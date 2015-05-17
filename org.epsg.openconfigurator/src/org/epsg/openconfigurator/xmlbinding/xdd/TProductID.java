@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlValue;
 
 
 /**
- * <p>Java-Klasse für t_productID complex type.
+ * <p>Java class for t_productID complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_productID"&gt;
@@ -37,7 +37,7 @@ public class TProductID {
     protected Boolean readOnly;
 
     /**
-     * Ruft den Wert der value-Eigenschaft ab.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
@@ -49,7 +49,7 @@ public class TProductID {
     }
 
     /**
-     * Legt den Wert der value-Eigenschaft fest.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
@@ -61,7 +61,7 @@ public class TProductID {
     }
 
     /**
-     * Ruft den Wert der readOnly-Eigenschaft ab.
+     * Gets the value of the readOnly property.
      * 
      * @return
      *     possible object is
@@ -77,7 +77,7 @@ public class TProductID {
     }
 
     /**
-     * Legt den Wert der readOnly-Eigenschaft fest.
+     * Sets the value of the readOnly property.
      * 
      * @param value
      *     allowed object is

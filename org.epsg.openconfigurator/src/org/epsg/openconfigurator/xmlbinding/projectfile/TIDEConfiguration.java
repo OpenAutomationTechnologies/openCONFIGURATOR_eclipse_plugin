@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlType;
  * Specifies optional configuration options which apply to the IDE
  *                 only.
  * 
- * <p>Java-Klasse für tIDEConfiguration complex type.
+ * <p>Java class for tIDEConfiguration complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tIDEConfiguration"&gt;
@@ -85,7 +85,7 @@ public class TIDEConfiguration {
     }
 
     /**
-     * Ruft den Wert der activeViewSetting-Eigenschaft ab.
+     * Gets the value of the activeViewSetting property.
      * 
      * @return
      *     possible object is
@@ -101,7 +101,7 @@ public class TIDEConfiguration {
     }
 
     /**
-     * Legt den Wert der activeViewSetting-Eigenschaft fest.
+     * Sets the value of the activeViewSetting property.
      * 
      * @param value
      *     allowed object is
@@ -114,9 +114,9 @@ public class TIDEConfiguration {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -174,7 +174,7 @@ public class TIDEConfiguration {
         }
 
         /**
-         * Ruft den Wert der type-Eigenschaft ab.
+         * Gets the value of the type property.
          * 
          * @return
          *     possible object is
@@ -186,7 +186,7 @@ public class TIDEConfiguration {
         }
 
         /**
-         * Legt den Wert der type-Eigenschaft fest.
+         * Sets the value of the type property.
          * 
          * @param value
          *     allowed object is

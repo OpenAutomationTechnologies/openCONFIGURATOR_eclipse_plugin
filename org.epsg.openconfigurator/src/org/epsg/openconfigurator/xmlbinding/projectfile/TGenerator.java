@@ -13,9 +13,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * Specifies information about the tool that generated this
  *                 project-file.
  * 
- * <p>Java-Klasse für tGenerator complex type.
+ * <p>Java class for tGenerator complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tGenerator"&gt;
@@ -57,7 +57,7 @@ public class TGenerator {
     protected XMLGregorianCalendar modifiedOn;
 
     /**
-     * Ruft den Wert der vendor-Eigenschaft ab.
+     * Gets the value of the vendor property.
      * 
      * @return
      *     possible object is
@@ -69,7 +69,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der vendor-Eigenschaft fest.
+     * Sets the value of the vendor property.
      * 
      * @param value
      *     allowed object is
@@ -81,7 +81,7 @@ public class TGenerator {
     }
 
     /**
-     * Ruft den Wert der toolName-Eigenschaft ab.
+     * Gets the value of the toolName property.
      * 
      * @return
      *     possible object is
@@ -93,7 +93,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der toolName-Eigenschaft fest.
+     * Sets the value of the toolName property.
      * 
      * @param value
      *     allowed object is
@@ -105,7 +105,7 @@ public class TGenerator {
     }
 
     /**
-     * Ruft den Wert der toolVersion-Eigenschaft ab.
+     * Gets the value of the toolVersion property.
      * 
      * @return
      *     possible object is
@@ -117,7 +117,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der toolVersion-Eigenschaft fest.
+     * Sets the value of the toolVersion property.
      * 
      * @param value
      *     allowed object is
@@ -129,7 +129,7 @@ public class TGenerator {
     }
 
     /**
-     * Ruft den Wert der createdBy-Eigenschaft ab.
+     * Gets the value of the createdBy property.
      * 
      * @return
      *     possible object is
@@ -141,7 +141,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der createdBy-Eigenschaft fest.
+     * Sets the value of the createdBy property.
      * 
      * @param value
      *     allowed object is
@@ -153,7 +153,7 @@ public class TGenerator {
     }
 
     /**
-     * Ruft den Wert der createdOn-Eigenschaft ab.
+     * Gets the value of the createdOn property.
      * 
      * @return
      *     possible object is
@@ -165,7 +165,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der createdOn-Eigenschaft fest.
+     * Sets the value of the createdOn property.
      * 
      * @param value
      *     allowed object is
@@ -177,7 +177,7 @@ public class TGenerator {
     }
 
     /**
-     * Ruft den Wert der modifiedBy-Eigenschaft ab.
+     * Gets the value of the modifiedBy property.
      * 
      * @return
      *     possible object is
@@ -189,7 +189,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der modifiedBy-Eigenschaft fest.
+     * Sets the value of the modifiedBy property.
      * 
      * @param value
      *     allowed object is
@@ -201,7 +201,7 @@ public class TGenerator {
     }
 
     /**
-     * Ruft den Wert der modifiedOn-Eigenschaft ab.
+     * Gets the value of the modifiedOn property.
      * 
      * @return
      *     possible object is
@@ -213,7 +213,7 @@ public class TGenerator {
     }
 
     /**
-     * Legt den Wert der modifiedOn-Eigenschaft fest.
+     * Sets the value of the modifiedOn property.
      * 
      * @param value
      *     allowed object is

@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_NetworkManagement complex type.
+ * <p>Java class for t_NetworkManagement complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_NetworkManagement"&gt;
@@ -51,7 +51,7 @@ public class TNetworkManagement {
     protected TDiagnostic diagnostic;
 
     /**
-     * Ruft den Wert der generalFeatures-Eigenschaft ab.
+     * Gets the value of the generalFeatures property.
      * 
      * @return
      *     possible object is
@@ -63,7 +63,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Legt den Wert der generalFeatures-Eigenschaft fest.
+     * Sets the value of the generalFeatures property.
      * 
      * @param value
      *     allowed object is
@@ -75,7 +75,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Ruft den Wert der mnFeatures-Eigenschaft ab.
+     * Gets the value of the mnFeatures property.
      * 
      * @return
      *     possible object is
@@ -87,7 +87,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Legt den Wert der mnFeatures-Eigenschaft fest.
+     * Sets the value of the mnFeatures property.
      * 
      * @param value
      *     allowed object is
@@ -99,7 +99,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Ruft den Wert der cnFeatures-Eigenschaft ab.
+     * Gets the value of the cnFeatures property.
      * 
      * @return
      *     possible object is
@@ -111,7 +111,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Legt den Wert der cnFeatures-Eigenschaft fest.
+     * Sets the value of the cnFeatures property.
      * 
      * @param value
      *     allowed object is
@@ -123,7 +123,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Ruft den Wert der deviceCommissioning-Eigenschaft ab.
+     * Gets the value of the deviceCommissioning property.
      * 
      * @return
      *     possible object is
@@ -135,7 +135,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Legt den Wert der deviceCommissioning-Eigenschaft fest.
+     * Sets the value of the deviceCommissioning property.
      * 
      * @param value
      *     allowed object is
@@ -147,7 +147,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Ruft den Wert der diagnostic-Eigenschaft ab.
+     * Gets the value of the diagnostic property.
      * 
      * @return
      *     possible object is
@@ -159,7 +159,7 @@ public class TNetworkManagement {
     }
 
     /**
-     * Legt den Wert der diagnostic-Eigenschaft fest.
+     * Sets the value of the diagnostic property.
      * 
      * @param value
      *     allowed object is

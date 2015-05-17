@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlType;
  * Element to define communication relationships in a POWERLINK network. I.e.:
  *                 How is an object transferred from node X to node Y. 
  * 
- * <p>Java-Klasse für tNetworkConfiguration complex type.
+ * <p>Java class for tNetworkConfiguration complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tNetworkConfiguration"&gt;
@@ -73,7 +73,7 @@ public class TNetworkConfiguration {
     protected Integer prescaler;
 
     /**
-     * Ruft den Wert der nodeCollection-Eigenschaft ab.
+     * Gets the value of the nodeCollection property.
      * 
      * @return
      *     possible object is
@@ -85,7 +85,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Legt den Wert der nodeCollection-Eigenschaft fest.
+     * Sets the value of the nodeCollection property.
      * 
      * @param value
      *     allowed object is
@@ -97,7 +97,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Ruft den Wert der communicationRelationships-Eigenschaft ab.
+     * Gets the value of the communicationRelationships property.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Legt den Wert der communicationRelationships-Eigenschaft fest.
+     * Sets the value of the communicationRelationships property.
      * 
      * @param value
      *     allowed object is
@@ -121,7 +121,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Ruft den Wert der cycleTime-Eigenschaft ab.
+     * Gets the value of the cycleTime property.
      * 
      * @return
      *     possible object is
@@ -133,7 +133,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Legt den Wert der cycleTime-Eigenschaft fest.
+     * Sets the value of the cycleTime property.
      * 
      * @param value
      *     allowed object is
@@ -145,7 +145,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Ruft den Wert der asyncMTU-Eigenschaft ab.
+     * Gets the value of the asyncMTU property.
      * 
      * @return
      *     possible object is
@@ -157,7 +157,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Legt den Wert der asyncMTU-Eigenschaft fest.
+     * Sets the value of the asyncMTU property.
      * 
      * @param value
      *     allowed object is
@@ -169,7 +169,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Ruft den Wert der multiplexedCycleLength-Eigenschaft ab.
+     * Gets the value of the multiplexedCycleLength property.
      * 
      * @return
      *     possible object is
@@ -185,7 +185,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Legt den Wert der multiplexedCycleLength-Eigenschaft fest.
+     * Sets the value of the multiplexedCycleLength property.
      * 
      * @param value
      *     allowed object is
@@ -197,7 +197,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Ruft den Wert der prescaler-Eigenschaft ab.
+     * Gets the value of the prescaler property.
      * 
      * @return
      *     possible object is
@@ -209,7 +209,7 @@ public class TNetworkConfiguration {
     }
 
     /**
-     * Legt den Wert der prescaler-Eigenschaft fest.
+     * Sets the value of the prescaler property.
      * 
      * @param value
      *     allowed object is

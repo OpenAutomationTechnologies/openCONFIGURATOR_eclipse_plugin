@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_capabilities complex type.
+ * <p>Java class for t_capabilities complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_capabilities"&gt;
@@ -147,7 +147,7 @@ public class TCapabilities {
     }
 
     /**
-     * Ruft den Wert der standardComplianceList-Eigenschaft ab.
+     * Gets the value of the standardComplianceList property.
      * 
      * @return
      *     possible object is
@@ -159,7 +159,7 @@ public class TCapabilities {
     }
 
     /**
-     * Legt den Wert der standardComplianceList-Eigenschaft fest.
+     * Sets the value of the standardComplianceList property.
      * 
      * @param value
      *     allowed object is
@@ -172,9 +172,9 @@ public class TCapabilities {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -238,7 +238,7 @@ public class TCapabilities {
         protected List<TCapabilities.CharacteristicsList.Characteristic> characteristic;
 
         /**
-         * Ruft den Wert der category-Eigenschaft ab.
+         * Gets the value of the category property.
          * 
          * @return
          *     possible object is
@@ -250,7 +250,7 @@ public class TCapabilities {
         }
 
         /**
-         * Legt den Wert der category-Eigenschaft fest.
+         * Sets the value of the category property.
          * 
          * @param value
          *     allowed object is
@@ -292,9 +292,9 @@ public class TCapabilities {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -358,9 +358,9 @@ public class TCapabilities {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -406,7 +406,7 @@ public class TCapabilities {
             protected List<TCapabilities.CharacteristicsList.Characteristic.CharacteristicContent> characteristicContent;
 
             /**
-             * Ruft den Wert der characteristicName-Eigenschaft ab.
+             * Gets the value of the characteristicName property.
              * 
              * @return
              *     possible object is
@@ -418,7 +418,7 @@ public class TCapabilities {
             }
 
             /**
-             * Legt den Wert der characteristicName-Eigenschaft fest.
+             * Sets the value of the characteristicName property.
              * 
              * @param value
              *     allowed object is
@@ -460,9 +460,9 @@ public class TCapabilities {
 
 
             /**
-             * <p>Java-Klasse für anonymous complex type.
+             * <p>Java class for anonymous complex type.
              * 
-             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * <p>The following schema fragment specifies the expected content contained within this class.
              * 
              * <pre>
              * &lt;complexType&gt;
@@ -526,9 +526,9 @@ public class TCapabilities {
 
 
             /**
-             * <p>Java-Klasse für anonymous complex type.
+             * <p>Java class for anonymous complex type.
              * 
-             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * <p>The following schema fragment specifies the expected content contained within this class.
              * 
              * <pre>
              * &lt;complexType&gt;
@@ -596,9 +596,9 @@ public class TCapabilities {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -671,9 +671,9 @@ public class TCapabilities {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -748,7 +748,7 @@ public class TCapabilities {
             }
 
             /**
-             * Ruft den Wert der name-Eigenschaft ab.
+             * Gets the value of the name property.
              * 
              * @return
              *     possible object is
@@ -760,7 +760,7 @@ public class TCapabilities {
             }
 
             /**
-             * Legt den Wert der name-Eigenschaft fest.
+             * Sets the value of the name property.
              * 
              * @param value
              *     allowed object is
@@ -772,7 +772,7 @@ public class TCapabilities {
             }
 
             /**
-             * Ruft den Wert der range-Eigenschaft ab.
+             * Gets the value of the range property.
              * 
              * @return
              *     possible object is
@@ -788,7 +788,7 @@ public class TCapabilities {
             }
 
             /**
-             * Legt den Wert der range-Eigenschaft fest.
+             * Sets the value of the range property.
              * 
              * @param value
              *     allowed object is

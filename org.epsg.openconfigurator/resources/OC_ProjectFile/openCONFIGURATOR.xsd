@@ -1,0 +1,463 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://sourceforge.net/projects/openconf/configuration" elementFormDefault="qualified">
+    <xs:import namespace="http://ethernet-powerlink.org/POWERLINK" schemaLocation="../XDD_ImportExport_Config/POWERLINK_Types.xsd"/>
+    <xs:element name="openCONFIGURATORProject" id="openCONFIGURATORProject">
+        <xs:annotation>
+            <xs:documentation xml:lang="en"> The openCONFIGURATOR project configuration represents a configured
+                POWERLINK network. </xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Generator" type="oc:tGenerator" minOccurs="0"/>
+                <xs:element name="IDEConfiguration" type="oc:tIDEConfiguration" minOccurs="0">
+                    <xs:key name="activeViewTypeKey">
+                        <xs:selector xpath="./oc:ViewSettings"/>
+                        <xs:field xpath="@type"/>
+                    </xs:key>
+                    <xs:keyref name="activeViewTypeKeyRef" refer="oc:activeViewTypeKey">
+                        <xs:selector xpath="."/>
+                        <xs:field xpath="@activeViewSetting"/>
+                    </xs:keyref>
+                </xs:element>
+                <xs:element name="ProjectConfiguration" type="oc:tProjectConfiguration">
+                    <xs:key name="activeAutoGenerationKey">
+                        <xs:selector xpath="./oc:AutoGenerationSettings"/>
+                        <xs:field xpath="@id"/>
+                    </xs:key>
+                    <xs:keyref name="activeAutoGenerationKeyRef" refer="oc:activeAutoGenerationKey">
+                        <xs:selector xpath="."/>
+                        <xs:field xpath="@activeAutoGenerationSetting"/>
+                    </xs:keyref>
+                <xs:key name="activePathKey">
+                    <xs:selector xpath="./oc:PathSettings/oc:Path"/>
+                    <xs:field xpath="@id"/>
+                </xs:key>
+                <xs:keyref name="activePathKeyRef" refer="oc:activePathKey">
+                    <xs:selector xpath="./oc:PathSettings"/>
+                    <xs:field xpath="@activePath"/>
+                </xs:keyref>
+                </xs:element>
+                <xs:element name="NetworkConfiguration" type="oc:tNetworkConfiguration"/>
+            </xs:sequence>
+            <xs:attribute name="version" type="oc:tVersion" fixed="1.0.0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                        The version of the openCONFIGURATOR project-file format. Changes in this schema require this attribute's value to be incremented.
+                        openCONFIGURATOR itself should be delivered with all versions of this XML-Schema to ensure backwards compatibility.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:attribute>
+        </xs:complexType>
+        <xs:key name="nodeIdKey">
+            <xs:selector xpath="./oc:NetworkConfiguration/oc:NodeCollection/oc:CN"/>
+            <xs:field xpath="@nodeID"/>
+        </xs:key>
+        <xs:keyref name="nodeIdKeyRef" refer="oc:nodeIdKey">
+            <xs:selector xpath="./oc:NetworkConfiguration/oc:NodeCollection/oc:MN/oc:RMNList/oc:RMN"/>
+            <xs:field xpath="@nodeID"/>
+        </xs:keyref>
+    </xs:element>
+    <xs:complexType name="tGenerator">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Specifies information about the tool that generated this
+                project-file.</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="vendor" type="ppc:tNonEmptyString" use="required"/>
+        <xs:attribute name="toolName" type="ppc:tNonEmptyString" use="required"/>
+        <xs:attribute name="toolVersion" type="ppc:tNonEmptyString" use="required"/>
+        <xs:attribute name="createdBy" type="ppc:tNonEmptyString"/>
+        <xs:attribute name="createdOn" type="xs:dateTime" use="required"/>
+        <xs:attribute name="modifiedBy" type="ppc:tNonEmptyString"/>
+        <xs:attribute name="modifiedOn" type="xs:dateTime" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="tIDEConfiguration">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Specifies optional configuration options which apply to the IDE
+                only.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ViewSettings" maxOccurs="unbounded">
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Setting" type="oc:tKeyValuePair" minOccurs="0" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attribute name="type" type="oc:tView" use="required"/>
+                </xs:complexType>
+                <xs:unique name="uniqueViewSetting">
+                    <xs:selector xpath="./oc:Setting"/>
+                    <xs:field xpath="@name"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="activeViewSetting" type="oc:tView" default="BASIC"/>
+    </xs:complexType>
+    <xs:complexType name="tProjectConfiguration">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Specifies configuration options which apply to the openCONFIGURATOR project
+                itself.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="PathSettings" minOccurs="0">
+            <xs:annotation>
+                    <xs:documentation xml:lang="en"> Element to store various path-references. </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence>
+                        <xs:element name="Path" type="oc:tPath" maxOccurs="unbounded"/>
+                    </xs:sequence>
+                    <xs:attribute name="activePath" type="ppc:tNonEmptyString" use="optional"/>
+                </xs:complexType>
+                <xs:unique name="uniquePathId">
+                    <xs:selector xpath="./oc:Path"/>
+                    <xs:field xpath="@id"/>
+                </xs:unique>
+            </xs:element>
+            <xs:element name="AutoGenerationSettings" type="oc:tAutoGenerationSettings" maxOccurs="unbounded">
+                <xs:unique name="uniqueAutoGenerationSetting">
+                    <xs:selector xpath="./oc:Setting"/>
+                    <xs:field xpath="@name"/>
+                </xs:unique>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="activeAutoGenerationSetting" type="ppc:tNonEmptyString" use="required"/>
+    </xs:complexType>
+    <xs:complexType name="tAutoGenerationSettings">
+        <xs:annotation>
+            <xs:documentation>openCONFIGURATOR auto-generation settings for the MN-OD. </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="Setting" type="oc:tKeyValuePair" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+        <xs:attribute name="id" type="ppc:tNonEmptyString">
+            <xs:annotation>
+                <xs:documentation xml:lang="en"> A unique identifier for this auto-generation configuration.
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:simpleType name="tView">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">The types of views provided by the openCONFIGURATOR-GUI.</xs:documentation>
+        </xs:annotation>
+        <xs:restriction base="xs:string">
+            <xs:enumeration value="BASIC"/>
+            <xs:enumeration value="ADVANCED"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="tNetworkConfiguration">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Element to define communication relationships in a POWERLINK network. I.e.:
+                How is an object transferred from node X to node Y. </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="NodeCollection" type="oc:tNodeCollection">
+                <xs:unique name="uniqueNodeID">
+                    <xs:selector xpath="./oc:MNNode | ./oc:CNNode"/>
+                    <xs:field xpath="@nodeID"/>
+                </xs:unique>
+            </xs:element>
+            <xs:element name="CommunicationRelationships" type="oc:tCommunicationRelationships" minOccurs="0"/>
+        </xs:sequence>
+        <xs:attribute name="cycleTime" type="xs:positiveInteger">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">The cycle-time of the POWERLINK network in µs. See EPSG DS 301,
+                    0x1006.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="asyncMTU">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">The MTU for the async. slot in bytes. See EPSG DS 301,
+                    0x1F98/0x8.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:unsignedShort">
+                    <xs:minInclusive value="300"/>
+                    <xs:maxInclusive value="1500"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+        <xs:attribute name="multiplexedCycleLength" type="oc:tMultiplexedCycleLength" default="0">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">The length of the multiplexed cycle. If 0 there is no multiplexing
+                    active. See EPSG DS 301, 0x1F98/0x7.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="prescaler">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">Toggle rate for the SoC PS flag. See EPSG DS 301,
+                    0x1F98/0x9.</xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:unsignedShort">
+                    <xs:minInclusive value="0"/>
+                    <xs:maxInclusive value="1000"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:complexType name="tNodeCollection">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">The Node collection element is a container for all nodes in a POWERLINK
+                network.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="MN" type="oc:tMN"/>
+            <xs:element name="CN" type="oc:tCN" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="tCommunicationRelationships">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Element to define communication relationships in a POWERLINK network. I.e.
+                how objects are transferred between nodes.</xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:any processContents="skip"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="tPath">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">Type to specify paths in the filesystem.</xs:documentation>
+        </xs:annotation>
+        <xs:attribute name="id" type="ppc:tNonEmptyString" use="required"/>
+        <xs:attribute name="path" use="required">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">
+                    Pathname in UNIX-Style (forward slashes).
+                </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:anyURI">
+                    <xs:minLength value="1"/>
+                </xs:restriction>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+    <xs:simpleType name="tVersion">
+        <xs:restriction base="xs:string">
+            <xs:pattern value="[0-9]+(\.[0-9]+){2,2}"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="tMultiplexedCycleLength">
+        <xs:restriction base="xs:nonNegativeInteger">
+            <xs:maxInclusive value="255"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="tKeyValuePair">
+        <xs:attribute name="name" type="ppc:tNonEmptyString" use="required"/>
+        <xs:attribute name="value" type="xs:string" default=""/>
+        <xs:attribute name="enabled" type="xs:boolean" default="true"/>
+    </xs:complexType>
+    <xs:simpleType name="tRegularCNNodeID">
+        <xs:restriction base="xs:unsignedByte">
+            <xs:minInclusive value="1"/>
+            <xs:maxInclusive value="239"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="tDefaultRedundantMNNodeID">
+        <xs:restriction base="xs:unsignedByte">
+            <xs:minInclusive value="241"/>
+            <xs:maxInclusive value="250"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:simpleType name="tDiagnosticNodeID">
+        <xs:restriction base="xs:unsignedByte">
+            <xs:enumeration value="253"/>
+        </xs:restriction>
+    </xs:simpleType>
+    <xs:complexType name="tAbstractNode" abstract="true">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">An abstract type for a POWERLINK node (MN or CN). </xs:documentation>
+        </xs:annotation>
+        <xs:sequence>
+            <xs:element name="ForcedObjects" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation xml:lang="en">
+                    Persists the configuration objects which are forced to the POWERLINK configuration.
+                </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                    <xs:sequence minOccurs="1" maxOccurs="unbounded">
+                        <xs:element ref="oc:Object"/>
+                    </xs:sequence>
+                </xs:complexType>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="name" type="ppc:tNonEmptyString"/>
+        <xs:attribute name="isAsyncOnly" type="xs:boolean" default="false">
+            <xs:annotation>
+                <xs:documentation xml:lang="en"> "True" -> AsyncOnly node. "False" -> Isochonrously accessed node. See
+                    EPSG DS 301, 0x1F81, Bit 8. </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="isType1Router" type="xs:boolean" default="false"/>
+        <xs:attribute name="isType2Router" type="xs:boolean" default="false"/>
+    </xs:complexType>
+    <xs:complexType name="tCN">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">A concrete type for a POWERLINK CN. </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="oc:tAbstractNode">
+                <xs:attribute name="nodeID" use="required">
+                    <xs:simpleType>
+                        <xs:union memberTypes="oc:tRegularCNNodeID oc:tDefaultRedundantMNNodeID oc:tDiagnosticNodeID"/>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="pathToXDC" use="required">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            Pathname in UNIX-Style (forward slashes).
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:anyURI">
+                            <xs:minLength value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="isMultiplexed" type="xs:boolean" default="false">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> Multiplexed CN. "False" -> Continuously accessed CN.
+                            See EPSG DS 301, 0x1F81, Bit 9. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="forcedMultiplexedCycle" type="oc:tMultiplexedCycleLength" default="0"/>
+                <xs:attribute name="isChained" type="xs:boolean" default="false"/>
+                <xs:attribute name="isMandatory" type="xs:boolean" default="false">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> Mandatory CN. "False" -> Optional CN. See EPSG DS
+                            301, 0x1F81, Bit 3. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="autostartNode" type="xs:boolean" default="true">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> Automatically configure and start this node. "False"
+                            -> Inform application but do not automatically configure and start this node. See EPSG DS
+                            301, 0x1F81, Bit 2. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="resetInOperational" type="xs:boolean" default="true">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> MN may reset node in CS_OPERATIONAL. "False" -> MN
+                            must not reset node in CS_OPERATIONAL. See EPSG DS 301, 0x1F81, Bit 4. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="verifyAppSwVersion" type="xs:boolean" default="false">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> Application software version verification is
+                            required. "False" -> Application software version verification is not required. See EPSG DS
+                            301, 0x1F81, Bit 5. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="autoAppSwUpdateAllowed" type="xs:boolean" default="false">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> Automatic update of application software allowed.
+                            "False" -> Automatic update of application software not allowed. See EPSG DS 301, 0x1F81,
+                            Bit 6. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="verifyDeviceType" type="xs:boolean" default="true"/>
+                <xs:attribute name="verifyVendorId" type="xs:boolean" default="false"/>
+                <xs:attribute name="verifyRevisionNumber" type="xs:boolean" default="false"/>
+                <xs:attribute name="verifyProductCode" type="xs:boolean" default="false"/>
+                <xs:attribute name="verifySerialNumber" type="xs:boolean" default="false"/>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="tMN">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">
+                <p> One Node to rule them all,<br/> One Node to find them,<br/> One Node to bring them all and in the
+                    darkness bind them.<br/> In the Land of Mordor where the Shadows lie. </p> A concrete type for a
+                POWERLINK MN. </xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="oc:tAbstractNode">
+                <xs:sequence>
+                    <xs:element name="RMNList" minOccurs="0">
+                        <xs:annotation>
+                            <xs:documentation xml:lang="en">
+                                Contains a list of references to CNs which act as redundant MNs (RMNs).
+                            </xs:documentation>
+                        </xs:annotation>
+                        <xs:complexType>
+                            <xs:sequence>
+                                <xs:element name="RMN" maxOccurs="unbounded">
+                                    <xs:annotation>
+                                        <xs:documentation xml:lang="en">
+                                            A reference to a CN which acts as redundant MN (RMN).
+                                        </xs:documentation>
+                                    </xs:annotation>
+                                    <xs:complexType>
+                                        <xs:attribute name="nodeIDRef" use="required">
+                                            <xs:simpleType>
+                                                <xs:union memberTypes="oc:tDefaultRedundantMNNodeID oc:tRegularCNNodeID"/>
+                                            </xs:simpleType>
+                                        </xs:attribute>
+                                    </xs:complexType>
+                                </xs:element>
+                            </xs:sequence>
+                        </xs:complexType>
+                        <xs:unique name="uniqueNodeIDRef">
+                            <xs:selector xpath="./oc:RMN"/>
+                            <xs:field xpath="@nodeID"/>
+                        </xs:unique>
+                    </xs:element>
+                </xs:sequence>
+                <xs:attribute name="nodeID" type="xs:unsignedByte" use="required" fixed="240"/>
+                <xs:attribute name="pathToXDC">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            Pathname in UNIX-Style (forward slashes).
+                            Optional for MNs to support EPSG DS 302-A (High Availability).
+                            For High Availability, the MN-element contains a list of references (RMNList) to CN-elements which represent the redundant MNs.
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:anyURI">
+                            <xs:minLength value="1"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="transmitsPRes" type="xs:boolean" default="false">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en"> "True" -> MN transmits PRes. "False" -> MN does not transmit
+                            PRes. See EPSG DS 301, 0x1F81, Bit 12. </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
+                <xs:attribute name="asyncSlotTimeout">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">The async. slot timeout in ns. See EPSG DS 301,
+                            0x1F8A/0x2.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:unsignedInt">
+                            <xs:minInclusive value="250"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+                <xs:attribute name="aSndMaxNumber" default="1">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">The max. no. of ASnd-Frames which can be sent in the async. phase. See
+                            Multi-ASnd feature, EPSG DS 302-B, 0x1F8A/0x3.</xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:unsignedByte">
+                            <xs:minInclusive value="1"/>
+                            <xs:maxInclusive value="254"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:element name="Object">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">One object that is forced to the configuration defined by index and subindex.</xs:documentation>
+        </xs:annotation>
+        <xs:complexType>
+            <xs:attribute name="index" type="ppc:tParameterIndex"/>
+            <xs:attribute name="subindex" type="ppc:tParameterSubIndex" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

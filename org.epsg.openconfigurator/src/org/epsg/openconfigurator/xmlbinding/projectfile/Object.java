@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für anonymous complex type.
+ * <p>Java class for anonymous complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType&gt;
@@ -41,7 +41,7 @@ public class Object {
     protected byte[] subindex;
 
     /**
-     * Ruft den Wert der index-Eigenschaft ab.
+     * Gets the value of the index property.
      * 
      * @return
      *     possible object is
@@ -53,7 +53,7 @@ public class Object {
     }
 
     /**
-     * Legt den Wert der index-Eigenschaft fest.
+     * Sets the value of the index property.
      * 
      * @param value
      *     allowed object is
@@ -65,7 +65,7 @@ public class Object {
     }
 
     /**
-     * Ruft den Wert der subindex-Eigenschaft ab.
+     * Gets the value of the subindex property.
      * 
      * @return
      *     possible object is
@@ -77,7 +77,7 @@ public class Object {
     }
 
     /**
-     * Legt den Wert der subindex-Eigenschaft fest.
+     * Sets the value of the subindex property.
      * 
      * @param value
      *     allowed object is

@@ -7,9 +7,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_DeviceManager complex type.
+ * <p>Java class for t_DeviceManager complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_DeviceManager"&gt;
@@ -34,7 +34,7 @@ public class TDeviceManager {
     protected TIndicatorList indicatorList;
 
     /**
-     * Ruft den Wert der indicatorList-Eigenschaft ab.
+     * Gets the value of the indicatorList property.
      * 
      * @return
      *     possible object is
@@ -46,7 +46,7 @@ public class TDeviceManager {
     }
 
     /**
-     * Legt den Wert der indicatorList-Eigenschaft fest.
+     * Sets the value of the indicatorList property.
      * 
      * @param value
      *     allowed object is

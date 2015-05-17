@@ -13,7 +13,7 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * 
- *                 
+ * 				
  * <pre>
  * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;p xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt; One Node to rule them all,&lt;br/&gt; One Node to find them,&lt;br/&gt; One Node to bring them all and in the
  *                     darkness bind them.&lt;br/&gt; In the Land of Mordor where the Shadows lie. &lt;/p&gt;
@@ -21,9 +21,9 @@ import javax.xml.bind.annotation.XmlType;
  *  A concrete type for a
  *                 POWERLINK MN. 
  * 
- * <p>Java-Klasse für tMN complex type.
+ * <p>Java class for tMN complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tMN"&gt;
@@ -109,7 +109,7 @@ public class TMN
     protected Short aSndMaxNumber;
 
     /**
-     * Ruft den Wert der rmnList-Eigenschaft ab.
+     * Gets the value of the rmnList property.
      * 
      * @return
      *     possible object is
@@ -121,7 +121,7 @@ public class TMN
     }
 
     /**
-     * Legt den Wert der rmnList-Eigenschaft fest.
+     * Sets the value of the rmnList property.
      * 
      * @param value
      *     allowed object is
@@ -133,7 +133,7 @@ public class TMN
     }
 
     /**
-     * Ruft den Wert der nodeID-Eigenschaft ab.
+     * Gets the value of the nodeID property.
      * 
      */
     public short getNodeID() {
@@ -141,7 +141,7 @@ public class TMN
     }
 
     /**
-     * Legt den Wert der nodeID-Eigenschaft fest.
+     * Sets the value of the nodeID property.
      * 
      */
     public void setNodeID(short value) {
@@ -149,7 +149,7 @@ public class TMN
     }
 
     /**
-     * Ruft den Wert der pathToXDC-Eigenschaft ab.
+     * Gets the value of the pathToXDC property.
      * 
      * @return
      *     possible object is
@@ -161,7 +161,7 @@ public class TMN
     }
 
     /**
-     * Legt den Wert der pathToXDC-Eigenschaft fest.
+     * Sets the value of the pathToXDC property.
      * 
      * @param value
      *     allowed object is
@@ -173,7 +173,7 @@ public class TMN
     }
 
     /**
-     * Ruft den Wert der transmitsPRes-Eigenschaft ab.
+     * Gets the value of the transmitsPRes property.
      * 
      * @return
      *     possible object is
@@ -189,7 +189,7 @@ public class TMN
     }
 
     /**
-     * Legt den Wert der transmitsPRes-Eigenschaft fest.
+     * Sets the value of the transmitsPRes property.
      * 
      * @param value
      *     allowed object is
@@ -201,7 +201,7 @@ public class TMN
     }
 
     /**
-     * Ruft den Wert der asyncSlotTimeout-Eigenschaft ab.
+     * Gets the value of the asyncSlotTimeout property.
      * 
      * @return
      *     possible object is
@@ -213,7 +213,7 @@ public class TMN
     }
 
     /**
-     * Legt den Wert der asyncSlotTimeout-Eigenschaft fest.
+     * Sets the value of the asyncSlotTimeout property.
      * 
      * @param value
      *     allowed object is
@@ -225,7 +225,7 @@ public class TMN
     }
 
     /**
-     * Ruft den Wert der aSndMaxNumber-Eigenschaft ab.
+     * Gets the value of the aSndMaxNumber property.
      * 
      * @return
      *     possible object is
@@ -241,7 +241,7 @@ public class TMN
     }
 
     /**
-     * Legt den Wert der aSndMaxNumber-Eigenschaft fest.
+     * Sets the value of the aSndMaxNumber property.
      * 
      * @param value
      *     allowed object is
@@ -254,9 +254,9 @@ public class TMN
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -325,9 +325,9 @@ public class TMN
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -354,7 +354,7 @@ public class TMN
             protected String nodeIDRef;
 
             /**
-             * Ruft den Wert der nodeIDRef-Eigenschaft ab.
+             * Gets the value of the nodeIDRef property.
              * 
              * @return
              *     possible object is
@@ -366,7 +366,7 @@ public class TMN
             }
 
             /**
-             * Legt den Wert der nodeIDRef-Eigenschaft fest.
+             * Sets the value of the nodeIDRef property.
              * 
              * @param value
              *     allowed object is

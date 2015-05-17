@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_allowedValuesTemplate complex type.
+ * <p>Java class for t_allowedValuesTemplate complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_allowedValuesTemplate"&gt;
@@ -108,7 +108,7 @@ public class TAllowedValuesTemplate {
     }
 
     /**
-     * Ruft den Wert der uniqueID-Eigenschaft ab.
+     * Gets the value of the uniqueID property.
      * 
      * @return
      *     possible object is
@@ -120,7 +120,7 @@ public class TAllowedValuesTemplate {
     }
 
     /**
-     * Legt den Wert der uniqueID-Eigenschaft fest.
+     * Sets the value of the uniqueID property.
      * 
      * @param value
      *     allowed object is

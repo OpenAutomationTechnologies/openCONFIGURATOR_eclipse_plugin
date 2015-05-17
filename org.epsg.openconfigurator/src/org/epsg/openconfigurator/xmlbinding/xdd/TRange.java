@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_range complex type.
+ * <p>Java class for t_range complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_range"&gt;
@@ -74,7 +74,7 @@ public class TRange {
     protected TRange.Step step;
 
     /**
-     * Ruft den Wert der minValue-Eigenschaft ab.
+     * Gets the value of the minValue property.
      * 
      * @return
      *     possible object is
@@ -86,7 +86,7 @@ public class TRange {
     }
 
     /**
-     * Legt den Wert der minValue-Eigenschaft fest.
+     * Sets the value of the minValue property.
      * 
      * @param value
      *     allowed object is
@@ -98,7 +98,7 @@ public class TRange {
     }
 
     /**
-     * Ruft den Wert der maxValue-Eigenschaft ab.
+     * Gets the value of the maxValue property.
      * 
      * @return
      *     possible object is
@@ -110,7 +110,7 @@ public class TRange {
     }
 
     /**
-     * Legt den Wert der maxValue-Eigenschaft fest.
+     * Sets the value of the maxValue property.
      * 
      * @param value
      *     allowed object is
@@ -122,7 +122,7 @@ public class TRange {
     }
 
     /**
-     * Ruft den Wert der step-Eigenschaft ab.
+     * Gets the value of the step property.
      * 
      * @return
      *     possible object is
@@ -134,7 +134,7 @@ public class TRange {
     }
 
     /**
-     * Legt den Wert der step-Eigenschaft fest.
+     * Sets the value of the step property.
      * 
      * @param value
      *     allowed object is
@@ -147,9 +147,9 @@ public class TRange {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -217,7 +217,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -229,7 +229,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -241,7 +241,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der offset-Eigenschaft ab.
+         * Gets the value of the offset property.
          * 
          * @return
          *     possible object is
@@ -253,7 +253,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der offset-Eigenschaft fest.
+         * Sets the value of the offset property.
          * 
          * @param value
          *     allowed object is
@@ -265,7 +265,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der multiplier-Eigenschaft ab.
+         * Gets the value of the multiplier property.
          * 
          * @return
          *     possible object is
@@ -277,7 +277,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der multiplier-Eigenschaft fest.
+         * Sets the value of the multiplier property.
          * 
          * @param value
          *     allowed object is
@@ -292,9 +292,9 @@ public class TRange {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -362,7 +362,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -374,7 +374,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -386,7 +386,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der offset-Eigenschaft ab.
+         * Gets the value of the offset property.
          * 
          * @return
          *     possible object is
@@ -398,7 +398,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der offset-Eigenschaft fest.
+         * Sets the value of the offset property.
          * 
          * @param value
          *     allowed object is
@@ -410,7 +410,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der multiplier-Eigenschaft ab.
+         * Gets the value of the multiplier property.
          * 
          * @return
          *     possible object is
@@ -422,7 +422,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der multiplier-Eigenschaft fest.
+         * Sets the value of the multiplier property.
          * 
          * @param value
          *     allowed object is
@@ -437,9 +437,9 @@ public class TRange {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -507,7 +507,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -519,7 +519,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -531,7 +531,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der offset-Eigenschaft ab.
+         * Gets the value of the offset property.
          * 
          * @return
          *     possible object is
@@ -543,7 +543,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der offset-Eigenschaft fest.
+         * Sets the value of the offset property.
          * 
          * @param value
          *     allowed object is
@@ -555,7 +555,7 @@ public class TRange {
         }
 
         /**
-         * Ruft den Wert der multiplier-Eigenschaft ab.
+         * Gets the value of the multiplier property.
          * 
          * @return
          *     possible object is
@@ -567,7 +567,7 @@ public class TRange {
         }
 
         /**
-         * Legt den Wert der multiplier-Eigenschaft fest.
+         * Sets the value of the multiplier property.
          * 
          * @param value
          *     allowed object is

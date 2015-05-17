@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlType;
  * Specifies configuration options which apply to the openCONFIGURATOR project
  *                 itself.
  * 
- * <p>Java-Klasse für tProjectConfiguration complex type.
+ * <p>Java class for tProjectConfiguration complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tProjectConfiguration"&gt;
@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.XmlType;
  *                 &lt;sequence&gt;
  *                   &lt;element name="Path" type="{http://sourceforge.net/projects/openconf/configuration}tPath" maxOccurs="unbounded"/&gt;
  *                 &lt;/sequence&gt;
+ *                 &lt;attribute name="activePath" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
  *           &lt;/complexType&gt;
@@ -59,7 +60,7 @@ public class TProjectConfiguration {
     protected String activeAutoGenerationSetting;
 
     /**
-     * Ruft den Wert der pathSettings-Eigenschaft ab.
+     * Gets the value of the pathSettings property.
      * 
      * @return
      *     possible object is
@@ -71,7 +72,7 @@ public class TProjectConfiguration {
     }
 
     /**
-     * Legt den Wert der pathSettings-Eigenschaft fest.
+     * Sets the value of the pathSettings property.
      * 
      * @param value
      *     allowed object is
@@ -112,7 +113,7 @@ public class TProjectConfiguration {
     }
 
     /**
-     * Ruft den Wert der activeAutoGenerationSetting-Eigenschaft ab.
+     * Gets the value of the activeAutoGenerationSetting property.
      * 
      * @return
      *     possible object is
@@ -124,7 +125,7 @@ public class TProjectConfiguration {
     }
 
     /**
-     * Legt den Wert der activeAutoGenerationSetting-Eigenschaft fest.
+     * Sets the value of the activeAutoGenerationSetting property.
      * 
      * @param value
      *     allowed object is
@@ -137,9 +138,9 @@ public class TProjectConfiguration {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -148,6 +149,7 @@ public class TProjectConfiguration {
      *       &lt;sequence&gt;
      *         &lt;element name="Path" type="{http://sourceforge.net/projects/openconf/configuration}tPath" maxOccurs="unbounded"/&gt;
      *       &lt;/sequence&gt;
+     *       &lt;attribute name="activePath" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
      * &lt;/complexType&gt;
@@ -163,6 +165,8 @@ public class TProjectConfiguration {
 
         @XmlElement(name = "Path", required = true)
         protected List<TPath> path;
+        @XmlAttribute(name = "activePath")
+        protected String activePath;
 
         /**
          * Gets the value of the path property.
@@ -191,6 +195,30 @@ public class TProjectConfiguration {
                 path = new ArrayList<TPath>();
             }
             return this.path;
+        }
+
+        /**
+         * Gets the value of the activePath property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getActivePath() {
+            return activePath;
+        }
+
+        /**
+         * Sets the value of the activePath property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setActivePath(String value) {
+            this.activePath = value;
         }
 
     }

@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_version complex type.
+ * <p>Java class for t_version complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_version"&gt;
@@ -51,7 +51,7 @@ public class TVersion {
     protected Boolean readOnly;
 
     /**
-     * Ruft den Wert der value-Eigenschaft ab.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
@@ -63,7 +63,7 @@ public class TVersion {
     }
 
     /**
-     * Legt den Wert der value-Eigenschaft fest.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
@@ -75,7 +75,7 @@ public class TVersion {
     }
 
     /**
-     * Ruft den Wert der versionType-Eigenschaft ab.
+     * Gets the value of the versionType property.
      * 
      * @return
      *     possible object is
@@ -87,7 +87,7 @@ public class TVersion {
     }
 
     /**
-     * Legt den Wert der versionType-Eigenschaft fest.
+     * Sets the value of the versionType property.
      * 
      * @param value
      *     allowed object is
@@ -99,7 +99,7 @@ public class TVersion {
     }
 
     /**
-     * Ruft den Wert der readOnly-Eigenschaft ab.
+     * Gets the value of the readOnly property.
      * 
      * @return
      *     possible object is
@@ -115,7 +115,7 @@ public class TVersion {
     }
 
     /**
-     * Legt den Wert der readOnly-Eigenschaft fest.
+     * Sets the value of the readOnly property.
      * 
      * @param value
      *     allowed object is

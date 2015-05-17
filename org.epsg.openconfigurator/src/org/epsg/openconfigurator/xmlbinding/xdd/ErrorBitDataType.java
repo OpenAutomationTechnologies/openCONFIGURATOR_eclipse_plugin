@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für ErrorBit_DataType complex type.
+ * <p>Java class for ErrorBit_DataType complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ErrorBit_DataType"&gt;
@@ -91,7 +91,7 @@ public class ErrorBitDataType {
     }
 
     /**
-     * Ruft den Wert der name-Eigenschaft ab.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
@@ -103,7 +103,7 @@ public class ErrorBitDataType {
     }
 
     /**
-     * Legt den Wert der name-Eigenschaft fest.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
@@ -115,7 +115,7 @@ public class ErrorBitDataType {
     }
 
     /**
-     * Ruft den Wert der offset-Eigenschaft ab.
+     * Gets the value of the offset property.
      * 
      */
     public int getOffset() {
@@ -123,7 +123,7 @@ public class ErrorBitDataType {
     }
 
     /**
-     * Legt den Wert der offset-Eigenschaft fest.
+     * Sets the value of the offset property.
      * 
      */
     public void setOffset(int value) {
@@ -132,9 +132,9 @@ public class ErrorBitDataType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -166,7 +166,7 @@ public class ErrorBitDataType {
         protected String uri;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -178,7 +178,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -190,7 +190,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der lang-Eigenschaft ab.
+         * Gets the value of the lang property.
          * 
          * @return
          *     possible object is
@@ -202,7 +202,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der lang-Eigenschaft fest.
+         * Sets the value of the lang property.
          * 
          * @param value
          *     allowed object is
@@ -214,7 +214,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der uri-Eigenschaft ab.
+         * Gets the value of the uri property.
          * 
          * @return
          *     possible object is
@@ -226,7 +226,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der uri-Eigenschaft fest.
+         * Sets the value of the uri property.
          * 
          * @param value
          *     allowed object is
@@ -241,9 +241,9 @@ public class ErrorBitDataType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -277,7 +277,7 @@ public class ErrorBitDataType {
         protected String textID;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -289,7 +289,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -301,7 +301,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der dictID-Eigenschaft ab.
+         * Gets the value of the dictID property.
          * 
          * @return
          *     possible object is
@@ -313,7 +313,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der dictID-Eigenschaft fest.
+         * Sets the value of the dictID property.
          * 
          * @param value
          *     allowed object is
@@ -325,7 +325,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der textID-Eigenschaft ab.
+         * Gets the value of the textID property.
          * 
          * @return
          *     possible object is
@@ -337,7 +337,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der textID-Eigenschaft fest.
+         * Sets the value of the textID property.
          * 
          * @param value
          *     allowed object is
@@ -352,9 +352,9 @@ public class ErrorBitDataType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -382,7 +382,7 @@ public class ErrorBitDataType {
         protected String lang;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -394,7 +394,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -406,7 +406,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der lang-Eigenschaft ab.
+         * Gets the value of the lang property.
          * 
          * @return
          *     possible object is
@@ -418,7 +418,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der lang-Eigenschaft fest.
+         * Sets the value of the lang property.
          * 
          * @param value
          *     allowed object is
@@ -433,9 +433,9 @@ public class ErrorBitDataType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -469,7 +469,7 @@ public class ErrorBitDataType {
         protected String textID;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -481,7 +481,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -493,7 +493,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der dictID-Eigenschaft ab.
+         * Gets the value of the dictID property.
          * 
          * @return
          *     possible object is
@@ -505,7 +505,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der dictID-Eigenschaft fest.
+         * Sets the value of the dictID property.
          * 
          * @param value
          *     allowed object is
@@ -517,7 +517,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Ruft den Wert der textID-Eigenschaft ab.
+         * Gets the value of the textID property.
          * 
          * @return
          *     possible object is
@@ -529,7 +529,7 @@ public class ErrorBitDataType {
         }
 
         /**
-         * Legt den Wert der textID-Eigenschaft fest.
+         * Sets the value of the textID property.
          * 
          * @param value
          *     allowed object is

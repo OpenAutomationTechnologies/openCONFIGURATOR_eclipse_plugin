@@ -1,0 +1,772 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+*******************************************************************************
+ EPSG - ETHERNET Powerlink Standardization Group
+ Working Group Tools - Subgroup of Technical Working Group
+*******************************************************************************
+
+ ETHERNET Powerlink XML device description
+
+*******************************************************************************
+
+ File:        ProfileBody_Device_Powerlink.xsd
+ Version:     0.13
+
+ The version number applies to the whole XML schema. So the version number
+ of all file must be identical.
+
+*******************************************************************************
+
+ For a complete schema description the following files are needed:
+ - Powerlink_Main.xsd
+ - CommonElements.xsd
+ - ISO15745ProfileContainer.xsd
+ - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - TextResource.xsd
+
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.ethernet-powerlink.org"
+            targetNamespace="http://www.ethernet-powerlink.org"
+            elementFormDefault="qualified">
+  <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+  <xsd:include schemaLocation="CommonElements.xsd"/>
+
+
+  <!-- POWERLINK profile body device -->
+  <xsd:complexType name="ProfileBody_Device_Powerlink">
+    <xsd:complexContent>
+      <xsd:extension base="ProfileBody_DataType">
+        <xsd:sequence>
+          <xsd:element name="DeviceIdentity" type="t_DeviceIdentity" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+                The DeviceIdentity element contains attributes that are
+                independent of the network and of the process, and which
+                uniquely identify the device.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="DeviceManager" type="t_DeviceManager" minOccurs="0">
+            <xsd:annotation>
+              <xsd:documentation>
+                The DeviceManager element contains attributes and supports
+                services that enable the monitoring of the device.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="DeviceFunction" type="t_DeviceFunction" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+                The DeviceFunction element describes the intrinsic function
+                of a device in terms of its technology. It contains network
+                independent descriptions/definitions of the technological
+                device functionality.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="ApplicationProcess" type="t_ApplicationProcess" minOccurs="0" maxOccurs="unbounded">
+            <xsd:annotation>
+              <xsd:documentation>
+                The ApplicationProcess element represents the set of services
+                and parameters, which constitute the behaviour and the
+                interfaces of the device in terms of the application,
+                independent of the device technology and the underlying
+                communication networks and communication protocols.
+              </xsd:documentation>
+            </xsd:annotation>
+          </xsd:element>
+          <xsd:element name="ExternalProfileHandle" type="ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
+        </xsd:sequence>
+        <xsd:attribute name="deviceClass" use="optional">
+          <xsd:simpleType>
+            <xsd:restriction base="xsd:NMTOKEN">
+              <xsd:enumeration value="compact"/>
+              <xsd:enumeration value="modular"/>
+              <xsd:enumeration value="configurable"/>
+            </xsd:restriction>
+          </xsd:simpleType>
+        </xsd:attribute>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+
+  <!-- POWERLINK device identity -->
+  <xsd:complexType name="t_DeviceIdentity">
+    <xsd:sequence>
+      <xsd:element name="vendorName">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="vendorID" type="t_vendorID" minOccurs="0"/>
+      <xsd:element name="vendorText" minOccurs="0">
+        <xsd:complexType>
+          <xsd:group ref="g_labels"/>
+          <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="deviceFamily" type="t_deviceFamily" minOccurs="0"/>
+      <xsd:element name="productFamily" minOccurs="0">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="productName">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="productID" type="t_productID" minOccurs="0"/>
+      <xsd:element name="productText" minOccurs="0">
+        <xsd:complexType>
+          <xsd:group ref="g_labels"/>
+          <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="orderNumber" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="version" type="t_version" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
+      <xsd:element name="specificationRevision" type="t_specificationRevision" minOccurs="0"/>
+      <xsd:element name="instanceName" minOccurs="0">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="readOnly" type="xsd:boolean" default="false"/>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <!-- POWERLINK device manager -->
+  <xsd:complexType name="t_DeviceManager">
+    <xsd:sequence>
+      <xsd:element name="indicatorList" type="t_indicatorList" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_indicatorList">
+    <xsd:sequence>
+      <xsd:element name="LEDList" minOccurs="0">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="LED" type="t_LED" maxOccurs="unbounded"/>
+            <xsd:element name="combinedState" type="t_combinedState" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_LED">
+    <xsd:sequence>
+      <xsd:group ref="g_labels"/>
+      <xsd:element name="LEDstate" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:group ref="g_labels"/>
+          <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+          <xsd:attribute name="state" use="required">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="on"/>
+                <xsd:enumeration value="off"/>
+                <xsd:enumeration value="flashing"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="LEDcolor" use="required">
+            <xsd:simpleType>
+              <xsd:restriction base="xsd:string">
+                <xsd:enumeration value="green"/>
+                <xsd:enumeration value="amber"/>
+                <xsd:enumeration value="red"/>
+              </xsd:restriction>
+            </xsd:simpleType>
+          </xsd:attribute>
+          <xsd:attribute name="flashingPeriod" type="xsd:unsignedInt" use="optional"/>
+          <xsd:attribute name="impulsWidth" type="xsd:unsignedByte" default="50"/>
+          <xsd:attribute name="numberOfImpulses" type="xsd:unsignedByte" default="1"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="LEDcolors" use="required">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="monocolor"/>
+          <xsd:enumeration value="bicolor"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="LEDtype" use="optional">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:string">
+          <xsd:enumeration value="IO"/>
+          <xsd:enumeration value="device"/>
+          <xsd:enumeration value="communication"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_combinedState">
+    <xsd:sequence>
+      <xsd:group ref="g_labels"/>
+      <xsd:element name="LEDstateRef" minOccurs="2" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="stateIDRef" type="xsd:IDREF" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <!-- POWERLINK device function -->
+  <xsd:complexType name="t_DeviceFunction">
+    <xsd:sequence>
+      <xsd:element name="capabilities" type="t_capabilities"/>
+      <xsd:element name="picturesList" type="t_picturesList" minOccurs="0"/>
+      <xsd:element name="dictionaryList" type="t_dictionaryList" minOccurs="0"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_capabilities">
+    <xsd:sequence>
+      <xsd:element name="characteristicsList" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="category" minOccurs="0">
+              <xsd:complexType>
+                <xsd:group ref="g_labels"/>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="characteristic" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="characteristicName">
+                    <xsd:complexType>
+                      <xsd:group ref="g_labels"/>
+                    </xsd:complexType>
+                  </xsd:element>
+                  <xsd:element name="characteristicContent" maxOccurs="unbounded">
+                    <xsd:complexType>
+                      <xsd:group ref="g_labels"/>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="standardComplianceList" minOccurs="0">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="compliantWith" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:group ref="g_labels"/>
+                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                <xsd:attribute name="range" default="international">
+                  <xsd:simpleType>
+                    <xsd:restriction base="xsd:NMTOKEN">
+                      <xsd:enumeration value="international"/>
+                      <xsd:enumeration value="internal"/>
+                    </xsd:restriction>
+                  </xsd:simpleType>
+                </xsd:attribute>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_picturesList">
+    <xsd:sequence>
+      <xsd:element name="picture" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:group ref="g_labels"/>
+          <xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
+          <xsd:attribute name="number" type="xsd:unsignedInt" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_dictionaryList">
+    <xsd:sequence>
+      <xsd:element name="dictionary" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="file">
+              <xsd:complexType>
+                <xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
+              </xsd:complexType>
+            </xsd:element>
+          </xsd:sequence>
+          <xsd:attribute name="lang" type="xsd:language" use="required"/>
+          <xsd:attribute name="dictID" type="xsd:token" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+
+  <!-- POWERLINK application process -->
+  <xsd:complexType name="t_ApplicationProcess">
+    <xsd:sequence>
+      <xsd:element name="dataTypeList" type="t_dataTypeList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            This element contains a list of user-defined data types.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="functionTypeList" type="t_functionTypeList" minOccurs="0"/>
+      <xsd:element name="functionInstanceList" type="t_functionInstanceList" minOccurs="0"/>
+      <xsd:element name="templateList" type="t_templateList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            This element contains a list of templates of parameters or allowed values.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="parameterList" type="t_parameterList">
+        <xsd:annotation>
+          <xsd:documentation>
+            This element contains a list of parameters.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+      <xsd:element name="parameterGroupList" type="t_parameterGroupList" minOccurs="0">
+        <xsd:annotation>
+          <xsd:documentation>
+            This element contains a list of parameter groups.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_dataTypeList">
+    <xsd:sequence>
+      <xsd:choice maxOccurs="unbounded">
+        <xsd:element name="array">
+          <xsd:annotation>
+            <xsd:documentation>
+              Defines a user-defined array.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:group ref="g_labels" minOccurs="0"/>
+              <xsd:element name="subrange" type="t_subrange" maxOccurs="unbounded"/>
+              <xsd:choice>
+                <xsd:group ref="g_simple"/>
+                <xsd:element name="dataTypeIDRef" type="t_dataTypeIDRef"/>
+              </xsd:choice>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="struct">
+          <xsd:annotation>
+            <xsd:documentation>
+              Defines a user-defined structure.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:group ref="g_labels" minOccurs="0"/>
+              <xsd:element name="varDeclaration" type="t_varDeclaration" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="enum">
+          <xsd:annotation>
+            <xsd:documentation>
+              Defines a user-defined enumeration.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:group ref="g_labels" minOccurs="0"/>
+              <xsd:element name="enumValue" type="t_enumValue" maxOccurs="unbounded"/>
+              <xsd:group ref="g_simple" minOccurs="0"/>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+            <xsd:attribute name="size" type="xsd:string" use="optional"/>
+          </xsd:complexType>
+        </xsd:element>
+        <xsd:element name="derived">
+          <xsd:annotation>
+            <xsd:documentation>
+              Defines a user-defined derived data type.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:group ref="g_labels" minOccurs="0"/>
+              <xsd:element name="count" type="t_count" minOccurs="0"/>
+              <xsd:choice>
+                <xsd:group ref="g_simple"/>
+                <xsd:element name="dataTypeIDRef" type="t_dataTypeIDRef"/>
+              </xsd:choice>
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string" use="required"/>
+            <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+            <xsd:attribute name="description" type="xsd:string" use="optional"/>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:choice>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_functionTypeList">
+    <xsd:sequence>
+      <xsd:element name="functionType" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="g_labels" minOccurs="0"/>
+            <xsd:element name="versionInfo" maxOccurs="unbounded">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:group ref="g_labels" minOccurs="0"/>
+                </xsd:sequence>
+                <xsd:attribute name="organization" type="xsd:string" use="required"/>
+                <xsd:attribute name="version" type="xsd:string" use="required"/>
+                <xsd:attribute name="author" type="xsd:string" use="required"/>
+                <xsd:attribute name="date" type="xsd:date" use="required"/>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="interfaceList">
+              <xsd:complexType>
+                <xsd:sequence>
+                  <xsd:element name="inputVars" minOccurs="0">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="varDeclaration" type="t_varDeclaration" maxOccurs="unbounded"/>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                  <xsd:element name="outputVars" minOccurs="0">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="varDeclaration" type="t_varDeclaration" maxOccurs="unbounded"/>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                  <xsd:element name="configVars" minOccurs="0">
+                    <xsd:complexType>
+                      <xsd:sequence>
+                        <xsd:element name="varDeclaration" type="t_varDeclaration" maxOccurs="unbounded"/>
+                      </xsd:sequence>
+                    </xsd:complexType>
+                  </xsd:element>
+                </xsd:sequence>
+              </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="functionInstanceList" type="t_functionInstanceList" minOccurs="0"/>
+          </xsd:sequence>
+          <xsd:attribute name="name" type="xsd:string" use="required"/>
+          <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+          <xsd:attribute name="package" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_functionInstanceList">
+    <xsd:sequence>
+      <xsd:element name="functionInstance" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="g_labels" minOccurs="0"/>
+          </xsd:sequence>
+          <xsd:attribute name="name" type="xsd:string" use="required"/>
+          <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+          <xsd:attribute name="typeIDRef" type="xsd:IDREF" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="connection" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="source" type="xsd:string" use="required"/>
+          <xsd:attribute name="destination" type="xsd:string" use="required"/>
+          <xsd:attribute name="description" type="xsd:string" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_templateList">
+    <xsd:sequence>
+      <xsd:element name="parameterTemplate" type="t_parameterTemplate" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="allowedValuesTemplate" type="t_allowedValuesTemplate" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_parameterList">
+    <xsd:sequence>
+      <xsd:element name="parameter" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:group ref="g_labels"/>
+            <xsd:choice>
+              <xsd:group ref="g_simple"/>
+              <xsd:element name="dataTypeIDRef" type="t_dataTypeIDRef"/>
+              <xsd:element name="variableRef" type="t_variableRef" maxOccurs="unbounded"/>
+            </xsd:choice>
+            <xsd:element name="conditionalSupport" type="t_conditionalSupport" minOccurs="0" maxOccurs="unbounded"/>
+            <xsd:element name="denotation" type="t_denotation" minOccurs="0"/>
+            <xsd:element name="actualValue" type="t_value" minOccurs="0"/>
+            <xsd:element name="defaultValue" type="t_value" minOccurs="0"/>
+            <xsd:element name="substituteValue" type="t_value" minOccurs="0"/>
+            <xsd:element name="allowedValues" type="t_allowedValues" minOccurs="0"/>
+            <xsd:element name="unit" type="t_unit" minOccurs="0"/>
+            <xsd:element name="property" type="t_property" minOccurs="0" maxOccurs="unbounded"/>
+          </xsd:sequence>
+          <xsd:attributeGroup ref="ag_parameter"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_parameterGroupList">
+    <xsd:sequence>
+      <xsd:element name="parameterGroup" type="t_parameterGroup" maxOccurs="unbounded"/>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_varDeclaration">
+    <xsd:sequence>
+      <xsd:group ref="g_labels" minOccurs="0"/>
+      <xsd:choice>
+        <xsd:group ref="g_simple"/>
+        <xsd:element name="dataTypeIDRef" type="t_dataTypeIDRef"/>
+      </xsd:choice>
+    </xsd:sequence>
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+    <xsd:attribute name="size" type="xsd:string" use="optional"/>
+    <xsd:attribute name="initialValue" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_dataTypeIDRef">
+    <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_parameterTemplate">
+    <xsd:sequence>
+      <xsd:choice minOccurs="0">
+        <xsd:group ref="g_simple"/>
+        <xsd:element name="dataTypeIDRef" type="t_dataTypeIDRef"/>
+      </xsd:choice>
+      <xsd:element name="conditionalSupport" type="t_conditionalSupport" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="actualValue" type="t_value" minOccurs="0"/>
+      <xsd:element name="defaultValue" type="t_value" minOccurs="0"/>
+      <xsd:element name="substituteValue" type="t_value" minOccurs="0"/>
+      <xsd:element name="allowedValues" type="t_allowedValues" minOccurs="0"/>
+      <xsd:element name="unit" type="t_unit" minOccurs="0"/>
+      <xsd:element name="property" type="t_property" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attributeGroup ref="ag_parameter"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_allowedValuesTemplate">
+    <xsd:sequence>
+      <xsd:element name="value" type="t_value" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="range" type="t_range" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_variableRef">
+    <xsd:sequence>
+      <xsd:element name="instanceIDRef" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="variableIDRef">
+        <xsd:complexType>
+          <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="memberRef" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="optional"/>
+          <xsd:attribute name="index" type="xsd:long" use="optional"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="position" type="xsd:unsignedByte" default="1"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_conditionalSupport">
+    <xsd:attribute name="paramIDRef" type="xsd:IDREF" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_denotation">
+    <xsd:group ref="g_labels"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_value">
+    <xsd:group ref="g_labels" minOccurs="0"/>
+    <xsd:attributeGroup ref="ag_value"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_allowedValues">
+    <xsd:sequence>
+      <xsd:element name="value" type="t_value" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="range" type="t_range" minOccurs="0" maxOccurs="unbounded"/>
+    </xsd:sequence>
+    <xsd:attribute name="templateIDRef" type="xsd:IDREF" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_range">
+    <xsd:sequence>
+      <xsd:element name="minValue">
+        <xsd:complexType>
+          <xsd:group ref="g_labels" minOccurs="0"/>
+          <xsd:attributeGroup ref="ag_value"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="maxValue">
+        <xsd:complexType>
+          <xsd:group ref="g_labels" minOccurs="0"/>
+          <xsd:attributeGroup ref="ag_value"/>
+        </xsd:complexType>
+      </xsd:element>
+      <xsd:element name="step" minOccurs="0">
+        <xsd:complexType>
+          <xsd:group ref="g_labels" minOccurs="0"/>
+          <xsd:attributeGroup ref="ag_value"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_unit">
+    <xsd:group ref="g_labels"/>
+    <xsd:attribute name="multiplier" type="xsd:string" use="required"/>
+    <xsd:attribute name="unitURI" type="xsd:anyURI" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_property">
+    <xsd:attribute name="name" type="xsd:string" use="required"/>
+    <xsd:attribute name="value" type="xsd:string" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_parameterGroup">
+    <xsd:sequence>
+      <xsd:group ref="g_labels"/>
+      <xsd:element name="parameterGroup" type="t_parameterGroup" minOccurs="0" maxOccurs="unbounded"/>
+      <xsd:element name="parameterRef" minOccurs="0" maxOccurs="unbounded">
+        <xsd:complexType>
+          <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="required"/>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:sequence>
+    <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+    <xsd:attribute name="kindOfAccess" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_subrange">
+    <xsd:attribute name="lowerLimit" type="xsd:long" use="required"/>
+    <xsd:attribute name="upperLimit" type="xsd:long" use="required"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_enumValue">
+    <xsd:group ref="g_labels"/>
+    <xsd:attribute name="value" type="xsd:string" use="optional"/>
+  </xsd:complexType>
+
+  <xsd:complexType name="t_count">
+    <xsd:sequence>
+      <xsd:group ref="g_labels" minOccurs="0"/>
+      <xsd:element name="defaultValue" type="t_value"/>
+      <xsd:element name="allowedValues" type="t_allowedValues" minOccurs="0"/>
+    </xsd:sequence>
+    <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+    <xsd:attribute name="access" default="read">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:NMTOKEN">
+          <xsd:enumeration value="const"/>
+          <xsd:enumeration value="read"/>
+          <xsd:enumeration value="write"/>
+          <xsd:enumeration value="readWrite"/>
+          <xsd:enumeration value="noAccess"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+  </xsd:complexType>
+
+  <xsd:attributeGroup name="ag_parameter">
+    <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+    <xsd:attribute name="access" default="read">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:NMTOKEN">
+          <xsd:enumeration value="const"/>
+          <xsd:enumeration value="read"/>
+          <xsd:enumeration value="write"/>
+          <xsd:enumeration value="readWrite"/>
+          <xsd:enumeration value="readWriteInput"/>
+          <xsd:enumeration value="readWriteOutput"/>
+          <xsd:enumeration value="noAccess"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="accessList" use="optional">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:NMTOKENS"/>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="support" use="optional">
+      <xsd:simpleType>
+        <xsd:restriction base="xsd:NMTOKEN">
+          <xsd:enumeration value="mandatory"/>
+          <xsd:enumeration value="optional"/>
+          <xsd:enumeration value="conditional"/>
+        </xsd:restriction>
+      </xsd:simpleType>
+    </xsd:attribute>
+    <xsd:attribute name="persistent" type="xsd:boolean" default="false"/>
+    <xsd:attribute name="offset" type="xsd:string" use="optional"/>
+    <xsd:attribute name="multiplier" type="xsd:string" use="optional"/>
+    <xsd:attribute name="templateIDRef" type="xsd:IDREF" use="optional"/>
+  </xsd:attributeGroup>
+
+  <xsd:attributeGroup name="ag_value">
+    <xsd:attribute name="value" type="xsd:string" use="required"/>
+    <xsd:attribute name="offset" type="xsd:string" use="optional"/>
+    <xsd:attribute name="multiplier" type="xsd:string" use="optional"/>
+  </xsd:attributeGroup>
+</xsd:schema>

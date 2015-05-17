@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_dataTypeIDRef complex type.
+ * <p>Java class for t_dataTypeIDRef complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_dataTypeIDRef"&gt;
@@ -36,7 +36,7 @@ public class TDataTypeIDRef {
     protected Object uniqueIDRef;
 
     /**
-     * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+     * Gets the value of the uniqueIDRef property.
      * 
      * @return
      *     possible object is
@@ -48,7 +48,7 @@ public class TDataTypeIDRef {
     }
 
     /**
-     * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+     * Sets the value of the uniqueIDRef property.
      * 
      * @param value
      *     allowed object is

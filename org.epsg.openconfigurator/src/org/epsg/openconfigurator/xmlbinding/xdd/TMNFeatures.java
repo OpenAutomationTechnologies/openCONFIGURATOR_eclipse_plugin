@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_MNFeatures complex type.
+ * <p>Java class for t_MNFeatures complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_MNFeatures"&gt;
@@ -93,7 +93,7 @@ public class TMNFeatures {
     protected Integer pdotpdoChannels;
 
     /**
-     * Ruft den Wert der dllErrMNMultipleMN-Eigenschaft ab.
+     * Gets the value of the dllErrMNMultipleMN property.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der dllErrMNMultipleMN-Eigenschaft fest.
+     * Sets the value of the dllErrMNMultipleMN property.
      * 
      * @param value
      *     allowed object is
@@ -121,7 +121,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der dllmnFeatureMultiplex-Eigenschaft ab.
+     * Gets the value of the dllmnFeatureMultiplex property.
      * 
      * @return
      *     possible object is
@@ -137,7 +137,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der dllmnFeatureMultiplex-Eigenschaft fest.
+     * Sets the value of the dllmnFeatureMultiplex property.
      * 
      * @param value
      *     allowed object is
@@ -149,7 +149,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der dllmnpResChaining-Eigenschaft ab.
+     * Gets the value of the dllmnpResChaining property.
      * 
      * @return
      *     possible object is
@@ -165,7 +165,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der dllmnpResChaining-Eigenschaft fest.
+     * Sets the value of the dllmnpResChaining property.
      * 
      * @param value
      *     allowed object is
@@ -177,7 +177,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der dllmnFeaturePResTx-Eigenschaft ab.
+     * Gets the value of the dllmnFeaturePResTx property.
      * 
      * @return
      *     possible object is
@@ -193,7 +193,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der dllmnFeaturePResTx-Eigenschaft fest.
+     * Sets the value of the dllmnFeaturePResTx property.
      * 
      * @param value
      *     allowed object is
@@ -205,7 +205,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnaSnd2SoC-Eigenschaft ab.
+     * Gets the value of the nmtmnaSnd2SoC property.
      * 
      */
     public long getNMTMNASnd2SoC() {
@@ -213,7 +213,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnaSnd2SoC-Eigenschaft fest.
+     * Sets the value of the nmtmnaSnd2SoC property.
      * 
      */
     public void setNMTMNASnd2SoC(long value) {
@@ -221,7 +221,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnBasicEthernet-Eigenschaft ab.
+     * Gets the value of the nmtmnBasicEthernet property.
      * 
      * @return
      *     possible object is
@@ -237,7 +237,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnBasicEthernet-Eigenschaft fest.
+     * Sets the value of the nmtmnBasicEthernet property.
      * 
      * @param value
      *     allowed object is
@@ -249,7 +249,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnMultiplCycMax-Eigenschaft ab.
+     * Gets the value of the nmtmnMultiplCycMax property.
      * 
      * @return
      *     possible object is
@@ -265,7 +265,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnMultiplCycMax-Eigenschaft fest.
+     * Sets the value of the nmtmnMultiplCycMax property.
      * 
      * @param value
      *     allowed object is
@@ -277,7 +277,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnpRes2PReq-Eigenschaft ab.
+     * Gets the value of the nmtmnpRes2PReq property.
      * 
      */
     public long getNMTMNPRes2PReq() {
@@ -285,7 +285,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnpRes2PReq-Eigenschaft fest.
+     * Sets the value of the nmtmnpRes2PReq property.
      * 
      */
     public void setNMTMNPRes2PReq(long value) {
@@ -293,7 +293,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnpRes2PRes-Eigenschaft ab.
+     * Gets the value of the nmtmnpRes2PRes property.
      * 
      */
     public long getNMTMNPRes2PRes() {
@@ -301,7 +301,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnpRes2PRes-Eigenschaft fest.
+     * Sets the value of the nmtmnpRes2PRes property.
      * 
      */
     public void setNMTMNPRes2PRes(long value) {
@@ -309,7 +309,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnpResRx2SoA-Eigenschaft ab.
+     * Gets the value of the nmtmnpResRx2SoA property.
      * 
      */
     public long getNMTMNPResRx2SoA() {
@@ -317,7 +317,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnpResRx2SoA-Eigenschaft fest.
+     * Sets the value of the nmtmnpResRx2SoA property.
      * 
      */
     public void setNMTMNPResRx2SoA(long value) {
@@ -325,7 +325,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnpResTx2SoA-Eigenschaft ab.
+     * Gets the value of the nmtmnpResTx2SoA property.
      * 
      */
     public long getNMTMNPResTx2SoA() {
@@ -333,7 +333,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnpResTx2SoA-Eigenschaft fest.
+     * Sets the value of the nmtmnpResTx2SoA property.
      * 
      */
     public void setNMTMNPResTx2SoA(long value) {
@@ -341,7 +341,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnSoA2ASndTx-Eigenschaft ab.
+     * Gets the value of the nmtmnSoA2ASndTx property.
      * 
      */
     public long getNMTMNSoA2ASndTx() {
@@ -349,7 +349,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnSoA2ASndTx-Eigenschaft fest.
+     * Sets the value of the nmtmnSoA2ASndTx property.
      * 
      */
     public void setNMTMNSoA2ASndTx(long value) {
@@ -357,7 +357,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtmnSoC2PReq-Eigenschaft ab.
+     * Gets the value of the nmtmnSoC2PReq property.
      * 
      */
     public long getNMTMNSoC2PReq() {
@@ -365,7 +365,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtmnSoC2PReq-Eigenschaft fest.
+     * Sets the value of the nmtmnSoC2PReq property.
      * 
      */
     public void setNMTMNSoC2PReq(long value) {
@@ -373,7 +373,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtNetTime-Eigenschaft ab.
+     * Gets the value of the nmtNetTime property.
      * 
      * @return
      *     possible object is
@@ -389,7 +389,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtNetTime-Eigenschaft fest.
+     * Sets the value of the nmtNetTime property.
      * 
      * @param value
      *     allowed object is
@@ -401,7 +401,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtNetTimeIsRealTime-Eigenschaft ab.
+     * Gets the value of the nmtNetTimeIsRealTime property.
      * 
      * @return
      *     possible object is
@@ -417,7 +417,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtNetTimeIsRealTime-Eigenschaft fest.
+     * Sets the value of the nmtNetTimeIsRealTime property.
      * 
      * @param value
      *     allowed object is
@@ -429,7 +429,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtRelativeTime-Eigenschaft ab.
+     * Gets the value of the nmtRelativeTime property.
      * 
      * @return
      *     possible object is
@@ -445,7 +445,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtRelativeTime-Eigenschaft fest.
+     * Sets the value of the nmtRelativeTime property.
      * 
      * @param value
      *     allowed object is
@@ -457,7 +457,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtSimpleBoot-Eigenschaft ab.
+     * Gets the value of the nmtSimpleBoot property.
      * 
      */
     public boolean isNMTSimpleBoot() {
@@ -465,7 +465,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtSimpleBoot-Eigenschaft fest.
+     * Sets the value of the nmtSimpleBoot property.
      * 
      */
     public void setNMTSimpleBoot(boolean value) {
@@ -473,7 +473,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Ruft den Wert der pdotpdoChannels-Eigenschaft ab.
+     * Gets the value of the pdotpdoChannels property.
      * 
      * @return
      *     possible object is
@@ -489,7 +489,7 @@ public class TMNFeatures {
     }
 
     /**
-     * Legt den Wert der pdotpdoChannels-Eigenschaft fest.
+     * Sets the value of the pdotpdoChannels property.
      * 
      * @param value
      *     allowed object is

@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ProfileBody_CommunicationNetwork_Powerlink complex type.
+ * <p>Java class for ProfileBody_CommunicationNetwork_Powerlink complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ProfileBody_CommunicationNetwork_Powerlink"&gt;
@@ -50,7 +50,7 @@ public class ProfileBodyCommunicationNetworkPowerlink
     protected List<ProfileHandleDataType> externalProfileHandle;
 
     /**
-     * Ruft den Wert der applicationLayers-Eigenschaft ab.
+     * Gets the value of the applicationLayers property.
      * 
      * @return
      *     possible object is
@@ -62,7 +62,7 @@ public class ProfileBodyCommunicationNetworkPowerlink
     }
 
     /**
-     * Legt den Wert der applicationLayers-Eigenschaft fest.
+     * Sets the value of the applicationLayers property.
      * 
      * @param value
      *     allowed object is
@@ -74,7 +74,7 @@ public class ProfileBodyCommunicationNetworkPowerlink
     }
 
     /**
-     * Ruft den Wert der transportLayers-Eigenschaft ab.
+     * Gets the value of the transportLayers property.
      * 
      * @return
      *     possible object is
@@ -86,7 +86,7 @@ public class ProfileBodyCommunicationNetworkPowerlink
     }
 
     /**
-     * Legt den Wert der transportLayers-Eigenschaft fest.
+     * Sets the value of the transportLayers property.
      * 
      * @param value
      *     allowed object is
@@ -98,7 +98,7 @@ public class ProfileBodyCommunicationNetworkPowerlink
     }
 
     /**
-     * Ruft den Wert der networkManagement-Eigenschaft ab.
+     * Gets the value of the networkManagement property.
      * 
      * @return
      *     possible object is
@@ -110,7 +110,7 @@ public class ProfileBodyCommunicationNetworkPowerlink
     }
 
     /**
-     * Legt den Wert der networkManagement-Eigenschaft fest.
+     * Sets the value of the networkManagement property.
      * 
      * @param value
      *     allowed object is

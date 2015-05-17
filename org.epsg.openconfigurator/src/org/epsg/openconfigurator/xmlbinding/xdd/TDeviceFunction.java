@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_DeviceFunction complex type.
+ * <p>Java class for t_DeviceFunction complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_DeviceFunction"&gt;
@@ -42,7 +42,7 @@ public class TDeviceFunction {
     protected TDictionaryList dictionaryList;
 
     /**
-     * Ruft den Wert der capabilities-Eigenschaft ab.
+     * Gets the value of the capabilities property.
      * 
      * @return
      *     possible object is
@@ -54,7 +54,7 @@ public class TDeviceFunction {
     }
 
     /**
-     * Legt den Wert der capabilities-Eigenschaft fest.
+     * Sets the value of the capabilities property.
      * 
      * @param value
      *     allowed object is
@@ -66,7 +66,7 @@ public class TDeviceFunction {
     }
 
     /**
-     * Ruft den Wert der picturesList-Eigenschaft ab.
+     * Gets the value of the picturesList property.
      * 
      * @return
      *     possible object is
@@ -78,7 +78,7 @@ public class TDeviceFunction {
     }
 
     /**
-     * Legt den Wert der picturesList-Eigenschaft fest.
+     * Sets the value of the picturesList property.
      * 
      * @param value
      *     allowed object is
@@ -90,7 +90,7 @@ public class TDeviceFunction {
     }
 
     /**
-     * Ruft den Wert der dictionaryList-Eigenschaft ab.
+     * Gets the value of the dictionaryList property.
      * 
      * @return
      *     possible object is
@@ -102,7 +102,7 @@ public class TDeviceFunction {
     }
 
     /**
-     * Legt den Wert der dictionaryList-Eigenschaft fest.
+     * Sets the value of the dictionaryList property.
      * 
      * @param value
      *     allowed object is

@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_ApplicationProcess complex type.
+ * <p>Java class for t_ApplicationProcess complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_ApplicationProcess"&gt;
@@ -51,7 +51,7 @@ public class TApplicationProcess {
     protected TParameterGroupList parameterGroupList;
 
     /**
-     * Ruft den Wert der dataTypeList-Eigenschaft ab.
+     * Gets the value of the dataTypeList property.
      * 
      * @return
      *     possible object is
@@ -63,7 +63,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Legt den Wert der dataTypeList-Eigenschaft fest.
+     * Sets the value of the dataTypeList property.
      * 
      * @param value
      *     allowed object is
@@ -75,7 +75,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Ruft den Wert der functionTypeList-Eigenschaft ab.
+     * Gets the value of the functionTypeList property.
      * 
      * @return
      *     possible object is
@@ -87,7 +87,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Legt den Wert der functionTypeList-Eigenschaft fest.
+     * Sets the value of the functionTypeList property.
      * 
      * @param value
      *     allowed object is
@@ -99,7 +99,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Ruft den Wert der functionInstanceList-Eigenschaft ab.
+     * Gets the value of the functionInstanceList property.
      * 
      * @return
      *     possible object is
@@ -111,7 +111,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Legt den Wert der functionInstanceList-Eigenschaft fest.
+     * Sets the value of the functionInstanceList property.
      * 
      * @param value
      *     allowed object is
@@ -123,7 +123,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Ruft den Wert der templateList-Eigenschaft ab.
+     * Gets the value of the templateList property.
      * 
      * @return
      *     possible object is
@@ -135,7 +135,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Legt den Wert der templateList-Eigenschaft fest.
+     * Sets the value of the templateList property.
      * 
      * @param value
      *     allowed object is
@@ -147,7 +147,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Ruft den Wert der parameterList-Eigenschaft ab.
+     * Gets the value of the parameterList property.
      * 
      * @return
      *     possible object is
@@ -159,7 +159,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Legt den Wert der parameterList-Eigenschaft fest.
+     * Sets the value of the parameterList property.
      * 
      * @param value
      *     allowed object is
@@ -171,7 +171,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Ruft den Wert der parameterGroupList-Eigenschaft ab.
+     * Gets the value of the parameterGroupList property.
      * 
      * @return
      *     possible object is
@@ -183,7 +183,7 @@ public class TApplicationProcess {
     }
 
     /**
-     * Legt den Wert der parameterGroupList-Eigenschaft fest.
+     * Sets the value of the parameterGroupList property.
      * 
      * @param value
      *     allowed object is

@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_conditionalSupport complex type.
+ * <p>Java class for t_conditionalSupport complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_conditionalSupport"&gt;
@@ -36,7 +36,7 @@ public class TConditionalSupport {
     protected Object paramIDRef;
 
     /**
-     * Ruft den Wert der paramIDRef-Eigenschaft ab.
+     * Gets the value of the paramIDRef property.
      * 
      * @return
      *     possible object is
@@ -48,7 +48,7 @@ public class TConditionalSupport {
     }
 
     /**
-     * Legt den Wert der paramIDRef-Eigenschaft fest.
+     * Sets the value of the paramIDRef property.
      * 
      * @param value
      *     allowed object is

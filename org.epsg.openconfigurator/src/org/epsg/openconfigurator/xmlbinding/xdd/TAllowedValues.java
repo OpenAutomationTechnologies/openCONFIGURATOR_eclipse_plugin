@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_allowedValues complex type.
+ * <p>Java class for t_allowedValues complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_allowedValues"&gt;
@@ -105,7 +105,7 @@ public class TAllowedValues {
     }
 
     /**
-     * Ruft den Wert der templateIDRef-Eigenschaft ab.
+     * Gets the value of the templateIDRef property.
      * 
      * @return
      *     possible object is
@@ -117,7 +117,7 @@ public class TAllowedValues {
     }
 
     /**
-     * Legt den Wert der templateIDRef-Eigenschaft fest.
+     * Sets the value of the templateIDRef property.
      * 
      * @param value
      *     allowed object is

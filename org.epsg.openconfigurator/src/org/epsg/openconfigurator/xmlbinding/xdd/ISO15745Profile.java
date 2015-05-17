@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für anonymous complex type.
+ * <p>Java class for anonymous complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType&gt;
@@ -42,7 +42,7 @@ public class ISO15745Profile {
     protected ProfileBodyDataType profileBody;
 
     /**
-     * Ruft den Wert der profileHeader-Eigenschaft ab.
+     * Gets the value of the profileHeader property.
      * 
      * @return
      *     possible object is
@@ -54,7 +54,7 @@ public class ISO15745Profile {
     }
 
     /**
-     * Legt den Wert der profileHeader-Eigenschaft fest.
+     * Sets the value of the profileHeader property.
      * 
      * @param value
      *     allowed object is
@@ -66,7 +66,7 @@ public class ISO15745Profile {
     }
 
     /**
-     * Ruft den Wert der profileBody-Eigenschaft ab.
+     * Gets the value of the profileBody property.
      * 
      * @return
      *     possible object is
@@ -78,7 +78,7 @@ public class ISO15745Profile {
     }
 
     /**
-     * Legt den Wert der profileBody-Eigenschaft fest.
+     * Sets the value of the profileBody property.
      * 
      * @param value
      *     allowed object is

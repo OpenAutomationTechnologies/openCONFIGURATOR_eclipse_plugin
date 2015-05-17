@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_count complex type.
+ * <p>Java class for t_count complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_count"&gt;
@@ -108,7 +108,7 @@ public class TCount {
     }
 
     /**
-     * Ruft den Wert der defaultValue-Eigenschaft ab.
+     * Gets the value of the defaultValue property.
      * 
      * @return
      *     possible object is
@@ -120,7 +120,7 @@ public class TCount {
     }
 
     /**
-     * Legt den Wert der defaultValue-Eigenschaft fest.
+     * Sets the value of the defaultValue property.
      * 
      * @param value
      *     allowed object is
@@ -132,7 +132,7 @@ public class TCount {
     }
 
     /**
-     * Ruft den Wert der allowedValues-Eigenschaft ab.
+     * Gets the value of the allowedValues property.
      * 
      * @return
      *     possible object is
@@ -144,7 +144,7 @@ public class TCount {
     }
 
     /**
-     * Legt den Wert der allowedValues-Eigenschaft fest.
+     * Sets the value of the allowedValues property.
      * 
      * @param value
      *     allowed object is
@@ -156,7 +156,7 @@ public class TCount {
     }
 
     /**
-     * Ruft den Wert der uniqueID-Eigenschaft ab.
+     * Gets the value of the uniqueID property.
      * 
      * @return
      *     possible object is
@@ -168,7 +168,7 @@ public class TCount {
     }
 
     /**
-     * Legt den Wert der uniqueID-Eigenschaft fest.
+     * Sets the value of the uniqueID property.
      * 
      * @param value
      *     allowed object is
@@ -180,7 +180,7 @@ public class TCount {
     }
 
     /**
-     * Ruft den Wert der access-Eigenschaft ab.
+     * Gets the value of the access property.
      * 
      * @return
      *     possible object is
@@ -196,7 +196,7 @@ public class TCount {
     }
 
     /**
-     * Legt den Wert der access-Eigenschaft fest.
+     * Sets the value of the access property.
      * 
      * @param value
      *     allowed object is

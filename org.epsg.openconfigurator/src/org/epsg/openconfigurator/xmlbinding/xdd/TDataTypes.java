@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_DataTypes complex type.
+ * <p>Java class for t_DataTypes complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_DataTypes"&gt;
@@ -153,7 +153,7 @@ public class TDataTypes {
     protected byte[] dataType;
 
     /**
-     * Ruft den Wert der boolean-Eigenschaft ab.
+     * Gets the value of the boolean property.
      * 
      * @return
      *     possible object is
@@ -165,7 +165,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der boolean-Eigenschaft fest.
+     * Sets the value of the boolean property.
      * 
      * @param value
      *     allowed object is
@@ -177,7 +177,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer8-Eigenschaft ab.
+     * Gets the value of the integer8 property.
      * 
      * @return
      *     possible object is
@@ -189,7 +189,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer8-Eigenschaft fest.
+     * Sets the value of the integer8 property.
      * 
      * @param value
      *     allowed object is
@@ -201,7 +201,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer16-Eigenschaft ab.
+     * Gets the value of the integer16 property.
      * 
      * @return
      *     possible object is
@@ -213,7 +213,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer16-Eigenschaft fest.
+     * Sets the value of the integer16 property.
      * 
      * @param value
      *     allowed object is
@@ -225,7 +225,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer32-Eigenschaft ab.
+     * Gets the value of the integer32 property.
      * 
      * @return
      *     possible object is
@@ -237,7 +237,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer32-Eigenschaft fest.
+     * Sets the value of the integer32 property.
      * 
      * @param value
      *     allowed object is
@@ -249,7 +249,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer24-Eigenschaft ab.
+     * Gets the value of the integer24 property.
      * 
      * @return
      *     possible object is
@@ -261,7 +261,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer24-Eigenschaft fest.
+     * Sets the value of the integer24 property.
      * 
      * @param value
      *     allowed object is
@@ -273,7 +273,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer40-Eigenschaft ab.
+     * Gets the value of the integer40 property.
      * 
      * @return
      *     possible object is
@@ -285,7 +285,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer40-Eigenschaft fest.
+     * Sets the value of the integer40 property.
      * 
      * @param value
      *     allowed object is
@@ -297,7 +297,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer48-Eigenschaft ab.
+     * Gets the value of the integer48 property.
      * 
      * @return
      *     possible object is
@@ -309,7 +309,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer48-Eigenschaft fest.
+     * Sets the value of the integer48 property.
      * 
      * @param value
      *     allowed object is
@@ -321,7 +321,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer56-Eigenschaft ab.
+     * Gets the value of the integer56 property.
      * 
      * @return
      *     possible object is
@@ -333,7 +333,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer56-Eigenschaft fest.
+     * Sets the value of the integer56 property.
      * 
      * @param value
      *     allowed object is
@@ -345,7 +345,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der integer64-Eigenschaft ab.
+     * Gets the value of the integer64 property.
      * 
      * @return
      *     possible object is
@@ -357,7 +357,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der integer64-Eigenschaft fest.
+     * Sets the value of the integer64 property.
      * 
      * @param value
      *     allowed object is
@@ -369,7 +369,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned8-Eigenschaft ab.
+     * Gets the value of the unsigned8 property.
      * 
      * @return
      *     possible object is
@@ -381,7 +381,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned8-Eigenschaft fest.
+     * Sets the value of the unsigned8 property.
      * 
      * @param value
      *     allowed object is
@@ -393,7 +393,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned16-Eigenschaft ab.
+     * Gets the value of the unsigned16 property.
      * 
      * @return
      *     possible object is
@@ -405,7 +405,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned16-Eigenschaft fest.
+     * Sets the value of the unsigned16 property.
      * 
      * @param value
      *     allowed object is
@@ -417,7 +417,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned32-Eigenschaft ab.
+     * Gets the value of the unsigned32 property.
      * 
      * @return
      *     possible object is
@@ -429,7 +429,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned32-Eigenschaft fest.
+     * Sets the value of the unsigned32 property.
      * 
      * @param value
      *     allowed object is
@@ -441,7 +441,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned24-Eigenschaft ab.
+     * Gets the value of the unsigned24 property.
      * 
      * @return
      *     possible object is
@@ -453,7 +453,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned24-Eigenschaft fest.
+     * Sets the value of the unsigned24 property.
      * 
      * @param value
      *     allowed object is
@@ -465,7 +465,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned40-Eigenschaft ab.
+     * Gets the value of the unsigned40 property.
      * 
      * @return
      *     possible object is
@@ -477,7 +477,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned40-Eigenschaft fest.
+     * Sets the value of the unsigned40 property.
      * 
      * @param value
      *     allowed object is
@@ -489,7 +489,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned48-Eigenschaft ab.
+     * Gets the value of the unsigned48 property.
      * 
      * @return
      *     possible object is
@@ -501,7 +501,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned48-Eigenschaft fest.
+     * Sets the value of the unsigned48 property.
      * 
      * @param value
      *     allowed object is
@@ -513,7 +513,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned56-Eigenschaft ab.
+     * Gets the value of the unsigned56 property.
      * 
      * @return
      *     possible object is
@@ -525,7 +525,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned56-Eigenschaft fest.
+     * Sets the value of the unsigned56 property.
      * 
      * @param value
      *     allowed object is
@@ -537,7 +537,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unsigned64-Eigenschaft ab.
+     * Gets the value of the unsigned64 property.
      * 
      * @return
      *     possible object is
@@ -549,7 +549,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unsigned64-Eigenschaft fest.
+     * Sets the value of the unsigned64 property.
      * 
      * @param value
      *     allowed object is
@@ -561,7 +561,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der real32-Eigenschaft ab.
+     * Gets the value of the real32 property.
      * 
      * @return
      *     possible object is
@@ -573,7 +573,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der real32-Eigenschaft fest.
+     * Sets the value of the real32 property.
      * 
      * @param value
      *     allowed object is
@@ -585,7 +585,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der real64-Eigenschaft ab.
+     * Gets the value of the real64 property.
      * 
      * @return
      *     possible object is
@@ -597,7 +597,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der real64-Eigenschaft fest.
+     * Sets the value of the real64 property.
      * 
      * @param value
      *     allowed object is
@@ -609,7 +609,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der visibleString-Eigenschaft ab.
+     * Gets the value of the visibleString property.
      * 
      * @return
      *     possible object is
@@ -621,7 +621,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der visibleString-Eigenschaft fest.
+     * Sets the value of the visibleString property.
      * 
      * @param value
      *     allowed object is
@@ -633,7 +633,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der octetString-Eigenschaft ab.
+     * Gets the value of the octetString property.
      * 
      * @return
      *     possible object is
@@ -645,7 +645,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der octetString-Eigenschaft fest.
+     * Sets the value of the octetString property.
      * 
      * @param value
      *     allowed object is
@@ -657,7 +657,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der unicodeString-Eigenschaft ab.
+     * Gets the value of the unicodeString property.
      * 
      * @return
      *     possible object is
@@ -669,7 +669,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der unicodeString-Eigenschaft fest.
+     * Sets the value of the unicodeString property.
      * 
      * @param value
      *     allowed object is
@@ -681,7 +681,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der timeOfDay-Eigenschaft ab.
+     * Gets the value of the timeOfDay property.
      * 
      * @return
      *     possible object is
@@ -693,7 +693,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der timeOfDay-Eigenschaft fest.
+     * Sets the value of the timeOfDay property.
      * 
      * @param value
      *     allowed object is
@@ -705,7 +705,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der timeDiff-Eigenschaft ab.
+     * Gets the value of the timeDiff property.
      * 
      * @return
      *     possible object is
@@ -717,7 +717,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der timeDiff-Eigenschaft fest.
+     * Sets the value of the timeDiff property.
      * 
      * @param value
      *     allowed object is
@@ -729,7 +729,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der domain-Eigenschaft ab.
+     * Gets the value of the domain property.
      * 
      * @return
      *     possible object is
@@ -741,7 +741,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der domain-Eigenschaft fest.
+     * Sets the value of the domain property.
      * 
      * @param value
      *     allowed object is
@@ -753,7 +753,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der macaddress-Eigenschaft ab.
+     * Gets the value of the macaddress property.
      * 
      * @return
      *     possible object is
@@ -765,7 +765,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der macaddress-Eigenschaft fest.
+     * Sets the value of the macaddress property.
      * 
      * @param value
      *     allowed object is
@@ -777,7 +777,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der ipaddress-Eigenschaft ab.
+     * Gets the value of the ipaddress property.
      * 
      * @return
      *     possible object is
@@ -789,7 +789,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der ipaddress-Eigenschaft fest.
+     * Sets the value of the ipaddress property.
      * 
      * @param value
      *     allowed object is
@@ -801,7 +801,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der nettime-Eigenschaft ab.
+     * Gets the value of the nettime property.
      * 
      * @return
      *     possible object is
@@ -813,7 +813,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der nettime-Eigenschaft fest.
+     * Sets the value of the nettime property.
      * 
      * @param value
      *     allowed object is
@@ -825,7 +825,7 @@ public class TDataTypes {
     }
 
     /**
-     * Ruft den Wert der dataType-Eigenschaft ab.
+     * Gets the value of the dataType property.
      * 
      * @return
      *     possible object is
@@ -837,7 +837,7 @@ public class TDataTypes {
     }
 
     /**
-     * Legt den Wert der dataType-Eigenschaft fest.
+     * Sets the value of the dataType property.
      * 
      * @param value
      *     allowed object is

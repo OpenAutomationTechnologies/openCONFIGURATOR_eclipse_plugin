@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_indicatorList complex type.
+ * <p>Java class for t_indicatorList complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_indicatorList"&gt;
@@ -49,7 +49,7 @@ public class TIndicatorList {
     protected TIndicatorList.LEDList ledList;
 
     /**
-     * Ruft den Wert der ledList-Eigenschaft ab.
+     * Gets the value of the ledList property.
      * 
      * @return
      *     possible object is
@@ -61,7 +61,7 @@ public class TIndicatorList {
     }
 
     /**
-     * Legt den Wert der ledList-Eigenschaft fest.
+     * Sets the value of the ledList property.
      * 
      * @param value
      *     allowed object is
@@ -74,9 +74,9 @@ public class TIndicatorList {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;

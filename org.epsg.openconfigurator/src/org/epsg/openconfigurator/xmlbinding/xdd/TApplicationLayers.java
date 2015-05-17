@@ -13,9 +13,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java-Klasse für t_ApplicationLayers complex type.
+ * <p>Java class for t_ApplicationLayers complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_ApplicationLayers"&gt;
@@ -106,7 +106,7 @@ public class TApplicationLayers {
     protected List<String> communicationEntityType;
 
     /**
-     * Ruft den Wert der identity-Eigenschaft ab.
+     * Gets the value of the identity property.
      * 
      * @return
      *     possible object is
@@ -118,7 +118,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Legt den Wert der identity-Eigenschaft fest.
+     * Sets the value of the identity property.
      * 
      * @param value
      *     allowed object is
@@ -130,7 +130,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Ruft den Wert der dataTypeList-Eigenschaft ab.
+     * Gets the value of the dataTypeList property.
      * 
      * @return
      *     possible object is
@@ -142,7 +142,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Legt den Wert der dataTypeList-Eigenschaft fest.
+     * Sets the value of the dataTypeList property.
      * 
      * @param value
      *     allowed object is
@@ -154,7 +154,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Ruft den Wert der objectList-Eigenschaft ab.
+     * Gets the value of the objectList property.
      * 
      * @return
      *     possible object is
@@ -166,7 +166,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Legt den Wert der objectList-Eigenschaft fest.
+     * Sets the value of the objectList property.
      * 
      * @param value
      *     allowed object is
@@ -178,7 +178,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Ruft den Wert der dynamicChannels-Eigenschaft ab.
+     * Gets the value of the dynamicChannels property.
      * 
      * @return
      *     possible object is
@@ -190,7 +190,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Legt den Wert der dynamicChannels-Eigenschaft fest.
+     * Sets the value of the dynamicChannels property.
      * 
      * @param value
      *     allowed object is
@@ -202,7 +202,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Ruft den Wert der conformanceClass-Eigenschaft ab.
+     * Gets the value of the conformanceClass property.
      * 
      * @return
      *     possible object is
@@ -214,7 +214,7 @@ public class TApplicationLayers {
     }
 
     /**
-     * Legt den Wert der conformanceClass-Eigenschaft fest.
+     * Sets the value of the conformanceClass property.
      * 
      * @param value
      *     allowed object is
@@ -256,9 +256,9 @@ public class TApplicationLayers {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -316,9 +316,9 @@ public class TApplicationLayers {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -376,9 +376,9 @@ public class TApplicationLayers {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -419,7 +419,7 @@ public class TApplicationLayers {
         protected TSpecificationRevision specificationRevision;
 
         /**
-         * Ruft den Wert der vendorID-Eigenschaft ab.
+         * Gets the value of the vendorID property.
          * 
          * @return
          *     possible object is
@@ -431,7 +431,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der vendorID-Eigenschaft fest.
+         * Sets the value of the vendorID property.
          * 
          * @param value
          *     allowed object is
@@ -443,7 +443,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der deviceFamily-Eigenschaft ab.
+         * Gets the value of the deviceFamily property.
          * 
          * @return
          *     possible object is
@@ -455,7 +455,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der deviceFamily-Eigenschaft fest.
+         * Sets the value of the deviceFamily property.
          * 
          * @param value
          *     allowed object is
@@ -467,7 +467,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der productID-Eigenschaft ab.
+         * Gets the value of the productID property.
          * 
          * @return
          *     possible object is
@@ -479,7 +479,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der productID-Eigenschaft fest.
+         * Sets the value of the productID property.
          * 
          * @param value
          *     allowed object is
@@ -520,7 +520,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der buildDate-Eigenschaft ab.
+         * Gets the value of the buildDate property.
          * 
          * @return
          *     possible object is
@@ -532,7 +532,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der buildDate-Eigenschaft fest.
+         * Sets the value of the buildDate property.
          * 
          * @param value
          *     allowed object is
@@ -544,7 +544,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der specificationRevision-Eigenschaft ab.
+         * Gets the value of the specificationRevision property.
          * 
          * @return
          *     possible object is
@@ -556,7 +556,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der specificationRevision-Eigenschaft fest.
+         * Sets the value of the specificationRevision property.
          * 
          * @param value
          *     allowed object is
@@ -571,9 +571,9 @@ public class TApplicationLayers {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -640,7 +640,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der mandatoryObjects-Eigenschaft ab.
+         * Gets the value of the mandatoryObjects property.
          * 
          * @return
          *     possible object is
@@ -652,7 +652,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der mandatoryObjects-Eigenschaft fest.
+         * Sets the value of the mandatoryObjects property.
          * 
          * @param value
          *     allowed object is
@@ -664,7 +664,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der optionalObjects-Eigenschaft ab.
+         * Gets the value of the optionalObjects property.
          * 
          * @return
          *     possible object is
@@ -676,7 +676,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der optionalObjects-Eigenschaft fest.
+         * Sets the value of the optionalObjects property.
          * 
          * @param value
          *     allowed object is
@@ -688,7 +688,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Ruft den Wert der manufacturerObjects-Eigenschaft ab.
+         * Gets the value of the manufacturerObjects property.
          * 
          * @return
          *     possible object is
@@ -700,7 +700,7 @@ public class TApplicationLayers {
         }
 
         /**
-         * Legt den Wert der manufacturerObjects-Eigenschaft fest.
+         * Sets the value of the manufacturerObjects property.
          * 
          * @param value
          *     allowed object is
