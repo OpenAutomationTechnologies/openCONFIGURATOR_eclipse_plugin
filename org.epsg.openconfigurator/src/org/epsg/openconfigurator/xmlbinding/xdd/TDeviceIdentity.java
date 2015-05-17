@@ -15,9 +15,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java-Klasse für t_DeviceIdentity complex type.
+ * <p>Java class for t_DeviceIdentity complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_DeviceIdentity"&gt;
@@ -139,7 +139,7 @@ public class TDeviceIdentity {
     protected TDeviceIdentity.InstanceName instanceName;
 
     /**
-     * Ruft den Wert der vendorName-Eigenschaft ab.
+     * Gets the value of the vendorName property.
      * 
      * @return
      *     possible object is
@@ -151,7 +151,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der vendorName-Eigenschaft fest.
+     * Sets the value of the vendorName property.
      * 
      * @param value
      *     allowed object is
@@ -163,7 +163,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der vendorID-Eigenschaft ab.
+     * Gets the value of the vendorID property.
      * 
      * @return
      *     possible object is
@@ -175,7 +175,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der vendorID-Eigenschaft fest.
+     * Sets the value of the vendorID property.
      * 
      * @param value
      *     allowed object is
@@ -187,7 +187,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der vendorText-Eigenschaft ab.
+     * Gets the value of the vendorText property.
      * 
      * @return
      *     possible object is
@@ -199,7 +199,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der vendorText-Eigenschaft fest.
+     * Sets the value of the vendorText property.
      * 
      * @param value
      *     allowed object is
@@ -211,7 +211,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der deviceFamily-Eigenschaft ab.
+     * Gets the value of the deviceFamily property.
      * 
      * @return
      *     possible object is
@@ -223,7 +223,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der deviceFamily-Eigenschaft fest.
+     * Sets the value of the deviceFamily property.
      * 
      * @param value
      *     allowed object is
@@ -235,7 +235,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der productFamily-Eigenschaft ab.
+     * Gets the value of the productFamily property.
      * 
      * @return
      *     possible object is
@@ -247,7 +247,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der productFamily-Eigenschaft fest.
+     * Sets the value of the productFamily property.
      * 
      * @param value
      *     allowed object is
@@ -259,7 +259,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der productName-Eigenschaft ab.
+     * Gets the value of the productName property.
      * 
      * @return
      *     possible object is
@@ -271,7 +271,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der productName-Eigenschaft fest.
+     * Sets the value of the productName property.
      * 
      * @param value
      *     allowed object is
@@ -283,7 +283,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der productID-Eigenschaft ab.
+     * Gets the value of the productID property.
      * 
      * @return
      *     possible object is
@@ -295,7 +295,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der productID-Eigenschaft fest.
+     * Sets the value of the productID property.
      * 
      * @param value
      *     allowed object is
@@ -307,7 +307,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der productText-Eigenschaft ab.
+     * Gets the value of the productText property.
      * 
      * @return
      *     possible object is
@@ -319,7 +319,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der productText-Eigenschaft fest.
+     * Sets the value of the productText property.
      * 
      * @param value
      *     allowed object is
@@ -389,7 +389,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der buildDate-Eigenschaft ab.
+     * Gets the value of the buildDate property.
      * 
      * @return
      *     possible object is
@@ -401,7 +401,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der buildDate-Eigenschaft fest.
+     * Sets the value of the buildDate property.
      * 
      * @param value
      *     allowed object is
@@ -413,7 +413,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der specificationRevision-Eigenschaft ab.
+     * Gets the value of the specificationRevision property.
      * 
      * @return
      *     possible object is
@@ -425,7 +425,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der specificationRevision-Eigenschaft fest.
+     * Sets the value of the specificationRevision property.
      * 
      * @param value
      *     allowed object is
@@ -437,7 +437,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Ruft den Wert der instanceName-Eigenschaft ab.
+     * Gets the value of the instanceName property.
      * 
      * @return
      *     possible object is
@@ -449,7 +449,7 @@ public class TDeviceIdentity {
     }
 
     /**
-     * Legt den Wert der instanceName-Eigenschaft fest.
+     * Sets the value of the instanceName property.
      * 
      * @param value
      *     allowed object is
@@ -462,9 +462,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -490,7 +490,7 @@ public class TDeviceIdentity {
         protected Boolean readOnly;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -502,7 +502,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -514,7 +514,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -530,7 +530,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is
@@ -545,9 +545,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -573,7 +573,7 @@ public class TDeviceIdentity {
         protected Boolean readOnly;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -585,7 +585,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -597,7 +597,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -613,7 +613,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is
@@ -628,9 +628,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -656,7 +656,7 @@ public class TDeviceIdentity {
         protected Boolean readOnly;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -668,7 +668,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -680,7 +680,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -696,7 +696,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is
@@ -711,9 +711,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -739,7 +739,7 @@ public class TDeviceIdentity {
         protected Boolean readOnly;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -751,7 +751,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -763,7 +763,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -779,7 +779,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is
@@ -794,9 +794,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -860,7 +860,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -876,7 +876,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is
@@ -891,9 +891,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -919,7 +919,7 @@ public class TDeviceIdentity {
         protected Boolean readOnly;
 
         /**
-         * Ruft den Wert der value-Eigenschaft ab.
+         * Gets the value of the value property.
          * 
          * @return
          *     possible object is
@@ -931,7 +931,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der value-Eigenschaft fest.
+         * Sets the value of the value property.
          * 
          * @param value
          *     allowed object is
@@ -943,7 +943,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -959,7 +959,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is
@@ -974,9 +974,9 @@ public class TDeviceIdentity {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -1040,7 +1040,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Ruft den Wert der readOnly-Eigenschaft ab.
+         * Gets the value of the readOnly property.
          * 
          * @return
          *     possible object is
@@ -1056,7 +1056,7 @@ public class TDeviceIdentity {
         }
 
         /**
-         * Legt den Wert der readOnly-Eigenschaft fest.
+         * Sets the value of the readOnly property.
          * 
          * @param value
          *     allowed object is

@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_GeneralFeatures complex type.
+ * <p>Java class for t_GeneralFeatures complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_GeneralFeatures"&gt;
@@ -249,7 +249,7 @@ public class TGeneralFeatures {
     protected Boolean sdoServer;
 
     /**
-     * Ruft den Wert der cfmConfigManager-Eigenschaft ab.
+     * Gets the value of the cfmConfigManager property.
      * 
      * @return
      *     possible object is
@@ -265,7 +265,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der cfmConfigManager-Eigenschaft fest.
+     * Sets the value of the cfmConfigManager property.
      * 
      * @param value
      *     allowed object is
@@ -277,7 +277,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der dllErrBadPhysMode-Eigenschaft ab.
+     * Gets the value of the dllErrBadPhysMode property.
      * 
      * @return
      *     possible object is
@@ -293,7 +293,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der dllErrBadPhysMode-Eigenschaft fest.
+     * Sets the value of the dllErrBadPhysMode property.
      * 
      * @param value
      *     allowed object is
@@ -305,7 +305,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der dllErrMacBuffer-Eigenschaft ab.
+     * Gets the value of the dllErrMacBuffer property.
      * 
      * @return
      *     possible object is
@@ -321,7 +321,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der dllErrMacBuffer-Eigenschaft fest.
+     * Sets the value of the dllErrMacBuffer property.
      * 
      * @param value
      *     allowed object is
@@ -333,7 +333,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der dllFeatureCN-Eigenschaft ab.
+     * Gets the value of the dllFeatureCN property.
      * 
      * @return
      *     possible object is
@@ -349,7 +349,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der dllFeatureCN-Eigenschaft fest.
+     * Sets the value of the dllFeatureCN property.
      * 
      * @param value
      *     allowed object is
@@ -361,7 +361,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der dllFeatureMN-Eigenschaft ab.
+     * Gets the value of the dllFeatureMN property.
      * 
      */
     public boolean isDLLFeatureMN() {
@@ -369,7 +369,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der dllFeatureMN-Eigenschaft fest.
+     * Sets the value of the dllFeatureMN property.
      * 
      */
     public void setDLLFeatureMN(boolean value) {
@@ -377,7 +377,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtBootTimeNotActive-Eigenschaft ab.
+     * Gets the value of the nmtBootTimeNotActive property.
      * 
      */
     public long getNMTBootTimeNotActive() {
@@ -385,7 +385,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtBootTimeNotActive-Eigenschaft fest.
+     * Sets the value of the nmtBootTimeNotActive property.
      * 
      */
     public void setNMTBootTimeNotActive(long value) {
@@ -393,7 +393,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtCycleTimeGranularity-Eigenschaft ab.
+     * Gets the value of the nmtCycleTimeGranularity property.
      * 
      * @return
      *     possible object is
@@ -409,7 +409,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtCycleTimeGranularity-Eigenschaft fest.
+     * Sets the value of the nmtCycleTimeGranularity property.
      * 
      * @param value
      *     allowed object is
@@ -421,7 +421,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtCycleTimeMax-Eigenschaft ab.
+     * Gets the value of the nmtCycleTimeMax property.
      * 
      */
     public long getNMTCycleTimeMax() {
@@ -429,7 +429,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtCycleTimeMax-Eigenschaft fest.
+     * Sets the value of the nmtCycleTimeMax property.
      * 
      */
     public void setNMTCycleTimeMax(long value) {
@@ -437,7 +437,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtCycleTimeMin-Eigenschaft ab.
+     * Gets the value of the nmtCycleTimeMin property.
      * 
      */
     public long getNMTCycleTimeMin() {
@@ -445,7 +445,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtCycleTimeMin-Eigenschaft fest.
+     * Sets the value of the nmtCycleTimeMin property.
      * 
      */
     public void setNMTCycleTimeMin(long value) {
@@ -453,7 +453,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtMinRedCycleTime-Eigenschaft ab.
+     * Gets the value of the nmtMinRedCycleTime property.
      * 
      * @return
      *     possible object is
@@ -469,7 +469,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtMinRedCycleTime-Eigenschaft fest.
+     * Sets the value of the nmtMinRedCycleTime property.
      * 
      * @param value
      *     allowed object is
@@ -481,7 +481,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtEmergencyQueueSize-Eigenschaft ab.
+     * Gets the value of the nmtEmergencyQueueSize property.
      * 
      * @return
      *     possible object is
@@ -497,7 +497,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtEmergencyQueueSize-Eigenschaft fest.
+     * Sets the value of the nmtEmergencyQueueSize property.
      * 
      * @param value
      *     allowed object is
@@ -509,7 +509,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtErrorEntries-Eigenschaft ab.
+     * Gets the value of the nmtErrorEntries property.
      * 
      */
     public long getNMTErrorEntries() {
@@ -517,7 +517,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtErrorEntries-Eigenschaft fest.
+     * Sets the value of the nmtErrorEntries property.
      * 
      */
     public void setNMTErrorEntries(long value) {
@@ -525,7 +525,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtFlushArpEntry-Eigenschaft ab.
+     * Gets the value of the nmtFlushArpEntry property.
      * 
      * @return
      *     possible object is
@@ -541,7 +541,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtFlushArpEntry-Eigenschaft fest.
+     * Sets the value of the nmtFlushArpEntry property.
      * 
      * @param value
      *     allowed object is
@@ -553,7 +553,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtNetHostNameSet-Eigenschaft ab.
+     * Gets the value of the nmtNetHostNameSet property.
      * 
      * @return
      *     possible object is
@@ -569,7 +569,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtNetHostNameSet-Eigenschaft fest.
+     * Sets the value of the nmtNetHostNameSet property.
      * 
      * @param value
      *     allowed object is
@@ -581,7 +581,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtMaxCNNodeID-Eigenschaft ab.
+     * Gets the value of the nmtMaxCNNodeID property.
      * 
      * @return
      *     possible object is
@@ -597,7 +597,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtMaxCNNodeID-Eigenschaft fest.
+     * Sets the value of the nmtMaxCNNodeID property.
      * 
      * @param value
      *     allowed object is
@@ -609,7 +609,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtMaxCNNumber-Eigenschaft ab.
+     * Gets the value of the nmtMaxCNNumber property.
      * 
      * @return
      *     possible object is
@@ -625,7 +625,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtMaxCNNumber-Eigenschaft fest.
+     * Sets the value of the nmtMaxCNNumber property.
      * 
      * @param value
      *     allowed object is
@@ -637,7 +637,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtMaxHeartbeats-Eigenschaft ab.
+     * Gets the value of the nmtMaxHeartbeats property.
      * 
      * @return
      *     possible object is
@@ -653,7 +653,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtMaxHeartbeats-Eigenschaft fest.
+     * Sets the value of the nmtMaxHeartbeats property.
      * 
      * @param value
      *     allowed object is
@@ -665,7 +665,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtNodeIDByHW-Eigenschaft ab.
+     * Gets the value of the nmtNodeIDByHW property.
      * 
      * @return
      *     possible object is
@@ -681,7 +681,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtNodeIDByHW-Eigenschaft fest.
+     * Sets the value of the nmtNodeIDByHW property.
      * 
      * @param value
      *     allowed object is
@@ -693,7 +693,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtProductCode-Eigenschaft ab.
+     * Gets the value of the nmtProductCode property.
      * 
      * @return
      *     possible object is
@@ -709,7 +709,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtProductCode-Eigenschaft fest.
+     * Sets the value of the nmtProductCode property.
      * 
      * @param value
      *     allowed object is
@@ -721,7 +721,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishActiveNodes-Eigenschaft ab.
+     * Gets the value of the nmtPublishActiveNodes property.
      * 
      * @return
      *     possible object is
@@ -737,7 +737,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishActiveNodes-Eigenschaft fest.
+     * Sets the value of the nmtPublishActiveNodes property.
      * 
      * @param value
      *     allowed object is
@@ -749,7 +749,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishConfigNodes-Eigenschaft ab.
+     * Gets the value of the nmtPublishConfigNodes property.
      * 
      * @return
      *     possible object is
@@ -765,7 +765,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishConfigNodes-Eigenschaft fest.
+     * Sets the value of the nmtPublishConfigNodes property.
      * 
      * @param value
      *     allowed object is
@@ -777,7 +777,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishEmergencyNew-Eigenschaft ab.
+     * Gets the value of the nmtPublishEmergencyNew property.
      * 
      * @return
      *     possible object is
@@ -793,7 +793,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishEmergencyNew-Eigenschaft fest.
+     * Sets the value of the nmtPublishEmergencyNew property.
      * 
      * @param value
      *     allowed object is
@@ -805,7 +805,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishNodeState-Eigenschaft ab.
+     * Gets the value of the nmtPublishNodeState property.
      * 
      * @return
      *     possible object is
@@ -821,7 +821,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishNodeState-Eigenschaft fest.
+     * Sets the value of the nmtPublishNodeState property.
      * 
      * @param value
      *     allowed object is
@@ -833,7 +833,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishOperational-Eigenschaft ab.
+     * Gets the value of the nmtPublishOperational property.
      * 
      * @return
      *     possible object is
@@ -849,7 +849,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishOperational-Eigenschaft fest.
+     * Sets the value of the nmtPublishOperational property.
      * 
      * @param value
      *     allowed object is
@@ -861,7 +861,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishPreOp1-Eigenschaft ab.
+     * Gets the value of the nmtPublishPreOp1 property.
      * 
      * @return
      *     possible object is
@@ -877,7 +877,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishPreOp1-Eigenschaft fest.
+     * Sets the value of the nmtPublishPreOp1 property.
      * 
      * @param value
      *     allowed object is
@@ -889,7 +889,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishPreOp2-Eigenschaft ab.
+     * Gets the value of the nmtPublishPreOp2 property.
      * 
      * @return
      *     possible object is
@@ -905,7 +905,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishPreOp2-Eigenschaft fest.
+     * Sets the value of the nmtPublishPreOp2 property.
      * 
      * @param value
      *     allowed object is
@@ -917,7 +917,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishReadyToOp-Eigenschaft ab.
+     * Gets the value of the nmtPublishReadyToOp property.
      * 
      * @return
      *     possible object is
@@ -933,7 +933,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishReadyToOp-Eigenschaft fest.
+     * Sets the value of the nmtPublishReadyToOp property.
      * 
      * @param value
      *     allowed object is
@@ -945,7 +945,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishStopped-Eigenschaft ab.
+     * Gets the value of the nmtPublishStopped property.
      * 
      * @return
      *     possible object is
@@ -961,7 +961,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishStopped-Eigenschaft fest.
+     * Sets the value of the nmtPublishStopped property.
      * 
      * @param value
      *     allowed object is
@@ -973,7 +973,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtPublishTime-Eigenschaft ab.
+     * Gets the value of the nmtPublishTime property.
      * 
      * @return
      *     possible object is
@@ -989,7 +989,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtPublishTime-Eigenschaft fest.
+     * Sets the value of the nmtPublishTime property.
      * 
      * @param value
      *     allowed object is
@@ -1001,7 +1001,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtRevisionNo-Eigenschaft ab.
+     * Gets the value of the nmtRevisionNo property.
      * 
      * @return
      *     possible object is
@@ -1017,7 +1017,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nmtRevisionNo-Eigenschaft fest.
+     * Sets the value of the nmtRevisionNo property.
      * 
      * @param value
      *     allowed object is
@@ -1029,7 +1029,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nwlForward-Eigenschaft ab.
+     * Gets the value of the nwlForward property.
      * 
      * @return
      *     possible object is
@@ -1045,7 +1045,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nwlForward-Eigenschaft fest.
+     * Sets the value of the nwlForward property.
      * 
      * @param value
      *     allowed object is
@@ -1057,7 +1057,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nwlicmpSupport-Eigenschaft ab.
+     * Gets the value of the nwlicmpSupport property.
      * 
      * @return
      *     possible object is
@@ -1073,7 +1073,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nwlicmpSupport-Eigenschaft fest.
+     * Sets the value of the nwlicmpSupport property.
      * 
      * @param value
      *     allowed object is
@@ -1085,7 +1085,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der nwlipSupport-Eigenschaft ab.
+     * Gets the value of the nwlipSupport property.
      * 
      * @return
      *     possible object is
@@ -1101,7 +1101,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der nwlipSupport-Eigenschaft fest.
+     * Sets the value of the nwlipSupport property.
      * 
      * @param value
      *     allowed object is
@@ -1113,7 +1113,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdoGranularity-Eigenschaft ab.
+     * Gets the value of the pdoGranularity property.
      * 
      * @return
      *     possible object is
@@ -1129,7 +1129,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdoGranularity-Eigenschaft fest.
+     * Sets the value of the pdoGranularity property.
      * 
      * @param value
      *     allowed object is
@@ -1141,7 +1141,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdoMaxDescrMem-Eigenschaft ab.
+     * Gets the value of the pdoMaxDescrMem property.
      * 
      * @return
      *     possible object is
@@ -1157,7 +1157,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdoMaxDescrMem-Eigenschaft fest.
+     * Sets the value of the pdoMaxDescrMem property.
      * 
      * @param value
      *     allowed object is
@@ -1169,7 +1169,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdorpdoChannelObjects-Eigenschaft ab.
+     * Gets the value of the pdorpdoChannelObjects property.
      * 
      * @return
      *     possible object is
@@ -1185,7 +1185,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdorpdoChannelObjects-Eigenschaft fest.
+     * Sets the value of the pdorpdoChannelObjects property.
      * 
      * @param value
      *     allowed object is
@@ -1197,7 +1197,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdorpdoChannels-Eigenschaft ab.
+     * Gets the value of the pdorpdoChannels property.
      * 
      * @return
      *     possible object is
@@ -1213,7 +1213,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdorpdoChannels-Eigenschaft fest.
+     * Sets the value of the pdorpdoChannels property.
      * 
      * @param value
      *     allowed object is
@@ -1225,7 +1225,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdorpdoCycleDataLim-Eigenschaft ab.
+     * Gets the value of the pdorpdoCycleDataLim property.
      * 
      * @return
      *     possible object is
@@ -1241,7 +1241,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdorpdoCycleDataLim-Eigenschaft fest.
+     * Sets the value of the pdorpdoCycleDataLim property.
      * 
      * @param value
      *     allowed object is
@@ -1253,7 +1253,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdorpdoOverallObjects-Eigenschaft ab.
+     * Gets the value of the pdorpdoOverallObjects property.
      * 
      * @return
      *     possible object is
@@ -1269,7 +1269,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdorpdoOverallObjects-Eigenschaft fest.
+     * Sets the value of the pdorpdoOverallObjects property.
      * 
      * @param value
      *     allowed object is
@@ -1281,7 +1281,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdoSelfReceipt-Eigenschaft ab.
+     * Gets the value of the pdoSelfReceipt property.
      * 
      * @return
      *     possible object is
@@ -1297,7 +1297,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdoSelfReceipt-Eigenschaft fest.
+     * Sets the value of the pdoSelfReceipt property.
      * 
      * @param value
      *     allowed object is
@@ -1309,7 +1309,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdotpdoChannelObjects-Eigenschaft ab.
+     * Gets the value of the pdotpdoChannelObjects property.
      * 
      * @return
      *     possible object is
@@ -1325,7 +1325,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdotpdoChannelObjects-Eigenschaft fest.
+     * Sets the value of the pdotpdoChannelObjects property.
      * 
      * @param value
      *     allowed object is
@@ -1337,7 +1337,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdotpdoCycleDataLim-Eigenschaft ab.
+     * Gets the value of the pdotpdoCycleDataLim property.
      * 
      * @return
      *     possible object is
@@ -1353,7 +1353,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdotpdoCycleDataLim-Eigenschaft fest.
+     * Sets the value of the pdotpdoCycleDataLim property.
      * 
      * @param value
      *     allowed object is
@@ -1365,7 +1365,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der pdotpdoOverallObjects-Eigenschaft ab.
+     * Gets the value of the pdotpdoOverallObjects property.
      * 
      * @return
      *     possible object is
@@ -1381,7 +1381,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der pdotpdoOverallObjects-Eigenschaft fest.
+     * Sets the value of the pdotpdoOverallObjects property.
      * 
      * @param value
      *     allowed object is
@@ -1393,7 +1393,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der phyExtEPLPorts-Eigenschaft ab.
+     * Gets the value of the phyExtEPLPorts property.
      * 
      * @return
      *     possible object is
@@ -1409,7 +1409,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der phyExtEPLPorts-Eigenschaft fest.
+     * Sets the value of the phyExtEPLPorts property.
      * 
      * @param value
      *     allowed object is
@@ -1421,7 +1421,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der phyHubDelay-Eigenschaft ab.
+     * Gets the value of the phyHubDelay property.
      * 
      * @return
      *     possible object is
@@ -1437,7 +1437,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der phyHubDelay-Eigenschaft fest.
+     * Sets the value of the phyHubDelay property.
      * 
      * @param value
      *     allowed object is
@@ -1449,7 +1449,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der phyHubIntegrated-Eigenschaft ab.
+     * Gets the value of the phyHubIntegrated property.
      * 
      * @return
      *     possible object is
@@ -1465,7 +1465,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der phyHubIntegrated-Eigenschaft fest.
+     * Sets the value of the phyHubIntegrated property.
      * 
      * @param value
      *     allowed object is
@@ -1477,7 +1477,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der phyHubJitter-Eigenschaft ab.
+     * Gets the value of the phyHubJitter property.
      * 
      * @return
      *     possible object is
@@ -1493,7 +1493,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der phyHubJitter-Eigenschaft fest.
+     * Sets the value of the phyHubJitter property.
      * 
      * @param value
      *     allowed object is
@@ -1505,7 +1505,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der rt1RT1SecuritySupport-Eigenschaft ab.
+     * Gets the value of the rt1RT1SecuritySupport property.
      * 
      * @return
      *     possible object is
@@ -1521,7 +1521,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der rt1RT1SecuritySupport-Eigenschaft fest.
+     * Sets the value of the rt1RT1SecuritySupport property.
      * 
      * @param value
      *     allowed object is
@@ -1533,7 +1533,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der rt1RT1Support-Eigenschaft ab.
+     * Gets the value of the rt1RT1Support property.
      * 
      * @return
      *     possible object is
@@ -1549,7 +1549,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der rt1RT1Support-Eigenschaft fest.
+     * Sets the value of the rt1RT1Support property.
      * 
      * @param value
      *     allowed object is
@@ -1561,7 +1561,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der rt2RT2Support-Eigenschaft ab.
+     * Gets the value of the rt2RT2Support property.
      * 
      * @return
      *     possible object is
@@ -1577,7 +1577,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der rt2RT2Support-Eigenschaft fest.
+     * Sets the value of the rt2RT2Support property.
      * 
      * @param value
      *     allowed object is
@@ -1589,7 +1589,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoClient-Eigenschaft ab.
+     * Gets the value of the sdoClient property.
      * 
      * @return
      *     possible object is
@@ -1605,7 +1605,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoClient-Eigenschaft fest.
+     * Sets the value of the sdoClient property.
      * 
      * @param value
      *     allowed object is
@@ -1617,7 +1617,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdFileRead-Eigenschaft ab.
+     * Gets the value of the sdoCmdFileRead property.
      * 
      * @return
      *     possible object is
@@ -1633,7 +1633,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdFileRead-Eigenschaft fest.
+     * Sets the value of the sdoCmdFileRead property.
      * 
      * @param value
      *     allowed object is
@@ -1645,7 +1645,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdFileWrite-Eigenschaft ab.
+     * Gets the value of the sdoCmdFileWrite property.
      * 
      * @return
      *     possible object is
@@ -1661,7 +1661,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdFileWrite-Eigenschaft fest.
+     * Sets the value of the sdoCmdFileWrite property.
      * 
      * @param value
      *     allowed object is
@@ -1673,7 +1673,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdLinkName-Eigenschaft ab.
+     * Gets the value of the sdoCmdLinkName property.
      * 
      * @return
      *     possible object is
@@ -1689,7 +1689,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdLinkName-Eigenschaft fest.
+     * Sets the value of the sdoCmdLinkName property.
      * 
      * @param value
      *     allowed object is
@@ -1701,7 +1701,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdReadAllByIndex-Eigenschaft ab.
+     * Gets the value of the sdoCmdReadAllByIndex property.
      * 
      * @return
      *     possible object is
@@ -1717,7 +1717,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdReadAllByIndex-Eigenschaft fest.
+     * Sets the value of the sdoCmdReadAllByIndex property.
      * 
      * @param value
      *     allowed object is
@@ -1729,7 +1729,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdReadByName-Eigenschaft ab.
+     * Gets the value of the sdoCmdReadByName property.
      * 
      * @return
      *     possible object is
@@ -1745,7 +1745,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdReadByName-Eigenschaft fest.
+     * Sets the value of the sdoCmdReadByName property.
      * 
      * @param value
      *     allowed object is
@@ -1757,7 +1757,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdReadMultParam-Eigenschaft ab.
+     * Gets the value of the sdoCmdReadMultParam property.
      * 
      * @return
      *     possible object is
@@ -1773,7 +1773,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdReadMultParam-Eigenschaft fest.
+     * Sets the value of the sdoCmdReadMultParam property.
      * 
      * @param value
      *     allowed object is
@@ -1785,7 +1785,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdWriteAllByIndex-Eigenschaft ab.
+     * Gets the value of the sdoCmdWriteAllByIndex property.
      * 
      * @return
      *     possible object is
@@ -1801,7 +1801,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdWriteAllByIndex-Eigenschaft fest.
+     * Sets the value of the sdoCmdWriteAllByIndex property.
      * 
      * @param value
      *     allowed object is
@@ -1813,7 +1813,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdWriteByName-Eigenschaft ab.
+     * Gets the value of the sdoCmdWriteByName property.
      * 
      * @return
      *     possible object is
@@ -1829,7 +1829,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdWriteByName-Eigenschaft fest.
+     * Sets the value of the sdoCmdWriteByName property.
      * 
      * @param value
      *     allowed object is
@@ -1841,7 +1841,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoCmdWriteMultParam-Eigenschaft ab.
+     * Gets the value of the sdoCmdWriteMultParam property.
      * 
      * @return
      *     possible object is
@@ -1857,7 +1857,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoCmdWriteMultParam-Eigenschaft fest.
+     * Sets the value of the sdoCmdWriteMultParam property.
      * 
      * @param value
      *     allowed object is
@@ -1869,7 +1869,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoMaxConnections-Eigenschaft ab.
+     * Gets the value of the sdoMaxConnections property.
      * 
      * @return
      *     possible object is
@@ -1885,7 +1885,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoMaxConnections-Eigenschaft fest.
+     * Sets the value of the sdoMaxConnections property.
      * 
      * @param value
      *     allowed object is
@@ -1897,7 +1897,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoMaxParallelConnections-Eigenschaft ab.
+     * Gets the value of the sdoMaxParallelConnections property.
      * 
      * @return
      *     possible object is
@@ -1913,7 +1913,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoMaxParallelConnections-Eigenschaft fest.
+     * Sets the value of the sdoMaxParallelConnections property.
      * 
      * @param value
      *     allowed object is
@@ -1925,7 +1925,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoSeqLayerTxHistorySize-Eigenschaft ab.
+     * Gets the value of the sdoSeqLayerTxHistorySize property.
      * 
      * @return
      *     possible object is
@@ -1941,7 +1941,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoSeqLayerTxHistorySize-Eigenschaft fest.
+     * Sets the value of the sdoSeqLayerTxHistorySize property.
      * 
      * @param value
      *     allowed object is
@@ -1953,7 +1953,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Ruft den Wert der sdoServer-Eigenschaft ab.
+     * Gets the value of the sdoServer property.
      * 
      * @return
      *     possible object is
@@ -1969,7 +1969,7 @@ public class TGeneralFeatures {
     }
 
     /**
-     * Legt den Wert der sdoServer-Eigenschaft fest.
+     * Sets the value of the sdoServer property.
      * 
      * @param value
      *     allowed object is

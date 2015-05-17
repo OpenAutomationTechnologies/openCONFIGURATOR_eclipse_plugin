@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType;
  * The Node collection element is a container for all nodes in a POWERLINK
  *                 network.
  * 
- * <p>Java-Klasse für tNodeCollection complex type.
+ * <p>Java class for tNodeCollection complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tNodeCollection"&gt;
@@ -45,7 +45,7 @@ public class TNodeCollection {
     protected List<TCN> cn;
 
     /**
-     * Ruft den Wert der mn-Eigenschaft ab.
+     * Gets the value of the mn property.
      * 
      * @return
      *     possible object is
@@ -57,7 +57,7 @@ public class TNodeCollection {
     }
 
     /**
-     * Legt den Wert der mn-Eigenschaft fest.
+     * Sets the value of the mn property.
      * 
      * @param value
      *     allowed object is

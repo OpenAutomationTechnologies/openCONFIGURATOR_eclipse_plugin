@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für anonymous complex type.
+ * <p>Java class for anonymous complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType&gt;
@@ -54,7 +54,7 @@ public class OpenCONFIGURATORProject {
     protected String version;
 
     /**
-     * Ruft den Wert der generator-Eigenschaft ab.
+     * Gets the value of the generator property.
      * 
      * @return
      *     possible object is
@@ -66,7 +66,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Legt den Wert der generator-Eigenschaft fest.
+     * Sets the value of the generator property.
      * 
      * @param value
      *     allowed object is
@@ -78,7 +78,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Ruft den Wert der ideConfiguration-Eigenschaft ab.
+     * Gets the value of the ideConfiguration property.
      * 
      * @return
      *     possible object is
@@ -90,7 +90,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Legt den Wert der ideConfiguration-Eigenschaft fest.
+     * Sets the value of the ideConfiguration property.
      * 
      * @param value
      *     allowed object is
@@ -102,7 +102,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Ruft den Wert der projectConfiguration-Eigenschaft ab.
+     * Gets the value of the projectConfiguration property.
      * 
      * @return
      *     possible object is
@@ -114,7 +114,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Legt den Wert der projectConfiguration-Eigenschaft fest.
+     * Sets the value of the projectConfiguration property.
      * 
      * @param value
      *     allowed object is
@@ -126,7 +126,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Ruft den Wert der networkConfiguration-Eigenschaft ab.
+     * Gets the value of the networkConfiguration property.
      * 
      * @return
      *     possible object is
@@ -138,7 +138,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Legt den Wert der networkConfiguration-Eigenschaft fest.
+     * Sets the value of the networkConfiguration property.
      * 
      * @param value
      *     allowed object is
@@ -150,7 +150,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Ruft den Wert der version-Eigenschaft ab.
+     * Gets the value of the version property.
      * 
      * @return
      *     possible object is
@@ -166,7 +166,7 @@ public class OpenCONFIGURATORProject {
     }
 
     /**
-     * Legt den Wert der version-Eigenschaft fest.
+     * Sets the value of the version property.
      * 
      * @param value
      *     allowed object is

@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_subrange complex type.
+ * <p>Java class for t_subrange complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_subrange"&gt;
@@ -35,7 +35,7 @@ public class TSubrange {
     protected long upperLimit;
 
     /**
-     * Ruft den Wert der lowerLimit-Eigenschaft ab.
+     * Gets the value of the lowerLimit property.
      * 
      */
     public long getLowerLimit() {
@@ -43,7 +43,7 @@ public class TSubrange {
     }
 
     /**
-     * Legt den Wert der lowerLimit-Eigenschaft fest.
+     * Sets the value of the lowerLimit property.
      * 
      */
     public void setLowerLimit(long value) {
@@ -51,7 +51,7 @@ public class TSubrange {
     }
 
     /**
-     * Ruft den Wert der upperLimit-Eigenschaft ab.
+     * Gets the value of the upperLimit property.
      * 
      */
     public long getUpperLimit() {
@@ -59,7 +59,7 @@ public class TSubrange {
     }
 
     /**
-     * Legt den Wert der upperLimit-Eigenschaft fest.
+     * Sets the value of the upperLimit property.
      * 
      */
     public void setUpperLimit(long value) {

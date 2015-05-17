@@ -8,9 +8,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für tKeyValuePair complex type.
+ * <p>Java class for tKeyValuePair complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tKeyValuePair"&gt;
@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *       &lt;attribute name="value" type="{http://www.w3.org/2001/XMLSchema}string" default="" /&gt;
+ *       &lt;attribute name="enabled" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -33,9 +34,11 @@ public class TKeyValuePair {
     protected String name;
     @XmlAttribute(name = "value")
     protected String value;
+    @XmlAttribute(name = "enabled")
+    protected Boolean enabled;
 
     /**
-     * Ruft den Wert der name-Eigenschaft ab.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
@@ -47,7 +50,7 @@ public class TKeyValuePair {
     }
 
     /**
-     * Legt den Wert der name-Eigenschaft fest.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
@@ -59,7 +62,7 @@ public class TKeyValuePair {
     }
 
     /**
-     * Ruft den Wert der value-Eigenschaft ab.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
@@ -75,7 +78,7 @@ public class TKeyValuePair {
     }
 
     /**
-     * Legt den Wert der value-Eigenschaft fest.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
@@ -84,6 +87,34 @@ public class TKeyValuePair {
      */
     public void setValue(String value) {
         this.value = value;
+    }
+
+    /**
+     * Gets the value of the enabled property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isEnabled() {
+        if (enabled == null) {
+            return true;
+        } else {
+            return enabled;
+        }
+    }
+
+    /**
+     * Sets the value of the enabled property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setEnabled(Boolean value) {
+        this.enabled = value;
     }
 
 }

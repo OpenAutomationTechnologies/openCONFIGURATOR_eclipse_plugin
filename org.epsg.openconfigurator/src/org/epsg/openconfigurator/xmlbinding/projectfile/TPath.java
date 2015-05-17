@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * Type to specify paths in the filesystem.
  * 
- * <p>Java-Klasse für tPath complex type.
+ * <p>Java class for tPath complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tPath"&gt;
@@ -43,7 +43,7 @@ public class TPath {
     protected String path;
 
     /**
-     * Ruft den Wert der id-Eigenschaft ab.
+     * Gets the value of the id property.
      * 
      * @return
      *     possible object is
@@ -55,7 +55,7 @@ public class TPath {
     }
 
     /**
-     * Legt den Wert der id-Eigenschaft fest.
+     * Sets the value of the id property.
      * 
      * @param value
      *     allowed object is
@@ -67,7 +67,7 @@ public class TPath {
     }
 
     /**
-     * Ruft den Wert der path-Eigenschaft ab.
+     * Gets the value of the path property.
      * 
      * @return
      *     possible object is
@@ -79,7 +79,7 @@ public class TPath {
     }
 
     /**
-     * Legt den Wert der path-Eigenschaft fest.
+     * Sets the value of the path property.
      * 
      * @param value
      *     allowed object is

@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_variableRef complex type.
+ * <p>Java class for t_variableRef complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_variableRef"&gt;
@@ -106,7 +106,7 @@ public class TVariableRef {
     }
 
     /**
-     * Ruft den Wert der variableIDRef-Eigenschaft ab.
+     * Gets the value of the variableIDRef property.
      * 
      * @return
      *     possible object is
@@ -118,7 +118,7 @@ public class TVariableRef {
     }
 
     /**
-     * Legt den Wert der variableIDRef-Eigenschaft fest.
+     * Sets the value of the variableIDRef property.
      * 
      * @param value
      *     allowed object is
@@ -159,7 +159,7 @@ public class TVariableRef {
     }
 
     /**
-     * Ruft den Wert der position-Eigenschaft ab.
+     * Gets the value of the position property.
      * 
      * @return
      *     possible object is
@@ -175,7 +175,7 @@ public class TVariableRef {
     }
 
     /**
-     * Legt den Wert der position-Eigenschaft fest.
+     * Sets the value of the position property.
      * 
      * @param value
      *     allowed object is
@@ -188,9 +188,9 @@ public class TVariableRef {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -214,7 +214,7 @@ public class TVariableRef {
         protected Object uniqueIDRef;
 
         /**
-         * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+         * Gets the value of the uniqueIDRef property.
          * 
          * @return
          *     possible object is
@@ -226,7 +226,7 @@ public class TVariableRef {
         }
 
         /**
-         * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+         * Sets the value of the uniqueIDRef property.
          * 
          * @param value
          *     allowed object is
@@ -241,9 +241,9 @@ public class TVariableRef {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -270,7 +270,7 @@ public class TVariableRef {
         protected Long index;
 
         /**
-         * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+         * Gets the value of the uniqueIDRef property.
          * 
          * @return
          *     possible object is
@@ -282,7 +282,7 @@ public class TVariableRef {
         }
 
         /**
-         * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+         * Sets the value of the uniqueIDRef property.
          * 
          * @param value
          *     allowed object is
@@ -294,7 +294,7 @@ public class TVariableRef {
         }
 
         /**
-         * Ruft den Wert der index-Eigenschaft ab.
+         * Gets the value of the index property.
          * 
          * @return
          *     possible object is
@@ -306,7 +306,7 @@ public class TVariableRef {
         }
 
         /**
-         * Legt den Wert der index-Eigenschaft fest.
+         * Sets the value of the index property.
          * 
          * @param value
          *     allowed object is
@@ -321,9 +321,9 @@ public class TVariableRef {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -347,7 +347,7 @@ public class TVariableRef {
         protected Object uniqueIDRef;
 
         /**
-         * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+         * Gets the value of the uniqueIDRef property.
          * 
          * @return
          *     possible object is
@@ -359,7 +359,7 @@ public class TVariableRef {
         }
 
         /**
-         * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+         * Sets the value of the uniqueIDRef property.
          * 
          * @param value
          *     allowed object is

@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * A concrete type for a POWERLINK CN. 
  * 
- * <p>Java-Klasse für tCN complex type.
+ * <p>Java class for tCN complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tCN"&gt;
@@ -89,7 +89,7 @@ public class TCN
     protected Boolean verifySerialNumber;
 
     /**
-     * Ruft den Wert der nodeID-Eigenschaft ab.
+     * Gets the value of the nodeID property.
      * 
      * @return
      *     possible object is
@@ -101,7 +101,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der nodeID-Eigenschaft fest.
+     * Sets the value of the nodeID property.
      * 
      * @param value
      *     allowed object is
@@ -113,7 +113,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der pathToXDC-Eigenschaft ab.
+     * Gets the value of the pathToXDC property.
      * 
      * @return
      *     possible object is
@@ -125,7 +125,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der pathToXDC-Eigenschaft fest.
+     * Sets the value of the pathToXDC property.
      * 
      * @param value
      *     allowed object is
@@ -137,7 +137,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der isMultiplexed-Eigenschaft ab.
+     * Gets the value of the isMultiplexed property.
      * 
      * @return
      *     possible object is
@@ -153,7 +153,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der isMultiplexed-Eigenschaft fest.
+     * Sets the value of the isMultiplexed property.
      * 
      * @param value
      *     allowed object is
@@ -165,7 +165,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der forcedMultiplexedCycle-Eigenschaft ab.
+     * Gets the value of the forcedMultiplexedCycle property.
      * 
      * @return
      *     possible object is
@@ -181,7 +181,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der forcedMultiplexedCycle-Eigenschaft fest.
+     * Sets the value of the forcedMultiplexedCycle property.
      * 
      * @param value
      *     allowed object is
@@ -193,7 +193,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der isChained-Eigenschaft ab.
+     * Gets the value of the isChained property.
      * 
      * @return
      *     possible object is
@@ -209,7 +209,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der isChained-Eigenschaft fest.
+     * Sets the value of the isChained property.
      * 
      * @param value
      *     allowed object is
@@ -221,7 +221,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der isMandatory-Eigenschaft ab.
+     * Gets the value of the isMandatory property.
      * 
      * @return
      *     possible object is
@@ -237,7 +237,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der isMandatory-Eigenschaft fest.
+     * Sets the value of the isMandatory property.
      * 
      * @param value
      *     allowed object is
@@ -249,7 +249,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der autostartNode-Eigenschaft ab.
+     * Gets the value of the autostartNode property.
      * 
      * @return
      *     possible object is
@@ -265,7 +265,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der autostartNode-Eigenschaft fest.
+     * Sets the value of the autostartNode property.
      * 
      * @param value
      *     allowed object is
@@ -277,7 +277,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der resetInOperational-Eigenschaft ab.
+     * Gets the value of the resetInOperational property.
      * 
      * @return
      *     possible object is
@@ -293,7 +293,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der resetInOperational-Eigenschaft fest.
+     * Sets the value of the resetInOperational property.
      * 
      * @param value
      *     allowed object is
@@ -305,7 +305,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der verifyAppSwVersion-Eigenschaft ab.
+     * Gets the value of the verifyAppSwVersion property.
      * 
      * @return
      *     possible object is
@@ -321,7 +321,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der verifyAppSwVersion-Eigenschaft fest.
+     * Sets the value of the verifyAppSwVersion property.
      * 
      * @param value
      *     allowed object is
@@ -333,7 +333,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der autoAppSwUpdateAllowed-Eigenschaft ab.
+     * Gets the value of the autoAppSwUpdateAllowed property.
      * 
      * @return
      *     possible object is
@@ -349,7 +349,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der autoAppSwUpdateAllowed-Eigenschaft fest.
+     * Sets the value of the autoAppSwUpdateAllowed property.
      * 
      * @param value
      *     allowed object is
@@ -361,7 +361,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der verifyDeviceType-Eigenschaft ab.
+     * Gets the value of the verifyDeviceType property.
      * 
      * @return
      *     possible object is
@@ -377,7 +377,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der verifyDeviceType-Eigenschaft fest.
+     * Sets the value of the verifyDeviceType property.
      * 
      * @param value
      *     allowed object is
@@ -389,7 +389,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der verifyVendorId-Eigenschaft ab.
+     * Gets the value of the verifyVendorId property.
      * 
      * @return
      *     possible object is
@@ -405,7 +405,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der verifyVendorId-Eigenschaft fest.
+     * Sets the value of the verifyVendorId property.
      * 
      * @param value
      *     allowed object is
@@ -417,7 +417,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der verifyRevisionNumber-Eigenschaft ab.
+     * Gets the value of the verifyRevisionNumber property.
      * 
      * @return
      *     possible object is
@@ -433,7 +433,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der verifyRevisionNumber-Eigenschaft fest.
+     * Sets the value of the verifyRevisionNumber property.
      * 
      * @param value
      *     allowed object is
@@ -445,7 +445,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der verifyProductCode-Eigenschaft ab.
+     * Gets the value of the verifyProductCode property.
      * 
      * @return
      *     possible object is
@@ -461,7 +461,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der verifyProductCode-Eigenschaft fest.
+     * Sets the value of the verifyProductCode property.
      * 
      * @param value
      *     allowed object is
@@ -473,7 +473,7 @@ public class TCN
     }
 
     /**
-     * Ruft den Wert der verifySerialNumber-Eigenschaft ab.
+     * Gets the value of the verifySerialNumber property.
      * 
      * @return
      *     possible object is
@@ -489,7 +489,7 @@ public class TCN
     }
 
     /**
-     * Legt den Wert der verifySerialNumber-Eigenschaft fest.
+     * Sets the value of the verifySerialNumber property.
      * 
      * @param value
      *     allowed object is

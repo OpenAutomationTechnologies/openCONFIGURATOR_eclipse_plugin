@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für ProfileBody_Device_Powerlink complex type.
+ * <p>Java class for ProfileBody_Device_Powerlink complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ProfileBody_Device_Powerlink"&gt;
@@ -71,7 +71,7 @@ public class ProfileBodyDevicePowerlink
     protected String deviceClass;
 
     /**
-     * Ruft den Wert der deviceIdentity-Eigenschaft ab.
+     * Gets the value of the deviceIdentity property.
      * 
      * @return
      *     possible object is
@@ -83,7 +83,7 @@ public class ProfileBodyDevicePowerlink
     }
 
     /**
-     * Legt den Wert der deviceIdentity-Eigenschaft fest.
+     * Sets the value of the deviceIdentity property.
      * 
      * @param value
      *     allowed object is
@@ -95,7 +95,7 @@ public class ProfileBodyDevicePowerlink
     }
 
     /**
-     * Ruft den Wert der deviceManager-Eigenschaft ab.
+     * Gets the value of the deviceManager property.
      * 
      * @return
      *     possible object is
@@ -107,7 +107,7 @@ public class ProfileBodyDevicePowerlink
     }
 
     /**
-     * Legt den Wert der deviceManager-Eigenschaft fest.
+     * Sets the value of the deviceManager property.
      * 
      * @param value
      *     allowed object is
@@ -206,7 +206,7 @@ public class ProfileBodyDevicePowerlink
     }
 
     /**
-     * Ruft den Wert der deviceClass-Eigenschaft ab.
+     * Gets the value of the deviceClass property.
      * 
      * @return
      *     possible object is
@@ -218,7 +218,7 @@ public class ProfileBodyDevicePowerlink
     }
 
     /**
-     * Legt den Wert der deviceClass-Eigenschaft fest.
+     * Sets the value of the deviceClass property.
      * 
      * @param value
      *     allowed object is

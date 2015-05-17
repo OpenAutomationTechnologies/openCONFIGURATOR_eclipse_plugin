@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_unit complex type.
+ * <p>Java class for t_unit complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_unit"&gt;
@@ -83,7 +83,7 @@ public class TUnit {
     }
 
     /**
-     * Ruft den Wert der multiplier-Eigenschaft ab.
+     * Gets the value of the multiplier property.
      * 
      * @return
      *     possible object is
@@ -95,7 +95,7 @@ public class TUnit {
     }
 
     /**
-     * Legt den Wert der multiplier-Eigenschaft fest.
+     * Sets the value of the multiplier property.
      * 
      * @param value
      *     allowed object is
@@ -107,7 +107,7 @@ public class TUnit {
     }
 
     /**
-     * Ruft den Wert der unitURI-Eigenschaft ab.
+     * Gets the value of the unitURI property.
      * 
      * @return
      *     possible object is
@@ -119,7 +119,7 @@ public class TUnit {
     }
 
     /**
-     * Legt den Wert der unitURI-Eigenschaft fest.
+     * Sets the value of the unitURI property.
      * 
      * @param value
      *     allowed object is

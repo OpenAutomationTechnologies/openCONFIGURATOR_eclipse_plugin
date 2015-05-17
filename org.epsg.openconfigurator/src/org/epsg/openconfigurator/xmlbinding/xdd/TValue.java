@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_value complex type.
+ * <p>Java class for t_value complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_value"&gt;
@@ -82,7 +82,7 @@ public class TValue {
     }
 
     /**
-     * Ruft den Wert der value-Eigenschaft ab.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
@@ -94,7 +94,7 @@ public class TValue {
     }
 
     /**
-     * Legt den Wert der value-Eigenschaft fest.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
@@ -106,7 +106,7 @@ public class TValue {
     }
 
     /**
-     * Ruft den Wert der offset-Eigenschaft ab.
+     * Gets the value of the offset property.
      * 
      * @return
      *     possible object is
@@ -118,7 +118,7 @@ public class TValue {
     }
 
     /**
-     * Legt den Wert der offset-Eigenschaft fest.
+     * Sets the value of the offset property.
      * 
      * @param value
      *     allowed object is
@@ -130,7 +130,7 @@ public class TValue {
     }
 
     /**
-     * Ruft den Wert der multiplier-Eigenschaft ab.
+     * Gets the value of the multiplier property.
      * 
      * @return
      *     possible object is
@@ -142,7 +142,7 @@ public class TValue {
     }
 
     /**
-     * Legt den Wert der multiplier-Eigenschaft fest.
+     * Sets the value of the multiplier property.
      * 
      * @param value
      *     allowed object is

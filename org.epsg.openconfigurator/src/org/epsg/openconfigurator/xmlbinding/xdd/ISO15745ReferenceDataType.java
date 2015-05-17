@@ -10,9 +10,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ISO15745Reference_DataType complex type.
+ * <p>Java class for ISO15745Reference_DataType complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ISO15745Reference_DataType"&gt;
@@ -48,7 +48,7 @@ public class ISO15745ReferenceDataType {
     protected String profileTechnology;
 
     /**
-     * Ruft den Wert der iso15745Part-Eigenschaft ab.
+     * Gets the value of the iso15745Part property.
      * 
      * @return
      *     possible object is
@@ -60,7 +60,7 @@ public class ISO15745ReferenceDataType {
     }
 
     /**
-     * Legt den Wert der iso15745Part-Eigenschaft fest.
+     * Sets the value of the iso15745Part property.
      * 
      * @param value
      *     allowed object is
@@ -72,7 +72,7 @@ public class ISO15745ReferenceDataType {
     }
 
     /**
-     * Ruft den Wert der iso15745Edition-Eigenschaft ab.
+     * Gets the value of the iso15745Edition property.
      * 
      * @return
      *     possible object is
@@ -84,7 +84,7 @@ public class ISO15745ReferenceDataType {
     }
 
     /**
-     * Legt den Wert der iso15745Edition-Eigenschaft fest.
+     * Sets the value of the iso15745Edition property.
      * 
      * @param value
      *     allowed object is
@@ -96,7 +96,7 @@ public class ISO15745ReferenceDataType {
     }
 
     /**
-     * Ruft den Wert der profileTechnology-Eigenschaft ab.
+     * Gets the value of the profileTechnology property.
      * 
      * @return
      *     possible object is
@@ -108,7 +108,7 @@ public class ISO15745ReferenceDataType {
     }
 
     /**
-     * Legt den Wert der profileTechnology-Eigenschaft fest.
+     * Sets the value of the profileTechnology property.
      * 
      * @param value
      *     allowed object is

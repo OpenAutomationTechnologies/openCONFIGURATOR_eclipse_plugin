@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_LED complex type.
+ * <p>Java class for t_LED complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_LED"&gt;
@@ -165,7 +165,7 @@ public class TLED {
     }
 
     /**
-     * Ruft den Wert der leDcolors-Eigenschaft ab.
+     * Gets the value of the leDcolors property.
      * 
      * @return
      *     possible object is
@@ -177,7 +177,7 @@ public class TLED {
     }
 
     /**
-     * Legt den Wert der leDcolors-Eigenschaft fest.
+     * Sets the value of the leDcolors property.
      * 
      * @param value
      *     allowed object is
@@ -189,7 +189,7 @@ public class TLED {
     }
 
     /**
-     * Ruft den Wert der leDtype-Eigenschaft ab.
+     * Gets the value of the leDtype property.
      * 
      * @return
      *     possible object is
@@ -201,7 +201,7 @@ public class TLED {
     }
 
     /**
-     * Legt den Wert der leDtype-Eigenschaft fest.
+     * Sets the value of the leDtype property.
      * 
      * @param value
      *     allowed object is
@@ -214,9 +214,9 @@ public class TLED {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -317,7 +317,7 @@ public class TLED {
         }
 
         /**
-         * Ruft den Wert der uniqueID-Eigenschaft ab.
+         * Gets the value of the uniqueID property.
          * 
          * @return
          *     possible object is
@@ -329,7 +329,7 @@ public class TLED {
         }
 
         /**
-         * Legt den Wert der uniqueID-Eigenschaft fest.
+         * Sets the value of the uniqueID property.
          * 
          * @param value
          *     allowed object is
@@ -341,7 +341,7 @@ public class TLED {
         }
 
         /**
-         * Ruft den Wert der state-Eigenschaft ab.
+         * Gets the value of the state property.
          * 
          * @return
          *     possible object is
@@ -353,7 +353,7 @@ public class TLED {
         }
 
         /**
-         * Legt den Wert der state-Eigenschaft fest.
+         * Sets the value of the state property.
          * 
          * @param value
          *     allowed object is
@@ -365,7 +365,7 @@ public class TLED {
         }
 
         /**
-         * Ruft den Wert der leDcolor-Eigenschaft ab.
+         * Gets the value of the leDcolor property.
          * 
          * @return
          *     possible object is
@@ -377,7 +377,7 @@ public class TLED {
         }
 
         /**
-         * Legt den Wert der leDcolor-Eigenschaft fest.
+         * Sets the value of the leDcolor property.
          * 
          * @param value
          *     allowed object is
@@ -389,7 +389,7 @@ public class TLED {
         }
 
         /**
-         * Ruft den Wert der flashingPeriod-Eigenschaft ab.
+         * Gets the value of the flashingPeriod property.
          * 
          * @return
          *     possible object is
@@ -401,7 +401,7 @@ public class TLED {
         }
 
         /**
-         * Legt den Wert der flashingPeriod-Eigenschaft fest.
+         * Sets the value of the flashingPeriod property.
          * 
          * @param value
          *     allowed object is
@@ -413,7 +413,7 @@ public class TLED {
         }
 
         /**
-         * Ruft den Wert der impulsWidth-Eigenschaft ab.
+         * Gets the value of the impulsWidth property.
          * 
          * @return
          *     possible object is
@@ -429,7 +429,7 @@ public class TLED {
         }
 
         /**
-         * Legt den Wert der impulsWidth-Eigenschaft fest.
+         * Sets the value of the impulsWidth property.
          * 
          * @param value
          *     allowed object is
@@ -441,7 +441,7 @@ public class TLED {
         }
 
         /**
-         * Ruft den Wert der numberOfImpulses-Eigenschaft ab.
+         * Gets the value of the numberOfImpulses property.
          * 
          * @return
          *     possible object is
@@ -457,7 +457,7 @@ public class TLED {
         }
 
         /**
-         * Legt den Wert der numberOfImpulses-Eigenschaft fest.
+         * Sets the value of the numberOfImpulses property.
          * 
          * @param value
          *     allowed object is

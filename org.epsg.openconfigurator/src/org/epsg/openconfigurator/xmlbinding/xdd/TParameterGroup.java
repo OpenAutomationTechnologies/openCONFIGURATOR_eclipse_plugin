@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_parameterGroup complex type.
+ * <p>Java class for t_parameterGroup complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_parameterGroup"&gt;
@@ -163,7 +163,7 @@ public class TParameterGroup {
     }
 
     /**
-     * Ruft den Wert der uniqueID-Eigenschaft ab.
+     * Gets the value of the uniqueID property.
      * 
      * @return
      *     possible object is
@@ -175,7 +175,7 @@ public class TParameterGroup {
     }
 
     /**
-     * Legt den Wert der uniqueID-Eigenschaft fest.
+     * Sets the value of the uniqueID property.
      * 
      * @param value
      *     allowed object is
@@ -187,7 +187,7 @@ public class TParameterGroup {
     }
 
     /**
-     * Ruft den Wert der kindOfAccess-Eigenschaft ab.
+     * Gets the value of the kindOfAccess property.
      * 
      * @return
      *     possible object is
@@ -199,7 +199,7 @@ public class TParameterGroup {
     }
 
     /**
-     * Legt den Wert der kindOfAccess-Eigenschaft fest.
+     * Sets the value of the kindOfAccess property.
      * 
      * @param value
      *     allowed object is
@@ -212,9 +212,9 @@ public class TParameterGroup {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -238,7 +238,7 @@ public class TParameterGroup {
         protected Object uniqueIDRef;
 
         /**
-         * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+         * Gets the value of the uniqueIDRef property.
          * 
          * @return
          *     possible object is
@@ -250,7 +250,7 @@ public class TParameterGroup {
         }
 
         /**
-         * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+         * Sets the value of the uniqueIDRef property.
          * 
          * @param value
          *     allowed object is

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+*******************************************************************************
+ EPSG - ETHERNET Powerlink Standardization Group
+ Working Group Tools - Subgroup of Technical Working Group
+*******************************************************************************
+
+ ETHERNET Powerlink XML device description
+
+*******************************************************************************
+
+ File:        TextResource.xsd
+ Version:     0.13
+
+ The version number applies to the whole XML schema. So the version number
+ of all file must be identical.
+
+*******************************************************************************
+
+ For a complete schema description the following files are needed:
+ - Powerlink_Main.xsd
+ - CommonElements.xsd
+ - ISO15745ProfileContainer.xsd
+ - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - TextResource.xsd
+
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.ethernet-powerlink.org"
+            xmlns="http://www.ethernet-powerlink.org"
+            elementFormDefault="qualified">
+  <xsd:element name="textResource">
+    <xsd:annotation>
+      <xsd:documentation>
+        This element shall be the document element of a text resource file.
+      </xsd:documentation>
+    </xsd:annotation>
+    <xsd:complexType>
+      <xsd:sequence>
+        <xsd:element name="textEntry" maxOccurs="unbounded">
+          <xsd:annotation>
+            <xsd:documentation>
+              This element shall store a single text.
+            </xsd:documentation>
+          </xsd:annotation>
+          <xsd:complexType>
+            <xsd:simpleContent>
+              <xsd:extension base="xsd:string">
+                <xsd:attribute name="textID" type="xsd:ID" use="required">
+                  <xsd:annotation>
+                    <xsd:documentation>
+                      The unique identifier of the text entry that is referenced by the according entry in the POWERLINK XML file.
+                    </xsd:documentation>
+                  </xsd:annotation>
+                </xsd:attribute>
+              </xsd:extension>
+            </xsd:simpleContent>
+          </xsd:complexType>
+        </xsd:element>
+      </xsd:sequence>
+      <xsd:attribute name="lang" type="xsd:language" use="required">
+        <xsd:annotation>
+          <xsd:documentation>
+            Defines the language used in the text resource file.
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+</xsd:schema>

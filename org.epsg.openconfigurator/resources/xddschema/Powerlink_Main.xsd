@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+*******************************************************************************
+ EPSG - ETHERNET Powerlink Standardization Group
+ Working Group Tools - Subgroup of Technical Working Group
+*******************************************************************************
+
+ ETHERNET Powerlink XML device description
+
+*******************************************************************************
+
+ File:        Powerlink_Main.xsd
+ Version:     0.13
+
+ The version number applies to the whole XML schema. So the version number
+ of all file must be identical.
+
+*******************************************************************************
+
+ For a complete schema description the following files are needed:
+ - Powerlink_Main.xsd
+ - CommonElements.xsd
+ - ISO15745ProfileContainer.xsd
+ - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - TextResource.xsd
+
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://www.ethernet-powerlink.org"
+            xmlns="http://www.ethernet-powerlink.org"
+            elementFormDefault="qualified">
+  <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+  <xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
+  <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
+  <xsd:include schemaLocation="TextResource.xsd"/>
+</xsd:schema>

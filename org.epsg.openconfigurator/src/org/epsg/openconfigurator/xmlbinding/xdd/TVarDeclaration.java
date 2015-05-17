@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_varDeclaration complex type.
+ * <p>Java class for t_varDeclaration complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_varDeclaration"&gt;
@@ -159,7 +159,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der bool-Eigenschaft ab.
+     * Gets the value of the bool property.
      * 
      * @return
      *     possible object is
@@ -171,7 +171,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der bool-Eigenschaft fest.
+     * Sets the value of the bool property.
      * 
      * @param value
      *     allowed object is
@@ -183,7 +183,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der bitstring-Eigenschaft ab.
+     * Gets the value of the bitstring property.
      * 
      * @return
      *     possible object is
@@ -195,7 +195,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der bitstring-Eigenschaft fest.
+     * Sets the value of the bitstring property.
      * 
      * @param value
      *     allowed object is
@@ -207,7 +207,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der byte-Eigenschaft ab.
+     * Gets the value of the byte property.
      * 
      * @return
      *     possible object is
@@ -219,7 +219,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der byte-Eigenschaft fest.
+     * Sets the value of the byte property.
      * 
      * @param value
      *     allowed object is
@@ -231,7 +231,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der char-Eigenschaft ab.
+     * Gets the value of the char property.
      * 
      * @return
      *     possible object is
@@ -243,7 +243,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der char-Eigenschaft fest.
+     * Sets the value of the char property.
      * 
      * @param value
      *     allowed object is
@@ -255,7 +255,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der word-Eigenschaft ab.
+     * Gets the value of the word property.
      * 
      * @return
      *     possible object is
@@ -267,7 +267,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der word-Eigenschaft fest.
+     * Sets the value of the word property.
      * 
      * @param value
      *     allowed object is
@@ -279,7 +279,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der dword-Eigenschaft ab.
+     * Gets the value of the dword property.
      * 
      * @return
      *     possible object is
@@ -291,7 +291,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der dword-Eigenschaft fest.
+     * Sets the value of the dword property.
      * 
      * @param value
      *     allowed object is
@@ -303,7 +303,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der lword-Eigenschaft ab.
+     * Gets the value of the lword property.
      * 
      * @return
      *     possible object is
@@ -315,7 +315,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der lword-Eigenschaft fest.
+     * Sets the value of the lword property.
      * 
      * @param value
      *     allowed object is
@@ -327,7 +327,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der sint-Eigenschaft ab.
+     * Gets the value of the sint property.
      * 
      * @return
      *     possible object is
@@ -339,7 +339,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der sint-Eigenschaft fest.
+     * Sets the value of the sint property.
      * 
      * @param value
      *     allowed object is
@@ -351,7 +351,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der int-Eigenschaft ab.
+     * Gets the value of the int property.
      * 
      * @return
      *     possible object is
@@ -363,7 +363,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der int-Eigenschaft fest.
+     * Sets the value of the int property.
      * 
      * @param value
      *     allowed object is
@@ -375,7 +375,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der dint-Eigenschaft ab.
+     * Gets the value of the dint property.
      * 
      * @return
      *     possible object is
@@ -387,7 +387,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der dint-Eigenschaft fest.
+     * Sets the value of the dint property.
      * 
      * @param value
      *     allowed object is
@@ -399,7 +399,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der lint-Eigenschaft ab.
+     * Gets the value of the lint property.
      * 
      * @return
      *     possible object is
@@ -411,7 +411,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der lint-Eigenschaft fest.
+     * Sets the value of the lint property.
      * 
      * @param value
      *     allowed object is
@@ -423,7 +423,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der usint-Eigenschaft ab.
+     * Gets the value of the usint property.
      * 
      * @return
      *     possible object is
@@ -435,7 +435,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der usint-Eigenschaft fest.
+     * Sets the value of the usint property.
      * 
      * @param value
      *     allowed object is
@@ -447,7 +447,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der uint-Eigenschaft ab.
+     * Gets the value of the uint property.
      * 
      * @return
      *     possible object is
@@ -459,7 +459,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der uint-Eigenschaft fest.
+     * Sets the value of the uint property.
      * 
      * @param value
      *     allowed object is
@@ -471,7 +471,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der udint-Eigenschaft ab.
+     * Gets the value of the udint property.
      * 
      * @return
      *     possible object is
@@ -483,7 +483,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der udint-Eigenschaft fest.
+     * Sets the value of the udint property.
      * 
      * @param value
      *     allowed object is
@@ -495,7 +495,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der ulint-Eigenschaft ab.
+     * Gets the value of the ulint property.
      * 
      * @return
      *     possible object is
@@ -507,7 +507,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der ulint-Eigenschaft fest.
+     * Sets the value of the ulint property.
      * 
      * @param value
      *     allowed object is
@@ -519,7 +519,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der real-Eigenschaft ab.
+     * Gets the value of the real property.
      * 
      * @return
      *     possible object is
@@ -531,7 +531,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der real-Eigenschaft fest.
+     * Sets the value of the real property.
      * 
      * @param value
      *     allowed object is
@@ -543,7 +543,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der lreal-Eigenschaft ab.
+     * Gets the value of the lreal property.
      * 
      * @return
      *     possible object is
@@ -555,7 +555,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der lreal-Eigenschaft fest.
+     * Sets the value of the lreal property.
      * 
      * @param value
      *     allowed object is
@@ -567,7 +567,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der string-Eigenschaft ab.
+     * Gets the value of the string property.
      * 
      * @return
      *     possible object is
@@ -579,7 +579,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der string-Eigenschaft fest.
+     * Sets the value of the string property.
      * 
      * @param value
      *     allowed object is
@@ -591,7 +591,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der wstring-Eigenschaft ab.
+     * Gets the value of the wstring property.
      * 
      * @return
      *     possible object is
@@ -603,7 +603,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der wstring-Eigenschaft fest.
+     * Sets the value of the wstring property.
      * 
      * @param value
      *     allowed object is
@@ -615,7 +615,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der dataTypeIDRef-Eigenschaft ab.
+     * Gets the value of the dataTypeIDRef property.
      * 
      * @return
      *     possible object is
@@ -627,7 +627,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der dataTypeIDRef-Eigenschaft fest.
+     * Sets the value of the dataTypeIDRef property.
      * 
      * @param value
      *     allowed object is
@@ -639,7 +639,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der name-Eigenschaft ab.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
@@ -651,7 +651,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der name-Eigenschaft fest.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
@@ -663,7 +663,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der uniqueID-Eigenschaft ab.
+     * Gets the value of the uniqueID property.
      * 
      * @return
      *     possible object is
@@ -675,7 +675,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der uniqueID-Eigenschaft fest.
+     * Sets the value of the uniqueID property.
      * 
      * @param value
      *     allowed object is
@@ -687,7 +687,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der size-Eigenschaft ab.
+     * Gets the value of the size property.
      * 
      * @return
      *     possible object is
@@ -699,7 +699,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der size-Eigenschaft fest.
+     * Sets the value of the size property.
      * 
      * @param value
      *     allowed object is
@@ -711,7 +711,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Ruft den Wert der initialValue-Eigenschaft ab.
+     * Gets the value of the initialValue property.
      * 
      * @return
      *     possible object is
@@ -723,7 +723,7 @@ public class TVarDeclaration {
     }
 
     /**
-     * Legt den Wert der initialValue-Eigenschaft fest.
+     * Sets the value of the initialValue property.
      * 
      * @param value
      *     allowed object is

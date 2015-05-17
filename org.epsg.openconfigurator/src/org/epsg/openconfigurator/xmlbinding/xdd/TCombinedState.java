@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_combinedState complex type.
+ * <p>Java class for t_combinedState complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_combinedState"&gt;
@@ -121,9 +121,9 @@ public class TCombinedState {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -147,7 +147,7 @@ public class TCombinedState {
         protected Object stateIDRef;
 
         /**
-         * Ruft den Wert der stateIDRef-Eigenschaft ab.
+         * Gets the value of the stateIDRef property.
          * 
          * @return
          *     possible object is
@@ -159,7 +159,7 @@ public class TCombinedState {
         }
 
         /**
-         * Legt den Wert der stateIDRef-Eigenschaft fest.
+         * Sets the value of the stateIDRef property.
          * 
          * @param value
          *     allowed object is

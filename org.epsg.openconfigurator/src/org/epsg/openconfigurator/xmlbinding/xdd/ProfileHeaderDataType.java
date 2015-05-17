@@ -12,9 +12,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java-Klasse für ProfileHeader_DataType complex type.
+ * <p>Java class for ProfileHeader_DataType complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ProfileHeader_DataType"&gt;
@@ -76,7 +76,7 @@ public class ProfileHeaderDataType {
     protected List<String> iasInterfaceType;
 
     /**
-     * Ruft den Wert der profileIdentification-Eigenschaft ab.
+     * Gets the value of the profileIdentification property.
      * 
      * @return
      *     possible object is
@@ -88,7 +88,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der profileIdentification-Eigenschaft fest.
+     * Sets the value of the profileIdentification property.
      * 
      * @param value
      *     allowed object is
@@ -100,7 +100,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der profileRevision-Eigenschaft ab.
+     * Gets the value of the profileRevision property.
      * 
      * @return
      *     possible object is
@@ -112,7 +112,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der profileRevision-Eigenschaft fest.
+     * Sets the value of the profileRevision property.
      * 
      * @param value
      *     allowed object is
@@ -124,7 +124,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der profileName-Eigenschaft ab.
+     * Gets the value of the profileName property.
      * 
      * @return
      *     possible object is
@@ -136,7 +136,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der profileName-Eigenschaft fest.
+     * Sets the value of the profileName property.
      * 
      * @param value
      *     allowed object is
@@ -148,7 +148,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der profileSource-Eigenschaft ab.
+     * Gets the value of the profileSource property.
      * 
      * @return
      *     possible object is
@@ -160,7 +160,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der profileSource-Eigenschaft fest.
+     * Sets the value of the profileSource property.
      * 
      * @param value
      *     allowed object is
@@ -172,7 +172,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der profileClassID-Eigenschaft ab.
+     * Gets the value of the profileClassID property.
      * 
      * @return
      *     possible object is
@@ -184,7 +184,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der profileClassID-Eigenschaft fest.
+     * Sets the value of the profileClassID property.
      * 
      * @param value
      *     allowed object is
@@ -196,7 +196,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der profileDate-Eigenschaft ab.
+     * Gets the value of the profileDate property.
      * 
      * @return
      *     possible object is
@@ -208,7 +208,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der profileDate-Eigenschaft fest.
+     * Sets the value of the profileDate property.
      * 
      * @param value
      *     allowed object is
@@ -220,7 +220,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der additionalInformation-Eigenschaft ab.
+     * Gets the value of the additionalInformation property.
      * 
      * @return
      *     possible object is
@@ -232,7 +232,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der additionalInformation-Eigenschaft fest.
+     * Sets the value of the additionalInformation property.
      * 
      * @param value
      *     allowed object is
@@ -244,7 +244,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Ruft den Wert der iso15745Reference-Eigenschaft ab.
+     * Gets the value of the iso15745Reference property.
      * 
      * @return
      *     possible object is
@@ -256,7 +256,7 @@ public class ProfileHeaderDataType {
     }
 
     /**
-     * Legt den Wert der iso15745Reference-Eigenschaft fest.
+     * Sets the value of the iso15745Reference property.
      * 
      * @param value
      *     allowed object is

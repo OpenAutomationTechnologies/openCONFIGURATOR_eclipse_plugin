@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_dynamicChannel complex type.
+ * <p>Java class for t_dynamicChannel complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_dynamicChannel"&gt;
@@ -73,7 +73,7 @@ public class TDynamicChannel {
     protected Short bitAlignment;
 
     /**
-     * Ruft den Wert der dataType-Eigenschaft ab.
+     * Gets the value of the dataType property.
      * 
      * @return
      *     possible object is
@@ -85,7 +85,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der dataType-Eigenschaft fest.
+     * Sets the value of the dataType property.
      * 
      * @param value
      *     allowed object is
@@ -97,7 +97,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Ruft den Wert der accessType-Eigenschaft ab.
+     * Gets the value of the accessType property.
      * 
      * @return
      *     possible object is
@@ -109,7 +109,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der accessType-Eigenschaft fest.
+     * Sets the value of the accessType property.
      * 
      * @param value
      *     allowed object is
@@ -121,7 +121,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Ruft den Wert der startIndex-Eigenschaft ab.
+     * Gets the value of the startIndex property.
      * 
      * @return
      *     possible object is
@@ -133,7 +133,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der startIndex-Eigenschaft fest.
+     * Sets the value of the startIndex property.
      * 
      * @param value
      *     allowed object is
@@ -145,7 +145,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Ruft den Wert der endIndex-Eigenschaft ab.
+     * Gets the value of the endIndex property.
      * 
      * @return
      *     possible object is
@@ -157,7 +157,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der endIndex-Eigenschaft fest.
+     * Sets the value of the endIndex property.
      * 
      * @param value
      *     allowed object is
@@ -169,7 +169,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Ruft den Wert der maxNumber-Eigenschaft ab.
+     * Gets the value of the maxNumber property.
      * 
      */
     public long getMaxNumber() {
@@ -177,7 +177,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der maxNumber-Eigenschaft fest.
+     * Sets the value of the maxNumber property.
      * 
      */
     public void setMaxNumber(long value) {
@@ -185,7 +185,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Ruft den Wert der addressOffset-Eigenschaft ab.
+     * Gets the value of the addressOffset property.
      * 
      * @return
      *     possible object is
@@ -197,7 +197,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der addressOffset-Eigenschaft fest.
+     * Sets the value of the addressOffset property.
      * 
      * @param value
      *     allowed object is
@@ -209,7 +209,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Ruft den Wert der bitAlignment-Eigenschaft ab.
+     * Gets the value of the bitAlignment property.
      * 
      * @return
      *     possible object is
@@ -221,7 +221,7 @@ public class TDynamicChannel {
     }
 
     /**
-     * Legt den Wert der bitAlignment-Eigenschaft fest.
+     * Sets the value of the bitAlignment property.
      * 
      * @param value
      *     allowed object is

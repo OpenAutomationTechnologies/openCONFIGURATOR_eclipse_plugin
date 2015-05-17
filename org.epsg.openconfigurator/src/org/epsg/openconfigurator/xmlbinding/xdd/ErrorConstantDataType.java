@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ErrorConstant_DataType complex type.
+ * <p>Java class for ErrorConstant_DataType complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ErrorConstant_DataType"&gt;
@@ -140,7 +140,7 @@ public class ErrorConstantDataType {
     }
 
     /**
-     * Ruft den Wert der name-Eigenschaft ab.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
@@ -152,7 +152,7 @@ public class ErrorConstantDataType {
     }
 
     /**
-     * Legt den Wert der name-Eigenschaft fest.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
@@ -164,7 +164,7 @@ public class ErrorConstantDataType {
     }
 
     /**
-     * Ruft den Wert der value-Eigenschaft ab.
+     * Gets the value of the value property.
      * 
      * @return
      *     possible object is
@@ -176,7 +176,7 @@ public class ErrorConstantDataType {
     }
 
     /**
-     * Legt den Wert der value-Eigenschaft fest.
+     * Sets the value of the value property.
      * 
      * @param value
      *     allowed object is
@@ -189,9 +189,9 @@ public class ErrorConstantDataType {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -307,7 +307,7 @@ public class ErrorConstantDataType {
         }
 
         /**
-         * Ruft den Wert der bitOffset-Eigenschaft ab.
+         * Gets the value of the bitOffset property.
          * 
          */
         public short getBitOffset() {
@@ -315,7 +315,7 @@ public class ErrorConstantDataType {
         }
 
         /**
-         * Legt den Wert der bitOffset-Eigenschaft fest.
+         * Sets the value of the bitOffset property.
          * 
          */
         public void setBitOffset(short value) {
@@ -323,7 +323,7 @@ public class ErrorConstantDataType {
         }
 
         /**
-         * Ruft den Wert der len-Eigenschaft ab.
+         * Gets the value of the len property.
          * 
          */
         public short getLen() {
@@ -331,7 +331,7 @@ public class ErrorConstantDataType {
         }
 
         /**
-         * Legt den Wert der len-Eigenschaft fest.
+         * Sets the value of the len property.
          * 
          */
         public void setLen(short value) {
@@ -339,7 +339,7 @@ public class ErrorConstantDataType {
         }
 
         /**
-         * Ruft den Wert der name-Eigenschaft ab.
+         * Gets the value of the name property.
          * 
          * @return
          *     possible object is
@@ -351,7 +351,7 @@ public class ErrorConstantDataType {
         }
 
         /**
-         * Legt den Wert der name-Eigenschaft fest.
+         * Sets the value of the name property.
          * 
          * @param value
          *     allowed object is
@@ -364,9 +364,9 @@ public class ErrorConstantDataType {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -433,7 +433,7 @@ public class ErrorConstantDataType {
             }
 
             /**
-             * Ruft den Wert der value-Eigenschaft ab.
+             * Gets the value of the value property.
              * 
              * @return
              *     possible object is
@@ -445,7 +445,7 @@ public class ErrorConstantDataType {
             }
 
             /**
-             * Legt den Wert der value-Eigenschaft fest.
+             * Sets the value of the value property.
              * 
              * @param value
              *     allowed object is
@@ -457,7 +457,7 @@ public class ErrorConstantDataType {
             }
 
             /**
-             * Ruft den Wert der name-Eigenschaft ab.
+             * Gets the value of the name property.
              * 
              * @return
              *     possible object is
@@ -469,7 +469,7 @@ public class ErrorConstantDataType {
             }
 
             /**
-             * Legt den Wert der name-Eigenschaft fest.
+             * Sets the value of the name property.
              * 
              * @param value
              *     allowed object is

@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_CNFeatures complex type.
+ * <p>Java class for t_CNFeatures complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_CNFeatures"&gt;
@@ -40,7 +40,7 @@ public class TCNFeatures {
     protected long nmtcnSoC2PReq;
 
     /**
-     * Ruft den Wert der dllcnFeatureMultiplex-Eigenschaft ab.
+     * Gets the value of the dllcnFeatureMultiplex property.
      * 
      * @return
      *     possible object is
@@ -56,7 +56,7 @@ public class TCNFeatures {
     }
 
     /**
-     * Legt den Wert der dllcnFeatureMultiplex-Eigenschaft fest.
+     * Sets the value of the dllcnFeatureMultiplex property.
      * 
      * @param value
      *     allowed object is
@@ -68,7 +68,7 @@ public class TCNFeatures {
     }
 
     /**
-     * Ruft den Wert der dllcnpResChaining-Eigenschaft ab.
+     * Gets the value of the dllcnpResChaining property.
      * 
      * @return
      *     possible object is
@@ -84,7 +84,7 @@ public class TCNFeatures {
     }
 
     /**
-     * Legt den Wert der dllcnpResChaining-Eigenschaft fest.
+     * Sets the value of the dllcnpResChaining property.
      * 
      * @param value
      *     allowed object is
@@ -96,7 +96,7 @@ public class TCNFeatures {
     }
 
     /**
-     * Ruft den Wert der nmtcnSoC2PReq-Eigenschaft ab.
+     * Gets the value of the nmtcnSoC2PReq property.
      * 
      */
     public long getNMTCNSoC2PReq() {
@@ -104,7 +104,7 @@ public class TCNFeatures {
     }
 
     /**
-     * Legt den Wert der nmtcnSoC2PReq-Eigenschaft fest.
+     * Sets the value of the nmtcnSoC2PReq property.
      * 
      */
     public void setNMTCNSoC2PReq(long value) {

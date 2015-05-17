@@ -17,9 +17,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_functionInstanceList complex type.
+ * <p>Java class for t_functionInstanceList complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_functionInstanceList"&gt;
@@ -130,9 +130,9 @@ public class TFunctionInstanceList {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -160,7 +160,7 @@ public class TFunctionInstanceList {
         protected String description;
 
         /**
-         * Ruft den Wert der source-Eigenschaft ab.
+         * Gets the value of the source property.
          * 
          * @return
          *     possible object is
@@ -172,7 +172,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Legt den Wert der source-Eigenschaft fest.
+         * Sets the value of the source property.
          * 
          * @param value
          *     allowed object is
@@ -184,7 +184,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Ruft den Wert der destination-Eigenschaft ab.
+         * Gets the value of the destination property.
          * 
          * @return
          *     possible object is
@@ -196,7 +196,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Legt den Wert der destination-Eigenschaft fest.
+         * Sets the value of the destination property.
          * 
          * @param value
          *     allowed object is
@@ -208,7 +208,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Ruft den Wert der description-Eigenschaft ab.
+         * Gets the value of the description property.
          * 
          * @return
          *     possible object is
@@ -220,7 +220,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Legt den Wert der description-Eigenschaft fest.
+         * Sets the value of the description property.
          * 
          * @param value
          *     allowed object is
@@ -235,9 +235,9 @@ public class TFunctionInstanceList {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -314,7 +314,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Ruft den Wert der name-Eigenschaft ab.
+         * Gets the value of the name property.
          * 
          * @return
          *     possible object is
@@ -326,7 +326,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Legt den Wert der name-Eigenschaft fest.
+         * Sets the value of the name property.
          * 
          * @param value
          *     allowed object is
@@ -338,7 +338,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Ruft den Wert der uniqueID-Eigenschaft ab.
+         * Gets the value of the uniqueID property.
          * 
          * @return
          *     possible object is
@@ -350,7 +350,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Legt den Wert der uniqueID-Eigenschaft fest.
+         * Sets the value of the uniqueID property.
          * 
          * @param value
          *     allowed object is
@@ -362,7 +362,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Ruft den Wert der typeIDRef-Eigenschaft ab.
+         * Gets the value of the typeIDRef property.
          * 
          * @return
          *     possible object is
@@ -374,7 +374,7 @@ public class TFunctionInstanceList {
         }
 
         /**
-         * Legt den Wert der typeIDRef-Eigenschaft fest.
+         * Sets the value of the typeIDRef property.
          * 
          * @param value
          *     allowed object is

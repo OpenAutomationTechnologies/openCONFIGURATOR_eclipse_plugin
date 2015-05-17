@@ -12,9 +12,9 @@ import org.w3c.dom.Element;
  * Element to define communication relationships in a POWERLINK network. I.e.
  *                 how objects are transferred between nodes.
  * 
- * <p>Java-Klasse für tCommunicationRelationships complex type.
+ * <p>Java class for tCommunicationRelationships complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tCommunicationRelationships"&gt;
@@ -40,7 +40,7 @@ public class TCommunicationRelationships {
     protected Element any;
 
     /**
-     * Ruft den Wert der any-Eigenschaft ab.
+     * Gets the value of the any property.
      * 
      * @return
      *     possible object is
@@ -52,7 +52,7 @@ public class TCommunicationRelationships {
     }
 
     /**
-     * Legt den Wert der any-Eigenschaft fest.
+     * Sets the value of the any property.
      * 
      * @param value
      *     allowed object is

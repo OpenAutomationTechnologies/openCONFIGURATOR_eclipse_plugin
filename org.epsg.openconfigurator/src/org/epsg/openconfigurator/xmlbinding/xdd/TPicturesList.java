@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_picturesList complex type.
+ * <p>Java class for t_picturesList complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_picturesList"&gt;
@@ -81,9 +81,9 @@ public class TPicturesList {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -152,7 +152,7 @@ public class TPicturesList {
         }
 
         /**
-         * Ruft den Wert der uri-Eigenschaft ab.
+         * Gets the value of the uri property.
          * 
          * @return
          *     possible object is
@@ -164,7 +164,7 @@ public class TPicturesList {
         }
 
         /**
-         * Legt den Wert der uri-Eigenschaft fest.
+         * Sets the value of the uri property.
          * 
          * @param value
          *     allowed object is
@@ -176,7 +176,7 @@ public class TPicturesList {
         }
 
         /**
-         * Ruft den Wert der number-Eigenschaft ab.
+         * Gets the value of the number property.
          * 
          * @return
          *     possible object is
@@ -188,7 +188,7 @@ public class TPicturesList {
         }
 
         /**
-         * Legt den Wert der number-Eigenschaft fest.
+         * Sets the value of the number property.
          * 
          * @param value
          *     allowed object is

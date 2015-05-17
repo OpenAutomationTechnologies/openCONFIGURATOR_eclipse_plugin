@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * An abstract type for a POWERLINK node (MN or CN). 
  * 
- * <p>Java-Klasse für tAbstractNode complex type.
+ * <p>Java class for tAbstractNode complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tAbstractNode"&gt;
@@ -68,7 +68,7 @@ public abstract class TAbstractNode {
     protected Boolean isType2Router;
 
     /**
-     * Ruft den Wert der forcedObjects-Eigenschaft ab.
+     * Gets the value of the forcedObjects property.
      * 
      * @return
      *     possible object is
@@ -80,7 +80,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Legt den Wert der forcedObjects-Eigenschaft fest.
+     * Sets the value of the forcedObjects property.
      * 
      * @param value
      *     allowed object is
@@ -92,7 +92,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Ruft den Wert der name-Eigenschaft ab.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
@@ -104,7 +104,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Legt den Wert der name-Eigenschaft fest.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
@@ -116,7 +116,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Ruft den Wert der isAsyncOnly-Eigenschaft ab.
+     * Gets the value of the isAsyncOnly property.
      * 
      * @return
      *     possible object is
@@ -132,7 +132,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Legt den Wert der isAsyncOnly-Eigenschaft fest.
+     * Sets the value of the isAsyncOnly property.
      * 
      * @param value
      *     allowed object is
@@ -144,7 +144,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Ruft den Wert der isType1Router-Eigenschaft ab.
+     * Gets the value of the isType1Router property.
      * 
      * @return
      *     possible object is
@@ -160,7 +160,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Legt den Wert der isType1Router-Eigenschaft fest.
+     * Sets the value of the isType1Router property.
      * 
      * @param value
      *     allowed object is
@@ -172,7 +172,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Ruft den Wert der isType2Router-Eigenschaft ab.
+     * Gets the value of the isType2Router property.
      * 
      * @return
      *     possible object is
@@ -188,7 +188,7 @@ public abstract class TAbstractNode {
     }
 
     /**
-     * Legt den Wert der isType2Router-Eigenschaft fest.
+     * Sets the value of the isType2Router property.
      * 
      * @param value
      *     allowed object is
@@ -201,9 +201,9 @@ public abstract class TAbstractNode {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;

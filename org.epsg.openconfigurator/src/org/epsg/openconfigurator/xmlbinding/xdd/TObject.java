@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
- * <p>Java-Klasse für t_Object complex type.
+ * <p>Java class for t_Object complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_Object"&gt;
@@ -122,7 +122,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der index-Eigenschaft ab.
+     * Gets the value of the index property.
      * 
      * @return
      *     possible object is
@@ -134,7 +134,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der index-Eigenschaft fest.
+     * Sets the value of the index property.
      * 
      * @param value
      *     allowed object is
@@ -146,7 +146,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der subNumber-Eigenschaft ab.
+     * Gets the value of the subNumber property.
      * 
      * @return
      *     possible object is
@@ -158,7 +158,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der subNumber-Eigenschaft fest.
+     * Sets the value of the subNumber property.
      * 
      * @param value
      *     allowed object is
@@ -170,7 +170,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der name-Eigenschaft ab.
+     * Gets the value of the name property.
      * 
      * @return
      *     possible object is
@@ -182,7 +182,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der name-Eigenschaft fest.
+     * Sets the value of the name property.
      * 
      * @param value
      *     allowed object is
@@ -194,7 +194,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der objectType-Eigenschaft ab.
+     * Gets the value of the objectType property.
      * 
      */
     public short getObjectType() {
@@ -202,7 +202,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der objectType-Eigenschaft fest.
+     * Sets the value of the objectType property.
      * 
      */
     public void setObjectType(short value) {
@@ -210,7 +210,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der dataType-Eigenschaft ab.
+     * Gets the value of the dataType property.
      * 
      * @return
      *     possible object is
@@ -222,7 +222,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der dataType-Eigenschaft fest.
+     * Sets the value of the dataType property.
      * 
      * @param value
      *     allowed object is
@@ -234,7 +234,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der lowLimit-Eigenschaft ab.
+     * Gets the value of the lowLimit property.
      * 
      * @return
      *     possible object is
@@ -246,7 +246,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der lowLimit-Eigenschaft fest.
+     * Sets the value of the lowLimit property.
      * 
      * @param value
      *     allowed object is
@@ -258,7 +258,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der highLimit-Eigenschaft ab.
+     * Gets the value of the highLimit property.
      * 
      * @return
      *     possible object is
@@ -270,7 +270,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der highLimit-Eigenschaft fest.
+     * Sets the value of the highLimit property.
      * 
      * @param value
      *     allowed object is
@@ -282,7 +282,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der accessType-Eigenschaft ab.
+     * Gets the value of the accessType property.
      * 
      * @return
      *     possible object is
@@ -294,7 +294,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der accessType-Eigenschaft fest.
+     * Sets the value of the accessType property.
      * 
      * @param value
      *     allowed object is
@@ -306,7 +306,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der defaultValue-Eigenschaft ab.
+     * Gets the value of the defaultValue property.
      * 
      * @return
      *     possible object is
@@ -318,7 +318,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der defaultValue-Eigenschaft fest.
+     * Sets the value of the defaultValue property.
      * 
      * @param value
      *     allowed object is
@@ -330,7 +330,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der actualValue-Eigenschaft ab.
+     * Gets the value of the actualValue property.
      * 
      * @return
      *     possible object is
@@ -342,7 +342,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der actualValue-Eigenschaft fest.
+     * Sets the value of the actualValue property.
      * 
      * @param value
      *     allowed object is
@@ -354,7 +354,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der denotation-Eigenschaft ab.
+     * Gets the value of the denotation property.
      * 
      * @return
      *     possible object is
@@ -366,7 +366,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der denotation-Eigenschaft fest.
+     * Sets the value of the denotation property.
      * 
      * @param value
      *     allowed object is
@@ -378,7 +378,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der pdOmapping-Eigenschaft ab.
+     * Gets the value of the pdOmapping property.
      * 
      * @return
      *     possible object is
@@ -390,7 +390,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der pdOmapping-Eigenschaft fest.
+     * Sets the value of the pdOmapping property.
      * 
      * @param value
      *     allowed object is
@@ -402,7 +402,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der objFlags-Eigenschaft ab.
+     * Gets the value of the objFlags property.
      * 
      * @return
      *     possible object is
@@ -414,7 +414,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der objFlags-Eigenschaft fest.
+     * Sets the value of the objFlags property.
      * 
      * @param value
      *     allowed object is
@@ -426,7 +426,7 @@ public class TObject {
     }
 
     /**
-     * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+     * Gets the value of the uniqueIDRef property.
      * 
      * @return
      *     possible object is
@@ -438,7 +438,7 @@ public class TObject {
     }
 
     /**
-     * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+     * Sets the value of the uniqueIDRef property.
      * 
      * @param value
      *     allowed object is
@@ -451,9 +451,9 @@ public class TObject {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -509,7 +509,7 @@ public class TObject {
         protected Object uniqueIDRef;
 
         /**
-         * Ruft den Wert der subIndex-Eigenschaft ab.
+         * Gets the value of the subIndex property.
          * 
          * @return
          *     possible object is
@@ -521,7 +521,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der subIndex-Eigenschaft fest.
+         * Sets the value of the subIndex property.
          * 
          * @param value
          *     allowed object is
@@ -533,7 +533,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der name-Eigenschaft ab.
+         * Gets the value of the name property.
          * 
          * @return
          *     possible object is
@@ -545,7 +545,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der name-Eigenschaft fest.
+         * Sets the value of the name property.
          * 
          * @param value
          *     allowed object is
@@ -557,7 +557,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der objectType-Eigenschaft ab.
+         * Gets the value of the objectType property.
          * 
          */
         public short getObjectType() {
@@ -565,7 +565,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der objectType-Eigenschaft fest.
+         * Sets the value of the objectType property.
          * 
          */
         public void setObjectType(short value) {
@@ -573,7 +573,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der dataType-Eigenschaft ab.
+         * Gets the value of the dataType property.
          * 
          * @return
          *     possible object is
@@ -585,7 +585,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der dataType-Eigenschaft fest.
+         * Sets the value of the dataType property.
          * 
          * @param value
          *     allowed object is
@@ -597,7 +597,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der lowLimit-Eigenschaft ab.
+         * Gets the value of the lowLimit property.
          * 
          * @return
          *     possible object is
@@ -609,7 +609,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der lowLimit-Eigenschaft fest.
+         * Sets the value of the lowLimit property.
          * 
          * @param value
          *     allowed object is
@@ -621,7 +621,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der highLimit-Eigenschaft ab.
+         * Gets the value of the highLimit property.
          * 
          * @return
          *     possible object is
@@ -633,7 +633,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der highLimit-Eigenschaft fest.
+         * Sets the value of the highLimit property.
          * 
          * @param value
          *     allowed object is
@@ -645,7 +645,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der accessType-Eigenschaft ab.
+         * Gets the value of the accessType property.
          * 
          * @return
          *     possible object is
@@ -657,7 +657,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der accessType-Eigenschaft fest.
+         * Sets the value of the accessType property.
          * 
          * @param value
          *     allowed object is
@@ -669,7 +669,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der defaultValue-Eigenschaft ab.
+         * Gets the value of the defaultValue property.
          * 
          * @return
          *     possible object is
@@ -681,7 +681,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der defaultValue-Eigenschaft fest.
+         * Sets the value of the defaultValue property.
          * 
          * @param value
          *     allowed object is
@@ -693,7 +693,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der actualValue-Eigenschaft ab.
+         * Gets the value of the actualValue property.
          * 
          * @return
          *     possible object is
@@ -705,7 +705,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der actualValue-Eigenschaft fest.
+         * Sets the value of the actualValue property.
          * 
          * @param value
          *     allowed object is
@@ -717,7 +717,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der denotation-Eigenschaft ab.
+         * Gets the value of the denotation property.
          * 
          * @return
          *     possible object is
@@ -729,7 +729,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der denotation-Eigenschaft fest.
+         * Sets the value of the denotation property.
          * 
          * @param value
          *     allowed object is
@@ -741,7 +741,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der pdOmapping-Eigenschaft ab.
+         * Gets the value of the pdOmapping property.
          * 
          * @return
          *     possible object is
@@ -753,7 +753,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der pdOmapping-Eigenschaft fest.
+         * Sets the value of the pdOmapping property.
          * 
          * @param value
          *     allowed object is
@@ -765,7 +765,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der objFlags-Eigenschaft ab.
+         * Gets the value of the objFlags property.
          * 
          * @return
          *     possible object is
@@ -777,7 +777,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der objFlags-Eigenschaft fest.
+         * Sets the value of the objFlags property.
          * 
          * @param value
          *     allowed object is
@@ -789,7 +789,7 @@ public class TObject {
         }
 
         /**
-         * Ruft den Wert der uniqueIDRef-Eigenschaft ab.
+         * Gets the value of the uniqueIDRef property.
          * 
          * @return
          *     possible object is
@@ -801,7 +801,7 @@ public class TObject {
         }
 
         /**
-         * Legt den Wert der uniqueIDRef-Eigenschaft fest.
+         * Sets the value of the uniqueIDRef property.
          * 
          * @param value
          *     allowed object is

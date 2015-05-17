@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_deviceFamily complex type.
+ * <p>Java class for t_deviceFamily complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_deviceFamily"&gt;
@@ -78,7 +78,7 @@ public class TDeviceFamily {
     }
 
     /**
-     * Ruft den Wert der readOnly-Eigenschaft ab.
+     * Gets the value of the readOnly property.
      * 
      * @return
      *     possible object is
@@ -94,7 +94,7 @@ public class TDeviceFamily {
     }
 
     /**
-     * Legt den Wert der readOnly-Eigenschaft fest.
+     * Sets the value of the readOnly property.
      * 
      * @param value
      *     allowed object is

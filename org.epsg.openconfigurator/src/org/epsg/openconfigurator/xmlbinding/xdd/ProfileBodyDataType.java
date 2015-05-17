@@ -13,9 +13,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java-Klasse für ProfileBody_DataType complex type.
+ * <p>Java class for ProfileBody_DataType complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ProfileBody_DataType"&gt;
@@ -79,7 +79,7 @@ public abstract class ProfileBodyDataType {
     protected List<String> supportedLanguages;
 
     /**
-     * Ruft den Wert der formatName-Eigenschaft ab.
+     * Gets the value of the formatName property.
      * 
      * @return
      *     possible object is
@@ -95,7 +95,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der formatName-Eigenschaft fest.
+     * Sets the value of the formatName property.
      * 
      * @param value
      *     allowed object is
@@ -107,7 +107,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der formatVersion-Eigenschaft ab.
+     * Gets the value of the formatVersion property.
      * 
      * @return
      *     possible object is
@@ -123,7 +123,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der formatVersion-Eigenschaft fest.
+     * Sets the value of the formatVersion property.
      * 
      * @param value
      *     allowed object is
@@ -135,7 +135,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileName-Eigenschaft ab.
+     * Gets the value of the fileName property.
      * 
      * @return
      *     possible object is
@@ -147,7 +147,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileName-Eigenschaft fest.
+     * Sets the value of the fileName property.
      * 
      * @param value
      *     allowed object is
@@ -159,7 +159,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileCreator-Eigenschaft ab.
+     * Gets the value of the fileCreator property.
      * 
      * @return
      *     possible object is
@@ -171,7 +171,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileCreator-Eigenschaft fest.
+     * Sets the value of the fileCreator property.
      * 
      * @param value
      *     allowed object is
@@ -183,7 +183,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileCreationDate-Eigenschaft ab.
+     * Gets the value of the fileCreationDate property.
      * 
      * @return
      *     possible object is
@@ -195,7 +195,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileCreationDate-Eigenschaft fest.
+     * Sets the value of the fileCreationDate property.
      * 
      * @param value
      *     allowed object is
@@ -207,7 +207,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileCreationTime-Eigenschaft ab.
+     * Gets the value of the fileCreationTime property.
      * 
      * @return
      *     possible object is
@@ -219,7 +219,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileCreationTime-Eigenschaft fest.
+     * Sets the value of the fileCreationTime property.
      * 
      * @param value
      *     allowed object is
@@ -231,7 +231,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileModificationDate-Eigenschaft ab.
+     * Gets the value of the fileModificationDate property.
      * 
      * @return
      *     possible object is
@@ -243,7 +243,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileModificationDate-Eigenschaft fest.
+     * Sets the value of the fileModificationDate property.
      * 
      * @param value
      *     allowed object is
@@ -255,7 +255,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileModificationTime-Eigenschaft ab.
+     * Gets the value of the fileModificationTime property.
      * 
      * @return
      *     possible object is
@@ -267,7 +267,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileModificationTime-Eigenschaft fest.
+     * Sets the value of the fileModificationTime property.
      * 
      * @param value
      *     allowed object is
@@ -279,7 +279,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileModifiedBy-Eigenschaft ab.
+     * Gets the value of the fileModifiedBy property.
      * 
      * @return
      *     possible object is
@@ -291,7 +291,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileModifiedBy-Eigenschaft fest.
+     * Sets the value of the fileModifiedBy property.
      * 
      * @param value
      *     allowed object is
@@ -303,7 +303,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Ruft den Wert der fileVersion-Eigenschaft ab.
+     * Gets the value of the fileVersion property.
      * 
      * @return
      *     possible object is
@@ -315,7 +315,7 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
-     * Legt den Wert der fileVersion-Eigenschaft fest.
+     * Sets the value of the fileVersion property.
      * 
      * @param value
      *     allowed object is

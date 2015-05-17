@@ -17,9 +17,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * <p>Java-Klasse für t_functionTypeList complex type.
+ * <p>Java class for t_functionTypeList complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_functionTypeList"&gt;
@@ -147,9 +147,9 @@ public class TFunctionTypeList {
 
 
     /**
-     * <p>Java-Klasse für anonymous complex type.
+     * <p>Java class for anonymous complex type.
      * 
-     * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+     * <p>The following schema fragment specifies the expected content contained within this class.
      * 
      * <pre>
      * &lt;complexType&gt;
@@ -320,7 +320,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Ruft den Wert der interfaceList-Eigenschaft ab.
+         * Gets the value of the interfaceList property.
          * 
          * @return
          *     possible object is
@@ -332,7 +332,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Legt den Wert der interfaceList-Eigenschaft fest.
+         * Sets the value of the interfaceList property.
          * 
          * @param value
          *     allowed object is
@@ -344,7 +344,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Ruft den Wert der functionInstanceList-Eigenschaft ab.
+         * Gets the value of the functionInstanceList property.
          * 
          * @return
          *     possible object is
@@ -356,7 +356,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Legt den Wert der functionInstanceList-Eigenschaft fest.
+         * Sets the value of the functionInstanceList property.
          * 
          * @param value
          *     allowed object is
@@ -368,7 +368,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Ruft den Wert der name-Eigenschaft ab.
+         * Gets the value of the name property.
          * 
          * @return
          *     possible object is
@@ -380,7 +380,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Legt den Wert der name-Eigenschaft fest.
+         * Sets the value of the name property.
          * 
          * @param value
          *     allowed object is
@@ -392,7 +392,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Ruft den Wert der uniqueID-Eigenschaft ab.
+         * Gets the value of the uniqueID property.
          * 
          * @return
          *     possible object is
@@ -404,7 +404,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Legt den Wert der uniqueID-Eigenschaft fest.
+         * Sets the value of the uniqueID property.
          * 
          * @param value
          *     allowed object is
@@ -416,7 +416,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Ruft den Wert der package-Eigenschaft ab.
+         * Gets the value of the package property.
          * 
          * @return
          *     possible object is
@@ -428,7 +428,7 @@ public class TFunctionTypeList {
         }
 
         /**
-         * Legt den Wert der package-Eigenschaft fest.
+         * Sets the value of the package property.
          * 
          * @param value
          *     allowed object is
@@ -441,9 +441,9 @@ public class TFunctionTypeList {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -504,7 +504,7 @@ public class TFunctionTypeList {
             protected TFunctionTypeList.FunctionType.InterfaceList.ConfigVars configVars;
 
             /**
-             * Ruft den Wert der inputVars-Eigenschaft ab.
+             * Gets the value of the inputVars property.
              * 
              * @return
              *     possible object is
@@ -516,7 +516,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der inputVars-Eigenschaft fest.
+             * Sets the value of the inputVars property.
              * 
              * @param value
              *     allowed object is
@@ -528,7 +528,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Ruft den Wert der outputVars-Eigenschaft ab.
+             * Gets the value of the outputVars property.
              * 
              * @return
              *     possible object is
@@ -540,7 +540,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der outputVars-Eigenschaft fest.
+             * Sets the value of the outputVars property.
              * 
              * @param value
              *     allowed object is
@@ -552,7 +552,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Ruft den Wert der configVars-Eigenschaft ab.
+             * Gets the value of the configVars property.
              * 
              * @return
              *     possible object is
@@ -564,7 +564,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der configVars-Eigenschaft fest.
+             * Sets the value of the configVars property.
              * 
              * @param value
              *     allowed object is
@@ -577,9 +577,9 @@ public class TFunctionTypeList {
 
 
             /**
-             * <p>Java-Klasse für anonymous complex type.
+             * <p>Java class for anonymous complex type.
              * 
-             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * <p>The following schema fragment specifies the expected content contained within this class.
              * 
              * <pre>
              * &lt;complexType&gt;
@@ -637,9 +637,9 @@ public class TFunctionTypeList {
 
 
             /**
-             * <p>Java-Klasse für anonymous complex type.
+             * <p>Java class for anonymous complex type.
              * 
-             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * <p>The following schema fragment specifies the expected content contained within this class.
              * 
              * <pre>
              * &lt;complexType&gt;
@@ -697,9 +697,9 @@ public class TFunctionTypeList {
 
 
             /**
-             * <p>Java-Klasse für anonymous complex type.
+             * <p>Java class for anonymous complex type.
              * 
-             * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+             * <p>The following schema fragment specifies the expected content contained within this class.
              * 
              * <pre>
              * &lt;complexType&gt;
@@ -759,9 +759,9 @@ public class TFunctionTypeList {
 
 
         /**
-         * <p>Java-Klasse für anonymous complex type.
+         * <p>Java class for anonymous complex type.
          * 
-         * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+         * <p>The following schema fragment specifies the expected content contained within this class.
          * 
          * <pre>
          * &lt;complexType&gt;
@@ -837,7 +837,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Ruft den Wert der organization-Eigenschaft ab.
+             * Gets the value of the organization property.
              * 
              * @return
              *     possible object is
@@ -849,7 +849,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der organization-Eigenschaft fest.
+             * Sets the value of the organization property.
              * 
              * @param value
              *     allowed object is
@@ -861,7 +861,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Ruft den Wert der version-Eigenschaft ab.
+             * Gets the value of the version property.
              * 
              * @return
              *     possible object is
@@ -873,7 +873,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der version-Eigenschaft fest.
+             * Sets the value of the version property.
              * 
              * @param value
              *     allowed object is
@@ -885,7 +885,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Ruft den Wert der author-Eigenschaft ab.
+             * Gets the value of the author property.
              * 
              * @return
              *     possible object is
@@ -897,7 +897,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der author-Eigenschaft fest.
+             * Sets the value of the author property.
              * 
              * @param value
              *     allowed object is
@@ -909,7 +909,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Ruft den Wert der date-Eigenschaft ab.
+             * Gets the value of the date property.
              * 
              * @return
              *     possible object is
@@ -921,7 +921,7 @@ public class TFunctionTypeList {
             }
 
             /**
-             * Legt den Wert der date-Eigenschaft fest.
+             * Sets the value of the date property.
              * 
              * @param value
              *     allowed object is

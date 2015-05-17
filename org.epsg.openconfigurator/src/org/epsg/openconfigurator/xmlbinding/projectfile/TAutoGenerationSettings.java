@@ -13,9 +13,9 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * openCONFIGURATOR auto-generation settings for the MN-OD. 
  * 
- * <p>Java-Klasse für tAutoGenerationSettings complex type.
+ * <p>Java class for tAutoGenerationSettings complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="tAutoGenerationSettings"&gt;
@@ -73,7 +73,7 @@ public class TAutoGenerationSettings {
     }
 
     /**
-     * Ruft den Wert der id-Eigenschaft ab.
+     * Gets the value of the id property.
      * 
      * @return
      *     possible object is
@@ -85,7 +85,7 @@ public class TAutoGenerationSettings {
     }
 
     /**
-     * Legt den Wert der id-Eigenschaft fest.
+     * Sets the value of the id property.
      * 
      * @param value
      *     allowed object is

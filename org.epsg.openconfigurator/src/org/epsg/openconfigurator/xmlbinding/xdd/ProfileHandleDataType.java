@@ -9,9 +9,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für ProfileHandle_DataType complex type.
+ * <p>Java class for ProfileHandle_DataType complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="ProfileHandle_DataType"&gt;
@@ -46,7 +46,7 @@ public class ProfileHandleDataType {
     protected String profileLocation;
 
     /**
-     * Ruft den Wert der profileIdentification-Eigenschaft ab.
+     * Gets the value of the profileIdentification property.
      * 
      * @return
      *     possible object is
@@ -58,7 +58,7 @@ public class ProfileHandleDataType {
     }
 
     /**
-     * Legt den Wert der profileIdentification-Eigenschaft fest.
+     * Sets the value of the profileIdentification property.
      * 
      * @param value
      *     allowed object is
@@ -70,7 +70,7 @@ public class ProfileHandleDataType {
     }
 
     /**
-     * Ruft den Wert der profileRevision-Eigenschaft ab.
+     * Gets the value of the profileRevision property.
      * 
      * @return
      *     possible object is
@@ -82,7 +82,7 @@ public class ProfileHandleDataType {
     }
 
     /**
-     * Legt den Wert der profileRevision-Eigenschaft fest.
+     * Sets the value of the profileRevision property.
      * 
      * @param value
      *     allowed object is
@@ -94,7 +94,7 @@ public class ProfileHandleDataType {
     }
 
     /**
-     * Ruft den Wert der profileLocation-Eigenschaft ab.
+     * Gets the value of the profileLocation property.
      * 
      * @return
      *     possible object is
@@ -106,7 +106,7 @@ public class ProfileHandleDataType {
     }
 
     /**
-     * Legt den Wert der profileLocation-Eigenschaft fest.
+     * Sets the value of the profileLocation property.
      * 
      * @param value
      *     allowed object is

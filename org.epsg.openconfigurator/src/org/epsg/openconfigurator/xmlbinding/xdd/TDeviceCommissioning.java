@@ -11,9 +11,9 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * <p>Java-Klasse für t_deviceCommissioning complex type.
+ * <p>Java class for t_deviceCommissioning complex type.
  * 
- * <p>Das folgende Schemafragment gibt den erwarteten Content an, der in dieser Klasse enthalten ist.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  * 
  * <pre>
  * &lt;complexType name="t_deviceCommissioning"&gt;
@@ -56,7 +56,7 @@ public class TDeviceCommissioning {
     protected Short usedNetworkInterface;
 
     /**
-     * Ruft den Wert der networkName-Eigenschaft ab.
+     * Gets the value of the networkName property.
      * 
      * @return
      *     possible object is
@@ -68,7 +68,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Legt den Wert der networkName-Eigenschaft fest.
+     * Sets the value of the networkName property.
      * 
      * @param value
      *     allowed object is
@@ -80,7 +80,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Ruft den Wert der nodeID-Eigenschaft ab.
+     * Gets the value of the nodeID property.
      * 
      */
     public short getNodeID() {
@@ -88,7 +88,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Legt den Wert der nodeID-Eigenschaft fest.
+     * Sets the value of the nodeID property.
      * 
      */
     public void setNodeID(short value) {
@@ -96,7 +96,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Ruft den Wert der nodeName-Eigenschaft ab.
+     * Gets the value of the nodeName property.
      * 
      * @return
      *     possible object is
@@ -108,7 +108,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Legt den Wert der nodeName-Eigenschaft fest.
+     * Sets the value of the nodeName property.
      * 
      * @param value
      *     allowed object is
@@ -149,7 +149,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Ruft den Wert der usedNetworkInterface-Eigenschaft ab.
+     * Gets the value of the usedNetworkInterface property.
      * 
      * @return
      *     possible object is
@@ -165,7 +165,7 @@ public class TDeviceCommissioning {
     }
 
     /**
-     * Legt den Wert der usedNetworkInterface-Eigenschaft fest.
+     * Sets the value of the usedNetworkInterface property.
      * 
      * @param value
      *     allowed object is
