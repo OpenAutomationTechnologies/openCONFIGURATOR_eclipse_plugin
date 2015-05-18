@@ -30,14 +30,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
+
 package org.epsg.openconfigurator.wizards;
 
+import java.io.File;
 import java.net.URI;
 
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -45,55 +49,157 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
+import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-public class NewPowerlinkNetworkProjectWizard extends Wizard implements INewWizard, IExecutableExtension {
+/**
+ * Creates the new POWERLINK network project wizard.
+ *
+ * @see WizardNewProjectCreationPage
+ * @see AddDefaultMasterNodeWizardPage
+ *
+ * @author Ramakrishnan P
+ *
+ */
+public class NewPowerlinkNetworkProjectWizard extends Wizard implements
+        INewWizard, IExecutableExtension {
 
-    private WizardNewProjectCreationPage _pageOne;
+    /**
+     * Wizard labels and messages.
+     */
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_NAME = "POWERLINK network project wizard";
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE = "POWERLINK network project";
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project";
+    public static final String NEW_PROJECT_WIZARD_TITLE = "New POWERLINK network project";
+
+    /**
+     * New project creation wizard page.
+     */
+    private WizardNewProjectCreationPage newProjectCreationPage;
+
+    /**
+     * Wizard page to add default managing node.
+     */
+    private AddDefaultMasterNodeWizardPage addDefaultMasterPage;
+
+    /**
+     * Configuration element.
+     */
     private IConfigurationElement _configurationElement;
 
+    /**
+     * Constructor.
+     */
     public NewPowerlinkNetworkProjectWizard() {
-        // TODO Auto-generated constructor stub
+        // Do nothing.
     }
 
     @Override
-    public void init(IWorkbench workbench, IStructuredSelection selection) {
-        setWindowTitle("New POWERLINK network project");
+    public void addPages() {
+        super.addPages();
 
+        newProjectCreationPage = new WizardNewProjectCreationPage(
+                NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_NAME);
+        newProjectCreationPage
+                .setTitle(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE);
+        newProjectCreationPage
+                .setDescription(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION);
+        addPage(newProjectCreationPage);
+
+        addDefaultMasterPage = new AddDefaultMasterNodeWizardPage();
+        addDefaultMasterPage.setPreviousPage(newProjectCreationPage);
+        addPage(addDefaultMasterPage);
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.wizard.Wizard#canFinish()
+     */
+    @Override
+    public boolean canFinish() {
+        if (getContainer().getCurrentPage() == newProjectCreationPage) {
+            return false;
+        }
+        return addDefaultMasterPage.isPageComplete();
+    }
+
+    /**
+     * Creates the new POWERLINK network project file inside the path.
+     */
+    private void createNewProjectFile() {
+        if (newProjectCreationPage.getLocationURI().getPath().isEmpty()) {
+            return;
+        }
+
+        String projectPath = newProjectCreationPage.getLocationPath()
+                .toString()
+                + File.separator
+                + newProjectCreationPage.getProjectName();
+        addDefaultMasterPage.copyXddToDeviceImportDir(projectPath);
+
+        String projectFileName = newProjectCreationPage.getLocationURI()
+                .getPath()
+                + File.separator
+                + newProjectCreationPage.getProjectName() + ".xml";
+        addDefaultMasterPage.createProject(projectFileName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
+        setWindowTitle(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_TITLE);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.wizard.Wizard#performCancel()
+     */
+    @Override
+    public boolean performCancel() {
+        return super.performCancel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean performFinish() {
 
-        String name = _pageOne.getProjectName();
+        String name = newProjectCreationPage.getProjectName();
         URI location = null;
-        if (!_pageOne.useDefaults()) {
-            location = _pageOne.getLocationURI();
+        if (!newProjectCreationPage.useDefaults()) {
+            location = newProjectCreationPage.getLocationURI();
         }
 
-        IProject proj = PowerlinkNetworkProjectSupport.createProject(name, location);
+        IProject proj = PowerlinkNetworkProjectSupport.createProject(name,
+                location);
+        createNewProjectFile();
+
+        try {
+            IProgressMonitor monitor = null;
+            proj.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         BasicNewProjectResourceWizard.updatePerspective(_configurationElement);
-        BasicNewProjectResourceWizard.selectAndReveal(proj, PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+        BasicNewResourceWizard.selectAndReveal(proj, PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow());
 
         return true;
     }
 
-    @Override
-     public void addPages() {
-     super.addPages();
-
-     _pageOne = new WizardNewProjectCreationPage("POWERLINK network project wizard");
-     _pageOne.setTitle("POWERLINK network project");
-     _pageOne.setDescription("Creating a new POWERLINK network project");
-
-
-     addPage(_pageOne);
-     }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) throws CoreException {
         _configurationElement = config;
-
     }
 
 }
