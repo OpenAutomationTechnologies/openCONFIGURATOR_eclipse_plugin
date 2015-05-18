@@ -39,6 +39,7 @@ import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 import org.eclipse.ui.views.contentoutline.IContentOutlinePage;
 import org.epsg.openconfigurator.util.OpenCONFIGURATORProjectMarshaller;
+import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
@@ -47,281 +48,270 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.xml.sax.SAXException;
 
 /**
- * An example showing how to create a multi-page editor. This example has 3
- * pages:
+ * An example showing how to create a multi-page editor. This example has 3 pages:
  * <ul>
  * <li>page 0 contains a nested text editor.
  * <li>page 1 allows you to change the font used in page 2
  * <li>page 2 shows the words in page 0 in sorted order
  * </ul>
  */
-public class IndustrialNetworkEditor extends MultiPageEditorPart implements
-		IResourceChangeListener {
+public class IndustrialNetworkEditor extends MultiPageEditorPart implements IResourceChangeListener {
 
-	public static final String ID = "org.epsg.openconfigurator.views.IndustrialNetworkEditor";
+  public static final String ID = "org.epsg.openconfigurator.views.IndustrialNetworkEditor";
 
-	private OpenCONFIGURATORProject currentProject;
-	private List<ISO15745ProfileContainer> xddFiles;
+  private OpenCONFIGURATORProject currentProject;
+  private List<ISO15745ProfileContainer> xddFiles;
 
-	/** The text editor used in page 0. */
-	private TextEditor editor;
+  /** The text editor used in page 0. */
+  private TextEditor editor;
 
-	/** The font chosen in page 1. */
-	private Font font;
+  /** The font chosen in page 1. */
+  private Font font;
 
-	/** The text widget used in page 2. */
-	private StyledText text;
-	/**
-	 * Creates a multi-page editor example.
-	 */
+  /** The text widget used in page 2. */
+  private StyledText text;
+  /**
+   * Creates a multi-page editor example.
+   */
 
-	private IndustrialNetworkOutlineView myOutlinePage;
+  private IndustrialNetworkOutlineView myOutlinePage;
 
-	public IndustrialNetworkEditor() {
-		super();
-		ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-		this.xddFiles = new ArrayList<ISO15745ProfileContainer>();
-	}
+  public IndustrialNetworkEditor() {
+    super();
+    ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
+    xddFiles = new ArrayList<ISO15745ProfileContainer>();
+  }
 
-	/**
-	 * Creates page 0 of the multi-page editor, which contains a text editor.
-	 */
-	void createPage0() {
-		try {
-			editor = new TextEditor();
-			int index = addPage(editor, getEditorInput());
-			setPageText(index, "Source File");
-		} catch (PartInitException e) {
-			ErrorDialog.openError(getSite().getShell(),
-					"Error creating nested text editor", null, e.getStatus());
-		}
-	}
+  /**
+   * Creates page 0 of the multi-page editor, which contains a text editor.
+   */
+  void createPage0() {
+    try {
+      editor = new TextEditor();
+      int index = addPage(editor, getEditorInput());
+      setPageText(index, "Source File");
+    } catch (PartInitException e) {
+      ErrorDialog.openError(getSite().getShell(), "Error creating nested text editor", null,
+          e.getStatus());
+    }
+  }
 
-	/**
-	 * Creates page 1 of the multi-page editor, which allows you to change the
-	 * font used in page 2.
-	 */
-	void createPage1() {
+  /**
+   * Creates page 1 of the multi-page editor, which allows you to change the font used in page 2.
+   */
+  void createPage1() {
 
-		int index = addPage(new IndustrialNetworkEditorNetworkTab(
-				getContainer(), SWT.NONE));
-		setPageText(index, "Network");
-	}
+    int index = addPage(new IndustrialNetworkEditorNetworkTab(getContainer(), SWT.NONE));
+    setPageText(index, "Network");
+  }
 
-	/**
-	 * Creates page 2 of the multi-page editor, which shows the sorted text.
-	 */
-	void createPage2() {
-		Composite composite = new Composite(getContainer(), SWT.NONE);
-		FillLayout layout = new FillLayout();
-		composite.setLayout(layout);
-		text = new StyledText(composite, SWT.H_SCROLL | SWT.V_SCROLL);
-		text.setEditable(false);
+  /**
+   * Creates page 2 of the multi-page editor, which shows the sorted text.
+   */
+  void createPage2() {
+    Composite composite = new Composite(getContainer(), SWT.NONE);
+    FillLayout layout = new FillLayout();
+    composite.setLayout(layout);
+    text = new StyledText(composite, SWT.H_SCROLL | SWT.V_SCROLL);
+    text.setEditable(false);
 
-		int index = addPage(composite);
-		setPageText(index, "Mapping");
-	}
+    int index = addPage(composite);
+    setPageText(index, "Mapping");
+  }
 
-	/**
-	 * Creates the pages of the multi-page editor.
-	 */
-	@Override
-	protected void createPages() {
-		try {
-			createPage1();
-			createPage2();
-			createPage0();
-			String editorText = editor.getDocumentProvider()
-					.getDocument(editor.getEditorInput()).get();
-			InputStream is = new ByteArrayInputStream(editorText.getBytes());
+  /**
+   * Creates the pages of the multi-page editor.
+   */
+  @Override
+  protected void createPages() {
+    try {
+      createPage1();
+      createPage2();
+      createPage0();
+      String editorText = editor.getDocumentProvider().getDocument(editor.getEditorInput()).get();
+      InputStream is = new ByteArrayInputStream(editorText.getBytes());
 
-			this.currentProject = OpenCONFIGURATORProjectMarshaller
-					.unmarshallopenCONFIGURATORProject(is);
-			for (int i = 0; i < currentProject.getNetworkConfiguration().getNodeCollection().getCN().size(); i++) {
-				TCN cn = currentProject.getNetworkConfiguration().getNodeCollection().getCN().get(i);
-				//get object which represents the workspace
-				IWorkspace workspace = ResourcesPlugin.getWorkspace();
-				File workspaceDirectory = workspace.getRoot().getLocation().toFile();
-				File file = new File(workspaceDirectory.getAbsolutePath() + System.getProperty("file.separator") + "LISIM" + System.getProperty("file.separator") + cn.getPathToXDC());
-				System.err.println(workspaceDirectory.getAbsolutePath() + System.getProperty("file.separator") + "LISIM" + System.getProperty("file.separator") + cn.getPathToXDC());
-				if(file.exists())		
-				{
-					ISO15745ProfileContainer xdd = OpenCONFIGURATORProjectMarshaller.unmarshallXDDFile(file);
-					this.xddFiles.add(xdd);
-				}
-			}
-			
-		} catch (FileNotFoundException | MalformedURLException | JAXBException
-				| SAXException | ParserConfigurationException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
+      currentProject = OpenCONFIGURATORProjectMarshaller.unmarshallopenCONFIGURATORProject(is);
+      for (int i = 0; i < currentProject.getNetworkConfiguration().getNodeCollection().getCN()
+          .size(); i++) {
+        TCN cn = currentProject.getNetworkConfiguration().getNodeCollection().getCN().get(i);
+        // get object which represents the workspace
+        IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        File workspaceDirectory = workspace.getRoot().getLocation().toFile();
+        File file = new File(workspaceDirectory.getAbsolutePath()
+            + System.getProperty("file.separator") + "LISIM" + System.getProperty("file.separator")
+            + cn.getPathToXDC());
+        System.err.println(workspaceDirectory.getAbsolutePath()
+            + System.getProperty("file.separator") + "LISIM" + System.getProperty("file.separator")
+            + cn.getPathToXDC());
+        if (file.exists()) {
+          ISO15745ProfileContainer xdd = XddMarshaller.unmarshallXDDFile(file);
+          xddFiles.add(xdd);
+        }
+      }
 
-	/**
-	 * The <code>MultiPageEditorPart</code> implementation of this
-	 * <code>IWorkbenchPart</code> method disposes all nested editors.
-	 * Subclasses may extend.
-	 */
-	@Override
-	public void dispose() {
-		ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-		super.dispose();
-	}
+    } catch (FileNotFoundException | MalformedURLException | JAXBException | SAXException
+        | ParserConfigurationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+  }
 
-	/**
-	 * Saves the multi-page editor's document.
-	 */
-	@Override
-	public void doSave(IProgressMonitor monitor) {
-		getEditor(2).doSave(monitor);
-	}
+  /**
+   * The <code>MultiPageEditorPart</code> implementation of this <code>IWorkbenchPart</code> method
+   * disposes all nested editors. Subclasses may extend.
+   */
+  @Override
+  public void dispose() {
+    ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+    super.dispose();
+  }
 
-	/**
-	 * Saves the multi-page editor's document as another file. Also updates the
-	 * text for page 0's tab, and updates this multi-page editor's input to
-	 * correspond to the nested editor's.
-	 */
-	@Override
-	public void doSaveAs() {
-		IEditorPart editor = getEditor(0);
-		editor.doSaveAs();
-		setPageText(2, editor.getTitle());
-		setInput(editor.getEditorInput());
-	}
+  /**
+   * Saves the multi-page editor's document.
+   */
+  @Override
+  public void doSave(IProgressMonitor monitor) {
+    getEditor(2).doSave(monitor);
+  }
 
-	/*
-	 * (non-Javadoc) Method declared on IEditorPart
-	 */
-	public void gotoMarker(IMarker marker) {
-		setActivePage(0);
-		IDE.gotoMarker(getEditor(0), marker);
-	}
+  /**
+   * Saves the multi-page editor's document as another file. Also updates the text for page 0's tab,
+   * and updates this multi-page editor's input to correspond to the nested editor's.
+   */
+  @Override
+  public void doSaveAs() {
+    IEditorPart editor = getEditor(0);
+    editor.doSaveAs();
+    setPageText(2, editor.getTitle());
+    setInput(editor.getEditorInput());
+  }
 
-	/**
-	 * The <code>MultiPageEditorExample</code> implementation of this method
-	 * checks that the input is an instance of <code>IFileEditorInput</code>.
-	 */
-	@Override
-	public void init(IEditorSite site, IEditorInput editorInput)
-			throws PartInitException {
-		if (!(editorInput instanceof IFileEditorInput))
-			throw new PartInitException(
-					"Invalid Input: Must be IFileEditorInput");
-		super.init(site, editorInput);
-	}
+  /*
+   * (non-Javadoc) Method declared on IEditorPart
+   */
+  public void gotoMarker(IMarker marker) {
+    setActivePage(0);
+    IDE.gotoMarker(getEditor(0), marker);
+  }
 
-	/*
-	 * (non-Javadoc) Method declared on IEditorPart.
-	 */
-	@Override
-	public boolean isSaveAsAllowed() {
-		return true;
-	}
+  /**
+   * The <code>MultiPageEditorExample</code> implementation of this method checks that the input is
+   * an instance of <code>IFileEditorInput</code>.
+   */
+  @Override
+  public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
+    if (!(editorInput instanceof IFileEditorInput))
+      throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+    super.init(site, editorInput);
+  }
 
-	/**
-	 * Calculates the contents of page 2 when the it is activated.
-	 */
-	@Override
-	protected void pageChange(int newPageIndex) {
-		super.pageChange(newPageIndex);
-		if (newPageIndex == 2) {
-			sortWords();
-		}
-	}
+  /*
+   * (non-Javadoc) Method declared on IEditorPart.
+   */
+  @Override
+  public boolean isSaveAsAllowed() {
+    return true;
+  }
 
-	/**
-	 * Closes all project files on project close.
-	 */
-	@Override
-	public void resourceChanged(final IResourceChangeEvent event) {
-		if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
-			Display.getDefault().asyncExec(new Runnable() {
-				@Override
-				public void run() {
-					IWorkbenchPage[] pages = getSite().getWorkbenchWindow()
-							.getPages();
-					for (int i = 0; i < pages.length; i++) {
-						if (((FileEditorInput) editor.getEditorInput())
-								.getFile().getProject()
-								.equals(event.getResource())) {
-							IEditorPart editorPart = pages[i].findEditor(editor
-									.getEditorInput());
-							pages[i].closeEditor(editorPart, true);
-						}
-					}
-				}
-			});
-		}
-	}
+  /**
+   * Calculates the contents of page 2 when the it is activated.
+   */
+  @Override
+  protected void pageChange(int newPageIndex) {
+    super.pageChange(newPageIndex);
+    if (newPageIndex == 2) {
+      sortWords();
+    }
+  }
 
-	/**
-	 * Sets the font related data to be applied to the text in page 2.
-	 */
-	void setFont() {
-		FontDialog fontDialog = new FontDialog(getSite().getShell());
-		fontDialog.setFontList(text.getFont().getFontData());
-		FontData fontData = fontDialog.open();
-		if (fontData != null) {
-			if (font != null)
-				font.dispose();
-			font = new Font(text.getDisplay(), fontData);
-			text.setFont(font);
-		}
-	}
+  /**
+   * Closes all project files on project close.
+   */
+  @Override
+  public void resourceChanged(final IResourceChangeEvent event) {
+    if (event.getType() == IResourceChangeEvent.PRE_CLOSE) {
+      Display.getDefault().asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          IWorkbenchPage[] pages = getSite().getWorkbenchWindow().getPages();
+          for (int i = 0; i < pages.length; i++) {
+            if (((FileEditorInput) editor.getEditorInput()).getFile().getProject()
+                .equals(event.getResource())) {
+              IEditorPart editorPart = pages[i].findEditor(editor.getEditorInput());
+              pages[i].closeEditor(editorPart, true);
+            }
+          }
+        }
+      });
+    }
+  }
 
-	/**
-	 * Sorts the words in page 0, and shows them in page 2.
-	 */
-	void sortWords() {
-		StringWriter displayText = new StringWriter();
-		for (int i = 0; i < this.currentProject.getNetworkConfiguration()
-				.getNodeCollection().getCN().size(); i++) {
-			IWorkspace workspace = ResourcesPlugin.getWorkspace();
-			File workspaceDirectory = workspace.getRoot().getLocation().toFile();
-			TCN cn = this.currentProject.getNetworkConfiguration()
-					.getNodeCollection().getCN().get(i);
-			displayText.write(((String) cn.getName()));
-			displayText.write(System.getProperty("line.separator"));
-			displayText.write(((String) cn.getNodeID()));
-			displayText.write(System.getProperty("line.separator"));
-			displayText.write(((String) workspaceDirectory.getAbsolutePath() + System.getProperty("file.separator") + cn.getPathToXDC()));
-			displayText.write(System.getProperty("line.separator"));
-			displayText.write(System.getProperty("line.separator"));
-		}
-		
-		if(xddFiles.get(0).getISO15745Profile().get(0).getProfileBody() instanceof ProfileBodyDevicePowerlink)
-		{
-			ProfileBodyDevicePowerlink device = (ProfileBodyDevicePowerlink) xddFiles.get(0).getISO15745Profile().get(0).getProfileBody();
-			displayText.write((String)device.getDeviceIdentity().getVendorName().getValue().toString());
-		}
-		if(xddFiles.get(0).getISO15745Profile().get(1).getProfileBody() instanceof ProfileBodyCommunicationNetworkPowerlink)
-		{
-			ProfileBodyCommunicationNetworkPowerlink device = (ProfileBodyCommunicationNetworkPowerlink) xddFiles.get(0).getISO15745Profile().get(1).getProfileBody();
-			displayText.write((String) Integer.toString(device.getApplicationLayers().getObjectList().getObject().size()));
-		}
-		
-		
-			
-		text.setText(displayText.toString());
+  /**
+   * Sets the font related data to be applied to the text in page 2.
+   */
+  void setFont() {
+    FontDialog fontDialog = new FontDialog(getSite().getShell());
+    fontDialog.setFontList(text.getFont().getFontData());
+    FontData fontData = fontDialog.open();
+    if (fontData != null) {
+      if (font != null)
+        font.dispose();
+      font = new Font(text.getDisplay(), fontData);
+      text.setFont(font);
+    }
+  }
 
-	}
+  /**
+   * Sorts the words in page 0, and shows them in page 2.
+   */
+  void sortWords() {
+    StringWriter displayText = new StringWriter();
+    for (int i = 0; i < currentProject.getNetworkConfiguration().getNodeCollection().getCN().size(); i++) {
+      IWorkspace workspace = ResourcesPlugin.getWorkspace();
+      File workspaceDirectory = workspace.getRoot().getLocation().toFile();
+      TCN cn = currentProject.getNetworkConfiguration().getNodeCollection().getCN().get(i);
+      displayText.write((cn.getName()));
+      displayText.write(System.getProperty("line.separator"));
+      displayText.write((cn.getNodeID()));
+      displayText.write(System.getProperty("line.separator"));
+      displayText.write((workspaceDirectory.getAbsolutePath()
+          + System.getProperty("file.separator") + cn.getPathToXDC()));
+      displayText.write(System.getProperty("line.separator"));
+      displayText.write(System.getProperty("line.separator"));
+    }
 
-	public Object getAdapter(Class required) {
-		if (IContentOutlinePage.class.equals(required)) {
-			if (myOutlinePage == null) {
-				myOutlinePage = new IndustrialNetworkOutlineView(
-						getDocumentProvider(), this);
-				myOutlinePage.setInput(getEditorInput());
-			}
-			return myOutlinePage;
-		}
-		return super.getAdapter(required);
-	}
+    if (xddFiles.get(0).getISO15745Profile().get(0).getProfileBody() instanceof ProfileBodyDevicePowerlink) {
+      ProfileBodyDevicePowerlink device = (ProfileBodyDevicePowerlink) xddFiles.get(0)
+          .getISO15745Profile().get(0).getProfileBody();
+      displayText.write(device.getDeviceIdentity().getVendorName().getValue().toString());
+    }
+    if (xddFiles.get(0).getISO15745Profile().get(1).getProfileBody() instanceof ProfileBodyCommunicationNetworkPowerlink) {
+      ProfileBodyCommunicationNetworkPowerlink device = (ProfileBodyCommunicationNetworkPowerlink) xddFiles
+          .get(0).getISO15745Profile().get(1).getProfileBody();
+      displayText.write(Integer.toString(device.getApplicationLayers().getObjectList().getObject()
+          .size()));
+    }
 
-	private Object getDocumentProvider() {
+    text.setText(displayText.toString());
 
-		return null;
-	}
+  }
+
+  @Override
+  public Object getAdapter(Class required) {
+    if (IContentOutlinePage.class.equals(required)) {
+      if (myOutlinePage == null) {
+        myOutlinePage = new IndustrialNetworkOutlineView(getDocumentProvider(), this);
+        myOutlinePage.setInput(getEditorInput());
+      }
+      return myOutlinePage;
+    }
+    return super.getAdapter(required);
+  }
+
+  private Object getDocumentProvider() {
+
+    return null;
+  }
 
 }
