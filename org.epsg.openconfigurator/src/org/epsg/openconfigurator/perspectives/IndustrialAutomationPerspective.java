@@ -38,7 +38,7 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
-import org.epsg.openconfigurator.editors.IndustrialNetworkEditor;
+import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 
 /**
@@ -89,7 +89,7 @@ public class IndustrialAutomationPerspective implements IPerspectiveFactory {
         IPageLayout.LEFT, 0.25f, factory.getEditorArea());
     topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER); // NON-NLS-1
     topLeft.addView(IndustrialNetworkView.ID); // NON-NLS-1
-    topLeft.addView(IndustrialNetworkEditor.ID); // NON-NLS-1
+    topLeft.addView(IndustrialNetworkProjectEditor.ID); // NON-NLS-1
 
     IFolderLayout topRight = factory.createFolder("topRight", // NON-NLS-1
         IPageLayout.RIGHT, 0.25f, factory.getEditorArea());

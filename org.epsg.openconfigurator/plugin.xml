@@ -34,12 +34,13 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.epsg.openconfigurator.editors.IndustrialNetworkEditor"
+            class="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
             contributorClass="org.epsg.openconfigurator.editors.IndustrialNetworkContribute"
+            default="true"
             extensions="xml"
             icon="icons/releng_gears.gif"
-            id="org.epsg.openconfigurator.editors.IndustrialNetworkEditor"
-            name="POWERLINK network editor">
+            id="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
+            name="POWERLINK Project editor">
       </editor>
    </extension>
    <extension
