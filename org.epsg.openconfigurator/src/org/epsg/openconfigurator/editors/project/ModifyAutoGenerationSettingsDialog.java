@@ -62,7 +62,10 @@ import org.eclipse.swt.widgets.Item;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.util.OpenCONFIGURATORProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
@@ -130,16 +133,39 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
 
       TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
 
-      // If Active setting is same as the element to be modified.. update the active setting also.
-      if (ag.getId().equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
-        projectConfiguration.setActiveAutoGenerationSetting((String) value);
-        dirty = true;
-      }
-
       if (ModifyAutoGenerationSettingsDialog.NAME.equals(property)) {
-        ag.setId((String) value);
+        String oldAgSettingId = ag.getId();
+        Result libApiRes = OpenConfiguratorCore.GetInstance().ReplaceConfigurationName(networkID,
+            oldAgSettingId, (String) value);
+        if (!libApiRes.IsSuccessful()) {
+          String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
+              + libApiRes.GetErrorMessage();
+          PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
 
+          System.err.println("ReplaceConfigurationName failed." + oldAgSettingId + ":"
+              + (String) value + ". " + errorMessage);
+          return;
+        }
+
+        ag.setId((String) value);
         dirty = true;
+
+        // If Active setting is same as the element to be modified.. update the active setting also.
+        if (oldAgSettingId.equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
+          libApiRes = OpenConfiguratorCore.GetInstance().SetActiveConfiguration(networkID,
+              ag.getId());
+          if (!libApiRes.IsSuccessful()) {
+            String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
+                + libApiRes.GetErrorMessage();
+            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
+
+            System.err.println("SetActiveConfiguration failed. " + errorMessage);
+            return;
+          }
+
+          projectConfiguration.setActiveAutoGenerationSetting(ag.getId());
+          dirty = true;
+        }
       }
 
       // Force the viewer to refresh
@@ -179,8 +205,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
     }
   }
 
-  private static final String DIALOG_TITLE = "Auto Generate Configuration Groups";
-  private static final String DIALOG_DEFAULT_MESSAGE = "Configure the auto generation settings group";
+  private static final String DIALOG_TITLE = "Build Configuration Groups";
+  private static final String DIALOG_DEFAULT_MESSAGE = "Configure the build configuration settings group";
   private static final String NAME = "Group Name";
   private static final String ADD_BUTTON_LABEL = "Add";
   private static final String DELETE_BUTTON_LABEL = "Delete";
@@ -191,6 +217,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
   private Table table;
   private Button deleteSettingsButton;
 
+  private String networkID;
   private TProjectConfiguration projectConfiguration;
   private boolean dirty = false;
 
@@ -200,9 +227,10 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
    * @param[in] parentShell The parent shell.
    * @param[in,out] projectConfiguration The {@link TProjectConfiguration} model instance.
    */
-  public ModifyAutoGenerationSettingsDialog(Shell parentShell,
+  public ModifyAutoGenerationSettingsDialog(Shell parentShell, final String networkID,
       TProjectConfiguration projectConfiguration) {
     super(parentShell);
+    this.networkID = networkID;
     this.projectConfiguration = projectConfiguration;
   }
 
@@ -296,9 +324,24 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
     btnNewAutoGeneration.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent event) {
+
+        String newAutoGenerationSettingsID = newAutoGenerationSettingsID();
+        Result libApiRes = OpenConfiguratorCore.GetInstance().CreateConfiguration(networkID,
+            newAutoGenerationSettingsID);
+        if (!libApiRes.IsSuccessful()) {
+          // Report to the user about the error from the library
+          String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
+              + libApiRes.GetErrorMessage();
+          PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
+
+          System.err.println("AddConfiguration '" + newAutoGenerationSettingsID + "' fails. "
+              + errorMessage);
+          return;
+        }
+
         TAutoGenerationSettings ag = new TAutoGenerationSettings();
-        ag.setId(newAutoGenerationSettingsID());
-        // TODO: Add All default <Settings> tag here.
+        ag.setId(newAutoGenerationSettingsID);
+        // TODO: Add All default <Settings> tag here. Do we need?
         projectConfiguration.getAutoGenerationSettings().add(0, ag);
         // projectConfiguration.getAutoGenerationSettings().add(ag);
         dirty = true;
@@ -390,7 +433,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
    * @return Unique ID.
    */
   private String newAutoGenerationSettingsID() {
-    final String commonName = "New group";
+    final String commonName = "custom";
 
     String uniqueName = commonName;
     int suffixValue = 0;
@@ -459,25 +502,44 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
       TAutoGenerationSettings settingTobeRemoved = agList.get(index);
       settingToBeRemoved = settingTobeRemoved.getId();
     } catch (IndexOutOfBoundsException e) {
-      System.out.println("Error in removing the autogenerationsetting. ID:" + index);
+      System.err.println("Error in removing the autogenerationsetting. ID:" + index);
       return false;
     }
 
     if ((settingToBeRemoved == null) || (settingToBeRemoved.isEmpty())) {
-      System.out.println("Error in removing the autogenerationsetting. ID:" + index);
+      System.err.println("Error in removing the autogenerationsetting. ID:" + index);
       return false;
     }
 
-    agList.remove(index); // No need to return the removed element.
+    Result libApiRes = OpenConfiguratorCore.GetInstance().RemoveConfiguration(networkID,
+        settingToBeRemoved);
+    if (!libApiRes.IsSuccessful()) {
+      String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
+          + libApiRes.GetErrorMessage();
+      PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
+      System.err.println("RemoveConfiguation failed. " + errorMessage);
+      return libApiRes.IsSuccessful();
+    }
 
+    agList.remove(index); // No need to return the removed element.
     if (settingToBeRemoved.equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
       // The item about to be removed is same as the active auto generation setting.
-      // Update the active autogeneration setting to 0, then remove it.
-      projectConfiguration.setActiveAutoGenerationSetting(agList.get(0).getId());
+      // Update the active auto-generation setting to 0, then remove it.
+      String currentActiveSetting = agList.get(0).getId();
+      libApiRes = OpenConfiguratorCore.GetInstance().SetActiveConfiguration(networkID,
+          currentActiveSetting);
+      if (!libApiRes.IsSuccessful()) {
+        String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
+            + libApiRes.GetErrorMessage();
+        PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
+        System.err.println("SetActiveConfiguration failed. " + errorMessage);
+        return libApiRes.IsSuccessful();
+      }
+      projectConfiguration.setActiveAutoGenerationSetting(currentActiveSetting);
     }
 
     dirty = true;
-    return true;
-  }
 
+    return libApiRes.IsSuccessful();
+  }
 }

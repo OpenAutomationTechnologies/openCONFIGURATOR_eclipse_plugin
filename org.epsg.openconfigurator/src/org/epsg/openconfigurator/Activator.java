@@ -38,9 +38,11 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 
+import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -51,6 +53,7 @@ public class Activator extends AbstractUIPlugin {
 
   // The plug-in ID
   public static final String PLUGIN_ID = "org.epsg.openconfigurator"; //$NON-NLS-1$
+  private static final String PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR = "openCONFIGURATOR plugin\nError loading shared libraries";
 
   // The shared instance
   private static Activator plugin;
@@ -160,6 +163,33 @@ public class Activator extends AbstractUIPlugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
     plugin = this;
+
+    // Load openCONFIGURATOR core libraries
+    try {
+      if (SystemUtils.IS_OS_LINUX) {
+        System.loadLibrary("boost_date_time");
+        System.loadLibrary("boost_system");
+        System.loadLibrary("boost_chrono");
+        System.loadLibrary("boost_filesystem");
+        System.loadLibrary("boost_thread");
+        System.loadLibrary("boost_log");
+        System.loadLibrary("boost_log_setup");
+      } else if (SystemUtils.IS_OS_WINDOWS) {
+        System.loadLibrary("boost_date_time-vc110-mt-1_54");
+        System.loadLibrary("boost_system-vc110-mt-1_54");
+        System.loadLibrary("boost_chrono-vc110-mt-1_54");
+        System.loadLibrary("boost_filesystem-vc110-mt-1_54");
+        System.loadLibrary("boost_thread-vc110-mt-1_54");
+        System.loadLibrary("boost_log-vc110-mt-1_54");
+        System.loadLibrary("boost_log_setup-vc110-mt-1_54");
+      }
+      System.loadLibrary("openconfigurator_core_lib");
+      System.loadLibrary("openconfigurator_core_wrapper_java");
+    } catch (UnsatisfiedLinkError e) {
+      e.printStackTrace();
+      PluginErrorDialogUtils.displayErrorMessageDialog(plugin.getWorkbench()
+          .getActiveWorkbenchWindow().getShell(), PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR, e);
+    }
   }
 
   /*
@@ -172,4 +202,5 @@ public class Activator extends AbstractUIPlugin {
     plugin = null;
     super.stop(context);
   }
+
 }

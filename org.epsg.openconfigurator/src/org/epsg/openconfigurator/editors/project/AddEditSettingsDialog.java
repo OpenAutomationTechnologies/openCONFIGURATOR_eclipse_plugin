@@ -52,6 +52,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.lib.wrapper.StringCollection;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TKeyValuePair;
 
@@ -72,6 +76,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
   private class BuilderConfiguration {
     private boolean alreadyAvailable;
     private String name;
+    private String description;
 
     BuilderConfiguration(String name) {
       this.name = name;
@@ -89,6 +94,14 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
       this.alreadyAvailable = alreadyAvailable;
     }
 
+    public String getDescription() {
+      return description;
+    }
+
+    public void setDescription(String description) {
+      this.description = description;
+    }
+
   }
 
   /**
@@ -96,7 +109,8 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
    */
   private List<BuilderConfiguration> builderConfig = new ArrayList<BuilderConfiguration>();
 
-  private final String VALUE_ERROR_MESSAGE = "Enter a valid value. Format: NodeID;NodeID; eg:1;32;110;";
+  private final String VALUE_ERROR_MESSAGE = "Enter a valid value.\nFormat: NodeID;NodeID; eg:1;32;110;";
+  private final String VALUE_TOOL_TIP = "Empty: all nodes.\nCustom format: NodeID;NodeID; eg:1;32;110;";
 
   /** UI Controls */
   private Text value;
@@ -110,15 +124,11 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
 
   private String activeSettingName;
 
-  // private int activeSettingIndex = -1;
-
-  private String[] listOfInputNames = { "Test1", "Test2", "Test3", "Test4" };
-
   /**
    * Data model from the openCONFIGURATOR project file. The <Setting> tag.
    */
-  TKeyValuePair activeSetting = new TKeyValuePair();
-  TAutoGenerationSettings agSettings;
+  private TKeyValuePair activeSetting = new TKeyValuePair();
+  private TAutoGenerationSettings agSettings;
 
   /**
    * Creates the add/edit settings dialog.
@@ -128,15 +138,31 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
    */
   public AddEditSettingsDialog(Shell parentShell, TAutoGenerationSettings autoGenerationSettings) {
     super(parentShell);
+
     agSettings = autoGenerationSettings;
 
-    for (String s : listOfInputNames) {
-      builderConfig.add(new BuilderConfiguration(s));
+    // Create the builderConfiguration based on the input from the library.
+    StringCollection support = new StringCollection();
+    Result libApiRes = OpenConfiguratorCore.GetInstance().GetSupportedSettingIds(support);
+    if (!libApiRes.IsSuccessful()) {
+      // Display a dialog to report it to the user
+      String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
+          + libApiRes.GetErrorMessage();
+      PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
+      System.err.println("GetSupportedSettingIds failed with error. " + errorMessage);
+      return;
     }
 
+    for (int i = 0; i < support.size(); i++) {
+      BuilderConfiguration cfg = new BuilderConfiguration(support.get(i));
+      builderConfig.add(cfg);
+    }
+
+    // Set AlreadyAvailable option if the builder configuration is already configured in the
+    // <AutoGenerationSettings>
     for (BuilderConfiguration builderConfig : builderConfig) {
       for (TKeyValuePair tempSetting : agSettings.getSetting()) {
-        if (tempSetting.getName().equals(builderConfig.getName())) {
+        if (tempSetting.getName().equalsIgnoreCase(builderConfig.getName())) {
           builderConfig.setAlreadyAvailable(true);
         }
       }
@@ -293,6 +319,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
 
     value = new Text(container, SWT.LEFT | SWT.SINGLE | SWT.BORDER);
     value.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+    value.setToolTipText(VALUE_TOOL_TIP);
 
     Label lblActive = new Label(container, SWT.CENTER);
     lblActive.setText("Active:");
@@ -412,8 +439,11 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
 
     if (activeSettingName != null) {
       for (TKeyValuePair tempSetting : agSettings.getSetting()) {
-        if (tempSetting.getName().equals(activeSettingName)) {
-          activeSetting = tempSetting;
+        if (tempSetting.getName().equalsIgnoreCase(activeSettingName)) {
+          // activeSetting = tempSetting;
+          activeSetting.setName(tempSetting.getName());
+          activeSetting.setValue(tempSetting.getValue());
+          activeSetting.setEnabled(tempSetting.isEnabled());
           break;
         }
       }
