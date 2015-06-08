@@ -60,7 +60,8 @@ public class IndustrialNetworkProjectSourcePage extends TextEditor implements IF
   private IndustrialNetworkProjectEditor editor;
   private int index;
   private Control partControl;
-  private boolean dirty;
+
+  // private boolean dirty;
 
   public IndustrialNetworkProjectSourcePage() {
     super();
@@ -71,12 +72,6 @@ public class IndustrialNetworkProjectSourcePage extends TextEditor implements IF
 
   @Override
   public boolean canLeaveThePage() {
-
-    if (dirty) {
-      // text content changed since last switch -> update data model
-      editor.reloadFromText(getDocument().get());
-
-    }
     return true;
   }
 
@@ -146,10 +141,10 @@ public class IndustrialNetworkProjectSourcePage extends TextEditor implements IF
 
   @Override
   public void setActive(boolean active) {
-    if (active) {
-      // clear dirty flag if text page is active now
-      dirty = false;
-    }
+    // if (active) {
+    // // clear dirty flag if text page is active now
+    // dirty = false;
+    // }
   }
 
   public void setContent(String source) {

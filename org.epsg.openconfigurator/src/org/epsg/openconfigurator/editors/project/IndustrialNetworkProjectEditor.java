@@ -44,7 +44,10 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
+import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -96,6 +99,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
 
   private static final String MARSHALL_ERROR = "Error marshalling the openCONFIGURATOR project";
   private static final String UNMARSHALL_ERROR = "Error unmarshalling the openCONFIGURATOR project";
+  private static final String INVALID_INPUT_ERROR = "Invalid input: Must be a valid openCONFIGURATOR project file.";
 
   private String networkId;
 
@@ -121,13 +125,26 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
   @Override
   public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
     if (!(editorInput instanceof IFileEditorInput))
-      throw new PartInitException("Invalid Input: Must be IFileEditorInput");
+      throw new PartInitException(INVALID_INPUT_ERROR);
     super.init(site, editorInput);
 
     IFileEditorInput input = (IFileEditorInput) editorInput;
     IFile file = input.getFile();
+
+    try {
+      currentProject = OpenCONFIGURATORProjectMarshaller.unmarshallopenCONFIGURATORProject(file
+          .getContents());
+    } catch (FileNotFoundException | MalformedURLException | JAXBException | SAXException
+        | ParserConfigurationException | CoreException e) {
+      e.printStackTrace();
+      throw new PartInitException(INVALID_INPUT_ERROR);
+    }
+
     IProject activeProject = file.getProject();
     networkId = activeProject.getName();
+
+    setInput(editorInput);
+    setPartName(file.getName());
   }
 
   /**
@@ -173,7 +190,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
    *
    * @param input Input content of openCONFIGURATOR type
    */
-  public void reloadFromText(String input) {
+  public void reloadFromSourceText(final String input) {
 
     try {
       InputStream is = new ByteArrayInputStream(input.getBytes());
@@ -187,6 +204,24 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
   }
 
   /**
+   * @brief Closes the all the pages added this editor.
+   */
+  private void closeEditor() {
+    Display.getDefault().asyncExec(new Runnable() {
+      @Override
+      public void run() {
+
+        IWorkbenchPage[] pages = IndustrialNetworkProjectEditor.this.getSite().getWorkbenchWindow()
+            .getPages();
+        for (IWorkbenchPage editorPage : pages) {
+          IEditorPart editorPart = editorPage.findEditor(getEditorInput());
+          editorPage.closeEditor(editorPart, true);
+        }
+      }
+    });
+  }
+
+  /**
    * @brief Handles the project change events.
    */
   @Override
@@ -196,27 +231,64 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
       case IResourceChangeEvent.POST_CHANGE:
         break;
       case IResourceChangeEvent.PRE_CLOSE:
-      case IResourceChangeEvent.PRE_DELETE:
-        Display.getDefault().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            IWorkbenchPage[] pages = IndustrialNetworkProjectEditor.this.getSite()
-                .getWorkbenchWindow().getPages();
-            for (int i = 0; i < pages.length; i++) {
-              if (((FileEditorInput) sourcePage.getEditorInput()).getFile().getProject()
-                  .equals(event.getResource())) {
-                IEditorPart editorPart = pages[i].findEditor(sourcePage.getEditorInput());
-                pages[i].closeEditor(editorPart, true);
-              }
-            }
-          }
-        });
+      case IResourceChangeEvent.PRE_DELETE: // Fallback
+        if (((FileEditorInput) sourcePage.getEditorInput()).getFile().getProject()
+            .equals(event.getResource())) {
+          closeEditor();
+        }
         break;
       case IResourceChangeEvent.PRE_BUILD:
         break;
       case IResourceChangeEvent.POST_BUILD:
         break;
       case IResourceChangeEvent.PRE_REFRESH:
+        break;
+      default:
+        break;
+    }
+
+    // Handle project file delete and rename events
+    IResourceDelta delta = event.getDelta();
+    if (delta == null)
+      return;
+
+    IFileEditorInput input = (IFileEditorInput) getEditorInput();
+    if (input == null) {
+      return;
+    }
+
+    // Project file is not present, so close all the editor pages.
+    IFile currentProjectFile = input.getFile();
+    if (currentProjectFile == null) {
+      closeEditor();
+      return;
+    }
+
+    IResourceDelta oldDelta = delta.findMember(currentProjectFile.getFullPath());
+    if (oldDelta == null) {
+      return;
+    }
+
+    switch (oldDelta.getKind()) {
+      case IResourceDelta.REMOVED:
+        if ((oldDelta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+          IPath newPath = oldDelta.getMovedToPath();
+          final IFile newfile = ResourcesPlugin.getWorkspace().getRoot().getFile(newPath);
+          if (newfile != null) {
+            setInput(new FileEditorInput(newfile));
+
+            if (newfile.getName() != null) {
+              Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                  setPartName(newfile.getName());
+                }
+              });
+            }
+          }
+        } else if (oldDelta.getFlags() == 0) {
+          closeEditor();
+        }
         break;
       default:
         break;
@@ -270,7 +342,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
   protected void addPages() {
 
     try {
-      createProjectSourceEditor();
 
       Result libApiRes = OpenConfiguratorCore.GetInstance().CreateNetwork(networkId);
       if (!libApiRes.IsSuccessful()) {
@@ -282,10 +353,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
         return;
       }
 
-      String editorText = getContent();
-      reloadFromText(editorText);
-
       createPowerlinkProjectEditor();
+      createProjectSourceEditor();
 
       this.setActivePage(editorPage.getId());
 
@@ -326,8 +395,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
 
     super.pageChange(newPageIndex);
 
-    // currentProject = editorPage.getOpenCONFIGURATORProject();
-
     if (sourcePage.getIndex() == newPageIndex) {
       String openconfiguratorProjectSource = new String("");
       try {
@@ -341,12 +408,15 @@ public final class IndustrialNetworkProjectEditor extends FormEditor implements
         e.printStackTrace();
       }
       sourcePage.setContent(openconfiguratorProjectSource);
+
+      if (!editorPage.isDirty())
+        sourcePage.doSave(null);
     }
 
     if (editorPage != null) {
       if (editorPage.getIndex() == newPageIndex) {
         String editorText = getContent();
-        reloadFromText(editorText);
+        reloadFromSourceText(editorText);
         editorPage.setOpenCONFIGURATORProject(currentProject);
       }
     }
