@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<site>
+   <feature url="features/org.epsg.openconfigurator.feature_1.0.0.201506171651.jar" id="org.epsg.openconfigurator.feature" version="1.0.0.201506171651"/>
+</site>
