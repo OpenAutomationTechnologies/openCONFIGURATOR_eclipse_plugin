@@ -41,70 +41,74 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IImportWizard;
 import org.eclipse.ui.IWorkbench;
 
-//import org.epsg.openconfigurator.wizards.ImportProjectWizardResourceSupport;
-
 /**
+ * A wizard implementation to import openCONFIGURATOR project files.
+ *
  * @author Ramakrishnan P
  *
  */
-public class ImportPowerlinkNetworkProjectWizard extends Wizard implements IImportWizard,
-    IExecutableExtension {
+public class ImportPowerlinkNetworkProjectWizard extends Wizard implements
+        IImportWizard, IExecutableExtension {
 
-  private ImportOpenConfiguratorProjectWizardPage mainPage;
+    /**
+     * Import openCONFIGURATOR project page.
+     */
+    private ImportOpenConfiguratorProjectWizardPage mainPage;
 
-  /**
-   *
-   */
-  public ImportPowerlinkNetworkProjectWizard() {
-    super();
-  }
+    /**
+     * Constructor.
+     */
+    public ImportPowerlinkNetworkProjectWizard() {
+        super();
+    }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#addPages()
-   */
-  @Override
-  public void addPages() {
-    super.addPages();
-    mainPage = new ImportOpenConfiguratorProjectWizardPage();
-    addPage(mainPage);
-  }
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.wizard.Wizard#addPages()
+     */
+    @Override
+    public void addPages() {
+        super.addPages();
+        mainPage = new ImportOpenConfiguratorProjectWizardPage();
+        addPage(mainPage);
+    }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
-   * org.eclipse.jface.viewers.IStructuredSelection)
-   */
-  @Override
-  public void init(IWorkbench workbench, IStructuredSelection selection) {
-    // this.setDefaultPageImageDescriptor(IDEWorkbenchPlugin
-    //        .getIDEImageDescriptor("wizban/importproj_wiz.png")); //$NON-NLS-1$
-    IStructuredSelection currentSelection = selection;
-  }
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.IWorkbenchWizard#init(org.eclipse.ui.IWorkbench,
+     * org.eclipse.jface.viewers.IStructuredSelection)
+     */
+    @Override
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
+        // this.setDefaultPageImageDescriptor(IDEWorkbenchPlugin
+        //        .getIDEImageDescriptor("wizban/importproj_wiz.png")); //$NON-NLS-1$
+        IStructuredSelection currentSelection = selection;
+    }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#performFinish()
-   */
-  @Override
-  public boolean performFinish() {
-    return mainPage.createProjects();
-  }
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.wizard.Wizard#performFinish()
+     */
+    @Override
+    public boolean performFinish() {
+        return mainPage.createProjects();
+    }
 
-  /*
-   * (non-Javadoc)
-   *
-   * @see
-   * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org.eclipse.core.runtime
-   * .IConfigurationElement, java.lang.String, java.lang.Object)
-   */
-  @Override
-  public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-      throws CoreException {
-    IConfigurationElement _configurationElement = config;
-  }
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.core.runtime.IExecutableExtension#setInitializationData(org
+     * .eclipse.core.runtime .IConfigurationElement, java.lang.String,
+     * java.lang.Object)
+     */
+    @Override
+    public void setInitializationData(IConfigurationElement config,
+            String propertyName, Object data) throws CoreException {
+        IConfigurationElement _configurationElement = config;
+    }
 
 }

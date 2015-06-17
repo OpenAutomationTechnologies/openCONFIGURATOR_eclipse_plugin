@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.editors.project;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -64,482 +65,562 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenCONFIGURATORLibraryUtils;
 import org.epsg.openconfigurator.util.OpenCONFIGURATORProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
 /**
- * @brief A dialog to modify the list of auto generation IDs.
+ * A dialog to modify the list of auto generation IDs.
  *
  * @author Ramakrishnan P
  *
  */
 public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
 
-  /**
-   *
-   * @brief A cell modifier is used to access the {@link TAutoGenerationSettings} data model from a
-   *        cell editor.
-   *
-   * @author Ramakrishnan P
-   *
-   */
-  private class AutoGenerationSettingsCellModifier implements ICellModifier {
-
-    private Viewer viewer;
-
-    public AutoGenerationSettingsCellModifier(Viewer viewer) {
-      this.viewer = viewer;
-    }
-
-    @Override
-    public boolean canModify(Object element, String property) {
-
-      if (ModifyAutoGenerationSettingsDialog.NAME.equals(property)) {
-
-        if (element instanceof Item)
-          element = ((Item) element).getData();
-
-        TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
-        if (ag.getId().equalsIgnoreCase(
-            OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-            || ag.getId().equalsIgnoreCase(
-                OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
-                || ag.getId().equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
-          return false;
-        }
-      }
-
-      return true;
-    }
-
-    @Override
-    public Object getValue(Object element, String property) {
-      TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
-      if (ModifyAutoGenerationSettingsDialog.NAME.equals(property))
-        return ag.getId();
-      return null;
-    }
-
-    @Override
-    public void modify(Object element, String property, Object value) {
-
-      if (element instanceof Item)
-        element = ((Item) element).getData();
-
-      // Use if needed to change the input value to uppercase
-      // value = ((String) value).toUpperCase();
-
-      TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
-
-      if (ModifyAutoGenerationSettingsDialog.NAME.equals(property)) {
-        String oldAgSettingId = ag.getId();
-        Result libApiRes = OpenConfiguratorCore.GetInstance().ReplaceConfigurationName(networkID,
-            oldAgSettingId, (String) value);
-        if (!libApiRes.IsSuccessful()) {
-          String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-              + libApiRes.GetErrorMessage();
-          PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
-
-          System.err.println("ReplaceConfigurationName failed." + oldAgSettingId + ":"
-              + (String) value + ". " + errorMessage);
-          return;
-        }
-
-        ag.setId((String) value);
-        dirty = true;
-
-        // If Active setting is same as the element to be modified.. update the active setting also.
-        if (oldAgSettingId.equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
-          libApiRes = OpenConfiguratorCore.GetInstance().SetActiveConfiguration(networkID,
-              ag.getId());
-          if (!libApiRes.IsSuccessful()) {
-            String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-                + libApiRes.GetErrorMessage();
-            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
-
-            System.err.println("SetActiveConfiguration failed. " + errorMessage);
-            return;
-          }
-
-          projectConfiguration.setActiveAutoGenerationSetting(ag.getId());
-          dirty = true;
-        }
-      }
-
-      // Force the viewer to refresh
-      viewer.refresh();
-
-    }
-  }
-
-  /**
-   * @brief A content provider class for the {@link TAutoGenerationSettings} model.
-   *
-   * @author Ramakrishnan P
-   */
-  class AutoGenerationSettingsContentProvider implements IStructuredContentProvider {
     /**
-     * Disposes any created resources
+     *
+     * A cell modifier is used to access the {@link TAutoGenerationSettings}
+     * data model from a cell editor.
+     *
+     * @author Ramakrishnan P
+     *
      */
-    @Override
-    public void dispose() {
-      // Do nothing
+    private class AutoGenerationSettingsCellModifier implements ICellModifier {
+
+        private Viewer viewer;
+
+        public AutoGenerationSettingsCellModifier(Viewer viewer) {
+            this.viewer = viewer;
+        }
+
+        @Override
+        public boolean canModify(Object element, String property) {
+
+            if (ModifyAutoGenerationSettingsDialog.NAME.equals(property)) {
+
+                if (element instanceof Item) {
+                    element = ((Item) element).getData();
+                }
+
+                TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
+                if (ag.getId()
+                        .equalsIgnoreCase(
+                                OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
+                        || ag.getId()
+                                .equalsIgnoreCase(
+                                        OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
+                        || ag.getId().equalsIgnoreCase(
+                                projectConfiguration
+                                        .getActiveAutoGenerationSetting())) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        @Override
+        public Object getValue(Object element, String property) {
+            TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
+            if (ModifyAutoGenerationSettingsDialog.NAME.equals(property)) {
+                return ag.getId();
+            }
+            return null;
+        }
+
+        @Override
+        public void modify(Object element, String property, Object value) {
+
+            if (element instanceof Item) {
+                element = ((Item) element).getData();
+            }
+
+            TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
+
+            if (ModifyAutoGenerationSettingsDialog.NAME.equals(property)) {
+                String oldAgSettingId = ag.getId();
+                Result libApiRes = OpenConfiguratorCore.GetInstance()
+                        .ReplaceConfigurationName(networkID, oldAgSettingId,
+                                (String) value);
+                if (!libApiRes.IsSuccessful()) {
+                    final String errorMessage = OpenCONFIGURATORLibraryUtils
+                            .getErrorMessage(libApiRes);
+                    System.err.println(oldAgSettingId + ":" + (String) value
+                            + ". " + errorMessage);
+                    PluginErrorDialogUtils.displayErrorMessageDialog(
+                            getShell(), errorMessage, null);
+                    return;
+                }
+
+                ag.setId((String) value);
+                dirty = true;
+
+                // If Active setting is same as the element to be modified..
+                // update the active setting also.
+                if (oldAgSettingId.equalsIgnoreCase(projectConfiguration
+                        .getActiveAutoGenerationSetting())) {
+                    libApiRes = OpenConfiguratorCore.GetInstance()
+                            .SetActiveConfiguration(networkID, ag.getId());
+                    if (!libApiRes.IsSuccessful()) {
+                        final String errorMessage = OpenCONFIGURATORLibraryUtils
+                                .getErrorMessage(libApiRes);
+                        System.err.println(errorMessage);
+                        PluginErrorDialogUtils.displayErrorMessageDialog(
+                                getShell(), errorMessage, null);
+                        return;
+                    }
+
+                    projectConfiguration.setActiveAutoGenerationSetting(ag
+                            .getId());
+                    dirty = true;
+                }
+            }
+
+            // Force the viewer to refresh
+            viewer.refresh();
+
+        }
     }
 
     /**
-     * Returns the Person objects
+     * A content provider class for the {@link TAutoGenerationSettings} model.
+     *
+     * @author Ramakrishnan P
      */
-    @Override
-    public Object[] getElements(Object inputElement) {
-      return ((List) inputElement).toArray();
+    class AutoGenerationSettingsContentProvider implements
+            IStructuredContentProvider {
+        /**
+         * Disposes any created resources
+         */
+        @Override
+        public void dispose() {
+            // Do nothing
+        }
+
+        /**
+         * Returns the Person objects
+         */
+        @Override
+        public Object[] getElements(Object inputElement) {
+            return ((List) inputElement).toArray();
+        }
+
+        /**
+         * Called when the input changes
+         */
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // Ignore
+        }
     }
 
     /**
-     * Called when the input changes
+     * Dialog messages and labels.
+     */
+    private static final String DIALOG_TITLE = "Build Configuration Groups";
+    private static final String DIALOG_DEFAULT_MESSAGE = "Configure the build configuration settings group";
+    private static final String NAME = "Group Name";
+    private static final String ADD_BUTTON_LABEL = "Add";
+    private static final String DELETE_BUTTON_LABEL = "Delete";
+    private static final String NEW_SETTINGS_GROUP_NAME = "custom";
+    private static final String SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED = "No empty values are allowed";
+    private static final String GROUP_NAME_ALREADY_PRESENT_ERROR = "{0} already present.";
+    private static final String REMOVE_GROUP_NAME_FAILED = "Error in removing the autogenerationsetting. ID:{0}";
+
+    /**
+     * Tableviwer to list the group IDs.
+     */
+    private TableViewer tableViewer;
+
+    /**
+     * The table instance.
+     */
+    private Table table;
+
+    /**
+     * Delete group ID button.
+     */
+    private Button deleteSettingsButton;
+
+    /**
+     * The network ID.
+     */
+    private String networkID;
+
+    /**
+     * The project configuration instance from model.
+     */
+    private TProjectConfiguration projectConfiguration;
+
+    /**
+     * Dialog dirty flag.
+     */
+    private boolean dirty = false;
+
+    /**
+     * Creates the modify auto generation settings dialog.
+     *
+     * @param parentShell The parent shell.
+     * @param networkID The network identifier.
+     * @param projectConfiguration The {@link TProjectConfiguration} model
+     *            instance.
+     */
+    public ModifyAutoGenerationSettingsDialog(Shell parentShell,
+            final String networkID, TProjectConfiguration projectConfiguration) {
+        super(parentShell);
+        this.networkID = networkID;
+        this.projectConfiguration = projectConfiguration;
+    }
+
+    /**
+     * Create contents of the footer button bar.
+     *
+     * @param parent Parent control.
      */
     @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      // Ignore
+    protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+                true);
     }
-  }
 
-  private static final String DIALOG_TITLE = "Build Configuration Groups";
-  private static final String DIALOG_DEFAULT_MESSAGE = "Configure the build configuration settings group";
-  private static final String NAME = "Group Name";
-  private static final String ADD_BUTTON_LABEL = "Add";
-  private static final String DELETE_BUTTON_LABEL = "Delete";
+    /**
+     * Create contents of the dialog.
+     *
+     * @param parent Parent control.
+     */
+    @Override
+    protected Control createDialogArea(Composite parent) {
+        setTitle(ModifyAutoGenerationSettingsDialog.DIALOG_TITLE);
+        setMessage(ModifyAutoGenerationSettingsDialog.DIALOG_DEFAULT_MESSAGE);
 
-  private static final String SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED = "No empty values are allowed";
+        Composite container = new Composite(parent, SWT.NONE);
+        container.setLayoutData(new GridData(GridData.FILL_BOTH));
+        container.setLayout(new GridLayout(2, false));
 
-  private TableViewer tableViewer;
-  private Table table;
-  private Button deleteSettingsButton;
+        // Add the TableViewer
+        tableViewer = new TableViewer(container, SWT.SINGLE | SWT.H_SCROLL
+                | SWT.V_SCROLL | SWT.BORDER);
 
-  private String networkID;
-  private TProjectConfiguration projectConfiguration;
-  private boolean dirty = false;
+        tableViewer
+                .setContentProvider(new AutoGenerationSettingsContentProvider());
+        tableViewer.setInput(projectConfiguration.getAutoGenerationSettings());
 
-  /**
-   * @brief Creates the Dialog instance
-   *
-   * @param[in] parentShell The parent shell.
-   * @param[in,out] projectConfiguration The {@link TProjectConfiguration} model instance.
-   */
-  public ModifyAutoGenerationSettingsDialog(Shell parentShell, final String networkID,
-      TProjectConfiguration projectConfiguration) {
-    super(parentShell);
-    this.networkID = networkID;
-    this.projectConfiguration = projectConfiguration;
-  }
+        table = tableViewer.getTable();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
+        gd.heightHint = 75;
+        table.setLayoutData(gd);
 
-  /**
-   * @brief Create contents of the footer button bar.
-   *
-   * @param[in] parent
-   */
-  @Override
-  protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-    // createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
-  }
+        TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer,
+                SWT.NONE);
+        final TableColumn nameColumn = viewerColumn.getColumn();
+        nameColumn.setText(ModifyAutoGenerationSettingsDialog.NAME);
 
-  /**
-   * @brief Create contents of the dialog.
-   *
-   * @param[in] parent
-   */
-  @Override
-  protected Control createDialogArea(Composite parent) {
-    setTitle(DIALOG_TITLE);
-    setMessage(DIALOG_DEFAULT_MESSAGE);
+        viewerColumn.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
+                return ag.getId();
+            }
+        });
 
-    Composite container = new Composite(parent, SWT.NONE);
-    container.setLayoutData(new GridData(GridData.FILL_BOTH));
-    container.setLayout(new GridLayout(2, false));
+        tableViewer
+                .addSelectionChangedListener(new ISelectionChangedListener() {
 
-    // Add the TableViewer
-    tableViewer = new TableViewer(container, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        ISelection s = event.getSelection();
 
-    tableViewer.setContentProvider(new AutoGenerationSettingsContentProvider());
-    tableViewer.setInput(projectConfiguration.getAutoGenerationSettings());
+                        if ((s instanceof IStructuredSelection)
+                                && (((IStructuredSelection) s).size() == 1)) {
+                            Object object = ((IStructuredSelection) s)
+                                    .getFirstElement();
 
-    table = tableViewer.getTable();
-    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
-    gd.heightHint = 75;
-    table.setLayoutData(gd);
+                            TAutoGenerationSettings ag = (TAutoGenerationSettings) object;
 
-    TableViewerColumn viewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-    final TableColumn nameColumn = viewerColumn.getColumn();
-    nameColumn.setText(NAME);
+                            // If the current selection ID = defaultOutputPath
+                            // then disable edit/delete button
+                            if (ag.getId()
+                                    .equalsIgnoreCase(
+                                            OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
+                                    || ag.getId()
+                                            .equalsIgnoreCase(
+                                                    OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
+                                    || ag.getId()
+                                            .equalsIgnoreCase(
+                                                    projectConfiguration
+                                                            .getActiveAutoGenerationSetting())) {
+                                deleteSettingsButton.setEnabled(false);
+                            } else {
+                                deleteSettingsButton.setEnabled(true);
+                            }
+                        } else {
+                            System.err
+                                    .println("Selection should be an event of structured selection.");
+                        }
+                    }
+                });
 
-    viewerColumn.setLabelProvider(new ColumnLabelProvider() {
-      @Override
-      public String getText(Object element) {
-        TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
-        return ag.getId();
-      }
-    });
-
-    tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
-
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-        ISelection s = event.getSelection();
-
-        if (s instanceof IStructuredSelection && ((IStructuredSelection) s).size() == 1) {
-          Object object = ((IStructuredSelection) s).getFirstElement();
-
-          TAutoGenerationSettings ag = (TAutoGenerationSettings) object;
-
-          // If the current selection ID = defaultOutputPath then disable edit/delete button
-          if (ag.getId().equalsIgnoreCase(
-              OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-              || ag.getId().equalsIgnoreCase(
-                  OpenCONFIGURATORProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
-              || ag.getId().equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
-            deleteSettingsButton.setEnabled(false);
-          } else {
-            deleteSettingsButton.setEnabled(true);
-          }
-        } else {
-          System.err.println("Selection should be an event of structured selection.");
+        for (int i = 0, n = table.getColumnCount(); i < n; i++) {
+            table.getColumn(i).pack();
         }
-      }
-    });
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
 
-    for (int i = 0, n = table.getColumnCount(); i < n; i++) {
-      table.getColumn(i).pack();
-    }
-    table.setHeaderVisible(true);
-    table.setLinesVisible(true);
+        // Add a button to create the new person
+        Button btnNewAutoGeneration = new Button(container, SWT.PUSH);
+        btnNewAutoGeneration
+                .setText(ModifyAutoGenerationSettingsDialog.ADD_BUTTON_LABEL);
+        gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        btnNewAutoGeneration.setLayoutData(gd);
 
-    // Add a button to create the new person
-    Button btnNewAutoGeneration = new Button(container, SWT.PUSH);
-    btnNewAutoGeneration.setText(ADD_BUTTON_LABEL);
-    gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-    btnNewAutoGeneration.setLayoutData(gd);
+        btnNewAutoGeneration.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
 
-    btnNewAutoGeneration.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent event) {
+                String newAutoGenerationSettingsID = newAutoGenerationSettingsID();
+                Result libApiRes = OpenConfiguratorCore.GetInstance()
+                        .CreateConfiguration(networkID,
+                                newAutoGenerationSettingsID);
+                if (!libApiRes.IsSuccessful()) {
+                    // Report to the user about the error from the library
+                    final String errorMessage = OpenCONFIGURATORLibraryUtils
+                            .getErrorMessage(libApiRes);
+                    System.err.println("AddConfiguration '"
+                            + newAutoGenerationSettingsID + "' fails. "
+                            + errorMessage);
+                    PluginErrorDialogUtils.displayErrorMessageDialog(
+                            getShell(), errorMessage, null);
+                    return;
+                }
 
-        String newAutoGenerationSettingsID = newAutoGenerationSettingsID();
-        Result libApiRes = OpenConfiguratorCore.GetInstance().CreateConfiguration(networkID,
-            newAutoGenerationSettingsID);
-        if (!libApiRes.IsSuccessful()) {
-          // Report to the user about the error from the library
-          String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-              + libApiRes.GetErrorMessage();
-          PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
+                TAutoGenerationSettings ag = new TAutoGenerationSettings();
+                ag.setId(newAutoGenerationSettingsID);
+                projectConfiguration.getAutoGenerationSettings().add(0, ag);
 
-          System.err.println("AddConfiguration '" + newAutoGenerationSettingsID + "' fails. "
-              + errorMessage);
-          return;
-        }
+                dirty = true;
+                tableViewer.refresh();
+            }
+        });
 
-        TAutoGenerationSettings ag = new TAutoGenerationSettings();
-        ag.setId(newAutoGenerationSettingsID);
-        // TODO: Add All default <Settings> tag here. Do we need?
-        projectConfiguration.getAutoGenerationSettings().add(0, ag);
-        // projectConfiguration.getAutoGenerationSettings().add(ag);
-        dirty = true;
+        deleteSettingsButton = new Button(container, SWT.PUSH);
+        deleteSettingsButton
+                .setText(ModifyAutoGenerationSettingsDialog.DELETE_BUTTON_LABEL);
+        gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        deleteSettingsButton.setLayoutData(gd);
+        deleteSettingsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                removeAutoGenerationSetting(table.getSelectionIndex());
+
+                // Force a refresh to update the elements from the model.
+                tableViewer.refresh();
+            }
+        });
+
+        // create the editors for the column
+        TextCellEditor idCellEditor = createIDColumnCellEditor(table);
+
+        // Set the editors, cell modifier, and column properties
+        tableViewer
+                .setColumnProperties(new String[] { ModifyAutoGenerationSettingsDialog.NAME });
+        tableViewer.setCellModifier(new AutoGenerationSettingsCellModifier(
+                tableViewer));
+        tableViewer.setCellEditors(new CellEditor[] { idCellEditor });
         tableViewer.refresh();
-      }
-    });
 
-    deleteSettingsButton = new Button(container, SWT.PUSH);
-    deleteSettingsButton.setText(DELETE_BUTTON_LABEL);
-    gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-    deleteSettingsButton.setLayoutData(gd);
-    deleteSettingsButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        removeAutoGenerationSetting(table.getSelectionIndex());
-
-        // Force a refresh to update the elements from the model.
-        tableViewer.refresh();
-      }
-    });
-
-    // create the editors for the column
-    TextCellEditor idCellEditor = createIDColumnCellEditor(table);
-
-    // Set the editors, cell modifier, and column properties
-    tableViewer.setColumnProperties(new String[] { NAME });
-    tableViewer.setCellModifier(new AutoGenerationSettingsCellModifier(tableViewer));
-    tableViewer.setCellEditors(new CellEditor[] { idCellEditor });
-    tableViewer.refresh();
-
-    return container;
-  }
-
-  /**
-   * @brief Create the editor for the {@link TAutoGenerationSettings#id}
-   *
-   *        Additionally it adds the validator to validate the values edited by the user.
-   *
-   * @param[in] tableObj The table instance where the editor will be added.
-   *
-   * @return The editor created for the cell.
-   */
-  private TextCellEditor createIDColumnCellEditor(Table tableObj) {
-    final TextCellEditor idCellEditor = new TextCellEditor(tableObj);
-    idCellEditor.addListener(new ICellEditorListener() {
-
-      @Override
-      public void editorValueChanged(boolean oldValidState, boolean newValidState) {
-        // TODO Auto-generated method stub
-        setErrorMessage(idCellEditor.getErrorMessage());
-      }
-
-      @Override
-      public void cancelEditor() {
-        // TODO Auto-generated method stub
-        setErrorMessage(null);
-      }
-
-      @Override
-      public void applyEditorValue() {
-        // TODO Auto-generated method stub
-        setErrorMessage(null);
-      }
-    });
-
-    idCellEditor.setValidator(new ICellEditorValidator() {
-
-      @Override
-      public String isValid(Object value) {
-        if (isAutoGenerationIdAlreadyPresent((String) value)) {
-          // TODO: fix the strings
-          return ((String) value + " already present.");
-        }
-
-        if (((String) value).isEmpty())
-          return (SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED);
-
-        return null;
-      }
-    });
-
-    return idCellEditor;
-  }
-
-  /**
-   * @brief Creates a unique ID from the ID's present in the list of {@link TAutoGenerationSettings}
-   *        .
-   *
-   * @return Unique ID.
-   */
-  private String newAutoGenerationSettingsID() {
-    final String commonName = "custom";
-
-    String uniqueName = commonName;
-    int suffixValue = 0;
-    while (isAutoGenerationIdAlreadyPresent(uniqueName)) {
-      suffixValue++;
-      uniqueName = commonName + " " + suffixValue;
+        return container;
     }
-    return uniqueName;
-  }
 
-  /**
-   * @brief Return the initial size of the dialog.
-   */
-  @Override
-  protected Point getInitialSize() {
-    return new Point(450, 450);
-  }
+    /**
+     * Create the editor for the {@link TAutoGenerationSettings#id}
+     *
+     * Additionally it adds the validator to validate the values edited by the
+     * user.
+     *
+     * @param tableObj The table instance where the editor will be added.
+     *
+     * @return The editor created for the cell.
+     */
+    private TextCellEditor createIDColumnCellEditor(Table tableObj) {
+        final TextCellEditor idCellEditor = new TextCellEditor(tableObj);
+        idCellEditor.addListener(new ICellEditorListener() {
 
-  /**
-   * @brief Checks for new ID is already present in the AutoGenerationSettings or not
-   *
-   * @param[in] id The new ID to be checked.
-   * @return true if already present, false otherwise
-   */
-  private boolean isAutoGenerationIdAlreadyPresent(final String id) {
-    List<TAutoGenerationSettings> agSettingList = projectConfiguration.getAutoGenerationSettings();
-    for (TAutoGenerationSettings agSettings : agSettingList) {
-      if (agSettings.getId().equalsIgnoreCase(id)) {
+            @Override
+            public void applyEditorValue() {
+                setErrorMessage(null);
+            }
+
+            @Override
+            public void cancelEditor() {
+                setErrorMessage(null);
+            }
+
+            @Override
+            public void editorValueChanged(boolean oldValidState,
+                    boolean newValidState) {
+                setErrorMessage(idCellEditor.getErrorMessage());
+            }
+        });
+
+        idCellEditor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                final String groupId = (String) value;
+                if (isAutoGenerationIdAlreadyPresent(groupId)) {
+                    return MessageFormat
+                            .format(ModifyAutoGenerationSettingsDialog.GROUP_NAME_ALREADY_PRESENT_ERROR,
+                                    groupId);
+                }
+
+                if (groupId.isEmpty()) {
+                    return (ModifyAutoGenerationSettingsDialog.SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED);
+                }
+
+                return null;
+            }
+        });
+
+        return idCellEditor;
+    }
+
+    /**
+     * Return the initial size of the dialog.
+     */
+    @Override
+    protected Point getInitialSize() {
+        return new Point(450, 450);
+    }
+
+    /**
+     * Checks for new ID is already present in the AutoGenerationSettings or not
+     *
+     * @param id The new ID to be checked.
+     * @return true if already present, false otherwise
+     */
+    private boolean isAutoGenerationIdAlreadyPresent(final String id) {
+        List<TAutoGenerationSettings> agSettingList = projectConfiguration
+                .getAutoGenerationSettings();
+        for (TAutoGenerationSettings agSettings : agSettingList) {
+            if (agSettings.getId().equalsIgnoreCase(id)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks for the dialog's dirty state.
+     *
+     * @return true if the data is modified, false otherwise.
+     */
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    /**
+     * Returns true to set the dialog re-sizable always.
+     */
+    @Override
+    protected boolean isResizable() {
         return true;
-      }
-    }
-    return false;
-  }
-
-  /**
-   * @brief Checks for the dialog's dirty state.
-   *
-   * @return true if the data is modified, false otherwise.
-   */
-  public boolean isDirty() {
-    return dirty;
-  }
-
-  /**
-   * @brief Returns true to set the dialog re-sizable always.
-   */
-  @Override
-  protected boolean isResizable() {
-    return true;
-  }
-
-  /**
-   * @brief Removes the {@link TAutoGenerationSettings} at the specified position in this list
-   *        (optional operation). Additionally this function resets the
-   *        {@link TProjectConfiguration.activeAutoGenerationSetting} if the current
-   *        activeAutoGenerationSetting element is removed.
-   *
-   * @param[in] index The index of the AutoGenerationSetting element to be removed
-   * @return <code>true</code> if the element is successfully removed. <code>false</code> otherwise.
-   */
-  private boolean removeAutoGenerationSetting(final int index) {
-    List<TAutoGenerationSettings> agList = projectConfiguration.getAutoGenerationSettings();
-
-    String settingToBeRemoved = null;
-    try {
-      TAutoGenerationSettings settingTobeRemoved = agList.get(index);
-      settingToBeRemoved = settingTobeRemoved.getId();
-    } catch (IndexOutOfBoundsException e) {
-      System.err.println("Error in removing the autogenerationsetting. ID:" + index);
-      return false;
     }
 
-    if ((settingToBeRemoved == null) || (settingToBeRemoved.isEmpty())) {
-      System.err.println("Error in removing the autogenerationsetting. ID:" + index);
-      return false;
+    /**
+     * Creates a unique ID from the ID's present in the list of
+     * {@link TAutoGenerationSettings} .
+     *
+     * @return Unique ID.
+     */
+    private String newAutoGenerationSettingsID() {
+
+        String uniqueName = ModifyAutoGenerationSettingsDialog.NEW_SETTINGS_GROUP_NAME;
+        int suffixValue = 0;
+        while (isAutoGenerationIdAlreadyPresent(uniqueName)) {
+            suffixValue++;
+            uniqueName = ModifyAutoGenerationSettingsDialog.NEW_SETTINGS_GROUP_NAME
+                    + " " + suffixValue;
+        }
+        return uniqueName;
     }
 
-    Result libApiRes = OpenConfiguratorCore.GetInstance().RemoveConfiguration(networkID,
-        settingToBeRemoved);
-    if (!libApiRes.IsSuccessful()) {
-      String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-          + libApiRes.GetErrorMessage();
-      PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
-      System.err.println("RemoveConfiguation failed. " + errorMessage);
-      return libApiRes.IsSuccessful();
-    }
+    /**
+     * Removes the {@link TAutoGenerationSettings} at the specified position in
+     * this list (optional operation). Additionally this function resets the
+     * {@link TProjectConfiguration.activeAutoGenerationSetting} if the current
+     * activeAutoGenerationSetting element is removed.
+     *
+     * @param index The index of the AutoGenerationSetting element to be removed
+     * @return <code>true</code> if the element is successfully removed.
+     *         <code>false</code> otherwise.
+     */
+    private boolean removeAutoGenerationSetting(final int index) {
+        List<TAutoGenerationSettings> agList = projectConfiguration
+                .getAutoGenerationSettings();
 
-    agList.remove(index); // No need to return the removed element.
-    if (settingToBeRemoved.equalsIgnoreCase(projectConfiguration.getActiveAutoGenerationSetting())) {
-      // The item about to be removed is same as the active auto generation setting.
-      // Update the active auto-generation setting to 0, then remove it.
-      String currentActiveSetting = agList.get(0).getId();
-      libApiRes = OpenConfiguratorCore.GetInstance().SetActiveConfiguration(networkID,
-          currentActiveSetting);
-      if (!libApiRes.IsSuccessful()) {
-        String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-            + libApiRes.GetErrorMessage();
-        PluginErrorDialogUtils.displayErrorMessageDialog(getShell(), errorMessage, null);
-        System.err.println("SetActiveConfiguration failed. " + errorMessage);
+        String settingToBeRemoved = null;
+        try {
+            TAutoGenerationSettings settingTobeRemoved = agList.get(index);
+            settingToBeRemoved = settingTobeRemoved.getId();
+        } catch (IndexOutOfBoundsException e) {
+
+            System.err
+                    .println(MessageFormat
+                    .format(ModifyAutoGenerationSettingsDialog.REMOVE_GROUP_NAME_FAILED,
+                            index));
+            return false;
+        }
+
+        if ((settingToBeRemoved == null) || (settingToBeRemoved.isEmpty())) {
+            System.err
+                    .println(MessageFormat
+                            .format(ModifyAutoGenerationSettingsDialog.REMOVE_GROUP_NAME_FAILED,
+                                    index));
+            return false;
+        }
+
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
+                .RemoveConfiguration(networkID, settingToBeRemoved);
+        if (!libApiRes.IsSuccessful()) {
+            final String errorMessage = OpenCONFIGURATORLibraryUtils
+                    .getErrorMessage(libApiRes);
+
+            System.err.println("RemoveConfiguation failed. " + errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
+                    errorMessage, null);
+
+            return libApiRes.IsSuccessful();
+        }
+
+        agList.remove(index); // No need to return the removed element.
+        if (settingToBeRemoved.equalsIgnoreCase(projectConfiguration
+                .getActiveAutoGenerationSetting())) {
+            // The item about to be removed is same as the active auto
+            // generation setting.
+            // Update the active auto-generation setting to 0, then remove it.
+            String currentActiveSetting = agList.get(0).getId();
+            libApiRes = OpenConfiguratorCore.GetInstance()
+                    .SetActiveConfiguration(networkID, currentActiveSetting);
+            if (!libApiRes.IsSuccessful()) {
+                final String errorMessage = OpenCONFIGURATORLibraryUtils
+                        .getErrorMessage(libApiRes);
+
+                System.err.println("SetActiveConfiguration failed. "
+                        + errorMessage);
+
+                PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
+                        errorMessage, null);
+
+                return libApiRes.IsSuccessful();
+            }
+            projectConfiguration
+                    .setActiveAutoGenerationSetting(currentActiveSetting);
+        }
+
+        dirty = true;
+
         return libApiRes.IsSuccessful();
-      }
-      projectConfiguration.setActiveAutoGenerationSetting(currentActiveSetting);
     }
-
-    dirty = true;
-
-    return libApiRes.IsSuccessful();
-  }
 }

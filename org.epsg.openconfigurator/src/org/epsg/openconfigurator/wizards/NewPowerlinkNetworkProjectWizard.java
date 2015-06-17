@@ -60,112 +60,146 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
  * @author Ramakrishnan P
  *
  */
-public class NewPowerlinkNetworkProjectWizard extends Wizard implements INewWizard,
-IExecutableExtension {
+public class NewPowerlinkNetworkProjectWizard extends Wizard implements
+        INewWizard, IExecutableExtension {
 
-  public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_NAME = "POWERLINK network project wizard";
-  public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE = "POWERLINK network project";
-  public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project";
-  public static final String NEW_PROJECT_WIZARD_TITLE = "New POWERLINK network project";
+    /**
+     * Wizard labels and messages.
+     */
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_NAME = "POWERLINK network project wizard";
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE = "POWERLINK network project";
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project";
+    public static final String NEW_PROJECT_WIZARD_TITLE = "New POWERLINK network project";
 
-  private WizardNewProjectCreationPage newProjectCreationPage;
-  private AddDefaultMasterNodeWizardPage addDefaultMasterPage;
-  private IConfigurationElement _configurationElement;
+    /**
+     * New project creation wizard page.
+     */
+    private WizardNewProjectCreationPage newProjectCreationPage;
 
-  public NewPowerlinkNetworkProjectWizard() {
-    // TODO Auto-generated constructor stub
-  }
+    /**
+     * Wizard page to add default managing node.
+     */
+    private AddDefaultMasterNodeWizardPage addDefaultMasterPage;
 
-  @Override
-  public void addPages() {
-    super.addPages();
+    /**
+     * Configuration element.
+     */
+    private IConfigurationElement _configurationElement;
 
-    newProjectCreationPage = new WizardNewProjectCreationPage(NEW_PROJECT_WIZARD_CREATION_PAGE_NAME);
-    newProjectCreationPage.setTitle(NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE);
-    newProjectCreationPage.setDescription(NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION);
-    addPage(newProjectCreationPage);
-
-    addDefaultMasterPage = new AddDefaultMasterNodeWizardPage();
-    addDefaultMasterPage.setPreviousPage(newProjectCreationPage);
-    addPage(addDefaultMasterPage);
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#canFinish()
-   */
-  @Override
-  public boolean canFinish() {
-    if (getContainer().getCurrentPage() == newProjectCreationPage)
-      return false;
-    return addDefaultMasterPage.isPageComplete();
-  }
-
-  /**
-   * Creates the new POWERLINK network project file inside the path.
-   */
-  private void createNewProjectFile() {
-    if (newProjectCreationPage.getLocationURI().getPath().isEmpty()) {
-      return;
+    /**
+     * Constructor.
+     */
+    public NewPowerlinkNetworkProjectWizard() {
+        // Do nothing.
     }
 
-    String projectPath = newProjectCreationPage.getLocationPath().toString() + File.separator
-        + newProjectCreationPage.getProjectName();
-    addDefaultMasterPage.copyXddToDeviceImportDir(projectPath);
+    @Override
+    public void addPages() {
+        super.addPages();
 
-    String projectFileName = newProjectCreationPage.getLocationURI().getPath() + File.separator
-        + newProjectCreationPage.getProjectName() + ".xml";
-    addDefaultMasterPage.createProject(projectFileName);
-  }
+        newProjectCreationPage = new WizardNewProjectCreationPage(
+                NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_NAME);
+        newProjectCreationPage
+                .setTitle(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE);
+        newProjectCreationPage
+                .setDescription(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION);
+        addPage(newProjectCreationPage);
 
-  @Override
-  public void init(IWorkbench workbench, IStructuredSelection selection) {
-    setWindowTitle(NEW_PROJECT_WIZARD_TITLE);
-  }
-
-  /*
-   * (non-Javadoc)
-   *
-   * @see org.eclipse.jface.wizard.Wizard#performCancel()
-   */
-  @Override
-  public boolean performCancel() {
-    // TODO Auto-generated method stub
-    return super.performCancel();
-  }
-
-  @Override
-  public boolean performFinish() {
-
-    String name = newProjectCreationPage.getProjectName();
-    URI location = null;
-    if (!newProjectCreationPage.useDefaults()) {
-      location = newProjectCreationPage.getLocationURI();
+        addDefaultMasterPage = new AddDefaultMasterNodeWizardPage();
+        addDefaultMasterPage.setPreviousPage(newProjectCreationPage);
+        addPage(addDefaultMasterPage);
     }
 
-    IProject proj = PowerlinkNetworkProjectSupport.createProject(name, location);
-    createNewProjectFile();
-
-    try {
-      IProgressMonitor monitor = null;
-      proj.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-    } catch (CoreException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.wizard.Wizard#canFinish()
+     */
+    @Override
+    public boolean canFinish() {
+        if (getContainer().getCurrentPage() == newProjectCreationPage) {
+            return false;
+        }
+        return addDefaultMasterPage.isPageComplete();
     }
 
-    BasicNewProjectResourceWizard.updatePerspective(_configurationElement);
-    BasicNewResourceWizard.selectAndReveal(proj, PlatformUI.getWorkbench()
-        .getActiveWorkbenchWindow());
+    /**
+     * Creates the new POWERLINK network project file inside the path.
+     */
+    private void createNewProjectFile() {
+        if (newProjectCreationPage.getLocationURI().getPath().isEmpty()) {
+            return;
+        }
 
-    return true;
-  }
+        String projectPath = newProjectCreationPage.getLocationPath()
+                .toString()
+                + File.separator
+                + newProjectCreationPage.getProjectName();
+        addDefaultMasterPage.copyXddToDeviceImportDir(projectPath);
 
-  @Override
-  public void setInitializationData(IConfigurationElement config, String propertyName, Object data)
-      throws CoreException {
-    _configurationElement = config;
-  }
+        String projectFileName = newProjectCreationPage.getLocationURI()
+                .getPath()
+                + File.separator
+                + newProjectCreationPage.getProjectName() + ".xml";
+        addDefaultMasterPage.createProject(projectFileName);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void init(IWorkbench workbench, IStructuredSelection selection) {
+        setWindowTitle(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_TITLE);
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.eclipse.jface.wizard.Wizard#performCancel()
+     */
+    @Override
+    public boolean performCancel() {
+        return super.performCancel();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean performFinish() {
+
+        String name = newProjectCreationPage.getProjectName();
+        URI location = null;
+        if (!newProjectCreationPage.useDefaults()) {
+            location = newProjectCreationPage.getLocationURI();
+        }
+
+        IProject proj = PowerlinkNetworkProjectSupport.createProject(name,
+                location);
+        createNewProjectFile();
+
+        try {
+            IProgressMonitor monitor = null;
+            proj.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        BasicNewProjectResourceWizard.updatePerspective(_configurationElement);
+        BasicNewResourceWizard.selectAndReveal(proj, PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow());
+
+        return true;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setInitializationData(IConfigurationElement config,
+            String propertyName, Object data) throws CoreException {
+        _configurationElement = config;
+    }
 
 }

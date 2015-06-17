@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.editors.project;
 
+import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -77,396 +78,478 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
  */
 public class ModifyPathSettingsDialog extends TitleAreaDialog {
 
-  private boolean dirty = false;
-  private static final String DIALOG_TITLE = "Available Output Locations";
-  private static final String DIALOG_DEFAULT_MESSAGE = "Modify the list of available output locations.";
-  private static final String SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED = "No empty values are allowed";
-
-  private static final String ADD_LABEL = "Add...";
-  private static final String EDIT_LABEL = "Edit...";
-  private static final String DELETE_LABEL = "Delete";
-
-  private static final String NAME = "Name";
-  private static final String PATH = "Location";
-
-  private static final String columns[] = { NAME, PATH };
-
-  private TableViewer tableViewer;
-  private Table table;
-  private Button btnNewPath;
-  private Button btnEditPath;
-  private Button deleteSettingsButton;
-
-  private TProjectConfiguration.PathSettings pathSettingsModel;
-
-  /**
-   * A content provider class for the {@link TProjectConfiguration.PathSettings} model.
-   *
-   * @author Ramakrishnan P
-   *
-   */
-  private class PathSettingsContentProvider implements IStructuredContentProvider {
     /**
-     * Disposes any created resources
+     * A content provider class for the
+     * {@link TProjectConfiguration.PathSettings} model.
+     *
+     * @author Ramakrishnan P
+     *
      */
-    @Override
-    public void dispose() {
-      // Do nothing
+    private class PathSettingsContentProvider implements
+            IStructuredContentProvider {
+        /**
+         * Disposes any created resources
+         */
+        @Override
+        public void dispose() {
+            // Do nothing
+        }
+
+        /**
+         * Returns the input elements
+         */
+        @Override
+        public Object[] getElements(Object inputElement) {
+            return ((List) inputElement).toArray();
+        }
+
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+            // ignore.
+        }
     }
 
     /**
-     * Returns the Person objects
+     * Cell modifier for the list of path settings.
+     *
+     * @author Ramakrishnan P
+     *
+     */
+    private class PathSettingsIdCellModifier implements ICellModifier {
+
+        private Viewer viewer;
+
+        public PathSettingsIdCellModifier(Viewer viewer) {
+            this.viewer = viewer;
+        }
+
+        @Override
+        public boolean canModify(Object element, String property) {
+            if (ModifyPathSettingsDialog.NAME.equals(property)) {
+
+                if (element instanceof Item) {
+                    element = ((Item) element).getData();
+                }
+
+                TPath path = (TPath) element;
+                if (path.getId()
+                        .equalsIgnoreCase(
+                                OpenCONFIGURATORProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        @Override
+        public Object getValue(Object element, String property) {
+            TPath path = (TPath) element;
+            if (ModifyPathSettingsDialog.NAME.equals(property)) {
+                return path.getId();
+            }
+            return null;
+        }
+
+        @Override
+        public void modify(Object element, String property, Object value) {
+
+            if (element instanceof Item) {
+                element = ((Item) element).getData();
+            }
+
+            TPath path = (TPath) element;
+
+            // If Active setting is same as the element to be modified.. update
+            // the active setting also.
+            if (path.getId()
+                    .equalsIgnoreCase(pathSettingsModel.getActivePath())) {
+                pathSettingsModel.setActivePath((String) value);
+                dirty = true;
+            }
+
+            if (ModifyPathSettingsDialog.NAME.equals(property)) {
+                path.setId((String) value);
+
+                dirty = true;
+            }
+
+            // Force the viewer to refresh
+            viewer.refresh();
+
+        }
+    }
+
+    /**
+     * Dialog messages and labels.
+     */
+    private static final String DIALOG_TITLE = "Available Output Locations";
+    private static final String DIALOG_DEFAULT_MESSAGE = "Modify the list of available output locations.";
+
+    private static final String NAME = "Name";
+    private static final String PATH = "Location";
+
+    private static final String ADD_LABEL = "Add...";
+    private static final String EDIT_LABEL = "Edit...";
+    private static final String DELETE_LABEL = "Delete";
+
+    private static final String SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED = "No empty values are allowed";
+    private static final String REMOVE_PATH_ERROR = "Error in removing the TPath. ID:{0}";
+
+    /**
+     * Column labels for the path settings table.
+     */
+    private static final String columns[] = { ModifyPathSettingsDialog.NAME,
+            ModifyPathSettingsDialog.PATH };
+
+    /**
+     * Dialog dirty flag.
+     */
+    private boolean dirty = false;
+
+    /**
+     * Table viewer for the path settings list.
+     */
+    private TableViewer tableViewer;
+
+    /**
+     * Table in the table viewer.
+     */
+    private Table table;
+
+    /**
+     * Add new path button.
+     */
+    private Button btnNewPath;
+
+    /**
+     * Edit path button.
+     */
+    private Button btnEditPath;
+
+    /**
+     * Delete path button.
+     */
+    private Button deleteSettingsButton;
+
+    /**
+     * Path settings model.
+     */
+    private TProjectConfiguration.PathSettings pathSettingsModel;
+
+    /**
+     * Create the modify path settings dialog.
+     *
+     * @param parentShell Parent shell.
+     * @param pathSettings Path settings model.
+     */
+    public ModifyPathSettingsDialog(Shell parentShell,
+            TProjectConfiguration.PathSettings pathSettings) {
+        super(parentShell);
+        pathSettingsModel = pathSettings;
+    }
+
+    /**
+     * Create contents of the footer button bar.
+     *
+     * @param parent Parent control.
      */
     @Override
-    public Object[] getElements(Object inputElement) {
-      return ((List) inputElement).toArray();
+    protected void createButtonsForButtonBar(Composite parent) {
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+                true);
     }
 
+    /**
+     * Create contents of the dialog.
+     *
+     * @param parent Parent control.
+     */
     @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      // TODO Auto-generated method stub
-    }
-  }
+    protected Control createDialogArea(Composite parent) {
+        setTitle(ModifyPathSettingsDialog.DIALOG_TITLE);
+        setMessage(ModifyPathSettingsDialog.DIALOG_DEFAULT_MESSAGE);
+        Composite container = new Composite(parent, SWT.NONE);
+        container.setLayoutData(new GridData(GridData.FILL_BOTH));
+        container.setLayout(new GridLayout(2, false));
 
-  /**
-   * Create the modify path settings dialog.
-   *
-   * @param parentShell
-   * @param pathSettings Path settings model.
-   */
-  public ModifyPathSettingsDialog(Shell parentShell, TProjectConfiguration.PathSettings pathSettings) {
-    super(parentShell);
-    pathSettingsModel = pathSettings;
-  }
+        // Add the TableViewer
+        tableViewer = new TableViewer(container, SWT.SINGLE | SWT.H_SCROLL
+                | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION);
 
-  /**
-   * Create contents of the dialog.
-   *
-   * @param parent
-   */
-  @Override
-  protected Control createDialogArea(Composite parent) {
-    setTitle(DIALOG_TITLE);
-    setMessage(DIALOG_DEFAULT_MESSAGE);
-    Composite container = new Composite(parent, SWT.NONE);
-    container.setLayoutData(new GridData(GridData.FILL_BOTH));
-    container.setLayout(new GridLayout(2, false));
+        table = tableViewer.getTable();
+        GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
+        gd.heightHint = 75;
+        table.setLayoutData(gd);
 
-    // Add the TableViewer
-    tableViewer = new TableViewer(container, SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER
-        | SWT.FULL_SELECTION);
+        TableViewerColumn nameViewerColumn = new TableViewerColumn(tableViewer,
+                SWT.NONE);
+        final TableColumn nameColumn = nameViewerColumn.getColumn();
+        nameColumn.setText(ModifyPathSettingsDialog.columns[0]);
 
-    table = tableViewer.getTable();
-    GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true, 1, 3);
-    gd.heightHint = 75;
-    table.setLayoutData(gd);
+        nameViewerColumn.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                TPath ag = (TPath) element;
+                return ag.getId();
+            }
+        });
 
-    TableViewerColumn nameViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
-    final TableColumn nameColumn = nameViewerColumn.getColumn();
-    nameColumn.setText(columns[0]);
+        TableViewerColumn pathViewerColumn = new TableViewerColumn(tableViewer,
+                SWT.NONE);
 
-    nameViewerColumn.setLabelProvider(new ColumnLabelProvider() {
-      @Override
-      public String getText(Object element) {
-        TPath ag = (TPath) element;
-        return ag.getId();
-      }
-    });
+        final TableColumn pathColumn = pathViewerColumn.getColumn();
+        pathColumn.setText(ModifyPathSettingsDialog.columns[1]);
 
-    TableViewerColumn pathViewerColumn = new TableViewerColumn(tableViewer, SWT.NONE);
+        pathViewerColumn.setLabelProvider(new ColumnLabelProvider() {
+            @Override
+            public String getText(Object element) {
+                TPath ag = (TPath) element;
+                return ag.getPath();
+            }
+        });
 
-    final TableColumn pathColumn = pathViewerColumn.getColumn();
-    pathColumn.setText(columns[1]);
+        tableViewer.setContentProvider(new PathSettingsContentProvider());
+        tableViewer.setInput(pathSettingsModel.getPath());
+        tableViewer
+                .addSelectionChangedListener(new ISelectionChangedListener() {
 
-    pathViewerColumn.setLabelProvider(new ColumnLabelProvider() {
-      @Override
-      public String getText(Object element) {
-        TPath ag = (TPath) element;
-        return ag.getPath();
-      }
-    });
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        ISelection s = event.getSelection();
 
-    tableViewer.setContentProvider(new PathSettingsContentProvider());
-    tableViewer.setInput(pathSettingsModel.getPath());
-    tableViewer.addSelectionChangedListener(new ISelectionChangedListener() {
+                        if ((s instanceof IStructuredSelection)
+                                && (((IStructuredSelection) s).size() == 1)) {
+                            Object object = ((IStructuredSelection) s)
+                                    .getFirstElement();
+                            TPath path = (TPath) object;
 
-      @Override
-      public void selectionChanged(SelectionChangedEvent event) {
-        ISelection s = event.getSelection();
+                            // If the current selection ID = defaultOutputPath
+                    // then disable edit/delete button
+                            if (path.getId()
+                                    .equalsIgnoreCase(
+                                            OpenCONFIGURATORProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                                btnEditPath.setEnabled(false);
+                                deleteSettingsButton.setEnabled(false);
+                            } else {
+                                btnEditPath.setEnabled(true);
+                                deleteSettingsButton.setEnabled(true);
+                            }
 
-        if (s instanceof IStructuredSelection && ((IStructuredSelection) s).size() == 1) {
-          Object object = ((IStructuredSelection) s).getFirstElement();
-          TPath path = (TPath) object;
+                        } else {
+                            System.err
+                                    .println("Selection should be an event of structured selection.");
+                        }
+                    }
+                });
 
-          // If the current selection ID = defaultOutputPath then disable edit/delete button
-          if (path.getId().equalsIgnoreCase(
-              OpenCONFIGURATORProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
-            btnEditPath.setEnabled(false);
-            deleteSettingsButton.setEnabled(false);
-          } else {
-            btnEditPath.setEnabled(true);
-            deleteSettingsButton.setEnabled(true);
-          }
-
-        } else {
-          System.err.println("Selection should be an event of structured selection.");
+        for (int i = 0, n = table.getColumnCount(); i < n; i++) {
+            table.getColumn(i).pack();
         }
-      }
-    });
+        table.setHeaderVisible(true);
+        table.setLinesVisible(true);
 
-    for (int i = 0, n = table.getColumnCount(); i < n; i++) {
-      table.getColumn(i).pack();
-    }
-    table.setHeaderVisible(true);
-    table.setLinesVisible(true);
+        // Add resize listener to auto resize according to the cell contents.
+        table.addListener(SWT.Resize, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                int width = table.getClientArea().width - nameColumn.getWidth();
+                pathColumn.setWidth(width);
+            }
+        });
 
-    table.addListener(SWT.Resize, new Listener() {
-      @Override
-      public void handleEvent(Event event) {
-        int width = table.getClientArea().width - nameColumn.getWidth();
-        pathColumn.setWidth(width);
-      }
-    });
+        // Add a button to create the new Path
+        btnNewPath = new Button(container, SWT.PUSH);
+        btnNewPath.setText(ModifyPathSettingsDialog.ADD_LABEL);
+        gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        btnNewPath.setLayoutData(gd);
 
-    // Add a button to create the new Path
-    btnNewPath = new Button(container, SWT.PUSH);
-    btnNewPath.setText(ADD_LABEL);
-    gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-    btnNewPath.setLayoutData(gd);
+        btnNewPath.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                TPath path = new TPath();
+                AddEditTPathDialog pathDialog = new AddEditTPathDialog(
+                        getShell(), pathSettingsModel, path);
 
-    btnNewPath.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        TPath path = new TPath();
-        AddEditTPathDialog pathDialog = new AddEditTPathDialog(getShell(), pathSettingsModel, path);
+                if (pathDialog.open() == Window.OK) {
+                    if (pathDialog.isDirty()) {
+                        dirty = true;
+                    }
+                    pathSettingsModel.getPath().add(path);
+                    tableViewer.refresh();
+                }
+            }
+        });
 
-        if (pathDialog.open() == Window.OK) {
-          if (pathDialog.isDirty())
-            dirty = true;
-          pathSettingsModel.getPath().add(path);
-          tableViewer.refresh();
-        }
-      }
-    });
+        btnEditPath = new Button(container, SWT.PUSH);
+        btnEditPath.setText(ModifyPathSettingsDialog.EDIT_LABEL);
+        gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        btnEditPath.setLayoutData(gd);
+        btnEditPath.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                TPath path = pathSettingsModel.getPath().get(
+                        table.getSelectionIndex());
 
-    btnEditPath = new Button(container, SWT.PUSH);
-    btnEditPath.setText(EDIT_LABEL);
-    gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-    btnEditPath.setLayoutData(gd);
-    btnEditPath.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        TPath path = pathSettingsModel.getPath().get(table.getSelectionIndex());
+                if (!path
+                        .getId()
+                        .equalsIgnoreCase(
+                                OpenCONFIGURATORProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                    AddEditTPathDialog pathDialog = new AddEditTPathDialog(
+                            getShell(), pathSettingsModel, path);
 
-        if (!path.getId().equalsIgnoreCase(
-            OpenCONFIGURATORProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
-          AddEditTPathDialog pathDialog = new AddEditTPathDialog(getShell(), pathSettingsModel,
-              path);
+                    if (pathDialog.open() == Window.OK) {
+                        if (pathDialog.isDirty()) {
+                            dirty = true;
+                        }
 
-          if (pathDialog.open() == Window.OK) {
-            if (pathDialog.isDirty())
-              dirty = true;
+                        tableViewer.refresh();
+                    }
+                }
+            }
+        });
 
-            tableViewer.refresh();
-          }
-        }
-      }
-    });
+        deleteSettingsButton = new Button(container, SWT.PUSH);
+        deleteSettingsButton.setText(ModifyPathSettingsDialog.DELETE_LABEL);
+        gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+        deleteSettingsButton.setLayoutData(gd);
+        deleteSettingsButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                removePath(table.getSelectionIndex());
+                dirty = true;
+                // Force a refresh to update the elements from the model.
+                tableViewer.refresh();
+            }
+        });
 
-    deleteSettingsButton = new Button(container, SWT.PUSH);
-    deleteSettingsButton.setText(DELETE_LABEL);
-    gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-    deleteSettingsButton.setLayoutData(gd);
-    deleteSettingsButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        removePath(table.getSelectionIndex());
-        dirty = true;
-        // Force a refresh to update the elements from the model.
+        // create the editors for the column
+        TextCellEditor idCellEditor = createIDColumnCellEditor(table);
+        // Set the editors, cell modifier, and column properties
+        tableViewer
+                .setColumnProperties(new String[] { ModifyPathSettingsDialog.NAME });
+        tableViewer
+                .setCellModifier(new PathSettingsIdCellModifier(tableViewer));
+        tableViewer.setCellEditors(new CellEditor[] { idCellEditor });
         tableViewer.refresh();
-      }
-    });
-
-    // create the editors for the column
-    TextCellEditor idCellEditor = createIDColumnCellEditor(table);
-    // Set the editors, cell modifier, and column properties
-    tableViewer.setColumnProperties(new String[] { NAME });
-    tableViewer.setCellModifier(new PathSettingsIdCellModifier(tableViewer));
-    tableViewer.setCellEditors(new CellEditor[] { idCellEditor });
-    tableViewer.refresh();
-    return parent;
-  }
-
-  private class PathSettingsIdCellModifier implements ICellModifier {
-
-    private Viewer viewer;
-
-    public PathSettingsIdCellModifier(Viewer viewer) {
-      this.viewer = viewer;
+        return parent;
     }
 
+    /**
+     * Creates the cell editor for the Path ID column.
+     *
+     * @param tableObj The table in which the contents are available.
+     * @return The text cell editor for the ID column.
+     */
+    private TextCellEditor createIDColumnCellEditor(Table tableObj) {
+        final TextCellEditor idCellEditor = new TextCellEditor(tableObj);
+        idCellEditor.addListener(new ICellEditorListener() {
+
+            @Override
+            public void applyEditorValue() {
+                setErrorMessage(null);
+            }
+
+            @Override
+            public void cancelEditor() {
+                setErrorMessage(null);
+            }
+
+            @Override
+            public void editorValueChanged(boolean oldValidState,
+                    boolean newValidState) {
+                setErrorMessage(idCellEditor.getErrorMessage());
+            }
+        });
+
+        idCellEditor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                if (OpenCONFIGURATORProjectUtils.isPathIdAlreadyPresent(
+                        pathSettingsModel, (String) value)) {
+                    return ((String) value + " already present.");
+                }
+
+                if (((String) value).isEmpty()) {
+                    return (ModifyPathSettingsDialog.SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED);
+                }
+
+                return null;
+            }
+        });
+
+        return idCellEditor;
+    }
+
+    /**
+     * Return the initial size of the dialog.
+     */
     @Override
-    public boolean canModify(Object element, String property) {
-      if (NAME.equals(property)) {
+    protected Point getInitialSize() {
+        return new Point(650, 300);
+    }
 
-        if (element instanceof Item)
-          element = ((Item) element).getData();
+    /**
+     * Checks for the dialog's dirty state.
+     *
+     * @return true if the data is modified, false otherwise.
+     */
+    public boolean isDirty() {
+        return dirty;
+    }
 
-        TPath path = (TPath) element;
-        if (path.getId().equalsIgnoreCase(
-            OpenCONFIGURATORProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
-          return false;
-        }
-
+    /**
+     * Returns true to set the dialog re-sizable always.
+     */
+    @Override
+    protected boolean isResizable() {
         return true;
-      }
-
-      return false;
     }
 
-    @Override
-    public Object getValue(Object element, String property) {
-      TPath path = (TPath) element;
-      if (NAME.equals(property))
-        return path.getId();
-      return null;
-    }
+    /**
+     * Removes the {@link TPath} at the specified position in this list
+     * (optional operation). Additionally this function resets the
+     * {@link TProjectConfiguration.PathSettings.activePathSetting} if the
+     * current activePathSetting element is removed.
+     *
+     * @param index The index of the Path element to be removed
+     * @return <code>true</code> if the element is successfully removed.
+     *         <code>false</code> otherwise.
+     */
+    private boolean removePath(final int index) {
+        List<TPath> pathList = pathSettingsModel.getPath();
 
-    @Override
-    public void modify(Object element, String property, Object value) {
+        String pathIdToBeRemoved = null;
+        try {
+            TPath pathTobeRemoved = pathList.get(index);
+            pathIdToBeRemoved = pathTobeRemoved.getId();
+        } catch (IndexOutOfBoundsException e) {
 
-      if (element instanceof Item)
-        element = ((Item) element).getData();
-
-      TPath path = (TPath) element;
-
-      // If Active setting is same as the element to be modified.. update the active setting also.
-      if (path.getId().equalsIgnoreCase(pathSettingsModel.getActivePath())) {
-        pathSettingsModel.setActivePath((String) value);
-        dirty = true;
-      }
-
-      if (NAME.equals(property)) {
-        path.setId((String) value);
-
-        dirty = true;
-      }
-
-      // Force the viewer to refresh
-      viewer.refresh();
-
-    }
-  }
-
-  private TextCellEditor createIDColumnCellEditor(Table tableObj) {
-    final TextCellEditor idCellEditor = new TextCellEditor(tableObj);
-    idCellEditor.addListener(new ICellEditorListener() {
-
-      @Override
-      public void editorValueChanged(boolean oldValidState, boolean newValidState) {
-        setErrorMessage(idCellEditor.getErrorMessage());
-      }
-
-      @Override
-      public void cancelEditor() {
-        setErrorMessage(null);
-      }
-
-      @Override
-      public void applyEditorValue() {
-        setErrorMessage(null);
-      }
-    });
-
-    idCellEditor.setValidator(new ICellEditorValidator() {
-
-      @Override
-      public String isValid(Object value) {
-        if (OpenCONFIGURATORProjectUtils.isPathIdAlreadyPresent(pathSettingsModel, (String) value)) {
-          return ((String) value + " already present.");
+            System.err.println(MessageFormat.format(
+                    ModifyPathSettingsDialog.REMOVE_PATH_ERROR, index));
+            return false;
         }
 
-        if (((String) value).isEmpty())
-          return (SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED);
+        if ((pathIdToBeRemoved == null) || (pathIdToBeRemoved.isEmpty())) {
+            System.err.println(MessageFormat.format(
+                    ModifyPathSettingsDialog.REMOVE_PATH_ERROR, index));
+            return false;
+        }
 
-        return null;
-      }
-    });
+        pathList.remove(index); // No need to return the removed element.
 
-    return idCellEditor;
-  }
+        if (pathIdToBeRemoved.equalsIgnoreCase(pathSettingsModel
+                .getActivePath())) {
+            // The item about to be removed is same as the activePathSetting.
+            // Update the activePathSetting setting to 0, then remove it.
+            pathSettingsModel.setActivePath(pathList.get(0).getId());
+        }
 
-  /**
-   * Removes the {@link TPath} at the specified position in this list (optional operation).
-   * Additionally this function resets the
-   * {@link TProjectConfiguration.PathSettings.activePathSetting} if the current activePathSetting
-   * element is removed.
-   *
-   * @param index The index of the Path element to be removed
-   * @return <code>true</code> if the element is successfully removed. <code>false</code> otherwise.
-   */
-  private boolean removePath(final int index) {
-    List<TPath> pathList = pathSettingsModel.getPath();
-
-    String pathIdToBeRemoved = null;
-    try {
-      TPath pathTobeRemoved = pathList.get(index);
-      pathIdToBeRemoved = pathTobeRemoved.getId();
-    } catch (IndexOutOfBoundsException e) {
-      System.err.println("Error in removing the TPath. ID:" + index);
-      return false;
+        dirty = true;
+        return true;
     }
-
-    if ((pathIdToBeRemoved == null) || (pathIdToBeRemoved.isEmpty())) {
-      System.err.println("Error in removing the TPath. ID:" + index);
-      return false;
-    }
-
-    pathList.remove(index); // No need to return the removed element.
-
-    if (pathIdToBeRemoved.equalsIgnoreCase(pathSettingsModel.getActivePath())) {
-      // The item about to be removed is same as the activePathSetting.
-      // Update the activePathSetting setting to 0, then remove it.
-      pathSettingsModel.setActivePath(pathList.get(0).getId());
-    }
-
-    dirty = true;
-    return true;
-  }
-
-  /**
-   * Create contents of the footer button bar.
-   *
-   * @param parent
-   */
-  @Override
-  protected void createButtonsForButtonBar(Composite parent) {
-    createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL, true);
-  }
-
-  /**
-   * Returns true to set the dialog re-sizable always.
-   */
-  @Override
-  protected boolean isResizable() {
-    return true;
-  }
-
-  /**
-   * Return the initial size of the dialog.
-   */
-  @Override
-  protected Point getInitialSize() {
-    return new Point(650, 300);
-  }
-
-  /**
-   * Checks for the dialog's dirty state.
-   *
-   * @return true if the data is modified, false otherwise.
-   */
-  public boolean isDirty() {
-    return dirty;
-  }
 
 }

@@ -1,8 +1,6 @@
 /*******************************************************************************
  * @file   OpenCONFIGURATORProjectMarshaller.java
  *
- * @brief  Handles the marshelling an unmarshelling of the Project XML files.
- *
  * @author Christoph Ruecker, Bernecker + Rainer Industrie-Elektronik Ges.m.b.H
  *         Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -60,118 +58,142 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
- *  Handles the marshelling an unmarshelling of the Project XML files.
+ * Handles the marshelling an unmarshelling of the Project XML files.
  */
 public final class OpenCONFIGURATORProjectMarshaller {
 
-  private static Schema projectSchema;
-  public static final String NAMESPACE_OC_URI = "http://sourceforge.net/projects/openconf/configuration"; ////$NON-NLS-1$
-  public static final String NAMESPACE_XSI_LOCATION = NAMESPACE_OC_URI + " openCONFIGURATOR.xsd"; ////$NON-NLS-1$
+    private static Schema projectSchema;
+    public static final String NAMESPACE_OC_URI = "http://sourceforge.net/projects/openconf/configuration"; ////$NON-NLS-1$
+    public static final String NAMESPACE_XSI_LOCATION = OpenCONFIGURATORProjectMarshaller.NAMESPACE_OC_URI
+            + " openCONFIGURATOR.xsd"; ////$NON-NLS-1$
 
-  static {
-    projectSchema = null;
-    URI projectSchemaPath = org.epsg.openconfigurator.Activator.getProjectSchemaFile();
-    if (projectSchemaPath != null) {
-      try {
-        File projectSchemaFile = new File(projectSchemaPath);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        projectSchema = schemaFactory.newSchema(projectSchemaFile);
-      } catch (SAXException e) {
-        e.printStackTrace();
-      }
+    static {
+        OpenCONFIGURATORProjectMarshaller.projectSchema = null;
+        URI projectSchemaPath = org.epsg.openconfigurator.Activator
+                .getProjectSchemaFile();
+        if (projectSchemaPath != null) {
+            try {
+                File projectSchemaFile = new File(projectSchemaPath);
+                SchemaFactory schemaFactory = SchemaFactory
+                        .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                OpenCONFIGURATORProjectMarshaller.projectSchema = schemaFactory
+                        .newSchema(projectSchemaFile);
+            } catch (SAXException e) {
+                e.printStackTrace();
+            }
+        }
     }
-  }
 
-  public static String marshallopenCONFIGURATORProject(final OpenCONFIGURATORProject base)
-      throws JAXBException {
-    StringWriter writer = new StringWriter();
-    final JAXBContext jc = JAXBContext.newInstance(OpenCONFIGURATORProject.class);
-    final Marshaller marshaller = jc.createMarshaller();
-    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, NAMESPACE_XSI_LOCATION);
-    marshaller.marshal(base, writer);
-    if (projectSchema != null)
-      marshaller.setSchema(projectSchema);
+    public static String marshallopenCONFIGURATORProject(
+            final OpenCONFIGURATORProject base) throws JAXBException {
+        StringWriter writer = new StringWriter();
+        final JAXBContext jc = JAXBContext
+                .newInstance(OpenCONFIGURATORProject.class);
+        final Marshaller marshaller = jc.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+                OpenCONFIGURATORProjectMarshaller.NAMESPACE_XSI_LOCATION);
+        marshaller.marshal(base, writer);
+        if (OpenCONFIGURATORProjectMarshaller.projectSchema != null) {
+            marshaller
+                    .setSchema(OpenCONFIGURATORProjectMarshaller.projectSchema);
+        }
 
-    return writer.toString();
-  }
+        return writer.toString();
+    }
 
-  /**
-   * @brief Static method to marshall an openCONFIGURATOR core class structure into a file
-   * @param base OpenCONFIGURATOR Project file to marshall
-   * @param file File to save the marshalled content into
-   * @throws JAXBException
-   */
-  public static void marshallopenCONFIGURATORProject(final OpenCONFIGURATORProject base,
-      final File file) throws JAXBException {
-    final JAXBContext jc = JAXBContext.newInstance(OpenCONFIGURATORProject.class);
-    final Marshaller marshaller = jc.createMarshaller();
-    marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-    marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION, NAMESPACE_XSI_LOCATION);
-    marshaller.marshal(base, file);
-    if (projectSchema != null)
-      marshaller.setSchema(projectSchema);
-  }
+    /**
+     * Static method to marshall an openCONFIGURATOR core class structure into a
+     * file
+     *
+     * @param base OpenCONFIGURATOR Project file to marshall
+     * @param file File to save the marshalled content into
+     * @throws JAXBException
+     */
+    public static void marshallopenCONFIGURATORProject(
+            final OpenCONFIGURATORProject base, final File file)
+            throws JAXBException {
+        final JAXBContext jc = JAXBContext
+                .newInstance(OpenCONFIGURATORProject.class);
+        final Marshaller marshaller = jc.createMarshaller();
+        marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+        marshaller.setProperty(Marshaller.JAXB_SCHEMA_LOCATION,
+                OpenCONFIGURATORProjectMarshaller.NAMESPACE_XSI_LOCATION);
+        marshaller.marshal(base, file);
+        if (OpenCONFIGURATORProjectMarshaller.projectSchema != null) {
+            marshaller
+                    .setSchema(OpenCONFIGURATORProjectMarshaller.projectSchema);
+        }
+    }
 
-  /**
-   * @brief Static method for unmarshalling a openCONFIGURATOR project xml file into a class
-   *        structure
-   * @param file File to unmarshall
-   * @return openCONFIGURATOR object with the unmarshalled content
-   * @throws JAXBException
-   * @throws ParserConfigurationException
-   * @throws SAXException
-   * @throws FileNotFoundException
-   * @throws MalformedURLException
-   */
-  public static OpenCONFIGURATORProject unmarshallopenCONFIGURATORProject(final File file)
-      throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException,
-      MalformedURLException {
-    final JAXBContext jc = JAXBContext.newInstance(OpenCONFIGURATORProject.class);
-    final SAXParserFactory spf = SAXParserFactory.newInstance();
-    spf.setXIncludeAware(true);
-    spf.setNamespaceAware(true);
+    /**
+     * Static method for unmarshalling a openCONFIGURATOR project xml file into
+     * a class structure
+     *
+     * @param file File to unmarshall
+     * @return openCONFIGURATOR object with the unmarshalled content
+     * @throws JAXBException
+     * @throws ParserConfigurationException
+     * @throws SAXException
+     * @throws FileNotFoundException
+     * @throws MalformedURLException
+     */
+    public static OpenCONFIGURATORProject unmarshallopenCONFIGURATORProject(
+            final File file) throws JAXBException, SAXException,
+            ParserConfigurationException, FileNotFoundException,
+            MalformedURLException {
+        final JAXBContext jc = JAXBContext
+                .newInstance(OpenCONFIGURATORProject.class);
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setXIncludeAware(true);
+        spf.setNamespaceAware(true);
 
-    final XMLReader xr = spf.newSAXParser().getXMLReader();
-    final InputSource input = new InputSource(new FileInputStream(file));
-    input.setSystemId(file.toURI().toString());
-    final SAXSource source = new SAXSource(xr, input);
+        final XMLReader xr = spf.newSAXParser().getXMLReader();
+        final InputSource input = new InputSource(new FileInputStream(file));
+        input.setSystemId(file.toURI().toString());
+        final SAXSource source = new SAXSource(xr, input);
 
-    final Unmarshaller unmarshaller = jc.createUnmarshaller();
-    if (projectSchema != null)
-      unmarshaller.setSchema(projectSchema);
-    final OpenCONFIGURATORProject osddFile = (OpenCONFIGURATORProject) unmarshaller
-        .unmarshal(source);
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
+        if (OpenCONFIGURATORProjectMarshaller.projectSchema != null) {
+            unmarshaller
+                    .setSchema(OpenCONFIGURATORProjectMarshaller.projectSchema);
+        }
+        final OpenCONFIGURATORProject osddFile = (OpenCONFIGURATORProject) unmarshaller
+                .unmarshal(source);
 
-    return osddFile;
-  }
+        return osddFile;
+    }
 
-  public static OpenCONFIGURATORProject unmarshallopenCONFIGURATORProject(final InputStream file)
-      throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException,
-      MalformedURLException {
-    final JAXBContext jc = JAXBContext.newInstance(OpenCONFIGURATORProject.class);
-    final SAXParserFactory spf = SAXParserFactory.newInstance();
-    spf.setXIncludeAware(true);
-    spf.setNamespaceAware(true);
+    public static OpenCONFIGURATORProject unmarshallopenCONFIGURATORProject(
+            final InputStream file) throws JAXBException, SAXException,
+            ParserConfigurationException, FileNotFoundException,
+            MalformedURLException {
+        final JAXBContext jc = JAXBContext
+                .newInstance(OpenCONFIGURATORProject.class);
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setXIncludeAware(true);
+        spf.setNamespaceAware(true);
 
-    final XMLReader xr = spf.newSAXParser().getXMLReader();
-    final InputSource input = new InputSource(file);
-    final SAXSource source = new SAXSource(xr, input);
+        final XMLReader xr = spf.newSAXParser().getXMLReader();
+        final InputSource input = new InputSource(file);
+        final SAXSource source = new SAXSource(xr, input);
 
-    final Unmarshaller unmarshaller = jc.createUnmarshaller();
-    if (projectSchema != null)
-      unmarshaller.setSchema(projectSchema);
-    final OpenCONFIGURATORProject osddFile = (OpenCONFIGURATORProject) unmarshaller
-        .unmarshal(source);
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
+        if (OpenCONFIGURATORProjectMarshaller.projectSchema != null) {
+            unmarshaller
+                    .setSchema(OpenCONFIGURATORProjectMarshaller.projectSchema);
+        }
+        final OpenCONFIGURATORProject osddFile = (OpenCONFIGURATORProject) unmarshaller
+                .unmarshal(source);
 
-    return osddFile;
-  }
+        return osddFile;
+    }
 
-  /**
-   * @brief Private constructor to disable the instantiation
-   */
-  private OpenCONFIGURATORProjectMarshaller() {
+    /**
+     * Private constructor to disable the instantiation
+     */
+    private OpenCONFIGURATORProjectMarshaller() {
 
-  }
+    }
 
 }

@@ -37,16 +37,17 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 
 public class TCNPropertiesSourceAdapterFactory implements IAdapterFactory {
 
-  @Override
-  public Object getAdapter(Object adaptableObject, Class adapterType) {
-    if (adapterType == IPropertySource.class)
-      return new TCNPropertySource((TCN) adaptableObject);
-    return null;
-  }
+    @Override
+    public Object getAdapter(Object adaptableObject, Class adapterType) {
+        if (adapterType == IPropertySource.class) {
+            return new TCNPropertySource((TCN) adaptableObject);
+        }
+        return null;
+    }
 
-  @Override
-  public Class[] getAdapterList() {
-    return new Class[] { IPropertySource.class };
-  }
+    @Override
+    public Class[] getAdapterList() {
+        return new Class[] { IPropertySource.class };
+    }
 
 }

@@ -76,11 +76,11 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.xml.sax.SAXException;
 
 /**
- * IndustrialNetworkProjectEditor class provides the multi-tab based form editor to configure the
- * openCONFIGURATOR project
+ * IndustrialNetworkProjectEditor class provides the multi-tab based form editor
+ * to configure the openCONFIGURATOR project
  *
- * This editor is the main UI opened once the project.xml is double clicked from the project
- * explorer.
+ * This editor is the main UI opened once the project.xml is double clicked from
+ * the project explorer.
  *
  * Additionally this opens the {@link IndustrialNetworkView}.
  *
@@ -88,418 +88,480 @@ import org.xml.sax.SAXException;
  *
  */
 public final class IndustrialNetworkProjectEditor extends FormEditor implements
-    IResourceChangeListener {
+        IResourceChangeListener {
 
-  public static final String ID = "org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor";
+    /**
+     * Identifier for this page.
+     */
+    public static final String ID = "org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor";
 
-  private static final String PROJECT_EDITOR_PAGE_NAME = "POWERLINK project";
-  private static final String PROJECT_EDITOR_CREATION_ERROR_MESSAGE = "Error creating project editor overview page";
-  private static final String PROJECT_SOURCE_PAGE_NAME = "Source";
-  private static final String PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE = "Error creating nested XML editor";
+    /**
+     * Editor strings and messages.
+     */
+    private static final String PROJECT_EDITOR_PAGE_NAME = "POWERLINK project";
+    private static final String PROJECT_EDITOR_CREATION_ERROR_MESSAGE = "Error creating project editor overview page";
+    private static final String PROJECT_SOURCE_PAGE_NAME = "Source";
+    private static final String PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE = "Error creating nested XML editor";
+    private static final String MARSHALL_ERROR = "Error marshalling the openCONFIGURATOR project";
+    private static final String UNMARSHALL_ERROR = "Error unmarshalling the openCONFIGURATOR project";
+    private static final String INVALID_INPUT_ERROR = "Invalid input: Must be a valid openCONFIGURATOR project file.";
 
-  private static final String MARSHALL_ERROR = "Error marshalling the openCONFIGURATOR project";
-  private static final String UNMARSHALL_ERROR = "Error unmarshalling the openCONFIGURATOR project";
-  private static final String INVALID_INPUT_ERROR = "Invalid input: Must be a valid openCONFIGURATOR project file.";
+    /**
+     * Network identifier for the editor.
+     */
+    private String networkId;
 
-  private String networkId;
+    /**
+     * openCONFIGURATOR project model
+     */
+    private OpenCONFIGURATORProject currentProject;
 
-  /**
-   * openCONFIGURATOR project model
-   */
-  private OpenCONFIGURATORProject currentProject;
+    /**
+     * Source editor page.
+     */
+    private IndustrialNetworkProjectSourcePage sourcePage;
 
-  private IndustrialNetworkProjectSourcePage sourcePage;
-  private IndustrialNetworkProjectEditorPage editorPage;
+    /**
+     * Advanced project editor page.
+     */
+    private IndustrialNetworkProjectEditorPage editorPage;
 
-  public IndustrialNetworkProjectEditor() {
-    super();
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
-  }
-
-  /**
-   * @brief Initializes the project editor
-   *
-   *        The <code>IndustrialNetworkProjectEditor</code> implementation of this method checks
-   *        that the input is an instance of <code>IFileEditorInput</code>.
-   */
-  @Override
-  public void init(IEditorSite site, IEditorInput editorInput) throws PartInitException {
-    if (!(editorInput instanceof IFileEditorInput))
-      throw new PartInitException(INVALID_INPUT_ERROR);
-    super.init(site, editorInput);
-
-    IFileEditorInput input = (IFileEditorInput) editorInput;
-    IFile file = input.getFile();
-
-    try {
-      currentProject = OpenCONFIGURATORProjectMarshaller.unmarshallopenCONFIGURATORProject(file
-          .getContents());
-    } catch (FileNotFoundException | MalformedURLException | JAXBException | SAXException
-        | ParserConfigurationException | CoreException e) {
-      e.printStackTrace();
-      throw new PartInitException(INVALID_INPUT_ERROR);
+    /**
+     * Constructor
+     */
+    public IndustrialNetworkProjectEditor() {
+        super();
+        ResourcesPlugin.getWorkspace().addResourceChangeListener(this);
     }
 
-    IProject activeProject = file.getProject();
-    networkId = activeProject.getName();
+    /**
+     * Adds an editor page and source page for the project editor.
+     *
+     * @see IndustrialNetworkProjectSourcePage
+     * @see IndustrialNetworkProjectEditorPage
+     */
+    @Override
+    protected void addPages() {
 
-    setInput(editorInput);
-    setPartName(file.getName());
-  }
+        try {
 
-  /**
-   * @return The network ID associated with the editor.
-   */
-  public String getNetworkId() {
-    return networkId;
-  }
-
-  /**
-   * @brief Checks whether the editor is dirty by checking all the pages that implemented.
-   */
-  @Override
-  public boolean isDirty() {
-    return (editorPage.isDirty() || sourcePage.isDirty() || super.isDirty());
-  }
-
-  /**
-   * @brief Returns false as saveAs is not supported for this editor.
-   */
-  @Override
-  public boolean isSaveAsAllowed() {
-    return false;
-  }
-
-  /**
-   * @brief Implement the actions that happens in the saveAs action.
-   */
-  @Override
-  public void doSaveAs() {
-    // TODO Auto-generated method stub
-  }
-
-  /**
-   * @brief Reloads the project editor source page contents from the model.
-   */
-  public void reloadEditorContentsFromModel() {
-    setContent(getSource());
-  }
-
-  /**
-   * @brief Updates the openCONFIGURATOR project model with the given input.
-   *
-   * @param input Input content of openCONFIGURATOR type
-   */
-  public void reloadFromSourceText(final String input) {
-
-    try {
-      InputStream is = new ByteArrayInputStream(input.getBytes());
-      currentProject = OpenCONFIGURATORProjectMarshaller.unmarshallopenCONFIGURATORProject(is);
-    } catch (FileNotFoundException | MalformedURLException | JAXBException | SAXException
-        | ParserConfigurationException e) {
-      IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1, e.getMessage(), e);
-      ErrorDialog.openError(getSite().getShell(), null, UNMARSHALL_ERROR, errorStatus);
-      e.printStackTrace();
-    }
-  }
-
-  /**
-   * @brief Closes the all the pages added this editor.
-   */
-  private void closeEditor() {
-    Display.getDefault().asyncExec(new Runnable() {
-      @Override
-      public void run() {
-
-        IWorkbenchPage[] pages = IndustrialNetworkProjectEditor.this.getSite().getWorkbenchWindow()
-            .getPages();
-        for (IWorkbenchPage editorPage : pages) {
-          IEditorPart editorPart = editorPage.findEditor(getEditorInput());
-          editorPage.closeEditor(editorPart, true);
-        }
-      }
-    });
-  }
-
-  /**
-   * @brief Handles the project change events.
-   */
-  @Override
-  public void resourceChanged(final IResourceChangeEvent event) {
-
-    switch (event.getType()) {
-      case IResourceChangeEvent.POST_CHANGE:
-        break;
-      case IResourceChangeEvent.PRE_CLOSE:
-      case IResourceChangeEvent.PRE_DELETE: // Fallback
-        if (((FileEditorInput) sourcePage.getEditorInput()).getFile().getProject()
-            .equals(event.getResource())) {
-          closeEditor();
-        }
-        break;
-      case IResourceChangeEvent.PRE_BUILD:
-        break;
-      case IResourceChangeEvent.POST_BUILD:
-        break;
-      case IResourceChangeEvent.PRE_REFRESH:
-        break;
-      default:
-        break;
-    }
-
-    // Handle project file delete and rename events
-    IResourceDelta delta = event.getDelta();
-    if (delta == null)
-      return;
-
-    IFileEditorInput input = (IFileEditorInput) getEditorInput();
-    if (input == null) {
-      return;
-    }
-
-    // Project file is not present, so close all the editor pages.
-    IFile currentProjectFile = input.getFile();
-    if (currentProjectFile == null) {
-      closeEditor();
-      return;
-    }
-
-    IResourceDelta oldDelta = delta.findMember(currentProjectFile.getFullPath());
-    if (oldDelta == null) {
-      return;
-    }
-
-    switch (oldDelta.getKind()) {
-      case IResourceDelta.REMOVED:
-        if ((oldDelta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
-          IPath newPath = oldDelta.getMovedToPath();
-          final IFile newfile = ResourcesPlugin.getWorkspace().getRoot().getFile(newPath);
-          if (newfile != null) {
-            setInput(new FileEditorInput(newfile));
-
-            if (newfile.getName() != null) {
-              Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                  setPartName(newfile.getName());
-                }
-              });
+            Result libApiRes = OpenConfiguratorCore.GetInstance()
+                    .CreateNetwork(networkId);
+            if (!libApiRes.IsSuccessful()) {
+                // Report error to the user using the dialog.
+                String errorMessage = OpenCONFIGURATORLibraryUtils
+                        .getErrorMessage(libApiRes);
+                System.err.println(errorMessage);
+                PluginErrorDialogUtils.displayErrorMessageDialog(getSite()
+                        .getShell(), errorMessage, null);
+                return;
             }
-          }
-        } else if (oldDelta.getFlags() == 0) {
-          closeEditor();
+
+            createPowerlinkProjectEditor();
+            createProjectSourceEditor();
+
+            this.setActivePage(editorPage.getId());
+
+            OpenCONFIGURATORProjectUtils
+                    .fixOpenCONFIGURATORProject(currentProject);
+            editorPage.setOpenCONFIGURATORProject(currentProject);
+
+            libApiRes = OpenCONFIGURATORLibraryUtils
+                    .addOpenCONFIGURATORProjectIntoLibrary(currentProject,
+                            networkId);
+            if (!libApiRes.IsSuccessful()) {
+                // Report error to the user using the dialog.
+                String errorMessage = OpenCONFIGURATORLibraryUtils
+                        .getErrorMessage(libApiRes);
+                System.err.println(errorMessage);
+                PluginErrorDialogUtils.displayErrorMessageDialog(getSite()
+                        .getShell(), errorMessage, null);
+                return;
+            }
+
+        } catch (NullPointerException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        break;
-      default:
-        break;
-    }
-  }
-
-  /**
-   * @brief Disposes the project editor UI.
-   */
-  @Override
-  public void dispose() {
-    Result libApiRes = OpenConfiguratorCore.GetInstance().RemoveNetwork(networkId);
-    if (!libApiRes.IsSuccessful()) {
-      // Report error to the user using the dialog.
-      String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-          + libApiRes.GetErrorMessage();
-      PluginErrorDialogUtils.displayErrorMessageDialog(getSite().getShell(), errorMessage, null);
-      System.err.println("RemoveNetwork failed. " + errorMessage);
     }
 
-    ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
-    super.dispose();
-  }
+    /**
+     * Closes the all the pages added this editor.
+     */
+    private void closeEditor() {
+        // Run in a separate thread.
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
 
-  /**
-   * @brief Saves the multi-page editor's changes.
-   */
-  @Override
-  public void doSave(IProgressMonitor monitor) {
-    editorPage.doSave(monitor);
-    sourcePage.doSave(monitor);
-  }
-
-  /**
-   * Marks the content in the project editor source page based on the marker.
-   *
-   * @param marker Marker details
-   */
-  public void gotoMarker(IMarker marker) {
-    this.setActivePage(0);
-    IDE.gotoMarker(getEditor(0), marker);
-  }
-
-  /**
-   * @brief Adds an editor page and source page for the project editor.
-   *
-   * @see IndustrialNetworkProjectSourcePage
-   * @see IndustrialNetworkProjectEditorPage
-   */
-  @Override
-  protected void addPages() {
-
-    try {
-
-      Result libApiRes = OpenConfiguratorCore.GetInstance().CreateNetwork(networkId);
-      if (!libApiRes.IsSuccessful()) {
-        // Report error to the user using the dialog.
-        String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-            + libApiRes.GetErrorMessage();
-        PluginErrorDialogUtils.displayErrorMessageDialog(getSite().getShell(), errorMessage, null);
-        System.err.println("CreateNetwork failed " + errorMessage);
-        return;
-      }
-
-      createPowerlinkProjectEditor();
-      createProjectSourceEditor();
-
-      this.setActivePage(editorPage.getId());
-
-      OpenCONFIGURATORProjectUtils.fixOpenCONFIGURATORProject(currentProject);
-      editorPage.setOpenCONFIGURATORProject(currentProject);
-
-      libApiRes = OpenCONFIGURATORLibraryUtils.addOpenCONFIGURATORProjectIntoLibrary(
-          currentProject, networkId);
-      if (!libApiRes.IsSuccessful()) {
-        // Report error to the user using the dialog.
-        String errorMessage = "Code:" + libApiRes.GetErrorType().ordinal() + "\t"
-            + libApiRes.GetErrorMessage();
-        PluginErrorDialogUtils.displayErrorMessageDialog(getSite().getShell(), errorMessage, null);
-        System.err.println("AddOpenConfiguaratorProjectIntoLib failed. " + errorMessage);
-        return;
-      }
-
-    } catch (NullPointerException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
+                IWorkbenchPage[] pages = IndustrialNetworkProjectEditor.this
+                        .getSite().getWorkbenchWindow().getPages();
+                for (IWorkbenchPage editorPage : pages) {
+                    IEditorPart editorPart = editorPage
+                            .findEditor(getEditorInput());
+                    editorPage.closeEditor(editorPart, true);
+                }
+            }
+        });
     }
-  }
 
-  /**
-   * @brief Handles the property change signals.
-   */
-  @Override
-  protected void handlePropertyChange(int propertyId) {
-    super.handlePropertyChange(propertyId);
-    // TODO: implement
-  }
+    /**
+     * Creates the POWERLNK project editor page
+     *
+     * @see IndustrialNetworkProjectEditorPage
+     */
+    private void createPowerlinkProjectEditor() {
 
-  /**
-   * @brief Reloads the contents of pages when the it is activated.
-   */
-  @Override
-  protected void pageChange(int newPageIndex) {
+        try {
+            editorPage = new IndustrialNetworkProjectEditorPage(this,
+                    getTitle());
+            int index = this.addPage(editorPage, getEditorInput());
+            setPageText(index,
+                    IndustrialNetworkProjectEditor.PROJECT_EDITOR_PAGE_NAME);
+            editorPage.setIndex(index);
 
-    super.pageChange(newPageIndex);
-
-    if (sourcePage.getIndex() == newPageIndex) {
-      String openconfiguratorProjectSource = new String("");
-      try {
-        if (currentProject != null) {
-          openconfiguratorProjectSource = OpenCONFIGURATORProjectMarshaller
-              .marshallopenCONFIGURATORProject(currentProject);
+        } catch (PartInitException e) {
+            ErrorDialog
+                    .openError(
+                            getSite().getShell(),
+                            null,
+                            IndustrialNetworkProjectEditor.PROJECT_EDITOR_CREATION_ERROR_MESSAGE,
+                            e.getStatus());
+            e.printStackTrace();
         }
-      } catch (JAXBException e) {
-        IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1, e.getMessage(), e);
-        ErrorDialog.openError(getSite().getShell(), null, MARSHALL_ERROR, errorStatus);
-        e.printStackTrace();
-      }
-      sourcePage.setContent(openconfiguratorProjectSource);
-
-      if (!editorPage.isDirty())
-        sourcePage.doSave(null);
     }
 
-    if (editorPage != null) {
-      if (editorPage.getIndex() == newPageIndex) {
-        String editorText = getContent();
-        reloadFromSourceText(editorText);
-        editorPage.setOpenCONFIGURATORProject(currentProject);
-      }
+    /**
+     * Creates the POWERLINK project editor source page
+     *
+     * @see IndustrialNetworkProjectSourcePage
+     */
+    private void createProjectSourceEditor() {
+        try {
+            sourcePage = new IndustrialNetworkProjectSourcePage();
+            int index = this.addPage(sourcePage, getEditorInput());
+            setPageText(index,
+                    IndustrialNetworkProjectEditor.PROJECT_SOURCE_PAGE_NAME);
+            sourcePage.setIndex(index);
+
+        } catch (PartInitException e) {
+            ErrorDialog
+                    .openError(
+                            getSite().getShell(),
+                            null,
+                            IndustrialNetworkProjectEditor.PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE,
+                            e.getStatus());
+            e.printStackTrace();
+        }
     }
-  }
 
-  /**
-   * @brief Creates the POWERLNK project editor page
-   * @see IndustrialNetworkProjectEditorPage
-   */
-  private void createPowerlinkProjectEditor() {
+    /**
+     * Disposes the project editor UI.
+     */
+    @Override
+    public void dispose() {
+        Result libApiRes = OpenConfiguratorCore.GetInstance().RemoveNetwork(
+                networkId);
+        if (!libApiRes.IsSuccessful()) {
+            // Report error to the user using the dialog.
+            String errorMessage = OpenCONFIGURATORLibraryUtils
+                    .getErrorMessage(libApiRes);
+            System.err.println(errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(getSite()
+                    .getShell(), errorMessage, null);
+        }
 
-    try {
-      editorPage = new IndustrialNetworkProjectEditorPage(this, getTitle());
-      int index = this.addPage(editorPage, getEditorInput());
-      setPageText(index, PROJECT_EDITOR_PAGE_NAME);
-      editorPage.setIndex(index);
-
-    } catch (PartInitException e) {
-      ErrorDialog.openError(getSite().getShell(), null, PROJECT_EDITOR_CREATION_ERROR_MESSAGE,
-          e.getStatus());
-      e.printStackTrace();
+        ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
+        super.dispose();
     }
-  }
 
-  /**
-   * @brief Creates the POWERLINK project editor source page
-   * @see IndustrialNetworkProjectSourcePage
-   */
-  private void createProjectSourceEditor() {
-    try {
-      sourcePage = new IndustrialNetworkProjectSourcePage();
-      int index = this.addPage(sourcePage, getEditorInput());
-      setPageText(index, PROJECT_SOURCE_PAGE_NAME);
-      sourcePage.setIndex(index);
-
-    } catch (PartInitException e) {
-      ErrorDialog.openError(getSite().getShell(), null, PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE,
-          e.getStatus());
-      e.printStackTrace();
+    /**
+     * Saves the multi-page editor's changes.
+     */
+    @Override
+    public void doSave(IProgressMonitor monitor) {
+        editorPage.doSave(monitor);
+        sourcePage.doSave(monitor);
     }
-  }
 
-  /**
-   * @brief Returns the contents of the project editor source page.
-   * @return the contents.
-   */
-  private String getContent() {
-    return getDocument().get();
-  }
-
-  /**
-   * @return the document instance
-   */
-  private IDocument getDocument() {
-    final IDocumentProvider provider = sourcePage.getDocumentProvider();
-
-    return provider.getDocument(getEditorInput());
-  }
-
-  /**
-   * @return the openCONFIGURATOR project model contents as string
-   */
-  private String getSource() {
-    String retVal = new String("");
-    try {
-      if (currentProject != null) {
-        OpenCONFIGURATORProjectUtils.updateGeneratorInformation(currentProject);
-        retVal = OpenCONFIGURATORProjectMarshaller.marshallopenCONFIGURATORProject(currentProject);
-      }
-    } catch (JAXBException e) {
-      IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1, e.getMessage(), e);
-      ErrorDialog.openError(getSite().getShell(), null, MARSHALL_ERROR, errorStatus);
-      e.printStackTrace();
+    /**
+     * Implement the actions that happens in the saveAs action.
+     */
+    @Override
+    public void doSaveAs() {
+        // TODO Auto-generated method stub
     }
-    return retVal;
-  }
 
-  /**
-   * @brief Sets the input contents to the project source editor.
-   *
-   * @param source
-   */
-  private void setContent(String source) {
-    getDocument().set(source);
-  }
+    /**
+     * Returns the contents of the project editor source page.
+     *
+     * @return the contents.
+     */
+    private String getContent() {
+        return getDocument().get();
+    }
+
+    /**
+     * @return the document instance
+     */
+    private IDocument getDocument() {
+        final IDocumentProvider provider = sourcePage.getDocumentProvider();
+
+        return provider.getDocument(getEditorInput());
+    }
+
+    /**
+     * @return The network ID associated with the editor.
+     */
+    public String getNetworkId() {
+        return networkId;
+    }
+
+    /**
+     * @return the openCONFIGURATOR project model contents as string
+     */
+    private String getSource() {
+        String retVal = new String("");
+        try {
+            if (currentProject != null) {
+                OpenCONFIGURATORProjectUtils
+                        .updateGeneratorInformation(currentProject);
+                retVal = OpenCONFIGURATORProjectMarshaller
+                        .marshallopenCONFIGURATORProject(currentProject);
+            }
+        } catch (JAXBException e) {
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, 1, e.getMessage(), e);
+            ErrorDialog.openError(getSite().getShell(), null,
+                    IndustrialNetworkProjectEditor.MARSHALL_ERROR, errorStatus);
+            e.printStackTrace();
+        }
+        return retVal;
+    }
+
+    /**
+     * Marks the content in the project editor source page based on the marker.
+     *
+     * @param marker Marker details
+     */
+    public void gotoMarker(IMarker marker) {
+        this.setActivePage(0);
+        IDE.gotoMarker(getEditor(0), marker);
+    }
+
+    /**
+     * Handles the property change signals.
+     */
+    @Override
+    protected void handlePropertyChange(int propertyId) {
+        super.handlePropertyChange(propertyId);
+    }
+
+    /**
+     * Initializes the project editor
+     *
+     * The <code>IndustrialNetworkProjectEditor</code> implementation of this
+     * method checks that the input is an instance of
+     * <code>IFileEditorInput</code>.
+     */
+    @Override
+    public void init(IEditorSite site, IEditorInput editorInput)
+            throws PartInitException {
+        if (!(editorInput instanceof IFileEditorInput)) {
+            throw new PartInitException(
+                    IndustrialNetworkProjectEditor.INVALID_INPUT_ERROR);
+        }
+        super.init(site, editorInput);
+
+        IFileEditorInput input = (IFileEditorInput) editorInput;
+        IFile file = input.getFile();
+
+        // Validate the input with openCONFIGURATOR project file schema.
+        try {
+            currentProject = OpenCONFIGURATORProjectMarshaller
+                    .unmarshallopenCONFIGURATORProject(file.getContents());
+        } catch (FileNotFoundException | MalformedURLException | JAXBException
+                | SAXException | ParserConfigurationException | CoreException e) {
+            e.printStackTrace();
+            throw new PartInitException(
+                    IndustrialNetworkProjectEditor.INVALID_INPUT_ERROR);
+        }
+
+        IProject activeProject = file.getProject();
+        networkId = activeProject.getName();
+
+        setInput(editorInput);
+        setPartName(file.getName());
+    }
+
+    /**
+     * Checks whether the editor is dirty by checking all the pages that
+     * implemented.
+     */
+    @Override
+    public boolean isDirty() {
+        return (editorPage.isDirty() || sourcePage.isDirty() || super.isDirty());
+    }
+
+    /**
+     * Returns false as saveAs is not supported for this editor.
+     */
+    @Override
+    public boolean isSaveAsAllowed() {
+        return false;
+    }
+
+    /**
+     * Reloads the contents of pages when the it is activated.
+     */
+    @Override
+    protected void pageChange(int newPageIndex) {
+
+        super.pageChange(newPageIndex);
+
+        if (sourcePage.getIndex() == newPageIndex) {
+            String openconfiguratorProjectSource = new String("");
+            try {
+                if (currentProject != null) {
+                    openconfiguratorProjectSource = OpenCONFIGURATORProjectMarshaller
+                            .marshallopenCONFIGURATORProject(currentProject);
+                }
+            } catch (JAXBException e) {
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, 1, e.getMessage(), e);
+                ErrorDialog.openError(getSite().getShell(), null,
+                        IndustrialNetworkProjectEditor.MARSHALL_ERROR,
+                        errorStatus);
+                e.printStackTrace();
+            }
+            sourcePage.setContent(openconfiguratorProjectSource);
+
+            if (!editorPage.isDirty()) {
+                sourcePage.doSave(null);
+            }
+        }
+
+        if (editorPage != null) {
+            if (editorPage.getIndex() == newPageIndex) {
+                String editorText = getContent();
+                reloadFromSourceText(editorText);
+                editorPage.setOpenCONFIGURATORProject(currentProject);
+            }
+        }
+    }
+
+    /**
+     * Reloads the project editor source page contents from the model.
+     */
+    public void reloadEditorContentsFromModel() {
+        setContent(getSource());
+    }
+
+    /**
+     * Updates the openCONFIGURATOR project model with the given input.
+     *
+     * @param input Input content of openCONFIGURATOR type
+     */
+    public void reloadFromSourceText(final String input) {
+
+        try {
+            InputStream is = new ByteArrayInputStream(input.getBytes());
+            currentProject = OpenCONFIGURATORProjectMarshaller
+                    .unmarshallopenCONFIGURATORProject(is);
+        } catch (FileNotFoundException | MalformedURLException | JAXBException
+                | SAXException | ParserConfigurationException e) {
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, 1, e.getMessage(), e);
+            ErrorDialog.openError(getSite().getShell(), null,
+                    IndustrialNetworkProjectEditor.UNMARSHALL_ERROR,
+                    errorStatus);
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Handles the project change events.
+     */
+    @Override
+    public void resourceChanged(final IResourceChangeEvent event) {
+
+        switch (event.getType()) {
+            case IResourceChangeEvent.POST_CHANGE:
+                break;
+            case IResourceChangeEvent.PRE_CLOSE:
+            case IResourceChangeEvent.PRE_DELETE: // Fallthrough
+                if (((FileEditorInput) sourcePage.getEditorInput()).getFile()
+                        .getProject().equals(event.getResource())) {
+                    closeEditor();
+                }
+                break;
+            case IResourceChangeEvent.PRE_BUILD:
+                break;
+            case IResourceChangeEvent.POST_BUILD:
+                break;
+            case IResourceChangeEvent.PRE_REFRESH:
+                break;
+            default:
+                break;
+        }
+
+        // Handle project file delete and rename events
+        IResourceDelta delta = event.getDelta();
+        if (delta == null) {
+            return;
+        }
+
+        IFileEditorInput input = (IFileEditorInput) getEditorInput();
+        if (input == null) {
+            return;
+        }
+
+        // Project file is not present, so close all the editor pages.
+        IFile currentProjectFile = input.getFile();
+        if (currentProjectFile == null) {
+            closeEditor();
+            return;
+        }
+
+        IResourceDelta oldDelta = delta.findMember(currentProjectFile
+                .getFullPath());
+        if (oldDelta == null) {
+            return;
+        }
+
+        switch (oldDelta.getKind()) {
+            case IResourceDelta.REMOVED:
+                if ((oldDelta.getFlags() & IResourceDelta.MOVED_TO) != 0) {
+                    IPath newPath = oldDelta.getMovedToPath();
+                    final IFile newfile = ResourcesPlugin.getWorkspace()
+                            .getRoot().getFile(newPath);
+                    if (newfile != null) {
+                        setInput(new FileEditorInput(newfile));
+
+                        if (newfile.getName() != null) {
+                            Display.getDefault().asyncExec(new Runnable() {
+                                @Override
+                                public void run() {
+                                    setPartName(newfile.getName());
+                                }
+                            });
+                        }
+                    }
+                } else if (oldDelta.getFlags() == 0) {
+                    closeEditor();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    /**
+     * Sets the input contents to the project source editor.
+     *
+     * @param source
+     */
+    private void setContent(String source) {
+        getDocument().set(source);
+    }
 }

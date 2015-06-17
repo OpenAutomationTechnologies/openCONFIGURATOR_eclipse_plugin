@@ -43,141 +43,166 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
 /**
- * An utility class to group all the methods that are used to communicate with the library.
+ * An utility class to group all the methods that are used to communicate with
+ * the library.
  *
  * @author Ramakrishnan P
  *
  */
 public class OpenCONFIGURATORLibraryUtils {
 
-  /**
-   * Add the configurations in openCONFIGURTOR project into the Network available in the library.
-   *
-   * @param[in] projectModel openCONFIGURATOR project instance.
-   * @param[in] networkId The Network ID.
-   *
-   * @return Result from the openCONFIGURATOR library.
-   */
-  public static Result addOpenCONFIGURATORProjectIntoLibrary(
-      final OpenCONFIGURATORProject projectModel, final String networkId) {
+    /**
+     * Add the network configuration details from the
+     * {@link TNetworkConfiguration} into the openCONFIGUATOR core library.
+     *
+     * @param networkConfiguration TNetworkConfiguration instance.
+     * @param networkId The Network ID.
+     *
+     * @return Result from the openCONFIGURATOR library.
+     */
+    private static Result addNetworkConfigurationIntoLibrary(
+            final TNetworkConfiguration networkConfiguration,
+            final String networkId) {
 
-    addProjectConfigurationIntoLibrary(projectModel.getProjectConfiguration(), networkId);
-    addNetworkConfigurationIntoLibrary(projectModel.getNetworkConfiguration(), networkId);
-
-    return new Result();
-  }
-
-  /**
-   * Add the project configuration details from {@link TProjectConfiguration} into the
-   * openCONFIGUATOR core library.
-   *
-   * @param[in] projectConfiguration TProjectConfiguration instance.
-   * @param[in] networkId The Network ID.
-   *
-   * @return Result from the openCONFIGURATOR library.
-   */
-  private static Result addProjectConfigurationIntoLibrary(
-      final TProjectConfiguration projectConfiguration, final String networkId) {
-
-    // AutoGenerationSettings set into the library
-    java.util.List<TAutoGenerationSettings> agSettingsList = projectConfiguration
-        .getAutoGenerationSettings();
-
-    for (TAutoGenerationSettings agSetting : agSettingsList) {
-
-      Result libApiRes = OpenConfiguratorCore.GetInstance().CreateConfiguration(networkId,
-          agSetting.getId());
-      if (!libApiRes.IsSuccessful()) {
-        return libApiRes;
-      }
-
-      java.util.List<TKeyValuePair> settingList = agSetting.getSetting();
-      for (TKeyValuePair setting : settingList) {
-
-        libApiRes = OpenConfiguratorCore.GetInstance().CreateConfigurationSetting(networkId,
-            agSetting.getId(), setting.getName(), setting.getValue());
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
+                .SetMultiplexedCycleLength(networkId,
+                        networkConfiguration.getMultiplexedCycleLength());
         if (!libApiRes.IsSuccessful()) {
-          return libApiRes;
+            return libApiRes;
         }
 
-        libApiRes = OpenConfiguratorCore.GetInstance().SetConfigurationSettingEnabled(networkId,
-            agSetting.getId(), setting.getName(), setting.isEnabled());
-        if (!libApiRes.IsSuccessful()) {
-          return libApiRes;
+        if (networkConfiguration.getAsyncMTU() != null) {
+            libApiRes = OpenConfiguratorCore.GetInstance().SetAsyncMtu(
+                    networkId, networkConfiguration.getAsyncMTU());
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
         }
-      }
-    }
 
-    // ActiveAutoGenerationSetting
-    OpenConfiguratorCore.GetInstance().SetActiveConfiguration(networkId,
-        projectConfiguration.getActiveAutoGenerationSetting());
-
-    return new Result();
-  }
-
-  /**
-   * Add the network configuration details from the {@link TNetworkConfiguration} into the
-   * openCONFIGUATOR core library.
-   *
-   * @param[in] networkConfiguration TNetworkConfiguration instance.
-   * @param[in] networkId The Network ID.
-   *
-   * @return Result from the openCONFIGURATOR library.
-   */
-  private static Result addNetworkConfigurationIntoLibrary(
-      final TNetworkConfiguration networkConfiguration, final String networkId) {
-
-    Result libApiRes = OpenConfiguratorCore.GetInstance().SetMultiplexedCycleLength(networkId,
-        networkConfiguration.getMultiplexedCycleLength());
-    if (!libApiRes.IsSuccessful()) {
-      return libApiRes;
-    }
-
-    if (networkConfiguration.getAsyncMTU() != null) {
-      libApiRes = OpenConfiguratorCore.GetInstance().SetAsyncMtu(networkId,
-          networkConfiguration.getAsyncMTU());
-      if (!libApiRes.IsSuccessful()) {
-        return libApiRes;
-      }
-    }
-
-    if (networkConfiguration.getCycleTime() != null) {
-      libApiRes = OpenConfiguratorCore.GetInstance().SetCycleTime(networkId,
-          networkConfiguration.getCycleTime().longValue());
-      if (!libApiRes.IsSuccessful()) {
-        return libApiRes;
-      }
-    }
-
-    if (networkConfiguration.getPrescaler() != null) {
-      libApiRes = OpenConfiguratorCore.GetInstance().SetPrescaler(networkId,
-          networkConfiguration.getPrescaler());
-      if (!libApiRes.IsSuccessful()) {
-        return libApiRes;
-      }
-    }
-
-    TNodeCollection nodeCollection = networkConfiguration.getNodeCollection();
-    if (nodeCollection != null) {
-      TMN mn = nodeCollection.getMN();
-      if (mn != null) {
-        libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(networkId, mn.getNodeID(),
-            mn.getName());
-        if (!libApiRes.IsSuccessful()) {
-          return libApiRes;
+        if (networkConfiguration.getCycleTime() != null) {
+            libApiRes = OpenConfiguratorCore.GetInstance().SetCycleTime(
+                    networkId, networkConfiguration.getCycleTime().longValue());
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
         }
-      }
 
-      java.util.List<TCN> cnList = nodeCollection.getCN();
-      for (TCN cn : cnList) {
-        libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(networkId,
-            new Short(cn.getNodeID()), cn.getName());
-        if (!libApiRes.IsSuccessful()) {
-          return libApiRes;
+        if (networkConfiguration.getPrescaler() != null) {
+            libApiRes = OpenConfiguratorCore.GetInstance().SetPrescaler(
+                    networkId, networkConfiguration.getPrescaler());
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
         }
-      }
-    }
-    return new Result();
-  }
 
+        TNodeCollection nodeCollection = networkConfiguration
+                .getNodeCollection();
+        if (nodeCollection != null) {
+            TMN mn = nodeCollection.getMN();
+            if (mn != null) {
+                libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(
+                        networkId, mn.getNodeID(), mn.getName());
+                if (!libApiRes.IsSuccessful()) {
+                    return libApiRes;
+                }
+            }
+
+            java.util.List<TCN> cnList = nodeCollection.getCN();
+            for (TCN cn : cnList) {
+                libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(
+                        networkId, new Short(cn.getNodeID()), cn.getName());
+                if (!libApiRes.IsSuccessful()) {
+                    return libApiRes;
+                }
+            }
+        }
+        return new Result();
+    }
+
+    /**
+     * Add the configurations in openCONFIGURTOR project into the Network
+     * available in the library.
+     *
+     * @param projectModel openCONFIGURATOR project instance.
+     * @param networkId The Network ID.
+     *
+     * @return Result from the openCONFIGURATOR library.
+     */
+    public static Result addOpenCONFIGURATORProjectIntoLibrary(
+            final OpenCONFIGURATORProject projectModel, final String networkId) {
+
+        OpenCONFIGURATORLibraryUtils.addProjectConfigurationIntoLibrary(
+                projectModel.getProjectConfiguration(), networkId);
+        OpenCONFIGURATORLibraryUtils.addNetworkConfigurationIntoLibrary(
+                projectModel.getNetworkConfiguration(), networkId);
+
+        return new Result();
+    }
+
+    /**
+     * Add the project configuration details from {@link TProjectConfiguration}
+     * into the openCONFIGUATOR core library.
+     *
+     * @param projectConfiguration TProjectConfiguration instance.
+     * @param networkId The Network ID.
+     *
+     * @return Result from the openCONFIGURATOR library.
+     */
+    private static Result addProjectConfigurationIntoLibrary(
+            final TProjectConfiguration projectConfiguration,
+            final String networkId) {
+
+        // AutoGenerationSettings set into the library
+        java.util.List<TAutoGenerationSettings> agSettingsList = projectConfiguration
+                .getAutoGenerationSettings();
+
+        for (TAutoGenerationSettings agSetting : agSettingsList) {
+
+            Result libApiRes = OpenConfiguratorCore.GetInstance()
+                    .CreateConfiguration(networkId, agSetting.getId());
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
+
+            java.util.List<TKeyValuePair> settingList = agSetting.getSetting();
+            for (TKeyValuePair setting : settingList) {
+
+                libApiRes = OpenConfiguratorCore.GetInstance()
+                        .CreateConfigurationSetting(networkId,
+                                agSetting.getId(), setting.getName(),
+                                setting.getValue());
+                if (!libApiRes.IsSuccessful()) {
+                    return libApiRes;
+                }
+
+                libApiRes = OpenConfiguratorCore.GetInstance()
+                        .SetConfigurationSettingEnabled(networkId,
+                                agSetting.getId(), setting.getName(),
+                                setting.isEnabled());
+                if (!libApiRes.IsSuccessful()) {
+                    return libApiRes;
+                }
+            }
+        }
+
+        // ActiveAutoGenerationSetting
+        OpenConfiguratorCore.GetInstance().SetActiveConfiguration(networkId,
+                projectConfiguration.getActiveAutoGenerationSetting());
+
+        return new Result();
+    }
+
+    /**
+     * Return the error message in a format from the openCONFIGURATOR result API
+     * library.
+     *
+     * @param result The result from openCONFIGURATOR library.
+     * @return The error message from the result instance.
+     */
+    public static String getErrorMessage(final Result result) {
+        String errorMessage = "Code:" + result.GetErrorType().ordinal() + "\t"
+                + result.GetErrorMessage();
+        System.out.println(result.GetErrorType().name());
+        return errorMessage;
+    }
 }

@@ -1,15 +1,14 @@
 /*******************************************************************************
  * @file   XddMarshaller.java
  *
- * @brief  Handles the marshelling an unmarshelling of the XDD/XDC files.
- *
  * @author Christoph Ruecker, Bernecker + Rainer Industrie-Elektronik Ges.m.b.H
  *         Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
  * @since 08.04.2013
  *
- * @copyright (c) 2015, Kalycito Infotech Private Limited
- *                    All rights reserved.
+ * @copyright (c) 2015, Kalycito Infotech Private Limited,
+ *                      Bernecker + Rainer Industrie-Elektronik Ges.m.b.H
+ *                      All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -59,74 +58,84 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLReader;
 
 /**
- * @author Ramakrishnan P
+ * Handles the marshelling an unmarshelling of the XDD/XDC files.
+ *
+ * @author Christoph Ruecker
  *
  */
 public final class XddMarshaller {
-  private static Schema xddSchema;
+    private static Schema xddSchema;
 
-  static {
+    static {
 
-    xddSchema = null;
-    URI xddSchemaPath = org.epsg.openconfigurator.Activator.getXddSchemaFile();
-    if (xddSchemaPath != null) {
-      try {
-        File xddSchemaFile = new File(xddSchemaPath);
-        SchemaFactory schemaFactory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        xddSchema = schemaFactory.newSchema(xddSchemaFile);
-      } catch (SAXException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
+        XddMarshaller.xddSchema = null;
+        URI xddSchemaPath = org.epsg.openconfigurator.Activator
+                .getXddSchemaFile();
+        if (xddSchemaPath != null) {
+            try {
+                File xddSchemaFile = new File(xddSchemaPath);
+                SchemaFactory schemaFactory = SchemaFactory
+                        .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                XddMarshaller.xddSchema = schemaFactory
+                        .newSchema(xddSchemaFile);
+            } catch (SAXException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
-  }
 
-  public static ISO15745ProfileContainer unmarshallXDD(final InputStream file)
-      throws JAXBException, SAXException, ParserConfigurationException, FileNotFoundException,
-      MalformedURLException {
-    final JAXBContext jc = JAXBContext.newInstance(ISO15745ProfileContainer.class);
-    final SAXParserFactory spf = SAXParserFactory.newInstance();
-    spf.setXIncludeAware(true);
-    spf.setNamespaceAware(true);
+    public static ISO15745ProfileContainer unmarshallXDD(final InputStream file)
+            throws JAXBException, SAXException, ParserConfigurationException,
+            FileNotFoundException, MalformedURLException {
+        final JAXBContext jc = JAXBContext
+                .newInstance(ISO15745ProfileContainer.class);
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setXIncludeAware(true);
+        spf.setNamespaceAware(true);
 
-    final XMLReader xr = spf.newSAXParser().getXMLReader();
-    final InputSource input = new InputSource(file);
-    final SAXSource source = new SAXSource(xr, input);
+        final XMLReader xr = spf.newSAXParser().getXMLReader();
+        final InputSource input = new InputSource(file);
+        final SAXSource source = new SAXSource(xr, input);
 
-    final Unmarshaller unmarshaller = jc.createUnmarshaller();
-    if (xddSchema != null)
-      unmarshaller.setSchema(xddSchema);
-    final ISO15745ProfileContainer xddFile = (ISO15745ProfileContainer) unmarshaller
-        .unmarshal(source);
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
+        if (XddMarshaller.xddSchema != null) {
+            unmarshaller.setSchema(XddMarshaller.xddSchema);
+        }
+        final ISO15745ProfileContainer xddFile = (ISO15745ProfileContainer) unmarshaller
+                .unmarshal(source);
 
-    return xddFile;
-  }
+        return xddFile;
+    }
 
-  public static ISO15745ProfileContainer unmarshallXDDFile(final File file) throws JAXBException,
-      SAXException, ParserConfigurationException, FileNotFoundException, MalformedURLException {
-    final JAXBContext jc = JAXBContext.newInstance(ISO15745ProfileContainer.class);
-    final SAXParserFactory spf = SAXParserFactory.newInstance();
-    spf.setXIncludeAware(true);
-    spf.setNamespaceAware(true);
+    public static ISO15745ProfileContainer unmarshallXDDFile(final File file)
+            throws JAXBException, SAXException, ParserConfigurationException,
+            FileNotFoundException, MalformedURLException {
+        final JAXBContext jc = JAXBContext
+                .newInstance(ISO15745ProfileContainer.class);
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setXIncludeAware(true);
+        spf.setNamespaceAware(true);
 
-    final XMLReader xr = spf.newSAXParser().getXMLReader();
-    final InputSource input = new InputSource(new FileInputStream(file));
-    input.setSystemId(file.toURI().toString());
-    final SAXSource source = new SAXSource(xr, input);
+        final XMLReader xr = spf.newSAXParser().getXMLReader();
+        final InputSource input = new InputSource(new FileInputStream(file));
+        input.setSystemId(file.toURI().toString());
+        final SAXSource source = new SAXSource(xr, input);
 
-    final Unmarshaller unmarshaller = jc.createUnmarshaller();
-    if (xddSchema != null)
-      unmarshaller.setSchema(xddSchema);
-    final ISO15745ProfileContainer xddFile = (ISO15745ProfileContainer) unmarshaller
-        .unmarshal(source);
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
+        if (XddMarshaller.xddSchema != null) {
+            unmarshaller.setSchema(XddMarshaller.xddSchema);
+        }
+        final ISO15745ProfileContainer xddFile = (ISO15745ProfileContainer) unmarshaller
+                .unmarshal(source);
 
-    return xddFile;
-  }
+        return xddFile;
+    }
 
-  /**
-   * @brief Private constructor to disable the instantiation
-   */
-  private XddMarshaller() {
+    /**
+     * Private constructor to disable the instantiation
+     */
+    private XddMarshaller() {
 
-  }
+    }
 }

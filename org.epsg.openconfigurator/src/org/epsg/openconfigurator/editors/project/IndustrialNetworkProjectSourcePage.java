@@ -51,109 +51,179 @@ import org.epsg.openconfigurator.editors.project.xml.XMLDocumentProvider;
  * @author Ramakrishnan P
  *
  */
-public class IndustrialNetworkProjectSourcePage extends TextEditor implements IFormPage {
+public class IndustrialNetworkProjectSourcePage extends TextEditor implements
+        IFormPage {
 
-  private static String ID = "org.epsg.openconfigurator.editors.IndustrialNetworkProjectSourceEditor";
+    /**
+     * Identifier
+     */
+    private static String ID = "org.epsg.openconfigurator.editors.IndustrialNetworkProjectSourceEditor";
 
-  private ColorManager colorManager;
+    /**
+     * Color manager to decorate the source pages.
+     */
+    private ColorManager colorManager;
 
-  private IndustrialNetworkProjectEditor editor;
-  private int index;
-  private Control partControl;
+    /**
+     * The editor instance.
+     */
+    private IndustrialNetworkProjectEditor editor;
 
-  // private boolean dirty;
+    /**
+     * Page index.
+     */
+    private int index;
 
-  public IndustrialNetworkProjectSourcePage() {
-    super();
-    colorManager = new ColorManager();
-    setSourceViewerConfiguration(new XMLConfiguration(colorManager));
-    this.setDocumentProvider(new XMLDocumentProvider());
-  }
+    /**
+     * The editors part control.
+     */
+    private Control partControl;
 
-  @Override
-  public boolean canLeaveThePage() {
-    return true;
-  }
+    /**
+     * Constructor.
+     */
+    public IndustrialNetworkProjectSourcePage() {
+        super();
+        colorManager = new ColorManager();
+        setSourceViewerConfiguration(new XMLConfiguration(colorManager));
+        this.setDocumentProvider(new XMLDocumentProvider());
+    }
 
-  @Override
-  public void createPartControl(Composite parent) {
-    super.createPartControl(parent);
-    Control[] children = parent.getChildren();
-    partControl = children[children.length - 1];
-  }
+    /**
+     * Always true and can flip to another page. The error handling is done in
+     * page change in the main editor.
+     */
+    @Override
+    public boolean canLeaveThePage() {
+        return true;
+    }
 
-  @Override
-  public void dispose() {
-    colorManager.dispose();
-    super.dispose();
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+        Control[] children = parent.getChildren();
+        partControl = children[children.length - 1];
+    }
 
-  @Override
-  public void doSave(IProgressMonitor progressMonitor) {
-    super.doSave(progressMonitor);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void dispose() {
+        colorManager.dispose();
+        super.dispose();
+    }
 
-  @Override
-  public FormEditor getEditor() {
-    return editor;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void doSave(IProgressMonitor progressMonitor) {
+        super.doSave(progressMonitor);
+    }
 
-  @Override
-  public String getId() {
-    return ID;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public FormEditor getEditor() {
+        return editor;
+    }
 
-  @Override
-  public int getIndex() {
-    return index;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String getId() {
+        return IndustrialNetworkProjectSourcePage.ID;
+    }
 
-  @Override
-  public IManagedForm getManagedForm() {
-    // not a form page
-    return null;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public int getIndex() {
+        return index;
+    }
 
-  @Override
-  public Control getPartControl() {
-    return partControl;
-  }
+    /**
+     * All ways null. Since the source page is not a form page.
+     */
+    @Override
+    public IManagedForm getManagedForm() {
+        // not a form page
+        return null;
+    }
 
-  @Override
-  public void initialize(FormEditor editor) {
-    this.editor = (IndustrialNetworkProjectEditor) editor;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public Control getPartControl() {
+        return partControl;
+    }
 
-  @Override
-  public boolean isActive() {
-    return equals(editor.getActivePageInstance());
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void initialize(FormEditor editor) {
+        this.editor = (IndustrialNetworkProjectEditor) editor;
+    }
 
-  @Override
-  public boolean isEditor() {
-    return true;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isActive() {
+        return equals(editor.getActivePageInstance());
+    }
 
-  @Override
-  public boolean selectReveal(Object object) {
-    return false;
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isEditor() {
+        return true;
+    }
 
-  @Override
-  public void setActive(boolean active) {
-    // if (active) {
-    // // clear dirty flag if text page is active now
-    // dirty = false;
-    // }
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean selectReveal(Object object) {
+        return false;
+    }
 
-  public void setContent(String source) {
-    getDocumentProvider().getDocument(getEditorInput()).set(source);
-  }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setActive(boolean active) {
+        // if (active) {
+        // // clear dirty flag if text page is active now
+        // dirty = false;
+        // }
+    }
 
-  @Override
-  public void setIndex(int index) {
-    this.index = index;
-  }
+    /**
+     * Sets the content string to the source editor from the project model.
+     *
+     * @param source The string source.
+     */
+    public void setContent(final String source) {
+        getDocumentProvider().getDocument(getEditorInput()).set(source);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void setIndex(int index) {
+        this.index = index;
+    }
 
 }

@@ -38,27 +38,30 @@ import org.eclipse.swt.widgets.Shell;
 import org.epsg.openconfigurator.Activator;
 
 /**
- * @brief Utility class for the openCONFIGURATOR plugin for the error dialogs.
+ * Utility class for the openCONFIGURATOR plugin for the error dialogs.
  *
  * @author Ramakrishnan P
  *
  */
 public final class PluginErrorDialogUtils {
 
-  /**
-   * Displays an error dialog with a given error-message.
-   *
-   * @param[in] parent Parent window for the dialog.
-   * @param[in] errorMessage Error message to be shown in the dialog.
-   * @param[in] exception Exception instance if any, can be null.
-   * @return the code of the button that was pressed that resulted in this dialog closing. This will
-   *         be Dialog.OK if the OK button was pressed, or Dialog.CANCEL if this dialog's close
-   *         window decoration or the ESC key was used.
-   */
-  public static int displayErrorMessageDialog(final Shell parent, final String errorMessage,
-      final Throwable exception) {
-    IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1, errorMessage, exception);
-    return ErrorDialog.openError(parent, "An internal error occurred", null, errorStatus);
-  }
+    /**
+     * Displays an error dialog with a given error-message.
+     *
+     * @param parent Parent window for the dialog.
+     * @param errorMessage Error message to be shown in the dialog.
+     * @param exception Exception instance if any, can be null.
+     * @return the code of the button that was pressed that resulted in this
+     *         dialog closing. This will be Dialog.OK if the OK button was
+     *         pressed, or Dialog.CANCEL if this dialog's close window
+     *         decoration or the ESC key was used.
+     */
+    public static int displayErrorMessageDialog(final Shell parent,
+            final String errorMessage, final Throwable exception) {
+        IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
+                errorMessage, exception);
+        return ErrorDialog.openError(parent, "An internal error occurred",
+                null, errorStatus);
+    }
 
 }
