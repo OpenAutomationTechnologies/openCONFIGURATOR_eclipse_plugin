@@ -34,12 +34,15 @@
    <extension
          point="org.eclipse.ui.editors">
       <editor
-            class="org.epsg.openconfigurator.editors.IndustrialNetworkEditor"
+            class="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
             contributorClass="org.epsg.openconfigurator.editors.IndustrialNetworkContribute"
-            extensions="xml"
+            default="true"
             icon="icons/releng_gears.gif"
-            id="org.epsg.openconfigurator.editors.IndustrialNetworkEditor"
-            name="POWERLINK network editor">
+            id="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
+            name="POWERLINK Project editor">
+         <contentTypeBinding
+               contentTypeId="org.epsg.openconfigurator.contenttype.projectfile">
+         </contentTypeBinding>
       </editor>
    </extension>
    <extension
@@ -209,6 +212,19 @@
             id="org.epsg.openconfigurator.wizard.importproject"
             name="Import openCONFIGURATOR projects (pre v1.4.0 are not supported)">
       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.core.contenttype.contentTypes">
+      <content-type
+            base-type="org.eclipse.core.runtime.xml"
+            file-extensions="xml"
+            id="org.epsg.openconfigurator.contenttype.projectfile"
+            name="openCONFIGURATOR project files"
+            priority="high">
+         <describer
+               class="org.epsg.openconfigurator.content.OpenConfiguratorProjectXmlContentDescriber">
+         </describer>
+      </content-type>
    </extension>
 
 </plugin>
