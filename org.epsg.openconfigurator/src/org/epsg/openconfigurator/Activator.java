@@ -41,6 +41,9 @@ import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
@@ -51,6 +54,7 @@ public class Activator extends AbstractUIPlugin {
 
     // The plug-in ID
     public static final String PLUGIN_ID = "org.epsg.openconfigurator"; //$NON-NLS-1$
+    private static final String PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR = "openCONFIGURATOR plugin\nError loading shared libraries";
 
     private static final String FILE_NOT_FOUND = "Requested file not found in the plugin. File: {0}";
 
@@ -125,6 +129,30 @@ public class Activator extends AbstractUIPlugin {
     public void start(BundleContext context) throws Exception {
         super.start(context);
         Activator.plugin = this;
+
+        // Load openCONFIGURATOR core libraries
+        try {
+            OpenConfiguratorLibraryUtils.loadOpenConfiguratorLibrary();
+        } catch (UnsatisfiedLinkError | SecurityException e) {
+            e.printStackTrace();
+            PluginErrorDialogUtils.displayErrorMessageDialog(Activator.plugin
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    Activator.PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR, e);
+        }
+
+        // Initialize openCONFIGURATOR library
+        Result libApiRes = OpenConfiguratorLibraryUtils
+                .initOpenConfiguratorLibrary();
+        if (!libApiRes.IsSuccessful()) {
+            // Report error to the user using the dialog.
+            String errorMessage = OpenConfiguratorLibraryUtils
+                    .getErrorMessage(libApiRes);
+            System.err.println("InitOpenConfigurator library failed. "
+                    + errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(Activator.plugin
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+                    errorMessage, null);
+        }
     }
 
     /*
@@ -139,4 +167,5 @@ public class Activator extends AbstractUIPlugin {
         Activator.plugin = null;
         super.stop(context);
     }
+
 }

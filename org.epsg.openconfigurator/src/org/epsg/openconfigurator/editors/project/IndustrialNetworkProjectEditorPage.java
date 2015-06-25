@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file   IndustrialNetworkProjectEditor.java
+ * @file   IndustrialNetworkProjectEditorPage.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -70,9 +70,12 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.Section;
-import org.eclipse.ui.forms.widgets.TableWrapData;
 import org.eclipse.ui.forms.widgets.TableWrapLayout;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TGenerator;
@@ -81,15 +84,17 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
 /**
- * @brief The editor page to manipulate the openCONFIGURATOR project.
+ * The editor page to manipulate the openCONFIGURATOR project.
  *
  * @author Ramakrishnan P
  *
  */
 public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
+    /** Identifier */
     private static final String ID = "org.epsg.openconfigurator.editors.IndustrialNetworkProjectEditorPage";
 
+    /** Editor label and error messages */
     private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING = "Build Configuration Settings";
     private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION = "Provides the build configuration settings for the project";
     private static final String AUTOGENERATIONSETTINGS_SECTION_ACTIVEGROUP_LABEL = "Active group:";
@@ -115,6 +120,17 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String PATH_SECTION_ADD_LABEL = "Add...";
     private static final String PATH_SECTION_OUTPUT_PATH_LABEL = "Output path:";
 
+    private static final String NO_ROWS_SELECTED_ERROR = "No rows selected.";
+    private static final String MULTIPSE_SELECTION_NOT_ALLOWED_ERROR = "Multiple rows selection is not supported.";
+    private static final String NO_LISTENERS_REGISTERED_ERROR = "New widget has registered but not handled.";
+    private static final String ERROR_MESSAGE = "{0} generation of all the works.";
+    private static final String ERROR_INITIALISATION_FAILED = "Error initializing the project configuration data";
+    private static final String ERROR_NO_PATH_AVAILABLE = "No path is available to set.";
+    private static final String FORM_EDITOR_PAGE_TITLE = "POWERLINK Project";
+
+    /**
+     * Form size
+     */
     private static final int FORM_BODY_MARGIN_TOP = 12;
     private static final int FORM_BODY_MARGIN_BOTTOM = 12;
     private static final int FORM_BODY_MARGIN_LEFT = 6;
@@ -123,18 +139,27 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final int FORM_BODY_VERTICAL_SPACING = 17;
     private static final int FORM_BODY_NUMBER_OF_COLUMNS = 2;
 
-    private boolean controlChange;
+    /**
+     * Editor dirty flag for this page.
+     */
     private boolean dirty = false;
-    private TableWrapData td;
+
+    /**
+     * Scrolled form.
+     */
     private ScrolledForm form;
 
+    /**
+     * Toolkit for the form editor.
+     */
     private FormToolkit toolkit;
 
-    IndustrialNetworkProjectEditor editor;
-
+    private IndustrialNetworkProjectEditor editor;
     private OpenCONFIGURATORProject currentProject;
 
-    /** Generator tag */
+    /**
+     * Controls for generator tag
+     */
     private Text generatorToolNameText;
     private Text generatorVendorText;
     private Text generatorVersionText;
@@ -143,8 +168,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private Text generatorModifiedOnText;
     private Text generatorModifiedByText;
 
-    /** Project Configuration tag */
-    // private Text projectFilePathText;
+    /**
+     * Controls for project configuration tag
+     */
     private Combo autoGenerationCombo;
     private Table agSettingsTable;
     private Button btnModifyAutoGenerationSettings;
@@ -152,12 +178,14 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private Button editSettingsButton;
     private Button deleteSettingsButton;
 
-    /** Path Setting tag */
+    /**
+     * Controls for path setting tag
+     */
     private Combo pathDropDown;
     private ComboViewer pathComboViewer;
 
     /**
-     * @brief Handles the selection events for the AutoGenerationSettings group
+     * Handles the selection events for the AutoGenerationSettings group
      */
     private SelectionAdapter autoGenerationSettingsSelectionAdapter = new SelectionAdapter() {
         @Override
@@ -168,18 +196,39 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         .getProjectConfiguration()
                         .getActiveAutoGenerationSetting()) {
 
-                    currentProject.getProjectConfiguration()
-                    .setActiveAutoGenerationSetting(
-                            autoGenerationCombo.getText());
-                    IndustrialNetworkProjectEditorPage.this
-                    .reloadAutoGenerationSettingsTable();
+                    Result libApiRes = OpenConfiguratorCore.GetInstance()
+                            .SetActiveConfiguration(editor.getNetworkId(),
+                                    autoGenerationCombo.getText());
+                    if (!libApiRes.IsSuccessful()) {
+                        // Display a dialog to report it to the user
+                        // TODO: set the combo value back to old one.
+                        String errorMessage = OpenConfiguratorLibraryUtils
+                                .getErrorMessage(libApiRes);
+                        System.err.println(autoGenerationCombo.getText() + " "
+                                + errorMessage);
 
+                        PluginErrorDialogUtils.displayErrorMessageDialog(
+                                getSite().getShell(), errorMessage, null);
+
+                        return;
+                    }
+
+                    currentProject.getProjectConfiguration()
+                            .setActiveAutoGenerationSetting(
+                                    autoGenerationCombo.getText());
+                    IndustrialNetworkProjectEditorPage.this.setDirty(true);
+
+                    IndustrialNetworkProjectEditorPage.this
+                            .reloadAutoGenerationSettingsTable();
+
+                    // Enable editable settings controls for only other than all
+                    // and none which are by default empty.
                     if (currentProject
                             .getProjectConfiguration()
                             .getActiveAutoGenerationSetting()
                             .equalsIgnoreCase(
                                     OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-                                    || currentProject
+                            || currentProject
                                     .getProjectConfiguration()
                                     .getActiveAutoGenerationSetting()
                                     .equalsIgnoreCase(
@@ -188,16 +237,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     } else {
                         setEnabledSettingsControls(true);
                     }
-
-                    IndustrialNetworkProjectEditorPage.this.setDirty(true);
-
-                    System.out.println("Auto generation combobox");
                 }
 
             } else if (e.widget == btnModifyAutoGenerationSettings) {
 
                 ModifyAutoGenerationSettingsDialog magsDialog = new ModifyAutoGenerationSettingsDialog(
-                        form.getShell(),
+                        form.getShell(), editor.getNetworkId(),
                         currentProject.getProjectConfiguration());
                 magsDialog.open();
 
@@ -208,96 +253,256 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 }
 
             } else if (e.widget == editSettingsButton) {
-                TAutoGenerationSettings autoGenerationSettings = IndustrialNetworkProjectEditorPage.this
+                TAutoGenerationSettings activeAgSettings = IndustrialNetworkProjectEditorPage.this
                         .getActiveAutoGenerationSetting();
 
                 int[] selectedIndices = agSettingsTable.getSelectionIndices();
                 if (selectedIndices.length <= 0) {
+                    System.err
+                            .println(IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR);
+                    PluginErrorDialogUtils
+                            .displayErrorMessageDialog(
+                                    getSite().getShell(),
+                                    IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR,
+                                    null);
                     return;
                 }
 
                 if (selectedIndices.length > 1) {
-                    // TODO: Display a error dialog
-                    System.out
-                    .println("ERROR: Multiple selection should not be possible.");
+                    System.err
+                            .println(IndustrialNetworkProjectEditorPage.MULTIPSE_SELECTION_NOT_ALLOWED_ERROR);
+                    PluginErrorDialogUtils
+                            .displayErrorMessageDialog(
+                                    getSite().getShell(),
+                                    IndustrialNetworkProjectEditorPage.MULTIPSE_SELECTION_NOT_ALLOWED_ERROR,
+                                    null);
                     return;
                 }
 
                 AddEditSettingsDialog addEditSettingsDialog = new AddEditSettingsDialog(
-                        form.getShell(), autoGenerationSettings);
+                        form.getShell(), activeAgSettings);
                 TableItem selectedRow = agSettingsTable
                         .getItem(selectedIndices[0]);
-                addEditSettingsDialog.setActiveSettingName(selectedRow
-                        .getText(0));
+                String currentSelectedSetting = selectedRow.getText(0);
+                addEditSettingsDialog
+                        .setActiveSettingName(currentSelectedSetting);
+
+                TKeyValuePair newData = OpenConfiguratorProjectUtils
+                        .getSetting(activeAgSettings, currentSelectedSetting);
 
                 if (addEditSettingsDialog.open() == Window.OK) {
                     if (addEditSettingsDialog.isDirty()) {
+
+                        // Remove the setting from model and library.
+                        Result libApiRes = OpenConfiguratorCore.GetInstance()
+                                .RemoveConfigurationSetting(
+                                        editor.getNetworkId(),
+                                        activeAgSettings.getId(),
+                                        newData.getName());
+                        if (!libApiRes.IsSuccessful()) {
+                            // Display a dialog to report it to the user
+                            String errorMessage = OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(libApiRes);
+                            System.err.println(activeAgSettings.getId() + ":"
+                                    + newData.getName() + ": " + errorMessage);
+                            PluginErrorDialogUtils.displayErrorMessageDialog(
+                                    getSite().getShell(), errorMessage, null);
+
+                            return;
+                        }
+
+                        if (!activeAgSettings.getSetting().remove(newData)) {
+                            System.err
+                                    .println(newData.getName()
+                                            + IndustrialNetworkProjectEditorPage.ERROR_MESSAGE);
+                        }
+
                         IndustrialNetworkProjectEditorPage.this.setDirty(true);
+
+                        TKeyValuePair modifiedData = addEditSettingsDialog
+                                .getData();
+
+                        libApiRes = OpenConfiguratorCore.GetInstance()
+                                .CreateConfigurationSetting(
+                                        editor.getNetworkId(),
+                                        activeAgSettings.getId(),
+                                        modifiedData.getName(),
+                                        modifiedData.getValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            // Display a dialog to report it to the user
+                            String errorMessage = OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(libApiRes);
+                            System.err.println(activeAgSettings.getId() + ":"
+                                    + modifiedData.getName() + ":"
+                                    + modifiedData.getValue() + ". "
+                                    + errorMessage);
+
+                            PluginErrorDialogUtils.displayErrorMessageDialog(
+                                    getSite().getShell(), errorMessage, null);
+
+                            return;
+                        }
+
+                        libApiRes = OpenConfiguratorCore.GetInstance()
+                                .SetConfigurationSettingEnabled(
+                                        editor.getNetworkId(),
+                                        activeAgSettings.getId(),
+                                        modifiedData.getName(),
+                                        modifiedData.isEnabled());
+                        if (!libApiRes.IsSuccessful()) {
+                            String errorMessage = OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(libApiRes);
+                            System.err.println(activeAgSettings.getId() + ":"
+                                    + modifiedData.getName() + ":"
+                                    + modifiedData.getValue() + ". "
+                                    + errorMessage);
+
+                            System.err.println(activeAgSettings.getId() + ":"
+                                    + modifiedData.getName() + ":"
+                                    + modifiedData.isEnabled() + ". "
+                                    + errorMessage);
+
+                            PluginErrorDialogUtils.displayErrorMessageDialog(
+                                    getSite().getShell(), errorMessage, null);
+
+                            return;
+                        }
+
+                        activeAgSettings.getSetting().add(modifiedData);
                     }
-                    System.out.println("Edit settings button"
-                            + addEditSettingsDialog.isDirty());
+
                     IndustrialNetworkProjectEditorPage.this
-                    .reloadAutoGenerationSettingsTable();
+                            .reloadAutoGenerationSettingsTable();
+                } else {
+                    // If cancelled.
                 }
 
             } else if (e.widget == addSettingsButton) {
 
-                TAutoGenerationSettings autoGenerationSettings = IndustrialNetworkProjectEditorPage.this
+                TAutoGenerationSettings activeAgSetting = IndustrialNetworkProjectEditorPage.this
                         .getActiveAutoGenerationSetting();
 
-                if (autoGenerationSettings != null) {
+                if (activeAgSetting != null) {
                     AddEditSettingsDialog addEditSettingsDialog = new AddEditSettingsDialog(
-                            form.getShell(), autoGenerationSettings);
+                            form.getShell(), activeAgSetting);
                     addEditSettingsDialog.setActiveSettingName(null);
 
                     if (addEditSettingsDialog.open() == Window.OK) {
                         // User clicked OK; update the label with the input
-                        TKeyValuePair setting = addEditSettingsDialog.getData();
+                        TKeyValuePair newSetting = addEditSettingsDialog
+                                .getData();
+
+                        Result libApiRes = OpenConfiguratorCore.GetInstance()
+                                .CreateConfigurationSetting(
+                                        editor.getNetworkId(),
+                                        activeAgSetting.getId(),
+                                        newSetting.getName(),
+                                        newSetting.getValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            // Display a dialog to report it to the user
+                            String errorMessage = OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(libApiRes);
+
+                            System.err.println(activeAgSetting.getId() + ":"
+                                    + newSetting.getName() + ":"
+                                    + newSetting.getValue() + ". "
+                                    + errorMessage);
+                            PluginErrorDialogUtils.displayErrorMessageDialog(
+                                    getSite().getShell(), errorMessage, null);
+
+                            return;
+                        }
+
+                        libApiRes = OpenConfiguratorCore.GetInstance()
+                                .SetConfigurationSettingEnabled(
+                                        editor.getNetworkId(),
+                                        activeAgSetting.getId(),
+                                        newSetting.getName(),
+                                        newSetting.isEnabled());
+                        if (!libApiRes.IsSuccessful()) {
+                            String errorMessage = OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(libApiRes);
+                            System.err.println(activeAgSetting.getId() + ":"
+                                    + newSetting.getName() + ":"
+                                    + newSetting.isEnabled() + ". "
+                                    + errorMessage);
+
+                            PluginErrorDialogUtils.displayErrorMessageDialog(
+                                    getSite().getShell(), errorMessage, null);
+
+                            return;
+                        }
 
                         // Update the model and the table with the newly added
                         // value
-
-                        List<TKeyValuePair> settingsList = autoGenerationSettings
+                        List<TKeyValuePair> settingsList = activeAgSetting
                                 .getSetting();
-                        settingsList.add(setting);
+                        settingsList.add(newSetting);
+
                         IndustrialNetworkProjectEditorPage.this.setDirty(true);
 
                         IndustrialNetworkProjectEditorPage.this
-                        .reloadAutoGenerationSettingsTable();
+                                .reloadAutoGenerationSettingsTable();
                     }
 
                 } else {
                     // It got cancelled.
                 }
             } else if (e.widget == deleteSettingsButton) {
+
                 TableItem[] selectedItemList = agSettingsTable.getSelection();
                 for (TableItem selectedItem : selectedItemList) {
                     String selectedItemName = selectedItem.getText(0);
-                    TAutoGenerationSettings ag = IndustrialNetworkProjectEditorPage.this
+                    TAutoGenerationSettings activeAgSetting = IndustrialNetworkProjectEditorPage.this
                             .getActiveAutoGenerationSetting();
-                    if (ag != null) {
-                        List<TKeyValuePair> settingsList = ag.getSetting();
+                    if (activeAgSetting != null) {
+
+                        List<TKeyValuePair> settingsList = activeAgSetting
+                                .getSetting();
                         for (TKeyValuePair setting : settingsList) {
                             if (setting.getName().equals(selectedItemName)) {
+
+                                Result libApiRes = OpenConfiguratorCore
+                                        .GetInstance()
+                                        .RemoveConfigurationSetting(
+                                                editor.getNetworkId(),
+                                                activeAgSetting.getId(),
+                                                setting.getName());
+                                if (!libApiRes.IsSuccessful()) {
+                                    String errorMessage = OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(libApiRes);
+                                    System.err.println(activeAgSetting.getId()
+                                            + ":" + setting.getName() + " . "
+                                            + errorMessage);
+                                    PluginErrorDialogUtils
+                                            .displayErrorMessageDialog(
+                                                    getSite().getShell(),
+                                                    errorMessage, null);
+
+                                    return;
+                                }
+
                                 settingsList.remove(setting);
                                 IndustrialNetworkProjectEditorPage.this
-                                .setDirty(true);
-                                System.out.println("Delete settings button");
+                                        .setDirty(true);
+                                IndustrialNetworkProjectEditorPage.this
+                                        .reloadAutoGenerationSettingsTable();
                                 break;
                             }
                         }
                     }
                 }
-                agSettingsTable.remove(agSettingsTable.getSelectionIndices());
+
             } else {
-                System.err.println("New widget has registered but not handled."
-                        + e.widget.toString());
+                System.err
+                        .println(IndustrialNetworkProjectEditorPage.NO_LISTENERS_REGISTERED_ERROR
+                                + "." + e.widget.toString());
             }
         }
     };
 
     /**
-     * @brief Handles the selection for the build configuration settings table.
+     * Handles the selection for the build configuration settings table.
      */
     private SelectionAdapter autoGenerationSettingsTableAdapter = new SelectionAdapter() {
         @Override
@@ -308,21 +513,52 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                             .getSelection();
                     for (TableItem selectedItem : selectedItemList) {
 
-                        TAutoGenerationSettings ag = IndustrialNetworkProjectEditorPage.this
+                        TAutoGenerationSettings activeAgSetting = IndustrialNetworkProjectEditorPage.this
                                 .getActiveAutoGenerationSetting();
-                        if (ag != null) {
-                            List<TKeyValuePair> settingsList = ag.getSetting();
+                        if (activeAgSetting != null) {
+                            List<TKeyValuePair> settingsList = activeAgSetting
+                                    .getSetting();
 
                             for (TKeyValuePair setting : settingsList) {
                                 if (selectedItem.getText(0).equals(
                                         setting.getName())) {
+
+                                    Result libApiRes = OpenConfiguratorCore
+                                            .GetInstance()
+                                            .SetConfigurationSettingEnabled(
+                                                    editor.getNetworkId(),
+                                                    activeAgSetting.getId(),
+                                                    setting.getName(),
+                                                    !setting.isEnabled());
+                                    if (!libApiRes.IsSuccessful()) {
+                                        String errorMessage = OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(libApiRes);
+                                        System.err.println(activeAgSetting
+                                                .getId()
+                                                + ":"
+                                                + setting.getName()
+                                                + ":"
+                                                + setting.isEnabled()
+                                                + ". "
+                                                + errorMessage);
+                                        PluginErrorDialogUtils
+                                                .displayErrorMessageDialog(
+                                                        getSite().getShell(),
+                                                        errorMessage, null);
+
+                                        // TODO: Display a dialog to report it
+                                        // to the user
+                                        return;
+                                    }
+
                                     setting.setEnabled(!setting.isEnabled());
+                                    IndustrialNetworkProjectEditorPage.this
+                                            .setDirty(true);
                                 }
                             }
                         }
 
                         // IndustrialNetworkProjectEditorPage.this.firePropertyChange(IEditorPart.PROP_INPUT);
-                        IndustrialNetworkProjectEditorPage.this.setDirty(true);
                     }
                 } else if (e.detail == SWT.NONE) {
                     // TODO Handle "Delete" button enable/disable.
@@ -332,7 +568,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     };
 
     /**
-     * @brief Handles the selection events from the output path combobox.
+     * Handles the selection events from the output path combobox.
      */
     private ISelectionChangedListener outputPathSelectionListener = new ISelectionChangedListener() {
         @Override
@@ -341,54 +577,45 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     .getSelection();
             if (selection.size() > 0) {
                 currentProject
-                .getProjectConfiguration()
-                .getPathSettings()
-                .setActivePath(
-                        ((TPath) selection.getFirstElement()).getId());
+                        .getProjectConfiguration()
+                        .getPathSettings()
+                        .setActivePath(
+                                ((TPath) selection.getFirstElement()).getId());
                 setDirty(true);
             }
         }
     };
 
     public IndustrialNetworkProjectEditorPage(
-            IndustrialNetworkProjectEditor editor, String title) {
+            IndustrialNetworkProjectEditor editor, final String title) {
         super(editor, IndustrialNetworkProjectEditorPage.ID, title);
         this.editor = editor;
     }
 
     /**
-     * Create the form page.
-     *
-     * @param title
-     */
-    public IndustrialNetworkProjectEditorPage(String title) {
-        super(IndustrialNetworkProjectEditorPage.ID, title);
-    }
-
-    /**
-     * @brief Adds the listener to the controls available in the project editor
-     *        page.
+     * Adds the listener to the controls available in the project editor page.
      */
     private void addListenersToContorls() {
         autoGenerationCombo
-        .addSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .addSelectionListener(autoGenerationSettingsSelectionAdapter);
         btnModifyAutoGenerationSettings
-        .addSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .addSelectionListener(autoGenerationSettingsSelectionAdapter);
         addSettingsButton
-        .addSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .addSelectionListener(autoGenerationSettingsSelectionAdapter);
         editSettingsButton
-        .addSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .addSelectionListener(autoGenerationSettingsSelectionAdapter);
         deleteSettingsButton
-        .addSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .addSelectionListener(autoGenerationSettingsSelectionAdapter);
         agSettingsTable
-        .addSelectionListener(autoGenerationSettingsTableAdapter);
+                .addSelectionListener(autoGenerationSettingsTableAdapter);
         pathComboViewer
-        .addSelectionChangedListener(outputPathSelectionListener);
+                .addSelectionChangedListener(outputPathSelectionListener);
     }
 
     /**
-     * @brief Create the GUI controls for the Generator in the openCONFIGURATOR
-     *        project model.
+     * Create the GUI controls for the Generator in the openCONFIGURATOR project
+     * model.
+     *
      * @param managedForm The instance of the form editor.
      */
     private void createAutoGenerationSettingsSection(
@@ -397,13 +624,13 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 .createSection(
                         managedForm.getForm().getBody(),
                         ExpandableComposite.EXPANDED | Section.DESCRIPTION
-                        | ExpandableComposite.TWISTIE
-                        | ExpandableComposite.TITLE_BAR);
+                                | ExpandableComposite.TWISTIE
+                                | ExpandableComposite.TITLE_BAR);
         managedForm.getToolkit().paintBordersFor(sctnAutoGenerationSettings);
         sctnAutoGenerationSettings
-        .setText(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING);
+                .setText(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING);
         sctnAutoGenerationSettings
-        .setDescription(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION);
+                .setDescription(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION);
 
         Composite clientComposite = toolkit.createComposite(
                 sctnAutoGenerationSettings, SWT.WRAP);
@@ -441,7 +668,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         dummyLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
                 false, 3, 1));
         dummyLabel
-        .setText(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_INFO_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_INFO_LABEL);
         toolkit.adapt(dummyLabel, true, true);
         dummyLabel.setForeground(toolkit.getColors()
                 .getColor(IFormColors.TITLE));
@@ -505,7 +732,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Create contents of the form.
+     * Create contents of the form.
      *
      * @param managedForm The instance of the form
      */
@@ -513,7 +740,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     protected void createFormContent(final IManagedForm managedForm) {
         toolkit = managedForm.getToolkit();
         form = managedForm.getForm();
-        form.setText("POWERLINK Project");
+        form.setText(IndustrialNetworkProjectEditorPage.FORM_EDITOR_PAGE_TITLE);
         Composite body = form.getBody();
         toolkit.decorateFormHeading(form.getForm());
         toolkit.paintBordersFor(body);
@@ -537,7 +764,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Creates the widgets and controls for the {@link TGenerator} model.
+     * Creates the widgets and controls for the {@link TGenerator} model.
      *
      * @param managedForm The parent form.
      */
@@ -547,9 +774,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 | ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         managedForm.getToolkit().paintBordersFor(sctnGenerator);
         sctnGenerator
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING);
         sctnGenerator
-        .setDescription(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING_DESCRIPTION);
+                .setDescription(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING_DESCRIPTION);
 
         Composite client = toolkit.createComposite(sctnGenerator, SWT.WRAP);
         GridLayout layout = new GridLayout(2, false);
@@ -563,7 +790,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatorvendor.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatorvendor
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VENDOR_NAME_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VENDOR_NAME_LABEL);
         toolkit.adapt(generatorvendor, true, true);
         generatorvendor.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -578,7 +805,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatortoolName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatortoolName
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_TOOL_NAME_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_TOOL_NAME_LABEL);
         toolkit.adapt(generatortoolName, true, true);
         generatortoolName.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -593,7 +820,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatorVersion.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatorVersion
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VERSION_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VERSION_LABEL);
         toolkit.adapt(generatorVersion, true, true);
         generatorVersion.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -608,7 +835,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatorCreatedOn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatorCreatedOn
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_ON_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_ON_LABEL);
         toolkit.adapt(generatorCreatedOn, true, true);
         generatorCreatedOn.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -623,7 +850,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatorModifiedOn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatorModifiedOn
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_ON_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_ON_LABEL);
         toolkit.adapt(generatorModifiedOn, true, true);
         generatorModifiedOn.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -638,7 +865,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatorCreatedBy.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatorCreatedBy
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_BY_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_BY_LABEL);
         toolkit.adapt(generatorCreatedBy, true, true);
         generatorCreatedBy.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -653,7 +880,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         generatorModifiedBy.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
                 false, false, 1, 1));
         generatorModifiedBy
-        .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_BY_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_BY_LABEL);
         toolkit.adapt(generatorModifiedBy, true, true);
         generatorModifiedBy.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -666,8 +893,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Creates the widgets and controls for the
-     *        {@link TProjectConfiguration.PathSettings} model.
+     * Creates the widgets and controls for the
+     * {@link TProjectConfiguration.PathSettings} model.
      *
      * @param managedForm The parent form.
      */
@@ -675,13 +902,13 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         Section sctnPathSettings = managedForm.getToolkit().createSection(
                 managedForm.getForm().getBody(),
                 ExpandableComposite.EXPANDED | Section.DESCRIPTION
-                | ExpandableComposite.TWISTIE
-                | ExpandableComposite.TITLE_BAR);
+                        | ExpandableComposite.TWISTIE
+                        | ExpandableComposite.TITLE_BAR);
         managedForm.getToolkit().paintBordersFor(sctnPathSettings);
         sctnPathSettings
-        .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING);
+                .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING);
         sctnPathSettings
-        .setDescription(IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING_DESCRIPTION);
+                .setDescription(IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING_DESCRIPTION);
 
         Composite clientComposite = toolkit.createComposite(sctnPathSettings,
                 SWT.WRAP);
@@ -697,7 +924,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         lblOutputPath.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
                 false, 1, 1));
         lblOutputPath
-        .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_OUTPUT_PATH_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_OUTPUT_PATH_LABEL);
         toolkit.adapt(lblOutputPath, true, true);
         lblOutputPath.setForeground(toolkit.getColors().getColor(
                 IFormColors.TITLE));
@@ -709,7 +936,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
         Button btnModifyOutputPath = new Button(clientComposite, SWT.PUSH);
         btnModifyOutputPath
-        .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_ADD_LABEL);
+                .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_ADD_LABEL);
         btnModifyOutputPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
                 false, false, 1, 1));
         toolkit.adapt(btnModifyOutputPath, true, true);
@@ -726,7 +953,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         setDirty(true);
                     }
                     currentProject.getProjectConfiguration().getPathSettings()
-                    .getPath().add(path);
+                            .getPath().add(path);
                     pathComboViewer.refresh();
                 }
 
@@ -782,7 +1009,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             public void linkActivated(HyperlinkEvent e) {
                 ModifyPathSettingsDialog magsDialog = new ModifyPathSettingsDialog(
                         form.getShell(), currentProject
-                        .getProjectConfiguration().getPathSettings());
+                                .getProjectConfiguration().getPathSettings());
                 magsDialog.open(); // Ok or Cancel modifies the value.
 
                 if (magsDialog.isDirty()) {
@@ -796,7 +1023,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Handles the save actions for the project editor page
+     * Handles the save actions for the project editor page
      */
     @Override
     public void doSave(IProgressMonitor monitor) {
@@ -809,7 +1036,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Returns the instance of the active auto generations setting node
+     * Returns the instance of the active auto generations setting node
      *
      * @return TAutoGenerationSettings
      */
@@ -827,8 +1054,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Returns the {@link TGenerator} instance from the openCONFIGURATOR
-     *        project model.
+     * Returns the {@link TGenerator} instance from the openCONFIGURATOR project
+     * model.
      *
      * @return the generator instance
      */
@@ -837,8 +1064,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Returns the {@link OpenCONFIGURATORProject} instance available in
-     *        the editor.
+     * Returns the {@link OpenCONFIGURATORProject} instance available in the
+     * editor.
      *
      * @return OpenCONFIGURATORProject instance
      */
@@ -849,7 +1076,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Returns the Path for the given ID.
+     * Returns the Path for the given ID.
      *
      * @param id Any string ID.
      *
@@ -868,7 +1095,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Initializes the project editor page.
+     * Initializes the project editor page.
      */
     @Override
     public void init(IEditorSite site, IEditorInput input) {
@@ -876,13 +1103,13 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Updates the {@link TProjectConfiguration} data from the
-     *        openCONFIGURATOR project to the UI controls
+     * Updates the {@link TProjectConfiguration} data from the openCONFIGURATOR
+     * project to the UI controls
      */
     private void initProjectConfigurationData() {
         if (currentProject == null) {
             System.err
-            .println("Error initializing the project configuration data");
+            .println(IndustrialNetworkProjectEditorPage.ERROR_INITIALISATION_FAILED);
             return;
         }
 
@@ -904,7 +1131,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         .getPathSettings().getPath().get(0);
                 pathDropDown.setText(path.getId() + " : " + path.getPath());
             } catch (IndexOutOfBoundsException e) {
-                System.err.println("No path is available to set.");
+                System.err
+                        .println(IndustrialNetworkProjectEditorPage.ERROR_NO_PATH_AVAILABLE);
             }
 
         }
@@ -919,7 +1147,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 .getActiveAutoGenerationSetting()
                 .equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-                        || currentProject
+                || currentProject
                         .getProjectConfiguration()
                         .getActiveAutoGenerationSetting()
                         .equalsIgnoreCase(
@@ -931,8 +1159,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Updates the {@link TGenerator} data from the openCONFIGURATOR
-     *        project to the UI controls
+     * Updates the {@link TGenerator} data from the openCONFIGURATOR project to
+     * the UI controls
      */
     private void initProjectGeneratorData() {
         if (getGenerator() == null) {
@@ -972,8 +1200,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Updates the {@link OpenCONFIGURATORProject} data to the UI
-     *        controls
+     * Updates the {@link OpenCONFIGURATORProject} data to the UI controls
      */
     private void intiProjectData() {
         initProjectConfigurationData();
@@ -981,8 +1208,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Checks if the given string available in the list of
-     *        {@link TAutoGenerationSettings}.
+     * Checks if the given string available in the list of
+     * {@link TAutoGenerationSettings}.
      *
      * @param activeAutoGenerationSetting
      * @return True if the setting is found. False otherwise.
@@ -1004,16 +1231,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Checks whether the control has changed or not.
-     *
-     * @return True if the setting is found. False otherwise.
-     */
-    private boolean isControlChanged() {
-        return controlChange;
-    }
-
-    /**
-     * @brief Handles it internally using the dirty flag.
+     * Handles it internally using the dirty flag.
      */
     @Override
     public boolean isDirty() {
@@ -1021,8 +1239,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Returns true, since the project editor is an editor. otherwise it
-     *        will be a form.
+     * Returns true, since the project editor is an editor. otherwise it will be
+     * a form.
      */
     @Override
     public boolean isEditor() {
@@ -1030,8 +1248,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Reloads the Auto Generation settings from the model into the
-     *        combo.
+     * Reloads the Auto Generation settings from the model into the combo.
      */
     private void reloadAutoGenerationSettingsCombo() {
         List<String> items = new ArrayList<String>();
@@ -1050,8 +1267,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Re-load the <Setting> tag values from the <AutoGenerationSettings>
-     *        parent into the table
+     * Re-load the Setting tag values from the AutoGenerationSettings parent
+     * into the table
      */
     private void reloadAutoGenerationSettingsTable() {
         String activeAutoGenerationSetting = currentProject
@@ -1085,22 +1302,22 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      */
     private void removeListenersToControls() {
         autoGenerationCombo
-        .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
         btnModifyAutoGenerationSettings
-        .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
         addSettingsButton
-        .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
         editSettingsButton
-        .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
         deleteSettingsButton
-        .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
+                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
         agSettingsTable
-        .removeSelectionListener(autoGenerationSettingsTableAdapter);
+                .removeSelectionListener(autoGenerationSettingsTableAdapter);
     }
 
     /**
-     * @brief Sets the editor dirty and notifies the base editor with
-     *        editorDirtoStateChanged signal.
+     * Sets the editor dirty and notifies the base editor with
+     * editorDirtoStateChanged signal.
      *
      * @param value state of the editor.
      */
@@ -1112,10 +1329,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Enables the AutoGenerationSettings group if the argument is true,
-     *        and disables it otherwise.
+     * Enables the AutoGenerationSettings group if the argument is true, and
+     * disables it otherwise.
      *
-     * @param enabled Enables/disable
+     * @param enabled Enables/disable the settings group
      */
     private void setEnabledSettingsControls(boolean enabled) {
         agSettingsTable.setEnabled(enabled);
@@ -1125,8 +1342,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Updates the openCONFIGURATOR objects instance and the values in
-     *        the UI.
+     * Updates the openCONFIGURATOR objects instance and the values in the UI.
      *
      * @param project OpenCONFIGURATORProject instance
      */
@@ -1141,8 +1357,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * @brief Updates the AutoGenerationSettings combo box from the
-     *        openCONFIGURATOR project model.
+     * Updates the AutoGenerationSettings combo box from the openCONFIGURATOR
+     * project model.
      */
     private void updateActiveAutoGenerationSetting() {
         String activeAutoGenerationSetting = currentProject
@@ -1152,17 +1368,34 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             autoGenerationCombo.setText(activeAutoGenerationSetting);
         } else {
             System.err
-            .println("An error occurred in active auto generation setting. "
-                    + activeAutoGenerationSetting);
+                    .println("An error occurred in active auto generation setting. "
+                            + activeAutoGenerationSetting);
             autoGenerationCombo.select(0);
-            currentProject.getProjectConfiguration()
-            .setActiveAutoGenerationSetting(
-                    autoGenerationCombo.getText());
+            if (!autoGenerationCombo.getText().isEmpty()) {
+                Result libApiRes = OpenConfiguratorCore.GetInstance()
+                        .SetActiveConfiguration(editor.getNetworkId(),
+                                autoGenerationCombo.getText());
+                if (!libApiRes.IsSuccessful()) {
+                    // TODO: Display a dialog to report it to the user
+                    // TODO: set the combo value back to old one.
+                    System.err.println("SetActiveConfiguration: "
+                            + autoGenerationCombo.getText()
+                            + "."
+                            + OpenConfiguratorLibraryUtils
+                            .getErrorMessage(libApiRes));
+                }
 
-            IndustrialNetworkProjectEditorPage.this.setDirty(true);
+                currentProject.getProjectConfiguration()
+                        .setActiveAutoGenerationSetting(
+                                autoGenerationCombo.getText());
+
+                IndustrialNetworkProjectEditorPage.this.setDirty(true);
+
+            } else {
+                // TODO: No autoGeneration settings are available in the list.
+            }
         }
         IndustrialNetworkProjectEditorPage.this
-        .reloadAutoGenerationSettingsTable();
+                .reloadAutoGenerationSettingsTable();
     }
-
 }

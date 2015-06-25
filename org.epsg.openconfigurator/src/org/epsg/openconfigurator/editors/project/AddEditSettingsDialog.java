@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.editors.project;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,12 +53,17 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.lib.wrapper.StringCollection;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TKeyValuePair;
 
 /**
  * A dialog to modify the build configuration settings in the library. It
- * modifies the <Settings> tag of the project XML.
+ * modifies the 'Settings' tag of the project XML.
  *
  * @author Ramakrishnan P
  *
@@ -70,55 +76,121 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
      * @author Ramakrishnan P
      */
     private class BuilderConfiguration {
+        /**
+         * Determines the availability of the configuration in the builder vs
+         * the library.
+         */
         private boolean alreadyAvailable;
+
+        /**
+         * The name of the configuration.
+         */
         private String name;
 
-        BuilderConfiguration(String name) {
+        /**
+         * The description of the configuration.
+         */
+        private String description;
+
+        /**
+         * Constructor
+         *
+         * @param name The name of the configuration.
+         */
+        BuilderConfiguration(final String name) {
             this.name = name;
         }
 
+        /**
+         * Returns the description corresponding to the builder configuration.
+         *
+         * @return The description.
+         */
+        public String getDescription() {
+            return description;
+        }
+
+        /**
+         * Returns the name corresponding to the builder configuration.
+         *
+         * @return The name.
+         */
         public String getName() {
             return name;
         }
 
+        /**
+         * @return true if already available, false otherwise.
+         */
         public boolean isAlreadyAvailable() {
             return alreadyAvailable;
         }
 
+        /**
+         * Set true if the builder configuration is already available or false
+         * otherwise.
+         *
+         * @param alreadyAvailable Flag to set the configuration already
+         *            available.
+         */
         public void setAlreadyAvailable(boolean alreadyAvailable) {
             this.alreadyAvailable = alreadyAvailable;
         }
-
     }
+
+    /**
+     * Dialog strings and messages.
+     */
+    private final String DIALOG_TITLE = "Configure settings - ";
+    private final String DIALOG_MESSAGE = "Configure the build configuration settings";
+    private final String VALUE_ERROR_MESSAGE = "Enter a valid value.\nFormat: NodeID;NodeID; eg:1;32;110;";
+    private final String VALUE_TOOL_TIP = "Empty: all nodes.\nCustom format: NodeID;NodeID; eg:1;32;110;";
+    private final String NAME_LABEL = "Name:";
+    private final String VALUE_LABEL = "Value:";
+    private final String ACTIVE_LABEL = "Active:";
+    private final String INVALID_SETTINGS_TYPE = "Select a valid Settings type";
+    private final String EMPTY_SETTINGS_TYPE_ERROR = "No new Settings are available. Try editing from the settings table.";
+    private final String ERROR_INVALID_NODE_ID = "{0} is not a valid node ID";
+
+    /**
+     * Builder settings value.
+     */
+    private Text value;
+
+    /**
+     * Builder settings type combo box.
+     */
+    private Combo settingsTypeCombo;
+
+    /**
+     * Builder settings active/not active check box.
+     */
+    private Button bntActive;
+
+    /**
+     * Dialog dirty flag.
+     */
+    private boolean dirty = false;
+
+    /**
+     * Store the active settings type name.
+     */
+    private String activeSettingName;
 
     /**
      * List of build configurations.
      */
     private List<BuilderConfiguration> builderConfig = new ArrayList<BuilderConfiguration>();
 
-    private final String VALUE_ERROR_MESSAGE = "Enter a valid value. Format: NodeID;NodeID; eg:1;32;110;";
-
-    /** UI Controls */
-    private Text value;
-    private Combo settingsTypeCombo;
-    private Button bntActive;
-
-    private boolean dirty = false;
-
-    private final String DIALOG_TITLE = "Configure settings - ";
-    private final String DIALOG_MESSAGE = "Configure the build configuration settings";
-
-    private String activeSettingName;
-
-    // private int activeSettingIndex = -1;
-
-    private String[] listOfInputNames = { "Test1", "Test2", "Test3", "Test4" };
+    /**
+     * The Setting data model from the openCONFIGURATOR project.
+     */
+    private TKeyValuePair activeSetting = new TKeyValuePair();
 
     /**
-     * Data model from the openCONFIGURATOR project file. The <Setting> tag.
+     * The AutoGenerationSettings data model from the openCONFIGURATOR project.
      */
-    TKeyValuePair activeSetting = new TKeyValuePair();
-    TAutoGenerationSettings agSettings;
+    private TAutoGenerationSettings agSettings;
 
     /**
      * Creates the add/edit settings dialog.
@@ -129,15 +201,34 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     public AddEditSettingsDialog(Shell parentShell,
             TAutoGenerationSettings autoGenerationSettings) {
         super(parentShell);
+
         agSettings = autoGenerationSettings;
 
-        for (String s : listOfInputNames) {
-            builderConfig.add(new BuilderConfiguration(s));
+        // Create the builderConfiguration based on the input from the library.
+        StringCollection support = new StringCollection();
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
+                .GetSupportedSettingIds(support);
+        if (!libApiRes.IsSuccessful()) {
+            // Display a dialog to report it to the user.
+            String errorMessage = OpenConfiguratorLibraryUtils
+                    .getErrorMessage(libApiRes);
+            System.err.println(errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
+                    errorMessage, null);
+            return;
         }
 
+        for (int i = 0; i < support.size(); i++) {
+            BuilderConfiguration cfg = new BuilderConfiguration(support.get(i));
+            builderConfig.add(cfg);
+        }
+
+        // Set AlreadyAvailable option if the builder configuration is already
+        // configured in the AutoGenerationSettings.
         for (BuilderConfiguration builderConfig : builderConfig) {
             for (TKeyValuePair tempSetting : agSettings.getSetting()) {
-                if (tempSetting.getName().equals(builderConfig.getName())) {
+                if (tempSetting.getName().equalsIgnoreCase(
+                        builderConfig.getName())) {
                     builderConfig.setAlreadyAvailable(true);
                 }
             }
@@ -148,6 +239,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
      * Adds the listener to the controls available in the dialog.
      */
     private void addControlListeners() {
+        /**
+         * Settings type combo box selection change listener.
+         */
         settingsTypeCombo.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -155,6 +249,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
             }
         });
 
+        /**
+         * Value text box - text modify listener.
+         */
         value.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -166,6 +263,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
             }
         });
 
+        /**
+         * Input verify listener for the value text box.
+         */
         value.addVerifyListener(new VerifyListener() {
             @Override
             public void verifyText(VerifyEvent event) {
@@ -195,6 +295,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
             }
         });
 
+        /**
+         * Active/In-Active check box selection changed listener.
+         */
         bntActive.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -211,6 +314,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     protected void buttonPressed(int buttonId) {
         if (buttonId == IDialogConstants.OK_ID) {
 
+            /**
+             * Check for the page is complete or not.
+             */
             if (isPageComplete()) {
                 activeSetting.setName(settingsTypeCombo.getText());
                 activeSetting.setValue(value.getText());
@@ -254,7 +360,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
         container.setLayout(layout);
 
         Label lblSettingsName = new Label(container, SWT.CENTER);
-        lblSettingsName.setText("Name:");
+        lblSettingsName.setText(NAME_LABEL);
         lblSettingsName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
                 false, 1, 1));
 
@@ -263,16 +369,17 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
                 true, false, 1, 1));
 
         Label lblValue = new Label(container, SWT.CENTER);
-        lblValue.setText("Value:");
+        lblValue.setText(VALUE_LABEL);
         lblValue.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false,
                 1, 1));
 
         value = new Text(container, SWT.LEFT | SWT.SINGLE | SWT.BORDER);
         value.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1,
                 1));
+        value.setToolTipText(VALUE_TOOL_TIP);
 
         Label lblActive = new Label(container, SWT.CENTER);
-        lblActive.setText("Active:");
+        lblActive.setText(ACTIVE_LABEL);
         lblActive.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
                 false, 1, 1));
 
@@ -281,15 +388,23 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
                 false, 1, 1));
         bntActive.setSelection(true);
 
+        /**
+         * Initialize the values from the project model.
+         */
         initValuesFromModel();
+
+        /**
+         * Add listeners to the dialog controls.
+         */
         addControlListeners();
+
         return container;
     }
 
     /**
      * Returns the updated model.
      *
-     * @return TKeyValuePair
+     * @return TKeyValuePair the active setting.
      */
     public TKeyValuePair getData() {
         return activeSetting;
@@ -298,7 +413,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     /**
      * Returns the list of settings names from the builder configurations.
      *
-     * @return String[] list of builder configuration names.
+     * @return String[] List of builder configuration names.
      */
     private String[] getSettingListFromBuilderConfiguraion() {
         ArrayList<String> stringList = new ArrayList<String>();
@@ -364,9 +479,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
             setErrorMessage(null);
         } else {
             if (settingsTypeCombo.getItemCount() > 0) {
-                setErrorMessage("Select a valid Settings type");
+                setErrorMessage(INVALID_SETTINGS_TYPE);
             } else {
-                setErrorMessage("No new Settings are available. Try editing from the settings table.");
+                setErrorMessage(EMPTY_SETTINGS_TYPE_ERROR);
             }
         }
 
@@ -388,7 +503,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     }
 
     /**
-     * Check for the valid value.
+     * Check for the valid value from the dialog.
      *
      * @param inputValue
      * @return true if valid, false otherwise.
@@ -406,10 +521,12 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
                     if ((shortValue > 0) && (shortValue < 256)) {
                         retValue = true;
                     } else {
-                        setErrorMessage(element + " is not a valid node ID");
+                        setErrorMessage(MessageFormat.format(
+                                ERROR_INVALID_NODE_ID, element));
                     }
                 } catch (NumberFormatException exception) {
-                    setErrorMessage(element + " is not a valid node ID");
+                    setErrorMessage(MessageFormat.format(ERROR_INVALID_NODE_ID,
+                            element));
                 }
             }
         } else {
@@ -430,8 +547,10 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
 
         if (activeSettingName != null) {
             for (TKeyValuePair tempSetting : agSettings.getSetting()) {
-                if (tempSetting.getName().equals(activeSettingName)) {
-                    activeSetting = tempSetting;
+                if (tempSetting.getName().equalsIgnoreCase(activeSettingName)) {
+                    activeSetting.setName(tempSetting.getName());
+                    activeSetting.setValue(tempSetting.getValue());
+                    activeSetting.setEnabled(tempSetting.isEnabled());
                     break;
                 }
             }

@@ -36,12 +36,8 @@ package org.epsg.openconfigurator.wizards;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.util.GregorianCalendar;
 
 import javax.xml.bind.JAXBException;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -66,15 +62,10 @@ import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TGenerator;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
 /**
  * A wizardpage class to add a default master node to the project.
@@ -504,56 +495,11 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
      */
     void createProject(final String projectFilePath) {
         File openConfiguratorProjectFile = new File(projectFilePath);
-        OpenCONFIGURATORProject openConfiguratorProject = new OpenCONFIGURATORProject();
-        TGenerator tGenerator = new TGenerator();
-        tGenerator
-        .setVendor("Kalycito Infotech Private Limited &amp; Bernecker + Rainer Industrie Elektronik Ges.m.b.H.");
-        // TODO: Identify the user from the system.
-        tGenerator.setCreatedBy("openCONFIGURATOR eclipse plugin");
-        tGenerator.setToolName("openCONFIGURATOR");
-        tGenerator.setToolVersion("2.0.0");
-        tGenerator.setCreatedOn(getXMLGregorianCalendarNow());
-        tGenerator.setModifiedOn(getXMLGregorianCalendarNow());
-        // TODO: Identify the user from the system.
-        tGenerator.setModifiedBy("openCONFIGURATOR eclipse plugin");
-        openConfiguratorProject.setGenerator(tGenerator);
-
-        // Add default project configurations
-        TProjectConfiguration tProjectConfiguration = new TProjectConfiguration();
-        tProjectConfiguration.setActiveAutoGenerationSetting("all");
-
-        // Add default output path
-        TProjectConfiguration.PathSettings pathSettings = new TProjectConfiguration.PathSettings();
-        java.util.List<TPath> pathList = pathSettings.getPath();
-        TPath path = new TPath();
-        path.setId("defaultOutputPath");
-        path.setPath("output");
-        pathList.add(path);
-        tProjectConfiguration.setPathSettings(pathSettings);
-
-        // Auto generation settings
-        java.util.List<TAutoGenerationSettings> autoGenerationSettingsList = tProjectConfiguration
-                .getAutoGenerationSettings();
-        TAutoGenerationSettings tAutoGenerationSettings = new TAutoGenerationSettings();
-        tAutoGenerationSettings.setId("all");
-        autoGenerationSettingsList.add(tAutoGenerationSettings);
-
-        tAutoGenerationSettings = new TAutoGenerationSettings();
-        tAutoGenerationSettings.setId("none");
-        autoGenerationSettingsList.add(tAutoGenerationSettings);
-
-        // Add Network configurations
-        TNodeCollection nc = new TNodeCollection();
-        nc.setMN(getMnNode());
-
-        TNetworkConfiguration tNetworkConfiguration = new TNetworkConfiguration();
-        tNetworkConfiguration.setNodeCollection(nc);
-
-        openConfiguratorProject.setProjectConfiguration(tProjectConfiguration);
-        openConfiguratorProject.setNetworkConfiguration(tNetworkConfiguration);
+        OpenCONFIGURATORProject project = OpenConfiguratorProjectUtils
+                .newDefaultOpenCONFIGURATORProject(getMnNode());
         try {
             OpenConfiguratorProjectMarshaller.marshallOpenConfiguratorProject(
-                    openConfiguratorProject, openConfiguratorProjectFile);
+                    project, openConfiguratorProjectFile);
         } catch (JAXBException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -600,29 +546,6 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         }
 
         return "";
-    }
-
-    /**
-     * Returns the current Gregorian Calendar time. If any exception returns
-     * null;
-     *
-     * @return XMLGregorianCalendar
-     */
-    public XMLGregorianCalendar getXMLGregorianCalendarNow() {
-        GregorianCalendar gregorianCalendar = new GregorianCalendar();
-        DatatypeFactory datatypeFactory;
-        try {
-            datatypeFactory = DatatypeFactory.newInstance();
-            XMLGregorianCalendar now = datatypeFactory
-                    .newXMLGregorianCalendar(gregorianCalendar);
-            return now;
-        } catch (DatatypeConfigurationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        System.err.println("Error getting the system time");
-        return null;
     }
 
     /**
