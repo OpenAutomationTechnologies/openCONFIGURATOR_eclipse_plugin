@@ -30,10 +30,18 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
+
 package org.epsg.openconfigurator;
 
+import java.io.IOException;
+import java.net.URL;
+import java.text.MessageFormat;
+
+import org.apache.commons.lang.SystemUtils;
+import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -41,55 +49,94 @@ import org.osgi.framework.BundleContext;
  */
 public class Activator extends AbstractUIPlugin {
 
-	// The plug-in ID
-	public static final String PLUGIN_ID = "org.epsg.openconfigurator"; //$NON-NLS-1$
+    // The plug-in ID
+    public static final String PLUGIN_ID = "org.epsg.openconfigurator"; //$NON-NLS-1$
 
-	// The shared instance
-	private static Activator plugin;
-	
-	/**
-	 * The constructor
-	 */
-	public Activator() {
-	}
+    private static final String FILE_NOT_FOUND = "Requested file not found in the plugin. File: {0}";
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void start(BundleContext context) throws Exception {
-		super.start(context);
-		plugin = this;
-	}
+    // The shared instance
+    private static Activator plugin;
 
-	/*
-	 * (non-Javadoc)
-	 * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-	 */
-	@Override
-	public void stop(BundleContext context) throws Exception {
-		plugin = null;
-		super.stop(context);
-	}
+    /**
+     * Get the absolute path of the file available within the plugin. The
+     * resources shall be one of IOpenConfiguratorResource.
+     *
+     * @param relativePath The relative path of the file.
+     * @return The absolute path of the requested file.
+     * @throws IOException The path could not be resolved.
+     */
+    public static String getAbsolutePath(final String relativePath)
+            throws IOException {
+        Bundle bundle = Activator.plugin.getBundle();
+        URL fileURL = bundle.getEntry(relativePath);
+        if (fileURL == null) {
+            throw new IOException(MessageFormat.format(
+                    Activator.FILE_NOT_FOUND, relativePath));
+        }
 
-	/**
-	 * Returns the shared instance
-	 *
-	 * @return the shared instance
-	 */
-	public static Activator getDefault() {
-		return plugin;
-	}
+        String absolutePath = null;
 
-	/**
-	 * Returns an image descriptor for the image file at the given
-	 * plug-in relative path
-	 *
-	 * @param path the path
-	 * @return the image descriptor
-	 */
-	public static ImageDescriptor getImageDescriptor(String path) {
-		return imageDescriptorFromPlugin(PLUGIN_ID, path);
-	}
+        absolutePath = FileLocator.resolve(fileURL).getPath();
+
+        // Remove the '/' from the path in windows.
+        if (SystemUtils.IS_OS_WINDOWS) {
+            if ((absolutePath != null) && (absolutePath.length() > 1)) {
+                absolutePath = absolutePath.substring(1);
+            }
+        }
+        return absolutePath;
+    }
+
+    /**
+     * Returns the shared instance
+     *
+     * @return the shared instance
+     */
+    public static Activator getDefault() {
+        return Activator.plugin;
+    }
+
+    /**
+     * Returns an image descriptor for the image file at the given plug-in
+     * relative path
+     *
+     * @param path the path
+     * @return the image descriptor
+     */
+    public static ImageDescriptor getImageDescriptor(String path) {
+        return AbstractUIPlugin.imageDescriptorFromPlugin(Activator.PLUGIN_ID,
+                path);
+    }
+
+    /**
+     * The constructor
+     */
+    public Activator() {
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
+     * )
+     */
+    @Override
+    public void start(BundleContext context) throws Exception {
+        super.start(context);
+        Activator.plugin = this;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
+     * )
+     */
+    @Override
+    public void stop(BundleContext context) throws Exception {
+        Activator.plugin = null;
+        super.stop(context);
+    }
 }
