@@ -122,7 +122,7 @@ public class IndustrialNetworkProjectSourcePage extends TextEditor implements
      */
     @Override
     public void doSave(IProgressMonitor progressMonitor) {
-        super.doSave(progressMonitor);
+        // super.doSave(progressMonitor);
     }
 
     /**

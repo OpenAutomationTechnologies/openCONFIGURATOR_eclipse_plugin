@@ -39,11 +39,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TKeyValuePair;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
 /**
@@ -56,74 +52,6 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 public class OpenConfiguratorLibraryUtils {
 
     /**
-     * Add the network configuration details from the
-     * {@link TNetworkConfiguration} into the openCONFIGUATOR core library.
-     *
-     * @param networkConfiguration TNetworkConfiguration instance.
-     * @param networkId The Network ID.
-     *
-     * @return Result from the openCONFIGURATOR library.
-     */
-    private static Result addNetworkConfigurationIntoLibrary(
-            final TNetworkConfiguration networkConfiguration,
-            final String networkId) {
-
-        Result libApiRes = OpenConfiguratorCore.GetInstance()
-                .SetMultiplexedCycleLength(networkId,
-                        networkConfiguration.getMultiplexedCycleLength());
-        if (!libApiRes.IsSuccessful()) {
-            return libApiRes;
-        }
-
-        if (networkConfiguration.getAsyncMTU() != null) {
-            libApiRes = OpenConfiguratorCore.GetInstance().SetAsyncMtu(
-                    networkId, networkConfiguration.getAsyncMTU());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-        }
-
-        if (networkConfiguration.getCycleTime() != null) {
-            libApiRes = OpenConfiguratorCore.GetInstance().SetCycleTime(
-                    networkId, networkConfiguration.getCycleTime().longValue());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-        }
-
-        if (networkConfiguration.getPrescaler() != null) {
-            libApiRes = OpenConfiguratorCore.GetInstance().SetPrescaler(
-                    networkId, networkConfiguration.getPrescaler());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-        }
-
-        TNodeCollection nodeCollection = networkConfiguration
-                .getNodeCollection();
-        if (nodeCollection != null) {
-            TMN mn = nodeCollection.getMN();
-            if (mn != null) {
-                libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(
-                        networkId, mn.getNodeID(), mn.getName());
-                if (!libApiRes.IsSuccessful()) {
-                    return libApiRes;
-                }
-            }
-
-            java.util.List<TCN> cnList = nodeCollection.getCN();
-            for (TCN cn : cnList) {
-                libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(
-                        networkId, new Short(cn.getNodeID()), cn.getName());
-                if (!libApiRes.IsSuccessful()) {
-                    return libApiRes;
-                }
-            }
-        }
-        return libApiRes;
-    }
-
-    /**
      * Add the configurations in openCONFIGURTOR project into the Network
      * available in the library.
      *
@@ -132,15 +60,12 @@ public class OpenConfiguratorLibraryUtils {
      *
      * @return Result from the openCONFIGURATOR library.
      */
-    public static Result addOpenCONFIGURATORProjectIntoLibrary(
-            final OpenCONFIGURATORProject projectModel, final String networkId) {
+    public static Result addOpenCONFIGURATORProject(
+            final OpenCONFIGURATORProject projectModel,
+            final String networkId) {
 
-        Result libApiRes = OpenConfiguratorLibraryUtils
-                .addProjectConfigurationIntoLibrary(
-                        projectModel.getProjectConfiguration(), networkId);
-        libApiRes = OpenConfiguratorLibraryUtils
-                .addNetworkConfigurationIntoLibrary(
-                        projectModel.getNetworkConfiguration(), networkId);
+        Result libApiRes = OpenConfiguratorLibraryUtils.addProjectConfiguration(
+                projectModel.getProjectConfiguration(), networkId);
 
         return libApiRes;
     }
@@ -154,7 +79,7 @@ public class OpenConfiguratorLibraryUtils {
      *
      * @return Result from the openCONFIGURATOR library.
      */
-    private static Result addProjectConfigurationIntoLibrary(
+    private static Result addProjectConfiguration(
             final TProjectConfiguration projectConfiguration,
             final String networkId) {
 
@@ -164,8 +89,8 @@ public class OpenConfiguratorLibraryUtils {
         Result libApiRes = new Result();
         for (TAutoGenerationSettings agSetting : agSettingsList) {
 
-            libApiRes = OpenConfiguratorCore.GetInstance().CreateConfiguration(
-                    networkId, agSetting.getId());
+            libApiRes = OpenConfiguratorCore.GetInstance()
+                    .CreateConfiguration(networkId, agSetting.getId());
             if (!libApiRes.IsSuccessful()) {
                 return libApiRes;
             }
@@ -226,7 +151,8 @@ public class OpenConfiguratorLibraryUtils {
         String boostLogSettingsFile = new String();
 
         boostLogSettingsFile = org.epsg.openconfigurator.Activator
-                .getAbsolutePath(IOpenConfiguratorResource.BOOST_LOG_CONFIGURATION);
+                .getAbsolutePath(
+                        IOpenConfiguratorResource.BOOST_LOG_CONFIGURATION);
 
         System.out.println("Path: " + boostLogSettingsFile);
         // Init logger class with configuration file path

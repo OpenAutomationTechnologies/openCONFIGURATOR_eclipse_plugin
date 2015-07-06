@@ -35,7 +35,6 @@
          point="org.eclipse.ui.editors">
       <editor
             class="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
-            contributorClass="org.epsg.openconfigurator.editors.IndustrialNetworkContribute"
             default="true"
             icon="icons/releng_gears.gif"
             id="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"

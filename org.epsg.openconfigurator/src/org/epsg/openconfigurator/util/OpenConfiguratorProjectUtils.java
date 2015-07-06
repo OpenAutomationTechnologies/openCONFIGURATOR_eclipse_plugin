@@ -289,7 +289,7 @@ public final class OpenConfiguratorProjectUtils {
      * Upgrade openCONFIGURATOR project to conform with 2.0 schema. Add default
      * fields for AutoGeneration Settings.
      *
-     * @param project OpenCONFIGURATOR project1
+     * @param project OpenCONFIGURATOR project
      */
     public static boolean upgradeOpenConfiguratorProject(
             OpenCONFIGURATORProject project) {

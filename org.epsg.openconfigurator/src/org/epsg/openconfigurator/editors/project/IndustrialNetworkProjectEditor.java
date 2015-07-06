@@ -53,6 +53,8 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
@@ -60,7 +62,9 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.editor.FormEditor;
+import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.texteditor.IDocumentProvider;
@@ -73,6 +77,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.xml.sax.SAXException;
 
 /**
@@ -87,8 +92,8 @@ import org.xml.sax.SAXException;
  * @author Ramakrishnan P
  *
  */
-public final class IndustrialNetworkProjectEditor extends FormEditor implements
-IResourceChangeListener {
+public final class IndustrialNetworkProjectEditor extends FormEditor
+        implements IResourceChangeListener, IPropertyChangeListener {
 
     /**
      * Identifier for this page.
@@ -112,9 +117,24 @@ IResourceChangeListener {
     private String networkId;
 
     /**
+     * Eclipse project instance linked with this editor.
+     */
+    private IProject activeProject;
+
+    /**
+     * openCONFIGURATOR project XML instance linked with this editor.
+     */
+    private IFile projectFile;
+
+    /**
      * openCONFIGURATOR project model
      */
     private OpenCONFIGURATORProject currentProject;
+
+    /**
+     * Flag to check for the library initialization
+     */
+    private boolean initSuccessful = false;
 
     /**
      * Source editor page.
@@ -145,39 +165,14 @@ IResourceChangeListener {
 
         try {
 
-            Result libApiRes = OpenConfiguratorCore.GetInstance()
-                    .CreateNetwork(networkId);
-            if (!libApiRes.IsSuccessful()) {
-                // Report error to the user using the dialog.
-                String errorMessage = OpenConfiguratorLibraryUtils
-                        .getErrorMessage(libApiRes);
-                System.err.println(errorMessage);
-                PluginErrorDialogUtils.displayErrorMessageDialog(getSite()
-                        .getShell(), errorMessage, null);
-                return;
-            }
-
             createPowerlinkProjectEditor();
             createProjectSourceEditor();
 
             this.setActivePage(editorPage.getId());
 
             OpenConfiguratorProjectUtils
-            .upgradeOpenConfiguratorProject(currentProject);
+                    .upgradeOpenConfiguratorProject(currentProject);
             editorPage.setOpenCONFIGURATORProject(currentProject);
-
-            libApiRes = OpenConfiguratorLibraryUtils
-                    .addOpenCONFIGURATORProjectIntoLibrary(currentProject,
-                            networkId);
-            if (!libApiRes.IsSuccessful()) {
-                // Report error to the user using the dialog.
-                String errorMessage = OpenConfiguratorLibraryUtils
-                        .getErrorMessage(libApiRes);
-                System.err.println(errorMessage);
-                PluginErrorDialogUtils.displayErrorMessageDialog(getSite()
-                        .getShell(), errorMessage, null);
-                return;
-            }
 
         } catch (NullPointerException e) {
             // TODO Auto-generated catch block
@@ -221,10 +216,7 @@ IResourceChangeListener {
             editorPage.setIndex(index);
 
         } catch (PartInitException e) {
-            ErrorDialog
-            .openError(
-                    getSite().getShell(),
-                    null,
+            ErrorDialog.openError(getSite().getShell(), null,
                     IndustrialNetworkProjectEditor.PROJECT_EDITOR_CREATION_ERROR_MESSAGE,
                     e.getStatus());
             e.printStackTrace();
@@ -243,12 +235,9 @@ IResourceChangeListener {
             setPageText(index,
                     IndustrialNetworkProjectEditor.PROJECT_SOURCE_PAGE_NAME);
             sourcePage.setIndex(index);
-
+            sourcePage.initialize(this);
         } catch (PartInitException e) {
-            ErrorDialog
-            .openError(
-                    getSite().getShell(),
-                    null,
+            ErrorDialog.openError(getSite().getShell(), null,
                     IndustrialNetworkProjectEditor.PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE,
                     e.getStatus());
             e.printStackTrace();
@@ -260,17 +249,18 @@ IResourceChangeListener {
      */
     @Override
     public void dispose() {
-        Result libApiRes = OpenConfiguratorCore.GetInstance().RemoveNetwork(
-                networkId);
-        if (!libApiRes.IsSuccessful()) {
-            // Report error to the user using the dialog.
-            String errorMessage = OpenConfiguratorLibraryUtils
-                    .getErrorMessage(libApiRes);
-            System.err.println(errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(getSite()
-                    .getShell(), errorMessage, null);
+        if (initSuccessful) {
+            Result libApiRes = OpenConfiguratorCore.GetInstance()
+                    .RemoveNetwork(networkId);
+            if (!libApiRes.IsSuccessful()) {
+                // Report error to the user using the dialog.
+                String errorMessage = OpenConfiguratorLibraryUtils
+                        .getErrorMessage(libApiRes);
+                System.err.println(errorMessage);
+                PluginErrorDialogUtils.displayErrorMessageDialog(
+                        getSite().getShell(), errorMessage, null);
+            }
         }
-
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
         super.dispose();
     }
@@ -311,6 +301,35 @@ IResourceChangeListener {
     }
 
     /**
+     * @return the openCONFIGURATOR project model contents as string
+     */
+    private String getModelData() {
+        String retVal = new String("");
+        try {
+            if (currentProject != null) {
+                OpenConfiguratorProjectUtils
+                        .updateGeneratorInformation(currentProject);
+                retVal = OpenConfiguratorProjectMarshaller
+                        .marshallOpenConfiguratorProject(currentProject);
+            }
+        } catch (JAXBException e) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, e.getMessage(), e);
+            ErrorDialog.openError(getSite().getShell(), null,
+                    IndustrialNetworkProjectEditor.MARSHALL_ERROR, errorStatus);
+            e.printStackTrace();
+        }
+        return retVal;
+    }
+
+    /**
+     * @return The network configuration instance from the project model.
+     */
+    public TNetworkConfiguration getNetworkConfiguration() {
+        return currentProject.getNetworkConfiguration();
+    }
+
+    /**
      * @return The network ID associated with the editor.
      */
     public String getNetworkId() {
@@ -318,25 +337,10 @@ IResourceChangeListener {
     }
 
     /**
-     * @return the openCONFIGURATOR project model contents as string
+     * @return The IFile instance of the openCONFIGURATOR project XML file.
      */
-    private String getSource() {
-        String retVal = new String("");
-        try {
-            if (currentProject != null) {
-                OpenConfiguratorProjectUtils
-                .updateGeneratorInformation(currentProject);
-                retVal = OpenConfiguratorProjectMarshaller
-                        .marshallOpenConfiguratorProject(currentProject);
-            }
-        } catch (JAXBException e) {
-            IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, 1, e.getMessage(), e);
-            ErrorDialog.openError(getSite().getShell(), null,
-                    IndustrialNetworkProjectEditor.MARSHALL_ERROR, errorStatus);
-            e.printStackTrace();
-        }
-        return retVal;
+    public IFile getProjectFile() {
+        return projectFile;
     }
 
     /**
@@ -374,24 +378,54 @@ IResourceChangeListener {
         super.init(site, editorInput);
 
         IFileEditorInput input = (IFileEditorInput) editorInput;
-        IFile file = input.getFile();
+        projectFile = input.getFile();
+        setPartName(projectFile.getName());
+
+        activeProject = projectFile.getProject();
+        networkId = activeProject.getName();
 
         // Validate the input with openCONFIGURATOR project file schema.
         try {
             currentProject = OpenConfiguratorProjectMarshaller
-                    .unmarshallOpenConfiguratorProject(file.getContents());
+                    .unmarshallOpenConfiguratorProject(
+                            projectFile.getContents());
         } catch (FileNotFoundException | MalformedURLException | JAXBException
-                | SAXException | ParserConfigurationException | CoreException e) {
+                | SAXException | ParserConfigurationException
+                | CoreException e) {
             e.printStackTrace();
             throw new PartInitException(
                     IndustrialNetworkProjectEditor.INVALID_INPUT_ERROR);
         }
 
-        IProject activeProject = file.getProject();
-        networkId = activeProject.getName();
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
+                .CreateNetwork(networkId);
+        if (!libApiRes.IsSuccessful()) {
+            // Report error to the user using the dialog.
+            String errorMessage = OpenConfiguratorLibraryUtils
+                    .getErrorMessage(libApiRes);
+            System.err.println(errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(
+                    getSite().getShell(), errorMessage, null);
+            return;
+        }
 
-        setInput(editorInput);
-        setPartName(file.getName());
+        libApiRes = OpenConfiguratorLibraryUtils
+                .addOpenCONFIGURATORProject(currentProject, networkId);
+        if (!libApiRes.IsSuccessful()) {
+            // Report error to the user using the dialog.
+            String errorMessage = OpenConfiguratorLibraryUtils
+                    .getErrorMessage(libApiRes);
+            System.err.println(errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(
+                    getSite().getShell(), errorMessage, null);
+            return;
+        }
+
+        System.out.println("activeProject- path" + activeProject.getLocation());
+
+        PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                .showView(IndustrialNetworkView.ID);
+        initSuccessful = true;
     }
 
     /**
@@ -400,7 +434,9 @@ IResourceChangeListener {
      */
     @Override
     public boolean isDirty() {
-        return (editorPage.isDirty() || sourcePage.isDirty() || super.isDirty());
+
+        System.out.println(" super:" + super.isDirty());
+        return super.isDirty();
     }
 
     /**
@@ -417,44 +453,45 @@ IResourceChangeListener {
     @Override
     protected void pageChange(int newPageIndex) {
 
+        if ((getActivePage() == editorPage.getIndex()) && isDirty()) {
+            updateSourceToModel();
+        }
+
+        // check for update from the source code
+        if ((getActivePage() == sourcePage.getIndex()) && (isDirty())) {
+            updateModelToSource();
+        }
+
+        // check for updates to be propagated to the source code
+        // if (newPageIndex == sourcePage.getIndex()) {
+        // System.err.println("Currently in SourcePage and not dirty");
+        // updateSourceToModel();
+        // }
+
+        // switch page
         super.pageChange(newPageIndex);
 
-        if (sourcePage.getIndex() == newPageIndex) {
-            String openconfiguratorProjectSource = new String("");
-            try {
-                if (currentProject != null) {
-                    openconfiguratorProjectSource = OpenConfiguratorProjectMarshaller
-                            .marshallOpenConfiguratorProject(currentProject);
-                }
-            } catch (JAXBException e) {
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, 1, e.getMessage(), e);
-                ErrorDialog.openError(getSite().getShell(), null,
-                        IndustrialNetworkProjectEditor.MARSHALL_ERROR,
-                        errorStatus);
-                e.printStackTrace();
-            }
-            sourcePage.setContent(openconfiguratorProjectSource);
-
-            if (!editorPage.isDirty()) {
-                sourcePage.doSave(null);
-            }
+        // update page if needed
+        final IFormPage page = getActivePageInstance();
+        if (page != null) {
+            // TODO update form page with new model data
+            editorPage.setOpenCONFIGURATORProject(currentProject);
+            page.setFocus();
         }
 
-        if (editorPage != null) {
-            if (editorPage.getIndex() == newPageIndex) {
-                String editorText = getContent();
-                reloadFromSourceText(editorText);
-                editorPage.setOpenCONFIGURATORProject(currentProject);
-            }
-        }
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent event) {
+        // TODO Auto-generated method stub
+
     }
 
     /**
      * Reloads the project editor source page contents from the model.
      */
     public void reloadEditorContentsFromModel() {
-        setContent(getSource());
+        setContent(getModelData());
     }
 
     /**
@@ -470,8 +507,8 @@ IResourceChangeListener {
                     .unmarshallOpenConfiguratorProject(is);
         } catch (FileNotFoundException | MalformedURLException | JAXBException
                 | SAXException | ParserConfigurationException e) {
-            IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, 1, e.getMessage(), e);
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, e.getMessage(), e);
             ErrorDialog.openError(getSite().getShell(), null,
                     IndustrialNetworkProjectEditor.UNMARSHALL_ERROR,
                     errorStatus);
@@ -523,8 +560,8 @@ IResourceChangeListener {
             return;
         }
 
-        IResourceDelta oldDelta = delta.findMember(currentProjectFile
-                .getFullPath());
+        IResourceDelta oldDelta = delta
+                .findMember(currentProjectFile.getFullPath());
         if (oldDelta == null) {
             return;
         }
@@ -563,5 +600,22 @@ IResourceChangeListener {
      */
     private void setContent(String source) {
         getDocument().set(source);
+    }
+
+    /**
+     * Updates the openCONIGURATOR project model into the XML source file.
+     */
+    private void updateModelToSource() {
+        System.out.println("Model -> Source");
+        String dataFromModel = getModelData();
+        getDocument().set(dataFromModel);
+    }
+
+    /**
+     * Update the XML source into the openCONFIGURATOR project model
+     */
+    private void updateSourceToModel() {
+        System.out.println("Source -> model");
+        reloadFromSourceText(getContent());
     }
 }

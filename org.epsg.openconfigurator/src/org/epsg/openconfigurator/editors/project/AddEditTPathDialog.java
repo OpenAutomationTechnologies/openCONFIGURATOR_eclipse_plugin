@@ -199,7 +199,8 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
                 }
 
                 // Check if is ID already present in the model
-                if (!path.getId().equalsIgnoreCase(txtName.getText())
+                if ((path.getId() != null)
+                        && !path.getId().equalsIgnoreCase(txtName.getText())
                         && OpenConfiguratorProjectUtils.isPathIdAlreadyPresent(
                                 pathSettingsModel, txtName.getText())) {
                     setErrorMessage(AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);

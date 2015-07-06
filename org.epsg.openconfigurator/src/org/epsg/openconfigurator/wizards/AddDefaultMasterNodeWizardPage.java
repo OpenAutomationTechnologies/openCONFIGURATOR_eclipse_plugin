@@ -39,6 +39,7 @@ import java.nio.file.Paths;
 
 import javax.xml.bind.JAXBException;
 
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -121,7 +122,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
     private Button btnDefaultConfiguation;
 
     /**
-     * Defualt managing node name.
+     * Default managing node name.
      */
     private Text txtNodeName;
 
@@ -151,7 +152,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
     private TMN mn = new TMN();
 
     /**
-     * Falg to monitor the page completion.
+     * Flag to monitor the page completion.
      */
     private boolean pageComplete = false;
 
@@ -164,13 +165,13 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
                 null);
         setDescription(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARD_PAGE_DESCRIPTION);
 
-        String mnXddPath;
+        String mnXddPath = IOpenConfiguratorResource.DEFAULT_MN_XDD;
         try {
             mnXddPath = org.epsg.openconfigurator.Activator
                     .getAbsolutePath(IOpenConfiguratorResource.DEFAULT_MN_XDD);
         } catch (IOException e) {
             e.printStackTrace();
-            mnXddPath = "openPOWERLINK_MN.XDD";
+
             PluginErrorDialogUtils.displayErrorMessageDialog(
                     org.epsg.openconfigurator.Activator.getDefault()
                             .getWorkbench().getActiveWorkbenchWindow()
@@ -203,9 +204,9 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
 
             String targetImportPath = new String(
                     projectPath
-                            + File.separator
+                            + IPath.SEPARATOR
                             + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
-                            + File.separator + mnXdd.getFileName().toString());
+                            + IPath.SEPARATOR + mnXdd.getFileName().toString());
 
             // Copy the MN XDD to deviceImport dir
             java.nio.file.Files.copy(
@@ -227,9 +228,9 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
 
             String targetConfigurationPath = new String(
                     projectPath
-                            + File.separator
+                            + IPath.SEPARATOR
                             + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICECONFIGURATION
-                            + File.separator + extensionXdd
+                            + IPath.SEPARATOR + extensionXdd
                             + AddDefaultMasterNodeWizardPage.XDC_EXTENSION);
 
             java.nio.file.Files.copy(
@@ -244,7 +245,11 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             // Set the relative path to the MN object
             java.nio.file.Path pathRelative = pathBase.relativize(Paths
                     .get(targetConfigurationPath));
-            mn.setPathToXDC(pathRelative.toString());
+
+            String relativePath = pathRelative.toString();
+            relativePath = relativePath.replace('\\', '/');
+
+            mn.setPathToXDC(relativePath);
 
         } catch (UnsupportedOperationException | SecurityException
                 | IOException e) {
@@ -556,7 +561,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
      */
     private boolean isMnConfigurationValid(final String mnXddPath) {
         boolean retVal = false;
-        if (getMnConfiguration().isEmpty()) {
+        if (mnXddPath.isEmpty()) {
             return retVal;
         }
 
