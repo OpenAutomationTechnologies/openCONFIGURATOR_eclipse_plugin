@@ -12,12 +12,12 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * An abstract type for a POWERLINK node (MN or CN). 
- * 
+ * An abstract type for a POWERLINK node (MN or CN).
+ *
  * <p>Java class for tAbstractNode complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="tAbstractNode"&gt;
  *   &lt;complexContent&gt;
@@ -43,8 +43,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tAbstractNode", propOrder = {
@@ -52,7 +52,8 @@ import javax.xml.bind.annotation.XmlType;
 })
 @XmlSeeAlso({
     TCN.class,
-    TMN.class
+    TMN.class,
+    TRMN.class
 })
 public abstract class TAbstractNode {
 
@@ -69,11 +70,11 @@ public abstract class TAbstractNode {
 
     /**
      * Gets the value of the forcedObjects property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link TAbstractNode.ForcedObjects }
-     *     
+     *
      */
     public TAbstractNode.ForcedObjects getForcedObjects() {
         return forcedObjects;
@@ -81,11 +82,11 @@ public abstract class TAbstractNode {
 
     /**
      * Sets the value of the forcedObjects property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link TAbstractNode.ForcedObjects }
-     *     
+     *
      */
     public void setForcedObjects(TAbstractNode.ForcedObjects value) {
         this.forcedObjects = value;
@@ -93,11 +94,11 @@ public abstract class TAbstractNode {
 
     /**
      * Gets the value of the name property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getName() {
         return name;
@@ -105,11 +106,11 @@ public abstract class TAbstractNode {
 
     /**
      * Sets the value of the name property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setName(String value) {
         this.name = value;
@@ -117,11 +118,11 @@ public abstract class TAbstractNode {
 
     /**
      * Gets the value of the isAsyncOnly property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isIsAsyncOnly() {
         if (isAsyncOnly == null) {
@@ -133,11 +134,11 @@ public abstract class TAbstractNode {
 
     /**
      * Sets the value of the isAsyncOnly property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setIsAsyncOnly(Boolean value) {
         this.isAsyncOnly = value;
@@ -145,11 +146,11 @@ public abstract class TAbstractNode {
 
     /**
      * Gets the value of the isType1Router property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isIsType1Router() {
         if (isType1Router == null) {
@@ -161,11 +162,11 @@ public abstract class TAbstractNode {
 
     /**
      * Sets the value of the isType1Router property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setIsType1Router(Boolean value) {
         this.isType1Router = value;
@@ -173,11 +174,11 @@ public abstract class TAbstractNode {
 
     /**
      * Gets the value of the isType2Router property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isIsType2Router() {
         if (isType2Router == null) {
@@ -189,11 +190,11 @@ public abstract class TAbstractNode {
 
     /**
      * Sets the value of the isType2Router property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setIsType2Router(Boolean value) {
         this.isType2Router = value;
@@ -202,9 +203,9 @@ public abstract class TAbstractNode {
 
     /**
      * <p>Java class for anonymous complex type.
-     * 
+     *
      * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
+     *
      * <pre>
      * &lt;complexType&gt;
      *   &lt;complexContent&gt;
@@ -216,8 +217,8 @@ public abstract class TAbstractNode {
      *   &lt;/complexContent&gt;
      * &lt;/complexType&gt;
      * </pre>
-     * 
-     * 
+     *
+     *
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
@@ -230,25 +231,25 @@ public abstract class TAbstractNode {
 
         /**
          * Gets the value of the object property.
-         * 
+         *
          * <p>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the object property.
-         * 
+         *
          * <p>
          * For example, to add a new item, do as follows:
          * <pre>
          *    getObject().add(newItem);
          * </pre>
-         * 
-         * 
+         *
+         *
          * <p>
          * Objects of the following type(s) are allowed in the list
          * {@link Object }
-         * 
-         * 
+         *
+         *
          */
         public List<Object> getObject() {
             if (object == null) {

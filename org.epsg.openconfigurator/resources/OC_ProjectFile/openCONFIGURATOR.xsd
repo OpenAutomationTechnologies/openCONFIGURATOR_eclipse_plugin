@@ -28,14 +28,14 @@
                         <xs:selector xpath="."/>
                         <xs:field xpath="@activeAutoGenerationSetting"/>
                     </xs:keyref>
-                <xs:key name="activePathKey">
-                    <xs:selector xpath="./oc:PathSettings/oc:Path"/>
-                    <xs:field xpath="@id"/>
-                </xs:key>
-                <xs:keyref name="activePathKeyRef" refer="oc:activePathKey">
-                    <xs:selector xpath="./oc:PathSettings"/>
-                    <xs:field xpath="@activePath"/>
-                </xs:keyref>
+                    <xs:key name="activePathKey">
+                        <xs:selector xpath="./oc:PathSettings/oc:Path"/>
+                        <xs:field xpath="@id"/>
+                    </xs:key>
+                    <xs:keyref name="activePathKeyRef" refer="oc:activePathKey">
+                        <xs:selector xpath="./oc:PathSettings"/>
+                        <xs:field xpath="@activePath"/>
+                    </xs:keyref>
                 </xs:element>
                 <xs:element name="NetworkConfiguration" type="oc:tNetworkConfiguration"/>
             </xs:sequence>
@@ -43,19 +43,11 @@
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
                         The version of the openCONFIGURATOR project-file format. Changes in this schema require this attribute's value to be incremented.
-                        openCONFIGURATOR itself should be delivered with all versions of this XML-Schema to ensure backwards compatibility.
+                        openCONFIGURATOR itself should be delivered with all versions of this XML-Schema to ensure backward compatibility.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
         </xs:complexType>
-        <xs:key name="nodeIdKey">
-            <xs:selector xpath="./oc:NetworkConfiguration/oc:NodeCollection/oc:CN"/>
-            <xs:field xpath="@nodeID"/>
-        </xs:key>
-        <xs:keyref name="nodeIdKeyRef" refer="oc:nodeIdKey">
-            <xs:selector xpath="./oc:NetworkConfiguration/oc:NodeCollection/oc:MN/oc:RMNList/oc:RMN"/>
-            <xs:field xpath="@nodeID"/>
-        </xs:keyref>
     </xs:element>
     <xs:complexType name="tGenerator">
         <xs:annotation>
@@ -98,7 +90,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="PathSettings" minOccurs="0">
-            <xs:annotation>
+                <xs:annotation>
                     <xs:documentation xml:lang="en"> Element to store various path-references. </xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
@@ -152,7 +144,7 @@
         <xs:sequence>
             <xs:element name="NodeCollection" type="oc:tNodeCollection">
                 <xs:unique name="uniqueNodeID">
-                    <xs:selector xpath="./oc:MNNode | ./oc:CNNode"/>
+                    <xs:selector xpath="./oc:MN | ./oc:CN | ./oc:RMN"/>
                     <xs:field xpath="@nodeID"/>
                 </xs:unique>
             </xs:element>
@@ -202,6 +194,7 @@
         </xs:annotation>
         <xs:sequence>
             <xs:element name="MN" type="oc:tMN"/>
+            <xs:element name="RMN" type="oc:tRMN" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element name="CN" type="oc:tCN" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
     </xs:complexType>
@@ -273,7 +266,7 @@
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
                     Persists the configuration objects which are forced to the POWERLINK configuration.
-                </xs:documentation>
+                    </xs:documentation>
                 </xs:annotation>
                 <xs:complexType>
                     <xs:sequence minOccurs="1" maxOccurs="unbounded">
@@ -336,9 +329,9 @@
                             301, 0x1F81, Bit 2. </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute name="resetInOperational" type="xs:boolean" default="true">
+                <xs:attribute name="resetInOperational" type="xs:boolean" default="false">
                     <xs:annotation>
-                        <xs:documentation xml:lang="en"> "True" -> MN may reset node in CS_OPERATIONAL. "False" -> MN
+                        <xs:documentation xml:lang="en"> "False" -> MN may reset node in CS_OPERATIONAL. "True" -> MN
                             must not reset node in CS_OPERATIONAL. See EPSG DS 301, 0x1F81, Bit 4. </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
@@ -361,6 +354,7 @@
                 <xs:attribute name="verifyRevisionNumber" type="xs:boolean" default="false"/>
                 <xs:attribute name="verifyProductCode" type="xs:boolean" default="false"/>
                 <xs:attribute name="verifySerialNumber" type="xs:boolean" default="false"/>
+                <xs:attribute name="enabled" type="xs:boolean" default="true"/>
             </xs:extension>
         </xs:complexContent>
     </xs:complexType>
@@ -373,44 +367,11 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="oc:tAbstractNode">
-                <xs:sequence>
-                    <xs:element name="RMNList" minOccurs="0">
-                        <xs:annotation>
-                            <xs:documentation xml:lang="en">
-                                Contains a list of references to CNs which act as redundant MNs (RMNs).
-                            </xs:documentation>
-                        </xs:annotation>
-                        <xs:complexType>
-                            <xs:sequence>
-                                <xs:element name="RMN" maxOccurs="unbounded">
-                                    <xs:annotation>
-                                        <xs:documentation xml:lang="en">
-                                            A reference to a CN which acts as redundant MN (RMN).
-                                        </xs:documentation>
-                                    </xs:annotation>
-                                    <xs:complexType>
-                                        <xs:attribute name="nodeIDRef" use="required">
-                                            <xs:simpleType>
-                                                <xs:union memberTypes="oc:tDefaultRedundantMNNodeID oc:tRegularCNNodeID"/>
-                                            </xs:simpleType>
-                                        </xs:attribute>
-                                    </xs:complexType>
-                                </xs:element>
-                            </xs:sequence>
-                        </xs:complexType>
-                        <xs:unique name="uniqueNodeIDRef">
-                            <xs:selector xpath="./oc:RMN"/>
-                            <xs:field xpath="@nodeID"/>
-                        </xs:unique>
-                    </xs:element>
-                </xs:sequence>
                 <xs:attribute name="nodeID" type="xs:unsignedByte" use="required" fixed="240"/>
                 <xs:attribute name="pathToXDC">
                     <xs:annotation>
                         <xs:documentation xml:lang="en">
                             Pathname in UNIX-Style (forward slashes).
-                            Optional for MNs to support EPSG DS 302-A (High Availability).
-                            For High Availability, the MN-element contains a list of references (RMNList) to CN-elements which represent the redundant MNs.
                         </xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
@@ -445,6 +406,28 @@
                         <xs:restriction base="xs:unsignedByte">
                             <xs:minInclusive value="1"/>
                             <xs:maxInclusive value="254"/>
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:attribute>
+            </xs:extension>
+        </xs:complexContent>
+    </xs:complexType>
+    <xs:complexType name="tRMN">
+        <xs:annotation>
+            <xs:documentation xml:lang="en">A concrete type for a POWERLINK RMN.</xs:documentation>
+        </xs:annotation>
+        <xs:complexContent>
+            <xs:extension base="oc:tAbstractNode">
+                <xs:attribute name="nodeID" type="xs:unsignedByte" use="required"/>
+                <xs:attribute name="pathToXDC">
+                    <xs:annotation>
+                        <xs:documentation xml:lang="en">
+                            Pathname in UNIX-Style (forward slashes).
+                        </xs:documentation>
+                    </xs:annotation>
+                    <xs:simpleType>
+                        <xs:restriction base="xs:anyURI">
+                            <xs:minLength value="1"/>
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:attribute>

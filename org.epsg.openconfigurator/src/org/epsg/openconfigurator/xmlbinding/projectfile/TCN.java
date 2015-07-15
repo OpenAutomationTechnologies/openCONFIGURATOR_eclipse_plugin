@@ -9,11 +9,11 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A concrete type for a POWERLINK CN. 
- * 
+ *
  * <p>Java class for tCN complex type.
- * 
+ *
  * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ *
  * <pre>
  * &lt;complexType name="tCN"&gt;
  *   &lt;complexContent&gt;
@@ -36,7 +36,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="isChained" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="isMandatory" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="autostartNode" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
- *       &lt;attribute name="resetInOperational" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
+ *       &lt;attribute name="resetInOperational" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="verifyAppSwVersion" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="autoAppSwUpdateAllowed" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="verifyDeviceType" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
@@ -44,12 +44,13 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="verifyRevisionNumber" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="verifyProductCode" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="verifySerialNumber" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="enabled" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tCN")
@@ -87,14 +88,16 @@ public class TCN
     protected Boolean verifyProductCode;
     @XmlAttribute(name = "verifySerialNumber")
     protected Boolean verifySerialNumber;
+    @XmlAttribute(name = "enabled")
+    protected Boolean enabled;
 
     /**
      * Gets the value of the nodeID property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getNodeID() {
         return nodeID;
@@ -102,11 +105,11 @@ public class TCN
 
     /**
      * Sets the value of the nodeID property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setNodeID(String value) {
         this.nodeID = value;
@@ -114,11 +117,11 @@ public class TCN
 
     /**
      * Gets the value of the pathToXDC property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link String }
-     *     
+     *
      */
     public String getPathToXDC() {
         return pathToXDC;
@@ -126,11 +129,11 @@ public class TCN
 
     /**
      * Sets the value of the pathToXDC property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link String }
-     *     
+     *
      */
     public void setPathToXDC(String value) {
         this.pathToXDC = value;
@@ -138,11 +141,11 @@ public class TCN
 
     /**
      * Gets the value of the isMultiplexed property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isIsMultiplexed() {
         if (isMultiplexed == null) {
@@ -154,11 +157,11 @@ public class TCN
 
     /**
      * Sets the value of the isMultiplexed property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setIsMultiplexed(Boolean value) {
         this.isMultiplexed = value;
@@ -166,11 +169,11 @@ public class TCN
 
     /**
      * Gets the value of the forcedMultiplexedCycle property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Integer }
-     *     
+     *
      */
     public int getForcedMultiplexedCycle() {
         if (forcedMultiplexedCycle == null) {
@@ -182,11 +185,11 @@ public class TCN
 
     /**
      * Sets the value of the forcedMultiplexedCycle property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Integer }
-     *     
+     *
      */
     public void setForcedMultiplexedCycle(Integer value) {
         this.forcedMultiplexedCycle = value;
@@ -194,11 +197,11 @@ public class TCN
 
     /**
      * Gets the value of the isChained property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isIsChained() {
         if (isChained == null) {
@@ -210,11 +213,11 @@ public class TCN
 
     /**
      * Sets the value of the isChained property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setIsChained(Boolean value) {
         this.isChained = value;
@@ -222,11 +225,11 @@ public class TCN
 
     /**
      * Gets the value of the isMandatory property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isIsMandatory() {
         if (isMandatory == null) {
@@ -238,11 +241,11 @@ public class TCN
 
     /**
      * Sets the value of the isMandatory property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setIsMandatory(Boolean value) {
         this.isMandatory = value;
@@ -250,11 +253,11 @@ public class TCN
 
     /**
      * Gets the value of the autostartNode property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isAutostartNode() {
         if (autostartNode == null) {
@@ -266,11 +269,11 @@ public class TCN
 
     /**
      * Sets the value of the autostartNode property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setAutostartNode(Boolean value) {
         this.autostartNode = value;
@@ -278,15 +281,15 @@ public class TCN
 
     /**
      * Gets the value of the resetInOperational property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isResetInOperational() {
         if (resetInOperational == null) {
-            return true;
+            return false;
         } else {
             return resetInOperational;
         }
@@ -294,11 +297,11 @@ public class TCN
 
     /**
      * Sets the value of the resetInOperational property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setResetInOperational(Boolean value) {
         this.resetInOperational = value;
@@ -306,11 +309,11 @@ public class TCN
 
     /**
      * Gets the value of the verifyAppSwVersion property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isVerifyAppSwVersion() {
         if (verifyAppSwVersion == null) {
@@ -322,11 +325,11 @@ public class TCN
 
     /**
      * Sets the value of the verifyAppSwVersion property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setVerifyAppSwVersion(Boolean value) {
         this.verifyAppSwVersion = value;
@@ -334,11 +337,11 @@ public class TCN
 
     /**
      * Gets the value of the autoAppSwUpdateAllowed property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isAutoAppSwUpdateAllowed() {
         if (autoAppSwUpdateAllowed == null) {
@@ -350,11 +353,11 @@ public class TCN
 
     /**
      * Sets the value of the autoAppSwUpdateAllowed property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setAutoAppSwUpdateAllowed(Boolean value) {
         this.autoAppSwUpdateAllowed = value;
@@ -362,11 +365,11 @@ public class TCN
 
     /**
      * Gets the value of the verifyDeviceType property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isVerifyDeviceType() {
         if (verifyDeviceType == null) {
@@ -378,11 +381,11 @@ public class TCN
 
     /**
      * Sets the value of the verifyDeviceType property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setVerifyDeviceType(Boolean value) {
         this.verifyDeviceType = value;
@@ -390,11 +393,11 @@ public class TCN
 
     /**
      * Gets the value of the verifyVendorId property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isVerifyVendorId() {
         if (verifyVendorId == null) {
@@ -406,11 +409,11 @@ public class TCN
 
     /**
      * Sets the value of the verifyVendorId property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setVerifyVendorId(Boolean value) {
         this.verifyVendorId = value;
@@ -418,11 +421,11 @@ public class TCN
 
     /**
      * Gets the value of the verifyRevisionNumber property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isVerifyRevisionNumber() {
         if (verifyRevisionNumber == null) {
@@ -434,11 +437,11 @@ public class TCN
 
     /**
      * Sets the value of the verifyRevisionNumber property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setVerifyRevisionNumber(Boolean value) {
         this.verifyRevisionNumber = value;
@@ -446,11 +449,11 @@ public class TCN
 
     /**
      * Gets the value of the verifyProductCode property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isVerifyProductCode() {
         if (verifyProductCode == null) {
@@ -462,11 +465,11 @@ public class TCN
 
     /**
      * Sets the value of the verifyProductCode property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setVerifyProductCode(Boolean value) {
         this.verifyProductCode = value;
@@ -474,11 +477,11 @@ public class TCN
 
     /**
      * Gets the value of the verifySerialNumber property.
-     * 
+     *
      * @return
      *     possible object is
      *     {@link Boolean }
-     *     
+     *
      */
     public boolean isVerifySerialNumber() {
         if (verifySerialNumber == null) {
@@ -490,14 +493,42 @@ public class TCN
 
     /**
      * Sets the value of the verifySerialNumber property.
-     * 
+     *
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *     
+     *
      */
     public void setVerifySerialNumber(Boolean value) {
         this.verifySerialNumber = value;
+    }
+
+    /**
+     * Gets the value of the enabled property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isEnabled() {
+        if (enabled == null) {
+            return true;
+        } else {
+            return enabled;
+        }
+    }
+
+    /**
+     * Sets the value of the enabled property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     * 
+     */
+    public void setEnabled(Boolean value) {
+        this.enabled = value;
     }
 
 }
