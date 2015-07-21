@@ -35,6 +35,8 @@ import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,6 +53,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -71,6 +74,7 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
@@ -130,6 +134,11 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * openCONFIGURATOR project model
      */
     private OpenCONFIGURATORProject currentProject;
+
+    /**
+     * List of nodes available in the project.
+     */
+    private Map<Short, Node> nodeCollection = new HashMap<Short, Node>();
 
     /**
      * Flag to check for the library initialization
@@ -337,6 +346,13 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     }
 
     /**
+     * @return Returns the XDD files.
+     */
+    public Map<Short, Node> getNodeCollection() {
+        return nodeCollection;
+    }
+
+    /**
      * @return The IFile instance of the openCONFIGURATOR project XML file.
      */
     public IFile getProjectFile() {
@@ -422,6 +438,24 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         }
 
         System.out.println("activeProject- path" + activeProject.getLocation());
+
+        final Job importNodeXdcJob = new Job("Import node XDD/XDC") {
+
+            @Override
+            protected IStatus run(IProgressMonitor monitor) {
+
+                TNetworkConfiguration networkCfg = currentProject
+                        .getNetworkConfiguration();
+                int totalWork = 1
+                        + networkCfg.getNodeCollection().getCN().size()
+                        + networkCfg.getNodeCollection().getRMN().size();
+                monitor.beginTask("Import MN XDD/XDC", totalWork);
+                return OpenConfiguratorProjectUtils.importNodes(projectFile,
+                        networkCfg, nodeCollection, monitor);
+            }
+        };
+
+        importNodeXdcJob.schedule();
 
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
                 .showView(IndustrialNetworkView.ID);
