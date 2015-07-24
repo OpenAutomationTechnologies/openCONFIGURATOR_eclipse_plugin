@@ -74,7 +74,9 @@ import org.eclipse.ui.texteditor.IDocumentProvider;
 import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.Path;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
@@ -82,6 +84,8 @@ import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration.PathSettings;
 import org.xml.sax.SAXException;
 
 /**
@@ -357,6 +361,42 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     public IFile getProjectFile() {
         return projectFile;
+    }
+
+    /**
+     * @return Returns the output path settings from the project XML.
+     */
+    public Path getProjectOutputPath() {
+        PathSettings pathSett = currentProject.getProjectConfiguration()
+                .getPathSettings();
+        String activeOutputPathID = pathSett.getActivePath();
+        if (activeOutputPathID == null) {
+            if (!pathSett.getPath().isEmpty()) {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, "defaultOutputPath");
+                if (defaultPath != null) {
+                    return new Path(activeProject, defaultPath.getPath(), true);
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. defaultPath not found");
+                }
+            }
+        } else {
+            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
+                    activeOutputPathID);
+            if (defaultPath != null) {
+                if (!defaultPath.getId()
+                        .equalsIgnoreCase("defaultOutputPath")) {
+                    return new Path(activeProject, defaultPath.getPath(),
+                            false);
+                }
+            } else {
+                System.err.println(
+                        "Unhandled error occurred. activeOutputPath not found");
+            }
+        }
+        return new Path(activeProject,
+                IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
     }
 
     /**

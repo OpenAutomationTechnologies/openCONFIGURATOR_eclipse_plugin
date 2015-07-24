@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file   IPowerlinkProjectSupport.java
+ * @file   Path.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -31,27 +31,42 @@
 
 package org.epsg.openconfigurator.model;
 
+import org.eclipse.core.resources.IProject;
+
 /**
- * Project support constants.
+ * Utility class to wrap the location
  *
  * @author Ramakrishnan P
  *
  */
-public interface IPowerlinkProjectSupport {
+public class Path {
+    /**
+     * Flag to set the path is available in workspace or not.
+     */
+    private boolean local;
 
-    public static final String MN_OBD_TXT = "mnobd.txt"; //$NON-NLS-1$
-    public static final String MN_OBD_CDC = "mnobd.cdc"; //$NON-NLS-1$
-    public static final String MN_OBD_CHAR_TXT = "mnobd_char.txt"; //$NON-NLS-1$
-    public static final String XAP_H = "xap.h"; //$NON-NLS-1$
-    public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
-    public static final String PROCESSIMAGE_CS = "ProcessImage.cs"; //$NON-NLS-1$
+    /**
+     * The location.
+     */
+    private String path;
 
-    public static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
-        MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
+    /**
+     * The eclipse project reference.
+     */
+    private IProject project;
 
-    public static final String DEVICE_IMPORT_DIR = "deviceImport";
-    public static final String DEVICE_CONFIGURATION_DIR = "deviceConfiguration";
-    public static final String DEFAULT_OUTPUT_DIR = "output";
+    public Path(IProject project, String path, boolean local) {
+        this.project = project;
+        this.path = path;
+        this.local = local;
+    }
 
-    public static final String UTF8_ENCODING = "UTF-8";
+    public String getPath() {
+        return path;
+    }
+
+    public boolean isLocal() {
+        return local;
+    }
+
 }

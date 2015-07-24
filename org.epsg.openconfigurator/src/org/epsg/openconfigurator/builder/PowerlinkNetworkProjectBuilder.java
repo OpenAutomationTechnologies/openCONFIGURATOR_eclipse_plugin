@@ -31,186 +31,625 @@
 
 package org.epsg.openconfigurator.builder;
 
+import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.file.DirectoryNotEmptyException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.NoSuchFileException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
-
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
-import org.xml.sax.helpers.DefaultHandler;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.epsg.openconfigurator.Activator;
+import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
+import org.epsg.openconfigurator.lib.wrapper.ByteCollection;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.Path;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 
+/**
+ * Builder implementation for POWERLINK project.
+ *
+ * @author Ramakrishnan P
+ *
+ */
 public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
-
-    class SampleDeltaVisitor implements IResourceDeltaVisitor {
-        /*
-         * (non-Javadoc)
-         * 
-         * @see
-         * org.eclipse.core.resources.IResourceDeltaVisitor#visit(org.eclipse
-         * .core.resources.IResourceDelta)
-         */
-        @Override
-        public boolean visit(IResourceDelta delta) throws CoreException {
-            IResource resource = delta.getResource();
-            switch (delta.getKind()) {
-                case IResourceDelta.ADDED:
-                    // handle added resource
-                    checkXML(resource);
-                    break;
-                case IResourceDelta.REMOVED:
-                    // handle removed resource
-                    break;
-                case IResourceDelta.CHANGED:
-                    // handle changed resource
-                    checkXML(resource);
-                    break;
-            }
-            // return true to continue visiting children.
-            return true;
-        }
-    }
-
-    class SampleResourceVisitor implements IResourceVisitor {
-        @Override
-        public boolean visit(IResource resource) {
-            checkXML(resource);
-            // return true to continue visiting children.
-            return true;
-        }
-    }
-
-    class XMLErrorHandler extends DefaultHandler {
-
-        private IFile file;
-
-        public XMLErrorHandler(IFile file) {
-            this.file = file;
-        }
-
-        private void addMarker(SAXParseException e, int severity) {
-            PowerlinkNetworkProjectBuilder.this.addMarker(file, e.getMessage(),
-                    e.getLineNumber(), severity);
-        }
-
-        @Override
-        public void error(SAXParseException exception) throws SAXException {
-            this.addMarker(exception, IMarker.SEVERITY_ERROR);
-        }
-
-        @Override
-        public void fatalError(SAXParseException exception) throws SAXException {
-            this.addMarker(exception, IMarker.SEVERITY_ERROR);
-        }
-
-        @Override
-        public void warning(SAXParseException exception) throws SAXException {
-            this.addMarker(exception, IMarker.SEVERITY_WARNING);
-        }
-    }
 
     public static final String BUILDER_ID = "org.epsg.openconfigurator.industrialNetworkBuilder";
 
-    private static final String MARKER_TYPE = "org.epsg.openconfigurator.xmlProblem";
-
-    private SAXParserFactory parserFactory;
-
-    private void addMarker(IFile file, String message, int lineNumber,
-            int severity) {
-        try {
-            IMarker marker = file
-                    .createMarker(PowerlinkNetworkProjectBuilder.MARKER_TYPE);
-            marker.setAttribute(IMarker.MESSAGE, message);
-            marker.setAttribute(IMarker.SEVERITY, severity);
-            if (lineNumber == -1) {
-                lineNumber = 1;
+    /**
+     * The list of Industrial network project editors wherein the library has
+     * only knowledge about the projects which are open via
+     * IndustrialNetworkProjectEditor.
+     *
+     * @return The list of Industrial network project editors.
+     */
+    private static List<IndustrialNetworkProjectEditor> getOpenProjectEditors() {
+        List<IndustrialNetworkProjectEditor> projectEditors = new ArrayList<IndustrialNetworkProjectEditor>();
+        IWorkbenchWindow workbenchWindows[] = PlatformUI.getWorkbench()
+                .getWorkbenchWindows();
+        for (IWorkbenchWindow window : workbenchWindows) {
+            IEditorReference[] editors = window.getActivePage()
+                    .getEditorReferences();
+            for (IEditorReference editor : editors) {
+                if (editor.getEditor(
+                        false) instanceof IndustrialNetworkProjectEditor) {
+                    IndustrialNetworkProjectEditor pjtEditor = (IndustrialNetworkProjectEditor) editor
+                            .getEditor(false);
+                    projectEditors.add(pjtEditor);
+                }
             }
-            marker.setAttribute(IMarker.LINE_NUMBER, lineNumber);
-        } catch (CoreException e) {
         }
+
+        return projectEditors;
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.core.internal.events.InternalBuilder#build(int,
      * java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    protected IProject[] build(int kind, Map args, IProgressMonitor monitor)
-            throws CoreException {
-        System.out.println("Builder executed");
-        if (kind == IncrementalProjectBuilder.FULL_BUILD) {
-            fullBuild(monitor);
-        } else {
-            IResourceDelta delta = getDelta(getProject());
-            if (delta == null) {
-                fullBuild(monitor);
+    protected IProject[] build(final int kind, Map args,
+            IProgressMonitor monitor) throws CoreException {
+        forgetLastBuiltState();
 
-            } else {
-                incrementalBuild(delta, monitor);
-            }
+        switch (kind) {
+            case IncrementalProjectBuilder.FULL_BUILD:
+            case IncrementalProjectBuilder.CLEAN_BUILD:
+            case IncrementalProjectBuilder.INCREMENTAL_BUILD:
+                fullBuild(monitor);
+                break;
+            case IncrementalProjectBuilder.AUTO_BUILD:
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        MessageDialog msd = new MessageDialog(
+                                Display.getDefault().getActiveShell(),
+                                "Build project", null,
+                                "Does not support 'Build Automatically'. Use clean then build project."
+                                        + kind,
+                                0, new String[] { "Ok" }, 0);
+                        msd.open();
+                    }
+                });
+                break;
+            default:
+                System.err.println("Un supported build type" + kind);
+                break;
         }
+
         return null;
     }
 
-    void checkXML(IResource resource) {
-        if ((resource instanceof IFile) && resource.getName().endsWith(".xml")) {
-            IFile file = (IFile) resource;
-            deleteMarkers(file);
-            XMLErrorHandler reporter = new XMLErrorHandler(file);
+    /**
+     * Build the concise device configuration outputs in the specified output
+     * path.
+     *
+     * @param networkId The network ID.
+     * @param outputpath The location to save the output files.
+     * @param monitor Monitor instance to update the progress activity.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean buildConciseDeviceConfiguration(final String networkId,
+            java.nio.file.Path outputpath, final IProgressMonitor monitor)
+                    throws CoreException {
+
+        String configurationOutput[] = new String[1];
+        ByteCollection cdcByteCollection = new ByteCollection();
+
+        Result res = OpenConfiguratorCore.GetInstance().BuildConfiguration(
+                networkId, configurationOutput, cdcByteCollection);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // TODO print to target console.
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+
             try {
-                getParser().parse(file.getContents(), reporter);
-            } catch (Exception e1) {
+                if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
+                    Files.createDirectory(outputpath);
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, 1, "Output path:"
+                                + outputpath.toString() + " does not exist.",
+                        null);
+                throw new CoreException(errorStatus);
+            }
+
+            // String[1] is always empty.
+            boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
+            if (!retVal) {
+                return retVal;
+            }
+
+            ByteBuffer buffer = ByteBuffer
+                    .allocate((int) cdcByteCollection.size());
+
+            for (int i = 0; i < cdcByteCollection.size(); i++) {
+                short value = cdcByteCollection.get(i);
+                // buffer.putShort(value);
+                buffer.put((byte) (value & 0xFF));
+                // buffer.put((byte) ((value >> 8) & 0xff));
+            }
+
+            retVal = createMnobdCdc(outputpath, buffer);
+            if (!retVal) {
+                return retVal;
+            }
+
+            retVal = createMnobdHexTxt(outputpath, buffer);
+            if (!retVal) {
+                return retVal;
             }
         }
+
+        return true;
     }
 
+    /**
+     * Writes the processimage variables for the specified node ID. The format
+     * is usable in the 'C' language.
+     *
+     * @param networkId The network ID.
+     * @param nodeId The node for which the processimage to be generated.
+     * @param targetPath The location to save the output file.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean buildCProcessImage(String networkId, short nodeId,
+            java.nio.file.Path targetPath) throws CoreException {
+        String piDataOutput[] = new String[1];
+        Result res = OpenConfiguratorCore.GetInstance()
+                .BuildCProcessImage(networkId, nodeId, piDataOutput);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // TODO print to target console.
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+            java.nio.file.Path targetFilePath = targetPath
+                    .resolve(IPowerlinkProjectSupport.XAP_H);
+
+            try {
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectory(targetPath);
+                }
+                Files.write(targetFilePath, piDataOutput[0].getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, 1,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        null);
+                throw new CoreException(errorStatus);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Writes the processimage variables for the specified node ID. The format
+     * is usable in the 'C#' language.
+     *
+     * @param networkId The network ID.
+     * @param nodeId The node for which the processimage to be generated.
+     * @param targetPath The location to save the output file.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean buildCSharpProcessImage(String networkId, short nodeId,
+            java.nio.file.Path targetPath) throws CoreException {
+        String piDataOutput[] = new String[1];
+        Result res = OpenConfiguratorCore.GetInstance()
+                .BuildNETProcessImage(networkId, nodeId, piDataOutput);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // TODO print to target console.
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+            java.nio.file.Path targetFilePath = targetPath
+                    .resolve(IPowerlinkProjectSupport.PROCESSIMAGE_CS);
+
+            try {
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectory(targetPath);
+                }
+                Files.write(targetFilePath, piDataOutput[0].getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, 1,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        null);
+                throw new CoreException(errorStatus);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Build the ProcessImage descriptions for currently active project.
+     *
+     * @param networkId The network ID.
+     * @param outputpath The location to save the output files.
+     * @param monitor Monitor instance to update the progress activity.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean buildProcessImageDescriptions(String networkId,
+            java.nio.file.Path targetPath, IProgressMonitor monitor)
+                    throws CoreException {
+
+        ByteCollection nodeIdCollection = new ByteCollection();
+        Result res = OpenConfiguratorCore.GetInstance()
+                .GetAvailableNodeIds(networkId, nodeIdCollection);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // TODO print to target console.
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        }
+
+        boolean ret = false;
+        for (int i = 0; i < nodeIdCollection.size(); i++) {
+            short value = nodeIdCollection.get(i);
+            java.nio.file.Path processImagePath = targetPath;
+            if (value != 240) {
+                processImagePath = processImagePath
+                        .resolve(String.valueOf(value));
+                // NOTE: Remove 'continue' to generate the Individual CN's PI
+                // descriptions.
+                continue;
+            }
+            ret = buildCProcessImage(networkId, value, processImagePath);
+            ret = buildXmlProcessImage(networkId, value, processImagePath);
+            ret = buildCSharpProcessImage(networkId, value, processImagePath);
+        }
+        return ret;
+    }
+
+    /**
+     * Writes the processimage variables for the specified node ID. The
+     * processimage variable are available in the XML format.
+     *
+     * @param networkId The network ID.
+     * @param nodeId The node for which the processimage to be generated.
+     * @param targetPath The location to save the output file.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean buildXmlProcessImage(String networkId, short nodeId,
+            java.nio.file.Path targetPath) throws CoreException {
+        String piDataOutput[] = new String[1];
+        Result res = OpenConfiguratorCore.GetInstance()
+                .BuildXMLProcessImage(networkId, nodeId, piDataOutput);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // TODO print to target console.
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+            java.nio.file.Path targetFilePath = targetPath
+                    .resolve(IPowerlinkProjectSupport.XAP_XML);
+
+            try {
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectory(targetPath);
+                }
+                Files.write(targetFilePath, piDataOutput[0].getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, 1,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        null);
+                throw new CoreException(errorStatus);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Cleans the generated output files. The list of output files are available
+     * in {@link IPowerlinkProjectSupport}
+     */
     @Override
     protected void clean(IProgressMonitor monitor) throws CoreException {
-        // delete markers set and files created
-        getProject().deleteMarkers(PowerlinkNetworkProjectBuilder.MARKER_TYPE,
-                true, IResource.DEPTH_INFINITE);
-    }
 
-    private void deleteMarkers(IFile file) {
-        try {
-            file.deleteMarkers(PowerlinkNetworkProjectBuilder.MARKER_TYPE,
-                    false, IResource.DEPTH_ZERO);
-        } catch (CoreException ce) {
+        List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
+        for (IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
+
+            String networkId = pjtEditor.getNetworkId();
+            if (getProject().getName().compareTo(networkId) != 0) {
+                continue;
+            }
+
+            Path outputpath = pjtEditor.getProjectOutputPath();
+
+            java.nio.file.Path targetPath;
+
+            if (outputpath.isLocal()) {
+                targetPath = FileSystems.getDefault().getPath(
+                        getProject().getLocation().toString(),
+                        outputpath.getPath());
+            } else {
+                targetPath = FileSystems.getDefault()
+                        .getPath(outputpath.getPath());
+            }
+
+            for (String outputFile : IPowerlinkProjectSupport.OUTPUT_FILES) {
+                java.nio.file.Path targetFilePath = targetPath
+                        .resolve(outputFile);
+                if (Files.exists(targetFilePath, LinkOption.NOFOLLOW_LINKS)) {
+                    try {
+                        Files.delete(targetFilePath);
+                    } catch (NoSuchFileException x) {
+                        System.err.format(
+                                "%s: no such" + " file or directory%n",
+                                targetPath);
+                    } catch (DirectoryNotEmptyException x) {
+                        System.err.format("%s not empty%n", targetPath);
+                    } catch (IOException x) {
+                        System.err.println(x);
+                    }
+                }
+            }
+
+            getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
         }
+        System.out.println(
+                "Project:" + getProject().getName() + " Clean successful");
     }
 
+    /**
+     * Create the mnobd.cdc in the specified output folder.
+     *
+     * @param outputFolder Location to save the file.
+     * @param buffer The file contents.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean createMnobdCdc(java.nio.file.Path outputFolder,
+            ByteBuffer buffer) throws CoreException {
+
+        java.nio.file.Path targetFilePath = outputFolder
+                .resolve(IPowerlinkProjectSupport.MN_OBD_CDC);
+
+        try {
+            Files.write(targetFilePath, buffer.array());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, 1, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    null);
+            throw new CoreException(errorStatus);
+        }
+
+        return true;
+    }
+
+    /**
+     * Create the mnobd_char.txt in the specified output folder.
+     *
+     * @param outputFolder Location to save the file.
+     * @param buffer The file contents.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean createMnobdHexTxt(java.nio.file.Path outputFolder,
+            ByteBuffer buffer) throws CoreException {
+
+        StringBuilder sb = new StringBuilder();
+        byte[] txtArray = buffer.array();
+        short lineBreakCount = 0;
+        for (Byte bs : txtArray) {
+            sb.append("0x"); //$NON-NLS-1$
+            sb.append(String.format("%02X", bs)); //$NON-NLS-1$
+            sb.append(","); //$NON-NLS-1$
+            lineBreakCount++;
+
+            if (lineBreakCount == 16) {
+                sb.append(System.lineSeparator());
+                lineBreakCount = 0;
+            } else {
+                sb.append(" "); //$NON-NLS-1$
+            }
+        }
+
+        java.nio.file.Path targetFilePath = outputFolder
+                .resolve(IPowerlinkProjectSupport.MN_OBD_CHAR_TXT);
+
+        try {
+            Files.write(targetFilePath, sb.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, 1, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    null);
+            throw new CoreException(errorStatus);
+        }
+        return true;
+    }
+
+    /**
+     * Create the mnobd.txt in the specified output folder.
+     *
+     * @param outputFolder Location to save the file.
+     * @param configuration The file contents.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private boolean createMnobdTxt(java.nio.file.Path outputFolder,
+            final String configuration) throws CoreException {
+
+        java.nio.file.Path targetFilePath = outputFolder
+                .resolve(IPowerlinkProjectSupport.MN_OBD_TXT);
+
+        try {
+            Files.write(targetFilePath, configuration.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, 1, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    null);
+            throw new CoreException(errorStatus);
+        }
+
+        return true;
+    }
+
+    /**
+     * Invokes a full build process on the the available projects.
+     *
+     * @param monitor Monitor instance to update the progress activity.
+     * @throws CoreException
+     */
     protected void fullBuild(final IProgressMonitor monitor)
             throws CoreException {
-        try {
-            getProject().accept(new SampleResourceVisitor());
-        } catch (CoreException e) {
-        }
-    }
 
-    private SAXParser getParser() throws ParserConfigurationException,
-            SAXException {
-        if (parserFactory == null) {
-            parserFactory = SAXParserFactory.newInstance();
-        }
-        return parserFactory.newSAXParser();
-    }
+        // Auto save all the open editors
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
+                for (IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
+                    if (pjtEditor.isDirty()) {
+                        pjtEditor.doSave(monitor);
+                    }
+                }
+            }
+        });
 
-    protected void incrementalBuild(IResourceDelta delta,
-            IProgressMonitor monitor) throws CoreException {
-        // the visitor does the work.
-        delta.accept(new SampleDeltaVisitor());
+        List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
+        for (IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
+
+            final String networkId = pjtEditor.getNetworkId();
+            if (getProject().getName().compareTo(networkId) != 0) {
+                continue;
+            }
+            if (pjtEditor.getNodeCollection().isEmpty()) {
+                return;
+            }
+
+            getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+            long buildStartTime = System.currentTimeMillis();
+
+            Path outputpath = pjtEditor.getProjectOutputPath();
+
+            final java.nio.file.Path targetPath;
+
+            if (outputpath.isLocal()) {
+                targetPath = FileSystems.getDefault().getPath(
+                        getProject().getLocation().toString(),
+                        outputpath.getPath());
+            } else {
+                targetPath = FileSystems.getDefault()
+                        .getPath(outputpath.getPath());
+            }
+
+            boolean buildCdcSuccess = buildConciseDeviceConfiguration(networkId,
+                    targetPath, monitor);
+            if (buildCdcSuccess) {
+
+                System.out.println("Project: " + networkId
+                        + ". Successfully generated mnobd.txt, mnobd.cdc, mnobd_char.txt.");
+
+                boolean buildPiSuccess = buildProcessImageDescriptions(
+                        networkId, targetPath, monitor);
+                if (!buildPiSuccess) {
+                    System.err.println("Project: " + networkId
+                            + ". Failed to generate processimage data. Xap.h, Xap.xml, processimage.cs are not generated!");
+                }
+
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            BuildMessageDialog msd = new BuildMessageDialog(
+                                    null, "Build project", null,
+                                    "Build project '" + networkId
+                                            + "' completed.\n"
+                                            + "Output files are generated in the location:\n"
+                                            + targetPath.toString());
+                            msd.open();
+
+                            if (msd.isOutputPathToBeShown()) {
+                                java.awt.Desktop.getDesktop()
+                                        .open(targetPath.toFile());
+                            }
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                });
+
+                try {
+                    pjtEditor.persistLibraryData(monitor);
+                } catch (InterruptedException e) {
+                    IStatus errorStatus = new Status(IStatus.ERROR,
+                            Activator.PLUGIN_ID, 1, e.getMessage(), null);
+                    throw new CoreException(errorStatus);
+                }
+            } else {
+                String errorStr = "Project: " + networkId
+                        + ". Failed to generate CDC. Xap.h, Xap.xml, processimage.cs are not generated!";
+                // TODO print to target console.
+                System.err.println(errorStr);
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, 1, errorStr, null);
+                throw new CoreException(errorStatus);
+            }
+
+            getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+
+            long buildEndTime = System.currentTimeMillis();
+            final long totalTimeInSeconds = (buildEndTime - buildStartTime)
+                    / 1000;
+            System.out
+                    .println("Build completed in " + totalTimeInSeconds + "s");
+
+        }
     }
 }
