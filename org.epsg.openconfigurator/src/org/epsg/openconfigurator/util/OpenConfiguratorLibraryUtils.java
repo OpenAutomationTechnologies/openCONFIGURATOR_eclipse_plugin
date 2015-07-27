@@ -1743,4 +1743,26 @@ public class OpenConfiguratorLibraryUtils {
         System.loadLibrary("openconfigurator_core_lib"); //$NON-NLS-1$
         System.loadLibrary("openconfigurator_core_wrapper_java"); //$NON-NLS-1$
     }
+
+    /**
+     * Remove the node from the library.
+     *
+     * @param node The node instance.
+     * @return Result from the openCONFIGURATOR library.
+     */
+    public static Result removeNode(Node node) {
+        return OpenConfiguratorCore.GetInstance()
+                .RemoveNode(node.getNetworkId(), node.getNodeId());
+    }
+
+    /**
+     * Toggles the enable disable flag in the openCONFIGURATOR library.
+     *
+     * @param node The node instance.
+     * @return Result from the openCONFIGURATOR library.
+     */
+    public static Result toggleEnableDisable(Node node) {
+        return OpenConfiguratorCore.GetInstance().EnableNode(
+                node.getNetworkId(), node.getNodeId(), !node.isEnabled());
+    }
 }

@@ -34,8 +34,9 @@
 package org.epsg.openconfigurator.views;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
@@ -44,107 +45,74 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.IStructuredContentProvider;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISharedImages;
-import org.eclipse.ui.IWorkbenchActionConstants;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.DrillDownAdapter;
 import org.eclipse.ui.part.ViewPart;
+import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.resources.IPluginImages;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 
 /**
- * This sample class demonstrates how to plug-in a new workbench view. The view
- * shows data obtained from the model. The sample creates a dummy model on the
- * fly, but a real implementation would connect to the model available either in
- * this or another plug-in (e.g. the workspace). The view is connected to the
- * model using a content provider.
- * <p>
- * The view uses a label provider to define how model objects should be
- * presented in the view. Each view can present the same model objects using
- * different labels and icons, if needed. Alternatively, a single label provider
- * can be shared between views in order to ensure that objects of the same type
- * are presented in the same way everywhere.
- * <p>
+ * Industrial network view to list all the nodes available in the project.
+ *
+ * @author Ramakrishnan P
+ *
  */
-public class IndustrialNetworkView extends ViewPart {
+public class IndustrialNetworkView extends ViewPart
+        implements ILinkedWithEditorView, IPropertyListener {
 
-    class NameSorter extends ViewerSorter {
-    }
-
-    class TreeObject implements IAdaptable {
-        private String name;
-        private TreeParent parent;
-
-        public TreeObject(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public Object getAdapter(Class key) {
-            return null;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public TreeParent getParent() {
-            return parent;
-        }
-
-        public void setParent(TreeParent parent) {
-            this.parent = parent;
-        }
-
+    /**
+     * Class to bind zero nodes with the tree view.
+     *
+     * @author Ramakrishnan P
+     *
+     */
+    private class EmptyNetworkView {
         @Override
         public String toString() {
-            return getName();
+            return "Network elements not available.";
         }
     }
 
-    class TreeParent extends TreeObject {
-        private ArrayList children;
-
-        public TreeParent(String name) {
-            super(name);
-            children = new ArrayList();
-        }
-
-        public void addChild(TreeObject child) {
-            children.add(child);
-            child.setParent(this);
-        }
-
-        public TreeObject[] getChildren() {
-            return (TreeObject[]) children.toArray(new TreeObject[children
-                    .size()]);
-        }
-
-        public boolean hasChildren() {
-            return children.size() > 0;
-        }
-
-        public void removeChild(TreeObject child) {
-            children.remove(child);
-            child.setParent(null);
-        }
-    }
-
-    class ViewContentProvider implements IStructuredContentProvider,
-            ITreeContentProvider {
-        private TreeParent invisibleRoot;
+    /**
+     * Content provider to list the nodes available in the project.
+     *
+     * @author Ramakrishnan P
+     *
+     */
+    private class ViewContentProvider implements ITreeContentProvider {
 
         @Override
         public void dispose() {
@@ -152,65 +120,83 @@ public class IndustrialNetworkView extends ViewPart {
 
         @Override
         public Object[] getChildren(Object parent) {
-            if (parent instanceof TreeParent) {
-                return ((TreeParent) parent).getChildren();
+
+            if (parent instanceof PowerlinkRootNode) {
+                PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
+                Object[] nodeList = powerlinkRoot.getNodeList(parent);
+                if (nodeList.length == 0) {
+                    return new Object[] { new EmptyNetworkView() };
+                } else {
+                    return nodeList;
+                }
+            } else if (parent instanceof Node) {
+                Node node = (Node) parent;
+
+                Object nodeObjectModel = node.getNodeModel();
+
+                if (nodeObjectModel instanceof TNetworkConfiguration) {
+                    return rootNode.getRmnNodeList().toArray();
+                } else if (nodeObjectModel instanceof TCN) {
+                    // TODO implement for Modular CN
+                } else if (nodeObjectModel instanceof TRMN) {
+                    // TODO implement for Modular RMN
+                }
             }
-            return new Object[0];
+
+            System.err.println("Returning empty object. Parent:" + parent);
+            return null;
         }
 
         @Override
         public Object[] getElements(Object parent) {
-            if (parent.equals(getViewSite())) {
-                if (invisibleRoot == null) {
-                    initialize();
-                }
-                return getChildren(invisibleRoot);
+
+            if (parent == null) {
+                return new Object[] { new EmptyNetworkView() };
+            } else {
+                return getChildren(parent);
             }
-            return getChildren(parent);
         }
 
         @Override
         public Object getParent(Object child) {
-            if (child instanceof TreeObject) {
-                return ((TreeObject) child).getParent();
+
+            if (child instanceof Node) {
+                Node node = (Node) child;
+
+                Object nodeObjectModel = node.getNodeModel();
+
+                if (nodeObjectModel instanceof TNetworkConfiguration) {
+                    return rootNode;
+                } else if (nodeObjectModel instanceof TCN) {
+                    return rootNode;
+                } else if (nodeObjectModel instanceof TRMN) {
+                    return rootNode.getMN();
+                }
             }
+
             return null;
         }
 
         @Override
         public boolean hasChildren(Object parent) {
-            if (parent instanceof TreeParent) {
-                return ((TreeParent) parent).hasChildren();
+            if (parent instanceof Node) {
+                Node node = (Node) parent;
+
+                Object nodeObjectModel = node.getNodeModel();
+
+                if (nodeObjectModel instanceof TNetworkConfiguration) {
+                    ArrayList<Node> nodeList = rootNode.getRmnNodeList();
+                    return (nodeList.size() > 0 ? true : false);
+                } else if (nodeObjectModel instanceof TCN) {
+                    // TODO implement for Modular CN
+                    return false;
+                } else if (nodeObjectModel instanceof TRMN) {
+                    // TODO implement for Modular RMN
+                    return false;
+                }
             }
+
             return false;
-        }
-
-        /*
-         * We will set up a dummy model to initialize tree hierarchy. In a real
-         * code, you will connect to a real model and expose its hierarchy.
-         */
-        private void initialize() {
-            TreeParent mn = new TreeParent("APC 910 - POWERLINK MN - v2.1.0");
-            TreeObject to1 = new TreeObject("X20PS9400");
-            TreeObject to2 = new TreeObject("X20DI6391");
-            TreeObject to3 = new TreeObject("X20DO6391");
-            TreeParent p1 = new TreeParent("X20BC0083");
-
-            p1.addChild(to1);
-            p1.addChild(to2);
-            p1.addChild(to3);
-
-            TreeObject to4 = new TreeObject("X20PS9400");
-            TreeParent p2 = new TreeParent("X20BC0083");
-            p2.addChild(to4);
-
-            TreeParent root = new TreeParent("POWERLINK");
-            root.addChild(mn);
-            mn.addChild(p1);
-            mn.addChild(p2);
-
-            invisibleRoot = new TreeParent("");
-            invisibleRoot.addChild(root);
         }
 
         @Override
@@ -218,20 +204,94 @@ public class IndustrialNetworkView extends ViewPart {
         }
     }
 
-    class ViewLabelProvider extends LabelProvider {
+    /**
+     * Label provider to display the text information for each node.
+     *
+     * @author Ramakrishnan P
+     *
+     */
+    private class ViewLabelProvider extends LabelProvider
+            implements IColorProvider {
+
+        @Override
+        public Color getBackground(Object element) {
+            return null;
+        }
+
+        @Override
+        public Color getForeground(Object element) {
+            if (element instanceof Node) {
+                Node nodeObj = (Node) element;
+
+                if (!nodeObj.isEnabled()) {
+                    return Display.getDefault().getSystemColor(SWT.COLOR_GRAY);
+                }
+            }
+
+            return null;
+        }
 
         @Override
         public Image getImage(Object obj) {
-            String imageKey = ISharedImages.IMG_TOOL_FORWARD;
-            if (obj instanceof TreeParent) {
-                imageKey = ISharedImages.IMG_OBJ_FOLDER;
+
+            if (obj instanceof Node) {
+                Node node = (Node) obj;
+
+                Object nodeObjectModel = node.getNodeModel();
+                if (nodeObjectModel instanceof TNetworkConfiguration) {
+                    return org.epsg.openconfigurator.Activator
+                            .getImageDescriptor(IPluginImages.MN_ICON)
+                            .createImage();
+                }
+                if (nodeObjectModel instanceof TCN) {
+                    TCN cnModel = (TCN) nodeObjectModel;
+                    if (cnModel.isEnabled()) {
+                        return org.epsg.openconfigurator.Activator
+                                .getImageDescriptor(IPluginImages.CN_ICON)
+                                .createImage();
+                    } else {
+                        return org.epsg.openconfigurator.Activator
+                                .getImageDescriptor(
+                                        IPluginImages.CN_DISABLED_ICON)
+                                .createImage();
+                    }
+                }
+                if (nodeObjectModel instanceof TRMN) {
+                    return org.epsg.openconfigurator.Activator
+                            .getImageDescriptor(IPluginImages.RMN_ICON)
+                            .createImage();
+                }
+            } else if (obj instanceof EmptyNetworkView) {
+                return null;
             }
+
             return PlatformUI.getWorkbench().getSharedImages()
-                    .getImage(imageKey);
+                    .getImage(ISharedImages.IMG_TOOL_FORWARD);
         }
 
         @Override
         public String getText(Object obj) {
+
+            if (obj instanceof Node) {
+                Node node = (Node) obj;
+
+                Object nodeObjectModel = node.getNodeModel();
+                if (nodeObjectModel instanceof TNetworkConfiguration) {
+                    TNetworkConfiguration networkConfiguration = (TNetworkConfiguration) nodeObjectModel;
+                    TNodeCollection nodeCollection = networkConfiguration
+                            .getNodeCollection();
+                    TMN mn = nodeCollection.getMN();
+                    return (mn.getName() + "(" + mn.getNodeID() + ")");
+                }
+                if (nodeObjectModel instanceof TCN) {
+                    TCN cn = (TCN) nodeObjectModel;
+                    return (cn.getName() + "(" + cn.getNodeID() + ")");
+                }
+                if (nodeObjectModel instanceof TRMN) {
+                    TRMN rmn = (TRMN) nodeObjectModel;
+                    return (rmn.getName() + "(" + rmn.getNodeID() + ")");
+                }
+            }
             return obj.toString();
         }
     }
@@ -241,23 +301,85 @@ public class IndustrialNetworkView extends ViewPart {
      */
     public static final String ID = "org.epsg.openconfigurator.views.IndustrialNetworkView";
 
-    /*
-     * The content provider class is responsible for providing objects to the
-     * view. It can wrap existing objects in adapters or simply return objects
-     * as-is. These objects may be sensitive to the current input of the view,
-     * or ignore it and always show the same content (like Task List, for
-     * example).
+    /**
+     * The root node of the Industrial network view.
      */
+    private PowerlinkRootNode rootNode = new PowerlinkRootNode();
 
+    /**
+     * Tree viewer to list the nodes.
+     */
     private TreeViewer viewer;
 
-    private DrillDownAdapter drillDownAdapter;
+    /**
+     * Add new node.
+     */
+    private Action addNewNode;
+    /**
+     * Show object dictionary.
+     */
+    private Action showObjectDictionary;
+    /**
+     * Show Properties action.
+     */
+    private Action showProperties;
+    /**
+     * Delete node action.
+     */
+    private Action deleteNode;
 
-    private Action action1;
+    /**
+     * Enable/Disable node action.
+     */
+    private Action enableDisableNode;
 
-    private Action action2;
+    /**
+     * Refresh the Industrial network view action.
+     */
+    private Action refreshAction;
 
+    /**
+     * Show PDO mapping action.
+     */
+    private Action showPdoMapping;
+
+    private Action replaceNode; // TBD.
+    private Action addModule;
+
+    /**
+     * Double clicked action.
+     */
     private Action doubleClickAction;
+
+    /**
+     * Call back to handle the selection changed events.
+     */
+    private ISelectionChangedListener viewerSelectionChangedListener = new ISelectionChangedListener() {
+
+        @Override
+        public void selectionChanged(SelectionChangedEvent event) {
+            contributeToActionBars();
+        }
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter treeViewerKeyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if (e.keyCode == SWT.DEL) {
+                IStructuredSelection selection = (IStructuredSelection) viewer
+                        .getSelection();
+                handleRemoveNode(selection);
+            } else if (e.keyCode == SWT.F5) {
+                handleRefresh();
+            }
+        }
+    };
+
+    private LinkWithEditorPartListener linkWithEditorPartListener = new LinkWithEditorPartListener(
+            this);
 
     /**
      * The constructor.
@@ -265,10 +387,14 @@ public class IndustrialNetworkView extends ViewPart {
     public IndustrialNetworkView() {
     }
 
+    /**
+     * Contribute to the action bars in the tree viewer.
+     */
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
         fillLocalPullDown(bars.getMenuManager());
         fillLocalToolBar(bars.getToolBarManager());
+        bars.updateActionBars();
     }
 
     /**
@@ -277,45 +403,194 @@ public class IndustrialNetworkView extends ViewPart {
      */
     @Override
     public void createPartControl(Composite parent) {
-        viewer = new TreeViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL);
-        drillDownAdapter = new DrillDownAdapter(viewer);
+        viewer = new TreeViewer(parent,
+                SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
         viewer.setContentProvider(new ViewContentProvider());
         viewer.setLabelProvider(new ViewLabelProvider());
-        viewer.setSorter(new NameSorter());
-        viewer.setInput(getViewSite());
+        viewer.expandAll();
 
-        // Create the help context id for the viewer's control
-        PlatformUI
-                .getWorkbench()
-                .getHelpSystem()
-                .setHelp(viewer.getControl(),
-                        "org.epsg.openconfigurator.viewer");
         makeActions();
         hookContextMenu();
         hookDoubleClickAction();
-        contributeToActionBars();
+
+        getSite().getPage().addPartListener(linkWithEditorPartListener);
+        getSite().setSelectionProvider(viewer);
+        viewer.addSelectionChangedListener(viewerSelectionChangedListener);
+        viewer.getControl().addKeyListener(treeViewerKeyListener);
     }
 
+    @Override
+    public void dispose() {
+        viewer.setSelection(TreeSelection.EMPTY);
+    }
+
+    @Override
+    public void editorActivated(IEditorPart activeEditor) {
+        if (!(activeEditor instanceof IndustrialNetworkProjectEditor)) {
+            return;
+        }
+
+        IndustrialNetworkProjectEditor activeEditorTemp = (IndustrialNetworkProjectEditor) activeEditor;
+        rootNode.setNodeCollection(activeEditorTemp.getNodeCollection());
+        Control control = viewer.getControl();
+        if ((control != null) && !control.isDisposed()) {
+            viewer.setInput(rootNode);
+        }
+    }
+
+    @Override
+    public void editorClosed(IEditorPart activeEditor) {
+
+        if (!(activeEditor instanceof IndustrialNetworkProjectEditor)) {
+            return;
+        }
+
+        rootNode.setNodeCollection(new HashMap<Short, Node>());
+        Control control = viewer.getControl();
+        if ((control != null) && !control.isDisposed()) {
+            viewer.setInput(rootNode);
+        }
+        viewer.setSelection(TreeSelection.EMPTY);
+    }
+
+    /**
+     * Prepares the context menu in the given menu manager based on the node
+     * selected in the tree viewer.
+     *
+     * @param manager The menu manager instance.
+     */
     private void fillContextMenu(IMenuManager manager) {
-        manager.add(action1);
-        manager.add(action2);
-        manager.add(new Separator());
-        drillDownAdapter.addNavigationActions(manager);
-        // Other plug-ins can contribute there actions here
-        manager.add(new Separator(IWorkbenchActionConstants.MB_ADDITIONS));
+        if (viewer.getSelection().isEmpty()) {
+            return;
+        }
+        if (viewer.getSelection() instanceof IStructuredSelection) {
+            IStructuredSelection selections = (IStructuredSelection) viewer
+                    .getSelection();
+            Object object = selections.getFirstElement();
+
+            if (object instanceof Node) {
+                Node node = (Node) object;
+
+                Object nodeObjectModel = node.getNodeModel();
+
+                if (nodeObjectModel instanceof TRMN) {
+                    manager.add(showPdoMapping);
+                    manager.add(showObjectDictionary);
+                    manager.add(new Separator());
+                    // manager.add(replaceNode);
+                    manager.add(deleteNode);
+                } else if (nodeObjectModel instanceof TNetworkConfiguration) {
+                    manager.add(addNewNode);
+                    manager.add(new Separator());
+                    manager.add(showPdoMapping);
+                    manager.add(showObjectDictionary);
+                    manager.add(new Separator());
+                    // manager.add(replaceNode);
+                } else if (nodeObjectModel instanceof TCN) {
+                    manager.add(enableDisableNode);
+                    manager.add(new Separator());
+                    manager.add(showPdoMapping);
+                    manager.add(showObjectDictionary);
+                    manager.add(new Separator());
+                    // manager.add(replaceNode);
+                    manager.add(deleteNode);
+                }
+
+                manager.add(new Separator());
+                manager.add(showProperties);
+            }
+        }
     }
 
     private void fillLocalPullDown(IMenuManager manager) {
-        manager.add(action1);
-        manager.add(new Separator());
-        manager.add(action2);
+        manager.removeAll();
+        fillContextMenu(manager);
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
-        manager.add(action1);
-        manager.add(action2);
-        manager.add(new Separator());
-        drillDownAdapter.addNavigationActions(manager);
+        manager.removeAll();
+
+        manager.add(refreshAction);
+        manager.add(showPdoMapping);
+        manager.add(showObjectDictionary);
+        manager.add(showProperties);
+    }
+
+    private void handleEnableDisable(IStructuredSelection selection) {
+        if (selection.isEmpty()) {
+            showMessage("No selection");
+            return;
+        }
+
+        List selectedObjectsList = selection.toList();
+
+        for (Object selectedObject : selectedObjectsList) {
+            if (selectedObject instanceof Node) {
+                Node node = (Node) selectedObject;
+                Result res = OpenConfiguratorLibraryUtils
+                        .toggleEnableDisable(node);
+                if (res.IsSuccessful()) {
+                    rootNode.toggleEnableDisable(node);
+
+                    handleRefresh();
+                } else {
+                    showMessage(
+                            OpenConfiguratorLibraryUtils.getErrorMessage(res));
+                }
+            }
+        }
+    }
+
+    private void handleRefresh() {
+        viewer.setInput(viewer.getInput());
+        viewer.expandAll();
+    }
+
+    public void handleRemoveNode(IStructuredSelection selection) {
+        if (selection.isEmpty()) {
+            showMessage("No selection");
+            return;
+        }
+
+        List selectedObjectsList = selection.toList();
+
+        for (Object selectedObject : selectedObjectsList) {
+            if (selectedObject instanceof Node) {
+                Node node = (Node) selectedObject;
+
+                Object nodeObjectModel = node.getNodeModel();
+                if ((nodeObjectModel instanceof TRMN)
+                        || (nodeObjectModel instanceof TCN)) {
+
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Delete node", null,
+                            "Are you sure you want to delete the node '"
+                                    + node.getNodeIDWithName() + "'",
+                            MessageDialog.QUESTION,
+                            new String[] { "Yes", "No" }, 1);
+                    int result = dialog.open();
+                    if (result == 0) {
+                        Result res = OpenConfiguratorLibraryUtils
+                                .removeNode(node);
+                        if (res.IsSuccessful()) {
+
+                            boolean retVal = rootNode.removeNode(node);
+                            if (!retVal) {
+                                System.err.println("Remove node Failed.");
+                            }
+                            handleRefresh();
+                        } else {
+                            showMessage(OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(res));
+                        }
+                    }
+                } else {
+                    showMessage("Delete this node not supported!");
+                }
+            } else {
+                System.err.println("Invalid tree item instance");
+            }
+        }
     }
 
     private void hookContextMenu() {
@@ -328,6 +603,7 @@ public class IndustrialNetworkView extends ViewPart {
             }
         });
         Menu menu = menuMgr.createContextMenu(viewer.getControl());
+        menuMgr.setRemoveAllWhenShown(true);
         viewer.getControl().setMenu(menu);
         getSite().registerContextMenu(menuMgr, viewer);
     }
@@ -342,36 +618,167 @@ public class IndustrialNetworkView extends ViewPart {
     }
 
     private void makeActions() {
-        action1 = new Action() {
+        addNewNode = new Action("Add Node...") {
             @Override
             public void run() {
-                showMessage("Action 1 executed");
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        && (selection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) selection;
+                    Object selectedObject = strucSelection.getFirstElement();
+                    if ((selectedObject instanceof Node)) {
+
+                        NewNodeWizard newNodeWizard = new NewNodeWizard(
+                                rootNode.getNodeCollection(),
+                                (Node) selectedObject);
+                        if (!newNodeWizard.hasErrors()) {
+                            WizardDialog wd = new WizardDialog(
+                                    PlatformUI.getWorkbench()
+                                            .getActiveWorkbenchWindow()
+                                            .getActivePage().getActiveEditor()
+                                            .getSite().getShell(),
+                                    newNodeWizard);
+                            wd.setTitle(newNodeWizard.getWindowTitle());
+                            wd.open();
+                        } else {
+                            showMessage(
+                                    "Internal error occurred. Please try again later");
+                        }
+                    }
+
+                    handleRefresh();
+                } else {
+                    showMessage("Invalid selection");
+                }
             }
         };
-        action1.setText("Action 1");
-        action1.setToolTipText("Action 1 tooltip");
-        action1.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+        addNewNode.setToolTipText("Add a node in the network.");
+        addNewNode
+                .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+                        .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+
+        enableDisableNode = new Action("Enable/Disable") {
+            @Override
+            public void run() {
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        & (selection instanceof IStructuredSelection)) {
+                    handleEnableDisable((IStructuredSelection) selection);
+                }
+            }
+        };
+        enableDisableNode.setToolTipText("Enable/Disable");
+        enableDisableNode.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
+
+        showObjectDictionary = new Action("Show Object Dictionary") {
+            @Override
+            public void run() {
+            }
+        };
+        showObjectDictionary.setToolTipText("Show Object Dictionary");
+        showObjectDictionary
+                .setImageDescriptor(org.epsg.openconfigurator.Activator
+                        .getImageDescriptor(IPluginImages.OBD_ICON));
+
+        showPdoMapping = new Action("Show PDO Mapping") {
+            @Override
+            public void run() {
+                showMessage(
+                        "The PDO Mapping view is not available in the pre-release.\n"
+                                + "Please use the 'object dictionary view' to modify the PDO mapping values.");
+            }
+        };
+        showPdoMapping.setToolTipText("Show PDO Mapping");
+        showPdoMapping.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.MAPPING_ICON));
+
+        showProperties = new Action("Properties") {
+
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET);
+                    viewer.setSelection(viewer.getSelection());
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage("Error opening properties view");
+                }
+            }
+        };
+        showProperties.setToolTipText("Show Properties");
+        showProperties.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.PROPERTIES_ICON));
+
+        replaceNode = new Action("Replace XDD/XDC") {
+            @Override
+            public void run() {
+                showMessage("Replace XDD/XDC not supported.!");
+            }
+        };
+        replaceNode.setToolTipText("Replace XDD/XDC");
+        replaceNode
+                .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+                        .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+
+        addModule = new Action("Add Module...") {
+            @Override
+            public void run() {
+                showMessage("Add Module action executed");
+            }
+        };
+        addModule.setToolTipText("Add Module...");
+        addModule.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                 .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
-        action2 = new Action() {
+        deleteNode = new Action("Remove") {
             @Override
             public void run() {
-                showMessage("Action 2 executed");
+
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        && (selection instanceof IStructuredSelection)) {
+                    handleRemoveNode((IStructuredSelection) selection);
+                }
             }
         };
-        action2.setText("Action 2");
-        action2.setToolTipText("Action 2 tooltip");
-        action2.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-                .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
+        deleteNode.setToolTipText("Remove");
+        deleteNode
+                .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+                        .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
+
         doubleClickAction = new Action() {
             @Override
             public void run() {
                 ISelection selection = viewer.getSelection();
-                Object obj = ((IStructuredSelection) selection)
-                        .getFirstElement();
-                showMessage("Double-click detected on " + obj.toString());
+                viewer.setExpandedElements(
+                        ((IStructuredSelection) selection).toArray());
             }
         };
+
+        refreshAction = new Action() {
+            @Override
+            public void run() {
+                handleRefresh();
+            }
+        };
+        refreshAction.setToolTipText("Refresh(F5)");
+        refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.REFRESH_ICON));
+    }
+
+    @Override
+    public void propertyChanged(Object source, int propId) {
+        handleRefresh();
     }
 
     /**
@@ -386,4 +793,5 @@ public class IndustrialNetworkView extends ViewPart {
         MessageDialog.openInformation(viewer.getControl().getShell(),
                 "Industrial Network", message);
     }
+
 }

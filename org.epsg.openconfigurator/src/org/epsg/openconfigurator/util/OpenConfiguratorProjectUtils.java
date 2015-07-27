@@ -47,6 +47,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -103,6 +106,91 @@ public final class OpenConfiguratorProjectUtils {
             OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList
                     .add(support.get(i));
         }
+    }
+
+    /**
+     * Removes the node from the node collection provided and from the project
+     * XML file.
+     *
+     * @param nodeCollection The list of available node.
+     * @param node The node to be removed.
+     * @param monitor Monitor instance to report the progress.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     */
+    public static boolean deleteNode(Map<Short, Node> nodeCollection, Node node,
+            IProgressMonitor monitor) {
+        // FIXME: Proper return type and handle all returns.
+        boolean retVal = false;
+        if (node == null) {
+            return retVal;
+        }
+
+        IProject currentProject = node.getProject();
+        if (currentProject == null) {
+            System.err.println("Current project null. returned null");
+            return retVal;
+        }
+
+        File localFile = new File(node.getAbsolutePathToXdc());
+        if (!localFile.exists()) {
+            System.err.println("XDC file does not exists");
+            return retVal;
+        } else {
+            retVal = localFile.delete();
+            if (retVal) {
+                try {
+
+                    currentProject.refreshLocal(IResource.DEPTH_INFINITE,
+                            monitor);
+                } catch (CoreException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                    return false;
+                }
+            } else {
+                System.err.println("File delete unsuccessful. File:"
+                        + node.getAbsolutePathToXdc());
+            }
+        }
+
+        Node mnNode = nodeCollection.get(new Short((short) 240));
+
+        // Remove from the viewer node collection.
+        Object nodeObjectModel = node.getNodeModel();
+        if (nodeObjectModel instanceof TRMN) {
+            TRMN rMN = (TRMN) nodeObjectModel;
+            nodeCollection.remove(rMN.getNodeID());
+            retVal = true;
+        } else if (nodeObjectModel instanceof TCN) {
+            TCN cnNode = (TCN) nodeObjectModel;
+            short nodeId = Short.parseShort(cnNode.getNodeID());
+            nodeCollection.remove(nodeId);
+            retVal = true;
+        } else {
+            System.err.println("Un-supported node" + nodeObjectModel);
+            return false;
+        }
+
+        // Remove from the openconfigurator model.
+        if (mnNode.getNodeModel() instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) mnNode
+                    .getNodeModel();
+            if (nodeObjectModel instanceof TRMN) {
+                List<TRMN> rmn = net.getNodeCollection().getRMN();
+                rmn.remove(nodeObjectModel);
+            } else if (nodeObjectModel instanceof TCN) {
+                List<TCN> cn = net.getNodeCollection().getCN();
+                cn.remove(nodeObjectModel);
+            } else {
+                System.err.println("Remove from openCONF model failed. Node ID:"
+                        + node.getNodeId() + " modelType:" + nodeObjectModel);
+                return false;
+            }
+        } else {
+            System.err.println("Node model has been changed");
+        }
+
+        return retVal;
     }
 
     /**
