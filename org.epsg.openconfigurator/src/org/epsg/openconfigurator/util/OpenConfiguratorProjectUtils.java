@@ -33,7 +33,9 @@ package org.epsg.openconfigurator.util;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -46,16 +48,19 @@ import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
@@ -106,6 +111,37 @@ public final class OpenConfiguratorProjectUtils {
             OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList
                     .add(support.get(i));
         }
+    }
+
+    /**
+     * Add node into the node collection and the node list.
+     *
+     * @param nodeList The list of available nodes.
+     * @param nodeCollection The node collection instance.
+     * @param node New node.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws IOException
+     */
+    public static boolean addNode(Map<Short, Node> nodeList,
+            TNodeCollection nodeCollection, Node node) throws IOException {
+
+        importNodeConfigurationFile(node);
+
+        Object nodeModel = node.getNodeModel();
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            nodeCollection.getCN().add(cn);
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            nodeCollection.getRMN().add(rmn);
+        } else {
+            // Invalid node
+            return false;
+        }
+
+        nodeList.put(new Short(node.getNodeId()), node);
+
+        return true;
     }
 
     /**
@@ -274,6 +310,65 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         return now;
+    }
+
+    /**
+     * Import node configuration file into the workspace. The path to the XDC
+     * will be absolute and after import into project the path to XDC will be
+     * update to relative.
+     *
+     * @param newNode The node XDC to be imported.
+     * @throws IOException
+     */
+    public static void importNodeConfigurationFile(Node newNode)
+            throws IOException {
+
+        java.nio.file.Path nodeImportFile = new File(newNode.getPathToXDC())
+                .toPath();
+        System.out.println("Import path: " + nodeImportFile.toString());
+        java.nio.file.Path projectRootPath = newNode.getProject().getLocation()
+                .toFile().toPath();
+        String targetImportPath = new String(projectRootPath.toString()
+                + IPath.SEPARATOR + IPowerlinkProjectSupport.DEVICE_IMPORT_DIR
+                + IPath.SEPARATOR + nodeImportFile.getFileName().toString());
+
+        // Copy the Node configuration to deviceImport dir
+
+        nodeImportFile = java.nio.file.Files.copy(
+                new java.io.File(nodeImportFile.toString()).toPath(),
+                new java.io.File(targetImportPath).toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+        // Rename the XDD to XDC and copy the deviceImport MN XDD to
+        // deviceConfiguration dir
+        String extensionXdd = FilenameUtils
+                .removeExtension(nodeImportFile.getFileName().toString());
+
+        // Append node ID and the 'XDC' extension to the configuration file.
+        extensionXdd += "_" + newNode.getNodeId()
+                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+        String targetConfigurationPath = new String(
+                projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                        + IPath.SEPARATOR + extensionXdd);
+
+        java.nio.file.Files.copy(nodeImportFile,
+                new java.io.File(targetConfigurationPath).toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+        // Set the relative path to the CN object
+        java.nio.file.Path pathRelative = projectRootPath
+                .relativize(Paths.get(targetConfigurationPath));
+
+        String relativePath = pathRelative.toString();
+        relativePath = relativePath.replace('\\', '/');
+
+        newNode.setPathToXDC(relativePath);
     }
 
     /**

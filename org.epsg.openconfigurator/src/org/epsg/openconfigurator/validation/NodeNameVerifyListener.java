@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file   IPowerlinkProjectSupport.java
+ * @file   NodeNameVerifyListener.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -29,42 +29,42 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.epsg.openconfigurator.model;
+package org.epsg.openconfigurator.validation;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.VerifyEvent;
+import org.eclipse.swt.events.VerifyListener;
 
 /**
- * Project support constants.
+ * Verify the node name
  *
  * @author Ramakrishnan P
  *
  */
-public interface IPowerlinkProjectSupport {
+public class NodeNameVerifyListener implements VerifyListener {
 
-    public static final String MN_OBD_TXT = "mnobd.txt"; //$NON-NLS-1$
-    public static final String MN_OBD_CDC = "mnobd.cdc"; //$NON-NLS-1$
-    public static final String MN_OBD_CHAR_TXT = "mnobd_char.txt"; //$NON-NLS-1$
-    public static final String XAP_H = "xap.h"; //$NON-NLS-1$
-    public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
-    public static final String PROCESSIMAGE_CS = "ProcessImage.cs"; //$NON-NLS-1$
+    @Override
+    public void verifyText(VerifyEvent event) {
+        // Assume we don't allow it
+        event.doit = false;
 
-    public static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
-            MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
+        // Get the character typed
+        char inputChar = event.character;
 
-    public static final String DEVICE_IMPORT_DIR = "deviceImport";
-    public static final String DEVICE_CONFIGURATION_DIR = "deviceConfiguration";
-    public static final String DEFAULT_OUTPUT_DIR = "output";
+        // Allow 0-9, A-Z, a-z
+        if (Character.isLetterOrDigit(inputChar)) {
+            event.doit = true;
+        }
 
-    public static final String UTF8_ENCODING = "UTF-8";
+        // Allow space
+        if (Character.isSpaceChar(inputChar)) {
+            event.doit = true;
+        }
 
-    public static final String XDC_EXTENSION = ".xdc"; ////$NON-NLS-1$
-    public static final String XDD_EXTENSION = ".xdd"; ////$NON-NLS-1$
-    public static final String DEFAULT_XDD_FILTER_EXTENSION = "*.xdd;*.XDD"; ////$NON-NLS-1$
-    public static final String DEFAULT_XDC_FILTER_EXTENSION = "*.xdc;*.XDC"; ////$NON-NLS-1$
-    public static final String DEFAULT_XDD_FILTER_NAME_EXTENSION = "XML Device Description(*.xdd)"; ////$NON-NLS-1$
-    public static final String DEFAULT_XDC_FILTER_NAME_EXTENSION = "XML Device Configuration(*.xdc)"; ////$NON-NLS-1$
-
-    public static final String[] CONFIGURATION_FILTER_EXTENSIONS = {
-            "*.xdc;*.xdd", "*" };
-
-    public static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
-            "XDD/XDC files", "All files" };
+        // Allow arrow keys and backspace and delete keys
+        if ((inputChar == SWT.BS) || (inputChar == SWT.ARROW_LEFT)
+                || (inputChar == SWT.ARROW_RIGHT) || (inputChar == SWT.DEL)) {
+            event.doit = true;
+        }
+    }
 }
