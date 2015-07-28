@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.model;
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.core.resources.IProject;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 
 /**
@@ -197,6 +198,11 @@ public class PowerlinkSubobject {
      * @param writeToXdc Writes the value immediately to XDC.
      */
     public void setActualValue(final String actualValue, boolean writeToXdc) {
+
+        if (writeToXdc) {
+            OpenConfiguratorProjectUtils.updateObjectAttributeValue(getNode(),
+                getObjectIdRaw(), true, getSubobjectIdRaw(), actualValue);
+        }
 
         subObject.setActualValue(actualValue);
     }

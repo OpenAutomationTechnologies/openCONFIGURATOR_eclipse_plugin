@@ -682,6 +682,24 @@ public final class OpenConfiguratorProjectUtils {
         }
     }
 
+    public static void updateObjectAttributeValue(final Node node,
+            final String objectId, final boolean isSubObject,
+            final String subObjectId, final String actualValue) {
+        try {
+
+            File xmlFile = new File(node.getAbsolutePathToXdc());
+
+            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                    IPowerlinkProjectSupport.UTF8_ENCODING);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xmlFile.toURI().toString());
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Upgrade openCONFIGURATOR project to conform with 2.0 schema. Add default
      * fields for AutoGeneration Settings.

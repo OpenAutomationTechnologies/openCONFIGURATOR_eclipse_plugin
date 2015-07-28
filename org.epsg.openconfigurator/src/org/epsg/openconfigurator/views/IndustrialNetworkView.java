@@ -680,6 +680,16 @@ public class IndustrialNetworkView extends ViewPart
         showObjectDictionary = new Action("Show Object Dictionary") {
             @Override
             public void run() {
+                try {
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(ObjectDictionaryView.ID);
+                    viewer.setSelection(viewer.getSelection());
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage("Error openning Object Dictionary");
+                }
             }
         };
         showObjectDictionary.setToolTipText("Show Object Dictionary");

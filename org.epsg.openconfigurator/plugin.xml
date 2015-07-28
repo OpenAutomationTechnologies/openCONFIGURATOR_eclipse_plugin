@@ -15,6 +15,14 @@
             class="org.epsg.openconfigurator.views.IndustrialNetworkView"
             id="org.epsg.openconfigurator.views.IndustrialNetworkView">
       </view>
+      <view
+            allowMultiple="false"
+            category="org.epsg.openconfigurator.view.category"
+            class="org.epsg.openconfigurator.views.ObjectDictionaryView"
+            icon="icons/obd.gif"
+            id="org.epsg.openconfigurator.views.ObjectDictionaryView"
+            name="Object Dictionary">
+      </view>
    </extension>
    <extension
          point="org.eclipse.help.contexts">
@@ -230,6 +238,20 @@
       <factory
             adaptableType="org.epsg.openconfigurator.model.Node"
             class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.epsg.openconfigurator.model.PowerlinkObject"
+            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.epsg.openconfigurator.model.PowerlinkSubobject"
+            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
          <adapter
                type="org.eclipse.ui.views.properties.IPropertySource">
          </adapter>
