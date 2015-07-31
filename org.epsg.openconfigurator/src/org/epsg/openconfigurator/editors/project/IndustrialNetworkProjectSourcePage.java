@@ -51,8 +51,8 @@ import org.epsg.openconfigurator.editors.project.xml.XmlDocumentProvider;
  * @author Ramakrishnan P
  *
  */
-public class IndustrialNetworkProjectSourcePage extends TextEditor implements
-        IFormPage {
+public class IndustrialNetworkProjectSourcePage extends TextEditor
+        implements IFormPage {
 
     /**
      * Identifier
@@ -122,7 +122,10 @@ public class IndustrialNetworkProjectSourcePage extends TextEditor implements
      */
     @Override
     public void doSave(IProgressMonitor progressMonitor) {
-        // super.doSave(progressMonitor);
+        if (isDirty()) {
+            editor.updateModelToSource();
+        }
+        super.doSave(progressMonitor);
     }
 
     /**

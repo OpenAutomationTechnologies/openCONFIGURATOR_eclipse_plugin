@@ -18,6 +18,8 @@ Require-Bundle: org.eclipse.ui,
  org.apache.commons.lang
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ClassPath: .,
- os/org.epsg.openconfigurator.wrapper.jar
+ os/org.epsg.openconfigurator.wrapper.jar,
+ os/jdom-2.0.6/jdom-2.0.6.jar,
+ os/jdom-2.0.6/lib/jaxen-1.1.6.jar
 Bundle-ActivationPolicy: lazy
 

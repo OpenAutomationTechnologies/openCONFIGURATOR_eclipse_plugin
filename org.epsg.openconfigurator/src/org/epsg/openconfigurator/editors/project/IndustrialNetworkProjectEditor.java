@@ -52,6 +52,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -508,8 +509,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     @Override
     public boolean isDirty() {
-
-        System.out.println(" super:" + super.isDirty());
         return super.isDirty();
     }
 
@@ -527,13 +526,9 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     @Override
     protected void pageChange(int newPageIndex) {
 
-        if ((getActivePage() == editorPage.getIndex()) && isDirty()) {
-            updateSourceToModel();
-        }
-
-        // check for update from the source code
-        if ((getActivePage() == sourcePage.getIndex()) && (isDirty())) {
+        if ((getActivePage() == editorPage.getIndex()) || (isDirty())) {
             updateModelToSource();
+            sourcePage.doSave(new NullProgressMonitor());
         }
 
         // check for updates to be propagated to the source code
@@ -548,11 +543,28 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         // update page if needed
         final IFormPage page = getActivePageInstance();
         if (page != null) {
-            // TODO update form page with new model data
             editorPage.setOpenCONFIGURATORProject(currentProject);
             page.setFocus();
         }
 
+    }
+
+    public void persistLibraryData(IProgressMonitor monitor) {
+        monitor.beginTask("Save XDC configurations", nodeCollection.size());
+
+        // Write the XDC configuration Changes from the library to the XDC file.
+        Result res = OpenConfiguratorProjectUtils.persistNodes(nodeCollection,
+                monitor);
+        if (!res.IsSuccessful()) {
+            System.err
+                    .println(OpenConfiguratorLibraryUtils.getErrorMessage(res));
+        }
+        monitor.done();
+
+        monitor.beginTask("Save project XML configurations", 100);
+        OpenConfiguratorProjectUtils.persistProjectFile(networkId,
+                currentProject, monitor);
+        monitor.done();
     }
 
     @Override
@@ -679,17 +691,17 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     /**
      * Updates the openCONIGURATOR project model into the XML source file.
      */
-    private void updateModelToSource() {
+    void updateModelToSource() {
         System.out.println("Model -> Source");
         String dataFromModel = getModelData();
-        getDocument().set(dataFromModel);
+        setContent(dataFromModel);
     }
 
     /**
      * Update the XML source into the openCONFIGURATOR project model
      */
-    private void updateSourceToModel() {
+    void updateSourceToModel() {
         System.out.println("Source -> model");
-        reloadFromSourceText(getContent());
+        // reloadFromSourceText(getContent());
     }
 }

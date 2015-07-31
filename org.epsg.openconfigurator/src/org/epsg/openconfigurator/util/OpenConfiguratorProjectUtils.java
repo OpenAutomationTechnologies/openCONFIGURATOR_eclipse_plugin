@@ -34,14 +34,17 @@ package org.epsg.openconfigurator.util;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -60,11 +63,15 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.epsg.openconfigurator.lib.wrapper.MapIterator;
+import org.epsg.openconfigurator.lib.wrapper.ObjectCollection;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -77,6 +84,13 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
+import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
+import org.jdom2.Document;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -144,6 +158,34 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         nodeList.put(new Short(node.getNodeId()), node);
+
+        try {
+
+            String projectXmlLocation = node.getProjectXml().getLocation()
+                    .toString();
+            File xmlFile = new File(projectXmlLocation);
+
+            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                    IPowerlinkProjectSupport.UTF8_ENCODING);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xmlFile.toURI().toString());
+
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(input);
+
+            ProjectJDomOperation.addNode(document, node);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+
+            // display nice
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(document, new FileWriter(projectXmlLocation));
+
+        } catch (JDOMException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+            return false;
+        }
 
         return true;
     }
@@ -228,6 +270,33 @@ public final class OpenConfiguratorProjectUtils {
             }
         } else {
             System.err.println("Node model has been changed");
+        }
+
+        // Remove from the openconfigurator project xml.
+        try {
+
+            String projectXmlLocation = node.getProjectXml().getLocation()
+                    .toString();
+            File xmlFile = new File(projectXmlLocation);
+
+            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                    IPowerlinkProjectSupport.UTF8_ENCODING);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xmlFile.toURI().toString());
+
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(input);
+
+            ProjectJDomOperation.deleteNode(document, node);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+
+            // display nice
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(document, new FileWriter(projectXmlLocation));
+        } catch (JDOMException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         return retVal;
@@ -615,6 +684,132 @@ public final class OpenConfiguratorProjectUtils {
         return openConfiguratorProject;
     }
 
+    public static Result persistNodes(final Map<Short, Node> nodeCollection,
+            IProgressMonitor monitor) {
+        Result res = new Result();
+
+        for (Map.Entry<Short, Node> entry : nodeCollection.entrySet()) {
+
+            Node node = entry.getValue();
+            if (node == null) {
+                System.err.println("Node" + entry.getKey() + " is null");
+                continue;
+            }
+
+            System.out.println(
+                    entry.getKey() + "----" + node.getAbsolutePathToXdc());
+
+            monitor.subTask("Updating node:" + node.getNodeIDWithName() + " ->"
+                    + node.getPathToXDC());
+
+            try {
+
+                File xmlFile = new File(node.getAbsolutePathToXdc());
+
+                Reader reader = new InputStreamReader(
+                        new FileInputStream(xmlFile),
+                        IPowerlinkProjectSupport.UTF8_ENCODING);
+                InputSource input = new InputSource(reader);
+                input.setSystemId(xmlFile.toURI().toString());
+
+                SAXBuilder builder = new SAXBuilder();
+                Document document = builder.build(input);
+
+                // Delete the actual value field on all objects available in the
+                // file.
+                XddJdomOperation.deleteActualValue(document);
+
+                ObjectCollection objectCollection = new ObjectCollection();
+                res = OpenConfiguratorCore.GetInstance()
+                        .GetObjectsWithActualValue(node.getNetworkId(),
+                                node.getNodeId(), objectCollection);
+                if (!res.IsSuccessful()) {
+                    // Continue operation for other nodes
+                    System.err.println(
+                            OpenConfiguratorLibraryUtils.getErrorMessage(res));
+                    continue;
+                }
+
+                // Prepare the Java based object collection.
+                java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
+                for (MapIterator iterator = objectCollection
+                        .iterator(); iterator.hasNext();) {
+                    String actualValue = iterator.GetValue();
+
+                    Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+                            iterator.GetKey().getFirst(),
+                            iterator.GetKey().getSecond());
+                    objectJCollection.put(entryVal, actualValue);
+                    iterator.next();
+                }
+
+                for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
+                        .entrySet()) {
+                    String actualValue = objectJcollectionEntry.getValue();
+                    long objectIdLong = objectJcollectionEntry.getKey()
+                            .getKey();
+                    String objectId = String.format("%04X", objectIdLong);
+
+                    boolean isSubObject = false;
+                    int subObjectIdShort = objectJcollectionEntry.getKey()
+                            .getValue();
+                    if (subObjectIdShort != -1) {
+                        isSubObject = true;
+                    }
+
+                    String subObjectId = String.format("%02X",
+                            subObjectIdShort);
+
+                    PowerlinkObject object = node.getObjects(objectIdLong);
+                    if (object != null) {
+
+                        if (!isSubObject) {
+                            object.setActualValue(actualValue);
+                            XddJdomOperation.updateActualValue(document, object,
+                                    actualValue);
+                        } else {
+                            PowerlinkSubobject subObj = object
+                                    .getSubObject((short) subObjectIdShort);
+                            if (subObj != null) {
+                                subObj.setActualValue(actualValue);
+                                XddJdomOperation.updateActualValue(document,
+                                        subObj, actualValue);
+                            } else {
+                                System.err.println("SubObject 0x" + objectId
+                                        + "/0x" + subObjectId
+                                        + "does not exists");
+                            }
+                        }
+                    } else {
+                        System.err.println(
+                                "Object 0x" + objectId + "does not exists");
+                    }
+                }
+
+                XMLOutputter xmlOutput = new XMLOutputter();
+
+                // display nice nice
+                xmlOutput.setFormat(Format.getPrettyFormat());
+                xmlOutput.output(document,
+                        new FileWriter(node.getAbsolutePathToXdc()));
+            } catch (JDOMException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            monitor.worked(1);
+        }
+        return res;
+    }
+
+    public static Result persistProjectFile(String networkId,
+            OpenCONFIGURATORProject openConfiguratorProject,
+            IProgressMonitor monitor) {
+
+        Result res = new Result();
+
+        return res;
+    }
+
     /**
      * Update the Generator informations to the current values.
      *
@@ -650,7 +845,19 @@ public final class OpenConfiguratorProjectUtils {
             InputSource input = new InputSource(reader);
             input.setSystemId(xmlFile.toURI().toString());
 
-        } catch (IOException e) {
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(input);
+
+            ProjectJDomOperation.updateNetworkAttributeValue(document,
+                    attributeName, attributeValue);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+
+            // display nice
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(document, new FileWriter(projectXmlLocation));
+
+        } catch (JDOMException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -676,7 +883,18 @@ public final class OpenConfiguratorProjectUtils {
             InputSource input = new InputSource(reader);
             input.setSystemId(xmlFile.toURI().toString());
 
-        } catch (IOException e) {
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(input);
+
+            ProjectJDomOperation.updateNodeAttributeValue(document, node,
+                    attributeName, attributeValue);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+            // display nice
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(document, new FileWriter(projectXmlLocation));
+
+        } catch (JDOMException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -694,7 +912,19 @@ public final class OpenConfiguratorProjectUtils {
             InputSource input = new InputSource(reader);
             input.setSystemId(xmlFile.toURI().toString());
 
-        } catch (IOException e) {
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(input);
+
+            XddJdomOperation.updateActualValue(document, objectId, isSubObject,
+                    subObjectId, actualValue);
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+            // display nice
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(document,
+                    new FileWriter(node.getAbsolutePathToXdc()));
+
+        } catch (JDOMException | IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

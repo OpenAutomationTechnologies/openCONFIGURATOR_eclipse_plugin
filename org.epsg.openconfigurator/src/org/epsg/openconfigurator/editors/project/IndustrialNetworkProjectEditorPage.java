@@ -1028,8 +1028,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     @Override
     public void doSave(IProgressMonitor monitor) {
 
-        if (dirty) {
-            editor.reloadEditorContentsFromModel();
+        if (isDirty()) {
+            editor.updateModelToSource();
         }
         setDirty(false);
         super.doSave(monitor);
