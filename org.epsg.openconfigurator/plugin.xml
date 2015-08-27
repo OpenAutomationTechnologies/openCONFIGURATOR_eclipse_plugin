@@ -225,5 +225,14 @@
          </describer>
       </content-type>
    </extension>
-
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.epsg.openconfigurator.model.Node"
+            class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

@@ -1,0 +1,60 @@
+/*******************************************************************************
+ * @file   IAbstractNodeProperties.java
+ *
+ * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2015, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
+package org.epsg.openconfigurator.model;
+
+/**
+ * Abstract node property objects.
+ *
+ * @author Ramakrishnan P
+ *
+ */
+public interface IAbstractNodeProperties {
+    // Common object names
+    public static final String NODE_NAME_OBJECT = "name"; //$NON-NLS-1$
+    public static final String NODE_ID_OBJECT = "nodeID"; //$NON-NLS-1$
+    public static final String NODE_CONIFG_OBJECT = "pathToXDC"; //$NON-NLS-1$
+    public static final String NODE_IS_ASYNC_ONLY_OBJECT = "isAsyncOnly"; //$NON-NLS-1$
+    public static final String NODE_IS_TYPE1_ROUTER_OBJECT = "isType1Router"; //$NON-NLS-1$
+    public static final String NODE_IS_TYPE2_ROUTER_OBJECT = "isType2Router"; //$NON-NLS-1$
+    public static final String NODE_FORCED_OBJECTS_OBJECT = "ForcedObjects"; //$NON-NLS-1$
+    public static final String NODE_LOSS_OF_SOC_TOLERANCE_OBJECT = "lossSocTolerance"; //$NON-NLS-1$
+
+    public static final String NAME_OF_THE_SELECTED_NODE = "Name of the node selected.";
+    public static final String NODE_IS_ASYNC_ONLY_DESCRIPTION = "Yes -> AsyncOnly node. No -> Isochonrously accessed node. See 0x1F81, Bit 8.";
+    public static final String NODE_ROUTER_TYPE1_DESCRIPTION = "Router type 1. See 0x1F81, Bit 10.";
+    public static final String NODE_ROUTER_TYPE2_DESCRIPTION = "Router type 2. See 0x1F81, Bit 11.";
+    public static final String LOSS_SOC_TOLERANCE_DESCRIPTION = "A tolerance interval in [ns] to be applied by CN’s Loss of SoC error recognition. See 0x1C14.";
+
+    public static final long LOSS_SOC_TOLERANCE_OBJECT_ID = 0x1C14;
+
+    public static final long NODE_ASSIGNMENT_OBJECT_ID = 0x1F81;
+}

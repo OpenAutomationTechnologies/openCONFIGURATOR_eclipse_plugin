@@ -32,8 +32,11 @@
 package org.epsg.openconfigurator.util;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
@@ -74,6 +77,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public final class OpenConfiguratorProjectUtils {
@@ -624,6 +628,58 @@ public final class OpenConfiguratorProjectUtils {
                 OpenConfiguratorProjectUtils.getXMLGregorianCalendarNow());
         project.getGenerator().setModifiedBy(System
                 .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID));
+    }
+
+    /**
+     * Update the network configuration attributes in the project XML file.
+     *
+     * @param node The node
+     * @param attributeName The attribute tag name.
+     * @param attributeValue The value to be applied.
+     */
+    public static void updateNetworkAttributeValue(final Node node,
+            final String attributeName, final String attributeValue) {
+        try {
+
+            String projectXmlLocation = node.getProjectXml().getLocation()
+                    .toString();
+            File xmlFile = new File(projectXmlLocation);
+
+            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                    IPowerlinkProjectSupport.UTF8_ENCODING);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xmlFile.toURI().toString());
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Update the node attributes in the project XML file.
+     *
+     * @param node The node to apply the attributes.
+     * @param attributeName The attribute tag name.
+     * @param attributeValue The value to be applied.
+     */
+    public static void updateNodeAttributeValue(final Node node,
+            final String attributeName, final String attributeValue) {
+        try {
+
+            String projectXmlLocation = node.getProjectXml().getLocation()
+                    .toString();
+            File xmlFile = new File(projectXmlLocation);
+
+            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                    IPowerlinkProjectSupport.UTF8_ENCODING);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xmlFile.toURI().toString());
+
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**

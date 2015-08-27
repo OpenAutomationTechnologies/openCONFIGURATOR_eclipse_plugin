@@ -46,6 +46,7 @@ import org.epsg.openconfigurator.lib.wrapper.DynamicChannelAccessType;
 import org.epsg.openconfigurator.lib.wrapper.GeneralFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.IEC_Datatype;
 import org.epsg.openconfigurator.lib.wrapper.MNFeatureEnum;
+import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.ObjectType;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.PDOMapping;
@@ -1753,6 +1754,30 @@ public class OpenConfiguratorLibraryUtils {
     public static Result removeNode(Node node) {
         return OpenConfiguratorCore.GetInstance()
                 .RemoveNode(node.getNetworkId(), node.getNodeId());
+    }
+
+    /**
+     * Add or remove the node assignment value.
+     * 
+     * @param nodeAssign The node assignment value to be added or removed.
+     * @param node Node to which the value to be applied.
+     * @param value <code> true</code> to add the node assignment value,
+     *            <code>False</code> to remove the node assignment value.
+     * @return Result from the openCONFIGURATOR library.
+     */
+    public static Result setNodeAssignment(NodeAssignment nodeAssign, Node node,
+            boolean value) {
+        Result libApiRes = new Result();
+        final String networkId = node.getNetworkId();
+        final short nodeId = node.getNodeId();
+        if (value) {
+            libApiRes = OpenConfiguratorCore.GetInstance()
+                    .AddNodeAssignment(networkId, nodeId, nodeAssign);
+        } else {
+            libApiRes = OpenConfiguratorCore.GetInstance()
+                    .RemoveNodeAssignment(networkId, nodeId, nodeAssign);
+        }
+        return libApiRes;
     }
 
     /**

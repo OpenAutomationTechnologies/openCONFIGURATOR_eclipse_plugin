@@ -1,0 +1,490 @@
+/*******************************************************************************
+ * @file   RedundantManagingNodePropertySource.java
+ *
+ * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2015, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
+package org.epsg.openconfigurator.adapters;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.bind.DatatypeConverter;
+
+import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.TextPropertyDescriptor;
+import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.IAbstractNodeProperties;
+import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
+import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+
+/**
+ * Describes the node properties for a Redundant Managing node.
+ *
+ * @see setNodeData
+ * @author Ramakrishnan P
+ *
+ */
+public class RedundantManagingNodePropertySource
+        extends AbstractNodePropertySource implements IPropertySource {
+
+    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active(µs)";
+    private static final String RMN_PRIORITY_LABEL = "Priority";
+
+    private static final TextPropertyDescriptor waitNotActiveDescriptor = new TextPropertyDescriptor(
+            IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT,
+            RMN_WAIT_NOT_ACTIVE_LABEL);
+    private static final TextPropertyDescriptor priorityDescriptor = new TextPropertyDescriptor(
+            IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT,
+            RMN_PRIORITY_LABEL);
+
+    private static final String ERROR_WAIT_NOT_ACTIVE_CANNOT_BE_EMPTY = "Wait NOT_ACTIVE value cannot be empty.";
+    private static final String INVALID_RANGE_WAIT_NOT_ACTIVE = "Invalid range for Wait NOT_ACTIVE";
+    private static final String ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE = "Invalid value for Wait NOT_ACTIVE";
+
+    private static final String ERROR_RMN_PRIORITY_CANNOT_BE_EMPTY = "Priority value cannot be empty.";
+    private static final String ERROR_INVALID_VALUE_RMN_PRIORITY = "Invalid value for Priority";
+
+    static {
+        waitNotActiveDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        waitNotActiveDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        waitNotActiveDescriptor.setDescription(
+                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_DESCRIPTION);
+
+        priorityDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        priorityDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        priorityDescriptor.setDescription(
+                IRedundantManagingNodeProperties.RMN_PRIORITY_DESCRIPTION);
+    }
+
+    private Node redundantManagingNode;
+    private TRMN rmn;
+
+    public RedundantManagingNodePropertySource(Node redundantManagingNode) {
+        super();
+        setNodeData(redundantManagingNode);
+
+        waitNotActiveDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleWaitNotActive(value);
+            }
+        });
+
+        priorityDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleRmnPriority(value);
+            }
+        });
+
+        nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIdDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        configurationDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+
+        isAsyncOnly.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isAsyncOnly.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+
+        isType1Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isType1Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isType2Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isType2Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        forcedObjects.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+
+        lossSocToleranceDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        lossSocToleranceDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+    }
+
+    private void addRedundantNodePropertyDescriptors(
+            List<IPropertyDescriptor> propertyList) {
+
+        if (rmn == null) {
+            return;
+        }
+
+        propertyList.add(nameDescriptor);
+        propertyList.add(nodeIdDescriptor);
+
+        if (rmn.getPathToXDC() != null) {
+
+            propertyList.add(configurationDescriptor);
+        }
+
+        propertyList.add(waitNotActiveDescriptor);
+
+        propertyList.add(priorityDescriptor);
+
+        propertyList.add(isAsyncOnly);
+        propertyList.add(isType1Router);
+        propertyList.add(isType2Router);
+        // propertyList.add(lossSocToleranceDescriptor);
+        if (rmn.getForcedObjects() != null) {
+            propertyList.add(forcedObjects);
+        }
+    }
+
+    @Override
+    public Object getEditableValue() {
+        return rmn;
+    }
+
+    @Override
+    public IPropertyDescriptor[] getPropertyDescriptors() {
+        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        addRedundantNodePropertyDescriptors(propertyList);
+
+        IPropertyDescriptor[] propertyDescriptorArray = {};
+        propertyDescriptorArray = propertyList.toArray(propertyDescriptorArray);
+        return propertyDescriptorArray;
+    }
+
+    @Override
+    public Object getPropertyValue(Object id) {
+        Object retObj = null;
+        if (id instanceof String) {
+            String objectId = (String) id;
+            switch (objectId) {
+                case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                    if (rmn.getName() != null) {
+                        retObj = rmn.getName();
+                    } else {
+                        retObj = new String();
+                    }
+                    break;
+                case IAbstractNodeProperties.NODE_ID_OBJECT:
+                    retObj = rmn.getNodeID();
+                    break;
+                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                    retObj = rmn.getPathToXDC();
+                    break;
+                case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
+                    retObj = redundantManagingNode.getRmnWaitNotActive();
+                    break;
+                case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
+                    retObj = redundantManagingNode.getRmnPriority();
+                    break;
+                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                    int value = (rmn.isIsAsyncOnly() == true) ? 0 : 1;
+                    retObj = new Integer(value);
+                    break;
+                }
+                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                    int value = (rmn.isIsType1Router() == true) ? 0 : 1;
+                    retObj = new Integer(value);
+                    break;
+                }
+                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                    int value = (rmn.isIsType2Router() == true) ? 0 : 1;
+                    retObj = new Integer(value);
+                    break;
+                }
+                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                    String objectText = "";
+                    if (rmn.getForcedObjects() != null) {
+                        List<org.epsg.openconfigurator.xmlbinding.projectfile.Object> forcedObjList = rmn
+                                .getForcedObjects().getObject();
+                        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object obj : forcedObjList) {
+                            objectText = objectText.concat("0x");
+
+                            objectText = objectText.concat(DatatypeConverter
+                                    .printHexBinary(obj.getIndex()));
+                            if (obj.getSubindex() != null) {
+                                objectText = objectText.concat("/0x");
+                                objectText = objectText.concat(DatatypeConverter
+                                        .printHexBinary(obj.getSubindex()));
+                            }
+                            objectText = objectText.concat(";");
+                        }
+                    }
+                    retObj = objectText;
+                    break;
+                case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
+                    retObj = redundantManagingNode.getLossOfSocTolerance();
+                    break;
+                default:
+                    System.err.println("Invalid object string ID:" + objectId);
+                    break;
+            }
+        } else {
+            System.err.println("Invalid object ID:" + id);
+        }
+
+        return retObj;
+    }
+
+    /**
+     * Handles the loss of SoC tolerance assignment.
+     *
+     * @param value The new value of loss of SoC tolerance.
+     *
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    @Override
+    protected String handleLossOfSoCTolerance(Object value) {
+        return NOT_SUPPORTED;
+    }
+
+    @Override
+    protected String handleNodeAssignValue(NodeAssignment nodeAssign,
+            Object value) {
+        if (value instanceof Integer) {
+            int val = ((Integer) value).intValue();
+            boolean result = (val == 0) ? true : false;
+            Result res = OpenConfiguratorLibraryUtils.setNodeAssignment(
+                    nodeAssign, redundantManagingNode, result);
+            if (!res.IsSuccessful()) {
+                return res.GetErrorMessage();
+            }
+        } else {
+            System.err.println(
+                    "handleNodeAssignValue: Invalid value type:" + value);
+        }
+        return null;
+    }
+
+    /**
+     * Handles the priority changes for an RMN.
+     *
+     * @param value New priority to be set.
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleRmnPriority(Object value) {
+        if (value instanceof String) {
+            if (((String) value).isEmpty()) {
+                return ERROR_RMN_PRIORITY_CANNOT_BE_EMPTY;
+            }
+
+            try {
+                long longValue = Long.decode((String) value);
+
+                Result res = OpenConfiguratorCore.GetInstance()
+                        .SetRedundantManagingNodePriority(
+                                redundantManagingNode.getNetworkId(),
+                                redundantManagingNode.getNodeId(), longValue);
+                if (!res.IsSuccessful()) {
+                    return res.GetErrorMessage();
+                }
+
+            } catch (NumberFormatException e) {
+                return ERROR_INVALID_VALUE_RMN_PRIORITY;
+            }
+        } else {
+            System.err
+                    .println("handleRmnPriority: Invalid value type:" + value);
+        }
+        return null;
+    }
+
+    @Override
+    protected String handleSetNodeName(Object name) {
+        if (name instanceof String) {
+            if (((String) name).isEmpty()) {
+                return ERROR_NODE_NAME_CANNOT_BE_EMPTY;
+            }
+
+            Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
+                    redundantManagingNode.getNetworkId(),
+                    redundantManagingNode.getNodeId(), (String) name);
+            if (!res.IsSuccessful()) {
+                return res.GetErrorMessage();
+            }
+        } else {
+            System.err.println("handleSetNodeName: Invalid value type:" + name);
+        }
+        return null;
+    }
+
+    /**
+     * Handles the wait not active modifications.
+     *
+     * @param value New value for wait not active.
+     *
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleWaitNotActive(Object value) {
+        if (value instanceof String) {
+            if (((String) value).isEmpty()) {
+                return ERROR_WAIT_NOT_ACTIVE_CANNOT_BE_EMPTY;
+            }
+            try {
+                long longValue = Long.decode((String) value);
+
+                // Check the minInclusive available in the Schema
+                if (longValue < 250) {
+                    return INVALID_RANGE_WAIT_NOT_ACTIVE;
+                }
+
+                Result res = OpenConfiguratorCore.GetInstance()
+                        .SetRedundantManagingNodeWaitNotActive(
+                                redundantManagingNode.getNetworkId(),
+                                redundantManagingNode.getNodeId(), longValue);
+                if (!res.IsSuccessful()) {
+                    return res.GetErrorMessage();
+                }
+            } catch (NumberFormatException e) {
+                return ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE;
+            }
+        } else {
+            System.err.println(
+                    "handleWaitNotActive: Invalid value type:" + value);
+        }
+        return null;
+    }
+
+    @Override
+    public boolean isPropertySet(Object id) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Override
+    public void resetPropertyValue(Object id) {
+        // TODO Auto-generated method stub
+    }
+
+    /**
+     * Set the node details if the property source instance to be re-used for a
+     * new node.
+     *
+     * @param redundantManagingNode The node instance.
+     */
+    public void setNodeData(final Node redundantManagingNode) {
+        this.redundantManagingNode = redundantManagingNode;
+
+        if (redundantManagingNode.getNodeModel() instanceof TRMN) {
+            rmn = (TRMN) redundantManagingNode.getNodeModel();
+        } else {
+            rmn = null;
+        }
+    }
+
+    @Override
+    public void setPropertyValue(Object id, Object value) {
+        if (id instanceof String) {
+            String objectId = (String) id;
+            switch (objectId) {
+                case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                    redundantManagingNode.setName((String) value);
+                    break;
+                case IAbstractNodeProperties.NODE_ID_OBJECT:
+                    System.err.println(objectId + " made editable");
+                    break;
+                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                    System.err.println(objectId + " made editable");
+                    break;
+                case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
+                    try {
+                        redundantManagingNode.setRmnWaitNotActive(
+                                Long.decode((String) value));
+                    } catch (NumberFormatException e) {
+                        System.err.println(
+                                objectId + " Number format exception" + e);
+                    }
+                    break;
+                case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
+                    try {
+                        redundantManagingNode
+                                .setRmnPriority(Long.decode((String) value));
+                    } catch (NumberFormatException e) {
+                        System.err.println(
+                                objectId + " Number format exception" + e);
+                    }
+                    break;
+                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                    if (value instanceof Integer) {
+                        int val = ((Integer) value).intValue();
+                        boolean result = (val == 0) ? true : false;
+                        rmn.setIsAsyncOnly(result);
+                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
+                                redundantManagingNode, objectId,
+                                String.valueOf(result));
+                    } else {
+                        System.err.println(objectId + " Invalid value type");
+                    }
+                    break;
+                }
+                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                    if (value instanceof Integer) {
+                        int val = ((Integer) value).intValue();
+                        boolean result = (val == 0) ? true : false;
+                        rmn.setIsType1Router(result);
+                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
+                                redundantManagingNode, objectId,
+                                String.valueOf(result));
+                    } else {
+                        System.err.println(objectId + " Invalid value type");
+                    }
+                    break;
+                }
+                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                    if (value instanceof Integer) {
+                        int val = ((Integer) value).intValue();
+                        boolean result = (val == 0) ? true : false;
+                        rmn.setIsType2Router(result);
+                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
+                                redundantManagingNode, objectId,
+                                String.valueOf(result));
+                    } else {
+                        System.err.println(objectId + " Invalid value type");
+                    }
+                    break;
+                }
+                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                    // Ignore
+                    break;
+                default:
+                    System.err.println("Invalid object string ID:" + objectId);
+                    break;
+            }
+        } else {
+            System.err.println("Invalid object ID:" + id);
+        }
+    }
+}

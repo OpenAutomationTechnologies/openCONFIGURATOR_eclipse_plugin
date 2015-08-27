@@ -165,6 +165,8 @@ public class PowerlinkRootNode {
         if (nodeObjectModel instanceof TCN) {
             TCN cnModel = (TCN) nodeObjectModel;
             cnModel.setEnabled(!cnModel.isEnabled());
+            OpenConfiguratorProjectUtils.updateNodeAttributeValue(node,
+                    "enabled", String.valueOf(cnModel.isEnabled()));
         } else {
             System.err.println("Enable disable not supported for nodeType"
                     + nodeObjectModel);
