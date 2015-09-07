@@ -35,8 +35,8 @@ import org.eclipse.ui.IFolderLayout;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
-import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
+import org.epsg.openconfigurator.views.ObjectDictionaryView;
 
 /**
  * The Industrial automation perspective which arranges the views and editors
@@ -50,73 +50,54 @@ public class IndustrialAutomationPerspective implements IPerspectiveFactory {
         super();
     }
 
-    private void addActionSets() {
-        // factory.addActionSet(JavaUI.ID_ACTION_SET);
-        // factory.addActionSet(JavaUI.ID_ELEMENT_CREATION_ACTION_SET);
-        // factory.addActionSet(IPageLayout.ID_NAVIGATE_ACTION_SET); //
-        // NON-NLS-1
-    }
-
     private void addNewWizardShortcuts() {
-        // factory.addNewWizardShortcut("org.eclipse.team.cvs.ui.newProjectCheckout");//NON-NLS-1
-        // factory.addNewWizardShortcut("org.eclipse.ui.wizards.new.folder");//NON-NLS-1
-        // factory.addNewWizardShortcut("org.eclipse.ui.wizards.new.file");//NON-NLS-1
-    }
-
-    private void addPerspectiveShortcuts() {
-        // factory.addPerspectiveShortcut("org.eclipse.team.ui.TeamSynchronizingPerspective");
-        // //NON-NLS-1
-        // factory.addPerspectiveShortcut("org.eclipse.team.cvs.ui.cvsPerspective");
-        // //NON-NLS-1
-        // factory.addPerspectiveShortcut("org.eclipse.ui.resourcePerspective");
-        // //NON-NLS-1
+        factory.addNewWizardShortcut(
+                "org.epsg.openconfigurator.newproject.wizard"); // NON-NLS-1
     }
 
     private void addViews() {
         // Creates the overall folder layout.
         // Note that each new Folder uses a percentage of the remaining
         // EditorArea.
+        String editorArea = factory.getEditorArea();
+        IFolderLayout topLeft = factory.createFolder("topLeft", // NON-NLS-1
+                IPageLayout.LEFT, 0.15f, editorArea);
+        topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);
 
         IFolderLayout bottom = factory.createFolder("bottomRight", // NON-NLS-1
-                IPageLayout.BOTTOM, 0.75f, factory.getEditorArea());
+                IPageLayout.BOTTOM, 0.75f, editorArea);
         bottom.addView(IConsoleConstants.ID_CONSOLE_VIEW);
         bottom.addView(IPageLayout.ID_PROP_SHEET);
+        bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
+        bottom.addView(IPageLayout.ID_PROGRESS_VIEW);
 
-        IFolderLayout topLeft = factory.createFolder("topLeft", // NON-NLS-1
-                IPageLayout.LEFT, 0.25f, factory.getEditorArea());
-        topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER); // NON-NLS-1
-        topLeft.addView(IndustrialNetworkView.ID); // NON-NLS-1
-        topLeft.addView(IndustrialNetworkProjectEditor.ID); // NON-NLS-1
+        IFolderLayout secondTopLeft = factory.createFolder("secondTopLeft", // NON-NLS-1
+                IPageLayout.LEFT, 0.15f, editorArea);
+        secondTopLeft.addPlaceholder(IndustrialNetworkView.ID);
+
+        factory.createFolder("centralEditor", IPageLayout.LEFT, 0.55f,
+                editorArea); // NON-NLS-1
 
         IFolderLayout topRight = factory.createFolder("topRight", // NON-NLS-1
-                IPageLayout.RIGHT, 0.25f, factory.getEditorArea());
-
+                IPageLayout.RIGHT, 0.90f, editorArea);
+        topRight.addPlaceholder(ObjectDictionaryView.ID);
     }
 
     private void addViewShortcuts() {
-        // factory.addShowViewShortcut("org.eclipse.ant.ui.views.AntView");
-        // //NON-NLS-1
-        // factory.addShowViewShortcut("org.eclipse.team.ccvs.ui.AnnotateView");
-        // //NON-NLS-1
-        // factory.addShowViewShortcut("org.eclipse.pde.ui.DependenciesView");
-        // //NON-NLS-1
-        // factory.addShowViewShortcut("org.eclipse.jdt.junit.ResultView");
-        // //NON-NLS-1
-        // factory.addShowViewShortcut("org.eclipse.team.ui.GenericHistoryView");
-        // //NON-NLS-1
         factory.addShowViewShortcut(IConsoleConstants.ID_CONSOLE_VIEW);
-        // factory.addShowViewShortcut(JavaUI.ID_PACKAGES);
-        // factory.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
-        factory.addShowViewShortcut(IPageLayout.ID_OUTLINE);
+        factory.addShowViewShortcut(IPageLayout.ID_PROGRESS_VIEW);
+        factory.addShowViewShortcut(IPageLayout.ID_PROBLEM_VIEW);
+        factory.addShowViewShortcut(IPageLayout.ID_PROP_SHEET);
+
+        factory.addShowViewShortcut(IndustrialNetworkView.ID);
+        factory.addShowViewShortcut(ObjectDictionaryView.ID);
     }
 
     @Override
     public void createInitialLayout(IPageLayout factory) {
         this.factory = factory;
         addViews();
-        addActionSets();
         addNewWizardShortcuts();
-        addPerspectiveShortcuts();
         addViewShortcuts();
     }
 
