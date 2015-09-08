@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/org.epsg.openconfigurator.feature_1.0.0.201506171651.jar" id="org.epsg.openconfigurator.feature" version="1.0.0.201506171651"/>
+   <feature url="features/org.epsg.openconfigurator.feature_2.0.0.201509141652.jar" id="org.epsg.openconfigurator.feature" version="2.0.0.201509141652">
+      <category name="org.epsg.category"/>
+   </feature>
+   <category-def name="org.epsg.category" label="Industrial Automation"/>
 </site>

@@ -107,7 +107,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static final String GENERATOR_VENDOR = "Kalycito Infotech Private Limited &amp; Bernecker + Rainer Industrie Elektronik Ges.m.b.H."; ////$NON-NLS-1$
     public static final String GENERATOR_TOOL_NAME = "openCONFIGURATOR"; ////$NON-NLS-1$
-    public static final String GENERATOR_TOOL_VERSION = "1.5.0"; ////$NON-NLS-1$
+    public static final String GENERATOR_TOOL_VERSION = "2.0.0-pre-release"; ////$NON-NLS-1$
     public static final String SYSTEM_USER_NAME_ID = "user.name";
 
     private static ArrayList<String> defaultBuildConfigurationIdList;

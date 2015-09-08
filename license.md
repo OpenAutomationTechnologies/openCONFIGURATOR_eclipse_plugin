@@ -2,7 +2,10 @@ Licenses {#page_licenses}
 ========
 
 The main source code of openCONFIGURATOR Eclipse Plugin is licensed under
-BSD license by Kalycito Infotech Pvt Ltd.,
+BSD license.
+
+Copyright (c) 2015 Kalycito Infotech Pvt Ltd.
+Copyright (c) 2015 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
 
 It is not allowed to remove any copyright information.
 
