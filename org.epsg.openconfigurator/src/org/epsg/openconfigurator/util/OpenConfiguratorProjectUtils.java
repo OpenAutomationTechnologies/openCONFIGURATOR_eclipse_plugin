@@ -62,6 +62,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.epsg.openconfigurator.lib.wrapper.MapIterator;
 import org.epsg.openconfigurator.lib.wrapper.ObjectCollection;
@@ -187,6 +189,14 @@ public final class OpenConfiguratorProjectUtils {
             return false;
         }
 
+        try {
+            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         return true;
     }
 
@@ -295,6 +305,14 @@ public final class OpenConfiguratorProjectUtils {
             xmlOutput.setFormat(Format.getPrettyFormat());
             xmlOutput.output(document, new FileWriter(projectXmlLocation));
         } catch (JDOMException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -684,6 +702,13 @@ public final class OpenConfiguratorProjectUtils {
         return openConfiguratorProject;
     }
 
+    /**
+     * Saves the actual value changes in the library to the XDD/XDC.
+     *
+     * @param nodeCollection The node list.
+     * @param monitor Progress monitor instance.
+     * @return The result from the library.
+     */
     public static Result persistNodes(final Map<Short, Node> nodeCollection,
             IProgressMonitor monitor) {
         Result res = new Result();
@@ -694,6 +719,11 @@ public final class OpenConfiguratorProjectUtils {
             if (node == null) {
                 System.err.println("Node" + entry.getKey() + " is null");
                 continue;
+            }
+
+            if (monitor.isCanceled()) {
+                throw new OperationCanceledException(
+                        "Operation cancelled by user. Not all data is saved to the XDC.");
             }
 
             System.out.println(
@@ -748,7 +778,6 @@ public final class OpenConfiguratorProjectUtils {
                     String actualValue = objectJcollectionEntry.getValue();
                     long objectIdLong = objectJcollectionEntry.getKey()
                             .getKey();
-                    String objectId = String.format("%04X", objectIdLong);
 
                     boolean isSubObject = false;
                     int subObjectIdShort = objectJcollectionEntry.getKey()
@@ -757,32 +786,33 @@ public final class OpenConfiguratorProjectUtils {
                         isSubObject = true;
                     }
 
-                    String subObjectId = String.format("%02X",
-                            subObjectIdShort);
-
                     PowerlinkObject object = node.getObjects(objectIdLong);
                     if (object != null) {
 
                         if (!isSubObject) {
-                            object.setActualValue(actualValue);
+                            object.setActualValue(actualValue, false);
                             XddJdomOperation.updateActualValue(document, object,
                                     actualValue);
                         } else {
                             PowerlinkSubobject subObj = object
                                     .getSubObject((short) subObjectIdShort);
                             if (subObj != null) {
-                                subObj.setActualValue(actualValue);
+                                subObj.setActualValue(actualValue, false);
                                 XddJdomOperation.updateActualValue(document,
                                         subObj, actualValue);
                             } else {
-                                System.err.println("SubObject 0x" + objectId
-                                        + "/0x" + subObjectId
-                                        + "does not exists");
+                                System.err.println("SubObject 0x"
+                                        + String.format("%04X", objectIdLong)
+                                        + "/0x"
+                                        + String.format("%02X",
+                                                subObjectIdShort)
+                                        + "does not exists in the XDC");
                             }
                         }
                     } else {
-                        System.err.println(
-                                "Object 0x" + objectId + "does not exists");
+                        System.err.println("Object 0x"
+                                + String.format("%04X", objectIdLong)
+                                + "does not exists in the XDC");
                     }
                 }
 
@@ -792,21 +822,13 @@ public final class OpenConfiguratorProjectUtils {
                 xmlOutput.setFormat(Format.getPrettyFormat());
                 xmlOutput.output(document,
                         new FileWriter(node.getAbsolutePathToXdc()));
+
             } catch (JDOMException | IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
             monitor.worked(1);
         }
-        return res;
-    }
-
-    public static Result persistProjectFile(String networkId,
-            OpenCONFIGURATORProject openConfiguratorProject,
-            IProgressMonitor monitor) {
-
-        Result res = new Result();
-
         return res;
     }
 
@@ -861,6 +883,14 @@ public final class OpenConfiguratorProjectUtils {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        try {
+            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -895,6 +925,14 @@ public final class OpenConfiguratorProjectUtils {
             xmlOutput.output(document, new FileWriter(projectXmlLocation));
 
         } catch (JDOMException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
@@ -949,9 +987,9 @@ public final class OpenConfiguratorProjectUtils {
             return false;
         }
 
-        System.out.println(
-                "Upgrading openCONFIGURATOR project to current version."
-                        + project.getGenerator().getToolVersion());
+        System.out.println("Upgrading openCONFIGURATOR project v("
+                + project.getGenerator().getToolVersion()
+                + ") to current version.");
 
         TProjectConfiguration projectConfiguration = project
                 .getProjectConfiguration();
@@ -997,6 +1035,22 @@ public final class OpenConfiguratorProjectUtils {
             // validated.
         }
 
+        TNetworkConfiguration net = project.getNetworkConfiguration();
+        if (net != null) {
+            net.setAsyncMTU(null);
+            net.setCycleTime(null);
+            net.setMultiplexedCycleLength(null);
+            net.setPrescaler(null);
+        }
+
+        TNodeCollection nodeColl = net.getNodeCollection();
+        if (nodeColl != null) {
+            TMN mn = nodeColl.getMN();
+            if (mn != null) {
+                mn.setASndMaxNumber(null);
+                mn.setAsyncSlotTimeout(null);
+            }
+        }
         OpenConfiguratorProjectUtils.updateGeneratorInformation(project);
         return true;
     }

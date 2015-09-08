@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.editors.project;
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -44,6 +45,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
@@ -64,9 +66,11 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IDE;
@@ -112,7 +116,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     /**
      * Editor strings and messages.
      */
-    private static final String PROJECT_EDITOR_PAGE_NAME = "POWERLINK project";
+    private static final String PROJECT_EDITOR_PAGE_NAME = "POWERLINK Project";
     private static final String PROJECT_EDITOR_CREATION_ERROR_MESSAGE = "Error creating project editor overview page";
     private static final String PROJECT_SOURCE_PAGE_NAME = "Source";
     private static final String PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE = "Error creating nested XML editor";
@@ -184,8 +188,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
 
             this.setActivePage(editorPage.getId());
 
-            OpenConfiguratorProjectUtils
-                    .upgradeOpenConfiguratorProject(currentProject);
             editorPage.setOpenCONFIGURATORProject(currentProject);
 
         } catch (NullPointerException e) {
@@ -288,21 +290,10 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         sourcePage.doSave(monitor);
     }
 
-    /**
-     * Implement the actions that happens in the saveAs action.
-     */
     @Override
     public void doSaveAs() {
         // TODO Auto-generated method stub
-    }
 
-    /**
-     * Returns the contents of the project editor source page.
-     *
-     * @return the contents.
-     */
-    private String getContent() {
-        return getDocument().get();
     }
 
     /**
@@ -441,6 +432,14 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         activeProject = projectFile.getProject();
         networkId = activeProject.getName();
 
+        try {
+            activeProject.refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         // Validate the input with openCONFIGURATOR project file schema.
         try {
             currentProject = OpenConfiguratorProjectMarshaller
@@ -453,6 +452,9 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             throw new PartInitException(
                     IndustrialNetworkProjectEditor.INVALID_INPUT_ERROR);
         }
+
+        OpenConfiguratorProjectUtils
+                .upgradeOpenConfiguratorProject(currentProject);
 
         Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .CreateNetwork(networkId);
@@ -491,8 +493,23 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                         + networkCfg.getNodeCollection().getCN().size()
                         + networkCfg.getNodeCollection().getRMN().size();
                 monitor.beginTask("Import MN XDD/XDC", totalWork);
-                return OpenConfiguratorProjectUtils.importNodes(projectFile,
-                        networkCfg, nodeCollection, monitor);
+                IStatus result = OpenConfiguratorProjectUtils.importNodes(
+                        projectFile, networkCfg, nodeCollection, monitor);
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        IViewPart viewPart = PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getActivePage()
+                                .findView(IndustrialNetworkView.ID);
+                        if (viewPart instanceof IndustrialNetworkView) {
+                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
+                            industrialView.editorActivated(
+                                    IndustrialNetworkProjectEditor.this);
+                        }
+                    }
+                });
+
+                return result;
             }
         };
 
@@ -501,15 +518,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
                 .showView(IndustrialNetworkView.ID);
         initSuccessful = true;
-    }
-
-    /**
-     * Checks whether the editor is dirty by checking all the pages that
-     * implemented.
-     */
-    @Override
-    public boolean isDirty() {
-        return super.isDirty();
     }
 
     /**
@@ -531,12 +539,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             sourcePage.doSave(new NullProgressMonitor());
         }
 
-        // check for updates to be propagated to the source code
-        // if (newPageIndex == sourcePage.getIndex()) {
-        // System.err.println("Currently in SourcePage and not dirty");
-        // updateSourceToModel();
-        // }
-
         // switch page
         super.pageChange(newPageIndex);
 
@@ -549,28 +551,40 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
 
     }
 
-    public void persistLibraryData(IProgressMonitor monitor) {
+    public void persistLibraryData(IProgressMonitor monitor)
+            throws InterruptedException {
         monitor.beginTask("Save XDC configurations", nodeCollection.size());
 
-        // Write the XDC configuration Changes from the library to the XDC file.
-        Result res = OpenConfiguratorProjectUtils.persistNodes(nodeCollection,
-                monitor);
-        if (!res.IsSuccessful()) {
-            System.err
-                    .println(OpenConfiguratorLibraryUtils.getErrorMessage(res));
-        }
-        monitor.done();
+        WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
 
-        monitor.beginTask("Save project XML configurations", 100);
-        OpenConfiguratorProjectUtils.persistProjectFile(networkId,
-                currentProject, monitor);
+            @Override
+            protected void execute(IProgressMonitor monitor)
+                    throws CoreException, InvocationTargetException,
+                    InterruptedException {
+                // Write the XDC configuration Changes from the library to the
+                // XDC file.
+                Result res = OpenConfiguratorProjectUtils
+                        .persistNodes(nodeCollection, monitor);
+                if (!res.IsSuccessful()) {
+                    System.err.println(
+                            OpenConfiguratorLibraryUtils.getErrorMessage(res));
+                }
+            }
+        };
+
+        try {
+            wmo.run(monitor);
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         monitor.done();
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent event) {
         // TODO Auto-generated method stub
-
     }
 
     /**
@@ -674,6 +688,12 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                     closeEditor();
                 }
                 break;
+            case IResourceDelta.CHANGED:
+                if (oldDelta.getFlags() == IResourceDelta.CONTENT) {
+                    setInput(new FileEditorInput(currentProjectFile));
+                }
+
+                break;
             default:
                 break;
         }
@@ -692,16 +712,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * Updates the openCONIGURATOR project model into the XML source file.
      */
     void updateModelToSource() {
-        System.out.println("Model -> Source");
         String dataFromModel = getModelData();
         setContent(dataFromModel);
-    }
-
-    /**
-     * Update the XML source into the openCONFIGURATOR project model
-     */
-    void updateSourceToModel() {
-        System.out.println("Source -> model");
-        // reloadFromSourceText(getContent());
     }
 }
