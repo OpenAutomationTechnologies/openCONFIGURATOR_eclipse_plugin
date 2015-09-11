@@ -31,6 +31,8 @@
 
 package org.epsg.openconfigurator.editors.project;
 
+import java.io.File;
+
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -229,6 +231,13 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
 
                 if (txtLocation.getText().isEmpty()) {
                     setErrorMessage(AddEditTPathDialog.LOCATION_FIELD_MESSAGE_MUST_SPEFIFY_PATH);
+                    return;
+                }
+
+                File file = new File(txtLocation.getText().trim());
+                if (!file.exists() || !file.isDirectory()) {
+                    setErrorMessage("Invalid path specified.");
+                    return;
                 }
 
                 dirty = true;
@@ -314,7 +323,12 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
         }
 
         if ((txtLocation.getText() != null) && !txtLocation.getText().isEmpty()) {
-            locationValid = true;
+            File file = new File(txtLocation.getText().trim());
+            if (!file.exists() || !file.isDirectory()) {
+                setErrorMessage("Invalid path specified.");
+            } else {
+                locationValid = true;
+            }
         } else {
             setErrorMessage(AddEditTPathDialog.LOCATION_FIELD_MESSAGE_INVALID_PATH);
         }

@@ -141,15 +141,15 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     /**
      * Dialog strings and messages.
      */
-    private final String DIALOG_TITLE = "Configure settings - ";
-    private final String DIALOG_MESSAGE = "Configure the build configuration settings";
+    private final String DIALOG_TITLE = "Configure Setting - ";
+    private final String DIALOG_MESSAGE = "Add a setting to build configuration.";
     private final String VALUE_ERROR_MESSAGE = "Enter a valid value.\nFormat: NodeID;NodeID; eg:1;32;110;";
     private final String VALUE_TOOL_TIP = "Empty: all nodes.\nCustom format: NodeID;NodeID; eg:1;32;110;";
     private final String NAME_LABEL = "Name:";
     private final String VALUE_LABEL = "Value:";
     private final String ACTIVE_LABEL = "Active:";
     private final String INVALID_SETTINGS_TYPE = "Select a valid Settings type";
-    private final String EMPTY_SETTINGS_TYPE_ERROR = "No new Settings are available. Try editing from the settings table.";
+    private final String EMPTY_SETTINGS_TYPE_ERROR = "No new settings are available. Try editing from the settings table.";
     private final String ERROR_INVALID_NODE_ID = "{0} is not a valid node ID";
 
     /**

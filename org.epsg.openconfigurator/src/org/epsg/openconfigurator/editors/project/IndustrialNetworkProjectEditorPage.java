@@ -95,17 +95,17 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String ID = "org.epsg.openconfigurator.editors.IndustrialNetworkProjectEditorPage";
 
     /** Editor label and error messages */
-    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING = "Build Configuration Settings";
-    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION = "Provides the build configuration settings for the project";
-    private static final String AUTOGENERATIONSETTINGS_SECTION_ACTIVEGROUP_LABEL = "Active group:";
+    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING = "Build Configurations";
+    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION = "Provides the build configuration for the project";
+    private static final String AUTOGENERATIONSETTINGS_SECTION_ACTIVEGROUP_LABEL = "Active Configuration:";
     private static final String AUTOGENERATIONSETTINGS_SECTION_MODIFY_LABEL = "Modify...";
     private static final String AUTOGENERATIONSETTINGS_SECTION_INFO_LABEL = "Configure the build configuration specific settings:";
     private static final String AUTOGENERATIONSETTINGS_SECTION_ADD_LABEL = "Add...";
     private static final String AUTOGENERATIONSETTINGS_SECTION_EDIT_LABEL = "Edit...";
     private static final String AUTOGENERATIONSETTINGS_SECTION_DELETE_LABEL = "Delete";
 
-    private static final String GENERATOR_SECTION_HEADING = "Generator";
-    private static final String GENERATOR_SECTION_HEADING_DESCRIPTION = "Provides the project file generator information";
+    private static final String GENERATOR_SECTION_HEADING = "Project Information";
+    private static final String GENERATOR_SECTION_HEADING_DESCRIPTION = "Provides detailed project information";
     private static final String GENERATOR_SECTION_MODIFIED_BY_LABEL = "Modified By:";
     private static final String GENERATOR_SECTION_CREATED_BY_LABEL = "Created By:";
     private static final String GENERATOR_SECTION_MODIFIED_ON_LABEL = "Modified On:";
@@ -114,8 +114,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String GENERATOR_SECTION_TOOL_NAME_LABEL = "Tool Name:";
     private static final String GENERATOR_SECTION_VENDOR_NAME_LABEL = "Vendor:";
 
-    private static final String PATH_SECTION_HEADING = "Project Path Settings";
-    private static final String PATH_SECTION_HEADING_DESCRIPTION = "Provides the Path Settings";
+    private static final String PATH_SECTION_HEADING = "Path Settings";
+    private static final String PATH_SECTION_HEADING_DESCRIPTION = "Provides the path settings for the project";
     private static final String PATH_SECTION_MODIFY_PATH_LIST_HYPERLINK_LABEL = "Modify the available list of paths";
     private static final String PATH_SECTION_ADD_LABEL = "Add...";
     private static final String PATH_SECTION_OUTPUT_PATH_LABEL = "Output path:";
@@ -449,6 +449,17 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     // It got cancelled.
                 }
             } else if (e.widget == deleteSettingsButton) {
+
+                int[] selectedIndices = agSettingsTable.getSelectionIndices();
+                if (selectedIndices.length <= 0) {
+                    System.err.println(
+                            IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR);
+                    PluginErrorDialogUtils.displayErrorMessageDialog(
+                            getSite().getShell(),
+                            IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR,
+                            null);
+                    return;
+                }
 
                 TableItem[] selectedItemList = agSettingsTable.getSelection();
                 for (TableItem selectedItem : selectedItemList) {
@@ -1017,6 +1028,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 }
 
                 pathComboViewer.refresh();
+                if (pathDropDown.getText().isEmpty()) {
+                    pathDropDown.select(0);
+                }
             }
         });
 

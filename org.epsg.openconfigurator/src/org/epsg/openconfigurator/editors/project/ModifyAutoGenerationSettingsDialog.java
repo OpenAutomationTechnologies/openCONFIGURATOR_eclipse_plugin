@@ -219,18 +219,18 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
     /**
      * Dialog messages and labels.
      */
-    private static final String DIALOG_TITLE = "Build Configuration Groups";
-    private static final String DIALOG_DEFAULT_MESSAGE = "Configure the build configuration settings group";
-    private static final String NAME = "Group Name";
+    private static final String DIALOG_TITLE = "Build Configurations";
+    private static final String DIALOG_DEFAULT_MESSAGE = "Add or delete build configurations.";
+    private static final String NAME = "Configuration Name";
     private static final String ADD_BUTTON_LABEL = "Add";
     private static final String DELETE_BUTTON_LABEL = "Delete";
     private static final String NEW_SETTINGS_GROUP_NAME = "custom";
     private static final String SETTINGS_ID_EMPTY_VALUES_NOT_ALLOWED = "No empty values are allowed";
     private static final String GROUP_NAME_ALREADY_PRESENT_ERROR = "{0} already present.";
-    private static final String REMOVE_GROUP_NAME_FAILED = "Error in removing the autogenerationsetting. ID:{0}";
+    private static final String REMOVE_GROUP_NAME_FAILED = "Error in removing the build configurations. ID:{0}";
 
     /**
-     * Tableviwer to list the group IDs.
+     * Table viewer to list the group IDs.
      */
     private TableViewer tableViewer;
 

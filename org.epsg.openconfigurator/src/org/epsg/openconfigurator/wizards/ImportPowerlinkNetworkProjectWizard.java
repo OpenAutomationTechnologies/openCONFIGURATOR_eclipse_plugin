@@ -47,8 +47,8 @@ import org.eclipse.ui.IWorkbench;
  * @author Ramakrishnan P
  *
  */
-public class ImportPowerlinkNetworkProjectWizard extends Wizard implements
-        IImportWizard, IExecutableExtension {
+public class ImportPowerlinkNetworkProjectWizard extends Wizard
+        implements IImportWizard, IExecutableExtension {
 
     /**
      * Import openCONFIGURATOR project page.
@@ -82,9 +82,6 @@ public class ImportPowerlinkNetworkProjectWizard extends Wizard implements
      */
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
-        // this.setDefaultPageImageDescriptor(IDEWorkbenchPlugin
-        //        .getIDEImageDescriptor("wizban/importproj_wiz.png")); //$NON-NLS-1$
-        IStructuredSelection currentSelection = selection;
     }
 
     /*
@@ -108,7 +105,6 @@ public class ImportPowerlinkNetworkProjectWizard extends Wizard implements
     @Override
     public void setInitializationData(IConfigurationElement config,
             String propertyName, Object data) throws CoreException {
-        IConfigurationElement _configurationElement = config;
     }
 
 }

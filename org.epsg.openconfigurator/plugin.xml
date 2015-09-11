@@ -10,7 +10,7 @@
       </category>
       <view
             name="Industrial Network"
-            icon="icons/releng_gears.gif"
+            icon="icons/window_16.gif"
             category="org.epsg.openconfigurator.view.category"
             class="org.epsg.openconfigurator.views.IndustrialNetworkView"
             id="org.epsg.openconfigurator.views.IndustrialNetworkView">
@@ -217,7 +217,7 @@
             class="org.epsg.openconfigurator.wizards.ImportPowerlinkNetworkProjectWizard"
             icon="icons/openconfigurator.gif"
             id="org.epsg.openconfigurator.wizard.importproject"
-            name="Import openCONFIGURATOR projects (pre v1.4.0 are not supported)">
+            name="Existing openCONFIGURATOR projects">
       </wizard>
    </extension>
    <extension

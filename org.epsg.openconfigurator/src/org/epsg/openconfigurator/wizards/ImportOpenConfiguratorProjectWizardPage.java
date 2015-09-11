@@ -299,7 +299,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private static final String IMPORT_PROJECT_WIZARD_PAGE_NAME = "Import openCONFIGURATOR project";
 
     private static final String IMPORT_PROJECT_WIZARD_PAGE_TITLE = "Import openCONFIGURATOR project";
-    private static final String IMPORT_PROJECT_WIZARD_PAGE_DESCRIPTION = "Select a directory to search for existing openCONFIGURATOR projects";
+    private static final String IMPORT_PROJECT_WIZARD_PAGE_DESCRIPTION = "Select a directory to search for existing projects (Version 1.4.0 or above required)";
 
     private static final String OPTIONS_GROUP_LABEL = "Options";
     private static final String NESTED_PROJECTS_LABEL = "Search for nested projects";

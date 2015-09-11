@@ -222,8 +222,6 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             int pos = extensionXdd.lastIndexOf(".");
             if (pos > 0) {
                 extensionXdd = extensionXdd.substring(0, pos);
-            } else {
-                // TODO: ERR. need to assert.
             }
 
             String targetConfigurationPath = new String(
@@ -280,7 +278,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
 
         Group grpConfiguration = new Group(composite, SWT.NONE);
         FormData fd_grpConfiguration = new FormData();
-        fd_grpConfiguration.right = new FormAttachment(100, -58);
+        fd_grpConfiguration.right = new FormAttachment(100, -10);
         fd_grpConfiguration.left = new FormAttachment(0, 10);
         grpConfiguration.setLayoutData(fd_grpConfiguration);
         grpConfiguration
@@ -317,9 +315,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         });
         btnBrowse.setEnabled(false);
         FormData fd_btnBrowse = new FormData();
-        fd_btnBrowse.right = new FormAttachment(0, 485);
         fd_btnBrowse.top = new FormAttachment(0, 54);
-        fd_btnBrowse.left = new FormAttachment(0, 410);
+        fd_btnBrowse.right = new FormAttachment(100, -41);
         btnBrowse.setLayoutData(fd_btnBrowse);
         btnBrowse
                 .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_BROWSE_LABEL);
@@ -365,6 +362,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
                 .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CUSTOM_LABEL);
 
         mnConfiguration = new Text(grpConfiguration, SWT.BORDER);
+        fd_btnBrowse.left = new FormAttachment(mnConfiguration, 14);
         mnConfiguration.setEnabled(false);
         mnConfiguration.setText(defaultMnXDD);
         mnConfiguration
@@ -385,7 +383,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             }
         });
         FormData fd_text = new FormData();
-        fd_text.right = new FormAttachment(0, 404);
+        fd_text.right = new FormAttachment(0, 421);
         fd_text.top = new FormAttachment(0, 56);
         fd_text.left = new FormAttachment(0, 104);
         mnConfiguration.setLayoutData(fd_text);
@@ -406,9 +404,9 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
 
         Label lblNodeId = new Label(composite, SWT.NONE);
         FormData fd_lblNodeId = new FormData();
-        fd_lblNodeId.right = new FormAttachment(0, 75);
-        fd_lblNodeId.top = new FormAttachment(0, 59);
-        fd_lblNodeId.left = new FormAttachment(0, 10);
+        fd_lblNodeId.top = new FormAttachment(spinnerNodeId, 3, SWT.TOP);
+        fd_lblNodeId.left = new FormAttachment(0, 22);
+        fd_lblNodeId.right = new FormAttachment(0, 87);
         lblNodeId.setLayoutData(fd_lblNodeId);
         lblNodeId
                 .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NODEID_LABEL);
@@ -416,21 +414,21 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         Label lblXddxdcFile = new Label(grpConfiguration, SWT.NONE);
         FormData fd_lblXddxdcFile = new FormData();
         fd_lblXddxdcFile.bottom = new FormAttachment(btnBrowse, 0, SWT.BOTTOM);
-        fd_lblXddxdcFile.top = new FormAttachment(mnConfiguration, 0, SWT.TOP);
-        fd_lblXddxdcFile.right = new FormAttachment(mnConfiguration, 0);
+        fd_lblXddxdcFile.top = new FormAttachment(composite_1, 26);
+        fd_lblXddxdcFile.left = new FormAttachment(composite_1, 0, SWT.LEFT);
         lblXddxdcFile.setLayoutData(fd_lblXddxdcFile);
         lblXddxdcFile
                 .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDD_XDC_FILE_LABEL);
 
         Label lblName = new Label(composite, SWT.NONE);
         FormData fd_lblName = new FormData();
-        fd_lblName.right = new FormAttachment(0, 65);
-        fd_lblName.top = new FormAttachment(0, 18);
-        fd_lblName.left = new FormAttachment(0, 10);
+        fd_lblName.left = new FormAttachment(lblNodeId, 0, SWT.LEFT);
+        fd_lblName.right = new FormAttachment(0, 77);
         lblName.setLayoutData(fd_lblName);
         lblName.setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_LABEL);
 
         txtNodeName = new Text(composite, SWT.BORDER);
+        fd_lblName.top = new FormAttachment(txtNodeName, 3, SWT.TOP);
         txtNodeName.setText(defaultMasterName);
         txtNodeName
                 .setToolTipText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_TIP);
@@ -482,10 +480,10 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         fd_text_1.left = new FormAttachment(0, 120);
         txtNodeName.setLayoutData(fd_text_1);
         txtNodeName.setFocus();
-        composite.setTabList(new Control[] { txtNodeName, spinnerNodeId,
-                grpConfiguration });
-        grpConfiguration.setTabList(new Control[] { composite_1,
-                mnConfiguration, btnBrowse });
+        composite.setTabList(
+                new Control[] { txtNodeName, spinnerNodeId, grpConfiguration });
+        grpConfiguration.setTabList(
+                new Control[] { composite_1, mnConfiguration, btnBrowse });
         composite_1.setTabList(new Control[] { btnDefaultConfiguation,
                 btnCustomConfiguration });
 
