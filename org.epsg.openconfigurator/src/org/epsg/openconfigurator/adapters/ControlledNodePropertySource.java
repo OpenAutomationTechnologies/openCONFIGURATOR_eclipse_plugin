@@ -76,7 +76,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
 
     private static final String CN_POLL_RESPONSE_MAX_LATENCY_LABEL = "PollResponse Max Latency(ns)";
-    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout(µs)";
+    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout(Âµs)";
 
     /**
      * Station types
@@ -498,7 +498,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
                     try {
                         long val = Long.decode(cnNode.getLossOfSocTolerance());
-                        long valInUs = Long.divideUnsigned(val, 1000);
+                        long valInUs = val / 1000;
                         retObj = String.valueOf(valInUs);
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
