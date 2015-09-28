@@ -2,3 +2,4 @@
 features
 plugins
 *~
+/target/
