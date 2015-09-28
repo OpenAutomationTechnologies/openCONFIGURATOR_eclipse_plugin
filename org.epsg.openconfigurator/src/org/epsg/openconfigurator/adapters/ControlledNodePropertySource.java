@@ -76,7 +76,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
 
     private static final String CN_POLL_RESPONSE_MAX_LATENCY_LABEL = "PollResponse Max Latency(ns)";
-    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout(µs)";
+    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout(" + "\u00B5" + "s)";
 
     /**
      * Station types

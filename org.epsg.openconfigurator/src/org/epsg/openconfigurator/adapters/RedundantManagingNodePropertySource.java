@@ -60,7 +60,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 public class RedundantManagingNodePropertySource
         extends AbstractNodePropertySource implements IPropertySource {
 
-    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active(µs)";
+    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active(" + "\u00B5" + "s)";
     private static final String RMN_PRIORITY_LABEL = "Priority";
 
     private static final TextPropertyDescriptor waitNotActiveDescriptor = new TextPropertyDescriptor(

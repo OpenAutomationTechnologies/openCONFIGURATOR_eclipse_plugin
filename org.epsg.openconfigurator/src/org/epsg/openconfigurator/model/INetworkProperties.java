@@ -44,7 +44,7 @@ public interface INetworkProperties {
     public static final String NET_MUTLIPLEX_CYCLE_CNT_OBJECT = "multiplexedCycleLength"; //$NON-NLS-1$
     public static final String NET_PRESCALER_OBJECT = "prescaler"; //$NON-NLS-1$
 
-    public static final String NETWORK_CYCLE_TIME_DESCRIPTION = "The cycle-time of the POWERLINK network in µs. See 0x1006.";
+    public static final String NETWORK_CYCLE_TIME_DESCRIPTION = "The cycle-time of the POWERLINK network in " + "\u00B5" + "s. See 0x1006.";
     public static final String NETWORK_ASYNC_MTU_DESCRIPTION = "The MTU for the async. slot in bytes. See 0x1F98/0x8.";
     public static final String NETWORK_MULTIPLEXED_CYCLE_CNT_DESCRIPTION = "The length of the multiplexed cycle. See 0x1F98/0x7.";
     public static final String NETWORK_PRE_SCALER_DESCRIPTION = "Toggle rate for the SoC PS flag. See 0x1F98/0x9.";

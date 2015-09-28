@@ -54,7 +54,7 @@ public abstract class AbstractNodePropertySource {
     private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Is Type1 Router";
     private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Is Type2 Router";
     private static final String NODE_FORCED_OBJECTS_LABEL = "Forced Objects";
-    private static final String CN_LOSS_OF_SOC_TOLERANCE_LABEL = "Loss of SoC Tolerance(µs)";
+    private static final String CN_LOSS_OF_SOC_TOLERANCE_LABEL = "Loss of SoC Tolerance(" + "\u00B5" + "s)";
 
     // ERROR messages
     public static final String NOT_SUPPORTED = "Currently not supported";

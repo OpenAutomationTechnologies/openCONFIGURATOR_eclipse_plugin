@@ -44,7 +44,7 @@ public interface IRedundantManagingNodeProperties
     public static final String RMN_WAIT_NOT_ACTIVE_OBJECT = "waitNotActive"; //$NON-NLS-1$
     public static final String RMN_PRIORITY_OBJECT = "priority"; //$NON-NLS-1$
 
-    public static final String RMN_WAIT_NOT_ACTIVE_DESCRIPTION = "Describes the time interval in µs that the RMN shall remain in state 'NOT_ACTIVE' and listen for POWERLINK frames on the network before it changes over to 'PRE_OPERATIONAL_1'.";
+    public static final String RMN_WAIT_NOT_ACTIVE_DESCRIPTION = "Describes the time interval in " + "\u00B5" + "s that the RMN shall remain in state 'NOT_ACTIVE' and listen for POWERLINK frames on the network before it changes over to 'PRE_OPERATIONAL_1'.";
     public static final String RMN_PRIORITY_DESCRIPTION = "Describes the priority that the RMN will have during switch-over (in case of AMN failure). Value 1 is the highest priority value.";
 
     //

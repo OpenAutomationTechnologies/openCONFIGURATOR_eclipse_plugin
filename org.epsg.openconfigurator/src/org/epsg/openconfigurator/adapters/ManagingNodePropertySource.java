@@ -67,7 +67,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             "Async Slot timeout(ns)", "ASnd Max Latency(ns)" };
 
     private static final String[] NETWORK_PROPERTY_LABEL_LIST = {
-            "Cycle Time(µs)", "Async MTU size(Bytes)",
+            "Cycle Time(" + "\u00B5" + "s)", "Async MTU size(Bytes)",
             "Multiplexed Cycle Count", "Pre-Scaler" };
 
     private static final String MN_CATEGORY = "Managing Node";
@@ -107,7 +107,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
 
     private static final String ERROR_CYCLE_TIME_CANNOT_BE_EMPTY = "Cycle-time cannot be empty.";
     private static final String INVALID_RANGE_CYCLE_TIME = "Invalid range for Cycle-time.";
-    private static final String MINIMIUM_PLK_SUPPORTED_CYCLE_TIME = "Minumum Cycle-time should be 250(µs) or above";
+    private static final String MINIMIUM_PLK_SUPPORTED_CYCLE_TIME = "Minumum Cycle-time should be 250(" + "\u00B5" + "s) or above";
     private static final String ERROR_INVALID_VALUE_CYCLE_TIME = "Invalid value for Cycle-time.";
 
     private static final String ERROR_ASYNC_MTU_CANNOT_BE_EMPTY = "AsyncMtu cannot be empty.";
