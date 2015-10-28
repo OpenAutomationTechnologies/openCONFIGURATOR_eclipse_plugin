@@ -322,6 +322,46 @@ public final class OpenConfiguratorProjectUtils {
     }
 
     /**
+     * Force actual value of the Object and writes in the project file
+     *
+     * @param node The node for which the object is forced.
+     * @param object The POWERLINK object to be forced.
+     * @param subObject The sub-object to be forced. Can be null.
+     * @param force True to force and False to remove.
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public static void forceActualValue(final Node node, PowerlinkObject object,
+            PowerlinkSubobject subObject, boolean force)
+                    throws JDOMException, IOException {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+
+        Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                IPowerlinkProjectSupport.UTF8_ENCODING);
+        InputSource input = new InputSource(reader);
+        input.setSystemId(xmlFile.toURI().toString());
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(input);
+
+        if (force) {
+            ProjectJDomOperation.forceActualValue(document, node, object,
+                    subObject);
+        } else {
+            ProjectJDomOperation.removeForcedObject(document, node, object,
+                    subObject);
+        }
+
+        XMLOutputter xmlOutput = new XMLOutputter();
+
+        // display nice
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(document, new FileWriter(projectXmlLocation));
+    }
+
+    /**
      * Get the active TAutoGenerationSettings instance from the project model.
      *
      * @param project OpenCONFIGURATORProject instance

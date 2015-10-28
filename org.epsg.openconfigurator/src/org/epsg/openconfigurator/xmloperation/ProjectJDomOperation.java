@@ -35,9 +35,10 @@ import java.util.List;
 
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
-import org.epsg.openconfigurator.model.IManagingNodeProperties;
 import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -221,20 +222,143 @@ public class ProjectJDomOperation {
      * @param node The node to be removed from the project file.
      */
     public static void deleteNode(Document document, Node node) {
-        String xpath = "//oc:";
-        if (node.getNodeModel() instanceof TCN) {
-            xpath += IControlledNodeProperties.CN_TAG;
-        } else if (node.getNodeModel() instanceof TRMN) {
-            xpath += IRedundantManagingNodeProperties.RMN_TAG;
+        JDomUtil.removeElement(document, node.getXpath(),
+                OPENCONFIGURATOR_NAMESPACE);
+    }
+
+    /**
+     * Add the force configuration for the object/sub-object for the given node.
+     *
+     * @param document The project file instance.
+     * @param node The node for which the object/sub-object has to be forced.
+     * @param object The object to be forced.
+     * @param subObject The sub-object to be forced. Null in case of object.
+     */
+    public static void forceActualValue(Document document, final Node node,
+            PowerlinkObject object, PowerlinkSubobject subObject) {
+
+        if (subObject != null) {
+            System.out.println("Force object actual value:"
+                    + object.getObjectIdRaw() + subObject.getSubobjectIdRaw());
         } else {
-            System.err.println("Unsupported node ID:" + node.getNodeId()
-                    + " modelType:" + node.getNodeModel());
+            System.out.println(
+                    "Force object actual value:" + object.getObjectIdRaw());
         }
 
-        xpath += "[@" + IAbstractNodeProperties.NODE_ID_OBJECT + "='"
-                + node.getNodeIdString() + "']";
+        if (isObjectAlreadyForced(document, node, object, subObject)) {
+            return;
+        }
+
+        String forcedTagXpath = node.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT;
+        if (JDomUtil.isXpathPresent(document, forcedTagXpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            Element newObjElement = new Element(
+                    IAbstractNodeProperties.NODE_OBJECTS_OBJECT);
+            Attribute objAttr = new Attribute(
+                    IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT,
+                    object.getObjectIdRaw());
+            newObjElement.setAttribute(objAttr);
+
+            if (subObject != null) {
+                Attribute subObjAttr = new Attribute(
+                        IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT,
+                        subObject.getSubobjectIdRaw());
+                newObjElement.setAttribute(subObjAttr);
+            }
+
+            JDomUtil.addNewElement(document, forcedTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE, newObjElement);
+        } else {
+
+            Element newObjElement = new Element(
+                    IAbstractNodeProperties.NODE_OBJECTS_OBJECT);
+            Attribute objAttr = new Attribute(
+                    IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT,
+                    object.getObjectIdRaw());
+            newObjElement.setAttribute(objAttr);
+
+            if (subObject != null) {
+                Attribute subObjAttr = new Attribute(
+                        IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT,
+                        subObject.getSubobjectIdRaw());
+                newObjElement.setAttribute(subObjAttr);
+            }
+
+            Element newElement = new Element(
+                    IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT);
+            newElement.setContent(newObjElement);
+
+            JDomUtil.addNewElement(document, node.getXpath(),
+                    OPENCONFIGURATOR_NAMESPACE, newElement);
+        }
+    }
+
+    /**
+     * Check if object is already forced in the project XML file.
+     *
+     * @param document The project file instance.
+     * @param node The node instance.
+     * @param object The object to be checked.
+     * @param subObject The sub-object to be checked.
+     * @return True if available False otherwise.
+     */
+    private static boolean isObjectAlreadyForced(Document document,
+            final Node node, PowerlinkObject object,
+            PowerlinkSubobject subObject) {
+        String xpath = node.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT + "/oc:"
+                + IAbstractNodeProperties.NODE_OBJECTS_OBJECT + "[@"
+                + IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT + "='"
+                + object.getObjectIdRaw() + "']";
+        if (subObject != null) {
+            xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT
+                    + "='" + subObject.getSubobjectIdRaw() + "']";
+        }
+
+        return JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE);
+    }
+
+    /**
+     * Remove the forced object from the project XML file.
+     *
+     * @param document The project file instance.
+     * @param node The node instance.
+     * @param object The object to be removed.
+     * @param subObject The sub-object to be removed. Null incaseof object.
+     */
+    public static void removeForcedObject(Document document, final Node node,
+            PowerlinkObject object, PowerlinkSubobject subObject) {
+
+        if (subObject != null) {
+            System.out.println("removeForcedObject actual value:"
+                    + object.getObjectIdRaw() + subObject.getSubobjectIdRaw());
+        } else {
+            System.out.println("removeForcedObject actual value:"
+                    + object.getObjectIdRaw());
+        }
+
+        String xpath = node.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT + "/oc:"
+                + IAbstractNodeProperties.NODE_OBJECTS_OBJECT + "[@"
+                + IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT + "='"
+                + object.getObjectIdRaw() + "']";
+        if (subObject != null) {
+            xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT
+                    + "='" + subObject.getSubobjectIdRaw() + "']";
+        }
 
         JDomUtil.removeElement(document, xpath, OPENCONFIGURATOR_NAMESPACE);
+
+        String forcedTagXpath = node.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT;
+
+        if (JDomUtil.getChildrenCount(document, forcedTagXpath,
+                OPENCONFIGURATOR_NAMESPACE) == 0) {
+            JDomUtil.removeElement(document, forcedTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE);
+        }
     }
 
     /**
@@ -262,19 +386,8 @@ public class ProjectJDomOperation {
     public static void updateNodeAttributeValue(Document document,
             final Node node, final String attributeName,
             final String attributeValue) {
-        String xpath = "//oc:";
-        Object nodeModel = node.getNodeModel();
-        if (nodeModel instanceof TNetworkConfiguration) {
-            xpath += IManagingNodeProperties.MN_TAG;
-        } else if (nodeModel instanceof TCN) {
-            xpath += IControlledNodeProperties.CN_TAG;
-        } else if (nodeModel instanceof TRMN) {
-            xpath += IRedundantManagingNodeProperties.RMN_TAG;
-        }
-        xpath += "[@" + IAbstractNodeProperties.NODE_ID_OBJECT + "='"
-                + node.getNodeIdString() + "']";
-
-        JDomUtil.updateAttribute(document, xpath, OPENCONFIGURATOR_NAMESPACE,
+        JDomUtil.updateAttribute(document, node.getXpath(),
+                OPENCONFIGURATOR_NAMESPACE,
                 new Attribute(attributeName, attributeValue));
     }
 }

@@ -31,18 +31,23 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
-import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.jdom2.JDOMException;
 
 /**
  * Describes the properties for a POWERLINK object.
@@ -97,6 +102,18 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             }
         });
 
+        forceActualValue.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        forceActualValue
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        forceActualValue.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+
+                return handleForceActualValue(value);
+            }
+        });
+
         denotationDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
         denotationDescriptor
@@ -140,6 +157,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
 
         if (isActualValueEditable()) {
             propertyList.add(actualValueEditableDescriptor);
+            propertyList.add(forceActualValue);
         } else {
             if (object.getActualValue() != null) {
                 propertyList.add(actualValueReadOnlyDescriptor);
@@ -214,6 +232,12 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                         retObj = new String();
                     }
                     break;
+                case OBJ_FORCE_ACTUAL_VALUE_ID:
+
+                    int val = (plkObject.isObjectForced() == true) ? 0 : 1;
+                    retObj = new Integer(val);
+
+                    break;
                 case OBJ_DENOTATION_ID:
                     retObj = object.getDenotation();
                     break;
@@ -242,13 +266,27 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
      *         being the error message to display to the end user.
      */
     protected String handleActualValue(Object value) {
-        String actualVal = (String) value;
-        Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(),
-                plkObject.getObjectId(), actualVal);
+        Result res = OpenConfiguratorLibraryUtils
+                .setObjectActualValue(plkObject, (String) value);
         if (!res.IsSuccessful()) {
             return OpenConfiguratorLibraryUtils.getErrorMessage(res);
         }
+        return null;
+    }
+
+    /**
+     * Handles the Force actual value modifications.
+     *
+     * @param value The value to be set.
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleForceActualValue(Object value) {
+        if (plkObject.getActualValue() == null) {
+            return "Set some value in the actual value field.";
+        }
+
         return null;
     }
 
@@ -299,9 +337,49 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID:
                     plkObject.setActualValue((String) value, true);
                     break;
+                case OBJ_FORCE_ACTUAL_VALUE_ID: {
+
+                    if (value instanceof Integer) {
+                        int val = ((Integer) value).intValue();
+                        boolean result = (val == 0) ? true : false;
+
+                        Result res = OpenConfiguratorLibraryUtils
+                                .forceObject(plkObject, result);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        } else {
+                            // Success - update the OBD
+                            try {
+                                plkObject.forceActualValue(result, true);
+                            } catch (JDOMException | IOException e) {
+                                e.printStackTrace();
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(
+                                                "Could not write to file."
+                                                        + e.getMessage());
+                            }
+                        }
+
+                    } else {
+                        System.err.println("Invalid value type" + value);
+                    }
+
+                    break;
+                }
                 default:
                     // others are not editable.
             }
+        }
+
+        try {
+            plkObject.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 }

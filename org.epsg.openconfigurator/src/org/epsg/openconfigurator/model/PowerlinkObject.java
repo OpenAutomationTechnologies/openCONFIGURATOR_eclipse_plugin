@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
+import org.jdom2.JDOMException;
 
 /**
  * Wrapper class for a POWERLINK object.
@@ -186,6 +188,27 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
         }
     }
 
+    /**
+     * Add the force configurations to the project.
+     *
+     * @param force True to add and false to remove.
+     * @param writeToProjectFile True to write the changes to the project file.
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public synchronized void forceActualValue(boolean force,
+            boolean writeToProjectFile) throws JDOMException, IOException {
+
+        if (writeToProjectFile) {
+            OpenConfiguratorProjectUtils.forceActualValue(getNode(), this, null,
+                    force);
+        }
+
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
+        forcedObj.setIndex(getObject().getIndex());
+        nodeInstance.forceObjectActualValue(forcedObj, force);
+    }
+
     public String getActualValue() {
         return object.getActualValue();
     }
@@ -239,6 +262,26 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
+     * @param subObjectId The sub-object id.
+     * @return The POWERLINK sub-object based on the given sub-object ID.
+     */
+    public PowerlinkSubobject getSubObject(final byte[] subObjectId) {
+        if (subObjectId == null) {
+            return null;
+        }
+
+        String subobjectIdRaw = DatatypeConverter.printHexBinary(subObjectId);
+        short subobjectIdShort = 0;
+        try {
+            subobjectIdShort = Short.parseShort(subobjectIdRaw, 16);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+
+        return getSubObject(subobjectIdShort);
+    }
+
+    /**
      * The subObject instance for the given ID, null if the subobject ID is not
      * found.
      *
@@ -285,6 +328,10 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
 
     public boolean hasTpdoMappableSubObjects() {
         return !tpdoMappableObjectList.isEmpty();
+    }
+
+    public boolean isObjectForced() {
+        return nodeInstance.isObjectIdForced(object.getIndex(), null);
     }
 
     public boolean isRpdoMappable() {

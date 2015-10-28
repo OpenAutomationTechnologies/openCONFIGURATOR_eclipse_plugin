@@ -60,6 +60,7 @@ public class JDomUtil {
      */
     public static void addNewElement(Document doc, String xpath,
             Namespace namespace, Element newElement) {
+        System.out.println("addNewElement: " + xpath);
         addNewElement(doc, getXPathExpressionElement(xpath, namespace),
                 newElement);
     }
@@ -78,6 +79,9 @@ public class JDomUtil {
         System.out.println("Size" + elementsList.size());
         for (Element element : elementsList) {
             newElement.setNamespace(element.getNamespace());
+            for (Element newChildElement : newElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
             element.addContent(newElement);
         }
     }
@@ -113,12 +117,32 @@ public class JDomUtil {
         }
     }
 
+    public static int getChildrenCount(Document document, String xpath,
+            Namespace namespace) {
+        System.out.println("getChildrenCount: " + xpath);
+        XPathExpression<Element> xpathExpr = getXPathExpressionElement(xpath,
+                namespace);
+        Element parentElement = xpathExpr.evaluateFirst(document);
+        return parentElement.getChildren().size();
+    }
+
     public static XPathExpression<Element> getXPathExpressionElement(
             String xpathValue, Namespace namespace) {
         XPathBuilder<Element> elementBuilder = new XPathBuilder<Element>(
                 xpathValue, Filters.element());
         elementBuilder.setNamespace(namespace);
         return elementBuilder.compileWith(XPathFactory.instance());
+    }
+
+    public static boolean isXpathPresent(Document document, String xpath,
+            Namespace namespace) {
+        System.out.println("isXpathPresent: " + xpath);
+        XPathExpression<Element> xpathExpr = getXPathExpressionElement(xpath,
+                namespace);
+        List<Element> elements = xpathExpr.evaluate(document);
+        System.err.println("isXpathPresent" + elements.size() + " Bool:"
+                + (elements.size() > 0));
+        return (elements.size() > 0);
     }
 
     /**

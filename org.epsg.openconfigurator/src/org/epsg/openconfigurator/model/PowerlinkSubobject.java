@@ -31,6 +31,8 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
+
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.core.resources.IProject;
@@ -41,6 +43,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
+import org.jdom2.JDOMException;
 
 /**
  * Wrapper class for a POWERLINK sub-object.
@@ -166,6 +169,29 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
         }
     }
 
+    /**
+     * Add the force configurations to the project.
+     *
+     * @param force True to add and false to remove.
+     * @param writeToProjectFile True to write the changes to the project file.
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public synchronized void forceActualValue(boolean force, boolean writeToXdc)
+            throws JDOMException, IOException {
+
+        if (writeToXdc) {
+            OpenConfiguratorProjectUtils.forceActualValue(getNode(), object,
+                    this, force);
+        }
+
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
+        forcedObj.setIndex(object.getObject().getIndex());
+        forcedObj.setSubindex(subObject.getSubIndex());
+
+        nodeInstance.forceObjectActualValue(forcedObj, force);
+    }
+
     public TObjectAccessType getAccessType() {
         return subObject.getAccessType();
     }
@@ -283,6 +309,11 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
 
     public String getXpath() {
         return xpath;
+    }
+
+    public boolean isObjectForced() {
+        return nodeInstance.isObjectIdForced(object.getObject().getIndex(),
+                subObject.getSubIndex());
     }
 
     public boolean isRpdoMappable() {

@@ -42,10 +42,12 @@ import javax.xml.bind.DatatypeConverter;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.AccessType;
 import org.epsg.openconfigurator.lib.wrapper.CNFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.Direction;
 import org.epsg.openconfigurator.lib.wrapper.DynamicChannelAccessType;
+import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.GeneralFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.IEC_Datatype;
 import org.epsg.openconfigurator.lib.wrapper.MNFeatureEnum;
@@ -64,6 +66,7 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObjects;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TKeyValuePair;
@@ -912,6 +915,11 @@ public class OpenConfiguratorLibraryUtils {
             return libApiRes;
         }
 
+        libApiRes = updateForcedObjectsIntoLibary(node);
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
         return libApiRes;
     }
 
@@ -1285,6 +1293,46 @@ public class OpenConfiguratorLibraryUtils {
                 channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
                 getDirection(channel.getPdoType()), channel.getChannelNumber(),
                 mappingSubObject.getSubobjecId());
+    }
+
+    /**
+     * Force the object's actual value to the library.
+     *
+     * @param plkObject The object for which the value has to be forced.
+     * @param force True to force.
+     * @return The result from the library.
+     */
+    public static Result forceObject(PowerlinkObject plkObject, boolean force) {
+        String actualValue = plkObject.getActualValue();
+        if (actualValue == null) {
+            actualValue = "";
+        }
+
+        Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
+                plkObject.getNetworkId(), plkObject.getNodeId(),
+                plkObject.getObjectId(), actualValue, force);
+        return res;
+    }
+
+    /**
+     * Force the sub-object's actual value to the library.
+     *
+     * @param plkSubObject The sub-object for which the value has to be forced.
+     * @param force True to force.
+     * @return The result from the library.
+     */
+    public static Result forceSubObject(PowerlinkSubobject plkSubObject,
+            boolean force) {
+        String actualValue = plkSubObject.getActualValue();
+        if (actualValue == null) {
+            actualValue = "";
+        }
+
+        Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
+                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
+                actualValue, force);
+        return res;
     }
 
     /**
@@ -1970,6 +2018,22 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
+     * Set the actual value of the object into the library.
+     *
+     * @param plkObject The object.
+     * @param actualValue The value to be updated in the library.
+     * @return Result from the library.
+     */
+    public static Result setObjectActualValue(PowerlinkObject plkObject,
+            String actualValue) {
+        Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
+                plkObject.getNetworkId(), plkObject.getNodeId(),
+                plkObject.getObjectId(), actualValue,
+                plkObject.isObjectForced());
+        return res;
+    }
+
+    /**
      * Set the actual value of the sub-object into the library.
      *
      * @param plkSubObject The sub-object.
@@ -1984,10 +2048,7 @@ public class OpenConfiguratorLibraryUtils {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
                 plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
-                actualValue);
-        if (res.IsSuccessful()) {
-            plkSubObject.setActualValue(actualValue, true);
-        }
+                actualValue, plkSubObject.isObjectForced());
 
         return res;
     }
@@ -2001,5 +2062,85 @@ public class OpenConfiguratorLibraryUtils {
     public static Result toggleEnableDisable(Node node) {
         return OpenConfiguratorCore.GetInstance().EnableNode(
                 node.getNetworkId(), node.getNodeId(), !node.isEnabled());
+    }
+
+    /**
+     * Update force configurations into the library.
+     *
+     * @param node Node instance.
+     *
+     * @return Result from the library.
+     */
+    private static Result updateForcedObjectsIntoLibary(Node node) {
+        Result libApiRes = new Result();
+        TAbstractNode abstractNode = null;
+        if (node.getNodeModel() instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) node
+                    .getNodeModel();
+            abstractNode = net.getNodeCollection().getMN();
+        } else if (node.getNodeModel() instanceof TCN) {
+            TCN cnModel = (TCN) node.getNodeModel();
+            abstractNode = cnModel;
+        } else if (node.getNodeModel() instanceof TRMN) {
+            abstractNode = (TRMN) node.getNodeModel();
+        } else {
+            System.err.println("Un-Supported node Type");
+            return new Result(ErrorCode.UNHANDLED_EXCEPTION,
+                    "Un-Supported node Type");
+        }
+
+        ForcedObjects forcedObjects = abstractNode.getForcedObjects();
+
+        if (forcedObjects == null) {
+            // Ignore if no objects are forced and return success.
+            return libApiRes;
+        }
+
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj : forcedObjects
+                .getObject()) {
+
+            if (forcedObj.getSubindex() == null) {
+                PowerlinkObject plkObj = node.getObject(forcedObj.getIndex());
+                if (plkObj == null) {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage("Object ID 0x"
+                                    + DatatypeConverter.printHexBinary(
+                                            forcedObj.getIndex())
+                                    + " is forced and is not available in the XDD/XDC file.");
+                    continue;
+                }
+
+                libApiRes = OpenConfiguratorLibraryUtils.forceObject(plkObj,
+                        true);
+            } else {
+                PowerlinkSubobject plkSubObj = node.getSubObject(
+                        forcedObj.getIndex(), forcedObj.getSubindex());
+
+                if (plkSubObj == null) {
+                    System.err.println(
+                            "Object is forced which is not available in the XDD/XDC file");
+
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage("Object ID 0x"
+                                    + DatatypeConverter.printHexBinary(
+                                            forcedObj.getIndex())
+                                    + "/0x"
+                                    + DatatypeConverter.printHexBinary(
+                                            forcedObj.getSubindex())
+                                    + " is forced and is not available in the XDD/XDC file.");
+
+                    continue;
+                }
+
+                libApiRes = OpenConfiguratorLibraryUtils
+                        .forceSubObject(plkSubObj, true);
+            }
+
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
+        }
+
+        return libApiRes;
     }
 }

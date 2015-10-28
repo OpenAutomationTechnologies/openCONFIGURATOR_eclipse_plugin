@@ -52,6 +52,9 @@ public interface IAbstractNodeProperties {
     public static final String NODE_IS_TYPE1_ROUTER_OBJECT = "isType1Router"; //$NON-NLS-1$
     public static final String NODE_IS_TYPE2_ROUTER_OBJECT = "isType2Router"; //$NON-NLS-1$
     public static final String NODE_FORCED_OBJECTS_OBJECT = "ForcedObjects"; //$NON-NLS-1$
+    public static final String NODE_OBJECTS_OBJECT = "Object"; //$NON-NLS-1$
+    public static final String NODE_OBJECTS_INDEX_OBJECT = "index"; //$NON-NLS-1$
+    public static final String NODE_OBJECTS_SUBINDEX_OBJECT = "subindex"; //$NON-NLS-1$
     public static final String NODE_LOSS_OF_SOC_TOLERANCE_OBJECT = "lossSocTolerance"; //$NON-NLS-1$
 
     public static final String NAME_OF_THE_SELECTED_NODE = "Name of the node selected.";

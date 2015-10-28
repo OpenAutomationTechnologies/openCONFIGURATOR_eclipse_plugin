@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
@@ -53,6 +54,7 @@ public class AbstractObjectPropertySource {
     public static final String OBJ_DEFAULT_VALUE_ID = "Obj.defaultValue"; //$NON-NLS-1$
     public static final String OBJ_ACTUAL_VALUE_READ_ONLY_ID = "Obj.actualValueReadOnly"; //$NON-NLS-1$
     public static final String OBJ_ACTUAL_VALUE_EDITABLE_ID = "Obj.actualValueEditable"; //$NON-NLS-1$
+    public static final String OBJ_FORCE_ACTUAL_VALUE_ID = "Obj.forceActualValue"; //$NON-NLS-1$
     public static final String OBJ_DENOTATION_ID = "Obj.denotation"; //$NON-NLS-1$
     public static final String OBJ_PDO_MAPPING_ID = "Obj.PDOmapping"; //$NON-NLS-1$
     public static final String OBJ_OBJFLAGS_ID = "Obj.objFlags"; //$NON-NLS-1$
@@ -68,6 +70,7 @@ public class AbstractObjectPropertySource {
     private static final String OBJ_ACCESS_TYPE_LABEL = "Access Type";
     private static final String OBJ_DEFAULT_VALUE_LABEL = "Default Value";
     private static final String OBJ_ACTUAL_VALUE_LABEL = "Actual Value";
+    private static final String OBJ_FORCE_ACTUAL_VALUE_LABEL = "Force Actual Value";
     private static final String OBJ_DENOTATION_LABEL = "Denotation";
     private static final String OBJ_PDO_MAPPING_LABEL = "PDOmapping";
     private static final String OBJ_OBJFLAGS_LABEL = "Object Flags";
@@ -94,6 +97,10 @@ public class AbstractObjectPropertySource {
             OBJ_ACTUAL_VALUE_READ_ONLY_ID, OBJ_ACTUAL_VALUE_LABEL);
     protected TextPropertyDescriptor actualValueEditableDescriptor = new TextPropertyDescriptor(
             OBJ_ACTUAL_VALUE_EDITABLE_ID, OBJ_ACTUAL_VALUE_LABEL);
+
+    protected ComboBoxPropertyDescriptor forceActualValue = new ComboBoxPropertyDescriptor(
+            OBJ_FORCE_ACTUAL_VALUE_ID, OBJ_FORCE_ACTUAL_VALUE_LABEL,
+            IPropertySourceSupport.YES_NO);
     protected PropertyDescriptor denotationDescriptor = new PropertyDescriptor(
             OBJ_DENOTATION_ID, OBJ_DENOTATION_LABEL);
     protected PropertyDescriptor pdoMappingDescriptor = new PropertyDescriptor(

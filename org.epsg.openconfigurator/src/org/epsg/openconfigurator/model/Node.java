@@ -46,6 +46,7 @@ import org.eclipse.core.runtime.IPath;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObjects;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
@@ -244,6 +245,97 @@ public class Node {
                 } catch (IndexOutOfBoundsException e) {
                     e.printStackTrace();
                 }
+            }
+        }
+    }
+
+    /**
+     * Add/remove force object model in the project model.
+     *
+     * @param forceObj The forced object model.
+     * @param force true to add and false to remove.
+     */
+    public void forceObjectActualValue(
+            org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj,
+            boolean force) {
+        ForcedObjects forcedObjTag = null;
+        if (nodeModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
+            TMN mn = net.getNodeCollection().getMN();
+            forcedObjTag = mn.getForcedObjects();
+            if (force) {
+                if (forcedObjTag == null) {
+                    mn.setForcedObjects(new ForcedObjects());
+                    forcedObjTag = mn.getForcedObjects();
+                }
+            } else {
+                removeForcedObject(forcedObjTag, forceObj);
+
+                if (forcedObjTag != null) {
+                    if (forcedObjTag.getObject().isEmpty()) {
+                        mn.setForcedObjects(null);
+                    }
+                }
+            }
+        } else if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            forcedObjTag = cn.getForcedObjects();
+            if (force) {
+                if (forcedObjTag == null) {
+                    cn.setForcedObjects(new ForcedObjects());
+                    forcedObjTag = cn.getForcedObjects();
+                }
+            } else {
+                removeForcedObject(forcedObjTag, forceObj);
+
+                if (forcedObjTag != null) {
+                    if (forcedObjTag.getObject().isEmpty()) {
+                        cn.setForcedObjects(null);
+                    }
+                }
+            }
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            forcedObjTag = rmn.getForcedObjects();
+            if (force) {
+                if (forcedObjTag == null) {
+                    rmn.setForcedObjects(new ForcedObjects());
+                    forcedObjTag = rmn.getForcedObjects();
+                }
+            } else {
+                removeForcedObject(forcedObjTag, forceObj);
+                if (forcedObjTag != null) {
+                    if (forcedObjTag.getObject().isEmpty()) {
+                        rmn.setForcedObjects(null);
+                    }
+                }
+            }
+        } else {
+            System.err.println("Invalid node model" + nodeModel);
+        }
+
+        if (force) {
+            boolean alreadyForced = false;
+            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                    .getObject()) {
+
+                if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                        forceObj.getIndex())) {
+                    if (forceObj.getSubindex() == null) {
+                        alreadyForced = true;
+                        break;
+                    } else {
+                        if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                                forceObj.getSubindex())) {
+                            alreadyForced = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!alreadyForced) {
+                forcedObjTag.getObject().add(forceObj);
             }
         }
     }
@@ -463,6 +555,21 @@ public class Node {
         return nodeModel;
     }
 
+    public PowerlinkObject getObject(final byte[] objectId) {
+        if (objectId == null) {
+            return null;
+        }
+
+        String objectIdRaw = DatatypeConverter.printHexBinary(objectId);
+        long objectIdL = 0;
+        try {
+            objectIdL = Long.parseLong(objectIdRaw, 16);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
+        return getObjects(objectIdL);
+    }
+
     /**
      * @param objectId object ID
      * @return Object with ID equals to objectId null otherwise.
@@ -650,6 +757,16 @@ public class Node {
         return rpdoMappableObjectList;
     }
 
+    public PowerlinkSubobject getSubObject(final byte[] objectId,
+            final byte[] subObjectId) {
+        PowerlinkObject object = getObject(objectId);
+        if ((object == null) || (subObjectId == null)) {
+            return null;
+        }
+
+        return object.getSubObject(subObjectId);
+    }
+
     /**
      * Retrieves the subobject instance for the given objectId and subObjectId
      * available in this node.
@@ -674,6 +791,22 @@ public class Node {
 
     public List<PowerlinkObject> getTpdoMappableObjectList() {
         return tpdoMappableObjectList;
+    }
+
+    public String getXpath() {
+        String xpath = "//oc:";
+
+        if (nodeModel instanceof TNetworkConfiguration) {
+            xpath += IManagingNodeProperties.MN_TAG;
+        } else if (nodeModel instanceof TCN) {
+            xpath += IControlledNodeProperties.CN_TAG;
+        } else if (nodeModel instanceof TRMN) {
+            xpath += IRedundantManagingNodeProperties.RMN_TAG;
+        }
+        xpath += "[@" + IAbstractNodeProperties.NODE_ID_OBJECT + "='"
+                + getNodeIdString() + "']";
+
+        return xpath;
     }
 
     /**
@@ -714,6 +847,69 @@ public class Node {
             }
         }
         return nodeIdAvailable;
+    }
+
+    public boolean isObjectIdForced(byte[] objectId, byte[] subObjectId) {
+
+        ForcedObjects forcedObjTag = null;
+        if (nodeModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
+            TMN mn = net.getNodeCollection().getMN();
+            forcedObjTag = mn.getForcedObjects();
+        } else if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            forcedObjTag = cn.getForcedObjects();
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            forcedObjTag = rmn.getForcedObjects();
+        } else {
+            System.err.println("Invalid node model" + nodeModel);
+        }
+
+        if (forcedObjTag == null) {
+            return false;
+        }
+
+        boolean alreadyForced = false;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+            if (java.util.Arrays.equals(tempForceObj.getIndex(), objectId)) {
+                if (subObjectId == null) {
+                    alreadyForced = true;
+                } else if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                        subObjectId)) {
+                    alreadyForced = true;
+                }
+            }
+        }
+
+        return alreadyForced;
+    }
+
+    private void removeForcedObject(ForcedObjects forcedObjTag,
+            org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObjToBeRemoved) {
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+
+            if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                    forcedObjToBeRemoved.getIndex())) {
+                if (forcedObjToBeRemoved.getSubindex() == null) {
+                    tempForcedObjToBeRemoved = tempForceObj;
+                    break;
+                } else {
+                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                            forcedObjToBeRemoved.getSubindex())) {
+                        tempForcedObjToBeRemoved = tempForceObj;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (tempForcedObjToBeRemoved != null) {
+            forcedObjTag.getObject().remove(tempForcedObjToBeRemoved);
+        }
     }
 
     /**
