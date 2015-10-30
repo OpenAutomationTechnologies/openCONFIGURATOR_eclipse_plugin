@@ -33,23 +33,33 @@ package org.epsg.openconfigurator.views;
 
 import java.util.List;
 
+import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
@@ -57,7 +67,7 @@ import org.eclipse.ui.part.ViewPart;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
-import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.resources.IPluginImages;
 
 /**
  * View to list the objects and subobjects of a node.
@@ -174,6 +184,8 @@ public class ObjectDictionaryView extends ViewPart {
 
     public static final String ID = "org.epsg.openconfigurator.views.ObjectDictionaryView"; //$NON-NLS-1$
 
+    public static final String OBJECT_DICTIONARY_VIEW_TITLE = "Object Dictionary";
+
     /**
      * Selection listener to update the objects and sub-objects in the Object
      * dictionary view.
@@ -183,9 +195,13 @@ public class ObjectDictionaryView extends ViewPart {
         public void selectionChanged(IWorkbenchPart part,
                 ISelection selection) {
 
+            setPartName(OBJECT_DICTIONARY_VIEW_TITLE);
+
             if (treeViewer == null) {
                 return;
             }
+
+            treeViewer.setInput(new EmptyObjectDictionary());
 
             if (sourcePart != null) {
                 sourcePart.getSite().getPage().removePartListener(partListener);
@@ -199,18 +215,12 @@ public class ObjectDictionaryView extends ViewPart {
                 IStructuredSelection ss = (IStructuredSelection) selection;
                 if (ss.size() > 1) {
                     System.err.println("Multiple selection not handled.");
-                    treeViewer.setInput(new EmptyObjectDictionary());
                     return;
                 }
                 Object selectedObj = ss.getFirstElement();
 
                 if (selectedObj == null) {
-                    treeViewer.setInput(new EmptyObjectDictionary());
                     return;
-                }
-
-                if (selectedObj instanceof TreeSelection) {
-                    treeViewer.setInput(new EmptyObjectDictionary());
                 }
 
                 if (selectedObj instanceof Node) {
@@ -239,10 +249,6 @@ public class ObjectDictionaryView extends ViewPart {
 
         @Override
         public Object[] getChildren(Object parentElement) {
-            if (parentElement instanceof TObject) {
-                TObject object = (TObject) parentElement;
-                return object.getSubObject().toArray();
-            }
             if (parentElement instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) parentElement;
                 return objItem.getSubObjects().toArray();
@@ -252,6 +258,7 @@ public class ObjectDictionaryView extends ViewPart {
 
         @Override
         public Object[] getElements(Object inputElement) {
+
             if (inputElement instanceof Node) {
                 Node nodeObj = (Node) inputElement;
 
@@ -265,15 +272,12 @@ public class ObjectDictionaryView extends ViewPart {
 
         @Override
         public Object getParent(Object element) {
+            System.err.println("getParent " + element);
             return null;
         }
 
         @Override
         public boolean hasChildren(Object element) {
-            if (element instanceof TObject) {
-                TObject object = (TObject) element;
-                return ((object.getSubObject().size() > 0) ? true : false);
-            }
             if (element instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) element;
                 return ((objItem.getSubObjects().size() > 0) ? true : false);
@@ -286,6 +290,15 @@ public class ObjectDictionaryView extends ViewPart {
                 Object newInput) {
         }
     };
+
+    private boolean communicationProfileObjectsVisible = true;
+    private boolean standardisedDeviceProfileObjectsVisible = true;
+    private boolean nonMappableObjectsVisible = true;
+
+    private Action hideCommunicationProfileObjects;
+    private Action hideStandardisedDeviceProfileObjects;
+    private Action hideNonMappableObjects;
+    private Action propertiesAction;
 
     /**
      * Object dictionary tree viewer.
@@ -313,6 +326,108 @@ public class ObjectDictionaryView extends ViewPart {
      */
     private PartListener partListener = new PartListener();
 
+    private void contributeToActionBars() {
+        IActionBars bars = getViewSite().getActionBars();
+
+        fillLocalToolBar(bars.getToolBarManager());
+        bars.updateActionBars();
+    }
+
+    /**
+     * Create the actions.
+     */
+    private void createActions() {
+        hideNonMappableObjects = new Action("Hide Non Mappable Objects",
+                IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                if (hideNonMappableObjects.isChecked()) {
+                    nonMappableObjectsVisible = false;
+                } else {
+                    nonMappableObjectsVisible = true;
+                }
+                treeViewer.refresh();
+            }
+        };
+        hideNonMappableObjects.setToolTipText("Hide Non Mappable Objects");
+        hideNonMappableObjects.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_HIDE_NON_MAPPABLE_ICON));
+        hideNonMappableObjects.setChecked(false);
+
+        hideCommunicationProfileObjects = new Action(
+                "Hide Communication Profile Area Objects(0x1000-0x1FFF)",
+                IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                if (hideCommunicationProfileObjects.isChecked()) {
+                    communicationProfileObjectsVisible = false;
+                } else {
+                    communicationProfileObjectsVisible = true;
+                }
+                treeViewer.refresh();
+            }
+        };
+        hideCommunicationProfileObjects.setToolTipText(
+                "Hide Communication Profile Area Objects(0x1000-0x1FFF)");
+        hideCommunicationProfileObjects.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_HIDE_COMMUNICATION_DEVICE_PROFILE_ICON));
+        hideCommunicationProfileObjects.setChecked(false);
+
+        hideStandardisedDeviceProfileObjects = new Action(
+                "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)",
+                IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                if (hideStandardisedDeviceProfileObjects.isChecked()) {
+                    standardisedDeviceProfileObjectsVisible = false;
+                } else {
+                    standardisedDeviceProfileObjectsVisible = true;
+                }
+                treeViewer.refresh();
+            }
+        };
+        hideStandardisedDeviceProfileObjects.setToolTipText(
+                "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)");
+        hideStandardisedDeviceProfileObjects.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_HIDE_STANDARDISED_DEVICE_PROFILE_ICON));
+        hideStandardisedDeviceProfileObjects.setChecked(false);
+
+        propertiesAction = new Action("Properties") {
+            @Override
+            public void run() {
+                super.run();
+                try {
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET);
+                    treeViewer.setSelection(treeViewer.getSelection());
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        };
+        propertiesAction.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.PROPERTIES_ICON));
+    }
+
+    protected void createContextMenu(Viewer viewer) {
+        MenuManager contextMenu = new MenuManager("ViewerMenu");
+        contextMenu.setRemoveAllWhenShown(true);
+        contextMenu.addMenuListener(new IMenuListener() {
+            @Override
+            public void menuAboutToShow(IMenuManager mgr) {
+                fillContextMenu(mgr);
+            }
+        });
+
+        Menu menu = contextMenu.createContextMenu(viewer.getControl());
+        viewer.getControl().setMenu(menu);
+    }
+
     /**
      * Create contents of the object dictionary view part.
      *
@@ -322,6 +437,7 @@ public class ObjectDictionaryView extends ViewPart {
     public void createPartControl(Composite parent) {
 
         PatternFilter filter = new PatternFilter();
+        filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
 
@@ -332,9 +448,59 @@ public class ObjectDictionaryView extends ViewPart {
                 PlatformUI.getWorkbench().getDecoratorManager()
                         .getLabelDecorator()));
         treeViewer.setInput(new Object());
+        createContextMenu(treeViewer);
+
+        createActions();
+
+        contributeToActionBars();
+
+        initializeToolBar();
+
         getViewSite().getPage().addSelectionListener(IndustrialNetworkView.ID,
                 listener);
         getViewSite().setSelectionProvider(treeViewer);
+        treeViewer.addFilter(new ViewerFilter() {
+
+            @Override
+            public boolean select(Viewer viewer, Object parentElement,
+                    Object element) {
+
+                if (element instanceof PowerlinkObject) {
+                    PowerlinkObject obj = (PowerlinkObject) element;
+                    if (!communicationProfileObjectsVisible) {
+                        if ((obj.getObjectId() >= 0x1000)
+                                && (obj.getObjectId() < 0x2000)) {
+                            return false;
+                        }
+
+                    }
+
+                    if (!standardisedDeviceProfileObjectsVisible) {
+                        if ((obj.getObjectId() >= 0x6000)
+                                && (obj.getObjectId() < 0x9FFF)) {
+                            return false;
+                        }
+                    }
+
+                    if (!nonMappableObjectsVisible) {
+                        if (!obj.isTpdoMappable() && !obj.isRpdoMappable()
+                                && !obj.hasTpdoMappableSubObjects()
+                                && !obj.hasRpdoMappableSubObjects()) {
+                            return false;
+                        }
+                    }
+                } else if (element instanceof PowerlinkSubobject) {
+                    PowerlinkSubobject subObj = (PowerlinkSubobject) element;
+                    if (!nonMappableObjectsVisible) {
+                        if (!subObj.isTpdoMappable()
+                                && !subObj.isRpdoMappable()) {
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+        });
     }
 
     @Override
@@ -348,11 +514,28 @@ public class ObjectDictionaryView extends ViewPart {
                 .removeSelectionListener(IndustrialNetworkView.ID, listener);
     }
 
+    protected void fillContextMenu(IMenuManager contextMenu) {
+
+        contextMenu.add(propertiesAction);
+    }
+
+    private void fillLocalToolBar(IToolBarManager manager) {
+        manager.removeAll();
+        manager.add(hideNonMappableObjects);
+        manager.add(hideCommunicationProfileObjects);
+        manager.add(hideStandardisedDeviceProfileObjects);
+    }
+
     public Control getControl() {
         if (treeViewer == null) {
             return null;
         }
         return treeViewer.getControl();
+    }
+
+    private void initializeToolBar() {
+        IToolBarManager toolbarManager = getViewSite().getActionBars()
+                .getToolBarManager();
     }
 
     @Override
