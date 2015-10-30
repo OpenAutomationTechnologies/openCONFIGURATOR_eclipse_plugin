@@ -215,6 +215,31 @@ public class IndustrialNetworkView extends ViewPart
     private class ViewLabelProvider extends LabelProvider
             implements IColorProvider {
 
+        Image mnIcon;
+        Image cnEnabledIcon;
+        Image cnDisabledIcon;
+        Image rmnIcon;
+
+        ViewLabelProvider() {
+            mnIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.MN_ICON).createImage();
+            cnEnabledIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.CN_ICON).createImage();
+            cnDisabledIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.CN_DISABLED_ICON)
+                    .createImage();
+            rmnIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.RMN_ICON).createImage();
+        }
+
+        @Override
+        public void dispose() {
+            mnIcon.dispose();
+            cnEnabledIcon.dispose();
+            cnDisabledIcon.dispose();
+            rmnIcon.dispose();
+        };
+
         @Override
         public Color getBackground(Object element) {
             return null;
@@ -241,27 +266,18 @@ public class IndustrialNetworkView extends ViewPart
 
                 Object nodeObjectModel = node.getNodeModel();
                 if (nodeObjectModel instanceof TNetworkConfiguration) {
-                    return org.epsg.openconfigurator.Activator
-                            .getImageDescriptor(IPluginImages.MN_ICON)
-                            .createImage();
+                    return mnIcon;
                 }
                 if (nodeObjectModel instanceof TCN) {
                     TCN cnModel = (TCN) nodeObjectModel;
                     if (cnModel.isEnabled()) {
-                        return org.epsg.openconfigurator.Activator
-                                .getImageDescriptor(IPluginImages.CN_ICON)
-                                .createImage();
+                        return cnEnabledIcon;
                     } else {
-                        return org.epsg.openconfigurator.Activator
-                                .getImageDescriptor(
-                                        IPluginImages.CN_DISABLED_ICON)
-                                .createImage();
+                        return cnDisabledIcon;
                     }
                 }
                 if (nodeObjectModel instanceof TRMN) {
-                    return org.epsg.openconfigurator.Activator
-                            .getImageDescriptor(IPluginImages.RMN_ICON)
-                            .createImage();
+                    return rmnIcon;
                 }
             } else if (obj instanceof EmptyNetworkView) {
                 return null;
