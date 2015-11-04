@@ -39,6 +39,7 @@ import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
@@ -76,7 +77,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
 
     private static final String CN_POLL_RESPONSE_MAX_LATENCY_LABEL = "PollResponse Max Latency(ns)";
-    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout(" + "\u00B5" + "s)";
+    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout("
+            + "\u00B5" + "s)";
 
     /**
      * Station types
@@ -89,6 +91,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             IControlledNodeProperties.CN_NODE_TYPE_OBJECT, CN_NODE_TYPE_LABEL,
             NODE_TYPES);
 
+    private static final TextPropertyDescriptor nodeIdEditableDescriptor = new TextPropertyDescriptor(
+            IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
     private static final TextPropertyDescriptor forcedMultiplexedCycle = new TextPropertyDescriptor(
             IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT,
             CN_FORCED_MULTIPLEXED_CYCLE_LABEL);
@@ -212,7 +216,16 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         setNodeData(cnNode);
 
         nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
-        nodeIdDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIdEditableDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIdEditableDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleSetNodeId(value);
+            }
+
+        });
         configurationDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
@@ -346,7 +359,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         }
 
         propertyList.add(nameDescriptor);
-        propertyList.add(nodeIdDescriptor);
+        propertyList.add(nodeIdEditableDescriptor);
 
         if (tcn.getPathToXDC() != null) {
 
@@ -402,8 +415,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 case IAbstractNodeProperties.NODE_NAME_OBJECT:
                     retObj = cnNode.getName();
                     break;
-                case IAbstractNodeProperties.NODE_ID_OBJECT:
-                    retObj = tcn.getNodeID();
+                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                    retObj = cnNode.getNodeIdString();
                     break;
                 case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                     retObj = tcn.getPathToXDC();
@@ -543,7 +556,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         .SetLossOfSocTolerance(cnNode.getNetworkId(),
                                 cnNode.getNodeId(), longValue * 1000);
                 if (!res.IsSuccessful()) {
-                    return res.GetErrorMessage();
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE;
@@ -564,7 +577,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             Result res = OpenConfiguratorLibraryUtils
                     .setNodeAssignment(nodeAssign, cnNode, result);
             if (!res.IsSuccessful()) {
-                return res.GetErrorMessage();
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
         } else {
             System.err.println(
@@ -590,14 +603,14 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         .ResetOperationMode(cnNode.getNetworkId(),
                                 cnNode.getNodeId());
                 if (!res.IsSuccessful()) {
-                    return res.GetErrorMessage();
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
             } else if (val == 1) { // Chained
                 Result res = OpenConfiguratorCore.GetInstance()
                         .SetOperationModeChained(cnNode.getNetworkId(),
                                 cnNode.getNodeId());
                 if (!res.IsSuccessful()) {
-                    return res.GetErrorMessage();
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
             } else if (val == 2) { // Multiplexed
                 Result res = OpenConfiguratorCore.GetInstance()
@@ -605,7 +618,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                 cnNode.getNodeId(),
                                 (short) tcn.getForcedMultiplexedCycle());
                 if (!res.IsSuccessful()) {
-                    return res.GetErrorMessage();
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
             } else {
                 System.err.println("Invalid node type:" + val);
@@ -647,7 +660,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     presMaxLatencySubObj, (String) value);
 
             if (!res.IsSuccessful()) {
-                return res.GetErrorMessage();
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
         } else {
             System.err.println(
@@ -683,6 +696,44 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         return null;
     }
 
+    /**
+     * Handle NodeId changes in properties
+     *
+     * @param id New Id for the Node
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means invalid, and non-null means valid, with the result
+     *         being the error message to display to the end user.
+     */
+    private String handleSetNodeId(Object id) {
+        if (id instanceof String) {
+            if (((String) id).isEmpty()) {
+                return ERROR_NODE_ID_CANNOT_BE_EMPTY;
+            }
+            try {
+                short nodeIDvalue = Short.valueOf(((String) id));
+                if ((nodeIDvalue == 0) || (nodeIDvalue >= 240)) {
+                    return "Invalid node id for a Controlled node";
+                }
+
+                if (nodeIDvalue == cnNode.getNodeId()) {
+                    return null;
+                }
+
+                boolean nodeIdAvailable = cnNode
+                        .isNodeIdAlreadyAvailable(nodeIDvalue);
+                if (nodeIdAvailable) {
+                    return "Node with id " + nodeIDvalue + " already exists.";
+                }
+            } catch (NumberFormatException ex) {
+                return "Invalid node id for a Controlled node";
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Handles Node name Changes in properties
+     */
     @Override
     protected String handleSetNodeName(Object name) {
         if (name instanceof String) {
@@ -698,7 +749,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
                     cnNode.getNetworkId(), cnNode.getNodeId(), nodeName);
             if (!res.IsSuccessful()) {
-                return res.GetErrorMessage();
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
         } else {
             System.err.println("handleSetNodeName: Invalid value type:" + name);
@@ -732,6 +783,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         }
     }
 
+    /**
+     * sets the value to the Controlled node properties
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
 
@@ -741,8 +795,34 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 case IAbstractNodeProperties.NODE_NAME_OBJECT:
                     cnNode.setName((String) value);
                     break;
-                case IAbstractNodeProperties.NODE_ID_OBJECT:
-                    System.err.println(objectId + " made editable");
+                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                    short nodeIDvalue = 0;
+                    try {
+                        nodeIDvalue = Short.valueOf(((String) value));
+                    } catch (NumberFormatException e) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(
+                                        "Invalid node id. " + e.getMessage());
+                        return;
+                    }
+
+                    Result res = OpenConfiguratorCore.GetInstance().SetNodeId(
+                            cnNode.getNetworkId(), cnNode.getNodeId(),
+                            nodeIDvalue);
+                    if (!res.IsSuccessful()) {
+                        PluginErrorDialogUtils.displayErrorMessageDialog(
+                                "Properties - NodeId", res);
+                    } else {
+                        try {
+                            cnNode.setNodeId(nodeIDvalue);
+                        } catch (IOException e) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            "Error occurred while setting the node id. "
+                                                    + e.getMessage());
+                        }
+                    }
+
                     break;
                 case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                     System.err.println(objectId + " made editable");

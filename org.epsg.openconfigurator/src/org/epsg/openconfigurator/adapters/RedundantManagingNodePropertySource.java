@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -40,6 +41,7 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
@@ -48,6 +50,7 @@ import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 
 /**
@@ -60,7 +63,8 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 public class RedundantManagingNodePropertySource
         extends AbstractNodePropertySource implements IPropertySource {
 
-    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active(" + "\u00B5" + "s)";
+    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active("
+            + "\u00B5" + "s)";
     private static final String RMN_PRIORITY_LABEL = "Priority";
 
     private static final TextPropertyDescriptor waitNotActiveDescriptor = new TextPropertyDescriptor(
@@ -69,6 +73,8 @@ public class RedundantManagingNodePropertySource
     private static final TextPropertyDescriptor priorityDescriptor = new TextPropertyDescriptor(
             IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT,
             RMN_PRIORITY_LABEL);
+    private static final TextPropertyDescriptor nodeIdEditableDescriptor = new TextPropertyDescriptor(
+            IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
 
     private static final String ERROR_WAIT_NOT_ACTIVE_CANNOT_BE_EMPTY = "Wait NOT_ACTIVE value cannot be empty.";
     private static final String INVALID_RANGE_WAIT_NOT_ACTIVE = "Invalid range for Wait NOT_ACTIVE";
@@ -117,7 +123,17 @@ public class RedundantManagingNodePropertySource
         });
 
         nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
-        nodeIdDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIdEditableDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIdEditableDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+
+                return handleRmnNodeIdvalue(value);
+            }
+
+        });
         configurationDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
@@ -136,6 +152,11 @@ public class RedundantManagingNodePropertySource
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
     }
 
+    /**
+     * Adds the List of Property Descriptors to the RMN Property
+     *
+     * @param propertyList
+     */
     private void addRedundantNodePropertyDescriptors(
             List<IPropertyDescriptor> propertyList) {
 
@@ -144,7 +165,7 @@ public class RedundantManagingNodePropertySource
         }
 
         propertyList.add(nameDescriptor);
-        propertyList.add(nodeIdDescriptor);
+        propertyList.add(nodeIdEditableDescriptor);
 
         if (rmn.getPathToXDC() != null) {
 
@@ -179,6 +200,9 @@ public class RedundantManagingNodePropertySource
         return propertyDescriptorArray;
     }
 
+    /**
+     * Receives the Property value to RMN properties
+     */
     @Override
     public Object getPropertyValue(Object id) {
         Object retObj = null;
@@ -192,8 +216,9 @@ public class RedundantManagingNodePropertySource
                         retObj = new String();
                     }
                     break;
-                case IAbstractNodeProperties.NODE_ID_OBJECT:
-                    retObj = rmn.getNodeID();
+                case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
+                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                    retObj = redundantManagingNode.getNodeIdString();
                     break;
                 case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                     retObj = rmn.getPathToXDC();
@@ -267,6 +292,15 @@ public class RedundantManagingNodePropertySource
         return NOT_SUPPORTED;
     }
 
+    /**
+     * Handles the Node assignment.
+     *
+     * @param value The new value of Node assignment.
+     * @param nodeAssign
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
     @Override
     protected String handleNodeAssignValue(NodeAssignment nodeAssign,
             Object value) {
@@ -276,12 +310,54 @@ public class RedundantManagingNodePropertySource
             Result res = OpenConfiguratorLibraryUtils.setNodeAssignment(
                     nodeAssign, redundantManagingNode, result);
             if (!res.IsSuccessful()) {
-                return res.GetErrorMessage();
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
         } else {
             System.err.println(
                     "handleNodeAssignValue: Invalid value type:" + value);
         }
+        return null;
+    }
+
+    /**
+     * Handles the RMN node ID value.
+     *
+     * @param id The new value of RMN node.
+     *
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    private String handleRmnNodeIdvalue(Object id) {
+
+        if (id instanceof String) {
+            if (((String) id).isEmpty()) {
+                return ERROR_NODE_ID_CANNOT_BE_EMPTY;
+            }
+            try {
+                short nodeIDvalue = Short.valueOf(((String) id));
+                if ((nodeIDvalue == 0) || (nodeIDvalue == 240)
+                        || (nodeIDvalue > 250)) {
+                    return "Invalid node id for a Redundant Managing node.";
+                }
+                if (nodeIDvalue < 240) {
+                    return "Redundant Managing node with id 0-240 is not supported.";
+                }
+
+                if (nodeIDvalue == redundantManagingNode.getNodeId()) {
+                    return null;
+                }
+
+                boolean nodeIdAvailable = redundantManagingNode
+                        .isNodeIdAlreadyAvailable(nodeIDvalue);
+                if (nodeIdAvailable) {
+                    return "Node with id " + nodeIDvalue + " already exists.";
+                }
+            } catch (NumberFormatException ex) {
+                return "Invalid node id for a Redundant Managing node.";
+            }
+        }
+
         return null;
     }
 
@@ -307,7 +383,7 @@ public class RedundantManagingNodePropertySource
                                 redundantManagingNode.getNetworkId(),
                                 redundantManagingNode.getNodeId(), longValue);
                 if (!res.IsSuccessful()) {
-                    return res.GetErrorMessage();
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
 
             } catch (NumberFormatException e) {
@@ -320,6 +396,14 @@ public class RedundantManagingNodePropertySource
         return null;
     }
 
+    /**
+     * Handles Node name Modifications
+     *
+     * @param name new Name of Node
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
     @Override
     protected String handleSetNodeName(Object name) {
         if (name instanceof String) {
@@ -337,7 +421,7 @@ public class RedundantManagingNodePropertySource
                     redundantManagingNode.getNetworkId(),
                     redundantManagingNode.getNodeId(), nodeName);
             if (!res.IsSuccessful()) {
-                return res.GetErrorMessage();
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
         } else {
             System.err.println("handleSetNodeName: Invalid value type:" + name);
@@ -372,7 +456,7 @@ public class RedundantManagingNodePropertySource
                                 redundantManagingNode.getNetworkId(),
                                 redundantManagingNode.getNodeId(), longValue);
                 if (!res.IsSuccessful()) {
-                    return res.GetErrorMessage();
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE;
@@ -411,6 +495,9 @@ public class RedundantManagingNodePropertySource
         }
     }
 
+    /**
+     * sets the value to the properties of RMN
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
         if (id instanceof String) {
@@ -419,8 +506,36 @@ public class RedundantManagingNodePropertySource
                 case IAbstractNodeProperties.NODE_NAME_OBJECT:
                     redundantManagingNode.setName((String) value);
                     break;
-                case IAbstractNodeProperties.NODE_ID_OBJECT:
-                    System.err.println(objectId + " made editable");
+                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+
+                    short nodeIDvalue = 0;
+                    try {
+                        nodeIDvalue = Short.valueOf(((String) value));
+                    } catch (NumberFormatException e) {
+
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(
+                                        "Invalid node id. " + e.getMessage());
+                        return;
+                    }
+
+                    Result res = OpenConfiguratorCore.GetInstance().SetNodeId(
+                            redundantManagingNode.getNetworkId(),
+                            redundantManagingNode.getNodeId(), nodeIDvalue);
+                    if (!res.IsSuccessful()) {
+                        PluginErrorDialogUtils.displayErrorMessageDialog(
+                                "Properties - NodeId", res);
+                    } else {
+                        try {
+                            redundantManagingNode.setNodeId(nodeIDvalue);
+                        } catch (IOException e) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            "Error occurred while setting the node id. "
+                                                    + e.getMessage());
+                        }
+                    }
+
                     break;
                 case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                     System.err.println(objectId + " made editable");

@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -101,12 +102,7 @@ public class Node {
     /**
      * Node ID in short datatype.
      */
-    private final short nodeId;
-
-    /**
-     * Node ID in string format(Integer not Hex).
-     */
-    private final String nodeIdStr;
+    private short nodeId;
 
     public Node() {
         nodeModel = null;
@@ -116,7 +112,6 @@ public class Node {
         nodeCollection = null;
         networkId = null;
         nodeId = 0;
-        nodeIdStr = null;
         objectsList = null;
     }
 
@@ -152,20 +147,19 @@ public class Node {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
 
             nodeId = net.getNodeCollection().getMN().getNodeID();
-            nodeIdStr = String.valueOf(nodeId);
         } else if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
 
-            nodeIdStr = cn.getNodeID();
-            nodeId = Short.decode(nodeIdStr);
+            nodeId = Short.decode(cn.getNodeID());
         } else if (nodeModel instanceof TRMN) {
             TRMN rmn = (TRMN) nodeModel;
 
             nodeId = rmn.getNodeID();
-            nodeIdStr = String.valueOf(nodeId);
+        } else if (nodeModel instanceof TMN) {
+            TMN tempMn = (TMN) nodeModel;
+            nodeId = tempMn.getNodeID();
         } else {
             nodeId = 0;
-            nodeIdStr = null;
             System.err
                     .println("getName Unhandled node model type:" + nodeModel);
         }
@@ -388,14 +382,14 @@ public class Node {
      * @return The node ID in string format.
      */
     public String getNodeIdString() {
-        return nodeIdStr;
+        return String.valueOf(nodeId);
     }
 
     /**
      * @return Name with node ID in the format <Name(NodeID)>
      */
     public String getNodeIDWithName() {
-        return getName() + "(" + getNodeIdString() + ")";
+        return getName() + " (" + getNodeIdString() + ")";
     }
 
     /**
@@ -626,6 +620,25 @@ public class Node {
     }
 
     /**
+     * Checks if the node id already available in the project.
+     *
+     * @param nodeIdTobeChecked The node Id to be checked.
+     *
+     * @return <code> True</code> if already available. <code>False</code>
+     *         otherwise.
+     */
+    public boolean isNodeIdAlreadyAvailable(short nodeIdTobeChecked) {
+        Set<Short> nodeSet = nodeCollection.keySet();
+        boolean nodeIdAvailable = false;
+        for (Short tempNodeId : nodeSet) {
+            if (tempNodeId.shortValue() == nodeIdTobeChecked) {
+                nodeIdAvailable = true;
+            }
+        }
+        return nodeIdAvailable;
+    }
+
+    /**
      * Set ASnd max number
      *
      * @param value value to be set.
@@ -813,6 +826,45 @@ public class Node {
 
         OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
                 IAbstractNodeProperties.NODE_NAME_OBJECT, newName);
+    }
+
+    /**
+     * Updates the id with the given node id.
+     *
+     * @param newNodeId The node id to be updated.
+     *
+     * @throws IOException Errors with project file or XDC file modifications.
+     */
+    public void setNodeId(final short newNodeId) throws IOException {
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
+                    String.valueOf(newNodeId));
+
+            cn.setNodeID(String.valueOf(newNodeId));
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
+                    String.valueOf(newNodeId));
+            rmn.setNodeID(newNodeId);
+        } else {
+            System.err.println("setNodeID(newID) ; Unhandled node model type:"
+                    + nodeModel);
+            return;
+        }
+
+        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
+                IAbstractNodeProperties.NODE_ID_OBJECT,
+                String.valueOf(newNodeId));
+
+        nodeCollection.remove(new Short(nodeId));
+
+        nodeId = newNodeId;
+
+        nodeCollection.put(new Short(nodeId), this);
+
+        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXDC());
     }
 
     /**

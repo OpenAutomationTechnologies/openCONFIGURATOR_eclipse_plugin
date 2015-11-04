@@ -944,6 +944,56 @@ public final class OpenConfiguratorProjectUtils {
         }
     }
 
+    /**
+     * Updates the node configuration file with the new node id.
+     *
+     * @param node The node instance.
+     *
+     * @param newNodeId The new node id to be set.
+     *
+     * @throws IOException Errors with XDC file modifications.
+     */
+    public static void updateNodeConfigurationPath(Node node, String newNodeId)
+            throws IOException {
+
+        java.nio.file.Path nodeImportFile = new File(node.getPathToXDC())
+                .toPath();
+
+        java.nio.file.Path projectRootPath = node.getProject().getLocation()
+                .toFile().toPath();
+
+        String xddNameWithExtension = nodeImportFile.getFileName().toString();
+        String oldNodeSuffix = "_" + node.getNodeId()
+                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+        String xddFileNameWithNoSuffix = xddNameWithExtension.substring(0,
+                xddNameWithExtension.length() - oldNodeSuffix.length());
+
+        // Append node ID and the 'XDC' extension to the configuration file.
+        String xddFileNameWithSuffix = xddFileNameWithNoSuffix + "_" + newNodeId
+                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+        String targetConfigurationPath = new String(
+                projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                        + IPath.SEPARATOR + xddFileNameWithSuffix);
+
+        java.nio.file.Path pathRelative = projectRootPath
+                .relativize(Paths.get(targetConfigurationPath));
+        File unModifiedfile = new File(projectRootPath + "/" + nodeImportFile);
+        File updatedfile = new File(projectRootPath + "/" + pathRelative);
+
+        String relativePath = pathRelative.toString();
+        relativePath = relativePath.replace('\\', '/');
+
+        // Set the relative path to the CN object
+        node.setPathToXDC(relativePath);
+        if (unModifiedfile.renameTo(updatedfile)) {
+            System.out.println(
+                    "Name of File Modified with respect to change in nodeId");
+        }
+    }
+
     public static void updateObjectAttributeValue(final Node node,
             final String objectId, final boolean isSubObject,
             final String subObjectId, final String actualValue) {

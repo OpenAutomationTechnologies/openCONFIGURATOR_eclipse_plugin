@@ -48,24 +48,28 @@ public abstract class AbstractNodePropertySource {
 
     // Common label names
     private static final String NODE_NAME_LABEL = "Node Name";
-    private static final String NODE_ID_LABEL = "Node ID";
-    private static final String NODE_CONFIG_LABEL = "Configuration";
+    public static final String NODE_ID_LABEL = "Node ID";
+    private static final String NODE_CONFIG_LABEL = "Configuration File";
     private static final String NODE_IS_ASYNC_ONLY_LABEL = "Is Async Only";
     private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Is Type1 Router";
     private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Is Type2 Router";
     private static final String NODE_FORCED_OBJECTS_LABEL = "Forced Objects";
-    private static final String CN_LOSS_OF_SOC_TOLERANCE_LABEL = "Loss of SoC Tolerance(" + "\u00B5" + "s)";
+    private static final String CN_LOSS_OF_SOC_TOLERANCE_LABEL = "Loss of SoC Tolerance("
+            + "\u00B5" + "s)";
 
     // ERROR messages
     public static final String NOT_SUPPORTED = "Currently not supported";
     public static final String ERROR_NODE_NAME_CANNOT_BE_EMPTY = "Node name cannot be empty.";
+    public static final String ERROR_NODE_ID_CANNOT_BE_EMPTY = "Node ID cannot be empty.";
+    public static final String ERROR_NODE_ID_EXCEEDS_RANGE = "Node id exceeds the range.";
+    public static final String ERROR_NODE_ID_DECEEDS_RANGE = "Node id deceeds the range.";
     public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
     public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value";
 
     protected TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_NAME_OBJECT, NODE_NAME_LABEL);
     protected PropertyDescriptor nodeIdDescriptor = new PropertyDescriptor(
-            IAbstractNodeProperties.NODE_ID_OBJECT, NODE_ID_LABEL);
+            IAbstractNodeProperties.NODE_ID_READONLY_OBJECT, NODE_ID_LABEL);
     protected PropertyDescriptor configurationDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_CONIFG_OBJECT, NODE_CONFIG_LABEL);
 
