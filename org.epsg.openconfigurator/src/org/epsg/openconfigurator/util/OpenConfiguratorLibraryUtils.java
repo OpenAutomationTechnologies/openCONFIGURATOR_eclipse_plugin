@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -40,6 +41,7 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.SystemUtils;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.epsg.openconfigurator.lib.wrapper.AccessType;
 import org.epsg.openconfigurator.lib.wrapper.CNFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.DynamicChannelAccessType;
@@ -1688,17 +1690,23 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static Result initOpenConfiguratorLibrary() throws IOException {
         OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
-        String boostLogSettingsFile = new String();
 
-        boostLogSettingsFile = org.epsg.openconfigurator.Activator
-                .getAbsolutePath(
-                        IOpenConfiguratorResource.BOOST_LOG_CONFIGURATION);
+        File libraryLogFile = new File(ResourcesPlugin.getWorkspace().getRoot()
+                .getLocation().toString()
+                + IOpenConfiguratorResource.LIBRARY_LOG_FILE_PATH);
+        if (libraryLogFile.exists() && libraryLogFile.canWrite()) {
+            Files.write(
+                    Paths.get(ResourcesPlugin.getWorkspace().getRoot()
+                            .getLocation().toString()
+                            + IOpenConfiguratorResource.LIBRARY_LOG_FILE_PATH),
+                    new byte[] {});
+        }
 
-        System.out.println("Path: " + boostLogSettingsFile);
-        String fileContents = new String(
-                Files.readAllBytes(Paths.get(boostLogSettingsFile)));
-        // Init logger class with configuration file path
-        Result libApiRes = core.InitLoggingConfiguration(fileContents);
+        String loggingPath = ResourcesPlugin.getWorkspace().getRoot()
+                .getLocation().toString() + "/.metadata/.plugins/"
+                + org.epsg.openconfigurator.Activator.PLUGIN_ID + "/";
+        Result libApiRes = core.InitEclipseLoggingPath(loggingPath);
+
         if (!libApiRes.IsSuccessful()) {
             return libApiRes;
         }

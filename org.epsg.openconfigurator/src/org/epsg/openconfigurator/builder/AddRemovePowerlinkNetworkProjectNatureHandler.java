@@ -44,17 +44,22 @@ import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-public class AddRemovePowerlinkNetworkProjectNatureHandler extends
-        AbstractHandler {
+/**
+ * Handles to Add or Remove the PowerlinkNetworkProject
+ *
+ * @author Ramakrishnan P
+ *
+ */
+public class AddRemovePowerlinkNetworkProjectNatureHandler
+        extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        // TODO Auto-generated method stub
         ISelection selection = HandlerUtil.getCurrentSelection(event);
         //
         if (selection instanceof IStructuredSelection) {
-            for (Iterator<?> it = ((IStructuredSelection) selection).iterator(); it
-                    .hasNext();) {
+            for (Iterator<?> it = ((IStructuredSelection) selection)
+                    .iterator(); it.hasNext();) {
                 Object element = it.next();
                 IProject project = null;
                 if (element instanceof IProject) {
@@ -92,8 +97,8 @@ public class AddRemovePowerlinkNetworkProjectNatureHandler extends
                 // Remove the nature
                 String[] newNatures = new String[natures.length - 1];
                 System.arraycopy(natures, 0, newNatures, 0, i);
-                System.arraycopy(natures, i + 1, newNatures, i, natures.length
-                        - i - 1);
+                System.arraycopy(natures, i + 1, newNatures, i,
+                        natures.length - i - 1);
                 description.setNatureIds(newNatures);
                 project.setDescription(description, null);
                 return;

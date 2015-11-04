@@ -33,15 +33,21 @@
 
 package org.epsg.openconfigurator;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.text.MessageFormat;
 
+import org.apache.commons.io.input.Tailer;
 import org.apache.commons.lang.SystemUtils;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
+import org.epsg.openconfigurator.console.LogFileTailListener;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.osgi.framework.Bundle;
@@ -74,8 +80,8 @@ public class Activator extends AbstractUIPlugin {
         Bundle bundle = Activator.plugin.getBundle();
         URL fileURL = bundle.getEntry(relativePath);
         if (fileURL == null) {
-            throw new IOException(MessageFormat.format(
-                    Activator.FILE_NOT_FOUND, relativePath));
+            throw new IOException(MessageFormat.format(Activator.FILE_NOT_FOUND,
+                    relativePath));
         }
 
         String absolutePath = null;
@@ -112,6 +118,8 @@ public class Activator extends AbstractUIPlugin {
                 path);
     }
 
+    private Tailer tailer;
+
     /**
      * The constructor
      */
@@ -121,9 +129,8 @@ public class Activator extends AbstractUIPlugin {
     /*
      * (non-Javadoc)
      *
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext
-     * )
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.
+     * BundleContext )
      */
     @Override
     public void start(BundleContext context) throws Exception {
@@ -135,8 +142,10 @@ public class Activator extends AbstractUIPlugin {
             OpenConfiguratorLibraryUtils.loadOpenConfiguratorLibrary();
         } catch (UnsatisfiedLinkError | SecurityException e) {
             e.printStackTrace();
-            PluginErrorDialogUtils.displayErrorMessageDialog(Activator.plugin
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    Activator.PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR
+                            + e.getMessage());
+            PluginErrorDialogUtils.displayErrorMessageDialog(
                     Activator.PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR, e);
         }
 
@@ -147,25 +156,29 @@ public class Activator extends AbstractUIPlugin {
             // Report error to the user using the dialog.
             String errorMessage = OpenConfiguratorLibraryUtils
                     .getErrorMessage(libApiRes);
-            System.err.println("InitOpenConfigurator library failed. "
-                    + errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(Activator.plugin
-                    .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                    errorMessage, null);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "InitOpenConfigurator library failed. " + errorMessage);
+            PluginErrorDialogUtils.displayErrorMessageDialog(errorMessage,
+                    libApiRes);
         }
+
+        // Read the log files written by the library and update in the console
+        String logPath = ResourcesPlugin.getWorkspace().getRoot().getLocation()
+                .toString() + IOpenConfiguratorResource.LIBRARY_LOG_FILE_PATH;
+        tailer = Tailer.create(new File(logPath), new LogFileTailListener(),
+                1000);
     }
 
     /*
      * (non-Javadoc)
      *
-     * @see
-     * org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext
-     * )
+     * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.
+     * BundleContext )
      */
     @Override
     public void stop(BundleContext context) throws Exception {
         Activator.plugin = null;
+        tailer.stop();
         super.stop(context);
     }
-
 }

@@ -551,8 +551,15 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
 
     }
 
+    /**
+     * Persist the data from the library in the XDC and the project files.
+     *
+     * @param monitor The progress monitor instance.
+     * @throws InterruptedException
+     * @throws InvocationTargetException
+     */
     public void persistLibraryData(IProgressMonitor monitor)
-            throws InterruptedException {
+            throws InterruptedException, InvocationTargetException {
         monitor.beginTask("Save XDC configurations", nodeCollection.size());
 
         WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
@@ -572,12 +579,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             }
         };
 
-        try {
-            wmo.run(monitor);
-        } catch (InvocationTargetException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        wmo.run(monitor);
 
         monitor.done();
     }

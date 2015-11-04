@@ -37,6 +37,13 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IProjectNature;
 import org.eclipse.core.runtime.CoreException;
 
+/**
+ * This class provides the eclipse based project nature for the POWERLINK
+ * network Project.
+ *
+ * @author Ramakrishnan P
+ *
+ */
 public class PowerlinkNetworkProjectNature implements IProjectNature {
 
     /**
@@ -48,8 +55,8 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
         ICommand[] commands = description.getBuildSpec();
 
         for (ICommand command : commands) {
-            if (command.getBuilderName().equals(
-                    PowerlinkNetworkProjectBuilder.BUILDER_ID)) {
+            if (command.getBuilderName()
+                    .equals(PowerlinkNetworkProjectBuilder.BUILDER_ID)) {
                 return;
             }
         }
@@ -66,7 +73,7 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.core.resources.IProjectNature#configure()
      */
     @Override
@@ -75,8 +82,8 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
         ICommand[] commands = desc.getBuildSpec();
 
         for (ICommand command : commands) {
-            if (command.getBuilderName().equals(
-                    PowerlinkNetworkProjectBuilder.BUILDER_ID)) {
+            if (command.getBuilderName()
+                    .equals(PowerlinkNetworkProjectBuilder.BUILDER_ID)) {
                 return;
             }
         }
@@ -92,7 +99,7 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.core.resources.IProjectNature#deconfigure()
      */
     @Override
@@ -100,8 +107,8 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
         IProjectDescription description = getProject().getDescription();
         ICommand[] commands = description.getBuildSpec();
         for (int i = 0; i < commands.length; ++i) {
-            if (commands[i].getBuilderName().equals(
-                    PowerlinkNetworkProjectBuilder.BUILDER_ID)) {
+            if (commands[i].getBuilderName()
+                    .equals(PowerlinkNetworkProjectBuilder.BUILDER_ID)) {
                 ICommand[] newCommands = new ICommand[commands.length - 1];
                 System.arraycopy(commands, 0, newCommands, 0, i);
                 System.arraycopy(commands, i + 1, newCommands, i,
@@ -115,7 +122,7 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.core.resources.IProjectNature#getProject()
      */
     @Override
@@ -125,7 +132,7 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.core.resources.IProjectNature#setProject(org.eclipse.core
      * .resources.IProject)

@@ -1,5 +1,7 @@
 /*******************************************************************************
- * @file   IOpenConfiguratorResource.java
+ * @file   LogFileTailListener.java
+ *
+ * @brief  Listens on the log file changes and prints in the console.
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -28,47 +30,23 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
+package org.epsg.openconfigurator.console;
 
-package org.epsg.openconfigurator.resources;
+import org.apache.commons.io.input.TailerListenerAdapter;
 
 /**
- * An interface to list all the resources available in the openCONFIGURATOR
- * plugin.
+ * Listener to listen the log file provided.
  *
  * @author Ramakrishnan P
  *
  */
-public interface IOpenConfiguratorResource {
+public class LogFileTailListener extends TailerListenerAdapter {
 
-    /**
-     * Log file path in the workspace.
-     */
-    public static final String LIBRARY_LOG_FILE_PATH = "/.metadata/.plugins/"
-            + org.epsg.openconfigurator.Activator.PLUGIN_ID + "/"
-            + org.epsg.openconfigurator.Activator.PLUGIN_ID + ".0.log";
+    public LogFileTailListener() {
+    }
 
-    /**
-     * Logging configuration file for BOOST.Log.
-     */
-    public static final String BOOST_LOG_CONFIGURATION = "resources/boost_log_settings.ini"; //$NON-NLS-1$
-
-    /**
-     * openCONFIGURATOR project schema.
-     */
-    public static final String PROJECT_SCHEMA = "resources/OC_ProjectFile/openCONFIGURATOR.xsd"; //$NON-NLS-1$
-
-    /**
-     * XDD schema.
-     */
-    public static final String XDD_SCHEMA = "resources/xddschema/Powerlink_Main.xsd"; //$NON-NLS-1$
-
-    /**
-     * Default MN XDD.
-     */
-    public static final String DEFAULT_MN_XDD = "resources/00000000_POWERLINK_CiA302-4_MN.xdd"; //$NON-NLS-1$
-
-    /**
-     * Default CN XDD.
-     */
-    public static final String DEFAULT_CN_XDD = "resources/00000000_POWERLINK_CiA401_CN.xdd"; //$NON-NLS-1$
+    @Override
+    public void handle(String line) {
+        OpenConfiguratorMessageConsole.getInstance().printLibraryMessage(line);
+    }
 }

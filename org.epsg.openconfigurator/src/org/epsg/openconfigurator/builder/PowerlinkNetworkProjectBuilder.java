@@ -32,6 +32,7 @@
 package org.epsg.openconfigurator.builder;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystems;
@@ -55,6 +56,7 @@ import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.epsg.openconfigurator.Activator;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.lib.wrapper.ByteCollection;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
@@ -160,8 +162,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 networkId, configurationOutput, cdcByteCollection);
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // TODO print to target console.
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -174,9 +178,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             } catch (IOException e1) {
                 e1.printStackTrace();
                 IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, 1, "Output path:"
+                        Activator.PLUGIN_ID, IStatus.OK, "Output path:"
                                 + outputpath.toString() + " does not exist.",
-                        null);
+                        e1);
                 throw new CoreException(errorStatus);
             }
 
@@ -227,8 +231,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 .BuildCProcessImage(networkId, nodeId, piDataOutput);
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // TODO print to target console.
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -244,10 +250,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             } catch (IOException e) {
                 e.printStackTrace();
                 IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, 1,
+                        Activator.PLUGIN_ID, IStatus.OK,
                         "Output file:" + targetFilePath.toString()
                                 + " is not accessible.",
-                        null);
+                        e);
                 throw new CoreException(errorStatus);
             }
         }
@@ -272,8 +278,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 .BuildNETProcessImage(networkId, nodeId, piDataOutput);
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // TODO print to target console.
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -289,10 +297,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             } catch (IOException e) {
                 e.printStackTrace();
                 IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, 1,
+                        Activator.PLUGIN_ID, IStatus.OK,
                         "Output file:" + targetFilePath.toString()
                                 + " is not accessible.",
-                        null);
+                        e);
                 throw new CoreException(errorStatus);
             }
         }
@@ -317,8 +325,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 .GetAvailableNodeIds(networkId, nodeIdCollection);
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // TODO print to target console.
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -359,8 +369,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 .BuildXMLProcessImage(networkId, nodeId, piDataOutput);
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    1, OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // TODO print to target console.
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -376,10 +388,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             } catch (IOException e) {
                 e.printStackTrace();
                 IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, 1,
+                        Activator.PLUGIN_ID, IStatus.OK,
                         "Output file:" + targetFilePath.toString()
                                 + " is not accessible.",
-                        null);
+                        e);
                 throw new CoreException(errorStatus);
             }
         }
@@ -457,9 +469,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, 1, "Output file:"
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
                             + targetFilePath.toString() + " is not accessible.",
-                    null);
+                    e);
             throw new CoreException(errorStatus);
         }
 
@@ -502,9 +514,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, 1, "Output file:"
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
                             + targetFilePath.toString() + " is not accessible.",
-                    null);
+                    e);
             throw new CoreException(errorStatus);
         }
         return true;
@@ -529,9 +541,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, 1, "Output file:"
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
                             + targetFilePath.toString() + " is not accessible.",
-                    null);
+                    e);
             throw new CoreException(errorStatus);
         }
 
@@ -567,10 +579,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             if (getProject().getName().compareTo(networkId) != 0) {
                 continue;
             }
-            if (pjtEditor.getNodeCollection().isEmpty()) {
-                return;
-            }
 
+            System.out.println("Build Started: Project: " + networkId);
+            OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
+                    "Build Started for project: " + networkId);
             getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
             long buildStartTime = System.currentTimeMillis();
@@ -592,53 +604,44 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     targetPath, monitor);
             if (buildCdcSuccess) {
 
-                System.out.println("Project: " + networkId
-                        + ". Successfully generated mnobd.txt, mnobd.cdc, mnobd_char.txt.");
-
                 boolean buildPiSuccess = buildProcessImageDescriptions(
                         networkId, targetPath, monitor);
                 if (!buildPiSuccess) {
-                    System.err.println("Project: " + networkId
-                            + ". Failed to generate processimage data. Xap.h, Xap.xml, processimage.cs are not generated!");
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "Build failed for project: " + networkId);
+                } else {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printInfoMessage(
+                                    "Build finished successfully for Project: "
+                                            + networkId);
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printInfoMessage("Generated output files at: "
+                                    + targetPath.toString());
                 }
 
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            BuildMessageDialog msd = new BuildMessageDialog(
-                                    null, "Build project", null,
-                                    "Build project '" + networkId
-                                            + "' completed.\n"
-                                            + "Output files are generated in the location:\n"
-                                            + targetPath.toString());
-                            msd.open();
-
-                            if (msd.isOutputPathToBeShown()) {
-                                java.awt.Desktop.getDesktop()
-                                        .open(targetPath.toFile());
-                            }
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
-                    }
-                });
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printInfoMessage("Updating node configuration files.");
 
                 try {
                     pjtEditor.persistLibraryData(monitor);
-                } catch (InterruptedException e) {
+                } catch (InterruptedException | InvocationTargetException e) {
+
                     IStatus errorStatus = new Status(IStatus.ERROR,
-                            Activator.PLUGIN_ID, 1, e.getMessage(), null);
+                            Activator.PLUGIN_ID, IStatus.OK, e.getMessage(), e);
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "Failed to update the node configuration files.\n\tError message: "
+                                            + e.getMessage());
                     throw new CoreException(errorStatus);
                 }
             } else {
-                String errorStr = "Project: " + networkId
-                        + ". Failed to generate CDC. Xap.h, Xap.xml, processimage.cs are not generated!";
-                // TODO print to target console.
+                String errorStr = "Build failed for project: " + networkId;
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printErrorMessage(errorStr);
                 System.err.println(errorStr);
                 IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, 1, errorStr, null);
+                        Activator.PLUGIN_ID, IStatus.OK, errorStr, null);
                 throw new CoreException(errorStatus);
             }
 
@@ -647,9 +650,12 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             long buildEndTime = System.currentTimeMillis();
             final long totalTimeInSeconds = (buildEndTime - buildStartTime)
                     / 1000;
+
+            OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
+                    "Completed updating node configuration files.");
+
             System.out
                     .println("Build completed in " + totalTimeInSeconds + "s");
-
         }
     }
 }
