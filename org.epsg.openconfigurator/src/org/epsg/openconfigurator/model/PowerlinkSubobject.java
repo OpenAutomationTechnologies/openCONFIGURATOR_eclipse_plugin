@@ -127,6 +127,22 @@ public class PowerlinkSubobject {
         }
     }
 
+    /**
+     * @return The actual value or default value if actual value is not
+     *         available.
+     */
+    public String getActualDefaultValue() {
+        if (getActualValue() != null) {
+            return getActualValue();
+        }
+
+        if (getDefaultValue() != null) {
+            return getDefaultValue();
+        }
+
+        return null;
+    }
+
     public String getActualValue() {
         return subObject.getActualValue();
     }
@@ -201,7 +217,7 @@ public class PowerlinkSubobject {
 
         if (writeToXdc) {
             OpenConfiguratorProjectUtils.updateObjectAttributeValue(getNode(),
-                getObjectIdRaw(), true, getSubobjectIdRaw(), actualValue);
+                    getObjectIdRaw(), true, getSubobjectIdRaw(), actualValue);
         }
 
         subObject.setActualValue(actualValue);

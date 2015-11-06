@@ -76,6 +76,21 @@ public class ObjectDatatype {
             case "0009":
                 retValue = "Visible_String";
                 break;
+            case "000A":
+                retValue = "Octet_String";
+                break;
+            case "000B":
+                retValue = "Unicode_String";
+                break;
+            case "000C":
+                retValue = "Time_of_Day";
+                break;
+            case "000D":
+                retValue = "Time_Diff";
+                break;
+            case "000F":
+                retValue = "Domain";
+                break;
             case "0010":
                 retValue = "Integer24";
                 break;
@@ -93,21 +108,6 @@ public class ObjectDatatype {
                 break;
             case "0015":
                 retValue = "Integer64";
-                break;
-            case "000A":
-                retValue = "Octet_String";
-                break;
-            case "000B":
-                retValue = "Unicode_String";
-                break;
-            case "000C":
-                retValue = "Time_of_Day";
-                break;
-            case "000D":
-                retValue = "Time_Diff";
-                break;
-            case "000F":
-                retValue = "Domain";
                 break;
             case "0016":
                 retValue = "Unsigned24";

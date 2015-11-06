@@ -108,7 +108,7 @@ public class NewNodeWizard extends Wizard {
     @Override
     public boolean performFinish() {
 
-        Node newNode = new Node(selectedNodeObj.getProjectXml(),
+        Node newNode = new Node(nodeList, selectedNodeObj.getProjectXml(),
                 addNodePage.getNode(), addNodePage.getXddModel());
 
         Result res = OpenConfiguratorLibraryUtils

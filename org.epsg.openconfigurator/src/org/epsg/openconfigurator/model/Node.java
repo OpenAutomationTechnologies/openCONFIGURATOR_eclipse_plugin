@@ -33,6 +33,8 @@ package org.epsg.openconfigurator.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -40,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -82,6 +85,10 @@ public class Node {
     private final IFile projectXml;
 
     /**
+     * List of nodes from a collection.
+     */
+    private final Map<Short, Node> nodeCollection;
+    /**
      * List of Objects available in the node.
      */
     private final List<PowerlinkObject> objectsList;
@@ -106,6 +113,7 @@ public class Node {
         xddModel = null;
         project = null;
         projectXml = null;
+        nodeCollection = null;
         networkId = null;
         nodeId = 0;
         nodeIdStr = null;
@@ -115,14 +123,16 @@ public class Node {
     /**
      * Constructs the Node instance with the following inputs.
      *
+     * @param nodeCollection The node list.
      * @param projectXml openCONFIGURATOR project file.
      * @param nodeModel Node instance from the openCONFIGURATOR project.
      *            Example: The Object is one of TNetworkConfiguration(only for
      *            MN), TCN, TRMN.
      * @param xddModel The memory of the XDC linked to this Node.
      */
-    public Node(IFile projectXml, Object nodeModel,
-            ISO15745ProfileContainer xddModel) {
+    public Node(Map<Short, Node> nodeCollection, IFile projectXml,
+            Object nodeModel, ISO15745ProfileContainer xddModel) {
+        this.nodeCollection = nodeCollection;
         this.projectXml = projectXml;
 
         if (projectXml != null) {
@@ -483,6 +493,52 @@ public class Node {
     }
 
     /**
+     * @return PresTimeoutvalue of CN node in ns
+     */
+    public long getPresTimeoutvalue() {
+
+        if (nodeModel instanceof TCN) {
+            Node mnNode = nodeCollection
+                    .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+            PowerlinkSubobject pollresponseSubObj = mnNode.getSubObject(
+                    INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID, nodeId);
+            if (pollresponseSubObj != null) {
+
+                String presTimeOutValueInNs = pollresponseSubObj
+                        .getActualValue();
+                if (presTimeOutValueInNs != null) {
+
+                    if (!presTimeOutValueInNs.isEmpty()) {
+                        return Long.decode(presTimeOutValueInNs);
+                    }
+
+                } else {
+
+                    presTimeOutValueInNs = pollresponseSubObj.getDefaultValue();
+                    if (presTimeOutValueInNs != null) {
+
+                        if (!presTimeOutValueInNs.isEmpty()) {
+                            return Long.decode(presTimeOutValueInNs);
+                        }
+                    } else {
+                        System.err.println("PresTimeout sub-object "
+                                + INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID
+                                + "/" + pollresponseSubObj.getSubobjectIdRaw()
+                                + " has no value.");
+                    }
+                }
+
+            } else {
+                System.err.println("PresTimeout sub-object "
+                        + INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID
+                        + "/" + Integer.toHexString(nodeId) + " not found");
+            }
+        }
+
+        return 0;
+    }
+
+    /**
      * @return Eclipse project associated with the node.
      */
     public IProject getProject() {
@@ -639,6 +695,30 @@ public class Node {
                 presMaxLatencyObj.setActualValue(value.toString(), true);
             } else {
                 System.err.println("PresMaxLatency object not found.");
+            }
+        }
+    }
+
+    /**
+     * Set the PRes timeout value.
+     *
+     * Supported for a CN only.
+     *
+     * @param value PRes timeout value in ns.
+     */
+    public void setCnPresTimeout(String value) {
+        if (nodeModel instanceof TCN) {
+            Node mnNode = nodeCollection
+                    .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+            if (mnNode != null) {
+                PowerlinkSubobject prestimeoutsubobj = mnNode.getSubObject(
+                        INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                        nodeId);
+                if (prestimeoutsubobj != null) {
+                    prestimeoutsubobj.setActualValue(value, true);
+                } else {
+                    System.err.println("PresTimeout SubObject not found");
+                }
             }
         }
     }

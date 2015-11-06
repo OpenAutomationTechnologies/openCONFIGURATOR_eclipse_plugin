@@ -38,7 +38,6 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
-import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
@@ -46,6 +45,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -126,7 +126,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT,
             CN_POLL_RESPONSE_MAX_LATENCY_LABEL);
 
-    private static final PropertyDescriptor presTimeoutDescriptor = new PropertyDescriptor(
+    private static final TextPropertyDescriptor presTimeoutDescriptor = new TextPropertyDescriptor(
             IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT,
             CN_POLL_RESPONSE_TIMEOUT_LABEL);
 
@@ -191,7 +191,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
 
         presMaxLatencyDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        presMaxLatencyDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
         presMaxLatencyDescriptor.setDescription(
                 IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_DESCRIPTION);
         presTimeoutDescriptor
@@ -200,6 +202,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
 
     // Error messages.
     private static final String ERROR_PRES_MAX_LATENCY_CANNOT_BE_EMPTY = "PRes max latency value cannot be empty.";
+    private static final String ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY = "PRes TimeOut value cannot be empty.";
 
     private Node cnNode;
     private TCN tcn;
@@ -492,8 +495,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     retObj = cnNode.getPresMaxLatencyValue();
                     break;
                 case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT:
-                    retObj = "Currently not supported. Use MN's 0x1F92/0x"
-                            + Integer.toHexString(cnNode.getNodeId());
+                    long presTimeoutinNs = cnNode.getPresTimeoutvalue();
+                    long presTimeoutInMs = presTimeoutinNs / 1000;
+                    retObj = String.valueOf(presTimeoutInMs);
                     break;
                 case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
                     try {
@@ -625,12 +629,22 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             if (((String) value).isEmpty()) {
                 return ERROR_PRES_MAX_LATENCY_CANNOT_BE_EMPTY;
             }
-            Result res = OpenConfiguratorCore.GetInstance()
-                    .SetSubObjectActualValue(cnNode.getNetworkId(),
-                            cnNode.getNodeId(),
-                            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID,
-                            (String) value);
+
+            PowerlinkSubobject presMaxLatencySubObj = cnNode.getSubObject(
+                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
+                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
+            if (presMaxLatencySubObj == null) {
+                return "Object 0x"
+                        + Long.toHexString(
+                                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID)
+                        + "/0x"
+                        + Integer.toHexString(
+                                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID)
+                        + " not found.";
+            }
+
+            Result res = OpenConfiguratorLibraryUtils.setSubObjectActualValue(
+                    presMaxLatencySubObj, (String) value);
 
             if (!res.IsSuccessful()) {
                 return res.GetErrorMessage();
@@ -651,8 +665,22 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
      *         being the error message to display to the end user.
      */
     protected String handlePresTimeout(Object value) {
-        return "Currently not supported. Use MN's 0x1F92/0x"
-                + Integer.toHexString(cnNode.getNodeId());
+        if (value instanceof String) {
+            if (((String) value).isEmpty()) {
+                return ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY;
+            }
+            Result res = OpenConfiguratorCore.GetInstance().SetPResTimeOut(
+                    cnNode.getNetworkId(), cnNode.getNodeId(),
+                    Long.decode((String) value).longValue() * 1000);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
+        } else {
+            System.err
+                    .println("handlePresTimeout: Invalid value type:" + value);
+        }
+
+        return null;
     }
 
     @Override
@@ -920,6 +948,18 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT: {
                     try {
                         cnNode.setCnPresMaxLatency(Long.decode((String) value));
+                    } catch (NumberFormatException e) {
+                        System.err.println(
+                                objectId + " Number format exception" + e);
+                    }
+                    break;
+                }
+                case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
+                    try {
+                        long presTimeoutInNs = Long.decode((String) value)
+                                .longValue() * 1000;
+                        cnNode.setCnPresTimeout(
+                                String.valueOf(presTimeoutInNs));
                     } catch (NumberFormatException e) {
                         System.err.println(
                                 objectId + " Number format exception" + e);

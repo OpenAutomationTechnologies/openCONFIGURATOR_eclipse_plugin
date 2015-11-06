@@ -490,12 +490,14 @@ public final class OpenConfiguratorProjectUtils {
                         + File.separator + mnNode.getPathToXDC());
                 System.out.println(
                         "MN XDD file path:" + mnXddFile.getAbsolutePath());
-                processingNode = new Node(projectFile, networkCfg, null);
+                processingNode = new Node(nodeCollection, projectFile,
+                        networkCfg, null);
 
                 ISO15745ProfileContainer xdd = XddMarshaller
                         .unmarshallXDDFile(mnXddFile);
                 // add TNetworkManagement Not TMN
-                Node newNode = new Node(projectFile, networkCfg, xdd);
+                Node newNode = new Node(nodeCollection, projectFile, networkCfg,
+                        xdd);
                 processingNode = newNode;
 
                 Result res = OpenConfiguratorLibraryUtils.addNode(
@@ -521,11 +523,13 @@ public final class OpenConfiguratorProjectUtils {
                 System.out.println(
                         "CN XDD file path:" + cnXddFile.getAbsolutePath());
 
-                processingNode = new Node(projectFile, cnNode, null);
+                processingNode = new Node(nodeCollection, projectFile, cnNode,
+                        null);
 
                 ISO15745ProfileContainer xdd = XddMarshaller
                         .unmarshallXDDFile(cnXddFile);
-                Node newNode = new Node(projectFile, cnNode, xdd);
+                Node newNode = new Node(nodeCollection, projectFile, cnNode,
+                        xdd);
                 processingNode = newNode;
 
                 Result res = OpenConfiguratorLibraryUtils.addNode(
@@ -553,11 +557,13 @@ public final class OpenConfiguratorProjectUtils {
                                 + rmnNode.getPathToXDC());
                 System.out.println(
                         "RMN XDD file path:" + rmnXddFile.getAbsolutePath());
-                processingNode = new Node(projectFile, rmnNode, null);
+                processingNode = new Node(nodeCollection, projectFile, rmnNode,
+                        null);
                 ISO15745ProfileContainer xdd = XddMarshaller
                         .unmarshallXDDFile(rmnXddFile);
 
-                Node newNode = new Node(projectFile, rmnNode, xdd);
+                Node newNode = new Node(nodeCollection, projectFile, rmnNode,
+                        xdd);
                 processingNode = newNode;
 
                 Result res = OpenConfiguratorLibraryUtils.addNode(
