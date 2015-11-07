@@ -9,7 +9,7 @@
             id="org.epsg.openconfigurator.view.category">
       </category>
       <view
-            name="Industrial Network"
+            name="POWERLINK Network"
             icon="icons/window_16.gif"
             category="org.epsg.openconfigurator.view.category"
             class="org.epsg.openconfigurator.views.IndustrialNetworkView"

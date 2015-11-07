@@ -81,9 +81,7 @@ import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 
 /**
@@ -292,23 +290,7 @@ public class IndustrialNetworkView extends ViewPart
 
             if (obj instanceof Node) {
                 Node node = (Node) obj;
-
-                Object nodeObjectModel = node.getNodeModel();
-                if (nodeObjectModel instanceof TNetworkConfiguration) {
-                    TNetworkConfiguration networkConfiguration = (TNetworkConfiguration) nodeObjectModel;
-                    TNodeCollection nodeCollection = networkConfiguration
-                            .getNodeCollection();
-                    TMN mn = nodeCollection.getMN();
-                    return (mn.getName() + "(" + mn.getNodeID() + ")");
-                }
-                if (nodeObjectModel instanceof TCN) {
-                    TCN cn = (TCN) nodeObjectModel;
-                    return (cn.getName() + "(" + cn.getNodeID() + ")");
-                }
-                if (nodeObjectModel instanceof TRMN) {
-                    TRMN rmn = (TRMN) nodeObjectModel;
-                    return (rmn.getName() + "(" + rmn.getNodeID() + ")");
-                }
+                return node.getNodeIDWithName();
             }
             return obj.toString();
         }
@@ -360,14 +342,6 @@ public class IndustrialNetworkView extends ViewPart
      * Show PDO mapping action.
      */
     private Action showPdoMapping;
-
-    private Action replaceNode; // TBD.
-    private Action addModule;
-
-    /**
-     * Double clicked action.
-     */
-    private Action doubleClickAction;
 
     /**
      * Call back to handle the selection changed events.
@@ -495,7 +469,6 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(showPdoMapping);
                     manager.add(showObjectDictionary);
                     manager.add(new Separator());
-                    // manager.add(replaceNode);
                     manager.add(deleteNode);
                 } else if (nodeObjectModel instanceof TNetworkConfiguration) {
                     manager.add(addNewNode);
@@ -503,14 +476,12 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(showPdoMapping);
                     manager.add(showObjectDictionary);
                     manager.add(new Separator());
-                    // manager.add(replaceNode);
                 } else if (nodeObjectModel instanceof TCN) {
                     manager.add(enableDisableNode);
                     manager.add(new Separator());
                     manager.add(showPdoMapping);
                     manager.add(showObjectDictionary);
                     manager.add(new Separator());
-                    // manager.add(replaceNode);
                     manager.add(deleteNode);
                 }
 
@@ -630,7 +601,7 @@ public class IndustrialNetworkView extends ViewPart
         viewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
-                doubleClickAction.run();
+                showPdoMapping.run();
             }
         });
     }
@@ -639,24 +610,18 @@ public class IndustrialNetworkView extends ViewPart
         addNewNode = new Action("Add Node...") {
             @Override
             public void run() {
-                ISelection selection = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getSelectionService()
-                        .getSelection();
-                if ((selection != null)
-                        && (selection instanceof IStructuredSelection)) {
-                    IStructuredSelection strucSelection = (IStructuredSelection) selection;
+                ISelection nodeTreeSelection = viewer.getSelection();
+                if ((nodeTreeSelection != null)
+                        && (nodeTreeSelection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
                     Object selectedObject = strucSelection.getFirstElement();
                     if ((selectedObject instanceof Node)) {
-
                         NewNodeWizard newNodeWizard = new NewNodeWizard(
                                 rootNode.getNodeCollection(),
                                 (Node) selectedObject);
                         if (!newNodeWizard.hasErrors()) {
                             WizardDialog wd = new WizardDialog(
-                                    PlatformUI.getWorkbench()
-                                            .getActiveWorkbenchWindow()
-                                            .getActivePage().getActiveEditor()
-                                            .getSite().getShell(),
+                                    Display.getDefault().getActiveShell(),
                                     newNodeWizard);
                             wd.setTitle(newNodeWizard.getWindowTitle());
                             wd.open();
@@ -664,9 +629,9 @@ public class IndustrialNetworkView extends ViewPart
                             showMessage(
                                     "Internal error occurred. Please try again later");
                         }
-                    }
 
-                    handleRefresh();
+                        handleRefresh();
+                    }
                 } else {
                     showMessage("Invalid selection");
                 }
@@ -713,7 +678,7 @@ public class IndustrialNetworkView extends ViewPart
                 .setImageDescriptor(org.epsg.openconfigurator.Activator
                         .getImageDescriptor(IPluginImages.OBD_ICON));
 
-        showPdoMapping = new Action("Show PDO Mapping") {
+        showPdoMapping = new Action("Show Mapping View") {
             @Override
             public void run() {
                 showMessage(
@@ -721,7 +686,7 @@ public class IndustrialNetworkView extends ViewPart
                                 + "Please use the 'object dictionary view' to modify the PDO mapping values.");
             }
         };
-        showPdoMapping.setToolTipText("Show PDO Mapping");
+        showPdoMapping.setToolTipText("Show Mapping View");
         showPdoMapping.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.MAPPING_ICON));
 
@@ -741,30 +706,9 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
         };
-        showProperties.setToolTipText("Show Properties");
+        showProperties.setToolTipText("Properties");
         showProperties.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.PROPERTIES_ICON));
-
-        replaceNode = new Action("Replace XDD/XDC") {
-            @Override
-            public void run() {
-                showMessage("Replace XDD/XDC not supported.!");
-            }
-        };
-        replaceNode.setToolTipText("Replace XDD/XDC");
-        replaceNode
-                .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-                        .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
-
-        addModule = new Action("Add Module...") {
-            @Override
-            public void run() {
-                showMessage("Add Module action executed");
-            }
-        };
-        addModule.setToolTipText("Add Module...");
-        addModule.setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
-                .getImageDescriptor(ISharedImages.IMG_OBJS_INFO_TSK));
 
         deleteNode = new Action("Remove") {
             @Override
@@ -784,22 +728,13 @@ public class IndustrialNetworkView extends ViewPart
                 .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                         .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
 
-        doubleClickAction = new Action() {
-            @Override
-            public void run() {
-                ISelection selection = viewer.getSelection();
-                viewer.setExpandedElements(
-                        ((IStructuredSelection) selection).toArray());
-            }
-        };
-
-        refreshAction = new Action() {
+        refreshAction = new Action("Refresh (F5)") {
             @Override
             public void run() {
                 handleRefresh();
             }
         };
-        refreshAction.setToolTipText("Refresh(F5)");
+        refreshAction.setToolTipText("Refresh (F5)");
         refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.REFRESH_ICON));
     }
@@ -819,7 +754,7 @@ public class IndustrialNetworkView extends ViewPart
 
     private void showMessage(String message) {
         MessageDialog.openInformation(viewer.getControl().getShell(),
-                "Industrial Network", message);
+                "POWERLINK Network", message);
     }
 
 }
