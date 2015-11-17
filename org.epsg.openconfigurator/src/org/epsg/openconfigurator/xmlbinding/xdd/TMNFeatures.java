@@ -35,6 +35,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="NMTRelativeTime" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTSimpleBoot" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="PDOTPDOChannels" type="{http://www.w3.org/2001/XMLSchema}unsignedShort" default="256" /&gt;
+ *       &lt;attribute name="NMTMNRedundancy" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -91,6 +92,8 @@ public class TMNFeatures {
     @XmlAttribute(name = "PDOTPDOChannels")
     @XmlSchemaType(name = "unsignedShort")
     protected Integer pdotpdoChannels;
+    @XmlAttribute(name = "NMTMNRedundancy")
+    protected Boolean nmtmnRedundancy;
 
     /**
      * Gets the value of the dllErrMNMultipleMN property.
@@ -498,6 +501,34 @@ public class TMNFeatures {
      */
     public void setPDOTPDOChannels(Integer value) {
         this.pdotpdoChannels = value;
+    }
+
+    /**
+     * Gets the value of the nmtmnRedundancy property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isNMTMNRedundancy() {
+        if (nmtmnRedundancy == null) {
+            return false;
+        } else {
+            return nmtmnRedundancy;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtmnRedundancy property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setNMTMNRedundancy(Boolean value) {
+        this.nmtmnRedundancy = value;
     }
 
 }

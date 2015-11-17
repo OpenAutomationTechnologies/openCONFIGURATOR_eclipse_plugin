@@ -57,10 +57,10 @@ public interface IOpenConfiguratorResource {
     /**
      * Default MN XDD.
      */
-    public static final String DEFAULT_MN_XDD = "resources/openPOWERLINK_MN.xdd"; //$NON-NLS-1$
+    public static final String DEFAULT_MN_XDD = "resources/00000000_POWERLINK_CiA302-4_MN.xdd"; //$NON-NLS-1$
 
     /**
      * Default CN XDD.
      */
-    public static final String DEFAULT_CN_XDD = "resources/openPOWERLINK_CN.xdd"; //$NON-NLS-1$
+    public static final String DEFAULT_CN_XDD = "resources/00000000_POWERLINK_CiA401_CN.xdd"; //$NON-NLS-1$
 }

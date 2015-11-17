@@ -508,6 +508,7 @@ W. Seiss      | 09.09.2010 | + Cleanup / restructuring
     <xsd:attribute name="NMTRelativeTime" type="xsd:boolean" use="optional" default="false"/>
     <xsd:attribute name="NMTSimpleBoot" type="xsd:boolean" use="required"/>
     <xsd:attribute name="PDOTPDOChannels" type="xsd:unsignedShort" use="optional" default="256"/>
+    <xsd:attribute name="NMTMNRedundancy" type="xsd:boolean" use="optional" default="false"/>
   </xsd:complexType>
 
   <!-- POWERLINK CN features -->

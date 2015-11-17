@@ -715,6 +715,9 @@ public class OpenConfiguratorLibraryUtils {
                 case PDOTPDOChannels:
                     value = String.valueOf(mnFeatures.getPDOTPDOChannels());
                     break;
+                case NMTMNRedundancy:
+                    value = String.valueOf(mnFeatures.isNMTMNRedundancy());
+                    break;
                 default:
                     System.err.println("MN feature not handled:" + mnFeature);
                     break;

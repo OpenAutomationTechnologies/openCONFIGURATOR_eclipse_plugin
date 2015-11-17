@@ -1,4 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+****************************************************************************
+
+  (c) SYSTEC electronic GmbH, D-07973 Greiz, August-Bebel-Str. 29
+      www.systec-electronic.com
+
+  (c) Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
+      B&R Strasse 1, A-5142 Eggelsberg
+      www.br-automation.com
+
+  Project:      openPOWERLINK
+
+  Description:  Device Description for a CiA DS401 POWERLINK CN
+
+  License:
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions
+    are met:
+
+    1. Redistributions of source code must retain the above copyright
+       notice, this list of conditions and the following disclaimer.
+
+    2. Redistributions in binary form must reproduce the above copyright
+       notice, this list of conditions and the following disclaimer in the
+       documentation and/or other materials provided with the distribution.
+
+    3. Neither the name of the copyright holders nor the names of its
+       contributors may be used to endorse or promote products derived
+       from this software without prior written permission. For written
+       permission, please contact info@systec-electronic.com.
+
+    THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+    "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+    LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+    FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+    COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+    INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+    BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+    CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+    LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+    ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+    Severability Clause:
+
+        If a provision of this License is or becomes illegal, invalid or
+        unenforceable in any jurisdiction, that shall not affect:
+        1. the validity or enforceability in that jurisdiction of any other
+           provision of this License; or
+        2. the validity or enforceability in other jurisdictions of that or
+           any other provision of this License.
+
+****************************************************************************
+-->
 <ISO15745ProfileContainer
   xmlns="http://www.ethernet-powerlink.org"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,13 +74,13 @@
     </ProfileHeader>
     <ProfileBody
       xsi:type="ProfileBody_Device_Powerlink"
-      fileName="openPOWERLINK_CN.xdd"
-      fileCreator="Kalycito Infotech Pvt Ltd"
-      fileCreationDate="2009-09-18"
-      fileCreationTime="15:50:00+01:00"
-      fileModificationDate="2015-08-19"
-      fileModificationTime="18:15:00+05:30"
-      fileModifiedBy="Kalycito Infotech Pvt Ltd"
+      fileName="00000000_POWERLINK_CiA401.xdd"
+      fileCreator="Bernecker+Rainer Industrie-Elektronik Ges.m.b.H."
+      fileCreationDate="2011-04-01"
+      fileCreationTime="10:00:00+02:00"
+      fileModificationDate="2015-08-07"
+      fileModificationTime="16:00:00+02:00"
+      fileModifiedBy="Bernecker+Rainer Industrie-Elektronik Ges.m.b.H."
       fileVersion="01.00"
       supportedLanguages="en">
       <DeviceIdentity>
@@ -66,13 +122,13 @@
     </ProfileHeader>
     <ProfileBody
       xsi:type="ProfileBody_CommunicationNetwork_Powerlink"
-      fileName="openPOWERLINK_CN.xdd"
-      fileCreator="Kalycito Infotech Pvt Ltd"
-      fileCreationDate="2009-09-18"
-      fileCreationTime="15:50:00+01:00"
-      fileModificationDate="2015-08-19"
-      fileModificationTime="18:15:00+05:30"
-      fileModifiedBy="Kalycito Infotech Pvt Ltd"
+      fileName="00000000_POWERLINK_CiA401.xdd"
+      fileCreator="Bernecker+Rainer Industrie-Elektronik Ges.m.b.H."
+      fileCreationDate="2011-04-01"
+      fileCreationTime="10:00:00+02:00"
+      fileModificationDate="2015-08-07"
+      fileModificationTime="16:00:00+02:00"
+      fileModifiedBy="Bernecker+Rainer Industrie-Elektronik Ges.m.b.H."
       fileVersion="01.00"
       supportedLanguages="en">
       <ApplicationLayers>
@@ -107,21 +163,6 @@
           <defType dataType="0009">
             <Visible_String/>
           </defType>
-          <defType dataType="000A">
-            <Octet_String/>
-          </defType>
-          <defType dataType="000B">
-            <Unicode_String/>
-          </defType>
-          <defType dataType="000C">
-            <Time_of_Day/>
-          </defType>
-          <defType dataType="000D">
-            <Time_Diff/>
-          </defType>
-          <defType dataType="000F">
-            <Domain/>
-          </defType>
           <defType dataType="0010">
             <Integer24/>
           </defType>
@@ -139,6 +180,21 @@
           </defType>
           <defType dataType="0015">
             <Integer64/>
+          </defType>
+          <defType dataType="000A">
+            <Octet_String/>
+          </defType>
+          <defType dataType="000B">
+            <Unicode_String/>
+          </defType>
+          <defType dataType="000C">
+            <Time_of_Day/>
+          </defType>
+          <defType dataType="000D">
+            <Time_Diff/>
+          </defType>
+          <defType dataType="000F">
+            <Domain/>
           </defType>
           <defType dataType="0016">
             <Unsigned24/>
@@ -178,7 +234,7 @@
             <SubObject subIndex="01" name="VendorId_U32" objectType="7" dataType="0007" accessType="const" PDOmapping="no" defaultValue="0x00000000"/>
             <SubObject subIndex="02" name="ProductCode_U32" objectType="7" dataType="0007" accessType="const" PDOmapping="no" defaultValue="0x00000000"/>
             <SubObject subIndex="03" name="RevisionNo_U32" objectType="7" dataType="0007" accessType="const" PDOmapping="no" defaultValue="0x00000000"/>
-            <SubObject subIndex="04" name="SerialNo_U32" objectType="7" dataType="0007" accessType="const" PDOmapping="no" defaultValue="0x00000000"/>
+            <SubObject subIndex="04" name="SerialNo_U32" objectType="7" dataType="0007" accessType="const" PDOmapping="no"/>
           </Object>
           <Object index="1020" name="CFM_VerifyConfiguration_REC" objectType="9">
             <SubObject subIndex="00" name="NumberOfEntries" objectType="7" dataType="0005" accessType="const" defaultValue="2"/>
@@ -1126,7 +1182,7 @@
           <Object index="1F93" name="NMT_EPLNodeID_REC" objectType="9">
             <SubObject subIndex="00" name="NumberOfEntries" objectType="7" dataType="0005" accessType="const" PDOmapping="no" defaultValue="2"/>
             <SubObject subIndex="01" name="NodeID_U8" objectType="7" dataType="0005" accessType="ro" PDOmapping="no"/>
-            <SubObject subIndex="02" name="NodeIDByHW_BOOL" objectType="7" dataType="0001" accessType="ro" PDOmapping="no"/>
+            <SubObject subIndex="02" name="NodeIDByHW_BOOL" objectType="7" dataType="0001" accessType="ro" PDOmapping="no" defaultValue="true"/>
           </Object>
           <Object index="1F98" name="NMT_CycleTiming_REC" objectType="9">
             <SubObject subIndex="00" name="NumberOfEntries" objectType="7" dataType="0005" accessType="const" PDOmapping="no" defaultValue="14"/>
@@ -1480,10 +1536,8 @@
           NMTNetHostNameSet="false"
           PDORPDOChannels="3"
           PDORPDOChannelObjects="25"
-          PDORPDOOverallObjects="75"
           PDOSelfReceipt="false"
           PDOTPDOChannelObjects="25"
-          PDOTPDOOverallObjects="25"
         />
         <CNFeatures
           DLLCNFeatureMultiplex="true"
