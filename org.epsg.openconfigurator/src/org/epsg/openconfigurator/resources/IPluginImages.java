@@ -38,16 +38,37 @@ package org.epsg.openconfigurator.resources;
  */
 public interface IPluginImages {
 
+    // View images
     public final static String LEGACY_OPENCONFIGURATOR_ICON = "icons/openconfigurator.gif";
     public final static String CONFIGURATION_ICON = "icons/releng_gears.gif";
     public final static String ETHERNET_POWERLINK_ICON = "icons/window_16.gif";
-    public final static String REFRESH_ICON = "icons/refresh.gif";
     public final static String PROPERTIES_ICON = "icons/properties.gif";
+    public final static String OBD_ICON = "icons/obd.gif";
+    public final static String MAPPING_ICON = "icons/mapping.gif";
+
+    // POWERLINK Network view icons
+    public final static String REFRESH_ICON = "icons/refresh.gif";
     public final static String RMN_ICON = "icons/rmn.gif";
     public final static String MN_ICON = "icons/mn.gif";
     public final static String CN_ICON = "icons/cn.gif";
     public final static String CN_DISABLED_ICON = "icons/cn_disabled.gif";
-    public final static String OBD_ICON = "icons/obd.gif";
-    public final static String MAPPING_ICON = "icons/mapping.gif";
     public final static String DISABLE_NODE_ICON = "icons/disable.gif";
+
+    // Mapping view icons
+    public final static String ERROR_ICON = "icons/error.gif";
+    public final static String FILTER_ICON = "icons/filter.gif";
+    public final static String WARNING_ICON = "icons/warning.gif";
+    public final static String SIGNED_YES_ICON = "icons/signed_yes.gif";
+    public final static String ARROW_DOWN_ICON = "icons/arrow_down.gif";
+    public final static String ARROW_UP_ICON = "icons/arrow_up.gif";
+    public final static String CLEAR_ICON = "icons/clear.gif";
+
+    // Object dictionary view icons
+    public final static String OBD_OBJECT_ICON = "icons/object.gif";
+    public final static String OBD_SUB_OBJECT_ICON = "icons/subobject.gif";
+    public final static String OBD_OVERLAY_LOCK_ICON = "icons/lock_overlay.gif";
+    public final static String OBD_OVERLAY_FORCED_OBJECTS_ICON = "icons/forced_objects_overlay.gif";
+    public final static String OBD_HIDE_NON_MAPPABLE_ICON = "icons/hide_non_mappable.gif";
+    public final static String OBD_HIDE_COMMUNICATION_DEVICE_PROFILE_ICON = "icons/hide_communication_device_profile.gif";
+    public final static String OBD_HIDE_STANDARDISED_DEVICE_PROFILE_ICON = "icons/hide_standardized_device_profile.gif";
 }
