@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="org.epsg.openconfigurator.feature"
-      label="EPSG openCONFIGURATOR - pre-release"
+      label="Ethernet POWERLINK openCONFIGURATOR"
       version="2.0.0.qualifier"
-      provider-name="Ethernet POWERLINK Standardization Group"
+      provider-name="Kalycito Infotech Pvt Ltd. and Bernecker + Rainer Industrie-Elektronik Ges.m.b.H."
       plugin="org.epsg.openconfigurator">
 
    <description>
-      EPSG openCONFIGURATOR pre-release
+      Ethernet POWERLINK openCONFIGURATOR
    </description>
 
    <copyright>
@@ -15,7 +15,7 @@
 Copyright (c) 2015 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
    </copyright>
 
-   <license url="">
+   <license url="license.html">
       Copyright (c) 2015 Kalycito Infotech Pvt Ltd.
 Copyright (c) 2015 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
 
