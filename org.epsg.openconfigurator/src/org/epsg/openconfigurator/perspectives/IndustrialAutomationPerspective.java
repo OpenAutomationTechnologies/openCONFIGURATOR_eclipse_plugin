@@ -37,6 +37,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.views.ObjectDictionaryView;
+import org.epsg.openconfigurator.views.mapping.MappingView;
 
 /**
  * The Industrial automation perspective which arranges the views and editors
@@ -61,25 +62,28 @@ public class IndustrialAutomationPerspective implements IPerspectiveFactory {
         // EditorArea.
         String editorArea = factory.getEditorArea();
         IFolderLayout topLeft = factory.createFolder("topLeft", // NON-NLS-1
-                IPageLayout.LEFT, 0.15f, editorArea);
+                IPageLayout.LEFT, 0.25f, editorArea);
         topLeft.addView(IPageLayout.ID_PROJECT_EXPLORER);
+        topLeft.addView(IndustrialNetworkView.ID);
 
-        IFolderLayout bottom = factory.createFolder("bottomRight", // NON-NLS-1
+        IFolderLayout bottomLeft = factory.createFolder("bottomLeft", // NON-NLS-1
+                IPageLayout.BOTTOM, 0.25f, "topLeft");
+        bottomLeft.addView(IPageLayout.ID_PROP_SHEET);
+
+        IFolderLayout bottomRight = factory.createFolder("bottomRight", // NON-NLS-1
                 IPageLayout.BOTTOM, 0.75f, editorArea);
-        bottom.addView(IConsoleConstants.ID_CONSOLE_VIEW);
-        bottom.addView(IPageLayout.ID_PROP_SHEET);
-        bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
-        bottom.addView(IPageLayout.ID_PROGRESS_VIEW);
+        bottomRight.addView(IConsoleConstants.ID_CONSOLE_VIEW);
 
-        IFolderLayout secondTopLeft = factory.createFolder("secondTopLeft", // NON-NLS-1
-                IPageLayout.LEFT, 0.15f, editorArea);
-        secondTopLeft.addPlaceholder(IndustrialNetworkView.ID);
+        bottomRight.addView(IPageLayout.ID_PROBLEM_VIEW);
+        bottomRight.addView(IPageLayout.ID_PROGRESS_VIEW);
 
-        factory.createFolder("centralEditor", IPageLayout.LEFT, 0.55f,
-                editorArea); // NON-NLS-1
+
+        IFolderLayout centralEditorArea = factory.createFolder(
+                "centralEditorArea", IPageLayout.LEFT, 0.50f, editorArea); // NON-NLS-1
+        centralEditorArea.addPlaceholder(MappingView.ID);
 
         IFolderLayout topRight = factory.createFolder("topRight", // NON-NLS-1
-                IPageLayout.RIGHT, 0.90f, editorArea);
+                IPageLayout.RIGHT, 0.75f, editorArea);
         topRight.addPlaceholder(ObjectDictionaryView.ID);
     }
 
@@ -91,6 +95,7 @@ public class IndustrialAutomationPerspective implements IPerspectiveFactory {
 
         factory.addShowViewShortcut(IndustrialNetworkView.ID);
         factory.addShowViewShortcut(ObjectDictionaryView.ID);
+        factory.addShowViewShortcut(MappingView.ID);
     }
 
     @Override
