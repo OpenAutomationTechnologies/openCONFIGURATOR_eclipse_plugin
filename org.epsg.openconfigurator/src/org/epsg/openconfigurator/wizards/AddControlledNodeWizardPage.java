@@ -83,14 +83,15 @@ public class AddControlledNodeWizardPage extends WizardPage {
             REDUNDANT_MANAGING_NODE_LABEL };
 
     private static final String DIALOG_PAGE_NAME = "AddCnwizardPage"; //$NON-NLS-1$
-    private static final String DIALOG_TILE = "Add a POWERLINK node";
-    private static final String DIALOG_DESCRIPTION = "Add a POWERLINK node to the network";
+    private static final String DIALOG_TILE = "POWERLINK node";
+    private static final String DIALOG_DESCRIPTION = "Add a POWERLINK node to the network.";
 
     private static final String NODE_TYPE_LABEL = "Node Type:";
     private static final String NODE_ID_LABEL = "Node ID:";
     private static final String RANGE_LABEL = "Range:";
     private static final String NAME_LABEL = "Name:";
-    private static final String NODE_CONFIGURATION_LABEL = "XDD/XDC:";
+    private static final String CONFIGURATION_FILE_LABEL = "Configuration File";
+    private static final String NODE_CONFIGURATION_LABEL = "XDD/XDC file:";
     private static final String DEFAULT_CONFIGURATION_LABEL = "Default";
     private static final String CUSTOM_CONFIGURATION_LABEL = "Custom";
     private static final String BROWSE_CONFIGURATION_LABEL = "Browse...";
@@ -99,11 +100,11 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String ERROR_DEFAULT_CN_XDD_NOT_FOUND = "Default CN XDD not found.";
     private static final String ERROR_DEFAULT_RMN_XDD_NOT_FOUND = "Default Redundant managing XDD not found.";
     private static final String ERROR_MAXIMUM_NODE_ID_LIMIT_REACHED = "Maximum Node ID limit({0}) reached.";
-    private static final String ERROR_MODEL_NOT_AVAILABLE = "Editor is not available to fetch the model";
-    private static final String ERROR_NODE_ALREADY_EXISTS = "Node already exists";
-    private static final String ERROR_INVALID_NODE_ID = "Invalid node ID";
-    private static final String ERROR_INVALID_NODE_NAME = "Enter a valid node name";
-    private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file";
+    private static final String ERROR_MODEL_NOT_AVAILABLE = "Editor is not available to fetch the model.";
+    private static final String ERROR_NODE_ALREADY_EXISTS = "Node already exists.";
+    private static final String ERROR_INVALID_NODE_ID = "Invalid node ID.";
+    private static final String ERROR_INVALID_NODE_NAME = "Enter a valid node name.";
+    private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
 
     /**
      * Control to display the Node name.
@@ -281,7 +282,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
         nodeName = new Text(container, SWT.BORDER);
         nodeName.setBounds(121, 89, 291, 21);
-        nodeName.setText(CONTROLLED_NODE_LABEL + " " + nodeIdSpinner.getText());
         nodeName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -291,10 +291,12 @@ public class AddControlledNodeWizardPage extends WizardPage {
                     setErrorMessage(ERROR_INVALID_NODE_NAME);
                     setPageComplete(false);
                 }
+                setConfigurationGroupEnabled(true);
                 getWizard().getContainer().updateButtons();
             }
         });
         nodeName.addVerifyListener(nameVerifyListener);
+        nodeName.setFocus();
 
         lblNodeIdRangeValue = new Label(container, SWT.LEFT);
         lblNodeIdRangeValue.setBounds(268, 48, 133, 15);
@@ -306,12 +308,12 @@ public class AddControlledNodeWizardPage extends WizardPage {
         lblRange.setText(RANGE_LABEL);
 
         Group grpConfigurationFile = new Group(container, SWT.NONE);
-        grpConfigurationFile.setText("Configuration file");
+        grpConfigurationFile.setText(CONFIGURATION_FILE_LABEL);
         grpConfigurationFile.setBounds(21, 127, 543, 116);
 
         Label lblXddxdc = new Label(grpConfigurationFile, SWT.NONE);
         lblXddxdc.setBounds(26, 60, 73, 16);
-        lblXddxdc.setText("XDD/XDC file:");
+        lblXddxdc.setText(NODE_CONFIGURATION_LABEL);
 
         btnDefault = new Button(grpConfigurationFile, SWT.RADIO);
         btnDefault.setBounds(26, 30, 82, 16);
@@ -398,6 +400,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
                 handleDefaultRadioButtonSelectionChanged(e);
             }
         });
+        setConfigurationGroupEnabled(false);
     }
 
     /**
@@ -448,7 +451,13 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private short getNextValidCnNodeId(List<TCN> cnNodeList) {
         setErrorMessage(null);
 
-        List<Short> nodeIdList = getNodeIDs(cnNodeList);
+        List<Short> nodeIdList = new ArrayList<Short>();
+
+        for (TCN cn : cnNodeList) {
+            Short cnNodeId = new Short(cn.getNodeID());
+            nodeIdList.add(cnNodeId);
+        }
+
         for (short i = IPowerlinkConstants.CN_MIN_NODE_ID; i <= IPowerlinkConstants.CN_MAX_NODE_ID; i++) {
             if (!isNodeIdAvailable(nodeIdList, i)) {
                 if (isValidCnNodeId(i)) {
@@ -512,16 +521,21 @@ public class AddControlledNodeWizardPage extends WizardPage {
     }
 
     /**
-     * Returns the list of node IDs.
-     *
-     * @param cnNodeList The list of nodes.
      * @return the list of node IDs.
      */
-    private List<Short> getNodeIDs(List<TCN> cnNodeList) {
+    private List<Short> getNodeIDs() {
         List<Short> nodeIdList = new ArrayList<Short>();
-        for (TCN cn : cnNodeList) {
+
+        nodeIdList.add(nodeCollection.getMN().getNodeID());
+
+        for (TCN cn : nodeCollection.getCN()) {
             Short cnNodeId = new Short(cn.getNodeID());
             nodeIdList.add(cnNodeId);
+        }
+
+        for (TRMN rmn : nodeCollection.getRMN()) {
+            Short rmnNodeId = new Short(rmn.getNodeID());
+            nodeIdList.add(rmnNodeId);
         }
         return nodeIdList;
     }
@@ -621,7 +635,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
                 short newCnNodeId = getNewCnNodeId();
                 nodeIdSpinner.setSelection(newCnNodeId);
 
-                nodeName.setText(CONTROLLED_NODE_LABEL + " " + newCnNodeId);
                 btnCustom.setEnabled(true);
                 break;
 
@@ -632,9 +645,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
                         + nodeIdSpinner.getMaximum());
                 short newRmnNodeId = getNewRmnNodeId();
                 nodeIdSpinner.setSelection(newRmnNodeId);
-
-                nodeName.setText(
-                        REDUNDANT_MANAGING_NODE_LABEL + " " + newRmnNodeId);
 
                 if (btnCustom.getSelection()) {
                     btnCustom.setSelection(false);
@@ -706,7 +716,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
     }
 
     private boolean isNodeIdAvailableInModel(String nodeId) {
-        List<Short> nodeIdList = getNodeIDs(nodeCollection.getCN());
+        List<Short> nodeIdList = getNodeIDs();
         boolean retVal = false;
         try {
             short parsedNodeId = Short.parseShort(nodeId);
@@ -726,13 +736,24 @@ public class AddControlledNodeWizardPage extends WizardPage {
      */
     private boolean isNodeNameValid(final String nodeName) {
         boolean retval = false;
+
         if (nodeName == null) {
             return retval;
         }
 
-        if (nodeName.length() > 3) {
+        if (nodeName.length() == 0) {
+            return retval;
+        }
+
+        // Space as first character is not allowed. ppc:tNonEmptyString
+        if (nodeName.charAt(0) == ' ') {
+            return retval;
+        }
+
+        if (nodeName.length() > 0) {
             retval = true;
         }
+
         return retval;
     }
 
@@ -745,23 +766,27 @@ public class AddControlledNodeWizardPage extends WizardPage {
         boolean nodeIdValid = isValidNodeId(nodeIdSpinner.getText());
         if (!nodeIdValid) {
             setErrorMessage(ERROR_INVALID_NODE_ID);
+            return false;
         }
 
         boolean nodeIdAlreadyAvailable = isNodeIdAvailableInModel(
                 nodeIdSpinner.getText());
         if (nodeIdAlreadyAvailable) {
             setErrorMessage(ERROR_NODE_ALREADY_EXISTS);
+            return false;
         }
 
         boolean nameValid = isNodeNameValid(nodeName.getText());
         if (!nameValid) {
             setErrorMessage(ERROR_INVALID_NODE_NAME);
+            return false;
         }
 
         boolean nodeConfigurationValid = isNodeConfigurationValid(
                 nodeConfigurationPath.getText());
         if (!nodeConfigurationValid) {
             setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
+            return false;
         }
 
         boolean pageComplete = (super.isPageComplete() && nodeIdValid
@@ -814,6 +839,24 @@ public class AddControlledNodeWizardPage extends WizardPage {
         return false;
     }
 
+    private void setConfigurationGroupEnabled(boolean enable) {
+        btnDefault.setEnabled(enable);
+        btnCustom.setEnabled(enable);
+
+        if (enable) {
+            if (btnDefault.getSelection()) {
+                nodeConfigurationPath.setEnabled(false);
+                btnBrowse.setEnabled(false);
+            } else {
+                btnBrowse.setEnabled(enable);
+                nodeConfigurationPath.setEnabled(enable);
+            }
+        } else {
+            btnBrowse.setEnabled(enable);
+            nodeConfigurationPath.setEnabled(enable);
+        }
+    }
+
     private void updateCnModel() {
         switch (getNodeType()) {
             case AddControlledNodeWizardPage.CONTROLLED_NODE_LABEL:
@@ -837,14 +880,35 @@ public class AddControlledNodeWizardPage extends WizardPage {
                 break;
         }
 
+        if (nodeModel == null) {
+            System.err.println("Invalid node type. " + getNodeType());
+            return;
+        }
+
         try {
-            xddModel = XddMarshaller.unmarshallXDDFile(
-                    new File(nodeConfigurationPath.getText()));
+            File xddFile = new File(nodeConfigurationPath.getText());
+
+            boolean fileExists = xddFile.exists();
+            // if file exists
+            if (fileExists) {
+
+                xddModel = XddMarshaller.unmarshallXDDFile(xddFile);
+
+            } else {
+                xddModel = null;
+                setErrorMessage("XDD/XDC file does not exist in the path: "
+                        + nodeConfigurationPath.getText());
+            }
+
         } catch (FileNotFoundException | JAXBException | SAXException
                 | ParserConfigurationException
                 | UnsupportedEncodingException e) {
             xddModel = null;
-            setErrorMessage("Invalid XDD/XDC file. " + e.getLocalizedMessage());
+            if (e.getMessage() != null) {
+                setErrorMessage("Invalid XDD/XDC file. " + e.getMessage());
+            } else {
+                setErrorMessage("Invalid XDD/XDC file.");
+            }
             e.printStackTrace();
         }
     }

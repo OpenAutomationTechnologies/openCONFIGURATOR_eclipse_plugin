@@ -52,7 +52,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
  */
 public class NewNodeWizard extends Wizard {
 
-    private static final String WINDOW_TITLE = "Add new POWERLINK node wizard";
+    private static final String WINDOW_TITLE = "POWERLINK node wizard";
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
 
     /**
