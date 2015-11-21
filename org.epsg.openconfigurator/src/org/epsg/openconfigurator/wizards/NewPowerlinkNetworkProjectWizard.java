@@ -41,7 +41,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -50,6 +50,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 
 /**
  * Creates the new POWERLINK network project wizard.
@@ -60,15 +61,15 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
  * @author Ramakrishnan P
  *
  */
-public class NewPowerlinkNetworkProjectWizard extends Wizard implements
-        INewWizard, IExecutableExtension {
+public class NewPowerlinkNetworkProjectWizard extends Wizard
+        implements INewWizard, IExecutableExtension {
 
     /**
      * Wizard labels and messages.
      */
     public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_NAME = "POWERLINK network project wizard";
     public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE = "POWERLINK network project";
-    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project";
+    public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project.";
     public static final String NEW_PROJECT_WIZARD_TITLE = "New POWERLINK network project";
 
     /**
@@ -99,10 +100,10 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard implements
 
         newProjectCreationPage = new WizardNewProjectCreationPage(
                 NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_NAME);
-        newProjectCreationPage
-                .setTitle(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE);
-        newProjectCreationPage
-                .setDescription(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION);
+        newProjectCreationPage.setTitle(
+                NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE);
+        newProjectCreationPage.setDescription(
+                NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION);
         addPage(newProjectCreationPage);
 
         addDefaultMasterPage = new AddDefaultMasterNodeWizardPage();
@@ -112,7 +113,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard implements
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.jface.wizard.Wizard#canFinish()
      */
     @Override
@@ -131,15 +132,12 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard implements
             return;
         }
 
-        String projectPath = newProjectCreationPage.getLocationPath()
-                .toString()
-                + File.separator
-                + newProjectCreationPage.getProjectName();
+        String projectPath = newProjectCreationPage.getLocationPath().toString()
+                + File.separator + newProjectCreationPage.getProjectName();
         addDefaultMasterPage.copyXddToDeviceImportDir(projectPath);
 
         String projectFileName = newProjectCreationPage.getLocationURI()
-                .getPath()
-                + File.separator
+                .getPath() + File.separator
                 + newProjectCreationPage.getProjectName() + ".xml";
         addDefaultMasterPage.createProject(projectFileName);
     }
@@ -149,12 +147,13 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard implements
      */
     @Override
     public void init(IWorkbench workbench, IStructuredSelection selection) {
-        setWindowTitle(NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_TITLE);
+        setWindowTitle(
+                NewPowerlinkNetworkProjectWizard.NEW_PROJECT_WIZARD_TITLE);
     }
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.eclipse.jface.wizard.Wizard#performCancel()
      */
     @Override
@@ -168,27 +167,37 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard implements
     @Override
     public boolean performFinish() {
 
-        String name = newProjectCreationPage.getProjectName();
+        // get a project descriptor
         URI location = null;
         if (!newProjectCreationPage.useDefaults()) {
             location = newProjectCreationPage.getLocationURI();
         }
 
-        IProject proj = PowerlinkNetworkProjectSupport.createProject(name,
-                location);
-        createNewProjectFile();
+        String name = newProjectCreationPage.getProjectName();
 
+        // get a project handle
         try {
-            IProgressMonitor monitor = null;
-            proj.refreshLocal(IResource.DEPTH_INFINITE, monitor);
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+            IProject newProjectHandle = PowerlinkNetworkProjectSupport
+                    .createProject(name, location);
 
-        BasicNewProjectResourceWizard.updatePerspective(_configurationElement);
-        BasicNewResourceWizard.selectAndReveal(proj, PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow());
+            createNewProjectFile();
+
+            if (newProjectHandle != null) {
+                newProjectHandle.refreshLocal(IResource.DEPTH_INFINITE,
+                        new NullProgressMonitor());
+            }
+
+            BasicNewProjectResourceWizard
+                    .updatePerspective(_configurationElement);
+            BasicNewResourceWizard.selectAndReveal(newProjectHandle,
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow());
+        } catch (CoreException ex) {
+            ex.printStackTrace();
+            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
+                    "Failed to create a new project.", ex);
+            getContainer().showPage(newProjectCreationPage);
+            return false;
+        }
 
         return true;
     }

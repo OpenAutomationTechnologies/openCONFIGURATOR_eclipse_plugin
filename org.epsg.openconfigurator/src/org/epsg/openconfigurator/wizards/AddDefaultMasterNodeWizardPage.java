@@ -34,10 +34,13 @@
 package org.epsg.openconfigurator.wizards;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.wizard.WizardPage;
@@ -46,8 +49,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.VerifyEvent;
-import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -61,12 +62,17 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.xml.sax.SAXException;
 
 /**
  * A wizardpage class to add a default master node to the project.
@@ -81,19 +87,14 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
      */
     public static final String DEFAULT_MN_WIZARD_PAGE_NAME = "AddDefaultMasterNode";
     public static final String DEFAULT_MN_WIZARD_PAGE_TITLE = "Project Managing Node";
-    public static final String DEFAULT_MN_WIZARD_PAGE_DESCRIPTION = "Add a managing node configuration";
+    public static final String DEFAULT_MN_WIZARD_PAGE_DESCRIPTION = "Add a managing node configuration.";
 
     public static final String PROJECT_DIRECTORY_DEVICEIMPORT = "deviceImport";
     public static final String PROJECT_DIRECTORY_DEVICECONFIGURATION = "deviceConfiguration";
-    public static final String XDC_EXTENSION = ".xdc"; ////$NON-NLS-1$
-    public static final String XDD_EXTENSION = ".xdd"; ////$NON-NLS-1$
+    private static final String XDC_EXTENSION = ".xdc"; ////$NON-NLS-1$
 
-    public static final String DEFAULT_MN_WIZARDPAGE_CONFIGURATION_FILE_LABEL = "Configuration file";
+    public static final String DEFAULT_MN_WIZARDPAGE_CONFIGURATION_FILE_LABEL = "Configuration File";
     public static final String DEFAULT_MN_WIZARDPAGE_IMPORT_FILE_LABEL = "Import Master Node's XDD/XDC";
-    public static final String DEFAULT_MN_WIZARDPAGE_XDD_FILTERS = "*.xdd;*.XDD"; ////$NON-NLS-1$
-    public static final String DEFAULT_MN_WIZARDPAGE_XDC_FILTERS = "*.xdc;*.XDC"; ////$NON-NLS-1$
-    public static final String DEFAULT_MN_WIZARDPAGE_XDD_FILTER_NAME = "XML Device Description(*.xdd)";
-    public static final String DEFAULT_MN_WIZARDPAGE_XDC_FILTER_NAME = "XML Device Configuration(*.xdc)";
     public static final String DEFAULT_MN_WIZARDPAGE_BROWSE_LABEL = "Browse...";
     public static final String DEFAULT_MN_WIZARDPAGE_DEFAULT_LABEL = "Default";
     public static final String DEFAULT_MN_WIZARDPAGE_CUSTOM_LABEL = "Custom";
@@ -156,6 +157,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
      */
     private boolean pageComplete = false;
 
+    private ISO15745ProfileContainer xddModel = null;
+
     /**
      * Create the Add default managing node wizard.
      */
@@ -163,7 +166,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         super(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARD_PAGE_NAME,
                 AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARD_PAGE_TITLE,
                 null);
-        setDescription(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARD_PAGE_DESCRIPTION);
+        setDescription(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARD_PAGE_DESCRIPTION);
 
         String mnXddPath = IOpenConfiguratorResource.DEFAULT_MN_XDD;
         try {
@@ -202,11 +206,9 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
 
             System.out.println("MN XDD path" + mnXdd.toString());
 
-            String targetImportPath = new String(
-                    projectPath
-                            + IPath.SEPARATOR
-                            + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
-                            + IPath.SEPARATOR + mnXdd.getFileName().toString());
+            String targetImportPath = new String(projectPath + IPath.SEPARATOR
+                    + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
+                    + IPath.SEPARATOR + mnXdd.getFileName().toString());
 
             // Copy the MN XDD to deviceImport dir
             java.nio.file.Files.copy(
@@ -225,8 +227,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             }
 
             String targetConfigurationPath = new String(
-                    projectPath
-                            + IPath.SEPARATOR
+                    projectPath + IPath.SEPARATOR
                             + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICECONFIGURATION
                             + IPath.SEPARATOR + extensionXdd
                             + AddDefaultMasterNodeWizardPage.XDC_EXTENSION);
@@ -241,8 +242,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             java.nio.file.Path pathBase = Paths.get(projectPath);
 
             // Set the relative path to the MN object
-            java.nio.file.Path pathRelative = pathBase.relativize(Paths
-                    .get(targetConfigurationPath));
+            java.nio.file.Path pathRelative = pathBase
+                    .relativize(Paths.get(targetConfigurationPath));
 
             String relativePath = pathRelative.toString();
             relativePath = relativePath.replace('\\', '/');
@@ -281,8 +282,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         fd_grpConfiguration.right = new FormAttachment(100, -10);
         fd_grpConfiguration.left = new FormAttachment(0, 10);
         grpConfiguration.setLayoutData(fd_grpConfiguration);
-        grpConfiguration
-                .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CONFIGURATION_FILE_LABEL);
+        grpConfiguration.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CONFIGURATION_FILE_LABEL);
         grpConfiguration.setLayout(new FormLayout());
 
         btnBrowse = new Button(grpConfiguration, SWT.PUSH);
@@ -291,18 +292,16 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent e) {
                 FileDialog fileDialog = new FileDialog(parent.getShell(),
                         SWT.OPEN);
-                fileDialog
-                        .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_IMPORT_FILE_LABEL);
+                fileDialog.setText(
+                        AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_IMPORT_FILE_LABEL);
+
                 // Set filter on .XDD and .XDC files
-                fileDialog
-                        .setFilterExtensions(new String[] {
-                                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDD_FILTERS,
-                                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDC_FILTERS });
+                fileDialog.setFilterExtensions(
+                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_EXTENSIONS);
                 // Put in a readable name for the filter
-                fileDialog
-                        .setFilterNames(new String[] {
-                                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDD_FILTER_NAME,
-                                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDC_FILTER_NAME });
+                fileDialog.setFilterNames(
+                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_NAMES_EXTENSIONS);
+
                 // Open Dialog and save result of selection
                 String selectedFile = fileDialog.open();
 
@@ -318,8 +317,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         fd_btnBrowse.top = new FormAttachment(0, 54);
         fd_btnBrowse.right = new FormAttachment(100, -41);
         btnBrowse.setLayoutData(fd_btnBrowse);
-        btnBrowse
-                .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_BROWSE_LABEL);
+        btnBrowse.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_BROWSE_LABEL);
 
         Composite composite_1 = new Composite(grpConfiguration, SWT.NONE);
         FormData fd_composite_1 = new FormData();
@@ -343,8 +342,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             }
         });
         btnDefaultConfiguation.setSelection(true);
-        btnDefaultConfiguation
-                .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_DEFAULT_LABEL);
+        btnDefaultConfiguation.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_DEFAULT_LABEL);
 
         Button btnCustomConfiguration = new Button(composite_1, SWT.RADIO);
         btnCustomConfiguration.addSelectionListener(new SelectionAdapter() {
@@ -358,15 +357,15 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
                 // getWizard().getContainer().updateButtons();
             }
         });
-        btnCustomConfiguration
-                .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CUSTOM_LABEL);
+        btnCustomConfiguration.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CUSTOM_LABEL);
 
         mnConfiguration = new Text(grpConfiguration, SWT.BORDER);
         fd_btnBrowse.left = new FormAttachment(mnConfiguration, 14);
         mnConfiguration.setEnabled(false);
         mnConfiguration.setText(defaultMnXDD);
-        mnConfiguration
-                .setToolTipText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_MN_PATH_TIP);
+        mnConfiguration.setToolTipText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_MN_PATH_TIP);
         mnConfiguration.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -376,7 +375,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
                     mn.setPathToXDC(getMnConfiguration());
                     pageComplete = true;
                 } else {
-                    setErrorMessage(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CHOOSE_VALID_FILE_MESSAGE);
+                    setErrorMessage(
+                            AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CHOOSE_VALID_FILE_MESSAGE);
                     pageComplete = false;
                 }
                 getWizard().getContainer().updateButtons();
@@ -399,8 +399,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         spinnerNodeId.setMaximum(255);
         spinnerNodeId.setSelection(defaultMnNodeId);
         spinnerNodeId.setEnabled(false);
-        spinnerNodeId
-                .setToolTipText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NODEID_TIP);
+        spinnerNodeId.setToolTipText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NODEID_TIP);
 
         Label lblNodeId = new Label(composite, SWT.NONE);
         FormData fd_lblNodeId = new FormData();
@@ -408,8 +408,8 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         fd_lblNodeId.left = new FormAttachment(0, 22);
         fd_lblNodeId.right = new FormAttachment(0, 87);
         lblNodeId.setLayoutData(fd_lblNodeId);
-        lblNodeId
-                .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NODEID_LABEL);
+        lblNodeId.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NODEID_LABEL);
 
         Label lblXddxdcFile = new Label(grpConfiguration, SWT.NONE);
         FormData fd_lblXddxdcFile = new FormData();
@@ -417,21 +417,22 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         fd_lblXddxdcFile.top = new FormAttachment(composite_1, 26);
         fd_lblXddxdcFile.left = new FormAttachment(composite_1, 0, SWT.LEFT);
         lblXddxdcFile.setLayoutData(fd_lblXddxdcFile);
-        lblXddxdcFile
-                .setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDD_XDC_FILE_LABEL);
+        lblXddxdcFile.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_XDD_XDC_FILE_LABEL);
 
         Label lblName = new Label(composite, SWT.NONE);
         FormData fd_lblName = new FormData();
         fd_lblName.left = new FormAttachment(lblNodeId, 0, SWT.LEFT);
         fd_lblName.right = new FormAttachment(0, 77);
         lblName.setLayoutData(fd_lblName);
-        lblName.setText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_LABEL);
+        lblName.setText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_LABEL);
 
         txtNodeName = new Text(composite, SWT.BORDER);
         fd_lblName.top = new FormAttachment(txtNodeName, 3, SWT.TOP);
         txtNodeName.setText(defaultMasterName);
-        txtNodeName
-                .setToolTipText(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_TIP);
+        txtNodeName.setToolTipText(
+                AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_TIP);
         txtNodeName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -440,40 +441,15 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
                     mn.setName(getTxtNodeName());
                     pageComplete = true;
                 } else {
-                    setErrorMessage(AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_MESSAGE);
+                    setErrorMessage(
+                            AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_MESSAGE);
                     pageComplete = false;
                 }
                 getWizard().getContainer().updateButtons();
             }
         });
 
-        txtNodeName.addVerifyListener(new VerifyListener() {
-            @Override
-            public void verifyText(VerifyEvent event) {
-                // Assume we don't allow it
-                event.doit = false;
-
-                // Get the character typed
-                char inputChar = event.character;
-
-                // Allow 0-9, A-Z, a-z
-                if (Character.isLetterOrDigit(inputChar)) {
-                    event.doit = true;
-                }
-
-                // Allow space
-                if (Character.isSpaceChar(inputChar)) {
-                    event.doit = true;
-                }
-
-                // Allow arrow keys and backspace and delete keys
-                if ((inputChar == SWT.BS) || (inputChar == SWT.ARROW_LEFT)
-                        || (inputChar == SWT.ARROW_RIGHT)
-                        || (inputChar == SWT.DEL)) {
-                    event.doit = true;
-                }
-            }
-        });
+        txtNodeName.addVerifyListener(new NodeNameVerifyListener());
         FormData fd_text_1 = new FormData();
         fd_text_1.right = new FormAttachment(0, 294);
         fd_text_1.top = new FormAttachment(0, 15);
@@ -579,9 +555,19 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
      */
     private boolean isMnNameValid(final String mnName) {
         boolean retval = false;
-        if (mnName.length() > 5) {
+        if (mnName.length() == 0) {
+            return retval;
+        }
+
+        // Space as first character is not allowed. ppc:tNonEmptyString
+        if (mnName.charAt(0) == ' ') {
+            return retval;
+        }
+
+        if (mnName.length() > 0) {
             retval = true;
         }
+
         return retval;
     }
 
@@ -590,9 +576,69 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
      */
     @Override
     public boolean isPageComplete() {
-        boolean mnConfigurationValid = isMnConfigurationValid(getMnConfiguration());
+        boolean canPageComplete = false;
+        setErrorMessage(null);
+        boolean mnConfigurationValid = isMnConfigurationValid(
+                getMnConfiguration());
+        if (!mnConfigurationValid) {
+            setErrorMessage(
+                    AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_CHOOSE_VALID_FILE_MESSAGE);
+            return canPageComplete;
+        }
+
         boolean mnNameValid = isMnNameValid(getTxtNodeName());
-        return (pageComplete && mnConfigurationValid && mnNameValid);
+        if (!mnNameValid) {
+            setErrorMessage(
+                    AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_MESSAGE);
+            return canPageComplete;
+        }
+
+        canPageComplete = (pageComplete && mnConfigurationValid && mnNameValid);
+
+        if (canPageComplete) {
+            updateMnModel();
+
+            if ((xddModel == null)) {
+                canPageComplete = false;
+            }
+        }
+
+        return canPageComplete;
+    }
+
+    private void updateMnModel() {
+
+        try {
+            File xddFile = getMnXddFile();
+
+            if (xddFile == null) {
+                xddModel = null;
+                setErrorMessage("Invalid XDD/XDC file.");
+                return;
+            }
+
+            boolean fileExists = xddFile.exists();
+            // if file exists
+            if (fileExists) {
+
+                xddModel = XddMarshaller.unmarshallXDDFile(xddFile);
+
+            } else {
+                xddModel = null;
+                setErrorMessage("XDD/XDC file does not exist in the path: "
+                        + getMnConfiguration());
+            }
+
+        } catch (FileNotFoundException | JAXBException | SAXException
+                | ParserConfigurationException
+                | UnsupportedEncodingException e) {
+            xddModel = null;
+            if (e.getMessage() != null) {
+                setErrorMessage("Invalid XDD/XDC file. " + e.getMessage());
+            } else {
+                setErrorMessage("Invalid XDD/XDC file.");
+            }
+        }
     }
 
     /**

@@ -87,8 +87,10 @@ public class PowerlinkNetworkProjectSupport {
      *
      * @param location
      * @param projectName
+     * @throws CoreException
      */
-    private static IProject createBaseProject(String projectName, URI location) {
+    private static IProject createBaseProject(String projectName, URI location)
+            throws CoreException {
         // it is acceptable to use the ResourcesPlugin class
         IProject newProject = ResourcesPlugin.getWorkspace().getRoot()
                 .getProject(projectName);
@@ -97,20 +99,15 @@ public class PowerlinkNetworkProjectSupport {
             URI projectLocation = location;
             IProjectDescription desc = newProject.getWorkspace()
                     .newProjectDescription(newProject.getName());
-            if ((location != null)
-                    && ResourcesPlugin.getWorkspace().getRoot()
+            if ((location != null) && ResourcesPlugin.getWorkspace().getRoot()
                     .getLocationURI().equals(location)) {
                 projectLocation = null;
             }
 
             desc.setLocationURI(projectLocation);
-            try {
-                newProject.create(desc, null);
-                if (!newProject.isOpen()) {
-                    newProject.open(null);
-                }
-            } catch (CoreException e) {
-                e.printStackTrace();
+            newProject.create(desc, null);
+            if (!newProject.isOpen()) {
+                newProject.open(null);
             }
         }
 
@@ -135,23 +132,20 @@ public class PowerlinkNetworkProjectSupport {
      * @param location
      * @param natureId
      * @return
+     * @throws CoreException
      */
-    public static IProject createProject(String projectName, URI location) {
+    public static IProject createProject(String projectName, URI location)
+            throws CoreException {
         Assert.isNotNull(projectName);
         Assert.isTrue(projectName.trim().length() > 0);
 
-        IProject project = PowerlinkNetworkProjectSupport.createBaseProject(
-                projectName, location);
-        try {
-            PowerlinkNetworkProjectSupport.addNature(project);
+        IProject project = PowerlinkNetworkProjectSupport
+                .createBaseProject(projectName, location);
+        PowerlinkNetworkProjectSupport.addNature(project);
 
-            String[] paths = { "deviceConfiguration", "deviceImport", "output" }; //$NON-NLS-1$ //$NON-NLS-2$
-            PowerlinkNetworkProjectSupport
-            .addToProjectStructure(project, paths);
-        } catch (CoreException e) {
-            e.printStackTrace();
-            project = null;
-        }
+        String[] paths = { "deviceConfiguration", "deviceImport", //$NON-NLS-1$ //$NON-NLS-2$
+                "output" };
+        PowerlinkNetworkProjectSupport.addToProjectStructure(project, paths);
 
         return project;
     }
