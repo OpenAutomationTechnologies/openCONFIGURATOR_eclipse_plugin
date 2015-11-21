@@ -257,4 +257,21 @@
          </adapter>
       </factory>
    </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            class="org.epsg.openconfigurator.views.ObjectDictionaryLabelDecorator"
+            icon="icons/lock_overlay.gif"
+            id="org.epsg.openconfigurator.decorator.nonwritableobjects"
+            label="lockoverlay"
+            lightweight="true"
+            location="BOTTOM_RIGHT"
+            state="true">
+          <enablement>
+            <objectClass
+                  name="org.epsg.openconfigurator.model.AbstractPowerlinkObject">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
 </plugin>

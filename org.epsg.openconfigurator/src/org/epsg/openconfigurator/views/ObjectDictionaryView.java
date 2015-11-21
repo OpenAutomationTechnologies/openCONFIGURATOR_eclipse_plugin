@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.views;
 
 import java.util.List;
 
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -126,20 +127,38 @@ public class ObjectDictionaryView extends ViewPart {
      *
      */
     private class TreeLabelProvider extends LabelProvider {
+        Image objectIcon;
+        Image subObjectIcon;
+
+        TreeLabelProvider() {
+            objectIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_OBJECT_ICON)
+                    .createImage();
+            subObjectIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_SUB_OBJECT_ICON)
+                    .createImage();
+        }
+
+        @Override
+        public void dispose() {
+            objectIcon.dispose();
+            subObjectIcon.dispose();
+        }
+
         @Override
         public Image getImage(Object element) {
-            String imageKey = ISharedImages.IMG_TOOL_FORWARD;
+
             if (element instanceof PowerlinkObject) {
-                imageKey = ISharedImages.IMG_OBJ_ELEMENT;
+                return objectIcon;
             } else if (element instanceof PowerlinkSubobject) {
-                imageKey = org.eclipse.ui.ide.IDE.SharedImages.IMG_OBJS_TASK_TSK;
+                return subObjectIcon;
             } else if (element instanceof EmptyObjectDictionary) {
                 // No image is needed for empty contents.
                 return null;
             }
 
             return PlatformUI.getWorkbench().getSharedImages()
-                    .getImage(imageKey);
+                    .getImage(ISharedImages.IMG_OBJ_ELEMENT);
         }
 
         @Override
@@ -196,6 +215,7 @@ public class ObjectDictionaryView extends ViewPart {
 
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
+                    setPartName(nodeObj.getNodeIDWithName());
                     treeViewer.setInput(nodeObj);
                 }
                 sourcePart = part;
@@ -307,12 +327,11 @@ public class ObjectDictionaryView extends ViewPart {
 
         treeViewer = tree.getViewer();
 
-        // treeViewer = new TreeViewer(parent);
-
         treeViewer.setContentProvider(objectDictionaryContentProvider);
-        treeViewer.setLabelProvider(labelProvider);
+        treeViewer.setLabelProvider(new DecoratingLabelProvider(labelProvider,
+                PlatformUI.getWorkbench().getDecoratorManager()
+                        .getLabelDecorator()));
         treeViewer.setInput(new Object());
-
         getViewSite().getPage().addSelectionListener(IndustrialNetworkView.ID,
                 listener);
         getViewSite().setSelectionProvider(treeViewer);
