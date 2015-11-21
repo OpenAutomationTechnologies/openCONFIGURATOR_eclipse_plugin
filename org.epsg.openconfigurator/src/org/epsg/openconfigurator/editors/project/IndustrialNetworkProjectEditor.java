@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.editors.project;
 
 import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
@@ -91,6 +92,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration.PathSettings;
+import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
 /**
@@ -570,11 +572,27 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                     InterruptedException {
                 // Write the XDC configuration Changes from the library to the
                 // XDC file.
-                Result res = OpenConfiguratorProjectUtils
-                        .persistNodes(nodeCollection, monitor);
-                if (!res.IsSuccessful()) {
-                    System.err.println(
-                            OpenConfiguratorLibraryUtils.getErrorMessage(res));
+
+                try {
+                    Result res = OpenConfiguratorProjectUtils
+                            .persistNodes(nodeCollection, monitor);
+                    if (!res.IsSuccessful()) {
+                        System.err.println(OpenConfiguratorLibraryUtils
+                                .getErrorMessage(res));
+                        IStatus errorStatus = new Status(IStatus.ERROR,
+                                Activator.PLUGIN_ID, IStatus.OK,
+                                OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res),
+                                null);
+                        throw new CoreException(errorStatus);
+                    }
+                } catch (JDOMException | IOException exception) {
+                    exception.printStackTrace();
+                    IStatus errorStatus = new Status(IStatus.ERROR,
+                            Activator.PLUGIN_ID, IStatus.OK,
+                            "Error while saving the XDC", exception);
+
+                    throw new CoreException(errorStatus);
                 }
             }
         };

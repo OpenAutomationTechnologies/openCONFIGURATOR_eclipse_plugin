@@ -66,6 +66,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.epsg.openconfigurator.lib.wrapper.MapIterator;
+import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.ObjectCollection;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
@@ -750,14 +751,127 @@ public final class OpenConfiguratorProjectUtils {
     }
 
     /**
+     * Persists the nodes actual value into the XDC.
+     *
+     * @param node The node instance.
+     * @return Result from the library.
+     * @throws JDOMException
+     * @throws IOException
+     */
+    public static Result persistNodeData(Node node)
+            throws JDOMException, IOException {
+
+        Result res = new Result();
+
+        File xmlFile = new File(node.getAbsolutePathToXdc());
+
+        Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                IPowerlinkProjectSupport.UTF8_ENCODING);
+
+        InputSource input = new InputSource(reader);
+        input.setSystemId(xmlFile.toURI().toString());
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(input);
+
+        // Delete the actual value from the model.
+        for (PowerlinkObject obj : node.getObjectsList()) {
+            List<PowerlinkSubobject> subObjList = obj.getSubObjects();
+            if (!subObjList.isEmpty()) {
+                for (PowerlinkSubobject subObj : subObjList) {
+                    subObj.setActualValue(null, false);
+                }
+            } else {
+                obj.setActualValue(null, false);
+            }
+        }
+
+        // Delete the actual value field on all objects available in the
+        // file.
+        XddJdomOperation.deleteActualValue(document);
+
+        ObjectCollection objectCollection = new ObjectCollection();
+        res = OpenConfiguratorCore.GetInstance().GetObjectsWithActualValue(
+                node.getNetworkId(), node.getNodeId(), objectCollection);
+        if (!res.IsSuccessful()) {
+            // Continue operation for other nodes
+            System.err
+                    .println(OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            return res;
+        }
+
+        // Prepare the Java based object collection.
+        java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
+        for (MapIterator iterator = objectCollection.iterator(); iterator
+                .hasNext();) {
+            String actualValue = iterator.GetValue();
+
+            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+                    iterator.GetKey().getFirst(),
+                    iterator.GetKey().getSecond());
+            objectJCollection.put(entryVal, actualValue);
+            iterator.next();
+        }
+
+        for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
+                .entrySet()) {
+            String actualValue = objectJcollectionEntry.getValue();
+            long objectIdLong = objectJcollectionEntry.getKey().getKey();
+
+            boolean isSubObject = false;
+            int subObjectIdShort = objectJcollectionEntry.getKey().getValue();
+            if (subObjectIdShort != -1) {
+                isSubObject = true;
+            }
+
+            PowerlinkObject object = node.getObjects(objectIdLong);
+            if (object != null) {
+
+                if (!isSubObject) {
+                    object.setActualValue(actualValue, false);
+                    XddJdomOperation.updateActualValue(document, object,
+                            actualValue);
+                } else {
+                    PowerlinkSubobject subObj = object
+                            .getSubObject((short) subObjectIdShort);
+                    if (subObj != null) {
+                        subObj.setActualValue(actualValue, false);
+                        XddJdomOperation.updateActualValue(document, subObj,
+                                actualValue);
+                    } else {
+                        System.err.println("SubObject 0x"
+                                + String.format("%04X", objectIdLong) + "/0x"
+                                + String.format("%02X", subObjectIdShort)
+                                + "does not exists in the XDC");
+                    }
+                }
+            } else {
+                System.err.println(
+                        "Object 0x" + String.format("%04X", objectIdLong)
+                                + "does not exists in the XDC");
+            }
+        }
+
+        XMLOutputter xmlOutput = new XMLOutputter();
+
+        // display nice nice
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(document, new FileWriter(node.getAbsolutePathToXdc()));
+
+        return res;
+    }
+
+    /**
      * Saves the actual value changes in the library to the XDD/XDC.
      *
      * @param nodeCollection The node list.
      * @param monitor Progress monitor instance.
      * @return The result from the library.
+     * @throws IOException
+     * @throws JDOMException
      */
     public static Result persistNodes(final Map<Short, Node> nodeCollection,
-            IProgressMonitor monitor) {
+            IProgressMonitor monitor) throws JDOMException, IOException {
         Result res = new Result();
 
         for (Map.Entry<Short, Node> entry : nodeCollection.entrySet()) {
@@ -779,101 +893,13 @@ public final class OpenConfiguratorProjectUtils {
             monitor.subTask("Updating node:" + node.getNodeIDWithName() + " ->"
                     + node.getPathToXDC());
 
-            try {
-
-                File xmlFile = new File(node.getAbsolutePathToXdc());
-
-                Reader reader = new InputStreamReader(
-                        new FileInputStream(xmlFile),
-                        IPowerlinkProjectSupport.UTF8_ENCODING);
-                InputSource input = new InputSource(reader);
-                input.setSystemId(xmlFile.toURI().toString());
-
-                SAXBuilder builder = new SAXBuilder();
-                Document document = builder.build(input);
-
-                // Delete the actual value field on all objects available in the
-                // file.
-                XddJdomOperation.deleteActualValue(document);
-
-                ObjectCollection objectCollection = new ObjectCollection();
-                res = OpenConfiguratorCore.GetInstance()
-                        .GetObjectsWithActualValue(node.getNetworkId(),
-                                node.getNodeId(), objectCollection);
-                if (!res.IsSuccessful()) {
-                    // Continue operation for other nodes
-                    System.err.println(
-                            OpenConfiguratorLibraryUtils.getErrorMessage(res));
-                    continue;
-                }
-
-                // Prepare the Java based object collection.
-                java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
-                for (MapIterator iterator = objectCollection
-                        .iterator(); iterator.hasNext();) {
-                    String actualValue = iterator.GetValue();
-
-                    Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
-                            iterator.GetKey().getFirst(),
-                            iterator.GetKey().getSecond());
-                    objectJCollection.put(entryVal, actualValue);
-                    iterator.next();
-                }
-
-                for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
-                        .entrySet()) {
-                    String actualValue = objectJcollectionEntry.getValue();
-                    long objectIdLong = objectJcollectionEntry.getKey()
-                            .getKey();
-
-                    boolean isSubObject = false;
-                    int subObjectIdShort = objectJcollectionEntry.getKey()
-                            .getValue();
-                    if (subObjectIdShort != -1) {
-                        isSubObject = true;
-                    }
-
-                    PowerlinkObject object = node.getObjects(objectIdLong);
-                    if (object != null) {
-
-                        if (!isSubObject) {
-                            object.setActualValue(actualValue, false);
-                            XddJdomOperation.updateActualValue(document, object,
-                                    actualValue);
-                        } else {
-                            PowerlinkSubobject subObj = object
-                                    .getSubObject((short) subObjectIdShort);
-                            if (subObj != null) {
-                                subObj.setActualValue(actualValue, false);
-                                XddJdomOperation.updateActualValue(document,
-                                        subObj, actualValue);
-                            } else {
-                                System.err.println("SubObject 0x"
-                                        + String.format("%04X", objectIdLong)
-                                        + "/0x"
-                                        + String.format("%02X",
-                                                subObjectIdShort)
-                                        + "does not exists in the XDC");
-                            }
-                        }
-                    } else {
-                        System.err.println("Object 0x"
-                                + String.format("%04X", objectIdLong)
-                                + "does not exists in the XDC");
-                    }
-                }
-
-                XMLOutputter xmlOutput = new XMLOutputter();
-
-                // display nice nice
-                xmlOutput.setFormat(Format.getPrettyFormat());
-                xmlOutput.output(document,
-                        new FileWriter(node.getAbsolutePathToXdc()));
-
-            } catch (JDOMException | IOException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+            res = persistNodeData(node);
+            if (!res.IsSuccessful()) {
+                // Continue operation for other nodes
+                continue;
             }
+
+            updateNodeAssignmentValues(node);
             monitor.worked(1);
         }
         return res;
@@ -938,6 +964,62 @@ public final class OpenConfiguratorProjectUtils {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    /**
+     * Persists the node Assignment values in the model and the project XML
+     * file.
+     *
+     * @param node The node instance.
+     * @throws IOException
+     * @throws JDOMException
+     */
+    public static void updateNodeAssignmentValues(final Node node)
+            throws JDOMException, IOException {
+        long nodeAssignmentValue = OpenConfiguratorLibraryUtils
+                .getNodeAssignment(node);
+
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+
+        Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
+                IPowerlinkProjectSupport.UTF8_ENCODING);
+        InputSource input = new InputSource(reader);
+        input.setSystemId(xmlFile.toURI().toString());
+
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(input);
+
+        NodeAssignment[] nodeAssignList = NodeAssignment.values();
+
+        for (NodeAssignment na : nodeAssignList) {
+            boolean nodeAssignmentEnabled = false;
+            if ((nodeAssignmentValue & na.swigValue()) == na.swigValue()) {
+                nodeAssignmentEnabled = true;
+            } else {
+                nodeAssignmentEnabled = false;
+            }
+
+            // Update in the model immediately.
+            boolean updatedInTheModel = node.setNodeAssignment(na,
+                    nodeAssignmentEnabled);
+
+            if (updatedInTheModel) {
+                String attributeName = Node.getNodeAssignment(na);
+                if (attributeName.isEmpty()) {
+                    continue;
+                }
+
+                ProjectJDomOperation.updateNodeAttributeValue(document, node,
+                        attributeName, String.valueOf(nodeAssignmentEnabled));
+            }
+        }
+
+        XMLOutputter xmlOutput = new XMLOutputter();
+        // display nice
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(document, new FileWriter(projectXmlLocation));
     }
 
     /**

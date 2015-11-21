@@ -43,6 +43,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
@@ -65,6 +66,65 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
  *
  */
 public class Node {
+
+    /**
+     * Returns the attribute name linked with the node assignment value.
+     *
+     * @param nmtNodeAssign The node assignment value.
+     * @return The attribute name.
+     */
+    public static String getNodeAssignment(NodeAssignment nmtNodeAssign) {
+        String attributeName = "";
+        switch (nmtNodeAssign) {
+
+            case NMT_NODEASSIGN_NODE_EXISTS:
+                // No.op
+                break;
+            case NMT_NODEASSIGN_NODE_IS_CN:
+                // No.op
+                break;
+            case NMT_NODEASSIGN_START_CN:
+                attributeName = IControlledNodeProperties.CN_AUTO_START_NODE_OBJECT;
+                break;
+            case NMT_NODEASSIGN_MANDATORY_CN:
+                attributeName = IControlledNodeProperties.CN_IS_MANDATORY_OBJECT;
+                break;
+            case NMT_NODEASSIGN_KEEPALIVE:
+                attributeName = IControlledNodeProperties.CN_RESET_IN_OPERATIONAL_OBJECT;
+                break;
+            case NMT_NODEASSIGN_SWVERSIONCHECK:
+                attributeName = IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT;
+                break;
+            case NMT_NODEASSIGN_SWUPDATE:
+                attributeName = IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT;
+                break;
+            case NMT_NODEASSIGN_ASYNCONLY_NODE:
+                attributeName = IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT;
+                break;
+            case NMT_NODEASSIGN_MULTIPLEXED_CN:
+                attributeName = IControlledNodeProperties.CN_IS_MULTIPLEXED;
+                break;
+            case NMT_NODEASSIGN_RT1:
+                attributeName = IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT;
+                break;
+            case NMT_NODEASSIGN_RT2:
+                attributeName = IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT;
+                break;
+            case NMT_NODEASSIGN_MN_PRES:
+                attributeName = IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT;
+                break;
+            case NMT_NODEASSIGN_PRES_CHAINING:
+                attributeName = IControlledNodeProperties.CN_IS_CHAINED;
+                break;
+            case MNT_NODEASSIGN_VALID:
+                // No.op
+                break;
+            default:
+                break;
+        }
+
+        return attributeName;
+    }
 
     /**
      * Node instance from the openCONFIGURATOR project. Example: The Object is
@@ -1100,6 +1160,190 @@ public class Node {
 
         OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
                 IAbstractNodeProperties.NODE_NAME_OBJECT, newName);
+    }
+
+    /**
+     * Add or remove the new node assignment value
+     *
+     * @param nmtNodeassign The node assignment value.
+     * @param enabled True to add or false to disable.
+     */
+    public boolean setNodeAssignment(NodeAssignment nmtNodeassign,
+            boolean enabled) {
+        boolean updatedInTheModel = false;
+
+        if (nodeModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
+            TMN mn = net.getNodeCollection().getMN();
+
+            switch (nmtNodeassign) {
+
+                case NMT_NODEASSIGN_NODE_EXISTS:
+                    // No.op
+                    break;
+                case NMT_NODEASSIGN_NODE_IS_CN:
+                    // No.op
+                    break;
+                case NMT_NODEASSIGN_START_CN:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_MANDATORY_CN:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_KEEPALIVE:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_SWVERSIONCHECK:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_SWUPDATE:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_ASYNCONLY_NODE:
+                    mn.setIsAsyncOnly(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MULTIPLEXED_CN:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_RT1:
+                    mn.setIsType1Router(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_RT2:
+                    mn.setIsType2Router(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MN_PRES:
+                    mn.setTransmitsPRes(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_PRES_CHAINING:
+                    // N.A in MN
+                    break;
+                case MNT_NODEASSIGN_VALID:
+                    // No.op
+                    break;
+                default:
+                    break;
+            }
+        } else if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            switch (nmtNodeassign) {
+
+                case NMT_NODEASSIGN_NODE_EXISTS:
+                    // No.op
+                    break;
+                case NMT_NODEASSIGN_NODE_IS_CN:
+                    // No.op
+                    break;
+                case NMT_NODEASSIGN_START_CN:
+                    cn.setAutostartNode(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MANDATORY_CN:
+                    cn.setIsMandatory(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_KEEPALIVE:
+                    cn.setResetInOperational(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_SWVERSIONCHECK:
+                    cn.setVerifyAppSwVersion(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_SWUPDATE:
+                    cn.setAutoAppSwUpdateAllowed(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_ASYNCONLY_NODE:
+                    cn.setIsAsyncOnly(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MULTIPLEXED_CN:
+                    cn.setIsMultiplexed(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_RT1:
+                    cn.setIsType1Router(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_RT2:
+                    cn.setIsType2Router(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MN_PRES:
+                    // Not applicable for CN.
+                    break;
+                case NMT_NODEASSIGN_PRES_CHAINING:
+                    cn.setIsChained(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case MNT_NODEASSIGN_VALID:
+                    // No.op
+                    break;
+                default:
+                    break;
+            }
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            switch (nmtNodeassign) {
+
+                case NMT_NODEASSIGN_NODE_EXISTS:
+                    // No.op
+                    break;
+                case NMT_NODEASSIGN_NODE_IS_CN:
+                    // No.op
+                    break;
+                case NMT_NODEASSIGN_START_CN:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_MANDATORY_CN:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_KEEPALIVE:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_SWVERSIONCHECK:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_SWUPDATE:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_ASYNCONLY_NODE:
+                    rmn.setIsAsyncOnly(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MULTIPLEXED_CN:
+                    // N.A in MN
+                    break;
+                case NMT_NODEASSIGN_RT1:
+                    rmn.setIsType1Router(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_RT2:
+                    rmn.setIsType2Router(enabled);
+                    updatedInTheModel = true;
+                    break;
+                case NMT_NODEASSIGN_MN_PRES:
+                    // TBD.
+                    break;
+                case NMT_NODEASSIGN_PRES_CHAINING:
+                    // N.A in MN
+                    break;
+                case MNT_NODEASSIGN_VALID:
+                    // No.op
+                    break;
+                default:
+                    break;
+            }
+        } else {
+            System.err.println(
+                    "setNodeAssignment Unhandled node model type:" + nodeModel);
+        }
+
+        return updatedInTheModel;
     }
 
     /**

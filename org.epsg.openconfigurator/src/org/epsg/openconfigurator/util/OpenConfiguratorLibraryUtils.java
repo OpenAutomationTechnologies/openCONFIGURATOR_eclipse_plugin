@@ -44,6 +44,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.AccessType;
+import org.epsg.openconfigurator.lib.wrapper.AssignmentCollection;
 import org.epsg.openconfigurator.lib.wrapper.CNFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.Direction;
 import org.epsg.openconfigurator.lib.wrapper.DynamicChannelAccessType;
@@ -1615,6 +1616,29 @@ public class OpenConfiguratorLibraryUtils {
         }
 
         return IEC_Datatype.UNDEFINED;
+    }
+
+    /**
+     * @param node The node.
+     * @return The node assignment value available for the given node.
+     */
+    public static long getNodeAssignment(final Node node) {
+        long nodeAssignValue = 0L;
+
+        AssignmentCollection assignmentColl = new AssignmentCollection();
+
+        Result libApiRes = OpenConfiguratorCore.GetInstance().GetNodeAssignment(
+                node.getNetworkId(), node.getNodeId(), assignmentColl);
+        if (!libApiRes.IsSuccessful()) {
+            System.err.println("ERROR: " + getErrorMessage(libApiRes));
+            return nodeAssignValue;
+        }
+
+        for (int i = 0; i < assignmentColl.size(); i++) {
+            nodeAssignValue |= assignmentColl.get(i);
+        }
+
+        return nodeAssignValue;
     }
 
     /**

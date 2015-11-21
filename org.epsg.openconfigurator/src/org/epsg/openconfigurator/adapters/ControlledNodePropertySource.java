@@ -31,9 +31,13 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -49,7 +53,9 @@ import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
+import org.jdom2.JDOMException;
 
 /**
  * Describes the node properties for a Controlled node.
@@ -843,13 +849,35 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                             tcn.setIsChained(false);
                             tcn.setIsMultiplexed(true);
                         }
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, IControlledNodeProperties.CN_IS_CHAINED,
-                                String.valueOf(tcn.isIsChained()));
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode,
-                                IControlledNodeProperties.CN_IS_MULTIPLEXED,
-                                String.valueOf(tcn.isIsMultiplexed()));
+
+                        // Node Assignment values will be modified by the
+                        // library. So refresh the project file data.
+                        try {
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAssignmentValues(cnNode);
+                        } catch (JDOMException | IOException e2) {
+                            e2.printStackTrace();
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            "Failed to update the project file."
+                                                    + e2.getMessage());
+                        }
+
+                        try {
+
+                            // RPDO nodeID will be changed by the library. So
+                            // refresh the node XDD data
+                            OpenConfiguratorProjectUtils
+                                    .persistNodeData(cnNode);
+
+                        } catch (JDOMException | IOException e1) {
+                            e1.printStackTrace();
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            "Failed to update the XDC."
+                                                    + e1.getMessage());
+                        }
+
                     } else {
                         System.err.println("Invalid value type");
                     }
@@ -1062,6 +1090,14 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
         } else {
             System.err.println("Invalid object ID:" + id);
+        }
+
+        try {
+            cnNode.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
     }
 }
