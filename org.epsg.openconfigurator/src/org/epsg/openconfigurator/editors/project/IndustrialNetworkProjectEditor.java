@@ -536,9 +536,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     @Override
     protected void pageChange(int newPageIndex) {
 
-        if ((getActivePage() == editorPage.getIndex()) || (isDirty())) {
+        if ((getActivePage() == sourcePage.getIndex()) && (isDirty())) {
             updateModelToSource();
-            sourcePage.doSave(new NullProgressMonitor());
         }
 
         // switch page
@@ -550,7 +549,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             editorPage.setOpenCONFIGURATORProject(currentProject);
             page.setFocus();
         }
-
     }
 
     /**

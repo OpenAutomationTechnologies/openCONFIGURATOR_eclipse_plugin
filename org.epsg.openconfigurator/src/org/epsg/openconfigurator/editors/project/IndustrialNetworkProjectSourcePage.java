@@ -185,6 +185,11 @@ public class IndustrialNetworkProjectSourcePage extends TextEditor
         return equals(editor.getActivePageInstance());
     }
 
+    @Override
+    public boolean isEditable() {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
