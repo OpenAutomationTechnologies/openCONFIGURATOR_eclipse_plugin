@@ -777,6 +777,13 @@ public class OpenConfiguratorLibraryUtils {
             if (!libApiRes.IsSuccessful()) {
                 return libApiRes;
             }
+
+            libApiRes = OpenConfiguratorCore.GetInstance().EnableNode(
+                    node.getNetworkId(), node.getNodeId(), cnModel.isEnabled());
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
+
             libApiRes = importXddModel(node.getNetworkId(), node.getNodeId(),
                     node.getISO15745ProfileContainer());
             if (!libApiRes.IsSuccessful()) {
