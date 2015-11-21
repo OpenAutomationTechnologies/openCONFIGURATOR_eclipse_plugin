@@ -657,12 +657,17 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     @Override
     protected String handleSetNodeName(Object name) {
         if (name instanceof String) {
-            if (((String) name).isEmpty()) {
+            String nodeName = ((String) name);
+            if (nodeName.isEmpty()) {
                 return ERROR_NODE_NAME_CANNOT_BE_EMPTY;
             }
 
+            if (nodeName.charAt(0) == ' ') {
+                return "Invalid name";
+            }
+
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    cnNode.getNetworkId(), cnNode.getNodeId(), (String) name);
+                    cnNode.getNetworkId(), cnNode.getNodeId(), nodeName);
             if (!res.IsSuccessful()) {
                 return res.GetErrorMessage();
             }

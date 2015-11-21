@@ -656,12 +656,18 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     @Override
     protected String handleSetNodeName(Object name) {
         if (name instanceof String) {
-            if (((String) name).isEmpty()) {
+            String nodeName = ((String) name);
+            if (nodeName.isEmpty()) {
                 return ERROR_NODE_NAME_CANNOT_BE_EMPTY;
             }
 
+            // Space as first character is not allowed. ppc:tNonEmptyString
+            if (nodeName.charAt(0) == ' ') {
+                return "Invalid name";
+            }
+
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    mnNode.getNetworkId(), mnNode.getNodeId(), (String) name);
+                    mnNode.getNetworkId(), mnNode.getNodeId(), nodeName);
             if (!res.IsSuccessful()) {
                 return res.GetErrorMessage();
             }
