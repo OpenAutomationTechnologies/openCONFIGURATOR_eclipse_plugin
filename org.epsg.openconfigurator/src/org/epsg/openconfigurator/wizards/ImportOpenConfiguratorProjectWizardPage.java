@@ -130,8 +130,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                 ProjectRecord project = (ProjectRecord) element;
                 // Select only valid openCONFIGURATOR projects and project
                 // without conflicts.
-                return (project.isValidOpenConfiguratorProject() && !project
-                        .hasConflicts());
+                return (project.isValidOpenConfiguratorProject()
+                        && !project.hasConflicts());
             }
             return false;
         }
@@ -143,8 +143,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * @author Ramakrishnan P
      *
      */
-    private final class ProjectLabelProvider extends LabelProvider implements
-            IColorProvider {
+    private final class ProjectLabelProvider extends LabelProvider
+            implements IColorProvider {
 
         @Override
         public Color getBackground(Object element) {
@@ -158,8 +158,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
 
                 if (projectRecord.hasConflicts()
                         || !projectRecord.isValidOpenConfiguratorProject()) {
-                    return getShell().getDisplay().getSystemColor(
-                            SWT.COLOR_GRAY);
+                    return getShell().getDisplay()
+                            .getSystemColor(SWT.COLOR_GRAY);
                 }
             }
 
@@ -289,8 +289,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         }
 
         private void updateProjectName() {
-            projectName = FilenameUtils.removeExtension(projectSystemFile
-                    .getName());
+            projectName = FilenameUtils
+                    .removeExtension(projectSystemFile.getName());
         }
     }
 
@@ -299,7 +299,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private static final String IMPORT_PROJECT_WIZARD_PAGE_NAME = "Import openCONFIGURATOR project";
 
     private static final String IMPORT_PROJECT_WIZARD_PAGE_TITLE = "Import openCONFIGURATOR project";
-    private static final String IMPORT_PROJECT_WIZARD_PAGE_DESCRIPTION = "Select a directory to search for existing projects (Version 1.4.0 or above required)";
+    private static final String IMPORT_PROJECT_WIZARD_PAGE_DESCRIPTION = "Select a directory to search for existing projects.\n(Version 1.4.0 or above required)";
 
     private static final String OPTIONS_GROUP_LABEL = "Options";
     private static final String NESTED_PROJECTS_LABEL = "Search for nested projects";
@@ -313,18 +313,17 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private static final String DE_SELECT_ALL_LABEL = "Deselect all";
     private static final String REFRESH_LABEL = "Refresh";
     private static final String IMPORT_OPENCONFIGURATOR_LABEL = "Import existing openCONFIGURATOR projects";
-    private static final String PROJECT_CREATION_ERRORS_LABEL = "Project creation errors";
+    private static final String PROJECT_CREATION_ERRORS_LABEL = "Error occurred while importing the projects";
 
     private static final String XML_EXTENSION_LABEL = ".xml"; //$NON-NLS-1$
     private static final String XAP_XML_LABEL = "xap.xml"; //$NON-NLS-1$
 
-    private static final String SELECT_DIRECTORY_LABEL = "Select a directory to search for existing openCONFIGURATOR projects.";
     private static final String CREATE_PROJECTS_TASK_LABEL = "Create projects";
     private static final String SEARCH_PROJECTS_TASK_LABEL = "Searching for projects";
     private static final String SEARCH_PROJECTS_IN_TASK_LABEL = "Searching for projects in ";
     private static final String PROCESSING_RESULTS_TASK_LABEL = "Processing results";
-    private static final String PROJECTS_EXISTS_WORKSPACE_MESSAGE = "Some projects cannot be imported because they already exist in the workspace";
-    private static final String NO_PROJECTS_FOUND_MESSAGE = "No projects are found to import";
+    private static final String PROJECTS_EXISTS_WORKSPACE_MESSAGE = "Some projects cannot be imported because they already exist in the workspace.";
+    private static final String NO_PROJECTS_FOUND_MESSAGE = "No projects are found to import.";
 
     /**
      * Overwrite query to get the input from the user whether to overwrite or
@@ -339,23 +338,24 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             String messageString;
             // Break the message up if there is a file name and a directory
             // and there are at least 2 segments.
-            if ((path.getFileExtension() == null) || (path.segmentCount() < 2)) {
+            if ((path.getFileExtension() == null)
+                    || (path.segmentCount() < 2)) {
                 messageString = "'" + pathString
                         + "' already exists. Would you like to overwrite it?";
             } else {
-                messageString = "Overwrite " + path.lastSegment()
-                        + " in folder"
+                messageString = "Overwrite " + path.lastSegment() + " in folder"
                         + path.removeLastSegments(1).toOSString() + "?";
             }
 
-            final MessageDialog dialog = new MessageDialog(getContainer()
-                    .getShell(), "Question", null, messageString,
-                    MessageDialog.QUESTION, new String[] {
-                            IDialogConstants.YES_LABEL,
+            final MessageDialog dialog = new MessageDialog(
+                    getContainer().getShell(), "Question", null, messageString,
+                    MessageDialog.QUESTION,
+                    new String[] { IDialogConstants.YES_LABEL,
                             IDialogConstants.YES_TO_ALL_LABEL,
                             IDialogConstants.NO_LABEL,
                             IDialogConstants.NO_TO_ALL_LABEL,
-                            IDialogConstants.CANCEL_LABEL }, 0) {
+                            IDialogConstants.CANCEL_LABEL },
+                    0) {
                 @Override
                 protected int getShellStyle() {
                     return super.getShellStyle() | SWT.SHEET;
@@ -455,10 +455,11 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * Create the import openCONFIGURATOR project wizard.
      */
     public ImportOpenConfiguratorProjectWizardPage() {
-        super(
-                ImportOpenConfiguratorProjectWizardPage.IMPORT_PROJECT_WIZARD_PAGE_NAME);
-        setTitle(ImportOpenConfiguratorProjectWizardPage.IMPORT_PROJECT_WIZARD_PAGE_TITLE);
-        setDescription(ImportOpenConfiguratorProjectWizardPage.IMPORT_PROJECT_WIZARD_PAGE_DESCRIPTION);
+        super(ImportOpenConfiguratorProjectWizardPage.IMPORT_PROJECT_WIZARD_PAGE_NAME);
+        setTitle(
+                ImportOpenConfiguratorProjectWizardPage.IMPORT_PROJECT_WIZARD_PAGE_TITLE);
+        setDescription(
+                ImportOpenConfiguratorProjectWizardPage.IMPORT_PROJECT_WIZARD_PAGE_DESCRIPTION);
         setPageComplete(false);
     }
 
@@ -538,11 +539,11 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         GridLayout layout = new GridLayout();
 
         optionsGroup.setLayout(layout);
-        optionsGroup.setLayoutData(new GridData(GridData.HORIZONTAL_ALIGN_FILL
-                | GridData.GRAB_HORIZONTAL));
+        optionsGroup.setLayoutData(new GridData(
+                GridData.HORIZONTAL_ALIGN_FILL | GridData.GRAB_HORIZONTAL));
 
-        optionsGroup
-                .setText(ImportOpenConfiguratorProjectWizardPage.OPTIONS_GROUP_LABEL);
+        optionsGroup.setText(
+                ImportOpenConfiguratorProjectWizardPage.OPTIONS_GROUP_LABEL);
 
         optionsGroup.setFont(parent.getFont());
         createOptionsGroupButtons(optionsGroup);
@@ -557,11 +558,11 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private void createOptionsGroupButtons(final Group optionsGroup) {
         final Button nestedProjectsCheckbox = new Button(optionsGroup,
                 SWT.CHECK);
-        nestedProjectsCheckbox
-                .setText(ImportOpenConfiguratorProjectWizardPage.NESTED_PROJECTS_LABEL);
+        nestedProjectsCheckbox.setText(
+                ImportOpenConfiguratorProjectWizardPage.NESTED_PROJECTS_LABEL);
 
-        nestedProjectsCheckbox.setLayoutData(new GridData(
-                GridData.FILL_HORIZONTAL));
+        nestedProjectsCheckbox
+                .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         nestedProjectsCheckbox.addSelectionListener(new SelectionAdapter() {
 
@@ -573,15 +574,15 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                 if (projectFromDirectoryRadio.getSelection()) {
 
                     ImportOpenConfiguratorProjectWizardPage.this
-                            .updateProjectsList(directoryPathField.getText()
-                                    .trim());
+                            .updateProjectsList(
+                                    directoryPathField.getText().trim());
                 }
             }
         });
 
         final Button copyCheckbox = new Button(optionsGroup, SWT.CHECK);
-        copyCheckbox
-                .setText(ImportOpenConfiguratorProjectWizardPage.COPY_PROJECTS_LABEL);
+        copyCheckbox.setText(
+                ImportOpenConfiguratorProjectWizardPage.COPY_PROJECTS_LABEL);
         copyCheckbox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         copyCheckbox.setSelection(copyFiles);
         copyCheckbox.setEnabled(false);
@@ -601,10 +602,10 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
 
         final Button hideConflictingProjects = new Button(optionsGroup,
                 SWT.CHECK);
+        hideConflictingProjects.setText(
+                ImportOpenConfiguratorProjectWizardPage.HIDE_PROJECTS_LABEL);
         hideConflictingProjects
-                .setText(ImportOpenConfiguratorProjectWizardPage.HIDE_PROJECTS_LABEL);
-        hideConflictingProjects.setLayoutData(new GridData(
-                GridData.FILL_HORIZONTAL));
+                .setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         hideConflictingProjects.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -635,7 +636,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      */
     private void createProjectDescription(ProjectRecord selectedProjectRecord,
             IProgressMonitor monitor) throws InvocationTargetException,
-            InterruptedException, IOException {
+                    InterruptedException, IOException {
 
         String projectName = FilenameUtils
                 .removeExtension(selectedProjectRecord.getProjectName());
@@ -677,8 +678,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                         .validateProjectLocationURI(project, locationURI);
 
                 if (!result.isOK()) {
-                    throw new InvocationTargetException(new CoreException(
-                            result));
+                    throw new InvocationTargetException(
+                            new CoreException(result));
                 }
 
                 importSource = new File(locationURI);
@@ -697,8 +698,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                     100);
             project.create(selectedProjectRecord.description,
                     new SubProgressMonitor(monitor, 30));
-            project.open(IResource.BACKGROUND_REFRESH, new SubProgressMonitor(
-                    monitor, 70));
+            project.open(IResource.BACKGROUND_REFRESH,
+                    new SubProgressMonitor(monitor, 70));
 
         } catch (CoreException e) {
             throw new InvocationTargetException(e);
@@ -739,8 +740,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
 
         // new project from directory radio button
         projectFromDirectoryRadio = new Button(projectGroup, SWT.RADIO);
-        projectFromDirectoryRadio
-                .setText(ImportOpenConfiguratorProjectWizardPage.SELECT_ROOT_DIRECTORY_LABEL);
+        projectFromDirectoryRadio.setText(
+                ImportOpenConfiguratorProjectWizardPage.SELECT_ROOT_DIRECTORY_LABEL);
 
         // project location entry
         directoryPathField = new Text(projectGroup, SWT.BORDER);
@@ -776,8 +777,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                     e.doit = false;
 
                     ImportOpenConfiguratorProjectWizardPage.this
-                            .updateProjectsList(directoryPathField.getText()
-                                    .trim());
+                            .updateProjectsList(
+                                    directoryPathField.getText().trim());
                 }
             }
         });
@@ -786,8 +787,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
 
             @Override
             public void focusLost(org.eclipse.swt.events.FocusEvent e) {
-                ImportOpenConfiguratorProjectWizardPage.this
-                        .updateProjectsList(directoryPathField.getText().trim());
+                ImportOpenConfiguratorProjectWizardPage.this.updateProjectsList(
+                        directoryPathField.getText().trim());
             }
         });
 
@@ -840,18 +841,13 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             if (t instanceof CoreException) {
                 status = ((CoreException) t).getStatus();
             } else {
-                status = new Status(
-                        IStatus.ERROR,
-                        Activator.PLUGIN_ID,
-                        1,
+                status = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
                         ImportOpenConfiguratorProjectWizardPage.PROJECT_CREATION_ERRORS_LABEL,
                         t);
             }
-            ErrorDialog
-                    .openError(
-                            getShell(),
-                            ImportOpenConfiguratorProjectWizardPage.PROJECT_CREATION_ERRORS_LABEL,
-                            null, status);
+            ErrorDialog.openError(getShell(),
+                    ImportOpenConfiguratorProjectWizardPage.PROJECT_CREATION_ERRORS_LABEL,
+                    null, status);
             return false;
         }
 
@@ -880,10 +876,10 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         GridData gridData = new GridData(SWT.FILL, SWT.FILL, true, true);
         gridData.widthHint = new PixelConverter(
                 projectsListCheckBoxTreeViewer.getControl())
-                .convertWidthInCharsToPixels(25);
+                        .convertWidthInCharsToPixels(25);
         gridData.heightHint = new PixelConverter(
                 projectsListCheckBoxTreeViewer.getControl())
-                .convertHeightInCharsToPixels(10);
+                        .convertHeightInCharsToPixels(10);
         projectsListCheckBoxTreeViewer.getControl().setLayoutData(gridData);
         projectsListCheckBoxTreeViewer
                 .setContentProvider(new ITreeContentProvider() {
@@ -940,12 +936,12 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         layout.marginHeight = 0;
         buttonsComposite.setLayout(layout);
 
-        buttonsComposite.setLayoutData(new GridData(
-                GridData.VERTICAL_ALIGN_BEGINNING));
+        buttonsComposite
+                .setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
         Button selectAll = new Button(buttonsComposite, SWT.PUSH);
-        selectAll
-                .setText(ImportOpenConfiguratorProjectWizardPage.SELECT_ALL_LABEL);
+        selectAll.setText(
+                ImportOpenConfiguratorProjectWizardPage.SELECT_ALL_LABEL);
         selectAll.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -968,8 +964,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         setButtonLayoutData(selectAll);
 
         Button deSelectAll = new Button(buttonsComposite, SWT.PUSH);
-        deSelectAll
-                .setText(ImportOpenConfiguratorProjectWizardPage.DE_SELECT_ALL_LABEL);
+        deSelectAll.setText(
+                ImportOpenConfiguratorProjectWizardPage.DE_SELECT_ALL_LABEL);
         deSelectAll.addSelectionListener(new SelectionAdapter() {
 
             @Override
@@ -993,8 +989,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             public void widgetSelected(SelectionEvent e) {
                 if (projectFromDirectoryRadio.getSelection()) {
                     ImportOpenConfiguratorProjectWizardPage.this
-                            .updateProjectsList(directoryPathField.getText()
-                                    .trim());
+                            .updateProjectsList(
+                                    directoryPathField.getText().trim());
                 }
             }
         });
@@ -1014,11 +1010,10 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         File[] files = directory.listFiles(new FilenameFilter() {
             @Override
             public boolean accept(File dir, String name) {
-                return (name
-                        .toLowerCase()
-                        .endsWith(
-                                ImportOpenConfiguratorProjectWizardPage.XML_EXTENSION_LABEL) && !name
-                        .equalsIgnoreCase(ImportOpenConfiguratorProjectWizardPage.XAP_XML_LABEL));
+                return (name.toLowerCase().endsWith(
+                        ImportOpenConfiguratorProjectWizardPage.XML_EXTENSION_LABEL)
+                        && !name.equalsIgnoreCase(
+                                ImportOpenConfiguratorProjectWizardPage.XAP_XML_LABEL));
             }
         });
 
@@ -1036,7 +1031,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         ArrayList<ProjectRecord> projectRecords = new ArrayList<ProjectRecord>();
         for (ProjectRecord selectedProject : selectedProjects) {
             String projectName = selectedProject.getProjectName();
-            selectedProject.hasConflicts = (isProjectFolderInWorkspacePath(projectName) && copyFiles)
+            selectedProject.hasConflicts = (isProjectFolderInWorkspacePath(
+                    projectName) && copyFiles)
                     || isProjectInWorkspace(projectName);
             projectRecords.add(selectedProject);
         }
@@ -1085,7 +1081,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                 ImportOpenConfiguratorProjectWizardPage.this.directoryPathField
                         .getShell(),
                 SWT.SHEET);
-        dialog.setMessage(ImportOpenConfiguratorProjectWizardPage.IMPORT_OPENCONFIGURATOR_LABEL);
+        dialog.setMessage(
+                ImportOpenConfiguratorProjectWizardPage.IMPORT_OPENCONFIGURATOR_LABEL);
 
         String dirName = ImportOpenConfiguratorProjectWizardPage.this.directoryPathField
                 .getText().trim();
@@ -1107,7 +1104,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         if (selectedDirectory != null) {
             ImportOpenConfiguratorProjectWizardPage.previouslyBrowsedDirectory = selectedDirectory;
             ImportOpenConfiguratorProjectWizardPage.this.directoryPathField
-                    .setText(ImportOpenConfiguratorProjectWizardPage.previouslyBrowsedDirectory);
+                    .setText(
+                            ImportOpenConfiguratorProjectWizardPage.previouslyBrowsedDirectory);
             ImportOpenConfiguratorProjectWizardPage.this
                     .updateProjectsList(selectedDirectory);
         }
@@ -1137,12 +1135,12 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private void updateProjectsList(final String path) {
 
         if ((path == null) || (path.length() == 0)) {
-            this.setMessage(ImportOpenConfiguratorProjectWizardPage.SELECT_DIRECTORY_LABEL);
             selectedProjects = new ArrayList<ProjectRecord>();
             projectsListCheckBoxTreeViewer.refresh(true);
-            projectsListCheckBoxTreeViewer.setCheckedElements(selectedProjects
-                    .toArray());
-            setPageComplete(projectsListCheckBoxTreeViewer.getCheckedElements().length > 0);
+            projectsListCheckBoxTreeViewer
+                    .setCheckedElements(selectedProjects.toArray());
+            setPageComplete(projectsListCheckBoxTreeViewer
+                    .getCheckedElements().length > 0);
             lastPath = path;
             return;
         }
@@ -1178,16 +1176,19 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
 
                     if (dirSelected && directory.isDirectory()) {
 
-                        monitor.subTask(ImportOpenConfiguratorProjectWizardPage.SEARCH_PROJECTS_IN_TASK_LABEL
-                                + directory.getPath());
+                        monitor.subTask(
+                                ImportOpenConfiguratorProjectWizardPage.SEARCH_PROJECTS_IN_TASK_LABEL
+                                        + directory.getPath());
 
-                        if (!collectProjectFilesFromDirectory(files, directory)) {
+                        if (!collectProjectFilesFromDirectory(files,
+                                directory)) {
                             return;
                         }
 
                         monitor.worked(50);
 
-                        monitor.subTask(ImportOpenConfiguratorProjectWizardPage.PROCESSING_RESULTS_TASK_LABEL);
+                        monitor.subTask(
+                                ImportOpenConfiguratorProjectWizardPage.PROCESSING_RESULTS_TASK_LABEL);
 
                         for (File projectFile : files) {
                             selectedProjects
@@ -1228,7 +1229,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             this.setMessage(null);
         }
 
-        setPageComplete(projectsListCheckBoxTreeViewer.getCheckedElements().length > 0);
+        setPageComplete(
+                projectsListCheckBoxTreeViewer.getCheckedElements().length > 0);
         if (selectedProjects.isEmpty()) {
             this.setMessage(
                     ImportOpenConfiguratorProjectWizardPage.NO_PROJECTS_FOUND_MESSAGE,
