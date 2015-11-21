@@ -40,6 +40,8 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -453,7 +455,7 @@ public class ObjectDictionaryView extends ViewPart {
         createActions();
 
         contributeToActionBars();
-
+        hookDoubleClickAction();
         initializeToolBar();
 
         getViewSite().getPage().addSelectionListener(IndustrialNetworkView.ID,
@@ -531,6 +533,18 @@ public class ObjectDictionaryView extends ViewPart {
             return null;
         }
         return treeViewer.getControl();
+    }
+
+    /**
+     * Double Click action for node on Object dictionary view
+     */
+    private void hookDoubleClickAction() {
+        treeViewer.addDoubleClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                propertiesAction.run();
+            }
+        });
     }
 
     private void initializeToolBar() {
