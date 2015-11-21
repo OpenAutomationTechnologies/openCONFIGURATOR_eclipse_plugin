@@ -56,6 +56,7 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
@@ -78,6 +79,7 @@ import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.resources.IPluginImages;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
@@ -104,6 +106,34 @@ public class IndustrialNetworkView extends ViewPart
         @Override
         public String toString() {
             return "Network elements not available.";
+        }
+    }
+
+    /**
+     * Node ID based comparator.
+     *
+     * An exception the MN node id will remain at the top.
+     *
+     * @author Ramakrishnan P
+     *
+     */
+    private class NodeIdBasedSorter extends ViewerComparator {
+
+        @Override
+        public int compare(Viewer viewer, Object e1, Object e2) {
+            if ((e1 instanceof Node) && (e2 instanceof Node)) {
+
+                Node nodeFirst = (Node) e1;
+                Node nodeSecond = (Node) e2;
+
+                if (nodeSecond
+                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                    return 255;
+                } else {
+                    return nodeFirst.getNodeId() - nodeSecond.getNodeId();
+                }
+            }
+            return super.compare(viewer, e1, e2);
         }
     }
 
@@ -400,6 +430,7 @@ public class IndustrialNetworkView extends ViewPart
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
         viewer.setContentProvider(new ViewContentProvider());
         viewer.setLabelProvider(new ViewLabelProvider());
+        viewer.setComparator(new NodeIdBasedSorter());
         viewer.expandAll();
 
         makeActions();
