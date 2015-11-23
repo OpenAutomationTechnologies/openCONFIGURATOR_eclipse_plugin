@@ -166,6 +166,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     private IndustrialNetworkProjectEditorPage editorPage;
 
+    private Job importNodeXdcJob;
+
     /**
      * Constructor
      */
@@ -268,6 +270,38 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     @Override
     public void dispose() {
         if (initSuccessful) {
+
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    if (importNodeXdcJob != null) {
+                        importNodeXdcJob.cancel();
+                        try {
+                            importNodeXdcJob.join();
+                        } catch (InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            });
+
+            nodeCollection.clear();
+
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    IViewPart viewPart = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .findView(IndustrialNetworkView.ID);
+                    if (viewPart instanceof IndustrialNetworkView) {
+                        IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
+                        industrialView.editorActivated(
+                                IndustrialNetworkProjectEditor.this);
+                    }
+                }
+            });
+
             Result libApiRes = OpenConfiguratorCore.GetInstance()
                     .RemoveNetwork(networkId);
             if (!libApiRes.IsSuccessful()) {
@@ -484,7 +518,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
 
         System.out.println("activeProject- path" + activeProject.getLocation());
 
-        final Job importNodeXdcJob = new Job("Import node XDD/XDC") {
+        importNodeXdcJob = new Job("Import node XDD/XDC") {
 
             @Override
             protected IStatus run(IProgressMonitor monitor) {

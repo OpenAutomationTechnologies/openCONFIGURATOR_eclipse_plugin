@@ -557,6 +557,12 @@ public final class OpenConfiguratorProjectUtils {
             // Import the CN nodes
             for (TCN cnNode : networkCfg.getNodeCollection().getCN()) {
 
+                if (monitor.isCanceled()) {
+                    return new Status(IStatus.OK,
+                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                            "Cancelled", null);
+                }
+
                 monitor.subTask("Import CN node XDC:" + cnNode.getName() + "("
                         + cnNode.getNodeID() + ")");
 
@@ -590,6 +596,12 @@ public final class OpenConfiguratorProjectUtils {
 
             // Import the RMN nodes
             for (TRMN rmnNode : networkCfg.getNodeCollection().getRMN()) {
+
+                if (monitor.isCanceled()) {
+                    return new Status(IStatus.OK,
+                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                            "Cancelled", null);
+                }
 
                 monitor.subTask("Import RMN node XDC:" + rmnNode.getName() + "("
                         + rmnNode.getNodeID() + ")");
