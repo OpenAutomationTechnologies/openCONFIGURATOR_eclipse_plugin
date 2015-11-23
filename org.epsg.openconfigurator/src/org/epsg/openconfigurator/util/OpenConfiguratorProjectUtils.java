@@ -679,7 +679,8 @@ public final class OpenConfiguratorProjectUtils {
         TGenerator tGenerator = new TGenerator();
         tGenerator.setVendor(OpenConfiguratorProjectUtils.GENERATOR_VENDOR);
         tGenerator.setCreatedBy(System
-                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID));
+                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID)
+                .trim());
         tGenerator
                 .setToolName(OpenConfiguratorProjectUtils.GENERATOR_TOOL_NAME);
         tGenerator.setToolVersion(
@@ -689,7 +690,8 @@ public final class OpenConfiguratorProjectUtils {
         tGenerator.setModifiedOn(
                 OpenConfiguratorProjectUtils.getXMLGregorianCalendarNow());
         tGenerator.setModifiedBy(System
-                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID));
+                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID)
+                .trim());
         openConfiguratorProject.setGenerator(tGenerator);
 
         // Add default project configurations
@@ -718,7 +720,7 @@ public final class OpenConfiguratorProjectUtils {
                 .getSetting();
         for (String buildConfiguration : OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList) {
             TKeyValuePair buildConfig = new TKeyValuePair();
-            buildConfig.setName(buildConfiguration);
+            buildConfig.setName(buildConfiguration.trim());
             buildConfig.setValue("");
             buildConfig.setEnabled(true);
 
@@ -916,8 +918,11 @@ public final class OpenConfiguratorProjectUtils {
                 OpenConfiguratorProjectUtils.GENERATOR_TOOL_VERSION);
         project.getGenerator().setModifiedOn(
                 OpenConfiguratorProjectUtils.getXMLGregorianCalendarNow());
-        project.getGenerator().setModifiedBy(System
-                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID));
+        project.getGenerator()
+                .setModifiedBy(System
+                        .getProperty(
+                                OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID)
+                        .trim());
     }
 
     /**
@@ -1321,7 +1326,7 @@ public final class OpenConfiguratorProjectUtils {
 
                         if (!buildConfigurationAvailable) {
                             TKeyValuePair buildConfig = new TKeyValuePair();
-                            buildConfig.setName(buildConfiguration);
+                            buildConfig.setName(buildConfiguration.trim());
                             buildConfig.setValue("");
                             buildConfig.setEnabled(true);
 

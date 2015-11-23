@@ -166,12 +166,12 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
             // the active setting also.
             if (path.getId()
                     .equalsIgnoreCase(pathSettingsModel.getActivePath())) {
-                pathSettingsModel.setActivePath((String) value);
+                pathSettingsModel.setActivePath(((String) value).trim());
                 dirty = true;
             }
 
             if (ModifyPathSettingsDialog.NAME.equals(property)) {
-                path.setId((String) value);
+                path.setId(((String) value).trim());
 
                 dirty = true;
             }
@@ -545,7 +545,7 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
                 .getActivePath())) {
             // The item about to be removed is same as the activePathSetting.
             // Update the activePathSetting setting to 0, then remove it.
-            pathSettingsModel.setActivePath(pathList.get(0).getId());
+            pathSettingsModel.setActivePath((pathList.get(0).getId()).trim());
         }
 
         dirty = true;

@@ -154,7 +154,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                     return;
                 }
 
-                ag.setId((String) value);
+                ag.setId(((String) value).trim());
                 dirty = true;
 
                 // If Active setting is same as the element to be modified..
@@ -172,8 +172,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                         return;
                     }
 
-                    projectConfiguration.setActiveAutoGenerationSetting(ag
-                            .getId());
+                    projectConfiguration
+                            .setActiveAutoGenerationSetting(ag.getId().trim());
                     dirty = true;
                 }
             }
@@ -600,7 +600,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
             // The item about to be removed is same as the active auto
             // generation setting.
             // Update the active auto-generation setting to 0, then remove it.
-            String currentActiveSetting = agList.get(0).getId();
+            String currentActiveSetting = agList.get(0).getId().trim();
             libApiRes = OpenConfiguratorCore.GetInstance()
                     .SetActiveConfiguration(networkID, currentActiveSetting);
             if (!libApiRes.IsSuccessful()) {

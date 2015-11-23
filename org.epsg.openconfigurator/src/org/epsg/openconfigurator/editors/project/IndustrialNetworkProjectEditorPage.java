@@ -95,8 +95,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String ID = "org.epsg.openconfigurator.editors.IndustrialNetworkProjectEditorPage";
 
     /** Editor label and error messages */
-    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING = "Build Configurations";
-    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION = "Provides the build configuration for the project";
+    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING = "Auto Build Configurations";
+    private static final String AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION = "Provides the build configuration for the project.";
     private static final String AUTOGENERATIONSETTINGS_SECTION_ACTIVEGROUP_LABEL = "Active Configuration:";
     private static final String AUTOGENERATIONSETTINGS_SECTION_MODIFY_LABEL = "Modify...";
     private static final String AUTOGENERATIONSETTINGS_SECTION_INFO_LABEL = "Configure the build configuration specific settings:";
@@ -105,7 +105,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String AUTOGENERATIONSETTINGS_SECTION_DELETE_LABEL = "Delete";
 
     private static final String GENERATOR_SECTION_HEADING = "Project Information";
-    private static final String GENERATOR_SECTION_HEADING_DESCRIPTION = "Provides detailed project information";
+    private static final String GENERATOR_SECTION_HEADING_DESCRIPTION = "Provides detailed project information.";
     private static final String GENERATOR_SECTION_MODIFIED_BY_LABEL = "Modified By:";
     private static final String GENERATOR_SECTION_CREATED_BY_LABEL = "Created By:";
     private static final String GENERATOR_SECTION_MODIFIED_ON_LABEL = "Modified On:";
@@ -115,7 +115,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String GENERATOR_SECTION_VENDOR_NAME_LABEL = "Vendor:";
 
     private static final String PATH_SECTION_HEADING = "Path Settings";
-    private static final String PATH_SECTION_HEADING_DESCRIPTION = "Provides the path settings for the project";
+    private static final String PATH_SECTION_HEADING_DESCRIPTION = "Provides the path settings for the project.";
     private static final String PATH_SECTION_MODIFY_PATH_LIST_HYPERLINK_LABEL = "Modify the available list of paths";
     private static final String PATH_SECTION_ADD_LABEL = "Add...";
     private static final String PATH_SECTION_OUTPUT_PATH_LABEL = "Output path:";
@@ -215,7 +215,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                     currentProject.getProjectConfiguration()
                             .setActiveAutoGenerationSetting(
-                                    autoGenerationCombo.getText());
+                                    autoGenerationCombo.getText().trim());
                     IndustrialNetworkProjectEditorPage.this.setDirty(true);
 
                     IndustrialNetworkProjectEditorPage.this
@@ -544,14 +544,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     if (!libApiRes.IsSuccessful()) {
                                         String errorMessage = OpenConfiguratorLibraryUtils
                                                 .getErrorMessage(libApiRes);
-                                        System.err.println(activeAgSetting
-                                                .getId()
-                                                + ":"
-                                                + setting.getName()
-                                                + ":"
-                                                + setting.isEnabled()
-                                                + ". "
-                                                + errorMessage);
                                         PluginErrorDialogUtils
                                                 .displayErrorMessageDialog(
                                                         getSite().getShell(),
@@ -587,11 +579,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             IStructuredSelection selection = (IStructuredSelection) event
                     .getSelection();
             if (selection.size() > 0) {
-                currentProject
-                        .getProjectConfiguration()
-                        .getPathSettings()
-                        .setActivePath(
-                                ((TPath) selection.getFirstElement()).getId());
+                currentProject.getProjectConfiguration().getPathSettings()
+                        .setActivePath(((TPath) selection.getFirstElement())
+                                .getId().trim());
                 setDirty(true);
             }
         }
@@ -1401,7 +1391,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                 currentProject.getProjectConfiguration()
                         .setActiveAutoGenerationSetting(
-                                autoGenerationCombo.getText());
+                                autoGenerationCombo.getText().trim());
 
                 IndustrialNetworkProjectEditorPage.this.setDirty(true);
 

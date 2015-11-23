@@ -318,7 +318,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
              * Check for the page is complete or not.
              */
             if (isPageComplete()) {
-                activeSetting.setName(settingsTypeCombo.getText());
+                activeSetting.setName(settingsTypeCombo.getText().trim());
                 activeSetting.setValue(value.getText());
                 activeSetting.setEnabled(bntActive.getSelection());
                 okPressed();
@@ -548,7 +548,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
         if (activeSettingName != null) {
             for (TKeyValuePair tempSetting : agSettings.getSetting()) {
                 if (tempSetting.getName().equalsIgnoreCase(activeSettingName)) {
-                    activeSetting.setName(tempSetting.getName());
+                    activeSetting.setName(tempSetting.getName().trim());
                     activeSetting.setValue(tempSetting.getValue());
                     activeSetting.setEnabled(tempSetting.isEnabled());
                     break;

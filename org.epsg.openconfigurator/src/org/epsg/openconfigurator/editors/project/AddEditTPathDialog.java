@@ -137,7 +137,7 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
             // Check for if the page is complete before sending OK pressed
             // signal.
             if (isPageComplete()) {
-                path.setId(txtName.getText());
+                path.setId(txtName.getText().trim());
                 path.setPath(txtLocation.getText());
                 okPressed();
             }
