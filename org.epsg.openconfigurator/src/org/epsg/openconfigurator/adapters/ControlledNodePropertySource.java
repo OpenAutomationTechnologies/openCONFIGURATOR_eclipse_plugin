@@ -534,9 +534,10 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             try {
                 long longValue = Long.decode((String) value);
 
+                // us converted to ns
                 Result res = OpenConfiguratorCore.GetInstance()
                         .SetLossOfSocTolerance(cnNode.getNetworkId(),
-                                cnNode.getNodeId(), longValue);
+                                cnNode.getNodeId(), longValue * 1000);
                 if (!res.IsSuccessful()) {
                     return res.GetErrorMessage();
                 }
@@ -928,7 +929,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
                     try {
                         cnNode.setLossOfSocTolerance(
-                                Long.decode((String) value));
+                                Long.decode((String) value) * 1000);
                     } catch (NumberFormatException e) {
                         System.err.println(
                                 objectId + " Number format exception" + e);
