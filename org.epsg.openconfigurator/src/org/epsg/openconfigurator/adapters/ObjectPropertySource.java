@@ -266,11 +266,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
      *         being the error message to display to the end user.
      */
     protected String handleActualValue(Object value) {
-        Result res = OpenConfiguratorLibraryUtils
-                .setObjectActualValue(plkObject, (String) value);
-        if (!res.IsSuccessful()) {
-            return OpenConfiguratorLibraryUtils.getErrorMessage(res);
-        }
+        // TODO: Test the inputs.
         return null;
     }
 
@@ -329,14 +325,28 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         object = plkObject.getObject();
     }
 
+    /**
+     * Sets the value to the Object Properties
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
+
         if (id instanceof String) {
             String objectId = (String) id;
             switch (objectId) {
-                case OBJ_ACTUAL_VALUE_EDITABLE_ID:
-                    plkObject.setActualValue((String) value, true);
+                case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
+                    Result res = OpenConfiguratorLibraryUtils
+                            .setObjectActualValue(plkObject, (String) value);
+                    if (!res.IsSuccessful()) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res));
+                    } else {
+                        // Success - update the OBD
+                        plkObject.setActualValue((String) value, true);
+                    }
                     break;
+                }
                 case OBJ_FORCE_ACTUAL_VALUE_ID: {
 
                     if (value instanceof Integer) {
