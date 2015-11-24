@@ -117,6 +117,8 @@ public final class OpenConfiguratorProjectUtils {
     private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid. XDC Path: {1}";
     private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project. XDC Path: {1}";
 
+    private static final String UPGRADE_MESSAGE = "Upgrading openCONFIGURATOR project version {0} to version {1}.";
+
     static {
         // Fetch the list of default buildConfigurationIDs from the
         // openconfigurator-core library.
@@ -927,15 +929,28 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateGeneratorInformation(
             OpenCONFIGURATORProject project) {
-        project.getGenerator().setToolVersion(
+
+        TGenerator generator = project.getGenerator();
+
+        if (generator == null) {
+            return;
+        }
+
+        String createdBy = generator.getCreatedBy();
+        if ((createdBy == null) || createdBy.isEmpty()) {
+            generator.setCreatedBy(System
+                    .getProperty(
+                            OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID)
+                    .trim());
+        }
+
+        generator.setToolVersion(
                 OpenConfiguratorProjectUtils.GENERATOR_TOOL_VERSION);
-        project.getGenerator().setModifiedOn(
+        generator.setModifiedOn(
                 OpenConfiguratorProjectUtils.getXMLGregorianCalendarNow());
-        project.getGenerator()
-                .setModifiedBy(System
-                        .getProperty(
-                                OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID)
-                        .trim());
+        generator.setModifiedBy(System
+                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID)
+                .trim());
     }
 
     /**
@@ -1302,82 +1317,96 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static boolean upgradeOpenConfiguratorProject(
             OpenCONFIGURATORProject project) {
-        if ((project == null) || (project.getGenerator() == null)
-                || (project.getGenerator().getToolVersion() == null)) {
+        TGenerator generator = project.getGenerator();
+        if ((project == null) || (generator == null)
+                || (generator.getToolVersion() == null)) {
             return false;
         }
 
-        if (!(project.getGenerator().getToolVersion().equalsIgnoreCase("1.4.1")
-                || project.getGenerator().getToolVersion()
-                        .equalsIgnoreCase("1.4.0"))) {
-            return false;
-        }
+        String toolVersionAvailable = generator.getToolVersion();
+        if (toolVersionAvailable.equalsIgnoreCase("2.0.0-pre-release")) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printInfoMessage(MessageFormat.format(UPGRADE_MESSAGE,
+                            toolVersionAvailable, GENERATOR_TOOL_VERSION));
 
-        System.out.println("Upgrading openCONFIGURATOR project v("
-                + project.getGenerator().getToolVersion()
-                + ") to current version.");
+            generator.setToolName(GENERATOR_TOOL_NAME);
+            generator.setVendor(GENERATOR_VENDOR);
+            OpenConfiguratorProjectUtils.updateGeneratorInformation(project);
+            return true;
+        } else if ((toolVersionAvailable.equalsIgnoreCase("1.4.1")
+                || toolVersionAvailable.equalsIgnoreCase("1.4.0"))) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printInfoMessage(MessageFormat.format(UPGRADE_MESSAGE,
+                            toolVersionAvailable, GENERATOR_TOOL_VERSION));
 
-        TProjectConfiguration projectConfiguration = project
-                .getProjectConfiguration();
-        if (projectConfiguration != null) {
-            java.util.List<TAutoGenerationSettings> autoGenerationSettingsList = projectConfiguration
-                    .getAutoGenerationSettings();
-            for (TAutoGenerationSettings agSettings : autoGenerationSettingsList) {
-                if (agSettings.getId().equalsIgnoreCase(
-                        OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)) {
-                    List<TKeyValuePair> settingsList = agSettings.getSetting();
+            generator.setToolName(GENERATOR_TOOL_NAME);
+            generator.setVendor(GENERATOR_VENDOR);
 
-                    for (String buildConfiguration : OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList) {
-                        boolean buildConfigurationAvailable = false;
-                        for (TKeyValuePair setting : settingsList) {
-                            if (setting.getName()
-                                    .equalsIgnoreCase(buildConfiguration)) {
-                                buildConfigurationAvailable = true;
-                                break;
+            TProjectConfiguration projectConfiguration = project
+                    .getProjectConfiguration();
+            if (projectConfiguration != null) {
+                java.util.List<TAutoGenerationSettings> autoGenerationSettingsList = projectConfiguration
+                        .getAutoGenerationSettings();
+                for (TAutoGenerationSettings agSettings : autoGenerationSettingsList) {
+                    if (agSettings.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)) {
+                        List<TKeyValuePair> settingsList = agSettings
+                                .getSetting();
+
+                        for (String buildConfiguration : OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList) {
+                            boolean buildConfigurationAvailable = false;
+                            for (TKeyValuePair setting : settingsList) {
+                                if (setting.getName()
+                                        .equalsIgnoreCase(buildConfiguration)) {
+                                    buildConfigurationAvailable = true;
+                                    break;
+                                }
                             }
+
+                            if (!buildConfigurationAvailable) {
+                                TKeyValuePair buildConfig = new TKeyValuePair();
+                                buildConfig.setName(buildConfiguration.trim());
+                                buildConfig.setValue("");
+                                buildConfig.setEnabled(true);
+
+                                settingsList.add(buildConfig);
+                            }
+
                         }
-
-                        if (!buildConfigurationAvailable) {
-                            TKeyValuePair buildConfig = new TKeyValuePair();
-                            buildConfig.setName(buildConfiguration.trim());
-                            buildConfig.setValue("");
-                            buildConfig.setEnabled(true);
-
-                            settingsList.add(buildConfig);
-                        }
-
                     }
                 }
+
+                TAutoGenerationSettings customAgSettings = new TAutoGenerationSettings();
+                customAgSettings.setId(
+                        OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_CUSTOM_ID);
+                autoGenerationSettingsList.add(customAgSettings);
+
+            } else {
+                // TODO create a new Project configuration. This might not be
+                // the case. Since it is schema validated.
             }
 
-            TAutoGenerationSettings customAgSettings = new TAutoGenerationSettings();
-            customAgSettings.setId(
-                    OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_CUSTOM_ID);
-            autoGenerationSettingsList.add(customAgSettings);
+            TNetworkConfiguration net = project.getNetworkConfiguration();
+            if (net != null) {
+                net.setAsyncMTU(null);
+                net.setCycleTime(null);
+                net.setMultiplexedCycleLength(null);
+                net.setPrescaler(null);
+            }
 
+            TNodeCollection nodeColl = net.getNodeCollection();
+            if (nodeColl != null) {
+                TMN mn = nodeColl.getMN();
+                if (mn != null) {
+                    mn.setASndMaxNumber(null);
+                    mn.setAsyncSlotTimeout(null);
+                }
+            }
+            OpenConfiguratorProjectUtils.updateGeneratorInformation(project);
         } else {
-            // TODO create a new Project configuration. This might not be the
-            // case. Since it is schema
-            // validated.
+            return false;
         }
 
-        TNetworkConfiguration net = project.getNetworkConfiguration();
-        if (net != null) {
-            net.setAsyncMTU(null);
-            net.setCycleTime(null);
-            net.setMultiplexedCycleLength(null);
-            net.setPrescaler(null);
-        }
-
-        TNodeCollection nodeColl = net.getNodeCollection();
-        if (nodeColl != null) {
-            TMN mn = nodeColl.getMN();
-            if (mn != null) {
-                mn.setASndMaxNumber(null);
-                mn.setAsyncSlotTimeout(null);
-            }
-        }
-        OpenConfiguratorProjectUtils.updateGeneratorInformation(project);
         return true;
     }
 }

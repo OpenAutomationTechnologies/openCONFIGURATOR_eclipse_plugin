@@ -168,6 +168,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
 
     private Job importNodeXdcJob;
 
+    private boolean upgradeFlag;
+
     /**
      * Constructor
      */
@@ -185,18 +187,17 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     @Override
     protected void addPages() {
 
-        try {
+        createPowerlinkProjectEditor();
+        createProjectSourceEditor();
 
-            createPowerlinkProjectEditor();
-            createProjectSourceEditor();
+        this.setActivePage(editorPage.getId());
 
-            this.setActivePage(editorPage.getId());
+        editorPage.setOpenCONFIGURATORProject(currentProject);
 
-            editorPage.setOpenCONFIGURATORProject(currentProject);
-
-        } catch (NullPointerException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        // If upgraded - update the source page and the file contents from
+        // the model.
+        if (upgradeFlag) {
+            updateModelToSource();
         }
     }
 
@@ -322,6 +323,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     @Override
     public void doSave(IProgressMonitor monitor) {
+        upgradeFlag = false;
         editorPage.doSave(monitor);
         sourcePage.doSave(monitor);
     }
@@ -329,7 +331,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     @Override
     public void doSaveAs() {
         // TODO Auto-generated method stub
-
     }
 
     /**
@@ -489,7 +490,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                     IndustrialNetworkProjectEditor.INVALID_INPUT_ERROR);
         }
 
-        OpenConfiguratorProjectUtils
+        upgradeFlag = OpenConfiguratorProjectUtils
                 .upgradeOpenConfiguratorProject(currentProject);
 
         Result libApiRes = OpenConfiguratorCore.GetInstance()
