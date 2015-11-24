@@ -65,6 +65,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.MapIterator;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.ObjectCollection;
@@ -126,7 +127,7 @@ public final class OpenConfiguratorProjectUtils {
         if (!libApiRes.IsSuccessful()) {
             // TODO: Display a dialog to report it to the user
             System.err.println("GetSupportedSettingIds failed with error: "
-                    + libApiRes.GetErrorMessage());
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(libApiRes));
         }
 
         for (int i = 0; i < support.size(); i++) {

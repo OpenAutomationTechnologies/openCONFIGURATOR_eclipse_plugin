@@ -881,7 +881,8 @@ public class OpenConfiguratorLibraryUtils {
 
         } else {
             System.err.println("Un-Supported node Type");
-            return libApiRes;
+            return new Result(ErrorCode.UNHANDLED_EXCEPTION,
+                    "Un-Supported node Type");
         }
 
         libApiRes = setNodeAssignment(NodeAssignment.MNT_NODEASSIGN_VALID, node,
@@ -1440,10 +1441,13 @@ public class OpenConfiguratorLibraryUtils {
      * @return The error message from the result instance.
      */
     public static String getErrorMessage(final Result result) {
-        String errorMessage = "Code:" + result.GetErrorType().ordinal() + "\t"
-                + result.GetErrorMessage();
-        System.out.println(result.GetErrorType().name());
-        return errorMessage;
+        String errorMesage = result.GetErrorMessage();
+        if (errorMesage.isEmpty()) {
+            errorMesage = result.GetErrorType().toString();
+            System.err.println("ErrorMessage is empty. Error Code:"
+                    + result.GetErrorType());
+        }
+        return errorMesage;
     }
 
     /**

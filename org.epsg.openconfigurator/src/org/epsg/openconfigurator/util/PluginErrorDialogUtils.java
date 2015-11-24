@@ -41,6 +41,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.epsg.openconfigurator.Activator;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 
 /**
  * Utility class for the openCONFIGURATOR plugin for the error dialogs.
@@ -63,11 +64,33 @@ public final class PluginErrorDialogUtils {
      *         pressed, or Dialog.CANCEL if this dialog's close window
      *         decoration or the ESC key was used.
      */
+    @Deprecated
     public static int displayErrorMessageDialog(final Shell parent,
             final String errorMessage, final Throwable exception) {
         IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
                 errorMessage, exception);
         return ErrorDialog.openError(parent,
+                PluginErrorDialogUtils.INTERNAL_ERROR_MESSAGE, null,
+                errorStatus);
+    }
+
+    public static int displayErrorMessageDialog(final String title,
+            final Result result) {
+        IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
+                OpenConfiguratorLibraryUtils.getErrorMessage(result), null);
+        return ErrorDialog.openError(
+                org.epsg.openconfigurator.Activator.getDefault().getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                title, null, errorStatus);
+    }
+
+    public static int displayErrorMessageDialog(final String errorMessage,
+            final Throwable exception) {
+        IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
+                errorMessage, exception);
+        return ErrorDialog.openError(
+                org.epsg.openconfigurator.Activator.getDefault().getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
                 PluginErrorDialogUtils.INTERNAL_ERROR_MESSAGE, null,
                 errorStatus);
     }
