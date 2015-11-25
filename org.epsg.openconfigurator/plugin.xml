@@ -23,6 +23,13 @@
             id="org.epsg.openconfigurator.views.ObjectDictionaryView"
             name="Object Dictionary">
       </view>
+      <view
+            category="org.epsg.openconfigurator.view.category"
+            class="org.epsg.openconfigurator.views.mapping.MappingView"
+            icon="icons/mapping.gif"
+            id="org.epsg.openconfigurator.views.MappingView"
+            name="Mapping View">
+      </view>
    </extension>
    <extension
          point="org.eclipse.ui.perspectives">

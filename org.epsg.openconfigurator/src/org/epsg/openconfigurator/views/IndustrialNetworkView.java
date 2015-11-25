@@ -79,6 +79,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
@@ -505,6 +506,10 @@ public class IndustrialNetworkView extends ViewPart
         manager.add(showProperties);
     }
 
+    public PowerlinkRootNode getNodeList() {
+        return rootNode;
+    }
+
     private void handleEnableDisable(IStructuredSelection selection) {
         if (selection.isEmpty()) {
             showMessage("No selection");
@@ -681,9 +686,15 @@ public class IndustrialNetworkView extends ViewPart
         showPdoMapping = new Action("Show Mapping View") {
             @Override
             public void run() {
-                showMessage(
-                        "The PDO Mapping view is not available in the pre-release.\n"
-                                + "Please use the 'object dictionary view' to modify the PDO mapping values.");
+
+                try {
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(MappingView.ID);
+                    viewer.setSelection(viewer.getSelection());
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage("Error openning MappingView");
+                }
             }
         };
         showPdoMapping.setToolTipText("Show Mapping View");

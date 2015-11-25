@@ -47,6 +47,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
@@ -92,7 +93,27 @@ public class Node {
     /**
      * List of Objects available in the node.
      */
-    private final List<PowerlinkObject> objectsList;
+    private final List<PowerlinkObject> objectsList = new ArrayList<PowerlinkObject>();;
+
+    /**
+     * TPDO mappable objects list.
+     */
+    private final List<PowerlinkObject> tpdoMappableObjectList = new ArrayList<PowerlinkObject>();
+
+    /**
+     * RPDO mappable objects list
+     */
+    private final List<PowerlinkObject> rpdoMappableObjectList = new ArrayList<PowerlinkObject>();
+
+    /**
+     * TPDO channels list.
+     */
+    private final List<TpdoChannel> tpdoChannelsList = new ArrayList<TpdoChannel>();
+
+    /**
+     * RPDO channels list.
+     */
+    private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
 
     /**
      * Network ID used for the openCONFIGURATOR library.
@@ -112,7 +133,6 @@ public class Node {
         nodeCollection = null;
         networkId = null;
         nodeId = 0;
-        objectsList = null;
     }
 
     /**
@@ -160,14 +180,14 @@ public class Node {
             nodeId = tempMn.getNodeID();
         } else {
             nodeId = 0;
-            System.err
-                    .println("getName Unhandled node model type:" + nodeModel);
+            System.err.println("Unhandled node model type:" + nodeModel);
         }
 
         // Calculate the objects during the object construction to improve
         // performance. Since there are no addition and deletion of objects
         // at runtime this is perfectly valid.
-        objectsList = new ArrayList<PowerlinkObject>();
+        List<PowerlinkObject> commParamObjList = new ArrayList<PowerlinkObject>();
+        List<PowerlinkObject> mapParamObjList = new ArrayList<PowerlinkObject>();
 
         if (xddModel != null) {
 
@@ -183,7 +203,46 @@ public class Node {
                     for (TObject obj : objList) {
                         PowerlinkObject plkObj = new PowerlinkObject(this, obj);
                         objectsList.add(plkObj);
+
+                        if (plkObj.getObjectIndex().startsWith("0x14")
+                                || plkObj.getObjectIndex().startsWith("0x18")) {
+                            commParamObjList.add(plkObj);
+                        } else if (plkObj.getObjectIndex().startsWith("0x16")
+                                || plkObj.getObjectIndex().startsWith("0x1A")) {
+                            mapParamObjList.add(plkObj);
+                        }
+
+                        if (plkObj.hasRpdoMappableSubObjects()
+                                || plkObj.isRpdoMappable()) {
+                            rpdoMappableObjectList.add(plkObj);
+                        }
+
+                        if (plkObj.hasTpdoMappableSubObjects()
+                                || plkObj.isTpdoMappable()) {
+                            tpdoMappableObjectList.add(plkObj);
+                        }
                     }
+                }
+            }
+
+            for (int i = 0; i < commParamObjList.size(); i++) {
+                try {
+                    PowerlinkObject commParam = commParamObjList.get(i);
+                    PowerlinkObject mapParam = mapParamObjList.get(i);
+
+                    char mapParamId = mapParam.getObjectIndex().charAt(3);
+
+                    if (mapParamId == '6') {
+                        rpdoChannelsList.add(
+                                new RpdoChannel(this, commParam, mapParam));
+                    } else if ((mapParamId == 'A') || (mapParamId == 'a')) {
+                        tpdoChannelsList.add(
+                                new TpdoChannel(this, commParam, mapParam));
+                    } else {
+                        System.err.println("Invalid PDO detected!");
+                    }
+                } catch (IndexOutOfBoundsException e) {
+                    e.printStackTrace();
                 }
             }
         }
@@ -356,6 +415,9 @@ public class Node {
             TRMN rmn = (TRMN) nodeModel;
 
             nodeName = rmn.getName();
+        } else if (nodeModel instanceof TMN) {
+            TMN mn = (TMN) nodeModel;
+            nodeName = mn.getName();
         } else {
             System.err
                     .println("getName Unhandled node model type:" + nodeModel);
@@ -580,6 +642,14 @@ public class Node {
         return StringUtils.EMPTY;
     }
 
+    public List<RpdoChannel> getRpdoChannelsList() {
+        return rpdoChannelsList;
+    }
+
+    public List<PowerlinkObject> getRpdoMappableObjectList() {
+        return rpdoMappableObjectList;
+    }
+
     /**
      * Retrieves the subobject instance for the given objectId and subObjectId
      * available in this node.
@@ -596,6 +666,14 @@ public class Node {
             return null;
         }
         return obj.getSubObject(subObjectId);
+    }
+
+    public List<TpdoChannel> getTpdoChannelsList() {
+        return tpdoChannelsList;
+    }
+
+    public List<PowerlinkObject> getTpdoMappableObjectList() {
+        return tpdoMappableObjectList;
     }
 
     /**

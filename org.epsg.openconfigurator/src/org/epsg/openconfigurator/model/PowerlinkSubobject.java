@@ -34,8 +34,13 @@ package org.epsg.openconfigurator.model;
 import javax.xml.bind.DatatypeConverter;
 
 import org.eclipse.core.resources.IProject;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
 
 /**
  * Wrapper class for a POWERLINK sub-object.
@@ -43,12 +48,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
  * @author Ramakrishnan P
  *
  */
-public class PowerlinkSubobject {
-
-    /**
-     * Node associated with this object.
-     */
-    private Node nodeInstance;
+public class PowerlinkSubobject extends AbstractPowerlinkObject {
 
     /**
      * Object associated with the sub-object.
@@ -96,6 +96,16 @@ public class PowerlinkSubobject {
     private final String dataType;
 
     /**
+     * Flag to indicate that this object is TPDO mappable or not.
+     */
+    private boolean isTpdoMappable = false;
+
+    /**
+     * Flag to indicate that this object is RPDO mappable or not.
+     */
+    private boolean isRpdoMappable = false;
+
+    /**
      * Constructs a POWERLINK SubObject.
      *
      * @param nodeInstance Node linked with the subobject.
@@ -104,7 +114,8 @@ public class PowerlinkSubobject {
      */
     public PowerlinkSubobject(Node nodeInstance, PowerlinkObject object,
             TObject.SubObject subObject) {
-        this.nodeInstance = nodeInstance;
+        super(nodeInstance);
+
         if (nodeInstance != null) {
             project = nodeInstance.getProject();
         }
@@ -117,14 +128,46 @@ public class PowerlinkSubobject {
         subobjectIdShort = Short.parseShort(subobjectIdRaw, 16);
         subobjectId = "0x" + subobjectIdRaw;
         readableName = (this.subObject.getName() + " (" + subobjectId + ")");
-        xpath = "//plk:Object[@index='" + getObjectIdRaw() + "']"
-                + "/plk:SubObject[@subIndex='" + subobjectIdRaw + "']";
+        xpath = object.getXpath() + "/plk:SubObject[@subIndex='"
+                + subobjectIdRaw + "']";
         if (this.subObject.getDataType() != null) {
             dataType = ObjectDatatype.getDatatypeName(DatatypeConverter
                     .printHexBinary(getSubObject().getDataType()));
         } else {
             dataType = "";
         }
+
+        TObjectPDOMapping pdoMapping = subObject.getPDOmapping();
+        TObjectAccessType accessType = subObject.getAccessType();
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.RPDO))) {
+
+            if (subObject.getUniqueIDRef() != null) {
+                isRpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RW)
+                        || (accessType == TObjectAccessType.WO)) {
+                    isRpdoMappable = true;
+                }
+            }
+
+        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.TPDO))) {
+            if (subObject.getUniqueIDRef() != null) {
+                isTpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RO)
+                        || (accessType == TObjectAccessType.RW)) {
+                    isTpdoMappable = true;
+                }
+            }
+        }
+    }
+
+    public TObjectAccessType getAccessType() {
+        return subObject.getAccessType();
     }
 
     /**
@@ -149,6 +192,10 @@ public class PowerlinkSubobject {
 
     public String getDatatype() {
         return dataType;
+    }
+
+    public String getDefaultValue() {
+        return subObject.getDefaultValue();
     }
 
     public String getNetworkId() {
@@ -179,8 +226,30 @@ public class PowerlinkSubobject {
         return object.getObjectIndex();
     }
 
+    public TObjectPDOMapping getPdoMapping() {
+        return subObject.getPDOmapping();
+    }
+
     public IProject getProject() {
         return project;
+    }
+
+    /**
+     * @return the size of the object based on the datatype.
+     */
+    public long getSize() {
+        long size[] = new long[2];
+        Result res = OpenConfiguratorCore.GetInstance().GetObjectSize(
+                nodeInstance.getNetworkId(), nodeInstance.getNodeId(),
+                object.getObjectId(), size);
+        if (!res.IsSuccessful()) {
+            System.err.println("Error getting the Size "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+        } else {
+            return size[0];
+        }
+
+        return 0;
     }
 
     public short getSubobjecId() {
@@ -203,8 +272,25 @@ public class PowerlinkSubobject {
         return readableName;
     }
 
+    /**
+     * @return Returns the unique name of the object by adding the object name,
+     *         id and sub-object name and id.
+     */
+    public String getUniqueName() {
+        return object.getObject().getName() + "_" + subObject.getName() + "("
+                + object.getObjectIndex() + "/" + subobjectId + ")";
+    }
+
     public String getXpath() {
         return xpath;
+    }
+
+    public boolean isRpdoMappable() {
+        return isRpdoMappable;
+    }
+
+    public boolean isTpdoMappable() {
+        return isTpdoMappable;
     }
 
     /**

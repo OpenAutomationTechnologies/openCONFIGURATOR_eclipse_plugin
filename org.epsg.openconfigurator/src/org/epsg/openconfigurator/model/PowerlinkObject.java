@@ -40,6 +40,8 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
 
 /**
  * Wrapper class for a POWERLINK object.
@@ -47,12 +49,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
  * @author Ramakrishnan P
  *
  */
-public class PowerlinkObject {
-
-    /**
-     * Node associated with this object.
-     */
-    private final Node nodeInstance;
+public class PowerlinkObject extends AbstractPowerlinkObject {
 
     /**
      * Object model from the XDC.
@@ -68,6 +65,16 @@ public class PowerlinkObject {
      * List of sub-objects available in the node.
      */
     private final List<PowerlinkSubobject> subObjectsList = new ArrayList<PowerlinkSubobject>();
+
+    /**
+     * TPDO mappable subobjects list.
+     */
+    private final List<PowerlinkSubobject> tpdoMappableObjectList = new ArrayList<PowerlinkSubobject>();
+
+    /**
+     * RPDO mappable subobjects list.
+     */
+    private final List<PowerlinkSubobject> rpdoMappableObjectList = new ArrayList<PowerlinkSubobject>();
 
     /**
      * Object ID in hex without 0x.
@@ -100,17 +107,28 @@ public class PowerlinkObject {
     private final String dataType;
 
     /**
+     * Flag to indicate that this object is TPDO mappable or not.
+     */
+    private boolean isTpdoMappable = false;
+
+    /**
+     * Flag to indicate that this object is RPDO mappable or not.
+     */
+    private boolean isRpdoMappable = false;
+
+    /**
      * Constructs a POWERLINK object.
      *
      * @param nodeInstance Node linked with the object.
      * @param object The Object model available in the XDC.
      */
     public PowerlinkObject(Node nodeInstance, TObject object) {
+        super(nodeInstance);
+
         if ((nodeInstance == null) || (object == null)) {
             throw new IllegalArgumentException();
         }
 
-        this.nodeInstance = nodeInstance;
         project = nodeInstance.getProject();
 
         this.object = object;
@@ -131,6 +149,40 @@ public class PowerlinkObject {
             PowerlinkSubobject obj = new PowerlinkSubobject(nodeInstance, this,
                     subObject);
             subObjectsList.add(obj);
+
+            if (obj.isRpdoMappable()) {
+                rpdoMappableObjectList.add(obj);
+            } else if (obj.isTpdoMappable()) {
+                tpdoMappableObjectList.add(obj);
+            }
+        }
+
+        if (((object.getPDOmapping() == TObjectPDOMapping.DEFAULT)
+                || (object.getPDOmapping() == TObjectPDOMapping.OPTIONAL)
+                || (object.getPDOmapping() == TObjectPDOMapping.RPDO))) {
+
+            if (object.getUniqueIDRef() != null) {
+                isRpdoMappable = true;
+            } else {
+                if ((object.getAccessType() == TObjectAccessType.RW)
+                        || (object.getAccessType() == TObjectAccessType.WO)) {
+                    isRpdoMappable = true;
+                }
+            }
+
+        } else if (((object.getPDOmapping() == TObjectPDOMapping.DEFAULT)
+                || (object.getPDOmapping() == TObjectPDOMapping.OPTIONAL)
+                || (object.getPDOmapping() == TObjectPDOMapping.TPDO))) {
+
+            if (object.getUniqueIDRef() != null) {
+                isTpdoMappable = true;
+            } else {
+                if ((object.getAccessType() == TObjectAccessType.RO)
+                        || (object.getAccessType() == TObjectAccessType.RW)) {
+                    isTpdoMappable = true;
+                }
+            }
+
         }
     }
 
@@ -174,8 +226,16 @@ public class PowerlinkObject {
         return objectId;
     }
 
+    public short getObjectType() {
+        return object.getObjectType();
+    }
+
     public IProject getProject() {
         return project;
+    }
+
+    public List<PowerlinkSubobject> getRpdoMappableObjectList() {
+        return rpdoMappableObjectList;
     }
 
     /**
@@ -208,11 +268,31 @@ public class PowerlinkObject {
         return readableName;
     }
 
+    public List<PowerlinkSubobject> getTpdoMappableObjectList() {
+        return tpdoMappableObjectList;
+    }
+
     /**
      * @return The XPath to find this object in the XDC.
      */
     public String getXpath() {
         return xpath;
+    }
+
+    public boolean hasRpdoMappableSubObjects() {
+        return !rpdoMappableObjectList.isEmpty();
+    }
+
+    public boolean hasTpdoMappableSubObjects() {
+        return !tpdoMappableObjectList.isEmpty();
+    }
+
+    public boolean isRpdoMappable() {
+        return isRpdoMappable;
+    }
+
+    public boolean isTpdoMappable() {
+        return isTpdoMappable;
     }
 
     /**
@@ -225,7 +305,7 @@ public class PowerlinkObject {
 
         if (writeToXdc) {
             OpenConfiguratorProjectUtils.updateObjectAttributeValue(getNode(),
-                getObjectIdRaw(), false, StringUtils.EMPTY, actualValue);
+                    getObjectIdRaw(), false, StringUtils.EMPTY, actualValue);
         }
 
         object.setActualValue(actualValue);

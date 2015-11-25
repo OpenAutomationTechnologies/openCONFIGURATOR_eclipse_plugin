@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.xmloperation;
 
+import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.jdom2.Attribute;
@@ -59,10 +60,22 @@ public class XddJdomOperation {
      * @param document XDD/XDC file instance.
      */
     public static void deleteActualValue(Document document) {
-        JDomUtil.removeAttribute(document, "//plk:Object[@actualValue]",
+        JDomUtil.removeAttribute(document,
+                "//plk:Object[@" + ACTUAL_VALUE + "]", POWERLINK_XDD_NAMESPACE,
+                ACTUAL_VALUE);
+        JDomUtil.removeAttribute(document,
+                "//plk:SubObject[@ " + ACTUAL_VALUE + "]",
                 POWERLINK_XDD_NAMESPACE, ACTUAL_VALUE);
-        JDomUtil.removeAttribute(document, "//plk:SubObject[@actualValue]",
-                POWERLINK_XDD_NAMESPACE, ACTUAL_VALUE);
+    }
+
+    public static void deleteMappingChannelActualValue(Document document,
+            PdoChannel pdoChannel) {
+
+        PowerlinkObject powerlinkObj = pdoChannel.getMappingParam();
+        String xpath = powerlinkObj.getXpath() + "/plk:SubObject[@"
+                + ACTUAL_VALUE + "]";
+        JDomUtil.removeAttributes(document, xpath, POWERLINK_XDD_NAMESPACE,
+                ACTUAL_VALUE);
     }
 
     /**

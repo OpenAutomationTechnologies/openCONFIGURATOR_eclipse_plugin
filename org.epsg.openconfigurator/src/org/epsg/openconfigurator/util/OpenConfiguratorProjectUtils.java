@@ -72,6 +72,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
@@ -1019,6 +1020,135 @@ public final class OpenConfiguratorProjectUtils {
                     new FileWriter(node.getAbsolutePathToXdc()));
 
         } catch (JDOMException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Updates the actual values available in the mapping param of the given PDO
+     * channel.
+     *
+     * @param pdoChannel The channel to be updated.
+     */
+    public static void updatePdoChannelActualValue(
+            final PdoChannel pdoChannel) {
+
+        try {
+
+            File xdcFile = new File(
+                    pdoChannel.getNode().getAbsolutePathToXdc());
+
+            Reader reader = new InputStreamReader(new FileInputStream(xdcFile),
+                    IPowerlinkProjectSupport.UTF8_ENCODING);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xdcFile.toURI().toString());
+
+            SAXBuilder builder = new SAXBuilder();
+            Document document = builder.build(input);
+
+            // Delete the mapping actual values from the model.
+            List<PowerlinkSubobject> subObjList = pdoChannel.getMappingParam()
+                    .getSubObjects();
+            if (!subObjList.isEmpty()) {
+                for (PowerlinkSubobject subObj : subObjList) {
+                    subObj.setActualValue(null, false);
+                }
+            }
+            // Delete the mapping actual values from the XDC file.
+            XddJdomOperation.deleteMappingChannelActualValue(document,
+                    pdoChannel);
+
+            ObjectCollection objectCollection = new ObjectCollection();
+
+            Result res = OpenConfiguratorCore.GetInstance()
+                    .GetChannelActualValues(pdoChannel.getNode().getNetworkId(),
+                            pdoChannel.getNode().getNodeId(),
+                            OpenConfiguratorLibraryUtils
+                                    .getDirection(pdoChannel.getPdoType()),
+                            pdoChannel.getChannelNumber(), objectCollection);
+
+            if (!res.IsSuccessful()) {
+                System.err.println("--GetChannelActualValues:"
+                        + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+                return;
+            }
+
+            System.err.println("Size of the object to be written to XDC= "
+                    + objectCollection.size());
+
+            java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
+
+            for (MapIterator iterator = objectCollection.iterator(); iterator
+                    .hasNext();) {
+                String actualValue = iterator.GetValue();
+
+                Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+                        iterator.GetKey().getFirst(),
+                        iterator.GetKey().getSecond());
+                objectJCollection.put(entryVal, actualValue);
+                iterator.next();
+            }
+
+            for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
+                    .entrySet()) {
+                String actualValue = objectJcollectionEntry.getValue();
+                System.out.println("Actual value ---------" + actualValue);
+                long objectIdLong = objectJcollectionEntry.getKey().getKey();
+
+                boolean isSubObject = false;
+                int subObjectIdShort = objectJcollectionEntry.getKey()
+                        .getValue();
+                if (subObjectIdShort != -1) {
+                    isSubObject = true;
+                }
+
+                PowerlinkObject object = pdoChannel.getNode()
+                        .getObjects(objectIdLong);
+                if (object != null) {
+
+                    if (!isSubObject) {
+                        object.setActualValue(actualValue, false);
+                        XddJdomOperation.updateActualValue(document, object,
+                                actualValue);
+                    } else {
+                        PowerlinkSubobject subObj = object
+                                .getSubObject((short) subObjectIdShort);
+                        if (subObj != null) {
+                            subObj.setActualValue(actualValue, false);
+                            XddJdomOperation.updateActualValue(document, subObj,
+                                    actualValue);
+                        } else {
+                            System.err.println("SubObject 0x"
+                                    + String.format("%04X", objectIdLong)
+                                    + "/0x"
+                                    + String.format("%02X", subObjectIdShort)
+                                    + "does not exists in the XDC");
+                        }
+                    }
+                } else {
+                    System.err.println(
+                            "Object 0x" + String.format("%04X", objectIdLong)
+                                    + "does not exists in the XDC");
+                }
+            }
+
+            XMLOutputter xmlOutput = new XMLOutputter();
+
+            // display nice
+            xmlOutput.setFormat(Format.getPrettyFormat());
+            xmlOutput.output(document,
+                    new FileWriter(xdcFile.getAbsolutePath()));
+
+        } catch (JDOMException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+        try {
+            pdoChannel.getNode().getProject().refreshLocal(
+                    IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        } catch (CoreException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }

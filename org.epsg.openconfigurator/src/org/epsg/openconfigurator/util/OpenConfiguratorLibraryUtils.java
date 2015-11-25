@@ -44,6 +44,7 @@ import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.epsg.openconfigurator.lib.wrapper.AccessType;
 import org.epsg.openconfigurator.lib.wrapper.CNFeatureEnum;
+import org.epsg.openconfigurator.lib.wrapper.Direction;
 import org.epsg.openconfigurator.lib.wrapper.DynamicChannelAccessType;
 import org.epsg.openconfigurator.lib.wrapper.GeneralFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.IEC_Datatype;
@@ -56,6 +57,10 @@ import org.epsg.openconfigurator.lib.wrapper.ParameterAccess;
 import org.epsg.openconfigurator.lib.wrapper.PlkDataType;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PdoChannel;
+import org.epsg.openconfigurator.model.PdoType;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
@@ -1244,6 +1249,45 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
+     * Clears the mapping values in the given channel.
+     *
+     * @param channel The channel values to be cleared.
+     * @return The result from the library.
+     */
+    public static Result clearChannelMapping(PdoChannel channel) {
+        System.out
+                .println("ClearMappingChannel: " + channel.getNode().getNodeId()
+                        + " Direction:" + getDirection(channel.getPdoType())
+                        + " ChannelNumber:" + channel.getChannelNumber());
+        return OpenConfiguratorCore.GetInstance().ClearMappingChannel(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber());
+    }
+
+    /**
+     * Clears the mapping values present in the given subobject.
+     *
+     * @param channel The mapping channel.
+     * @param mappingSubObject The subobject for which the values has to be
+     *            cleared.
+     * @return The result from the library.
+     */
+    public static Result clearSelectedmappingobject(PdoChannel channel,
+            PowerlinkSubobject mappingSubObject) {
+
+        System.out
+                .println("ClearMappingObject: " + channel.getNode().getNodeId()
+                        + " Direction:" + getDirection(channel.getPdoType())
+                        + " ChannelNumber:" + channel.getChannelNumber()
+                        + " Position:" + mappingSubObject.getSubobjecId());
+
+        return OpenConfiguratorCore.GetInstance().ClearMappingObject(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber(),
+                mappingSubObject.getSubobjecId());
+    }
+
+    /**
      * Get the library compatible accessType for the one in the XDC.
      *
      * @param accessTypeXdc AccessType from the XDC.
@@ -1271,6 +1315,44 @@ public class OpenConfiguratorLibraryUtils {
             }
         }
         return accessType;
+    }
+
+    /**
+     * @param channel The mapping channel.
+     * @return The total size of channel.
+     */
+    public static long getChannelSize(PdoChannel channel) {
+        long[] tempSize = new long[1];
+        Result res = OpenConfiguratorCore.GetInstance().GetChannelSize(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber(),
+                tempSize);
+
+        return tempSize[0];
+    }
+
+    /**
+     * Get the library compatible Direction based on the given PDO type.
+     *
+     * @param pdoType The PDO type.
+     * @return Library compatible Direction.
+     */
+    public static Direction getDirection(PdoType pdoType) {
+        Direction dir;
+        switch (pdoType) {
+            case TPDO:
+                dir = Direction.TX;
+                break;
+            case RPDO:
+                dir = Direction.RX;
+                break;
+            default:
+                dir = Direction.RX;
+                System.err.println("Invalid PDO type.");
+                break;
+        }
+
+        return dir;
     }
 
     /**
@@ -1764,6 +1846,95 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
+     * Map all available objects for the given channel.
+     *
+     * @param channel Mapping channel.
+     * @return Result from the library.
+     */
+    public static Result mappAvailableObjects(PdoChannel channel) {
+        return OpenConfiguratorCore.GetInstance().MapAllObjectsToChannel(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber(),
+                true);
+    }
+
+    /**
+     * Map the given object to the given channel.
+     *
+     * @param channel The channel in which the object to be mapped.
+     * @param mappingSubObject The mapping sub-object in which the mapping value
+     *            has to be persisted.
+     * @param objectToBeMapped The object to be mapped.
+     * @return Result from the library.
+     */
+    public static Result mappObjectToChannel(PdoChannel channel,
+            PowerlinkSubobject mappingSubObject,
+            PowerlinkObject objectToBeMapped) {
+        System.out.println("mappObjectToChannel ->ChannelNumber:"
+                + channel.getChannelNumber() + channel.getPdoType() + " "
+                + mappingSubObject.getObjectIndex() + "/"
+                + mappingSubObject.getSubobjectIndex() + " --- "
+                + objectToBeMapped.getObjectIndex());
+
+        return OpenConfiguratorCore.GetInstance().MapObjectToChannel(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber(),
+                mappingSubObject.getSubobjecId(),
+                objectToBeMapped.getObjectId(), channel.getTargetNodeId(),
+                true);
+    }
+
+    /**
+     * Map the given sub-object to the given channel.
+     *
+     * @param channel The channel in which the object to be mapped.
+     * @param mappingSubObject The mapping sub-object in which the mapping value
+     *            has to be persisted.
+     * @param subObjectTobeMapped The sub-object to be mapped.
+     * @return Result from the library.
+     */
+    public static Result mappSubObjectToChannel(PdoChannel channel,
+            PowerlinkSubobject mappingSubObject,
+            PowerlinkSubobject subObjectTobeMapped) {
+
+        System.out.println("MappSubObjectToChannel ->ChannelNumber:"
+                + channel.getChannelNumber() + channel.getPdoType() + " "
+                + mappingSubObject.getObjectIndex() + "/"
+                + mappingSubObject.getSubobjectIndex() + " --- "
+                + subObjectTobeMapped.getObjectIndex() + "/"
+                + subObjectTobeMapped.getSubobjectIndex());
+
+        return OpenConfiguratorCore.GetInstance().MapSubObjectToChannel(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber(),
+                mappingSubObject.getSubobjecId(),
+                subObjectTobeMapped.getObjectId(),
+                subObjectTobeMapped.getSubobjecId(), channel.getTargetNodeId(),
+                true);
+    }
+
+    /**
+     * Move the mapping from the current position to the new position.
+     *
+     * @param channel The channel in which the object to be mapped.
+     * @param currentPosition The current position of the value to be moved.
+     * @param newPosition The new position of the value.
+     * @return Result from the library.
+     */
+    public static Result moveMappingObject(PdoChannel channel,
+            int currentPosition, int newPosition) {
+        System.out.println("MoveMappingObject -> Node:"
+                + channel.getNode().getNodeId() + " Direction:"
+                + getDirection(channel.getPdoType()) + " ChannelNumber:"
+                + channel.getChannelNumber() + " CurrentPosition:"
+                + currentPosition + " NewPosition:" + newPosition);
+        return OpenConfiguratorCore.GetInstance().MoveMappingObject(
+                channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
+                getDirection(channel.getPdoType()), channel.getChannelNumber(),
+                currentPosition, newPosition);
+    }
+
+    /**
      * Remove the node from the library.
      *
      * @param node The node instance.
@@ -1776,7 +1947,7 @@ public class OpenConfiguratorLibraryUtils {
 
     /**
      * Add or remove the node assignment value.
-     * 
+     *
      * @param nodeAssign The node assignment value to be added or removed.
      * @param node Node to which the value to be applied.
      * @param value <code> true</code> to add the node assignment value,
@@ -1796,6 +1967,29 @@ public class OpenConfiguratorLibraryUtils {
                     .RemoveNodeAssignment(networkId, nodeId, nodeAssign);
         }
         return libApiRes;
+    }
+
+    /**
+     * Set the actual value of the sub-object into the library.
+     *
+     * @param plkSubObject The sub-object.
+     * @param actualValue The value to be updated in the library.
+     * @return Result from the library.
+     */
+    public static Result setSubObjectActualValue(
+            PowerlinkSubobject plkSubObject, String actualValue) {
+        System.out.println("Set SubObject ActualValue--- "
+                + plkSubObject.getObjectIdRaw() + "/"
+                + plkSubObject.getSubobjectIdRaw() + " Value:" + actualValue);
+        Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
+                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
+                actualValue);
+        if (res.IsSuccessful()) {
+            plkSubObject.setActualValue(actualValue, true);
+        }
+
+        return res;
     }
 
     /**
