@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 *******************************************************************************
- EPSG - ETHERNET Powerlink Standardization Group
+ EPSG - Ethernet POWERLINK Standardization Group
  Working Group Tools - Subgroup of Technical Working Group
 *******************************************************************************
 
- ETHERNET Powerlink XML device description
+ Ethernet POWERLINK XML device description
 
 *******************************************************************************
 
  File:        Powerlink_Main.xsd
- Version:     0.13
+ Version:     0.15
 
  The version number applies to the whole XML schema. So the version number
  of all file must be identical.
@@ -20,19 +20,25 @@
  For a complete schema description the following files are needed:
  - Powerlink_Main.xsd
  - CommonElements.xsd
+ - CommonElements_Modular.xsd
  - ISO15745ProfileContainer.xsd
  - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_Device_Powerlink_Modular_Head.xsd
+ - ProfileBody_Device_Powerlink_Modular_Child.xsd
  - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd
  - TextResource.xsd
 
 *******************************************************************************
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.ethernet-powerlink.org"
-            xmlns="http://www.ethernet-powerlink.org"
-            elementFormDefault="qualified">
-  <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
-  <xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
-  <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
-  <xsd:include schemaLocation="TextResource.xsd"/>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
+    <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_Device_Powerlink_Modular_Head.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_Device_Powerlink_Modular_Child.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd"/>
+    <xsd:include schemaLocation="TextResource.xsd"/>
 </xsd:schema>

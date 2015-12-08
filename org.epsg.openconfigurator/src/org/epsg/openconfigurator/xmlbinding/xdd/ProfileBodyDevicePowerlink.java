@@ -37,6 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;/restriction&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
+ *       &lt;attribute name="specificationVersion" type="{http://www.ethernet-powerlink.org}t_specificationVersion" default="1.0.4" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -69,6 +70,8 @@ public class ProfileBodyDevicePowerlink
     @XmlAttribute(name = "deviceClass")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     protected String deviceClass;
+    @XmlAttribute(name = "specificationVersion")
+    protected String specificationVersion;
 
     /**
      * Gets the value of the deviceIdentity property.
@@ -227,6 +230,34 @@ public class ProfileBodyDevicePowerlink
      */
     public void setDeviceClass(String value) {
         this.deviceClass = value;
+    }
+
+    /**
+     * Gets the value of the specificationVersion property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSpecificationVersion() {
+        if (specificationVersion == null) {
+            return "1.0.4";
+        } else {
+            return specificationVersion;
+        }
+    }
+
+    /**
+     * Sets the value of the specificationVersion property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSpecificationVersion(String value) {
+        this.specificationVersion = value;
     }
 
 }

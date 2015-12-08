@@ -27,9 +27,9 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *       &lt;attribute name="fileCreator" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="fileCreationDate" use="required" type="{http://www.w3.org/2001/XMLSchema}date" /&gt;
  *       &lt;attribute name="fileCreationTime" type="{http://www.w3.org/2001/XMLSchema}time" /&gt;
+ *       &lt;attribute name="fileModifiedBy" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="fileModificationDate" type="{http://www.w3.org/2001/XMLSchema}date" /&gt;
  *       &lt;attribute name="fileModificationTime" type="{http://www.w3.org/2001/XMLSchema}time" /&gt;
- *       &lt;attribute name="fileModifiedBy" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="fileVersion" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="supportedLanguages"&gt;
  *         &lt;simpleType&gt;
@@ -47,7 +47,11 @@ import javax.xml.datatype.XMLGregorianCalendar;
 @XmlType(name = "ProfileBody_DataType")
 @XmlSeeAlso({
     ProfileBodyDevicePowerlink.class,
-    ProfileBodyCommunicationNetworkPowerlink.class
+    ProfileBodyCommunicationNetworkPowerlink.class,
+    ProfileBodyDevicePowerlinkModularHead.class,
+    ProfileBodyDevicePowerlinkModularChild.class,
+    ProfileBodyCommunicationNetworkPowerlinkModularHead.class,
+    ProfileBodyCommunicationNetworkPowerlinkModularChild.class
 })
 public abstract class ProfileBodyDataType {
 
@@ -65,14 +69,14 @@ public abstract class ProfileBodyDataType {
     @XmlAttribute(name = "fileCreationTime")
     @XmlSchemaType(name = "time")
     protected XMLGregorianCalendar fileCreationTime;
+    @XmlAttribute(name = "fileModifiedBy")
+    protected String fileModifiedBy;
     @XmlAttribute(name = "fileModificationDate")
     @XmlSchemaType(name = "date")
     protected XMLGregorianCalendar fileModificationDate;
     @XmlAttribute(name = "fileModificationTime")
     @XmlSchemaType(name = "time")
     protected XMLGregorianCalendar fileModificationTime;
-    @XmlAttribute(name = "fileModifiedBy")
-    protected String fileModifiedBy;
     @XmlAttribute(name = "fileVersion", required = true)
     protected String fileVersion;
     @XmlAttribute(name = "supportedLanguages")
@@ -231,6 +235,30 @@ public abstract class ProfileBodyDataType {
     }
 
     /**
+     * Gets the value of the fileModifiedBy property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getFileModifiedBy() {
+        return fileModifiedBy;
+    }
+
+    /**
+     * Sets the value of the fileModifiedBy property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setFileModifiedBy(String value) {
+        this.fileModifiedBy = value;
+    }
+
+    /**
      * Gets the value of the fileModificationDate property.
      * 
      * @return
@@ -276,30 +304,6 @@ public abstract class ProfileBodyDataType {
      */
     public void setFileModificationTime(XMLGregorianCalendar value) {
         this.fileModificationTime = value;
-    }
-
-    /**
-     * Gets the value of the fileModifiedBy property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getFileModifiedBy() {
-        return fileModifiedBy;
-    }
-
-    /**
-     * Sets the value of the fileModifiedBy property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setFileModifiedBy(String value) {
-        this.fileModifiedBy = value;
     }
 
     /**

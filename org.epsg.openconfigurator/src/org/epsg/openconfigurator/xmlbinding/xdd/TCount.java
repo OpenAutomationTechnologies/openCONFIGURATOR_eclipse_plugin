@@ -57,10 +57,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 public class TCount {
 
     @XmlElements({
-        @XmlElement(name = "label", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Label.class),
-        @XmlElement(name = "description", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Description.class),
-        @XmlElement(name = "labelRef", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.LabelRef.class),
-        @XmlElement(name = "descriptionRef", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.DescriptionRef.class)
+        @XmlElement(name = "label", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.Label.class),
+        @XmlElement(name = "description", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.Description.class),
+        @XmlElement(name = "labelRef", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.LabelRef.class),
+        @XmlElement(name = "descriptionRef", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.DescriptionRef.class)
     })
     protected List<Object> labelOrDescriptionOrLabelRef;
     @XmlElement(required = true)
@@ -93,10 +93,10 @@ public class TCount {
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Label }
-     * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Description }
-     * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.LabelRef }
-     * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.DescriptionRef }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.Label }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.Description }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.LabelRef }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.DescriptionRef }
      * 
      * 
      */

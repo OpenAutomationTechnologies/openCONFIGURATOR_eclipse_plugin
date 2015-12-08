@@ -33,8 +33,10 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="NMTNetTime" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTNetTimeIsRealTime" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTRelativeTime" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="NMTServiceUdpIp" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTSimpleBoot" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *       &lt;attribute name="PDOTPDOChannels" type="{http://www.w3.org/2001/XMLSchema}unsignedShort" default="256" /&gt;
+ *       &lt;attribute name="NMTMNDNA" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTMNRedundancy" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
@@ -87,11 +89,15 @@ public class TMNFeatures {
     protected Boolean nmtNetTimeIsRealTime;
     @XmlAttribute(name = "NMTRelativeTime")
     protected Boolean nmtRelativeTime;
+    @XmlAttribute(name = "NMTServiceUdpIp")
+    protected Boolean nmtServiceUdpIp;
     @XmlAttribute(name = "NMTSimpleBoot", required = true)
     protected boolean nmtSimpleBoot;
     @XmlAttribute(name = "PDOTPDOChannels")
     @XmlSchemaType(name = "unsignedShort")
     protected Integer pdotpdoChannels;
+    @XmlAttribute(name = "NMTMNDNA")
+    protected Boolean nmtmndna;
     @XmlAttribute(name = "NMTMNRedundancy")
     protected Boolean nmtmnRedundancy;
 
@@ -460,6 +466,34 @@ public class TMNFeatures {
     }
 
     /**
+     * Gets the value of the nmtServiceUdpIp property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isNMTServiceUdpIp() {
+        if (nmtServiceUdpIp == null) {
+            return false;
+        } else {
+            return nmtServiceUdpIp;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtServiceUdpIp property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setNMTServiceUdpIp(Boolean value) {
+        this.nmtServiceUdpIp = value;
+    }
+
+    /**
      * Gets the value of the nmtSimpleBoot property.
      * 
      */
@@ -504,12 +538,40 @@ public class TMNFeatures {
     }
 
     /**
-     * Gets the value of the nmtmnRedundancy property.
-     *
+     * Gets the value of the nmtmndna property.
+     * 
      * @return
      *     possible object is
      *     {@link Boolean }
-     *
+     *     
+     */
+    public boolean isNMTMNDNA() {
+        if (nmtmndna == null) {
+            return false;
+        } else {
+            return nmtmndna;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtmndna property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setNMTMNDNA(Boolean value) {
+        this.nmtmndna = value;
+    }
+
+    /**
+     * Gets the value of the nmtmnRedundancy property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
      */
     public boolean isNMTMNRedundancy() {
         if (nmtmnRedundancy == null) {
@@ -521,11 +583,11 @@ public class TMNFeatures {
 
     /**
      * Sets the value of the nmtmnRedundancy property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link Boolean }
-     *
+     *     
      */
     public void setNMTMNRedundancy(Boolean value) {
         this.nmtmnRedundancy = value;

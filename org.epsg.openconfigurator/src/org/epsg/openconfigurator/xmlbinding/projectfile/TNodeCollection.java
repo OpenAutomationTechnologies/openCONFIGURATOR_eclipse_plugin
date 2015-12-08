@@ -12,11 +12,11 @@ import javax.xml.bind.annotation.XmlType;
 /**
  * The Node collection element is a container for all nodes in a POWERLINK
  *                 network.
- *
+ * 
  * <p>Java class for tNodeCollection complex type.
- *
+ * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * 
  * <pre>
  * &lt;complexType name="tNodeCollection"&gt;
  *   &lt;complexContent&gt;
@@ -30,8 +30,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tNodeCollection", propOrder = {
@@ -50,11 +50,11 @@ public class TNodeCollection {
 
     /**
      * Gets the value of the mn property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link TMN }
-     *
+     *     
      */
     public TMN getMN() {
         return mn;
@@ -62,11 +62,11 @@ public class TNodeCollection {
 
     /**
      * Sets the value of the mn property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link TMN }
-     *
+     *     
      */
     public void setMN(TMN value) {
         this.mn = value;
@@ -74,24 +74,25 @@ public class TNodeCollection {
 
     /**
      * Gets the value of the rmn property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the rmn property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getRMN().add(newItem);
      * </pre>
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link TRMN }
-     *
-     *
+     * 
+     * 
      */
     public List<TRMN> getRMN() {
         if (rmn == null) {
@@ -102,25 +103,25 @@ public class TNodeCollection {
 
     /**
      * Gets the value of the cn property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the cn property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getCN().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link TCN }
-     *
-     *
+     * 
+     * 
      */
     public List<TCN> getCN() {
         if (cn == null) {

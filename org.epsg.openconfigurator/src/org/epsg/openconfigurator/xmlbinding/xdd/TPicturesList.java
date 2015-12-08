@@ -8,8 +8,11 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
+import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 
 /**
@@ -28,6 +31,7 @@ import javax.xml.bind.annotation.XmlType;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *                 &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
  *                 &lt;attribute name="URI" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+ *                 &lt;attribute name="uniqueID" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *                 &lt;attribute name="number" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" /&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -91,6 +95,7 @@ public class TPicturesList {
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
      *       &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
      *       &lt;attribute name="URI" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
+     *       &lt;attribute name="uniqueID" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
      *       &lt;attribute name="number" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" /&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
@@ -106,15 +111,20 @@ public class TPicturesList {
     public static class Picture {
 
         @XmlElements({
-            @XmlElement(name = "label", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Label.class),
-            @XmlElement(name = "description", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Description.class),
-            @XmlElement(name = "labelRef", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.LabelRef.class),
-            @XmlElement(name = "descriptionRef", type = org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.DescriptionRef.class)
+            @XmlElement(name = "label", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.Label.class),
+            @XmlElement(name = "description", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.Description.class),
+            @XmlElement(name = "labelRef", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.LabelRef.class),
+            @XmlElement(name = "descriptionRef", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.DescriptionRef.class)
         })
         protected List<Object> labelOrDescriptionOrLabelRef;
         @XmlAttribute(name = "URI", required = true)
         @XmlSchemaType(name = "anyURI")
         protected String uri;
+        @XmlAttribute(name = "uniqueID")
+        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+        @XmlID
+        @XmlSchemaType(name = "ID")
+        protected String uniqueID;
         @XmlAttribute(name = "number")
         @XmlSchemaType(name = "unsignedInt")
         protected Long number;
@@ -137,10 +147,10 @@ public class TPicturesList {
          * 
          * <p>
          * Objects of the following type(s) are allowed in the list
-         * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Label }
-         * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.Description }
-         * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.LabelRef }
-         * {@link org.epsg.openconfigurator.xmlbinding.xdd.ErrorBitDataType.DescriptionRef }
+         * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.Label }
+         * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.Description }
+         * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.LabelRef }
+         * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.DescriptionRef }
          * 
          * 
          */
@@ -173,6 +183,30 @@ public class TPicturesList {
          */
         public void setURI(String value) {
             this.uri = value;
+        }
+
+        /**
+         * Gets the value of the uniqueID property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getUniqueID() {
+            return uniqueID;
+        }
+
+        /**
+         * Sets the value of the uniqueID property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setUniqueID(String value) {
+            this.uniqueID = value;
         }
 
         /**

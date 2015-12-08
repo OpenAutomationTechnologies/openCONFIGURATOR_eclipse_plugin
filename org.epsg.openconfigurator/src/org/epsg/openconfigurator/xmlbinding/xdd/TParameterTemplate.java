@@ -7,6 +7,7 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlSchemaType;
@@ -25,6 +26,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
+ *         &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
  *         &lt;choice minOccurs="0"&gt;
  *           &lt;group ref="{http://www.ethernet-powerlink.org}g_simple"/&gt;
  *           &lt;element name="dataTypeIDRef" type="{http://www.ethernet-powerlink.org}t_dataTypeIDRef"/&gt;
@@ -47,6 +49,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "t_parameterTemplate", propOrder = {
+    "labelOrDescriptionOrLabelRef",
     "bool",
     "bitstring",
     "_byte",
@@ -77,6 +80,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 })
 public class TParameterTemplate {
 
+    @XmlElements({
+        @XmlElement(name = "label", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.Label.class),
+        @XmlElement(name = "description", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.Description.class),
+        @XmlElement(name = "labelRef", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.LabelRef.class),
+        @XmlElement(name = "descriptionRef", type = org.epsg.openconfigurator.xmlbinding.xdd.Connector.DescriptionRef.class)
+    })
+    protected List<Object> labelOrDescriptionOrLabelRef;
     @XmlElement(name = "BOOL")
     protected Object bool;
     @XmlElement(name = "BITSTRING")
@@ -146,6 +156,38 @@ public class TParameterTemplate {
     @XmlIDREF
     @XmlSchemaType(name = "IDREF")
     protected Object templateIDRef;
+
+    /**
+     * Gets the value of the labelOrDescriptionOrLabelRef property.
+     * 
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the labelOrDescriptionOrLabelRef property.
+     * 
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getLabelOrDescriptionOrLabelRef().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.Label }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.Description }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.LabelRef }
+     * {@link org.epsg.openconfigurator.xmlbinding.xdd.Connector.DescriptionRef }
+     * 
+     * 
+     */
+    public List<Object> getLabelOrDescriptionOrLabelRef() {
+        if (labelOrDescriptionOrLabelRef == null) {
+            labelOrDescriptionOrLabelRef = new ArrayList<Object>();
+        }
+        return this.labelOrDescriptionOrLabelRef;
+    }
 
     /**
      * Gets the value of the bool property.

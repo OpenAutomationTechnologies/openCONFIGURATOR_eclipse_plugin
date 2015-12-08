@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 *******************************************************************************
- EPSG - ETHERNET Powerlink Standardization Group
+ EPSG - Ethernet POWERLINK Standardization Group
  Working Group Tools - Subgroup of Technical Working Group
 *******************************************************************************
 
- ETHERNET Powerlink XML device description
+ Ethernet POWERLINK XML device description
 
 *******************************************************************************
 
  File:        CommonElements.xsd
- Version:     0.13
+ Version:     0.15
 
  The version number applies to the whole XML schema. So the version number
  of all file must be identical.
@@ -20,207 +20,212 @@
  For a complete schema description the following files are needed:
  - Powerlink_Main.xsd
  - CommonElements.xsd
+ - CommonElements_Modular.xsd
  - ISO15745ProfileContainer.xsd
  - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_Device_Powerlink_Modular_Head.xsd
+ - ProfileBody_Device_Powerlink_Modular_Child.xsd
  - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd
  - TextResource.xsd
 
 *******************************************************************************
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.ethernet-powerlink.org"
-            xmlns="http://www.ethernet-powerlink.org"
-            elementFormDefault="qualified">
-
-  <!-- Common groups -->
-  <xsd:group name="g_labels">
-    <xsd:sequence>
-      <xsd:choice maxOccurs="unbounded">
-        <xsd:element name="label">
-          <xsd:annotation>
-            <xsd:documentation>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
+    <!-- Common groups -->
+    <xsd:group name="g_labels">
+        <xsd:sequence>
+            <xsd:choice maxOccurs="unbounded">
+                <xsd:element name="label">
+                    <xsd:annotation>
+                        <xsd:documentation>
               This element allows storage of the identifying name inside the XML file itself.
             </xsd:documentation>
-          </xsd:annotation>
-          <xsd:complexType>
-            <xsd:simpleContent>
-              <xsd:extension base="xsd:string">
-                <xsd:attribute name="lang" type="xsd:language" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:simpleContent>
+                            <xsd:extension base="xsd:string">
+                                <xsd:attribute name="lang" type="xsd:language" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       This attribute references the language used for the identifying text. This attribute consists of a combination of a language code (as defined in ISO 639-2) plus an optional dash character plus an optional country code (as defined in ISO 3166-1), ex: en-us, de, fr.
                     </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-              </xsd:extension>
-            </xsd:simpleContent>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="description">
-          <xsd:annotation>
-            <xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                            </xsd:extension>
+                        </xsd:simpleContent>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="description">
+                    <xsd:annotation>
+                        <xsd:documentation>
               This element allows storage of descriptive information inside the XML file itself.
             </xsd:documentation>
-          </xsd:annotation>
-          <xsd:complexType>
-            <xsd:simpleContent>
-              <xsd:extension base="xsd:string">
-                <xsd:attribute name="lang" type="xsd:language" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:simpleContent>
+                            <xsd:extension base="xsd:string">
+                                <xsd:attribute name="lang" type="xsd:language" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       This attribute references the language used for the descriptive information. This attribute consists of a combination of a language code (as defined in ISO 639-2) plus an optional dash character plus an optional country code (as defined in ISO 3166-1), ex: en-us, de, fr.
                     </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="URI" type="xsd:anyURI" use="optional">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                                <xsd:attribute name="URI" type="xsd:anyURI" use="optional">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       Optional link to further descriptive information.
                     </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-              </xsd:extension>
-            </xsd:simpleContent>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="labelRef">
-          <xsd:annotation>
-            <xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                            </xsd:extension>
+                        </xsd:simpleContent>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="labelRef">
+                    <xsd:annotation>
+                        <xsd:documentation>
               This element allows storage of identifying names inside an external text resource file.
             </xsd:documentation>
-          </xsd:annotation>
-          <xsd:complexType>
-            <xsd:simpleContent>
-              <xsd:extension base="xsd:anyURI">
-                <xsd:attribute name="dictID" type="xsd:NMTOKEN" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:simpleContent>
+                            <xsd:extension base="xsd:anyURI">
+                                <xsd:attribute name="dictID" type="xsd:NMTOKEN" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       This attribute references a single element inside the dictionaryList element. The dictionary element contains a link to the external text resource file.
                     </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="textID" type="xsd:NMTOKEN" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                                <xsd:attribute name="textID" type="xsd:NMTOKEN" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       This attribute references a chracter sequence inside the external text resource file by pattern matching.
                     </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-              </xsd:extension>
-            </xsd:simpleContent>
-          </xsd:complexType>
-        </xsd:element>
-        <xsd:element name="descriptionRef">
-          <xsd:annotation>
-            <xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                            </xsd:extension>
+                        </xsd:simpleContent>
+                    </xsd:complexType>
+                </xsd:element>
+                <xsd:element name="descriptionRef">
+                    <xsd:annotation>
+                        <xsd:documentation>
               This element allows storage of reference descriptive texts inside an external text resource file.
             </xsd:documentation>
-          </xsd:annotation>
-          <xsd:complexType>
-            <xsd:simpleContent>
-              <xsd:extension base="xsd:anyURI">
-                <xsd:attribute name="dictID" type="xsd:NMTOKEN" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                    </xsd:annotation>
+                    <xsd:complexType>
+                        <xsd:simpleContent>
+                            <xsd:extension base="xsd:anyURI">
+                                <xsd:attribute name="dictID" type="xsd:NMTOKEN" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       This attribute references a single element inside the dictionaryList element. The dictionary element contains a link to the external text resource file.
                     </xsd:documentation>
-                  </xsd:annotation>
-                </xsd:attribute>
-                <xsd:attribute name="textID" type="xsd:NMTOKEN" use="required">
-                  <xsd:annotation>
-                    <xsd:documentation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                                <xsd:attribute name="textID" type="xsd:NMTOKEN" use="required">
+                                    <xsd:annotation>
+                                        <xsd:documentation>
                       This attribute references a chracter sequence inside the external text resource file by pattern matching.
                     </xsd:documentation>
-                  </xsd:annotation>
+                                    </xsd:annotation>
+                                </xsd:attribute>
+                            </xsd:extension>
+                        </xsd:simpleContent>
+                    </xsd:complexType>
+                </xsd:element>
+            </xsd:choice>
+        </xsd:sequence>
+    </xsd:group>
+    <xsd:group name="g_simple">
+        <xsd:choice>
+            <xsd:element name="BOOL"/>
+            <xsd:element name="BITSTRING"/>
+            <xsd:element name="BYTE"/>
+            <xsd:element name="CHAR"/>
+            <xsd:element name="WORD"/>
+            <xsd:element name="DWORD"/>
+            <xsd:element name="LWORD"/>
+            <xsd:element name="SINT"/>
+            <xsd:element name="INT"/>
+            <xsd:element name="DINT"/>
+            <xsd:element name="LINT"/>
+            <xsd:element name="USINT"/>
+            <xsd:element name="UINT"/>
+            <xsd:element name="UDINT"/>
+            <xsd:element name="ULINT"/>
+            <xsd:element name="REAL"/>
+            <xsd:element name="LREAL"/>
+            <xsd:element name="STRING"/>
+            <xsd:element name="WSTRING"/>
+        </xsd:choice>
+    </xsd:group>
+    <!-- Common types -->
+    <xsd:complexType name="t_vendorID">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="t_deviceFamily">
+        <xsd:group ref="g_labels"/>
+        <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+    </xsd:complexType>
+    <xsd:complexType name="t_productID">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="t_version">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="versionType" use="required">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="SW">
+                                <xsd:annotation>
+                                    <xsd:documentation>Software</xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:enumeration>
+                            <xsd:enumeration value="FW">
+                                <xsd:annotation>
+                                    <xsd:documentation>Firmware</xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:enumeration>
+                            <xsd:enumeration value="HW">
+                                <xsd:annotation>
+                                    <xsd:documentation>Hardware</xsd:documentation>
+                                </xsd:annotation>
+                            </xsd:enumeration>
+                        </xsd:restriction>
+                    </xsd:simpleType>
                 </xsd:attribute>
-              </xsd:extension>
-            </xsd:simpleContent>
-          </xsd:complexType>
-        </xsd:element>
-      </xsd:choice>
-    </xsd:sequence>
-  </xsd:group>
-
-  <xsd:group name="g_simple">
-    <xsd:choice>
-      <xsd:element name="BOOL"/>
-      <xsd:element name="BITSTRING"/>
-      <xsd:element name="BYTE"/>
-      <xsd:element name="CHAR"/>
-      <xsd:element name="WORD"/>
-      <xsd:element name="DWORD"/>
-      <xsd:element name="LWORD"/>
-      <xsd:element name="SINT"/>
-      <xsd:element name="INT"/>
-      <xsd:element name="DINT"/>
-      <xsd:element name="LINT"/>
-      <xsd:element name="USINT"/>
-      <xsd:element name="UINT"/>
-      <xsd:element name="UDINT"/>
-      <xsd:element name="ULINT"/>
-      <xsd:element name="REAL"/>
-      <xsd:element name="LREAL"/>
-      <xsd:element name="STRING"/>
-      <xsd:element name="WSTRING"/>
-    </xsd:choice>
-  </xsd:group>
-
-  <!-- Common types -->
-  <xsd:complexType name="t_vendorID">
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:string">
-        <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
-      </xsd:extension>
-    </xsd:simpleContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="t_deviceFamily">
-    <xsd:group ref="g_labels"/>
-    <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
-  </xsd:complexType>
-
-  <xsd:complexType name="t_productID">
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:string">
-        <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
-      </xsd:extension>
-    </xsd:simpleContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="t_version">
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:string">
-        <xsd:attribute name="versionType" use="required">
-          <xsd:simpleType>
-            <xsd:restriction base="xsd:NMTOKEN">
-              <xsd:enumeration value="SW">
-                <xsd:annotation>
-                  <xsd:documentation>Software</xsd:documentation>
-                </xsd:annotation>
-              </xsd:enumeration>
-              <xsd:enumeration value="FW">
-                <xsd:annotation>
-                  <xsd:documentation>Firmware</xsd:documentation>
-                </xsd:annotation>
-              </xsd:enumeration>
-              <xsd:enumeration value="HW">
-                <xsd:annotation>
-                  <xsd:documentation>Hardware</xsd:documentation>
-                </xsd:annotation>
-              </xsd:enumeration>
-            </xsd:restriction>
-          </xsd:simpleType>
-        </xsd:attribute>
-        <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
-      </xsd:extension>
-    </xsd:simpleContent>
-  </xsd:complexType>
-
-  <xsd:complexType name="t_specificationRevision">
-    <xsd:simpleContent>
-      <xsd:extension base="xsd:string">
-        <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
-      </xsd:extension>
-    </xsd:simpleContent>
-  </xsd:complexType>
+                <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:complexType name="t_specificationRevision">
+        <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+                <xsd:attribute name="readOnly" type="xsd:boolean" default="true"/>
+            </xsd:extension>
+        </xsd:simpleContent>
+    </xsd:complexType>
+    <xsd:simpleType name="t_specificationVersion">
+        <xsd:annotation>
+            <xsd:documentation xml:lang="en">Defines the version of the XDD specification which is represented by the profile.
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="1.0.3"/>
+            <xsd:enumeration value="1.0.4"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 </xsd:schema>

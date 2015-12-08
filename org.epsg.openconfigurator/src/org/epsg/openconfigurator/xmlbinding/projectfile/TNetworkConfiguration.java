@@ -226,11 +226,11 @@ public class TNetworkConfiguration {
 
     /**
      * Gets the value of the lossOfSocTolerance property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link BigInteger }
-     *
+     *     
      */
     public BigInteger getLossOfSocTolerance() {
         if (lossOfSocTolerance == null) {
@@ -242,11 +242,11 @@ public class TNetworkConfiguration {
 
     /**
      * Sets the value of the lossOfSocTolerance property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link BigInteger }
-     *
+     *     
      */
     public void setLossOfSocTolerance(BigInteger value) {
         this.lossOfSocTolerance = value;

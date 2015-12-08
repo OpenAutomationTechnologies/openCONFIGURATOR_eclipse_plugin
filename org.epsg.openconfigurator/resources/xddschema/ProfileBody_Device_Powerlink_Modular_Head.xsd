@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+*******************************************************************************
+ EPSG - Ethernet POWERLINK Standardization Group
+ Working Group Tools - Subgroup of Technical Working Group
+*******************************************************************************
+
+ Ethernet POWERLINK XML device description
+
+*******************************************************************************
+
+ File:        ProfileBody_Device_Powerlink_Modular_Head.xsd
+ Version:     0.15
+
+ The version number applies to the whole XML schema. So the version number
+ of all file must be identical.
+
+*******************************************************************************
+
+ For a complete schema description the following files are needed:
+ - Powerlink_Main.xsd
+ - CommonElements.xsd
+ - CommonElements_Modular.xsd
+ - ISO15745ProfileContainer.xsd
+ - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_Device_Powerlink_Modular_Head.xsd
+ - ProfileBody_Device_Powerlink_Modular_Child.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd
+ - TextResource.xsd
+
+*******************************************************************************
+-->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xdd="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
+    <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+    <xsd:include schemaLocation="CommonElements_Modular.xsd"/>
+    <xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
+    <!-- POWERLINK profile body device -->
+    <xsd:complexType name="ProfileBody_Device_Powerlink_Modular_Head">
+        <xsd:complexContent>
+            <xsd:extension base="xdd:ProfileBody_DataType">
+                <xsd:sequence>
+                    <xsd:element name="DeviceIdentity" type="xdd:t_DeviceIdentity" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                The DeviceIdentity element contains attributes that are
+                independent of the network and of the process, and which
+                uniquely identify the device.
+              </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="DeviceManager" type="xdd:t_DeviceManager_Modular_Head" minOccurs="0">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                The DeviceManager element contains attributes and supports
+                services that enable the monitoring of the device.
+              </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="DeviceFunction" type="xdd:t_DeviceFunction" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                The DeviceFunction element describes the intrinsic function
+                of a device in terms of its technology. It contains network
+                independent descriptions/definitions of the technological
+                device functionality.
+              </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="ApplicationProcess" type="xdd:t_ApplicationProcess" minOccurs="0" maxOccurs="unbounded">
+                        <xsd:annotation>
+                            <xsd:documentation>
+                The ApplicationProcess element represents the set of services
+                and parameters, which constitute the behaviour and the
+                interfaces of the device in terms of the application,
+                independent of the device technology and the underlying
+                communication networks and communication protocols.
+              </xsd:documentation>
+                        </xsd:annotation>
+                    </xsd:element>
+                    <xsd:element name="ExternalProfileHandle" type="xdd:ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:sequence>
+                <xsd:attribute name="deviceClass" use="optional">
+                    <xsd:simpleType>
+                        <xsd:restriction base="xsd:NMTOKEN">
+                            <xsd:enumeration value="compact"/>
+                            <xsd:enumeration value="modular"/>
+                            <xsd:enumeration value="configurable"/>
+                        </xsd:restriction>
+                    </xsd:simpleType>
+                </xsd:attribute>
+                <xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- POWERLINK device manager -->
+    <xsd:complexType name="t_DeviceManager_Modular_Head">
+        <xsd:sequence>
+            <xsd:element name="indicatorList" type="xdd:t_indicatorList" minOccurs="0"/>
+            <xsd:element name="moduleManagement" type="xdd:t_moduleManagement"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <!-- Modular device support -->
+    <xsd:complexType name="t_moduleManagement">
+        <xsd:sequence>
+            <xsd:element name="interfaceList" type="xdd:t_interfaceList" minOccurs="1" maxOccurs="1"/>
+            <xsd:element name="moduleInterface" type="xdd:t_moduleInterface" minOccurs="0"/>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="t_interfaceList">
+        <xsd:sequence>
+            <xsd:element name="interface" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:group ref="xdd:g_labels"/>
+                        <xsd:element ref="xdd:fileList"/>
+                        <xsd:element ref="xdd:moduleTypeList"/>
+                        <xsd:element ref="xdd:connectedModuleList" minOccurs="0"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+                    <xsd:attribute name="maxModules" type="xsd:positiveInteger" use="required"/>
+                    <xsd:attribute name="unusedSlots" type="xsd:boolean" use="required"/>
+                    <xsd:attribute name="moduleAddressing" type="xdd:t_moduleAddressingHead" use="required"/>
+                    <xsd:attribute name="multipleModules" type="xsd:boolean" use="optional" default="true"/>
+                    <xsd:attribute name="identList" type="xdd:dt_ParameterIndex" use="optional"/>
+                    <xsd:attribute name="firmwareList" type="xdd:dt_ParameterIndex" use="optional"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="connectedModuleList">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="xdd:connectedModule" minOccurs="1" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+        <xsd:unique name="uniquePosition">
+            <xsd:selector xpath="./xdd:connectedModule"/>
+            <xsd:field xpath="@position"/>
+        </xsd:unique>
+    </xsd:element>
+    <xsd:element name="connectedModule">
+        <xsd:complexType>
+            <xsd:attribute name="childIDRef" type="xsd:string" use="required"/>
+            <xsd:attribute name="position" type="xsd:positiveInteger" use="required"/>
+            <xsd:attribute name="address" type="xsd:positiveInteger" use="optional"/>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>

@@ -1,7 +1,10 @@
 
 package org.epsg.openconfigurator.xmlbinding.xdd;
 
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.annotation.XmlElementDecl;
 import javax.xml.bind.annotation.XmlRegistry;
+import javax.xml.namespace.QName;
 
 
 /**
@@ -21,12 +24,21 @@ import javax.xml.bind.annotation.XmlRegistry;
 @XmlRegistry
 public class ObjectFactory {
 
+    private final static QName _Classification_QNAME = new QName("http://www.ethernet-powerlink.org", "classification");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: org.epsg.openconfigurator.xmlbinding.xdd
      * 
      */
     public ObjectFactory() {
+    }
+
+    /**
+     * Create an instance of {@link Connector }
+     * 
+     */
+    public Connector createConnector() {
+        return new Connector();
     }
 
     /**
@@ -38,11 +50,43 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ErrorBitDataType }
+     * Create an instance of {@link TObjectExtension }
      * 
      */
-    public ErrorBitDataType createErrorBitDataType() {
-        return new ErrorBitDataType();
+    public TObjectExtension createTObjectExtension() {
+        return new TObjectExtension();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersExtension }
+     * 
+     */
+    public TApplicationLayersExtension createTApplicationLayersExtension() {
+        return new TApplicationLayersExtension();
+    }
+
+    /**
+     * Create an instance of {@link TObjectExtensionHead }
+     * 
+     */
+    public TObjectExtensionHead createTObjectExtensionHead() {
+        return new TObjectExtensionHead();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersModularHead }
+     * 
+     */
+    public TApplicationLayersModularHead createTApplicationLayersModularHead() {
+        return new TApplicationLayersModularHead();
+    }
+
+    /**
+     * Create an instance of {@link TInterfaceList }
+     * 
+     */
+    public TInterfaceList createTInterfaceList() {
+        return new TInterfaceList();
     }
 
     /**
@@ -270,11 +314,131 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Connector.Label }
+     * 
+     */
+    public Connector.Label createConnectorLabel() {
+        return new Connector.Label();
+    }
+
+    /**
+     * Create an instance of {@link Connector.Description }
+     * 
+     */
+    public Connector.Description createConnectorDescription() {
+        return new Connector.Description();
+    }
+
+    /**
+     * Create an instance of {@link Connector.LabelRef }
+     * 
+     */
+    public Connector.LabelRef createConnectorLabelRef() {
+        return new Connector.LabelRef();
+    }
+
+    /**
+     * Create an instance of {@link Connector.DescriptionRef }
+     * 
+     */
+    public Connector.DescriptionRef createConnectorDescriptionRef() {
+        return new Connector.DescriptionRef();
+    }
+
+    /**
+     * Create an instance of {@link Firmware }
+     * 
+     */
+    public Firmware createFirmware() {
+        return new Firmware();
+    }
+
+    /**
      * Create an instance of {@link TextResource.TextEntry }
      * 
      */
     public TextResource.TextEntry createTextResourceTextEntry() {
         return new TextResource.TextEntry();
+    }
+
+    /**
+     * Create an instance of {@link org.epsg.openconfigurator.xmlbinding.xdd.File }
+     * 
+     */
+    public org.epsg.openconfigurator.xmlbinding.xdd.File createFile() {
+        return new org.epsg.openconfigurator.xmlbinding.xdd.File();
+    }
+
+    /**
+     * Create an instance of {@link FileList }
+     * 
+     */
+    public FileList createFileList() {
+        return new FileList();
+    }
+
+    /**
+     * Create an instance of {@link ModuleTypeList }
+     * 
+     */
+    public ModuleTypeList createModuleTypeList() {
+        return new ModuleTypeList();
+    }
+
+    /**
+     * Create an instance of {@link ModuleType }
+     * 
+     */
+    public ModuleType createModuleType() {
+        return new ModuleType();
+    }
+
+    /**
+     * Create an instance of {@link ConnectedModuleList }
+     * 
+     */
+    public ConnectedModuleList createConnectedModuleList() {
+        return new ConnectedModuleList();
+    }
+
+    /**
+     * Create an instance of {@link ConnectedModule }
+     * 
+     */
+    public ConnectedModule createConnectedModule() {
+        return new ConnectedModule();
+    }
+
+    /**
+     * Create an instance of {@link org.epsg.openconfigurator.xmlbinding.xdd.InterfaceList }
+     * 
+     */
+    public org.epsg.openconfigurator.xmlbinding.xdd.InterfaceList createInterfaceList() {
+        return new org.epsg.openconfigurator.xmlbinding.xdd.InterfaceList();
+    }
+
+    /**
+     * Create an instance of {@link org.epsg.openconfigurator.xmlbinding.xdd.Interface }
+     * 
+     */
+    public org.epsg.openconfigurator.xmlbinding.xdd.Interface createInterface() {
+        return new org.epsg.openconfigurator.xmlbinding.xdd.Interface();
+    }
+
+    /**
+     * Create an instance of {@link RangeList }
+     * 
+     */
+    public RangeList createRangeList() {
+        return new RangeList();
+    }
+
+    /**
+     * Create an instance of {@link Range }
+     * 
+     */
+    public Range createRange() {
+        return new Range();
     }
 
     /**
@@ -355,6 +519,30 @@ public class ObjectFactory {
      */
     public TDeviceFunction createTDeviceFunction() {
         return new TDeviceFunction();
+    }
+
+    /**
+     * Create an instance of {@link TConnectorList }
+     * 
+     */
+    public TConnectorList createTConnectorList() {
+        return new TConnectorList();
+    }
+
+    /**
+     * Create an instance of {@link TFirmwareList }
+     * 
+     */
+    public TFirmwareList createTFirmwareList() {
+        return new TFirmwareList();
+    }
+
+    /**
+     * Create an instance of {@link TClassificationList }
+     * 
+     */
+    public TClassificationList createTClassificationList() {
+        return new TClassificationList();
     }
 
     /**
@@ -550,35 +738,163 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link ErrorBitDataType.Label }
+     * Create an instance of {@link ErrorBitDataType }
      * 
      */
-    public ErrorBitDataType.Label createErrorBitDataTypeLabel() {
-        return new ErrorBitDataType.Label();
+    public ErrorBitDataType createErrorBitDataType() {
+        return new ErrorBitDataType();
     }
 
     /**
-     * Create an instance of {@link ErrorBitDataType.Description }
+     * Create an instance of {@link TModuleInterface }
      * 
      */
-    public ErrorBitDataType.Description createErrorBitDataTypeDescription() {
-        return new ErrorBitDataType.Description();
+    public TModuleInterface createTModuleInterface() {
+        return new TModuleInterface();
     }
 
     /**
-     * Create an instance of {@link ErrorBitDataType.LabelRef }
+     * Create an instance of {@link ProfileBodyDevicePowerlinkModularHead }
      * 
      */
-    public ErrorBitDataType.LabelRef createErrorBitDataTypeLabelRef() {
-        return new ErrorBitDataType.LabelRef();
+    public ProfileBodyDevicePowerlinkModularHead createProfileBodyDevicePowerlinkModularHead() {
+        return new ProfileBodyDevicePowerlinkModularHead();
     }
 
     /**
-     * Create an instance of {@link ErrorBitDataType.DescriptionRef }
+     * Create an instance of {@link TDeviceManagerModularHead }
      * 
      */
-    public ErrorBitDataType.DescriptionRef createErrorBitDataTypeDescriptionRef() {
-        return new ErrorBitDataType.DescriptionRef();
+    public TDeviceManagerModularHead createTDeviceManagerModularHead() {
+        return new TDeviceManagerModularHead();
+    }
+
+    /**
+     * Create an instance of {@link TModuleManagement }
+     * 
+     */
+    public TModuleManagement createTModuleManagement() {
+        return new TModuleManagement();
+    }
+
+    /**
+     * Create an instance of {@link ProfileBodyDevicePowerlinkModularChild }
+     * 
+     */
+    public ProfileBodyDevicePowerlinkModularChild createProfileBodyDevicePowerlinkModularChild() {
+        return new ProfileBodyDevicePowerlinkModularChild();
+    }
+
+    /**
+     * Create an instance of {@link TDeviceManagerModularChild }
+     * 
+     */
+    public TDeviceManagerModularChild createTDeviceManagerModularChild() {
+        return new TDeviceManagerModularChild();
+    }
+
+    /**
+     * Create an instance of {@link TModuleManagementModularChild }
+     * 
+     */
+    public TModuleManagementModularChild createTModuleManagementModularChild() {
+        return new TModuleManagementModularChild();
+    }
+
+    /**
+     * Create an instance of {@link ProfileBodyCommunicationNetworkPowerlinkModularHead }
+     * 
+     */
+    public ProfileBodyCommunicationNetworkPowerlinkModularHead createProfileBodyCommunicationNetworkPowerlinkModularHead() {
+        return new ProfileBodyCommunicationNetworkPowerlinkModularHead();
+    }
+
+    /**
+     * Create an instance of {@link ProfileBodyCommunicationNetworkPowerlinkModularChild }
+     * 
+     */
+    public ProfileBodyCommunicationNetworkPowerlinkModularChild createProfileBodyCommunicationNetworkPowerlinkModularChild() {
+        return new ProfileBodyCommunicationNetworkPowerlinkModularChild();
+    }
+
+    /**
+     * Create an instance of {@link TObjectExtension.SubObject }
+     * 
+     */
+    public TObjectExtension.SubObject createTObjectExtensionSubObject() {
+        return new TObjectExtension.SubObject();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersExtension.Identity }
+     * 
+     */
+    public TApplicationLayersExtension.Identity createTApplicationLayersExtensionIdentity() {
+        return new TApplicationLayersExtension.Identity();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersExtension.ObjectList }
+     * 
+     */
+    public TApplicationLayersExtension.ObjectList createTApplicationLayersExtensionObjectList() {
+        return new TApplicationLayersExtension.ObjectList();
+    }
+
+    /**
+     * Create an instance of {@link TObjectExtensionHead.SubObject }
+     * 
+     */
+    public TObjectExtensionHead.SubObject createTObjectExtensionHeadSubObject() {
+        return new TObjectExtensionHead.SubObject();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersModularHead.Identity }
+     * 
+     */
+    public TApplicationLayersModularHead.Identity createTApplicationLayersModularHeadIdentity() {
+        return new TApplicationLayersModularHead.Identity();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersModularHead.DataTypeList }
+     * 
+     */
+    public TApplicationLayersModularHead.DataTypeList createTApplicationLayersModularHeadDataTypeList() {
+        return new TApplicationLayersModularHead.DataTypeList();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersModularHead.ObjectList }
+     * 
+     */
+    public TApplicationLayersModularHead.ObjectList createTApplicationLayersModularHeadObjectList() {
+        return new TApplicationLayersModularHead.ObjectList();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersModularHead.DynamicChannels }
+     * 
+     */
+    public TApplicationLayersModularHead.DynamicChannels createTApplicationLayersModularHeadDynamicChannels() {
+        return new TApplicationLayersModularHead.DynamicChannels();
+    }
+
+    /**
+     * Create an instance of {@link TApplicationLayersModularHead.ModuleManagement }
+     * 
+     */
+    public TApplicationLayersModularHead.ModuleManagement createTApplicationLayersModularHeadModuleManagement() {
+        return new TApplicationLayersModularHead.ModuleManagement();
+    }
+
+    /**
+     * Create an instance of {@link TInterfaceList.Interface }
+     * 
+     */
+    public TInterfaceList.Interface createTInterfaceListInterface() {
+        return new TInterfaceList.Interface();
     }
 
     /**
@@ -915,6 +1231,15 @@ public class ObjectFactory {
      */
     public TDeviceIdentity.InstanceName createTDeviceIdentityInstanceName() {
         return new TDeviceIdentity.InstanceName();
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link String }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "http://www.ethernet-powerlink.org", name = "classification")
+    public JAXBElement<String> createClassification(String value) {
+        return new JAXBElement<String>(_Classification_QNAME, String.class, null, value);
     }
 
 }

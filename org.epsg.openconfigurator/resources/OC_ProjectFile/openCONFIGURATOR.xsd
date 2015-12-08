@@ -280,6 +280,7 @@
                     </xs:sequence>
                 </xs:complexType>
             </xs:element>
+            <xs:element ref="oc:InterfaceList" minOccurs="0"/>
         </xs:sequence>
         <xs:attribute name="name" type="ppc:tNonEmptyString"/>
         <xs:attribute name="isAsyncOnly" type="xs:boolean" default="false">
@@ -456,5 +457,43 @@
             <xs:attribute name="index" type="ppc:tParameterIndex"/>
             <xs:attribute name="subindex" type="ppc:tParameterSubIndex" use="optional"/>
         </xs:complexType>
+    </xs:element>
+    <xs:element name="InterfaceList">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="Interface" minOccurs="1" maxOccurs="unbounded">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="Module" minOccurs="1" maxOccurs="unbounded">
+                                <xs:complexType>
+                                    <xs:attribute name="name" type="ppc:tNonEmptyString"/>
+                                    <xs:attribute name="position" type="xs:nonNegativeInteger"/>
+                                    <xs:attribute name="pathToXDC">
+                                        <xs:annotation>
+                                            <xs:documentation xml:lang="en">Pathname in UNIX-Style (forward slashes).</xs:documentation>
+                                        </xs:annotation>
+                                        <xs:simpleType>
+                                            <xs:restriction base="xs:anyURI">
+                                                <xs:minLength value="1"/>
+                                            </xs:restriction>
+                                        </xs:simpleType>
+                                    </xs:attribute>
+                                    <xs:attribute name="enabled" type="xs:boolean" default="true"/>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="id" type="ppc:tNonEmptyString"/>
+                    </xs:complexType>
+                    <xs:unique name="uniqueModulePosition">
+                        <xs:selector xpath="./oc:Module"/>
+                        <xs:field xpath="@position"/>
+                    </xs:unique>
+                </xs:element>
+            </xs:sequence>
+        </xs:complexType>
+        <xs:unique name="uniqueInterfaceID">
+            <xs:selector xpath="./oc:Interface"/>
+            <xs:field xpath="@id"/>
+        </xs:unique>
     </xs:element>
 </xs:schema>

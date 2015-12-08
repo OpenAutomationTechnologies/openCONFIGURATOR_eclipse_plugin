@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
@@ -22,6 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;group ref="{http://www.ethernet-powerlink.org}g_ProfileBody_CommunicationNetwork_Powerlink"/&gt;
  *         &lt;element name="ExternalProfileHandle" type="{http://www.ethernet-powerlink.org}ProfileHandle_DataType" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/choice&gt;
+ *       &lt;attribute name="specificationVersion" type="{http://www.ethernet-powerlink.org}t_specificationVersion" default="1.0.4" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -48,6 +50,8 @@ public class ProfileBodyCommunicationNetworkPowerlink
     protected TNetworkManagement networkManagement;
     @XmlElement(name = "ExternalProfileHandle")
     protected List<ProfileHandleDataType> externalProfileHandle;
+    @XmlAttribute(name = "specificationVersion")
+    protected String specificationVersion;
 
     /**
      * Gets the value of the applicationLayers property.
@@ -148,6 +152,34 @@ public class ProfileBodyCommunicationNetworkPowerlink
             externalProfileHandle = new ArrayList<ProfileHandleDataType>();
         }
         return this.externalProfileHandle;
+    }
+
+    /**
+     * Gets the value of the specificationVersion property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getSpecificationVersion() {
+        if (specificationVersion == null) {
+            return "1.0.4";
+        } else {
+            return specificationVersion;
+        }
+    }
+
+    /**
+     * Sets the value of the specificationVersion property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setSpecificationVersion(String value) {
+        this.specificationVersion = value;
     }
 
 }

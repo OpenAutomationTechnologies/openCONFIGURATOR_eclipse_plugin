@@ -9,11 +9,11 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * A concrete type for a POWERLINK RMN.
- *
+ * 
  * <p>Java class for tRMN complex type.
- *
+ * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * 
  * <pre>
  * &lt;complexType name="tRMN"&gt;
  *   &lt;complexContent&gt;
@@ -35,8 +35,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tRMN")
@@ -51,11 +51,11 @@ public class TRMN
 
     /**
      * Gets the value of the nodeID property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getNodeID() {
         return nodeID;
@@ -63,11 +63,11 @@ public class TRMN
 
     /**
      * Sets the value of the nodeID property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setNodeID(String value) {
         this.nodeID = value;
@@ -75,11 +75,11 @@ public class TRMN
 
     /**
      * Gets the value of the pathToXDC property.
-     *
+     * 
      * @return
      *     possible object is
      *     {@link String }
-     *
+     *     
      */
     public String getPathToXDC() {
         return pathToXDC;
@@ -87,11 +87,11 @@ public class TRMN
 
     /**
      * Sets the value of the pathToXDC property.
-     *
+     * 
      * @param value
      *     allowed object is
      *     {@link String }
-     *
+     *     
      */
     public void setPathToXDC(String value) {
         this.pathToXDC = value;

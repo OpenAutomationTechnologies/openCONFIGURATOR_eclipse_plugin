@@ -29,12 +29,15 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="NMTMinRedCycleTime" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="0" /&gt;
  *       &lt;attribute name="NMTEmergencyQueueSize" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="0" /&gt;
  *       &lt;attribute name="NMTErrorEntries" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" /&gt;
+ *       &lt;attribute name="NMTExtNmtCmds" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTFlushArpEntry" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="NMTIsochronous" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="NMTNetHostNameSet" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTMaxCNNodeID" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="239" /&gt;
  *       &lt;attribute name="NMTMaxCNNumber" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="239" /&gt;
  *       &lt;attribute name="NMTMaxHeartbeats" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="254" /&gt;
  *       &lt;attribute name="NMTNodeIDByHW" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
+ *       &lt;attribute name="NMTNodeIDBySW" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTProductCode" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="0" /&gt;
  *       &lt;attribute name="NMTPublishActiveNodes" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTPublishConfigNodes" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -50,6 +53,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="NWLForward" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NWLICMPSupport" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NWLIPSupport" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
+ *       &lt;attribute name="PDODynamicMapping" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="PDOGranularity" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="8" /&gt;
  *       &lt;attribute name="PDOMaxDescrMem" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="4294967295" /&gt;
  *       &lt;attribute name="PDORPDOChannelObjects" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="254" /&gt;
@@ -60,9 +64,9 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="PDOTPDOChannelObjects" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="254" /&gt;
  *       &lt;attribute name="PDOTPDOCycleDataLim" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="4294967295" /&gt;
  *       &lt;attribute name="PDOTPDOOverallObjects" type="{http://www.w3.org/2001/XMLSchema}unsignedShort" default="65535" /&gt;
- *       &lt;attribute name="PHYExtEPLPorts" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="1" /&gt;
+ *       &lt;attribute name="PHYExtEPLPorts" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="2" /&gt;
  *       &lt;attribute name="PHYHubDelay" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="460" /&gt;
- *       &lt;attribute name="PHYHubIntegrated" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="PHYHubIntegrated" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *       &lt;attribute name="PHYHubJitter" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="70" /&gt;
  *       &lt;attribute name="RT1RT1SecuritySupport" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="RT1RT1Support" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -81,6 +85,9 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="SDOMaxParallelConnections" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="1" /&gt;
  *       &lt;attribute name="SDOSeqLayerTxHistorySize" type="{http://www.w3.org/2001/XMLSchema}unsignedShort" default="5" /&gt;
  *       &lt;attribute name="SDOServer" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
+ *       &lt;attribute name="SDOSupportASnd" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="SDOSupportPDO" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="SDOSupportUdpIp" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -123,8 +130,12 @@ public class TGeneralFeatures {
     @XmlAttribute(name = "NMTErrorEntries", required = true)
     @XmlSchemaType(name = "unsignedInt")
     protected long nmtErrorEntries;
+    @XmlAttribute(name = "NMTExtNmtCmds")
+    protected Boolean nmtExtNmtCmds;
     @XmlAttribute(name = "NMTFlushArpEntry")
     protected Boolean nmtFlushArpEntry;
+    @XmlAttribute(name = "NMTIsochronous")
+    protected Boolean nmtIsochronous;
     @XmlAttribute(name = "NMTNetHostNameSet")
     protected Boolean nmtNetHostNameSet;
     @XmlAttribute(name = "NMTMaxCNNodeID")
@@ -138,6 +149,8 @@ public class TGeneralFeatures {
     protected Short nmtMaxHeartbeats;
     @XmlAttribute(name = "NMTNodeIDByHW")
     protected Boolean nmtNodeIDByHW;
+    @XmlAttribute(name = "NMTNodeIDBySW")
+    protected Boolean nmtNodeIDBySW;
     @XmlAttribute(name = "NMTProductCode")
     @XmlSchemaType(name = "unsignedInt")
     protected Long nmtProductCode;
@@ -170,6 +183,8 @@ public class TGeneralFeatures {
     protected Boolean nwlicmpSupport;
     @XmlAttribute(name = "NWLIPSupport")
     protected Boolean nwlipSupport;
+    @XmlAttribute(name = "PDODynamicMapping")
+    protected Boolean pdoDynamicMapping;
     @XmlAttribute(name = "PDOGranularity")
     @XmlSchemaType(name = "unsignedByte")
     protected Short pdoGranularity;
@@ -247,6 +262,12 @@ public class TGeneralFeatures {
     protected Integer sdoSeqLayerTxHistorySize;
     @XmlAttribute(name = "SDOServer")
     protected Boolean sdoServer;
+    @XmlAttribute(name = "SDOSupportASnd")
+    protected Boolean sdoSupportASnd;
+    @XmlAttribute(name = "SDOSupportPDO")
+    protected Boolean sdoSupportPDO;
+    @XmlAttribute(name = "SDOSupportUdpIp")
+    protected Boolean sdoSupportUdpIp;
 
     /**
      * Gets the value of the cfmConfigManager property.
@@ -525,6 +546,34 @@ public class TGeneralFeatures {
     }
 
     /**
+     * Gets the value of the nmtExtNmtCmds property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isNMTExtNmtCmds() {
+        if (nmtExtNmtCmds == null) {
+            return false;
+        } else {
+            return nmtExtNmtCmds;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtExtNmtCmds property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setNMTExtNmtCmds(Boolean value) {
+        this.nmtExtNmtCmds = value;
+    }
+
+    /**
      * Gets the value of the nmtFlushArpEntry property.
      * 
      * @return
@@ -550,6 +599,34 @@ public class TGeneralFeatures {
      */
     public void setNMTFlushArpEntry(Boolean value) {
         this.nmtFlushArpEntry = value;
+    }
+
+    /**
+     * Gets the value of the nmtIsochronous property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isNMTIsochronous() {
+        if (nmtIsochronous == null) {
+            return true;
+        } else {
+            return nmtIsochronous;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtIsochronous property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setNMTIsochronous(Boolean value) {
+        this.nmtIsochronous = value;
     }
 
     /**
@@ -690,6 +767,34 @@ public class TGeneralFeatures {
      */
     public void setNMTNodeIDByHW(Boolean value) {
         this.nmtNodeIDByHW = value;
+    }
+
+    /**
+     * Gets the value of the nmtNodeIDBySW property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isNMTNodeIDBySW() {
+        if (nmtNodeIDBySW == null) {
+            return false;
+        } else {
+            return nmtNodeIDBySW;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtNodeIDBySW property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setNMTNodeIDBySW(Boolean value) {
+        this.nmtNodeIDBySW = value;
     }
 
     /**
@@ -1113,6 +1218,34 @@ public class TGeneralFeatures {
     }
 
     /**
+     * Gets the value of the pdoDynamicMapping property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isPDODynamicMapping() {
+        if (pdoDynamicMapping == null) {
+            return true;
+        } else {
+            return pdoDynamicMapping;
+        }
+    }
+
+    /**
+     * Sets the value of the pdoDynamicMapping property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setPDODynamicMapping(Boolean value) {
+        this.pdoDynamicMapping = value;
+    }
+
+    /**
      * Gets the value of the pdoGranularity property.
      * 
      * @return
@@ -1402,7 +1535,7 @@ public class TGeneralFeatures {
      */
     public short getPHYExtEPLPorts() {
         if (phyExtEPLPorts == null) {
-            return ((short) 1);
+            return ((short) 2);
         } else {
             return phyExtEPLPorts;
         }
@@ -1458,7 +1591,7 @@ public class TGeneralFeatures {
      */
     public boolean isPHYHubIntegrated() {
         if (phyHubIntegrated == null) {
-            return false;
+            return true;
         } else {
             return phyHubIntegrated;
         }
@@ -1978,6 +2111,90 @@ public class TGeneralFeatures {
      */
     public void setSDOServer(Boolean value) {
         this.sdoServer = value;
+    }
+
+    /**
+     * Gets the value of the sdoSupportASnd property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isSDOSupportASnd() {
+        if (sdoSupportASnd == null) {
+            return false;
+        } else {
+            return sdoSupportASnd;
+        }
+    }
+
+    /**
+     * Sets the value of the sdoSupportASnd property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setSDOSupportASnd(Boolean value) {
+        this.sdoSupportASnd = value;
+    }
+
+    /**
+     * Gets the value of the sdoSupportPDO property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isSDOSupportPDO() {
+        if (sdoSupportPDO == null) {
+            return false;
+        } else {
+            return sdoSupportPDO;
+        }
+    }
+
+    /**
+     * Sets the value of the sdoSupportPDO property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setSDOSupportPDO(Boolean value) {
+        this.sdoSupportPDO = value;
+    }
+
+    /**
+     * Gets the value of the sdoSupportUdpIp property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isSDOSupportUdpIp() {
+        if (sdoSupportUdpIp == null) {
+            return false;
+        } else {
+            return sdoSupportUdpIp;
+        }
+    }
+
+    /**
+     * Sets the value of the sdoSupportUdpIp property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setSDOSupportUdpIp(Boolean value) {
+        this.sdoSupportUdpIp = value;
     }
 
 }

@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
 *******************************************************************************
- EPSG - ETHERNET Powerlink Standardization Group
+ EPSG - Ethernet POWERLINK Standardization Group
  Working Group Tools - Subgroup of Technical Working Group
 *******************************************************************************
 
- ETHERNET Powerlink XML device description
+ Ethernet POWERLINK XML device description
 
 *******************************************************************************
 
  File:        ProfileBody_CommunicationNetwork_Powerlink.xsd
- Version:     0.13
+ Version:     0.15
 
  The version number applies to the whole XML schema. So the version number
  of all file must be identical.
@@ -20,9 +20,14 @@
  For a complete schema description the following files are needed:
  - Powerlink_Main.xsd
  - CommonElements.xsd
+ - CommonElements_Modular.xsd
  - ISO15745ProfileContainer.xsd
  - ProfileBody_Device_Powerlink.xsd
+ - ProfileBody_Device_Powerlink_Modular_Head.xsd
+ - ProfileBody_Device_Powerlink_Modular_Child.xsd
  - ProfileBody_CommunicationNetwork_Powerlink.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd
+ - ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd
  - TextResource.xsd
 
 *******************************************************************************
@@ -118,6 +123,20 @@ W. Seiss      | 09.09.2010 | + Cleanup / restructuring
               |            |   * Deleted PDOmapping values "true" and "false"
               |            |     (according to CANopen schema 1.0.2)
 
+B. Avramov    | 01.12.2015 | + Added optional specification version to profile
+C. Ruecker    | V 0.14     | + Added DNA feature entries
+              |            |    * NMTDNA
+              |            |    * NMTCNSetNodeNumberTime
+              |            | + Added MN Redundance feature entries
+              |            |    * NMTMNRedundancy
+              |            | + Added classificationList
+              |            | + Added connectorList
+
+C. Ruecker    | 15.12.2015 | + Modular Device Support
+              | V 0.15     |    * Added abstract types for modular node
+              |            |
+              |            |
+              |            |
 *******************************************************************************
 
  List of open points:
@@ -125,474 +144,467 @@ W. Seiss      | 09.09.2010 | + Cleanup / restructuring
 
 *******************************************************************************
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-            targetNamespace="http://www.ethernet-powerlink.org"
-            xmlns="http://www.ethernet-powerlink.org"
-            elementFormDefault="qualified">
-  <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
-  <xsd:include schemaLocation="CommonElements.xsd"/>
-
-  <!-- POWERLINK profile body communication network -->
-  <xsd:complexType name="ProfileBody_CommunicationNetwork_Powerlink">
-    <xsd:complexContent>
-      <xsd:extension base="ProfileBody_DataType">
-        <xsd:choice>
-          <xsd:group ref="g_ProfileBody_CommunicationNetwork_Powerlink"/>
-          <xsd:element name="ExternalProfileHandle" type="ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:choice>
-      </xsd:extension>
-    </xsd:complexContent>
-  </xsd:complexType>
-
-  <!-- Definition of profile body elements -->
-  <xsd:group name="g_ProfileBody_CommunicationNetwork_Powerlink">
-    <xsd:sequence>
-      <!-- POWERLINK application layers -->
-      <xsd:element name="ApplicationLayers" type="t_ApplicationLayers">
-        <xsd:annotation>
-          <xsd:documentation>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
+    <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+    <xsd:include schemaLocation="CommonElements.xsd"/>
+    <!-- POWERLINK profile body communication network -->
+    <xsd:complexType name="ProfileBody_CommunicationNetwork_Powerlink">
+        <xsd:complexContent>
+            <xsd:extension base="ProfileBody_DataType">
+                <xsd:choice>
+                    <xsd:group ref="g_ProfileBody_CommunicationNetwork_Powerlink"/>
+                    <xsd:element name="ExternalProfileHandle" type="ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
+                </xsd:choice>
+                <xsd:attribute name="specificationVersion" type="t_specificationVersion" use="optional" default="1.0.4"/>
+            </xsd:extension>
+        </xsd:complexContent>
+    </xsd:complexType>
+    <!-- Definition of profile body elements -->
+    <xsd:group name="g_ProfileBody_CommunicationNetwork_Powerlink">
+        <xsd:sequence>
+            <!-- POWERLINK application layers -->
+            <xsd:element name="ApplicationLayers" type="t_ApplicationLayers">
+                <xsd:annotation>
+                    <xsd:documentation>
             The ApplicationLayers element represents POWERLINK application layer,
             e.g. gives detailed information about a devices object dictionary.
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <!-- POWERLINK transport layers (empty) -->
-      <xsd:element name="TransportLayers">
-        <xsd:annotation>
-          <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <!-- POWERLINK transport layers (empty) -->
+            <xsd:element name="TransportLayers">
+                <xsd:annotation>
+                    <xsd:documentation>
             The TransportLayers element is present for compatibility to the
             CANopen XML device description. For POWERLINK this element is
             empty.
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <!-- POWERLINK network management -->
-      <xsd:element name="NetworkManagement" type="t_NetworkManagement">
-        <xsd:annotation>
-          <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <!-- POWERLINK network management -->
+            <xsd:element name="NetworkManagement" type="t_NetworkManagement">
+                <xsd:annotation>
+                    <xsd:documentation>
             The NetworkManagement element is used to store specific device
             features and diagnostic capabilities.
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-    </xsd:sequence>
-  </xsd:group>
-
-  <!-- POWERLINK application layers -->
-  <xsd:complexType name="t_ApplicationLayers">
-    <xsd:sequence>
-      <xsd:element name="identity" minOccurs="0">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="vendorID" type="t_vendorID" minOccurs="0"/>
-            <xsd:element name="deviceFamily" type="t_deviceFamily" minOccurs="0"/>
-            <xsd:element name="productID" type="t_productID" minOccurs="0"/>
-            <xsd:element name="version" type="t_version" minOccurs="0" maxOccurs="unbounded"/>
-            <xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
-            <xsd:element name="specificationRevision" type="t_specificationRevision" minOccurs="0"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="DataTypeList">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="defType" type="t_DataTypes" maxOccurs="unbounded"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="ObjectList">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="Object" type="t_Object" maxOccurs="65535"/>
-          </xsd:sequence>
-          <xsd:attribute name="mandatoryObjects" type="xsd:unsignedInt" use="optional"/>
-          <xsd:attribute name="optionalObjects" type="xsd:unsignedInt" use="optional"/>
-          <xsd:attribute name="manufacturerObjects" type="xsd:unsignedInt" use="optional"/>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="dynamicChannels" minOccurs="0">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="dynamicChannel" type="t_dynamicChannel" maxOccurs="unbounded"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-    </xsd:sequence>
-    <xsd:attribute name="conformanceClass" type="xsd:string" use="optional">
-      <xsd:annotation>
-        <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+        </xsd:sequence>
+    </xsd:group>
+    <!-- POWERLINK application layers -->
+    <xsd:complexType name="t_ApplicationLayers">
+        <xsd:sequence>
+            <xsd:element name="identity" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="vendorID" type="t_vendorID" minOccurs="0"/>
+                        <xsd:element name="deviceFamily" type="t_deviceFamily" minOccurs="0"/>
+                        <xsd:element name="productID" type="t_productID" minOccurs="0"/>
+                        <xsd:element name="version" type="t_version" minOccurs="0" maxOccurs="unbounded"/>
+                        <xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
+                        <xsd:element name="specificationRevision" type="t_specificationRevision" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="DataTypeList">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="defType" type="t_DataTypes" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="ObjectList">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Object" type="t_Object" maxOccurs="65535"/>
+                    </xsd:sequence>
+                    <xsd:attribute name="mandatoryObjects" type="xsd:unsignedInt" use="optional"/>
+                    <xsd:attribute name="optionalObjects" type="xsd:unsignedInt" use="optional"/>
+                    <xsd:attribute name="manufacturerObjects" type="xsd:unsignedInt" use="optional"/>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="dynamicChannels" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="dynamicChannel" type="t_dynamicChannel" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="conformanceClass" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>
           Conformance class of the device type. Using that attribute it is
           possible to classify the device according to the supported services
           of the communication protocol.
         </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-    <xsd:attribute name="communicationEntityType" type="xsd:NMTOKENS" default="slave">
-      <xsd:annotation>
-        <xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="communicationEntityType" type="xsd:NMTOKENS" default="slave">
+            <xsd:annotation>
+                <xsd:documentation>
           Shall not be used. Provided for compatibility to CANopen.
         </xsd:documentation>
-      </xsd:annotation>
-    </xsd:attribute>
-  </xsd:complexType>
-
-  <!-- POWERLINK data types -->
-  <xsd:complexType name="t_DataTypes">
-    <xsd:choice>
-      <xsd:element name="Boolean"/>
-      <xsd:element name="Integer8"/>
-      <xsd:element name="Integer16"/>
-      <xsd:element name="Integer32"/>
-      <xsd:element name="Integer24"/>
-      <xsd:element name="Integer40"/>
-      <xsd:element name="Integer48"/>
-      <xsd:element name="Integer56"/>
-      <xsd:element name="Integer64"/>
-      <xsd:element name="Unsigned8"/>
-      <xsd:element name="Unsigned16"/>
-      <xsd:element name="Unsigned32"/>
-      <xsd:element name="Unsigned24"/>
-      <xsd:element name="Unsigned40"/>
-      <xsd:element name="Unsigned48"/>
-      <xsd:element name="Unsigned56"/>
-      <xsd:element name="Unsigned64"/>
-      <xsd:element name="Real32"/>
-      <xsd:element name="Real64"/>
-      <xsd:element name="Visible_String"/>
-      <xsd:element name="Octet_String"/>
-      <xsd:element name="Unicode_String"/>
-      <xsd:element name="Time_of_Day"/>
-      <xsd:element name="Time_Diff"/>
-      <xsd:element name="Domain"/>
-      <xsd:element name="MAC_ADDRESS"/>
-      <xsd:element name="IP_ADDRESS"/>
-      <xsd:element name="NETTIME"/>
-    </xsd:choice>
-    <xsd:attribute name="dataType" type="xsd:hexBinary" use="required"/>
-  </xsd:complexType>
-
-  <!-- POWERLINK object -->
-  <xsd:complexType name="t_Object">
-    <xsd:sequence>
-      <xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
-        <xsd:complexType>
-          <xsd:attributeGroup ref="ag_Powerlink_Object"/>
-          <xsd:attribute name="subIndex" type="xsd:hexBinary" use="required"/>
-        </xsd:complexType>
-      </xsd:element>
-    </xsd:sequence>
-    <xsd:attribute name="index" type="xsd:hexBinary" use="required"/>
-    <xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
-    <xsd:attributeGroup ref="ag_Powerlink_Object"/>
-  </xsd:complexType>
-
-  <!-- Common attributes of POWERLINK objects and subobjects -->
-  <xsd:attributeGroup name="ag_Powerlink_Object">
-    <xsd:attribute name="name" type="xsd:string" use="required"/>
-    <xsd:attribute name="objectType" type="xsd:unsignedByte" use="required"/>
-    <xsd:attribute name="dataType" type="xsd:hexBinary" use="optional"/>
-    <xsd:attribute name="lowLimit" type="xsd:string" use="optional"/>
-    <xsd:attribute name="highLimit" type="xsd:string" use="optional"/>
-    <xsd:attribute name="accessType" type="t_ObjectAccessType" use="optional" />
-    <xsd:attribute name="defaultValue" type="xsd:string" use="optional"/>
-    <xsd:attribute name="actualValue" type="xsd:string" use="optional"/>
-    <xsd:attribute name="denotation" type="xsd:string" use="optional"/>
-    <xsd:attribute name="PDOmapping" type="t_ObjectPDOMapping" use="optional" />
-    <xsd:attribute name="objFlags" type="xsd:hexBinary" use="optional"/>
-    <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="optional"/>
-  </xsd:attributeGroup>
-
-  <!-- Access types of an object / subobject -->
-  <xsd:simpleType name="t_ObjectAccessType">
-    <xsd:restriction base="xsd:NMTOKEN">
-      <xsd:enumeration value="ro">
-        <xsd:annotation>
-          <xsd:documentation>Object is read-only and can change.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="wo">
-        <xsd:annotation>
-          <xsd:documentation>Object is write-only.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="rw">
-        <xsd:annotation>
-          <xsd:documentation>Object can be read and written to.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="const">
-        <xsd:annotation>
-          <xsd:documentation>Object is read-only and cannot change.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-    </xsd:restriction>
-  </xsd:simpleType>
-
-  <!-- Ability to map an object / subobject to a PDO -->
-  <xsd:simpleType name="t_ObjectPDOMapping">
-    <xsd:restriction base="xsd:NMTOKEN">
-      <xsd:enumeration value="no">
-        <xsd:annotation>
-          <xsd:documentation>Object cannot be mapped to a PDO.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="default">
-        <xsd:annotation>
-          <xsd:documentation>Object is by default mapped to a PDO.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="optional">
-        <xsd:annotation>
-          <xsd:documentation>Object can be mapped to any PDO.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="TPDO">
-        <xsd:annotation>
-          <xsd:documentation>Object can be mapped to a Transmit PDO.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-      <xsd:enumeration value="RPDO">
-        <xsd:annotation>
-          <xsd:documentation>Object can be mapped to a Receive PDO.</xsd:documentation>
-        </xsd:annotation>
-      </xsd:enumeration>
-    </xsd:restriction>
-  </xsd:simpleType>
-
-  <!-- POWERLINK dynamic channel definition -->
-  <xsd:complexType name="t_dynamicChannel">
-    <xsd:attribute name="dataType" type="xsd:hexBinary" use="required"/>
-    <xsd:attribute name="accessType" use="required">
-      <xsd:simpleType>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:complexType>
+    <!-- POWERLINK data types -->
+    <xsd:complexType name="t_DataTypes">
+        <xsd:choice>
+            <xsd:element name="Boolean"/>
+            <xsd:element name="Integer8"/>
+            <xsd:element name="Integer16"/>
+            <xsd:element name="Integer32"/>
+            <xsd:element name="Integer24"/>
+            <xsd:element name="Integer40"/>
+            <xsd:element name="Integer48"/>
+            <xsd:element name="Integer56"/>
+            <xsd:element name="Integer64"/>
+            <xsd:element name="Unsigned8"/>
+            <xsd:element name="Unsigned16"/>
+            <xsd:element name="Unsigned32"/>
+            <xsd:element name="Unsigned24"/>
+            <xsd:element name="Unsigned40"/>
+            <xsd:element name="Unsigned48"/>
+            <xsd:element name="Unsigned56"/>
+            <xsd:element name="Unsigned64"/>
+            <xsd:element name="Real32"/>
+            <xsd:element name="Real64"/>
+            <xsd:element name="Visible_String"/>
+            <xsd:element name="Octet_String"/>
+            <xsd:element name="Unicode_String"/>
+            <xsd:element name="Time_of_Day"/>
+            <xsd:element name="Time_Diff"/>
+            <xsd:element name="Domain"/>
+            <xsd:element name="MAC_ADDRESS"/>
+            <xsd:element name="IP_ADDRESS"/>
+            <xsd:element name="NETTIME"/>
+        </xsd:choice>
+        <xsd:attribute name="dataType" type="xsd:hexBinary" use="required"/>
+    </xsd:complexType>
+    <!-- POWERLINK object -->
+    <xsd:complexType name="t_Object">
+        <xsd:sequence>
+            <xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
+                <xsd:complexType>
+                    <xsd:attributeGroup ref="ag_Powerlink_Object"/>
+                    <xsd:attribute name="subIndex" type="xsd:hexBinary" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="index" type="xsd:hexBinary" use="required"/>
+        <xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
+        <xsd:attributeGroup ref="ag_Powerlink_Object"/>
+    </xsd:complexType>
+    <!-- Common attributes of POWERLINK objects and subobjects -->
+    <xsd:attributeGroup name="ag_Powerlink_Object">
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="objectType" type="xsd:unsignedByte" use="required"/>
+        <xsd:attribute name="dataType" type="xsd:hexBinary" use="optional"/>
+        <xsd:attribute name="lowLimit" type="xsd:string" use="optional"/>
+        <xsd:attribute name="highLimit" type="xsd:string" use="optional"/>
+        <xsd:attribute name="accessType" type="t_ObjectAccessType" use="optional"/>
+        <xsd:attribute name="defaultValue" type="xsd:string" use="optional"/>
+        <xsd:attribute name="actualValue" type="xsd:string" use="optional"/>
+        <xsd:attribute name="denotation" type="xsd:string" use="optional"/>
+        <xsd:attribute name="PDOmapping" type="t_ObjectPDOMapping" use="optional"/>
+        <xsd:attribute name="objFlags" type="xsd:hexBinary" use="optional"/>
+        <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="optional"/>
+    </xsd:attributeGroup>
+    <!-- Access types of an object / subobject -->
+    <xsd:simpleType name="t_ObjectAccessType">
         <xsd:restriction base="xsd:NMTOKEN">
-          <xsd:enumeration value="readOnly"/>
-          <xsd:enumeration value="writeOnly"/>
-          <xsd:enumeration value="readWriteOutput"/>
+            <xsd:enumeration value="ro">
+                <xsd:annotation>
+                    <xsd:documentation>Object is read-only and can change.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="wo">
+                <xsd:annotation>
+                    <xsd:documentation>Object is write-only.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="rw">
+                <xsd:annotation>
+                    <xsd:documentation>Object can be read and written to.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="const">
+                <xsd:annotation>
+                    <xsd:documentation>Object is read-only and cannot change.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
         </xsd:restriction>
-      </xsd:simpleType>
-    </xsd:attribute>
-    <xsd:attribute name="startIndex" type="xsd:hexBinary" use="required"/>
-    <xsd:attribute name="endIndex" type="xsd:hexBinary" use="required"/>
-    <xsd:attribute name="maxNumber" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="addressOffset" type="xsd:hexBinary" use="required"/>
-    <xsd:attribute name="bitAlignment" type="xsd:unsignedByte" use="optional"/>
-  </xsd:complexType>
-
-  <!-- POWERLINK network management layers -->
-  <xsd:complexType name="t_NetworkManagement">
-    <xsd:sequence>
-      <xsd:element name="GeneralFeatures" type="t_GeneralFeatures">
-        <xsd:annotation>
-          <xsd:documentation>
+    </xsd:simpleType>
+    <!-- Ability to map an object / subobject to a PDO -->
+    <xsd:simpleType name="t_ObjectPDOMapping">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="no">
+                <xsd:annotation>
+                    <xsd:documentation>Object cannot be mapped to a PDO.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="default">
+                <xsd:annotation>
+                    <xsd:documentation>Object is by default mapped to a PDO.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="optional">
+                <xsd:annotation>
+                    <xsd:documentation>Object can be mapped to any PDO.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="TPDO">
+                <xsd:annotation>
+                    <xsd:documentation>Object can be mapped to a Transmit PDO.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+            <xsd:enumeration value="RPDO">
+                <xsd:annotation>
+                    <xsd:documentation>Object can be mapped to a Receive PDO.</xsd:documentation>
+                </xsd:annotation>
+            </xsd:enumeration>
+        </xsd:restriction>
+    </xsd:simpleType>
+    <!-- POWERLINK dynamic channel definition -->
+    <xsd:complexType name="t_dynamicChannel">
+        <xsd:attribute name="dataType" type="xsd:hexBinary" use="required"/>
+        <xsd:attribute name="accessType" use="required">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKEN">
+                    <xsd:enumeration value="readOnly"/>
+                    <xsd:enumeration value="writeOnly"/>
+                    <xsd:enumeration value="readWriteOutput"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="startIndex" type="xsd:hexBinary" use="required"/>
+        <xsd:attribute name="endIndex" type="xsd:hexBinary" use="required"/>
+        <xsd:attribute name="maxNumber" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="addressOffset" type="xsd:hexBinary" use="required"/>
+        <xsd:attribute name="bitAlignment" type="xsd:unsignedByte" use="optional"/>
+    </xsd:complexType>
+    <!-- POWERLINK network management layers -->
+    <xsd:complexType name="t_NetworkManagement">
+        <xsd:sequence>
+            <xsd:element name="GeneralFeatures" type="t_GeneralFeatures">
+                <xsd:annotation>
+                    <xsd:documentation>
             Lists general features of a POWERLINK device.
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="MNFeatures" type="t_MNFeatures" minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="MNFeatures" type="t_MNFeatures" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
             Lists MN specific features. (only valid if the device can be operated as MN)
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="CNFeatures" type="t_CNFeatures" minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="CNFeatures" type="t_CNFeatures" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
             Lists CN specific features. (only valid if the device can be operated as CN)
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="deviceCommissioning" type="t_deviceCommissioning" minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="deviceCommissioning" type="t_deviceCommissioning" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
             Stores configuration specific data. (only valid in XDC files)
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-      <xsd:element name="Diagnostic" type="t_Diagnostic" minOccurs="0">
-        <xsd:annotation>
-          <xsd:documentation>
+                </xsd:annotation>
+            </xsd:element>
+            <xsd:element name="Diagnostic" type="t_Diagnostic" minOccurs="0">
+                <xsd:annotation>
+                    <xsd:documentation>
             Provides tools with presentational detail for the information transported
             in the StatusResponse frame.
           </xsd:documentation>
-        </xsd:annotation>
-      </xsd:element>
-    </xsd:sequence>
-  </xsd:complexType>
-
-  <!-- POWERLINK general features -->
-  <xsd:complexType name="t_GeneralFeatures">
-    <xsd:attribute name="CFMConfigManager" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="DLLErrBadPhysMode" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="DLLErrMacBuffer" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="DLLFeatureCN" type="xsd:boolean" use="optional" default="true"/>
-    <xsd:attribute name="DLLFeatureMN" type="xsd:boolean" use="required"/>
-    <xsd:attribute name="NMTBootTimeNotActive" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTCycleTimeGranularity" type="xsd:unsignedInt" use="optional" default="1"/>
-    <xsd:attribute name="NMTCycleTimeMax" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTCycleTimeMin" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMinRedCycleTime" type="xsd:unsignedInt" use="optional" default="0" />
-    <xsd:attribute name="NMTEmergencyQueueSize" type="xsd:unsignedInt" use="optional" default="0"/>
-    <xsd:attribute name="NMTErrorEntries" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTFlushArpEntry" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTNetHostNameSet" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTMaxCNNodeID" type="xsd:unsignedByte" use="optional" default="239"/>
-    <xsd:attribute name="NMTMaxCNNumber" type="xsd:unsignedByte" use="optional" default="239"/>
-    <xsd:attribute name="NMTMaxHeartbeats" type="xsd:unsignedByte" use="optional" default="254"/>
-    <xsd:attribute name="NMTNodeIDByHW" type="xsd:boolean" use="optional" default="true"/>
-    <xsd:attribute name="NMTProductCode" type="xsd:unsignedInt" use="optional" default="0"/>
-    <xsd:attribute name="NMTPublishActiveNodes" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishConfigNodes" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishEmergencyNew" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishNodeState" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishOperational" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishPreOp1" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishPreOp2" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishReadyToOp" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishStopped" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTPublishTime" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTRevisionNo" type="xsd:unsignedInt" use="optional" default="0"/>
-    <xsd:attribute name="NWLForward" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NWLICMPSupport" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NWLIPSupport" type="xsd:boolean" use="optional" default="true"/>
-    <xsd:attribute name="PDOGranularity" type="xsd:unsignedByte" use="optional" default="8"/>
-    <xsd:attribute name="PDOMaxDescrMem" type="xsd:unsignedInt" use="optional" default="4294967295"/>
-    <xsd:attribute name="PDORPDOChannelObjects" type="xsd:unsignedByte" use="optional" default="254"/>
-    <xsd:attribute name="PDORPDOChannels" type="xsd:unsignedShort" use="optional" default="256"/>
-    <xsd:attribute name="PDORPDOCycleDataLim" type="xsd:unsignedInt" use="optional" default="4294967295"/>
-    <xsd:attribute name="PDORPDOOverallObjects" type="xsd:unsignedShort" use="optional" default="65535"/>
-    <xsd:attribute name="PDOSelfReceipt" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="PDOTPDOChannelObjects" type="xsd:unsignedByte" use="optional" default="254"/>
-    <xsd:attribute name="PDOTPDOCycleDataLim" type="xsd:unsignedInt" use="optional" default="4294967295"/>
-    <xsd:attribute name="PDOTPDOOverallObjects" type="xsd:unsignedShort" use="optional" default="65535"/>
-    <xsd:attribute name="PHYExtEPLPorts" type="xsd:unsignedByte" use="optional" default="1"/>
-    <xsd:attribute name="PHYHubDelay" type="xsd:unsignedInt" use="optional" default="460" />
-    <xsd:attribute name="PHYHubIntegrated" type="xsd:boolean" use="optional" default="false" />
-    <xsd:attribute name="PHYHubJitter" type="xsd:unsignedInt" use="optional" default="70" />
-    <xsd:attribute name="RT1RT1SecuritySupport" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="RT1RT1Support" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="RT2RT2Support" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOClient" type="xsd:boolean" use="optional" default="true"/>
-    <xsd:attribute name="SDOCmdFileRead" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdFileWrite" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdLinkName" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdReadAllByIndex" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdReadByName" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdReadMultParam" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdWriteAllByIndex" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdWriteByName" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOCmdWriteMultParam" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="SDOMaxConnections" type="xsd:unsignedInt" use="optional" default="1"/>
-    <xsd:attribute name="SDOMaxParallelConnections" type="xsd:unsignedInt" use="optional" default="1"/>
-    <xsd:attribute name="SDOSeqLayerTxHistorySize" type="xsd:unsignedShort" use="optional" default="5"/>
-    <xsd:attribute name="SDOServer" type="xsd:boolean" use="optional" default="true"/>
-  </xsd:complexType>
-
-  <!-- POWERLINK MN features -->
-  <xsd:complexType name="t_MNFeatures">
-    <xsd:attribute name="DLLErrMNMultipleMN" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="DLLMNFeatureMultiplex" type="xsd:boolean" use="optional" default="true"/>
-    <xsd:attribute name="DLLMNPResChaining" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="DLLMNFeaturePResTx" type="xsd:boolean" use="optional" default="true"/>
-    <xsd:attribute name="NMTMNASnd2SoC" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMNBasicEthernet" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTMNMultiplCycMax" type="xsd:unsignedByte" use="optional" default="0"/>
-    <xsd:attribute name="NMTMNPRes2PReq" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMNPRes2PRes" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMNPResRx2SoA" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMNPResTx2SoA" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMNSoA2ASndTx" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTMNSoC2PReq" type="xsd:unsignedInt" use="required"/>
-    <xsd:attribute name="NMTNetTime" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTNetTimeIsRealTime" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTRelativeTime" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTSimpleBoot" type="xsd:boolean" use="required"/>
-    <xsd:attribute name="PDOTPDOChannels" type="xsd:unsignedShort" use="optional" default="256"/>
-    <xsd:attribute name="NMTMNRedundancy" type="xsd:boolean" use="optional" default="false"/>
-  </xsd:complexType>
-
-  <!-- POWERLINK CN features -->
-  <xsd:complexType name="t_CNFeatures">
-    <xsd:attribute name="DLLCNFeatureMultiplex" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="DLLCNPResChaining" type="xsd:boolean" use="optional" default="false"/>
-    <xsd:attribute name="NMTCNSoC2PReq" type="xsd:unsignedInt" use="required"/>
-  </xsd:complexType>
-
-  <!-- POWERLINK device commissioning (for XDC files) -->
-  <xsd:complexType name="t_deviceCommissioning">
-    <xsd:attribute name="networkName" type="xsd:string" use="required"/>
-    <xsd:attribute name="nodeID" type="xsd:unsignedByte" use="required"/>
-    <xsd:attribute name="nodeName" type="xsd:string" use="required"/>
-    <xsd:attribute name="nodeType" use="required">
-      <xsd:simpleType>
-        <xsd:restriction base="xsd:NMTOKENS">
-          <xsd:enumeration value="MN"/>
-          <xsd:enumeration value="CN"/>
-        </xsd:restriction>
-      </xsd:simpleType>
-    </xsd:attribute>
-    <xsd:attribute name="usedNetworkInterface" type="xsd:unsignedByte" use="optional" default="0"/>
-  </xsd:complexType>
-
-  <!-- POWERLINK diagnostic -->
-  <xsd:complexType name="t_Diagnostic">
-    <xsd:choice maxOccurs="unbounded">
-      <xsd:element name="ErrorList" minOccurs="0">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="Error" type="ErrorConstant_DataType" maxOccurs="unbounded"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-      <xsd:element name="StaticErrorBitField" minOccurs="0">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:element name="ErrorBit" type="ErrorBit_DataType" maxOccurs="64"/>
-          </xsd:sequence>
-        </xsd:complexType>
-      </xsd:element>
-    </xsd:choice>
-  </xsd:complexType>
-
-  <!-- Error code constant -->
-  <xsd:complexType name="ErrorConstant_DataType">
-    <xsd:sequence>
-      <!-- for desriptive texts (optional) -->
-      <xsd:group ref="g_labels" minOccurs="0"/>
-      <!-- description of the 64 bits additional information  -->
-      <xsd:element name="addInfo" minOccurs="0" maxOccurs="unbounded">
-        <xsd:complexType>
-          <xsd:sequence>
-            <xsd:group ref="g_labels" minOccurs="0"/>
-            <xsd:element name="value" minOccurs="0" maxOccurs="unbounded">
-              <xsd:complexType>
-                <xsd:group ref="g_labels" minOccurs="0"/>
-                <xsd:attribute name="value" type="xsd:string" use="required"/>
-                <xsd:attribute name="name" type="xsd:string" use="required"/>
-              </xsd:complexType>
+                </xsd:annotation>
             </xsd:element>
-          </xsd:sequence>
-          <xsd:attribute name="bitOffset" type="xsd:unsignedByte" use="required"/>
-          <xsd:attribute name="len" type="xsd:unsignedByte" use="required"/>
-          <xsd:attribute name="name" type="xsd:string" use="required"/>
-        </xsd:complexType>
-      </xsd:element>
-    </xsd:sequence>
-    <xsd:attribute name="name" type="xsd:string" use="required"/>
-    <xsd:attribute name="value" type="xsd:string" use="required"/>
-  </xsd:complexType>
-
-  <!-- A bit in the static error bit field -->
-  <xsd:complexType name="ErrorBit_DataType">
-    <!-- for desriptive texts (optional) -->
-    <xsd:group ref="g_labels" minOccurs="0" maxOccurs="unbounded"/>
-    <xsd:attribute name="name" type="xsd:string" use="required"/>
-    <xsd:attribute name="offset" use="required">
-      <xsd:simpleType>
-        <xsd:restriction base="xsd:nonNegativeInteger">
-          <xsd:maxInclusive value="63"/>
-        </xsd:restriction>
-      </xsd:simpleType>
-    </xsd:attribute>
-  </xsd:complexType>
+        </xsd:sequence>
+    </xsd:complexType>
+    <!-- POWERLINK general features -->
+    <xsd:complexType name="t_GeneralFeatures">
+        <xsd:attribute name="CFMConfigManager" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="DLLErrBadPhysMode" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="DLLErrMacBuffer" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="DLLFeatureCN" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="DLLFeatureMN" type="xsd:boolean" use="required"/>
+        <xsd:attribute name="NMTBootTimeNotActive" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTCycleTimeGranularity" type="xsd:unsignedInt" use="optional" default="1"/>
+        <xsd:attribute name="NMTCycleTimeMax" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTCycleTimeMin" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMinRedCycleTime" type="xsd:unsignedInt" use="optional" default="0"/>
+        <xsd:attribute name="NMTEmergencyQueueSize" type="xsd:unsignedInt" use="optional" default="0"/>
+        <xsd:attribute name="NMTErrorEntries" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTExtNmtCmds" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTFlushArpEntry" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTIsochronous" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="NMTNetHostNameSet" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTMaxCNNodeID" type="xsd:unsignedByte" use="optional" default="239"/>
+        <xsd:attribute name="NMTMaxCNNumber" type="xsd:unsignedByte" use="optional" default="239"/>
+        <xsd:attribute name="NMTMaxHeartbeats" type="xsd:unsignedByte" use="optional" default="254"/>
+        <xsd:attribute name="NMTNodeIDByHW" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="NMTNodeIDBySW" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTProductCode" type="xsd:unsignedInt" use="optional" default="0"/>
+        <xsd:attribute name="NMTPublishActiveNodes" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishConfigNodes" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishEmergencyNew" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishNodeState" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishOperational" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishPreOp1" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishPreOp2" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishReadyToOp" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishStopped" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTPublishTime" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTRevisionNo" type="xsd:unsignedInt" use="optional" default="0"/>
+        <xsd:attribute name="NWLForward" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NWLICMPSupport" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NWLIPSupport" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="PDODynamicMapping" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="PDOGranularity" type="xsd:unsignedByte" use="optional" default="8"/>
+        <xsd:attribute name="PDOMaxDescrMem" type="xsd:unsignedInt" use="optional" default="4294967295"/>
+        <xsd:attribute name="PDORPDOChannelObjects" type="xsd:unsignedByte" use="optional" default="254"/>
+        <xsd:attribute name="PDORPDOChannels" type="xsd:unsignedShort" use="optional" default="256"/>
+        <xsd:attribute name="PDORPDOCycleDataLim" type="xsd:unsignedInt" use="optional" default="4294967295"/>
+        <xsd:attribute name="PDORPDOOverallObjects" type="xsd:unsignedShort" use="optional" default="65535"/>
+        <xsd:attribute name="PDOSelfReceipt" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="PDOTPDOChannelObjects" type="xsd:unsignedByte" use="optional" default="254"/>
+        <xsd:attribute name="PDOTPDOCycleDataLim" type="xsd:unsignedInt" use="optional" default="4294967295"/>
+        <xsd:attribute name="PDOTPDOOverallObjects" type="xsd:unsignedShort" use="optional" default="65535"/>
+        <xsd:attribute name="PHYExtEPLPorts" type="xsd:unsignedByte" use="optional" default="2"/>
+        <xsd:attribute name="PHYHubDelay" type="xsd:unsignedInt" use="optional" default="460"/>
+        <xsd:attribute name="PHYHubIntegrated" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="PHYHubJitter" type="xsd:unsignedInt" use="optional" default="70"/>
+        <xsd:attribute name="RT1RT1SecuritySupport" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="RT1RT1Support" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="RT2RT2Support" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOClient" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="SDOCmdFileRead" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdFileWrite" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdLinkName" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdReadAllByIndex" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdReadByName" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdReadMultParam" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdWriteAllByIndex" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdWriteByName" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOCmdWriteMultParam" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOMaxConnections" type="xsd:unsignedInt" use="optional" default="1"/>
+        <xsd:attribute name="SDOMaxParallelConnections" type="xsd:unsignedInt" use="optional" default="1"/>
+        <xsd:attribute name="SDOSeqLayerTxHistorySize" type="xsd:unsignedShort" use="optional" default="5"/>
+        <xsd:attribute name="SDOServer" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="SDOSupportASnd" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOSupportPDO" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="SDOSupportUdpIp" type="xsd:boolean" use="optional" default="false"/>
+    </xsd:complexType>
+    <!-- POWERLINK MN features -->
+    <xsd:complexType name="t_MNFeatures">
+        <xsd:attribute name="DLLErrMNMultipleMN" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="DLLMNFeatureMultiplex" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="DLLMNPResChaining" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="DLLMNFeaturePResTx" type="xsd:boolean" use="optional" default="true"/>
+        <xsd:attribute name="NMTMNASnd2SoC" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMNBasicEthernet" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTMNMultiplCycMax" type="xsd:unsignedByte" use="optional" default="0"/>
+        <xsd:attribute name="NMTMNPRes2PReq" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMNPRes2PRes" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMNPResRx2SoA" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMNPResTx2SoA" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMNSoA2ASndTx" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTMNSoC2PReq" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTNetTime" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTNetTimeIsRealTime" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTRelativeTime" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTServiceUdpIp" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTSimpleBoot" type="xsd:boolean" use="required"/>
+        <xsd:attribute name="PDOTPDOChannels" type="xsd:unsignedShort" use="optional" default="256"/>
+        <xsd:attribute name="NMTMNDNA" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTMNRedundancy" type="xsd:boolean" use="optional" default="false"/>
+    </xsd:complexType>
+    <!-- POWERLINK CN features -->
+    <xsd:complexType name="t_CNFeatures">
+        <xsd:attribute name="DLLCNFeatureMultiplex" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="DLLCNPResChaining" type="xsd:boolean" use="optional" default="false"/>
+        <xsd:attribute name="NMTCNPreOp2ToReady2Op" type="xsd:unsignedInt" use="optional"/>
+        <xsd:attribute name="NMTCNSoC2PReq" type="xsd:unsignedInt" use="required"/>
+        <xsd:attribute name="NMTCNSetNodeNumberTime" type="xsd:unsignedInt" use="optional" default="0"/>
+        <xsd:attribute name="NMTCNDNA" type="xsd:boolean" use="optional" default="false"/>
+    </xsd:complexType>
+    <!-- POWERLINK device commissioning (for XDC files) -->
+    <xsd:complexType name="t_deviceCommissioning">
+        <xsd:attribute name="networkName" type="xsd:string" use="required"/>
+        <xsd:attribute name="nodeID" type="xsd:unsignedByte" use="required"/>
+        <xsd:attribute name="nodeName" type="xsd:string" use="required"/>
+        <xsd:attribute name="nodeType" use="required">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:NMTOKENS">
+                    <xsd:enumeration value="MN"/>
+                    <xsd:enumeration value="CN"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <xsd:attribute name="usedNetworkInterface" type="xsd:unsignedByte" use="optional" default="0"/>
+    </xsd:complexType>
+    <!-- POWERLINK diagnostic -->
+    <xsd:complexType name="t_Diagnostic">
+        <xsd:choice maxOccurs="unbounded">
+            <xsd:element name="ErrorList" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="Error" type="ErrorConstant_DataType" maxOccurs="unbounded"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="StaticErrorBitField" minOccurs="0">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="ErrorBit" type="ErrorBit_DataType" maxOccurs="64"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:choice>
+    </xsd:complexType>
+    <!-- Error code constant -->
+    <xsd:complexType name="ErrorConstant_DataType">
+        <xsd:sequence>
+            <!-- for desriptive texts (optional) -->
+            <xsd:group ref="g_labels" minOccurs="0"/>
+            <!-- description of the 64 bits additional information  -->
+            <xsd:element name="addInfo" minOccurs="0" maxOccurs="unbounded">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:group ref="g_labels" minOccurs="0"/>
+                        <xsd:element name="value" minOccurs="0" maxOccurs="unbounded">
+                            <xsd:complexType>
+                                <xsd:group ref="g_labels" minOccurs="0"/>
+                                <xsd:attribute name="value" type="xsd:string" use="required"/>
+                                <xsd:attribute name="name" type="xsd:string" use="required"/>
+                            </xsd:complexType>
+                        </xsd:element>
+                    </xsd:sequence>
+                    <xsd:attribute name="bitOffset" type="xsd:unsignedByte" use="required"/>
+                    <xsd:attribute name="len" type="xsd:unsignedByte" use="required"/>
+                    <xsd:attribute name="name" type="xsd:string" use="required"/>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:sequence>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="value" type="xsd:string" use="required"/>
+    </xsd:complexType>
+    <!-- A bit in the static error bit field -->
+    <xsd:complexType name="ErrorBit_DataType">
+        <xsd:group ref="g_labels" minOccurs="0" maxOccurs="unbounded"/>
+        <xsd:attribute name="name" type="xsd:string" use="required"/>
+        <xsd:attribute name="offset" use="required">
+            <xsd:simpleType>
+                <xsd:restriction base="xsd:nonNegativeInteger">
+                    <xsd:maxInclusive value="63"/>
+                </xsd:restriction>
+            </xsd:simpleType>
+        </xsd:attribute>
+        <!-- for desriptive texts (optional) -->
+    </xsd:complexType>
 </xsd:schema>
