@@ -41,6 +41,7 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
@@ -96,6 +97,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
 
     private static final TextPropertyDescriptor nodeIdEditableDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
+    private static final PropertyDescriptor nodeIDDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
     private static final TextPropertyDescriptor forcedMultiplexedCycle = new TextPropertyDescriptor(
             IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT,
             CN_FORCED_MULTIPLEXED_CYCLE_LABEL);
@@ -139,6 +142,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
 
     static {
         nodeTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIDDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
         forcedMultiplexedCycle
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
@@ -219,6 +223,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         setNodeData(cnNode);
 
         nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeErrorDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeIdEditableDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeIdEditableDescriptor.setValidator(new ICellEditorValidator() {
@@ -360,36 +365,47 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         if (tcn == null) {
             return;
         }
+        // checks whether the XDC import has occurred
+        if (!cnNode.hasXdd()) {
+            propertyList.add(nameDescriptor);
+            propertyList.add(nodeIdEditableDescriptor);
 
-        propertyList.add(nameDescriptor);
-        propertyList.add(nodeIdEditableDescriptor);
+            if (tcn.getPathToXDC() != null) {
 
-        if (tcn.getPathToXDC() != null) {
+                propertyList.add(configurationDescriptor);
+            }
 
-            propertyList.add(configurationDescriptor);
-        }
+            propertyList.add(nodeTypeDescriptor);
+            propertyList.add(forcedMultiplexedCycle);
+            propertyList.add(isMandatory);
+            propertyList.add(autostartNode);
+            propertyList.add(resetInOperational);
+            propertyList.add(verifyAppSwVersion);
+            propertyList.add(autoAppSwUpdateAllowed);
+            propertyList.add(verifyDeviceType);
+            propertyList.add(verifyVendorId);
+            propertyList.add(verifyRevisionNumber);
+            propertyList.add(verifyProductCode);
+            propertyList.add(verifySerialNumber);
+            propertyList.add(isAsyncOnly);
+            propertyList.add(isType1Router);
+            propertyList.add(isType2Router);
 
-        propertyList.add(nodeTypeDescriptor);
-        propertyList.add(forcedMultiplexedCycle);
-        propertyList.add(isMandatory);
-        propertyList.add(autostartNode);
-        propertyList.add(resetInOperational);
-        propertyList.add(verifyAppSwVersion);
-        propertyList.add(autoAppSwUpdateAllowed);
-        propertyList.add(verifyDeviceType);
-        propertyList.add(verifyVendorId);
-        propertyList.add(verifyRevisionNumber);
-        propertyList.add(verifyProductCode);
-        propertyList.add(verifySerialNumber);
-        propertyList.add(isAsyncOnly);
-        propertyList.add(isType1Router);
-        propertyList.add(isType2Router);
+            propertyList.add(presMaxLatencyDescriptor);
+            propertyList.add(presTimeoutDescriptor);
+            // propertyList.add(lossSocToleranceDescriptor);
+            if (tcn.getForcedObjects() != null) {
+                propertyList.add(forcedObjects);
+            }
+        } else {
+            propertyList.add(readOnlynameDescriptor);
+            propertyList.add(nodeIDDescriptor);
 
-        propertyList.add(presMaxLatencyDescriptor);
-        propertyList.add(presTimeoutDescriptor);
-        // propertyList.add(lossSocToleranceDescriptor);
-        if (tcn.getForcedObjects() != null) {
-            propertyList.add(forcedObjects);
+            if (tcn.getPathToXDC() != null) {
+
+                propertyList.add(configurationDescriptor);
+            }
+            propertyList.add(nodeErrorDescriptor);
         }
     }
 
@@ -423,6 +439,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     break;
                 case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                     retObj = tcn.getPathToXDC();
+                    break;
+                case IAbstractNodeProperties.NODE_ERROR_OBJECT:
+                    retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
                     break;
                 case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {
                     int value = 0; // Normal Station.

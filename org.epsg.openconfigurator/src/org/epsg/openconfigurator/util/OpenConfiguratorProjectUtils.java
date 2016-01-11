@@ -504,24 +504,40 @@ public final class OpenConfiguratorProjectUtils {
 
                 processingNode = new Node(nodeCollection, projectFile, cnNode,
                         null);
+                try {
 
-                ISO15745ProfileContainer xdd = XddMarshaller
-                        .unmarshallXDDFile(cnXddFile);
-                Node newNode = new Node(nodeCollection, projectFile, cnNode,
-                        xdd);
-                processingNode = newNode;
+                    ISO15745ProfileContainer xdd = XddMarshaller
+                            .unmarshallXDDFile(cnXddFile);
 
-                Result res = OpenConfiguratorLibraryUtils.addNode(
-                        newNode.getNetworkId(), new Short(newNode.getNodeId()),
-                        newNode);
-                if (res.IsSuccessful()) {
-                    nodeCollection.put(new Short(newNode.getNodeId()), newNode);
-                } else {
-                    return new Status(IStatus.ERROR,
-                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                            OpenConfiguratorLibraryUtils.getErrorMessage(res),
-                            null);
+                    Node newNode = new Node(nodeCollection, projectFile, cnNode,
+                            xdd);
+
+                    processingNode = newNode;
+
+                    Result res = OpenConfiguratorLibraryUtils.addNode(
+                            newNode.getNetworkId(),
+                            new Short(newNode.getNodeId()), newNode);
+                    if (res.IsSuccessful()) {
+                        nodeCollection.put(new Short(newNode.getNodeId()),
+                                newNode);
+                    } else {
+                        return new Status(IStatus.ERROR,
+                                org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res),
+                                null);
+                    }
+
+                } catch (JAXBException | SAXException
+                        | ParserConfigurationException | FileNotFoundException
+                        | UnsupportedEncodingException e) {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(e.getCause().getMessage()
+                                    + " for the node " + "'" + cnNode.getName()
+                                    + "(" + cnNode.getNodeID() + ")" + "'");
                 }
+                nodeCollection.put(new Short(processingNode.getNodeId()),
+                        processingNode);
                 monitor.worked(1);
             }
 
@@ -544,23 +560,37 @@ public final class OpenConfiguratorProjectUtils {
                         "RMN XDD file path:" + rmnXddFile.getAbsolutePath());
                 processingNode = new Node(nodeCollection, projectFile, rmnNode,
                         null);
-                ISO15745ProfileContainer xdd = XddMarshaller
-                        .unmarshallXDDFile(rmnXddFile);
+                try {
+                    ISO15745ProfileContainer xdd = XddMarshaller
+                            .unmarshallXDDFile(rmnXddFile);
 
-                Node newNode = new Node(nodeCollection, projectFile, rmnNode,
-                        xdd);
-                processingNode = newNode;
+                    Node newNode = new Node(nodeCollection, projectFile,
+                            rmnNode, xdd);
+                    processingNode = newNode;
 
-                Result res = OpenConfiguratorLibraryUtils.addNode(
-                        newNode.getNetworkId(), newNode.getNodeId(), newNode);
-                if (res.IsSuccessful()) {
-                    nodeCollection.put(new Short(newNode.getNodeId()), newNode);
-                } else {
-                    return new Status(IStatus.ERROR,
-                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                            OpenConfiguratorLibraryUtils.getErrorMessage(res),
-                            null);
+                    Result res = OpenConfiguratorLibraryUtils.addNode(
+                            newNode.getNetworkId(), newNode.getNodeId(),
+                            newNode);
+                    if (res.IsSuccessful()) {
+                        nodeCollection.put(new Short(newNode.getNodeId()),
+                                newNode);
+                    } else {
+                        return new Status(IStatus.ERROR,
+                                org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res),
+                                null);
+                    }
+                } catch (JAXBException | SAXException
+                        | ParserConfigurationException | FileNotFoundException
+                        | UnsupportedEncodingException e) {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(e.getCause().getMessage()
+                                    + " for the node " + "'" + rmnNode.getName()
+                                    + "(" + rmnNode.getNodeID() + ")" + "'");
                 }
+                nodeCollection.put(new Short(processingNode.getNodeId()),
+                        processingNode);
                 monitor.worked(1);
             }
 
@@ -763,7 +793,12 @@ public final class OpenConfiguratorProjectUtils {
                 System.err.println("Node" + entry.getKey() + " is null");
                 continue;
             }
-
+            if (node.hasXdd()) {
+                OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                        "The Node " + "'" + node.getNodeIDWithName() + "'"
+                                + " has invalid XDD file.");
+                continue;
+            }
             if (monitor.isCanceled()) {
                 throw new OperationCanceledException(
                         "Operation cancelled by user. Not all data is saved to the XDC.");

@@ -54,7 +54,7 @@ public interface IPluginImages {
     public final static String CN_DISABLED_ICON = "icons/cn_disabled.gif";
     public final static String DISABLE_NODE_ICON = "icons/disable.gif";
     public final static String OVERLAY_CHAINED_NODE_ICON = "icons/chained.gif";
-
+    public final static String ERROR_OVERLAY_NODE_ICON = "icons/error_overlay.gif";
     // Mapping view icons
     public final static String ERROR_ICON = "icons/error.gif";
     public final static String FILTER_ICON = "icons/filter.gif";

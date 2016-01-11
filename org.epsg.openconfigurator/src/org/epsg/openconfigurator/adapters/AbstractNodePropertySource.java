@@ -49,6 +49,7 @@ public abstract class AbstractNodePropertySource {
     // Common label names
     private static final String NODE_NAME_LABEL = "Node Name";
     public static final String NODE_ID_LABEL = "Node ID";
+    public static final String NODE_ERROR_LABEL = "Error";
     private static final String NODE_CONFIG_LABEL = "Configuration File";
     private static final String NODE_IS_ASYNC_ONLY_LABEL = "Is Async Only";
     private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Is Type1 Router";
@@ -68,10 +69,14 @@ public abstract class AbstractNodePropertySource {
 
     protected TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_NAME_OBJECT, NODE_NAME_LABEL);
+    protected PropertyDescriptor readOnlynameDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.NODE_NAME_OBJECT, NODE_NAME_LABEL);
     protected PropertyDescriptor nodeIdDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_ID_READONLY_OBJECT, NODE_ID_LABEL);
     protected PropertyDescriptor configurationDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_CONIFG_OBJECT, NODE_CONFIG_LABEL);
+    protected PropertyDescriptor nodeErrorDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.NODE_ERROR_OBJECT, NODE_ERROR_LABEL);
 
     protected ComboBoxPropertyDescriptor isAsyncOnly = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT,
@@ -94,6 +99,8 @@ public abstract class AbstractNodePropertySource {
             CN_LOSS_OF_SOC_TOLERANCE_LABEL);
 
     AbstractNodePropertySource() {
+        readOnlynameDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nameDescriptor.setDescription(
                 IAbstractNodeProperties.NAME_OF_THE_SELECTED_NODE);
         nameDescriptor.setValidator(new ICellEditorValidator() {

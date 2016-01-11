@@ -563,9 +563,24 @@ public class IndustrialNetworkView extends ViewPart
         for (Object selectedObject : selectedObjectsList) {
             if (selectedObject instanceof Node) {
                 Node node = (Node) selectedObject;
-                Result res = OpenConfiguratorLibraryUtils
-                        .toggleEnableDisable(node);
-                if (res.IsSuccessful()) {
+                // checks for valid XDC file
+                if (!node.hasXdd()) {
+                    Result res = OpenConfiguratorLibraryUtils
+                            .toggleEnableDisable(node);
+                    if (res.IsSuccessful()) {
+                        try {
+                            rootNode.toggleEnableDisable(node);
+                        } catch (JDOMException | IOException e) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(e.getMessage());
+                            e.printStackTrace();
+                        }
+                        viewer.refresh();
+                    } else {
+                        showMessage(OpenConfiguratorLibraryUtils
+                                .getErrorMessage(res));
+                    }
+                } else {
                     try {
                         rootNode.toggleEnableDisable(node);
                     } catch (JDOMException | IOException e) {
@@ -622,9 +637,35 @@ public class IndustrialNetworkView extends ViewPart
                             new String[] { "Yes", "No" }, 1);
                     int result = dialog.open();
                     if (result == 0) {
-                        Result res = OpenConfiguratorLibraryUtils
-                                .removeNode(node);
-                        if (res.IsSuccessful()) {
+                        // checks for valid XDC file
+                        if (!node.hasXdd()) {
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .removeNode(node);
+                            if (res.IsSuccessful()) {
+                                try {
+                                    rootNode.removeNode(node);
+                                } catch (JDOMException | IOException e) {
+                                    if (e instanceof NoSuchFileException) {
+                                        OpenConfiguratorMessageConsole
+                                                .getInstance()
+                                                .printErrorMessage("The file "
+                                                        + e.getMessage()
+                                                        + " cannot be found.");
+                                    } else {
+                                        OpenConfiguratorMessageConsole
+                                                .getInstance()
+                                                .printErrorMessage(
+                                                        e.getMessage());
+                                    }
+                                    e.printStackTrace();
+                                }
+
+                                handleRefresh();
+                            } else {
+                                showMessage(OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res));
+                            }
+                        } else {
                             try {
                                 rootNode.removeNode(node);
                             } catch (JDOMException | IOException e) {
@@ -640,9 +681,6 @@ public class IndustrialNetworkView extends ViewPart
                                 e.printStackTrace();
                             }
                             handleRefresh();
-                        } else {
-                            showMessage(OpenConfiguratorLibraryUtils
-                                    .getErrorMessage(res));
                         }
                     }
                 } else {

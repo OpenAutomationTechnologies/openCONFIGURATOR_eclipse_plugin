@@ -46,6 +46,7 @@ public interface IAbstractNodeProperties {
     public static final String NODE_ID_OBJECT = "nodeID"; //$NON-NLS-1$
     public static final String NODE_ID_READONLY_OBJECT = "node.NodeId.ReadOnly"; //$NON-NLS-1$
     public static final String NODE_ID_EDITABLE_OBJECT = "node.NodeId.Editable"; //$NON-NLS-1$
+    public static final String NODE_ERROR_OBJECT = "node.NodeId.Error"; //$NON-NLS-1$
 
     public static final String NODE_CONIFG_OBJECT = "pathToXDC"; //$NON-NLS-1$
     public static final String NODE_IS_ASYNC_ONLY_OBJECT = "isAsyncOnly"; //$NON-NLS-1$
@@ -62,6 +63,7 @@ public interface IAbstractNodeProperties {
     public static final String NODE_ROUTER_TYPE1_DESCRIPTION = "Router type 1. See 0x1F81, Bit 10.";
     public static final String NODE_ROUTER_TYPE2_DESCRIPTION = "Router type 2. See 0x1F81, Bit 11.";
     public static final String LOSS_SOC_TOLERANCE_DESCRIPTION = "A tolerance interval in [ns] to be applied by CN's Loss of SoC error recognition. See 0x1C14.";
+    public static final String NODE_ERROR_DESCRIPTION = "Invalid Configuration file.";
 
     public static final long LOSS_SOC_TOLERANCE_OBJECT_ID = 0x1C14;
 

@@ -39,6 +39,7 @@ import javax.xml.bind.DatatypeConverter;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
@@ -71,6 +72,8 @@ public class RedundantManagingNodePropertySource
     private static final TextPropertyDescriptor priorityDescriptor = new TextPropertyDescriptor(
             IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT,
             RMN_PRIORITY_LABEL);
+    private static final PropertyDescriptor nodeIDDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
     private static final TextPropertyDescriptor nodeIdEditableDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
 
@@ -121,6 +124,8 @@ public class RedundantManagingNodePropertySource
         });
 
         nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeErrorDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeIDDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeIdEditableDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeIdEditableDescriptor.setValidator(new ICellEditorValidator() {
@@ -161,25 +166,36 @@ public class RedundantManagingNodePropertySource
         if (rmn == null) {
             return;
         }
+        // checks whether XDC import of node has occurred
+        if (!redundantManagingNode.hasXdd()) {
+            propertyList.add(nameDescriptor);
+            propertyList.add(nodeIdEditableDescriptor);
 
-        propertyList.add(nameDescriptor);
-        propertyList.add(nodeIdEditableDescriptor);
+            if (rmn.getPathToXDC() != null) {
 
-        if (rmn.getPathToXDC() != null) {
+                propertyList.add(configurationDescriptor);
+            }
 
-            propertyList.add(configurationDescriptor);
-        }
+            propertyList.add(waitNotActiveDescriptor);
 
-        propertyList.add(waitNotActiveDescriptor);
+            propertyList.add(priorityDescriptor);
 
-        propertyList.add(priorityDescriptor);
+            propertyList.add(isAsyncOnly);
+            propertyList.add(isType1Router);
+            propertyList.add(isType2Router);
+            // propertyList.add(lossSocToleranceDescriptor);
+            if (rmn.getForcedObjects() != null) {
+                propertyList.add(forcedObjects);
+            }
+        } else {
+            propertyList.add(readOnlynameDescriptor);
+            propertyList.add(nodeIDDescriptor);
 
-        propertyList.add(isAsyncOnly);
-        propertyList.add(isType1Router);
-        propertyList.add(isType2Router);
-        // propertyList.add(lossSocToleranceDescriptor);
-        if (rmn.getForcedObjects() != null) {
-            propertyList.add(forcedObjects);
+            if (rmn.getPathToXDC() != null) {
+
+                propertyList.add(configurationDescriptor);
+            }
+            propertyList.add(nodeErrorDescriptor);
         }
     }
 
@@ -220,6 +236,9 @@ public class RedundantManagingNodePropertySource
                     break;
                 case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                     retObj = rmn.getPathToXDC();
+                    break;
+                case IAbstractNodeProperties.NODE_ERROR_OBJECT:
+                    retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
                     break;
                 case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
                     retObj = redundantManagingNode.getRmnWaitNotActive();

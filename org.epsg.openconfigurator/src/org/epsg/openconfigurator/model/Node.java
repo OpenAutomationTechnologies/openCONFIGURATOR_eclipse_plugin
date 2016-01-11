@@ -888,6 +888,19 @@ public class Node {
     }
 
     /**
+     * Checks for valid XDD model.
+     *
+     * @return <code>True</code> if node has no XDD/XDC file. <code>False</code>
+     *         if node has XDD/XDC file
+     */
+    public boolean hasXdd() {
+        if (getISO15745ProfileContainer() == null) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Checks for the enable disable flag available in the openCONFIGURATOR
      * project model. Currently supported on for a CN node. Other nodes are
      * enabled by default.
