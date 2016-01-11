@@ -142,8 +142,6 @@ public final class OpenConfiguratorProjectUtils {
             TNodeCollection nodeCollection, Node node)
                     throws IOException, JDOMException {
 
-        importNodeConfigurationFile(node);
-
         Object nodeModel = node.getNodeModel();
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;

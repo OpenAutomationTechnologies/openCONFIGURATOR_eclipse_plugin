@@ -34,14 +34,24 @@
 package org.epsg.openconfigurator.wizards;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExecutableExtension;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.INewWizard;
@@ -50,7 +60,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.WizardNewProjectCreationPage;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.xml.sax.SAXException;
 
 /**
  * Creates the new POWERLINK network project wizard.
@@ -71,6 +86,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
     public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE = "POWERLINK network project";
     public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project.";
     public static final String NEW_PROJECT_WIZARD_TITLE = "New POWERLINK network project";
+    private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the XDD files.";
 
     /**
      * New project creation wizard page.
@@ -83,6 +99,11 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
     private AddDefaultMasterNodeWizardPage addDefaultMasterPage;
 
     /**
+     * Add validateXddWizardPage
+     */
+    private final ValidateXddWizardPage validateXddPage;
+
+    /**
      * Configuration element.
      */
     private IConfigurationElement _configurationElement;
@@ -91,7 +112,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
      * Constructor.
      */
     public NewPowerlinkNetworkProjectWizard() {
-        // Do nothing.
+        validateXddPage = new ValidateXddWizardPage();
     }
 
     @Override
@@ -109,6 +130,8 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
         addDefaultMasterPage = new AddDefaultMasterNodeWizardPage();
         addDefaultMasterPage.setPreviousPage(newProjectCreationPage);
         addPage(addDefaultMasterPage);
+        validateXddPage.setPreviousPage(addDefaultMasterPage);
+        addPage(validateXddPage);
     }
 
     /*
@@ -121,7 +144,78 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
         if (getContainer().getCurrentPage() == newProjectCreationPage) {
             return false;
         }
-        return addDefaultMasterPage.isPageComplete();
+        if (getContainer().getCurrentPage() == addDefaultMasterPage) {
+            return false;
+        }
+        return validateXddPage.isPageComplete();
+    }
+
+    /**
+     * Import the device description and device configuration files into the
+     * respective directories into the project.
+     *
+     * @param projectPath Path of the project
+     */
+    void copyXddToDeviceImportDir(final String projectPath) {
+        try {
+
+            java.nio.file.Path mnXdd = validateXddPage
+                    .getNodeConfigurationPath();
+
+            System.out.println("MN XDD path" + mnXdd.toString());
+
+            String targetImportPath = new String(projectPath + IPath.SEPARATOR
+                    + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
+                    + IPath.SEPARATOR + mnXdd.getFileName().toString());
+
+            // Copy the MN XDD to deviceImport dir
+            java.nio.file.Files.copy(
+                    new java.io.File(mnXdd.toString()).toPath(),
+                    new java.io.File(targetImportPath).toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                    java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+            // Rename the XDD to XDC and copy the deviceImport MN XDD to
+            // deviceConfiguration dir
+            String extensionXdd = mnXdd.getFileName().toString();
+            int pos = extensionXdd.lastIndexOf(".");
+            if (pos > 0) {
+                extensionXdd = extensionXdd.substring(0, pos);
+            }
+
+            String targetConfigurationPath = new String(
+                    projectPath + IPath.SEPARATOR
+                            + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICECONFIGURATION
+                            + IPath.SEPARATOR + extensionXdd
+                            + IPowerlinkProjectSupport.XDC_EXTENSION);
+
+            java.nio.file.Files.copy(
+                    new java.io.File(targetImportPath).toPath(),
+                    new java.io.File(targetConfigurationPath).toPath(),
+                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                    java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                    java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+            java.nio.file.Path pathBase = Paths.get(projectPath);
+
+            // Set the relative path to the MN object
+            java.nio.file.Path pathRelative = pathBase
+                    .relativize(Paths.get(targetConfigurationPath));
+
+            String relativePath = pathRelative.toString();
+            relativePath = relativePath.replace('\\', '/');
+
+            Object nodemodel = addDefaultMasterPage.getNode();
+            ((TMN) nodemodel).setPathToXDC(relativePath);
+
+        } catch (UnsupportedOperationException | SecurityException
+                | IOException e) {
+            e.printStackTrace();
+
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    ERROR_WHILE_COPYING_XDD);
+        }
     }
 
     /**
@@ -134,7 +228,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
 
         String projectPath = newProjectCreationPage.getLocationPath().toString()
                 + File.separator + newProjectCreationPage.getProjectName();
-        addDefaultMasterPage.copyXddToDeviceImportDir(projectPath);
+        copyXddToDeviceImportDir(projectPath);
 
         String projectFileName = newProjectCreationPage.getLocationURI()
                 .getPath() + File.separator
@@ -175,6 +269,29 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
 
         String name = newProjectCreationPage.getProjectName();
 
+        Object nodeObject = addDefaultMasterPage.getNode();
+        Path xdcPath = validateXddPage.getNodeConfigurationPath();
+        if (nodeObject instanceof TMN) {
+            TMN mnModel = (TMN) nodeObject;
+            mnModel.setPathToXDC(xdcPath.toString());
+        } else {
+            validateXddPage.getErrorStyledText("Invalid node model");
+            System.err.println("Invalid node model");
+        }
+
+        ISO15745ProfileContainer xddModel = null;
+        try {
+            xddModel = XddMarshaller.unmarshallXDDFile(xdcPath.toFile());
+            validateXddPage.getErrorStyledText("");
+        } catch (FileNotFoundException | UnsupportedEncodingException
+                | JAXBException | SAXException
+                | ParserConfigurationException e2) {
+            validateXddPage.getErrorStyledText(e2.getCause().getMessage());
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    e2.getCause().getMessage());
+            e2.printStackTrace();
+            return false;
+        }
         // get a project handle
         try {
             IProject newProjectHandle = PowerlinkNetworkProjectSupport
@@ -193,9 +310,9 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow());
         } catch (CoreException ex) {
             ex.printStackTrace();
-            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
-                    "Failed to create a new project.", ex);
-            getContainer().showPage(newProjectCreationPage);
+            validateXddPage.getErrorStyledText(ex.getCause().getMessage());
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    "Failed to create a new project.");
             return false;
         }
 

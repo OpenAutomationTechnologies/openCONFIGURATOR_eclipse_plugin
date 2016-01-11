@@ -31,9 +31,16 @@
 
 package org.epsg.openconfigurator.wizards;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
 import java.util.Map;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
@@ -41,9 +48,14 @@ import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.jdom2.JDOMException;
+import org.xml.sax.SAXException;
 
 /**
  * Wizard dialog to add a new POWERLINK node.
@@ -55,11 +67,17 @@ public class NewNodeWizard extends Wizard {
 
     private static final String WINDOW_TITLE = "POWERLINK node wizard";
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
+    public static final String ERROR_NODE_MODEL = "Invalid node model";
 
     /**
      * Add new node wizard page.
      */
     private final AddControlledNodeWizardPage addNodePage;
+
+    /**
+     * Add validateXddWizardPage
+     */
+    private final ValidateXddWizardPage validateXddPage;
 
     /**
      * Selected node object. The new node will be added below this node.
@@ -83,17 +101,31 @@ public class NewNodeWizard extends Wizard {
 
         setWindowTitle(WINDOW_TITLE);
         addNodePage = new AddControlledNodeWizardPage(nodeCollection);
+        validateXddPage = new ValidateXddWizardPage();
     }
 
+    /**
+     * Add wizard page
+     */
     @Override
     public void addPages() {
         super.addPages();
         addPage(addNodePage);
+        addPage(validateXddPage);
+        validateXddPage.setPreviousPage(addNodePage);
     }
 
+    /**
+     * Move to next page or finish the wizard.
+     */
     @Override
     public boolean canFinish() {
-        return super.canFinish() && addNodePage.isPageComplete();
+        if (getContainer().getCurrentPage() == addNodePage) {
+            return false;
+        } else {
+            return validateXddPage.isPageComplete() && true;
+        }
+
     }
 
     /**
@@ -106,11 +138,57 @@ public class NewNodeWizard extends Wizard {
         return addNodePage.hasErrors();
     }
 
+    /**
+     * Complete the Wizard page.
+     */
     @Override
     public boolean performFinish() {
+        validateXddPage.getErrorStyledText("");
+        Object nodeObject = addNodePage.getNode();
+        Path xdcPath = validateXddPage.getNodeConfigurationPath();
+        if (nodeObject instanceof TCN) {
+            TCN cnModel = (TCN) nodeObject;
+            cnModel.setPathToXDC(xdcPath.toString());
+        } else if (nodeObject instanceof TRMN) {
+            TRMN rmnModel = (TRMN) nodeObject;
+            rmnModel.setPathToXDC(xdcPath.toString());
+        } else {
+            validateXddPage.getErrorStyledText(ERROR_NODE_MODEL);
+            System.err.println(ERROR_NODE_MODEL);
+        }
+
+        ISO15745ProfileContainer xddModel = null;
+        try {
+            xddModel = XddMarshaller.unmarshallXDDFile(xdcPath.toFile());
+        } catch (FileNotFoundException | UnsupportedEncodingException
+                | JAXBException | SAXException
+                | ParserConfigurationException e2) {
+            if ((e2.getMessage() != null) && !e2.getMessage().isEmpty()) {
+                validateXddPage.getErrorStyledText(e2.getMessage());
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        e2.getMessage(), "");
+            } else if ((e2.getCause() != null)
+                    && (e2.getCause().getMessage() != null)
+                    && !e2.getCause().getMessage().isEmpty()) {
+                validateXddPage.getErrorStyledText(e2.getCause().getMessage());
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        e2.getCause().getMessage(), "");
+            }
+            e2.printStackTrace();
+            return false;
+        }
 
         Node newNode = new Node(nodeList, selectedNodeObj.getProjectXml(),
-                addNodePage.getNode(), addNodePage.getXddModel());
+                nodeObject, xddModel);
+
+        try {
+            OpenConfiguratorProjectUtils.importNodeConfigurationFile(newNode);
+        } catch (IOException e1) {
+            validateXddPage.getErrorStyledText(e1.getCause().getMessage());
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    e1.getCause().getMessage());
+            e1.printStackTrace();
+        }
 
         Result res = OpenConfiguratorLibraryUtils
                 .addNode(newNode.getNetworkId(), newNode.getNodeId(), newNode);
@@ -120,19 +198,23 @@ public class NewNodeWizard extends Wizard {
                 OpenConfiguratorProjectUtils.addNode(nodeList, nodeCollection,
                         newNode);
             } catch (IOException | JDOMException e) {
-                PluginErrorDialogUtils
-                        .displayErrorMessageDialog(
-                                org.epsg.openconfigurator.Activator.getDefault()
-                                        .getWorkbench()
-                                        .getActiveWorkbenchWindow().getShell(),
-                                ERROR_WHILE_COPYING_XDD, null);
+                if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                    validateXddPage.getErrorStyledText(e.getMessage());
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, e.getMessage(), "");
+                } else if ((e.getCause() != null)
+                        && (e.getCause().getMessage() != null)
+                        && !e.getCause().getMessage().isEmpty()) {
+                    validateXddPage
+                            .getErrorStyledText(e.getCause().getMessage());
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                            newNode.getProject().getName());
+                }
             }
         } else {
-            PluginErrorDialogUtils.displayErrorMessageDialog(
-                    org.epsg.openconfigurator.Activator.getDefault()
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(),
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
 
             // Try removing the node.
             // FIXME: do we need this?
@@ -148,4 +230,5 @@ public class NewNodeWizard extends Wizard {
         }
         return true;
     }
+
 }

@@ -1,46 +1,39 @@
 /*******************************************************************************
- * @file   AddControlledNodeWizardPage.java
- *
- * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
- *
- * @copyright (c) 2015, Kalycito Infotech Private Limited
- *                    All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *   * Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
- *   * Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *   * Neither the name of the copyright holders nor the
- *     names of its contributors may be used to endorse or promote products
- *     derived from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
- * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *******************************************************************************/
+* @file   AddControlledNodeWizardPage.java
+*
+* @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
+*
+* @copyright (c) 2015, Kalycito Infotech Private Limited
+*                    All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions are met:
+*   * Redistributions of source code must retain the above copyright
+*     notice, this list of conditions and the following disclaimer.
+*   * Redistributions in binary form must reproduce the above copyright
+*     notice, this list of conditions and the following disclaimer in the
+*     documentation and/or other materials provided with the distribution.
+*   * Neither the name of the copyright holders nor the
+*     names of its contributors may be used to endorse or promote products
+*     derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+* WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+* DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+* DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+* (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+* LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+* ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+* SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*******************************************************************************/
 
 package org.epsg.openconfigurator.wizards;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.xml.bind.JAXBException;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -48,26 +41,16 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
-import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
-import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
-import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
-import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
-import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
-import org.xml.sax.SAXException;
 
 /**
  * Add new node (Controlled node, Redundant managing node) wizard page.
@@ -83,38 +66,24 @@ public class AddControlledNodeWizardPage extends WizardPage {
             REDUNDANT_MANAGING_NODE_LABEL };
 
     private static final String DIALOG_PAGE_NAME = "AddCnwizardPage"; //$NON-NLS-1$
-    private static final String DIALOG_TILE = "POWERLINK node";
-    private static final String DIALOG_DESCRIPTION = "Add a POWERLINK node to the network.";
+    public static final String DIALOG_TILE = "POWERLINK node";
+    public static final String DIALOG_DESCRIPTION = "Add a POWERLINK node to the network.";
 
     private static final String NODE_TYPE_LABEL = "Node Type:";
     private static final String NODE_ID_LABEL = "Node ID:";
     private static final String RANGE_LABEL = "Range:";
     private static final String NAME_LABEL = "Name:";
-    private static final String CONFIGURATION_FILE_LABEL = "Configuration File";
-    private static final String NODE_CONFIGURATION_LABEL = "XDD/XDC file:";
-    private static final String DEFAULT_CONFIGURATION_LABEL = "Default";
-    private static final String CUSTOM_CONFIGURATION_LABEL = "Custom";
-    private static final String BROWSE_CONFIGURATION_LABEL = "Browse...";
-    private static final String IMPORT_CN_CONFIGURATION_FILE_DIALOG_LABEL = "Import node's XDD/XDC";
 
-    private static final String ERROR_DEFAULT_CN_XDD_NOT_FOUND = "Default CN XDD not found.";
-    private static final String ERROR_DEFAULT_RMN_XDD_NOT_FOUND = "Default Redundant managing XDD not found.";
     private static final String ERROR_MAXIMUM_NODE_ID_LIMIT_REACHED = "Maximum Node ID limit({0}) reached.";
     private static final String ERROR_MODEL_NOT_AVAILABLE = "Editor is not available to fetch the model.";
     private static final String ERROR_NODE_ALREADY_EXISTS = "Node already exists.";
     private static final String ERROR_INVALID_NODE_ID = "Invalid node ID.";
     private static final String ERROR_INVALID_NODE_NAME = "Enter a valid node name.";
-    private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
 
     /**
      * Control to display the Node name.
      */
     private Text nodeName;
-
-    /**
-     * Control to display the node configuration path.
-     */
-    private Text nodeConfigurationPath;
 
     /**
      * Control to list the type of supported node.
@@ -147,44 +116,9 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private TNodeCollection nodeCollection = null;
 
     /**
-     * Browse XDD/XDC button.
-     */
-    private Button btnBrowse;
-
-    /**
-     * Default radio button.
-     */
-    private Button btnDefault;
-
-    /**
-     * Default controlled node XDD path.
-     */
-    private final String defaultCnXDD;
-
-    /**
-     * Default managing node XDD path.
-     */
-    private final String defaultMnXDD;
-
-    /**
-     * Custom radio button.
-     */
-    private Button btnCustom;
-
-    /**
-     * This is to restore the custom configuration.
-     */
-    private String customConfiguration;
-
-    /**
      * The base object to store the node model.
      */
     private Object nodeModel = null; // TCN/TRMN
-
-    /**
-     * The XDD/XDC model.
-     */
-    private ISO15745ProfileContainer xddModel = null;
 
     /**
      * Create the wizard.
@@ -197,39 +131,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         setErrorMessage(null);
         this.nodeCollection = nodeCollection;
 
-        String cnXddPath = IOpenConfiguratorResource.DEFAULT_CN_XDD;
-
-        try {
-            cnXddPath = org.epsg.openconfigurator.Activator
-                    .getAbsolutePath(IOpenConfiguratorResource.DEFAULT_CN_XDD);
-        } catch (IOException e) {
-            e.printStackTrace();
-            PluginErrorDialogUtils
-                    .displayErrorMessageDialog(
-                            org.epsg.openconfigurator.Activator.getDefault()
-                                    .getWorkbench().getActiveWorkbenchWindow()
-                                    .getShell(),
-                            ERROR_DEFAULT_CN_XDD_NOT_FOUND, e);
-        }
-
-        defaultCnXDD = cnXddPath;
-
-        String mnXddPath = IOpenConfiguratorResource.DEFAULT_MN_XDD;
-        try {
-            mnXddPath = org.epsg.openconfigurator.Activator
-                    .getAbsolutePath(IOpenConfiguratorResource.DEFAULT_MN_XDD);
-        } catch (IOException e) {
-            e.printStackTrace();
-            PluginErrorDialogUtils
-                    .displayErrorMessageDialog(
-                            org.epsg.openconfigurator.Activator.getDefault()
-                                    .getWorkbench().getActiveWorkbenchWindow()
-                                    .getShell(),
-                            ERROR_DEFAULT_RMN_XDD_NOT_FOUND, e);
-        }
-
-        defaultMnXDD = mnXddPath;
-        customConfiguration = "";
     }
 
     /**
@@ -272,7 +173,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
             @Override
             public void modifyText(ModifyEvent e) {
-                handleNodeIdSpinnerModification(e);
+                getWizard().getContainer().updateButtons();
             }
         });
 
@@ -291,7 +192,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
                     setErrorMessage(ERROR_INVALID_NODE_NAME);
                     setPageComplete(false);
                 }
-                setConfigurationGroupEnabled(true);
                 getWizard().getContainer().updateButtons();
             }
         });
@@ -307,100 +207,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         lblRange.setBounds(211, 48, 51, 19);
         lblRange.setText(RANGE_LABEL);
 
-        Group grpConfigurationFile = new Group(container, SWT.NONE);
-        grpConfigurationFile.setText(CONFIGURATION_FILE_LABEL);
-        grpConfigurationFile.setBounds(21, 127, 543, 116);
-
-        Label lblXddxdc = new Label(grpConfigurationFile, SWT.NONE);
-        lblXddxdc.setBounds(26, 60, 73, 16);
-        lblXddxdc.setText(NODE_CONFIGURATION_LABEL);
-
-        btnDefault = new Button(grpConfigurationFile, SWT.RADIO);
-        btnDefault.setBounds(26, 30, 82, 16);
-        btnDefault.setText(DEFAULT_CONFIGURATION_LABEL);
-
-        btnCustom = new Button(grpConfigurationFile, SWT.RADIO);
-        btnCustom.setBounds(114, 30, 90, 16);
-        btnCustom.setText(CUSTOM_CONFIGURATION_LABEL);
-        btnCustom.setSelection(true);
-
-        nodeConfigurationPath = new Text(grpConfigurationFile, SWT.BORDER);
-        nodeConfigurationPath.setBounds(110, 57, 292, 25);
-
-        nodeConfigurationPath.setToolTipText(nodeConfigurationPath.getText());
-        if (btnDefault.getSelection()) {
-            nodeConfigurationPath.setEnabled(false);
-            nodeConfigurationPath.setText(defaultCnXDD);
-        }
-        if (btnDefault.getSelection()) {
-            btnBrowse.setEnabled(false);
-        }
-
-        btnBrowse = new Button(grpConfigurationFile, SWT.NONE);
-        btnBrowse.setBounds(421, 57, 90, 25);
-        btnBrowse.setText(BROWSE_CONFIGURATION_LABEL);
-        btnBrowse.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-
-                FileDialog fileDialog = new FileDialog(
-                        getContainer().getShell(), SWT.OPEN);
-
-                fileDialog.setText(IMPORT_CN_CONFIGURATION_FILE_DIALOG_LABEL);
-                // Set filter on .XDD and .XDC files
-                fileDialog.setFilterExtensions(
-                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_EXTENSIONS);
-                // Put in a readable name for the filter
-                fileDialog.setFilterNames(
-                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_NAMES_EXTENSIONS);
-                // Open Dialog and save result of selection
-                String selectedFile = fileDialog.open();
-
-                if (selectedFile != null) {
-                    nodeConfigurationPath.setText(selectedFile.trim());
-                }
-            }
-        });
-        nodeConfigurationPath.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                setErrorMessage(null);
-                setPageComplete(true);
-                if (!isNodeConfigurationValid(
-                        nodeConfigurationPath.getText())) {
-                    setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
-                    setPageComplete(false);
-                }
-
-                if (btnCustom.getSelection()) {
-                    customConfiguration = nodeConfigurationPath.getText();
-                }
-                nodeConfigurationPath
-                        .setToolTipText(nodeConfigurationPath.getText());
-                getWizard().getContainer().updateButtons();
-            }
-        });
-        btnCustom.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-
-                if (btnCustom.getSelection()) {
-                    nodeConfigurationPath.setEnabled(true);
-                    nodeConfigurationPath.setText(customConfiguration);
-                    btnBrowse.setEnabled(true);
-                }
-            }
-        });
-        btnDefault.addSelectionListener(new SelectionAdapter() {
-
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                handleDefaultRadioButtonSelectionChanged(e);
-            }
-        });
-        setConfigurationGroupEnabled(false);
     }
 
     /**
@@ -555,69 +361,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
     }
 
     /**
-     * @return The path for the XDD/XDC.
-     */
-    String getXdcPath() {
-        return nodeConfigurationPath.getText();
-    }
-
-    /**
-     * @return The XDD/XDC model.
-     */
-    ISO15745ProfileContainer getXddModel() {
-        return xddModel;
-    }
-
-    /**
-     * Handles the selection change events of the XDD/XDC configuration group.
-     *
-     * @param e The selection change events.
-     */
-    private void handleDefaultRadioButtonSelectionChanged(SelectionEvent e) {
-        if (btnDefault.getSelection()) {
-            nodeConfigurationPath.setEnabled(false);
-            btnBrowse.setEnabled(false);
-            switch (nodeTypeCombo.getText()) {
-                case CONTROLLED_NODE_LABEL:
-                    nodeConfigurationPath.setText(defaultCnXDD);
-                    break;
-                case REDUNDANT_MANAGING_NODE_LABEL:
-                    nodeConfigurationPath.setText(defaultMnXDD);
-                    break;
-                default:
-                    System.err.println("invalid selection");
-            }
-
-        }
-    }
-
-    /**
-     * Handles the node ID change events.
-     *
-     * @param e Modification event.
-     */
-    private void handleNodeIdSpinnerModification(ModifyEvent e) {
-        setErrorMessage(null);
-        setPageComplete(true);
-
-        switch (nodeTypeCombo.getText()) {
-            case CONTROLLED_NODE_LABEL:
-                if (btnDefault.getSelection()) {
-                    nodeConfigurationPath.setText(defaultCnXDD);
-                }
-                break;
-            case REDUNDANT_MANAGING_NODE_LABEL:
-                if (btnDefault.getSelection()) {
-                    nodeConfigurationPath.setText(defaultMnXDD);
-                }
-                break;
-            default:
-                System.err.println("invalid selection");
-                setPageComplete(false);
-        }
-    }
-
-    /**
      * Handles the node type change events.
      *
      * @param selection The node type selection
@@ -634,8 +377,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
                 short newCnNodeId = getNewCnNodeId();
                 nodeIdSpinner.setSelection(newCnNodeId);
-
-                btnCustom.setEnabled(true);
                 break;
 
             case REDUNDANT_MANAGING_NODE_LABEL:
@@ -645,14 +386,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
                         + nodeIdSpinner.getMaximum());
                 short newRmnNodeId = getNewRmnNodeId();
                 nodeIdSpinner.setSelection(newRmnNodeId);
-
-                if (btnCustom.getSelection()) {
-                    btnCustom.setSelection(false);
-                    btnDefault.setSelection(true);
-                    btnDefault.notifyListeners(SWT.Selection, new Event());
-                }
-                btnCustom.setEnabled(false);
-
                 break;
 
             default:
@@ -675,24 +408,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
      */
     public boolean hasErrors() {
         return errorField;
-    }
-
-    /**
-     * Checks for the valid XDD path.
-     *
-     * @param xddPath The path to the XDD/XDC.
-     * @return true if valid, false otherwise.
-     */
-    private boolean isNodeConfigurationValid(final String xddPath) {
-        boolean retVal = false;
-        if ((xddPath == null) || (xddPath.isEmpty())) {
-            return retVal;
-        }
-
-        File file = new File(xddPath);
-        retVal = file.isFile();
-
-        return retVal;
     }
 
     /**
@@ -762,6 +477,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
      */
     @Override
     public boolean isPageComplete() {
+
         setErrorMessage(null);
         boolean nodeIdValid = isValidNodeId(nodeIdSpinner.getText());
         if (!nodeIdValid) {
@@ -782,21 +498,13 @@ public class AddControlledNodeWizardPage extends WizardPage {
             return false;
         }
 
-        boolean nodeConfigurationValid = isNodeConfigurationValid(
-                nodeConfigurationPath.getText());
-        if (!nodeConfigurationValid) {
-            setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
-            return false;
-        }
-
         boolean pageComplete = (super.isPageComplete() && nodeIdValid
-                && !nodeIdAlreadyAvailable && nameValid
-                && nodeConfigurationValid);
+                && !nodeIdAlreadyAvailable && nameValid);
 
         if (pageComplete) {
             updateCnModel();
 
-            if ((nodeModel == null) || (xddModel == null)) {
+            if ((nodeModel == null)) {
                 pageComplete = false;
             }
         }
@@ -839,40 +547,20 @@ public class AddControlledNodeWizardPage extends WizardPage {
         return false;
     }
 
-    private void setConfigurationGroupEnabled(boolean enable) {
-        btnDefault.setEnabled(enable);
-        btnCustom.setEnabled(enable);
-
-        if (enable) {
-            if (btnDefault.getSelection()) {
-                nodeConfigurationPath.setEnabled(false);
-                btnBrowse.setEnabled(false);
-            } else {
-                btnBrowse.setEnabled(enable);
-                nodeConfigurationPath.setEnabled(enable);
-            }
-        } else {
-            btnBrowse.setEnabled(enable);
-            nodeConfigurationPath.setEnabled(enable);
-        }
-    }
-
     private void updateCnModel() {
         switch (getNodeType()) {
-            case AddControlledNodeWizardPage.CONTROLLED_NODE_LABEL:
+            case CONTROLLED_NODE_LABEL:
                 TCN cnModel = new TCN();
                 cnModel.setName(nodeName.getText());
                 cnModel.setNodeID(
                         Integer.toString(nodeIdSpinner.getSelection()));
-                cnModel.setPathToXDC(nodeConfigurationPath.getText());
                 nodeModel = cnModel;
                 break;
-            case AddControlledNodeWizardPage.REDUNDANT_MANAGING_NODE_LABEL:
+            case REDUNDANT_MANAGING_NODE_LABEL:
                 TRMN rmnModel = new TRMN();
                 rmnModel.setName(nodeName.getText());
                 rmnModel.setNodeID(Short.parseShort(
                         Integer.toString(nodeIdSpinner.getSelection())));
-                rmnModel.setPathToXDC(nodeConfigurationPath.getText());
                 nodeModel = rmnModel;
                 break;
             default:
@@ -885,31 +573,5 @@ public class AddControlledNodeWizardPage extends WizardPage {
             return;
         }
 
-        try {
-            File xddFile = new File(nodeConfigurationPath.getText());
-
-            boolean fileExists = xddFile.exists();
-            // if file exists
-            if (fileExists) {
-
-                xddModel = XddMarshaller.unmarshallXDDFile(xddFile);
-
-            } else {
-                xddModel = null;
-                setErrorMessage("XDD/XDC file does not exist in the path: "
-                        + nodeConfigurationPath.getText());
-            }
-
-        } catch (FileNotFoundException | JAXBException | SAXException
-                | ParserConfigurationException
-                | UnsupportedEncodingException e) {
-            xddModel = null;
-            if (e.getMessage() != null) {
-                setErrorMessage("Invalid XDD/XDC file. " + e.getMessage());
-            } else {
-                setErrorMessage("Invalid XDD/XDC file.");
-            }
-            e.printStackTrace();
-        }
     }
 }

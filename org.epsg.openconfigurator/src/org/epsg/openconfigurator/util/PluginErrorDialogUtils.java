@@ -34,6 +34,9 @@ package org.epsg.openconfigurator.util;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
@@ -41,6 +44,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.epsg.openconfigurator.Activator;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 
 /**
@@ -114,5 +118,17 @@ public final class PluginErrorDialogUtils {
         }
 
         return iworkbenchpage.getActiveEditor();
+    }
+
+    /**
+     * Displays the message in a dialog.
+     *
+     * @param messageType The message type determines the image to be displayed.
+     * @param message The message to be shown.
+     */
+    public static void showMessageWindow(int messageType, String message) {
+        OpenConfiguratorMessageConsole.getInstance().printErrorMessage(message);
+        MessageDialog.open(messageType, Display.getDefault().getActiveShell(),
+                "Error", message, SWT.NONE);
     }
 }
