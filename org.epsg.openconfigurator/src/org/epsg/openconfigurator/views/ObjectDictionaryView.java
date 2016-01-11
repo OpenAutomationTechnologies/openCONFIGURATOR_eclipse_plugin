@@ -227,10 +227,13 @@ public class ObjectDictionaryView extends ViewPart {
 
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
-                    setPartName(nodeObj.getNodeIDWithName());
-                    treeViewer.setInput(nodeObj);
+                    // Set input only if the node is enabled.
+                    if (nodeObj.isEnabled()) {
+                        sourcePart = part;
+                        setPartName(nodeObj.getNodeIDWithName());
+                        treeViewer.setInput(nodeObj);
+                    }
                 }
-                sourcePart = part;
             }
 
             if (sourcePart != null) {

@@ -67,6 +67,11 @@ public class NodeAdapterFactory implements IAdapterFactory {
         if (adapterType == IPropertySource.class) {
             if (adaptableObject instanceof Node) {
                 Node nodeObj = (Node) adaptableObject;
+                // Hide property source,when the node is disabled.
+                if (!nodeObj.isEnabled()) {
+                    return null;
+                }
+
                 Object nodeModel = nodeObj.getNodeModel();
                 if (nodeModel instanceof TNetworkConfiguration) {
                     if (mnPropertySource == null) {

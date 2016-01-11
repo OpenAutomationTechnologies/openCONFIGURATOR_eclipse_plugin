@@ -1307,6 +1307,45 @@ public class MappingView extends ViewPart {
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
                     setPartName(nodeObj.getNodeIDWithName());
+                    // Set null as input to the view, when the node is disabled.
+                    if (!nodeObj.isEnabled()) {
+                        setPartName("Mapping View");
+
+                        // Summary
+                        tpdoSummaryTableViewer.setInput(null);
+                        rpdoSummaryTableViewer.setInput(null);
+
+                        // TPDO page
+                        tpdoChannelComboViewer.setInput(null);
+                        tpdoTableViewer.setInput(null);
+                        sndtoNodecomboviewer.setInput(null);
+                        setPdoGuiControlsEnabled(PdoType.TPDO, false);
+                        tpdoActionsbuttonGroup.setVisible(false);
+                        tpdoEnabledMappingEntriesText.removeVerifyListener(
+                                enabledEntriesVerifyListener);
+                        tpdoEnabledMappingEntriesText
+                                .setText(StringUtils.EMPTY);
+                        tpdoEnabledMappingEntriesText.addVerifyListener(
+                                enabledEntriesVerifyListener);
+                        tpdoEnabledMappingEntriesText.setEnabled(false);
+                        tpdoChannelSize.setText(StringUtils.EMPTY);
+
+                        // RPDO page
+                        rpdoChannelComboViewer.setInput(null);
+                        rpdoTableViewer.setInput(null);
+                        receiveFromNodecomboviewer.setInput(null);
+                        setPdoGuiControlsEnabled(PdoType.RPDO, false);
+                        rpdoActionsbuttonGroup.setVisible(false);
+                        rpdoEnabledMappingEntriesText.removeVerifyListener(
+                                enabledEntriesVerifyListener);
+                        rpdoEnabledMappingEntriesText
+                                .setText(StringUtils.EMPTY);
+                        rpdoEnabledMappingEntriesText.addVerifyListener(
+                                enabledEntriesVerifyListener);
+                        rpdoEnabledMappingEntriesText.setEnabled(false);
+                        rpdoChannelSize.setText(StringUtils.EMPTY);
+                        return;
+                    }
 
                     updateTargetNodeIdList();
 

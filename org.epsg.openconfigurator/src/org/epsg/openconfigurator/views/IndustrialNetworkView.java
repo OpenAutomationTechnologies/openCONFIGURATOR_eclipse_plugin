@@ -517,15 +517,20 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                 } else if (nodeObjectModel instanceof TCN) {
                     manager.add(enableDisableNode);
-                    manager.add(new Separator());
-                    manager.add(showPdoMapping);
-                    manager.add(showObjectDictionary);
+                    // Display list of menu only if the nodes are enabled.
+                    if (node.isEnabled()) {
+                        manager.add(new Separator());
+                        manager.add(showPdoMapping);
+                        manager.add(showObjectDictionary);
+                    }
                     manager.add(new Separator());
                     manager.add(deleteNode);
                 }
-
-                manager.add(new Separator());
-                manager.add(showProperties);
+                // Display list of menu only if the nodes are enabled.
+                if (node.isEnabled()) {
+                    manager.add(new Separator());
+                    manager.add(showProperties);
+                }
             }
         }
     }
@@ -537,7 +542,6 @@ public class IndustrialNetworkView extends ViewPart
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.removeAll();
-
         manager.add(refreshAction);
         manager.add(showPdoMapping);
         manager.add(showObjectDictionary);
@@ -569,11 +573,22 @@ public class IndustrialNetworkView extends ViewPart
                                 .printErrorMessage(e.getMessage());
                         e.printStackTrace();
                     }
-
-                    handleRefresh();
+                    viewer.refresh();
+                }
+                // Set empty selection when node is disabled.
+                if (!node.isEnabled()) {
+                    viewer.setSelection(TreeSelection.EMPTY);
                 } else {
-                    showMessage(
-                            OpenConfiguratorLibraryUtils.getErrorMessage(res));
+                    viewer.setSelection(viewer.getSelection());
+                    try {
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getActivePage()
+                                .showView(IPageLayout.ID_PROP_SHEET);
+                    } catch (PartInitException e) {
+                        System.err.println("Empty Properties sheet");
+                        e.printStackTrace();
+                    }
+                    setFocus();
                 }
             }
         }
@@ -581,7 +596,6 @@ public class IndustrialNetworkView extends ViewPart
 
     private void handleRefresh() {
         viewer.setInput(viewer.getInput());
-        viewer.expandAll();
     }
 
     public void handleRemoveNode(IStructuredSelection selection) {
