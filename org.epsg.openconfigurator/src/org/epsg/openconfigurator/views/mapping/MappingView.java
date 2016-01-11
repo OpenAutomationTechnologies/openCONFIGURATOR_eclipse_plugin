@@ -1331,6 +1331,9 @@ public class MappingView extends ViewPart {
                         sndtoNodecomboviewer.setSelection(null, true);
                     }
 
+                    handlePdoTableResize(PdoType.TPDO,
+                            showAdvancedview.isChecked());
+
                     // RPDO Page
                     List<RpdoChannel> rpdoChannels = nodeObj
                             .getRpdoChannelsList();
@@ -1347,6 +1350,9 @@ public class MappingView extends ViewPart {
                         receiveFromNodecomboviewer.setInput(null);
                         receiveFromNodecomboviewer.setSelection(null, true);
                     }
+
+                    handlePdoTableResize(PdoType.RPDO,
+                            showAdvancedview.isChecked());
                 } else {
                     System.err.println(
                             "Other than node is selected!" + selectedObj);
@@ -1644,10 +1650,11 @@ public class MappingView extends ViewPart {
                 Section sctnNewSection = formToolkit.createSection(
                         composite_NewTab,
                         ExpandableComposite.CLIENT_INDENT
+                                | ExpandableComposite.EXPANDED
                                 | ExpandableComposite.TWISTIE
                                 | ExpandableComposite.TITLE_BAR);
                 sctnNewSection.setLayoutData(
-                        new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+                        new GridData(SWT.FILL, SWT.FILL, true, true, 1, 6));
                 sctnNewSection.setRedraw(true);
                 formToolkit.paintBordersFor(sctnNewSection);
                 sctnNewSection.setText(PDO_TPDO_CHANNELS_SECTION_TITLE);
@@ -1657,15 +1664,13 @@ public class MappingView extends ViewPart {
                         .createComposite(sctnNewSection, SWT.NONE);
                 formToolkit.paintBordersFor(composite_4);
                 sctnNewSection.setClient(composite_4);
-                composite_4.setLayout(new GridLayout(1, true));
+                composite_4.setLayout(new FillLayout(SWT.HORIZONTAL));
                 composite_4.setLayoutData(
                         new GridData(SWT.FILL, SWT.FILL, true, true));
 
                 tpdoSummaryTableViewer = new TableViewer(composite_4,
                         SWT.BORDER | SWT.FULL_SELECTION);
                 Table tpdoSummaryTable = tpdoSummaryTableViewer.getTable();
-                tpdoSummaryTable.setLayoutData(
-                        new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
                 tpdoSummaryTable.setLinesVisible(true);
                 tpdoSummaryTable.setHeaderVisible(true);
 
@@ -1739,10 +1744,11 @@ public class MappingView extends ViewPart {
                 Section sctnRpdoChannel = formToolkit.createSection(
                         composite_NewTab,
                         ExpandableComposite.CLIENT_INDENT
+                                | ExpandableComposite.EXPANDED
                                 | ExpandableComposite.TWISTIE
                                 | ExpandableComposite.TITLE_BAR);
                 sctnRpdoChannel.setLayoutData(
-                        new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+                        new GridData(SWT.FILL, SWT.FILL, true, true, 1, 6));
                 formToolkit.paintBordersFor(sctnRpdoChannel);
                 sctnRpdoChannel.setText(PDO_RPDO_CHANNELS_SECTION_TITLE);
                 sctnRpdoChannel.setExpanded(true);
@@ -1751,15 +1757,13 @@ public class MappingView extends ViewPart {
                         .createComposite(sctnRpdoChannel, SWT.NONE);
                 formToolkit.paintBordersFor(composite_8);
                 sctnRpdoChannel.setClient(composite_8);
-                composite_8.setLayout(new GridLayout(1, false));
+                composite_8.setLayout(new FillLayout(SWT.HORIZONTAL));
                 composite_8.setLayoutData(
                         new GridData(SWT.LEFT, SWT.CENTER, true, true, 1, 1));
 
                 rpdoSummaryTableViewer = new TableViewer(composite_8,
                         SWT.BORDER | SWT.FULL_SELECTION);
                 Table rpdoSummaryTable = rpdoSummaryTableViewer.getTable();
-                rpdoSummaryTable.setLayoutData(
-                        new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
                 rpdoSummaryTable.setLinesVisible(true);
                 rpdoSummaryTable.setHeaderVisible(true);
                 formToolkit.paintBordersFor(rpdoSummaryTable);
