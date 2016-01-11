@@ -188,6 +188,14 @@ public class ObjectDictionaryView extends ViewPart {
 
     public static final String OBJECT_DICTIONARY_VIEW_TITLE = "Object Dictionary";
 
+    // Object dictionary filters title
+    public static final String HIDE_NON_MAPPABLE_OBJECTS = "Hide Non Mappable Objects";
+    public static final String HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS = "Hide Communication Profile Area Objects(0x1000-0x1FFF)";
+    public static final String HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS = "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)";
+    public static final String HIDE_NON_FORCED_OBJECTS = "Hide NonForced Objects";
+
+    public static final String OBJECT_PROPERTIES = "Properties";
+
     /**
      * Selection listener to update the objects and sub-objects in the Object
      * dictionary view.
@@ -299,10 +307,12 @@ public class ObjectDictionaryView extends ViewPart {
     private boolean communicationProfileObjectsVisible = true;
     private boolean standardisedDeviceProfileObjectsVisible = true;
     private boolean nonMappableObjectsVisible = true;
+    private boolean forcedObjectsVisible = true;
 
     private Action hideCommunicationProfileObjects;
     private Action hideStandardisedDeviceProfileObjects;
     private Action hideNonMappableObjects;
+    private Action hideNonForcedObjects;
     private Action propertiesAction;
 
     /**
@@ -342,7 +352,7 @@ public class ObjectDictionaryView extends ViewPart {
      * Create the actions.
      */
     private void createActions() {
-        hideNonMappableObjects = new Action("Hide Non Mappable Objects",
+        hideNonMappableObjects = new Action(HIDE_NON_MAPPABLE_OBJECTS,
                 IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
@@ -354,15 +364,14 @@ public class ObjectDictionaryView extends ViewPart {
                 treeViewer.refresh();
             }
         };
-        hideNonMappableObjects.setToolTipText("Hide Non Mappable Objects");
+        hideNonMappableObjects.setToolTipText(HIDE_NON_MAPPABLE_OBJECTS);
         hideNonMappableObjects.setImageDescriptor(
                 org.epsg.openconfigurator.Activator.getImageDescriptor(
                         IPluginImages.OBD_HIDE_NON_MAPPABLE_ICON));
         hideNonMappableObjects.setChecked(false);
 
         hideCommunicationProfileObjects = new Action(
-                "Hide Communication Profile Area Objects(0x1000-0x1FFF)",
-                IAction.AS_CHECK_BOX) {
+                HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS, IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
                 if (hideCommunicationProfileObjects.isChecked()) {
@@ -373,15 +382,15 @@ public class ObjectDictionaryView extends ViewPart {
                 treeViewer.refresh();
             }
         };
-        hideCommunicationProfileObjects.setToolTipText(
-                "Hide Communication Profile Area Objects(0x1000-0x1FFF)");
+        hideCommunicationProfileObjects
+                .setToolTipText(HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS);
         hideCommunicationProfileObjects.setImageDescriptor(
                 org.epsg.openconfigurator.Activator.getImageDescriptor(
                         IPluginImages.OBD_HIDE_COMMUNICATION_DEVICE_PROFILE_ICON));
         hideCommunicationProfileObjects.setChecked(false);
 
         hideStandardisedDeviceProfileObjects = new Action(
-                "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)",
+                HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS,
                 IAction.AS_CHECK_BOX) {
             @Override
             public void run() {
@@ -393,14 +402,33 @@ public class ObjectDictionaryView extends ViewPart {
                 treeViewer.refresh();
             }
         };
-        hideStandardisedDeviceProfileObjects.setToolTipText(
-                "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)");
+        hideStandardisedDeviceProfileObjects
+                .setToolTipText(HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS);
         hideStandardisedDeviceProfileObjects.setImageDescriptor(
                 org.epsg.openconfigurator.Activator.getImageDescriptor(
                         IPluginImages.OBD_HIDE_STANDARDISED_DEVICE_PROFILE_ICON));
         hideStandardisedDeviceProfileObjects.setChecked(false);
 
-        propertiesAction = new Action("Properties") {
+        hideNonForcedObjects = new Action(HIDE_NON_FORCED_OBJECTS,
+                IAction.AS_CHECK_BOX) {
+
+            @Override
+            public void run() {
+                if (hideNonForcedObjects.isChecked()) {
+                    forcedObjectsVisible = false;
+                } else {
+                    forcedObjectsVisible = true;
+                }
+                treeViewer.refresh();
+            }
+        };
+        hideNonForcedObjects.setToolTipText(HIDE_NON_FORCED_OBJECTS);
+        hideNonForcedObjects.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_HIDE_NON_FORCED_ICON));
+        hideNonForcedObjects.setChecked(false);
+
+        propertiesAction = new Action(OBJECT_PROPERTIES) {
             @Override
             public void run() {
                 super.run();
@@ -494,6 +522,11 @@ public class ObjectDictionaryView extends ViewPart {
                             return false;
                         }
                     }
+                    if (!forcedObjectsVisible) {
+                        if (!obj.isObjectForced()) {
+                            return false;
+                        }
+                    }
                 } else if (element instanceof PowerlinkSubobject) {
                     PowerlinkSubobject subObj = (PowerlinkSubobject) element;
                     if (!nonMappableObjectsVisible) {
@@ -529,6 +562,7 @@ public class ObjectDictionaryView extends ViewPart {
         manager.add(hideNonMappableObjects);
         manager.add(hideCommunicationProfileObjects);
         manager.add(hideStandardisedDeviceProfileObjects);
+        manager.add(hideNonForcedObjects);
     }
 
     public Control getControl() {

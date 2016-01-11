@@ -72,4 +72,5 @@ public interface IPluginImages {
     public final static String OBD_HIDE_NON_MAPPABLE_ICON = "icons/hide_non_mappable.gif";
     public final static String OBD_HIDE_COMMUNICATION_DEVICE_PROFILE_ICON = "icons/hide_communication_device_profile.gif";
     public final static String OBD_HIDE_STANDARDISED_DEVICE_PROFILE_ICON = "icons/hide_standardized_device_profile.gif";
+    public final static String OBD_HIDE_NON_FORCED_ICON = "icons/hide_non_forced.gif";
 }
