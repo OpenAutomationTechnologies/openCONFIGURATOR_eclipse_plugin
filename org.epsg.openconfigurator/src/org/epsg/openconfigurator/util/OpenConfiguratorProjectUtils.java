@@ -741,14 +741,15 @@ public final class OpenConfiguratorProjectUtils {
         org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
         // Delete the actual value from the model.
-        for (PowerlinkObject obj : node.getObjectsList()) {
+        for (PowerlinkObject obj : node.getObjectDictionary()
+                .getObjectsList()) {
             List<PowerlinkSubobject> subObjList = obj.getSubObjects();
             if (!subObjList.isEmpty()) {
                 for (PowerlinkSubobject subObj : subObjList) {
-                    subObj.setActualValue(null, false);
+                    subObj.deleteActualValue();
                 }
             } else {
-                obj.setActualValue(null, false);
+                obj.deleteActualValue();
             }
         }
 
@@ -1016,15 +1017,24 @@ public final class OpenConfiguratorProjectUtils {
         }
     }
 
-    public static void updateObjectAttributeValue(final Node node,
-            final String objectId, final boolean isSubObject,
-            final String subObjectId, final String actualValue)
-                    throws JDOMException, IOException {
+    public static void updateObjectAttributeActualValue(final Node node,
+            final PowerlinkObject object, String actualValue)
+                    throws IOException, JDOMException {
         File xmlFile = new File(node.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-        XddJdomOperation.updateActualValue(document, objectId, isSubObject,
-                subObjectId, actualValue);
+        XddJdomOperation.updateActualValue(document, object, actualValue);
+
+        JDomUtil.writeToXmlDocument(document, xmlFile);
+    }
+
+    public static void updateObjectAttributeActualValue(final Node node,
+            final PowerlinkSubobject object, String actualValue)
+                    throws IOException, JDOMException {
+        File xmlFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        XddJdomOperation.updateActualValue(document, object, actualValue);
 
         JDomUtil.writeToXmlDocument(document, xmlFile);
     }
@@ -1051,7 +1061,7 @@ public final class OpenConfiguratorProjectUtils {
                 .getSubObjects();
         if (!subObjList.isEmpty()) {
             for (PowerlinkSubobject subObj : subObjList) {
-                subObj.setActualValue(null, false);
+                subObj.deleteActualValue();
             }
         }
 

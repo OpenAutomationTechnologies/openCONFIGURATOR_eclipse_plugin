@@ -320,7 +320,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
 
     public void setObjectData(PowerlinkObject adaptableObject) {
         plkObject = adaptableObject;
-        object = plkObject.getObject();
+        object = plkObject.getModel();
     }
 
     /**

@@ -54,7 +54,7 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 
         if (element instanceof PowerlinkObject) {
             PowerlinkObject obj = (PowerlinkObject) element;
-            return obj.getText();
+            return obj.getNameWithId();
         } else if (element instanceof PowerlinkSubobject) {
             PowerlinkSubobject obj = (PowerlinkSubobject) element;
             return obj.getUniqueName();

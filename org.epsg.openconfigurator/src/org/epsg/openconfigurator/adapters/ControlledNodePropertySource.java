@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -428,130 +429,138 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     public Object getPropertyValue(Object id) {
 
         Object retObj = null;
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                    retObj = cnNode.getName();
-                    break;
-                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
-                    retObj = cnNode.getNodeIdString();
-                    break;
-                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
-                    retObj = tcn.getPathToXDC();
-                    break;
-                case IAbstractNodeProperties.NODE_ERROR_OBJECT:
-                    retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
-                    break;
-                case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {
-                    int value = 0; // Normal Station.
-                    if (tcn.isIsChained()) {
-                        value = 1;
-                    } else if (tcn.isIsMultiplexed()) {
-                        value = 2;
-                    }
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                        retObj = cnNode.getName();
+                        break;
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                        retObj = cnNode.getNodeIdString();
+                        break;
+                    case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        retObj = tcn.getPathToXDC();
+                        break;
+                    case IAbstractNodeProperties.NODE_ERROR_OBJECT:
+                        retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
+                        break;
+                    case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {
+                        int value = 0; // Normal Station.
+                        if (tcn.isIsChained()) {
+                            value = 1;
+                        } else if (tcn.isIsMultiplexed()) {
+                            value = 2;
+                        }
 
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT:
-                    retObj = String.valueOf(tcn.getForcedMultiplexedCycle());
-                    break;
-                case IControlledNodeProperties.CN_IS_MANDATORY_OBJECT: {
-                    int value = (tcn.isIsMandatory() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_AUTO_START_NODE_OBJECT: {
-                    int value = (tcn.isAutostartNode() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_RESET_IN_OPERATIONAL_OBJECT: {
-                    int value = (tcn.isResetInOperational() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT: {
-                    int value = (tcn.isVerifyAppSwVersion() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT: {
-                    int value = (tcn.isAutoAppSwUpdateAllowed() == true) ? 0
-                            : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_OBJECT: {
-                    int value = (tcn.isVerifyDeviceType() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_VENDOR_ID_OBJECT: {
-                    int value = (tcn.isVerifyVendorId() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_REVISION_NUMBER_OBJECT: {
-                    int value = (tcn.isVerifyRevisionNumber() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_PRODUCT_CODE_OBJECT: {
-                    int value = (tcn.isVerifyProductCode() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT: {
-                    int value = (tcn.isVerifySerialNumber() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                    int value = (tcn.isIsAsyncOnly() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                    int value = (tcn.isIsType1Router() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                    int value = (tcn.isIsType2Router() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
-                    retObj = cnNode.getForcedObjectsString();
-                    break;
-                case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT:
-                    retObj = cnNode.getPresMaxLatencyValue();
-                    break;
-                case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT:
-                    long presTimeoutinNs = cnNode.getPresTimeoutvalue();
-                    long presTimeoutInMs = presTimeoutinNs / 1000;
-                    retObj = String.valueOf(presTimeoutInMs);
-                    break;
-                case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                    try {
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT:
+                        retObj = String
+                                .valueOf(tcn.getForcedMultiplexedCycle());
+                        break;
+                    case IControlledNodeProperties.CN_IS_MANDATORY_OBJECT: {
+                        int value = (tcn.isIsMandatory() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_AUTO_START_NODE_OBJECT: {
+                        int value = (tcn.isAutostartNode() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_RESET_IN_OPERATIONAL_OBJECT: {
+                        int value = (tcn.isResetInOperational() == true) ? 0
+                                : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT: {
+                        int value = (tcn.isVerifyAppSwVersion() == true) ? 0
+                                : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT: {
+                        int value = (tcn.isAutoAppSwUpdateAllowed() == true) ? 0
+                                : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_OBJECT: {
+                        int value = (tcn.isVerifyDeviceType() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_VERIFY_VENDOR_ID_OBJECT: {
+                        int value = (tcn.isVerifyVendorId() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_VERIFY_REVISION_NUMBER_OBJECT: {
+                        int value = (tcn.isVerifyRevisionNumber() == true) ? 0
+                                : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_VERIFY_PRODUCT_CODE_OBJECT: {
+                        int value = (tcn.isVerifyProductCode() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT: {
+                        int value = (tcn.isVerifySerialNumber() == true) ? 0
+                                : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                        int value = (tcn.isIsAsyncOnly() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                        int value = (tcn.isIsType1Router() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                        int value = (tcn.isIsType2Router() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        retObj = cnNode.getForcedObjectsString();
+                        break;
+                    case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT:
+                        retObj = cnNode.getPresMaxLatencyValue();
+                        break;
+                    case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
+                        long presTimeoutinNs = cnNode.getPresTimeoutvalue();
+                        long presTimeoutInMs = presTimeoutinNs / 1000;
+                        retObj = String.valueOf(presTimeoutInMs);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
                         long val = Long.decode(cnNode.getLossOfSocTolerance());
                         long valInUs = val / 1000;
                         retObj = String.valueOf(valInUs);
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
+                        break;
                     }
-                    break;
+                    default:
+                        System.err.println(
+                                "Invalid object string ID:" + objectId);
+                        break;
                 }
-                default:
-                    System.err.println("Invalid object string ID:" + objectId);
-                    break;
+            } else {
+                System.err.println("Invalid object ID:" + id);
             }
-        } else {
-            System.err.println("Invalid object ID:" + id);
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Property: " + id + " " + e.getMessage());
+            retObj = StringUtils.EMPTY;
         }
-
         return retObj;
     }
 
@@ -665,9 +674,10 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 return ERROR_PRES_MAX_LATENCY_CANNOT_BE_EMPTY;
             }
 
-            PowerlinkSubobject presMaxLatencySubObj = cnNode.getSubObject(
-                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
+            PowerlinkSubobject presMaxLatencySubObj = cnNode
+                    .getObjectDictionary().getSubObject(
+                            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
+                            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
             if (presMaxLatencySubObj == null) {
                 return "Object 0x"
                         + Long.toHexString(

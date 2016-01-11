@@ -309,101 +309,98 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
      */
     @Override
     public Object getPropertyValue(Object id) {
-
         Object retObj = null;
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                    retObj = mnNode.getName();
-                    break;
-                case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
-                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
-                    retObj = mnNode.getNodeIdString();
-                    break;
-                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
-                    retObj = mn.getPathToXDC();
-                    break;
-                case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
-                    try {
-                        if (!mnNode.getLossOfSocTolerance().isEmpty()) {
-                            long val = Long
-                                    .decode(mnNode.getLossOfSocTolerance());
-                            long valInUs = val / 1000;
-                            retObj = String.valueOf(valInUs);
-                        } else {
-                            retObj = StringUtils.EMPTY;
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                        retObj = mnNode.getName();
+                        break;
+                    case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                        retObj = mnNode.getNodeIdString();
+                        break;
+                    case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        retObj = mn.getPathToXDC();
+                        break;
+                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
+                        long val = Long.decode(mnNode.getLossOfSocTolerance());
+                        long valInUs = val / 1000;
+                        retObj = String.valueOf(valInUs);
+                        break;
+                    }
+                    case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT: {
+                        int val = 0;
+                        if (!mn.isTransmitsPRes()) {
+                            val = 1;
                         }
-                    } catch (NumberFormatException e) {
-                        e.printStackTrace();
-                    }
-                    break;
-                case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT: {
-                    int val = 0;
-                    if (!mn.isTransmitsPRes()) {
-                        val = 1;
-                    }
 
-                    retObj = new Integer(val);
-                    break;
+                        retObj = new Integer(val);
+                        break;
+                    }
+                    case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
+                        retObj = mnNode.getAsyncSlotTimeout();
+                        break;
+                    case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
+                        retObj = mnNode.getAsndMaxNumber();
+                        break;
+                    case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                        int val = 0;
+                        if (!mn.isIsAsyncOnly()) {
+                            val = 1;
+                        }
+
+                        retObj = new Integer(val);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                        int val = 0;
+                        if (!mn.isIsType1Router()) {
+                            val = 1;
+                        }
+
+                        retObj = new Integer(val);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                        int val = 0;
+                        if (!mn.isIsType2Router()) {
+                            val = 1;
+                        }
+
+                        retObj = new Integer(val);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        retObj = mnNode.getForcedObjectsString();
+                        break;
+                    case INetworkProperties.NET_CYCLE_TIME_OBJECT:
+                        retObj = mnNode.getCycleTime();
+                        break;
+                    case INetworkProperties.NET_ASYNC_MTU_OBJECT:
+                        retObj = mnNode.getAsyncMtu();
+                        break;
+
+                    case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
+                        retObj = mnNode.getMultiplexedCycleCnt();
+                        break;
+                    case INetworkProperties.NET_PRESCALER_OBJECT:
+                        retObj = mnNode.getPrescaler();
+                        break;
+                    default:
+                        System.err.println(
+                                "Invalid object string ID:" + objectId);
+                        break;
                 }
-                case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
-                    retObj = mnNode.getAsyncSlotTimeout();
-                    break;
-                case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
-                    retObj = mnNode.getAsndMaxNumber();
-                    break;
-                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                    int val = 0;
-                    if (!mn.isIsAsyncOnly()) {
-                        val = 1;
-                    }
-
-                    retObj = new Integer(val);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                    int val = 0;
-                    if (!mn.isIsType1Router()) {
-                        val = 1;
-                    }
-
-                    retObj = new Integer(val);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                    int val = 0;
-                    if (!mn.isIsType2Router()) {
-                        val = 1;
-                    }
-
-                    retObj = new Integer(val);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
-                    retObj = mnNode.getForcedObjectsString();
-                    break;
-                case INetworkProperties.NET_CYCLE_TIME_OBJECT:
-                    retObj = mnNode.getCycleTime();
-                    break;
-                case INetworkProperties.NET_ASYNC_MTU_OBJECT:
-                    retObj = mnNode.getAsyncMtu();
-                    break;
-
-                case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
-                    retObj = mnNode.getMultiplexedCycleLength();
-                    break;
-                case INetworkProperties.NET_PRESCALER_OBJECT:
-                    retObj = mnNode.getPrescaler();
-                    break;
-                default:
-                    System.err.println("Invalid object string ID:" + objectId);
-                    break;
+            } else {
+                System.err.println("Invalid object ID:" + id);
             }
-        } else {
-            System.err.println("Invalid object ID:" + id);
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Property: " + id + " " + e.getMessage());
+            retObj = StringUtils.EMPTY;
         }
-
         return retObj;
     }
 

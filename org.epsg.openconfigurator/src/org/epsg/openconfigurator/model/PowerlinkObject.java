@@ -99,11 +99,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     private final String xpath;
 
     /**
-     * Name of the object with ID.
-     */
-    private final String readableName; // Object name is not modifiable
-
-    /**
      * Datatype in the human readable format.
      */
     private final String dataType;
@@ -137,7 +132,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
         objectIdRaw = DatatypeConverter.printHexBinary(this.object.getIndex());
         objectIdL = Long.parseLong(objectIdRaw, 16);
         objectId = "0x" + objectIdRaw;
-        readableName = (this.object.getName() + " (" + objectId + ")");
         xpath = "//plk:Object[@index='" + objectIdRaw + "']";
         if (this.object.getDataType() != null) {
             dataType = ObjectDatatype.getDatatypeName(DatatypeConverter
@@ -159,33 +153,41 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
             }
         }
 
-        if (((object.getPDOmapping() == TObjectPDOMapping.DEFAULT)
-                || (object.getPDOmapping() == TObjectPDOMapping.OPTIONAL)
-                || (object.getPDOmapping() == TObjectPDOMapping.RPDO))) {
+        TObjectPDOMapping pdoMapping = object.getPDOmapping();
+        TObjectAccessType accessType = object.getAccessType();
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.RPDO))) {
 
             if (object.getUniqueIDRef() != null) {
                 isRpdoMappable = true;
             } else {
-                if ((object.getAccessType() == TObjectAccessType.RW)
-                        || (object.getAccessType() == TObjectAccessType.WO)) {
+                if ((accessType == TObjectAccessType.RW)
+                        || (accessType == TObjectAccessType.WO)) {
                     isRpdoMappable = true;
                 }
             }
-
-        } else if (((object.getPDOmapping() == TObjectPDOMapping.DEFAULT)
-                || (object.getPDOmapping() == TObjectPDOMapping.OPTIONAL)
-                || (object.getPDOmapping() == TObjectPDOMapping.TPDO))) {
+        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.TPDO))) {
 
             if (object.getUniqueIDRef() != null) {
                 isTpdoMappable = true;
             } else {
-                if ((object.getAccessType() == TObjectAccessType.RO)
-                        || (object.getAccessType() == TObjectAccessType.RW)) {
+
+                if ((accessType == TObjectAccessType.RO)
+                        || (accessType == TObjectAccessType.RW)) {
                     isTpdoMappable = true;
                 }
             }
-
         }
+    }
+
+    /**
+     * Note: This does not delete from the XML file.
+     */
+    public void deleteActualValue() {
+        object.setActualValue(null);
     }
 
     /**
@@ -193,8 +195,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      *
      * @param force True to add and false to remove.
      * @param writeToProjectFile True to write the changes to the project file.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public synchronized void forceActualValue(boolean force,
             boolean writeToProjectFile) throws JDOMException, IOException {
@@ -205,63 +207,176 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
         }
 
         org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
-        forcedObj.setIndex(getObject().getIndex());
+        forcedObj.setIndex(getModel().getIndex());
         nodeInstance.forceObjectActualValue(forcedObj, force);
     }
 
-    public String getActualValue() {
-        return object.getActualValue();
+    /**
+     * @return Actual or Default value of the object
+     */
+    public String getActualDefaultValue() {
+        String actualValue = object.getActualValue();
+        if ((actualValue != null) && !actualValue.isEmpty()) {
+            return actualValue;
+        }
+
+        String defaultValue = object.getDefaultValue();
+        if (defaultValue != null) {
+            return defaultValue;
+        }
+
+        return StringUtils.EMPTY;
     }
 
+    /**
+     * @return Actual value of the object
+     */
+    public String getActualValue() {
+        String actualValue = object.getActualValue();
+        if (actualValue == null) {
+            actualValue = StringUtils.EMPTY;
+        }
+        return actualValue;
+    }
+
+    /**
+     * @return Data type of the object
+     */
     public String getDataType() {
         return dataType;
     }
 
+    /**
+     * @return Default value of the object
+     */
+    public String getDefaultValue() {
+        String defaultValue = object.getDefaultValue();
+        if (defaultValue == null) {
+            defaultValue = StringUtils.EMPTY;
+        }
+        return defaultValue;
+    }
+
+    /**
+     * @return High limit value of object.
+     */
+    public String getHighLimit() {
+        String highLimit = object.getHighLimit();
+        if (highLimit == null) {
+            highLimit = StringUtils.EMPTY;
+        }
+        return highLimit;
+    }
+
+    /**
+     * @return Low limit value of object
+     */
+    public String getLowLimit() {
+        String lowLimit = object.getLowLimit();
+        if (lowLimit == null) {
+            lowLimit = StringUtils.EMPTY;
+        }
+        return lowLimit;
+    }
+
+    /**
+     * @return Instance of Object from the object model.
+     */
+    public TObject getModel() {
+        return object;
+    }
+
+    /**
+     * @return Name of the object from the object model.
+     */
+    public String getName() {
+        String objectName = object.getName();
+        if (objectName == null) {
+            objectName = StringUtils.EMPTY;
+        }
+        return objectName;
+    }
+
+    /**
+     * @return Name with its ID of object.
+     */
+    public String getNameWithId() {
+        return (getName() + " (" + objectId + ")");
+    }
+
+    /**
+     * @return name of the project.
+     */
     public String getNetworkId() {
         return project.getName();
     }
 
+    /**
+     * @return Instance of node from the node model.
+     */
     public Node getNode() {
         return nodeInstance;
     }
 
+    /**
+     * @return Id of the node from the node model.
+     */
     public short getNodeId() {
         return nodeInstance.getNodeId();
     }
 
+    /**
+     * @return the node model from the node.
+     */
     public Object getNodeModel() {
         return nodeInstance.getNodeModel();
     }
 
-    public TObject getObject() {
-        return object;
-    }
-
+    /**
+     * @return Object ID of the given object.
+     */
     public long getObjectId() {
         return objectIdL;
     }
 
+    /**
+     * @return Short Object ID of the given object.
+     */
     public String getObjectIdRaw() {
         return objectIdRaw;
     }
 
+    /**
+     * @return Index of the given object.
+     */
     public String getObjectIndex() {
         return objectId;
     }
 
+    /**
+     * @return DataType of the given object.
+     */
     public short getObjectType() {
         return object.getObjectType();
     }
 
+    /**
+     * @return Instance of project.
+     */
     public IProject getProject() {
         return project;
     }
 
+    /**
+     * @return List of RPDO mappable objects from the available node.
+     */
     public List<PowerlinkSubobject> getRpdoMappableObjectList() {
         return rpdoMappableObjectList;
     }
 
     /**
+     * Get the sub object from the given sub object ID.
+     *
      * @param subObjectId The sub-object id.
      * @return The POWERLINK sub-object based on the given sub-object ID.
      */
@@ -282,7 +397,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
-     * The subObject instance for the given ID, null if the subobject ID is not
+     * The subObject instance for the given ID, null if the sub object ID is not
      * found.
      *
      * @param subObjectId SubObject ID ranges from 0x00 to 0xFE
@@ -298,19 +413,15 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
-     * @return The list of subobjects.
+     * @return The list of sub objects from the given node.
      */
     public List<PowerlinkSubobject> getSubObjects() {
         return subObjectsList;
     }
 
     /**
-     * @return The name of the object with ID.
+     * @return List of TPDO mappable objects from the given node.
      */
-    public String getText() {
-        return readableName;
-    }
-
     public List<PowerlinkSubobject> getTpdoMappableObjectList() {
         return tpdoMappableObjectList;
     }
@@ -322,22 +433,48 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
         return xpath;
     }
 
+    /**
+     * Checks for the RPDO mappable subObjects.
+     *
+     * @return <code>true</code> if RPDO mappable sub-objects are available.
+     *         <code>false</code> if RPDO mappable sub-objects is empty.
+     */
     public boolean hasRpdoMappableSubObjects() {
         return !rpdoMappableObjectList.isEmpty();
     }
 
+    /**
+     * Checks for the TPDO mappable subObjects.
+     *
+     * @return <code>true</code> if TPDO mappable sub-objects are available.
+     *         <code>false</code> if TPDO mappable sub-objects is empty.
+     */
     public boolean hasTpdoMappableSubObjects() {
         return !tpdoMappableObjectList.isEmpty();
     }
 
+    /**
+     * Checks for forced objects.
+     *
+     * @return <code>true</code> if object is forced. <code>false</code> if
+     *         object is not forced
+     */
     public boolean isObjectForced() {
         return nodeInstance.isObjectIdForced(object.getIndex(), null);
     }
 
+    /**
+     * @return <code>true</code> if object is RPDO mappable. <code>false</code>
+     *         if object is not.
+     */
     public boolean isRpdoMappable() {
         return isRpdoMappable;
     }
 
+    /**
+     * @return <code>true</code> if object is TPDO mappable. <code>false</code>
+     *         if object is not.
+     */
     public boolean isTpdoMappable() {
         return isTpdoMappable;
     }
@@ -347,17 +484,26 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      *
      * @param actualValue The value to be set.
      * @param writeToXdc Writes the value to the XDC immediately.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setActualValue(final String actualValue, boolean writeToXdc)
             throws JDOMException, IOException {
 
+        TObjectAccessType accessType = getModel().getAccessType();
+        if (accessType != null) {
+            if ((accessType == TObjectAccessType.RO)
+                    || (accessType == TObjectAccessType.CONST)) {
+                throw new RuntimeException("Restricted access to object " + "'"
+                        + object.getName() + "'" + " to set the actual value.");
+            }
+        }
+
         object.setActualValue(actualValue);
 
         if (writeToXdc) {
-            OpenConfiguratorProjectUtils.updateObjectAttributeValue(getNode(),
-                    getObjectIdRaw(), false, StringUtils.EMPTY, actualValue);
+            OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(
+                    getNode(), this, actualValue);
         }
     }
 }

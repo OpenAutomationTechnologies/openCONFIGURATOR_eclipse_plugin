@@ -30,6 +30,8 @@
  *******************************************************************************/
 package org.epsg.openconfigurator.model;
 
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+
 /**
  * A wrapper base type for creating a PDO Channel.
  *
@@ -176,8 +178,7 @@ public class PdoChannel {
 
         int nextrowindex = (currentSubObject.getSubobjecId() + 1);
 
-        return currentSubObject.getNode().getSubObject(
-                currentSubObject.getObjectId(), (short) nextrowindex);
+        return currentSubObject.getObject().getSubObject((short) nextrowindex);
     }
 
     /**
@@ -207,8 +208,7 @@ public class PdoChannel {
 
         short previousrowindex = (short) (currentSubObject.getSubobjecId() - 1);
 
-        return currentSubObject.getNode()
-                .getSubObject(currentSubObject.getObjectId(), previousrowindex);
+        return currentSubObject.getObject().getSubObject(previousrowindex);
     }
 
     /**
@@ -217,24 +217,24 @@ public class PdoChannel {
     public short getTargetNodeId() {
         PowerlinkSubobject nodeIdSubObj = communicationParam
                 .getSubObject((short) 1);
-        String targetNodeId = "-1";
-
+        short nodeIdValue = -1;
         if (nodeIdSubObj != null) {
-            targetNodeId = nodeIdSubObj.getActualValue();
-            if (targetNodeId == null) {
-                targetNodeId = nodeIdSubObj.getDefaultValue();
-            }
+            String targetNodeId = nodeIdSubObj.getActualDefaultValue();
 
             if (targetNodeId.isEmpty()) {
-                targetNodeId = "-1";
+                targetNodeId = "0";
             }
-        }
 
-        short nodeIdValue = -1;
-        try {
-            nodeIdValue = Integer.decode(targetNodeId).shortValue();
-        } catch (NumberFormatException ex) {
-
+            try {
+                nodeIdValue = Integer.decode(targetNodeId).shortValue();
+            } catch (NumberFormatException ex) {
+                OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                        "Invalid Target node Id for channel" + getText());
+            }
+        } else {
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Subobject " + communicationParam.getObjectIndex()
+                            + "/0x01 not found.");
         }
 
         return nodeIdValue;

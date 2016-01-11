@@ -70,6 +70,7 @@ import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.resources.IPluginImages;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 
 /**
  * View to list the objects and subobjects of a node.
@@ -176,7 +177,7 @@ public class ObjectDictionaryView extends ViewPart {
         @Override
         public String getText(Object element) {
             if (element instanceof PowerlinkObject) {
-                return ((PowerlinkObject) element).getText();
+                return ((PowerlinkObject) element).getNameWithId();
             } else if (element instanceof PowerlinkSubobject) {
                 return ((PowerlinkSubobject) element).getText();
             }
@@ -275,7 +276,8 @@ public class ObjectDictionaryView extends ViewPart {
             if (inputElement instanceof Node) {
                 Node nodeObj = (Node) inputElement;
 
-                List<PowerlinkObject> objectsList = nodeObj.getObjectsList();
+                List<PowerlinkObject> objectsList = nodeObj
+                        .getObjectDictionary().getObjectsList();
 
                 return objectsList.toArray();
             }
@@ -501,16 +503,16 @@ public class ObjectDictionaryView extends ViewPart {
                 if (element instanceof PowerlinkObject) {
                     PowerlinkObject obj = (PowerlinkObject) element;
                     if (!communicationProfileObjectsVisible) {
-                        if ((obj.getObjectId() >= 0x1000)
-                                && (obj.getObjectId() < 0x2000)) {
+                        if ((obj.getObjectId() >= IPowerlinkConstants.COMMUNICATION_PROFILE_START_INDEX)
+                                && (obj.getObjectId() < IPowerlinkConstants.MANUFACTURER_PROFILE_START_INDEX)) {
                             return false;
                         }
 
                     }
 
                     if (!standardisedDeviceProfileObjectsVisible) {
-                        if ((obj.getObjectId() >= 0x6000)
-                                && (obj.getObjectId() < 0x9FFF)) {
+                        if ((obj.getObjectId() >= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                && (obj.getObjectId() <= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
                             return false;
                         }
                     }

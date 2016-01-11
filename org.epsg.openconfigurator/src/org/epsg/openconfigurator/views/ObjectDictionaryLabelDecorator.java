@@ -69,7 +69,7 @@ public class ObjectDictionaryLabelDecorator
 
             // Only VAR type is allowed to be edited.
             if ((obj.getObjectType() == 7)) {
-                TObjectAccessType accessType = obj.getObject().getAccessType();
+                TObjectAccessType accessType = obj.getModel().getAccessType();
                 if (accessType != null) {
                     if ((accessType == TObjectAccessType.RO)
                             || (accessType == TObjectAccessType.CONST)) {
@@ -95,8 +95,8 @@ public class ObjectDictionaryLabelDecorator
             }
 
             // Only VAR type is allowed to be edited.
-            if ((subObj.getSubObject().getObjectType() == 7)) {
-                TObjectAccessType accessType = subObj.getSubObject()
+            if ((subObj.getModel().getObjectType() == 7)) {
+                TObjectAccessType accessType = subObj.getModel()
                         .getAccessType();
                 if (accessType != null) {
                     if ((accessType == TObjectAccessType.RO)

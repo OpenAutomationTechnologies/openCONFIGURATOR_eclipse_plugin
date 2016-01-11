@@ -668,7 +668,8 @@ public class MappingView extends ViewPart {
             if (inputElement instanceof Node) {
                 Node node = (Node) inputElement;
                 if (pdoType == PdoType.TPDO) {
-                    List<TpdoChannel> tpdoChannels = node.getTpdoChannelsList();
+                    List<TpdoChannel> tpdoChannels = node.getObjectDictionary()
+                            .getTpdoChannelsList();
 
                     if (!tpdoSummaryOnlyShowChannelsWithData) {
                         return tpdoChannels.toArray();
@@ -684,7 +685,8 @@ public class MappingView extends ViewPart {
                         return pdoChannels.toArray();
                     }
                 } else if (pdoType == PdoType.RPDO) {
-                    List<RpdoChannel> rpdoChannels = node.getRpdoChannelsList();
+                    List<RpdoChannel> rpdoChannels = node.getObjectDictionary()
+                            .getRpdoChannelsList();
 
                     if (!rpdoSummaryOnlyShowChannelsWithData) {
                         return rpdoChannels.toArray();
@@ -871,7 +873,7 @@ public class MappingView extends ViewPart {
                         }
 
                         PowerlinkObject mappableObject = nodeObj
-                                .getObjects(objectIdValue);
+                                .getObjectDictionary().getObject(objectIdValue);
                         if (mappableObject == null) {
                             return errorImage;
                         }
@@ -1354,7 +1356,7 @@ public class MappingView extends ViewPart {
                     rpdoSummaryTableViewer.setInput(nodeObj);
 
                     // TPDO page
-                    List<TpdoChannel> tpdoChannels = nodeObj
+                    List<TpdoChannel> tpdoChannels = nodeObj.getObjectDictionary()
                             .getTpdoChannelsList();
                     tpdoChannelComboViewer.setInput(tpdoChannels);
                     if (tpdoChannels.size() > 0) {
@@ -1374,7 +1376,7 @@ public class MappingView extends ViewPart {
                             showAdvancedview.isChecked());
 
                     // RPDO Page
-                    List<RpdoChannel> rpdoChannels = nodeObj
+                    List<RpdoChannel> rpdoChannels = nodeObj.getObjectDictionary()
                             .getRpdoChannelsList();
                     rpdoChannelComboViewer.setInput(rpdoChannels);
                     if (rpdoChannels.size() > 0) {
@@ -2451,7 +2453,8 @@ public class MappingView extends ViewPart {
             return emptyObject;
         }
 
-        PowerlinkObject mappableObject = nodeObj.getObjects(objectIdValue);
+        PowerlinkObject mappableObject = nodeObj.getObjectDictionary()
+                .getObject(objectIdValue);
         if (mappableObject != null) {
             String subObjectId = value.substring(12, 14);
             short subObjectIdValue = Short.parseShort(subObjectId, 16);
@@ -2486,13 +2489,13 @@ public class MappingView extends ViewPart {
         String value = mappingSubObj.getActualDefaultValue();
 
         if (value == null) {
-            return emptyObject.getText();
+            return emptyObject.getNameWithId();
         }
 
         if (value.length() != 18) {
             if ((value.length() == 3) || (value.length() == 1)) {
                 if (Integer.decode(value) == 0) {
-                    return emptyObject.getText();
+                    return emptyObject.getNameWithId();
                 }
             }
             return "Invalid value(" + value + ")";
@@ -2508,12 +2511,13 @@ public class MappingView extends ViewPart {
         }
 
         if (objectIdValue == 0) {
-            return emptyObject.getText();
+            return emptyObject.getNameWithId();
         }
 
         String subObjectId = value.substring(12, 14);
 
-        PowerlinkObject mappableObject = nodeObj.getObjects(objectIdValue);
+        PowerlinkObject mappableObject = nodeObj.getObjectDictionary()
+                .getObject(objectIdValue);
         if (mappableObject != null) {
             short subObjectIdValue = 0;
             try {
@@ -2525,7 +2529,7 @@ public class MappingView extends ViewPart {
 
             if (mappableObject.getObjectType() == 7) {
                 if (subObjectIdValue == 0) {
-                    return mappableObject.getText();
+                    return mappableObject.getNameWithId();
                 } else {
                     System.err.println(
                             "Error in XDD/XDC. Var type objects has subobjects!");
@@ -2557,7 +2561,7 @@ public class MappingView extends ViewPart {
 
         if (pdoType == PdoType.TPDO) {
             List<PowerlinkObject> tpdoMappableObjList = nodeObj
-                    .getTpdoMappableObjectList();
+                    .getObjectDictionary().getTpdoMappableObjectList();
 
             for (PowerlinkObject plkObj : tpdoMappableObjList) {
                 if (plkObj.isTpdoMappable()) {
@@ -2571,7 +2575,7 @@ public class MappingView extends ViewPart {
             }
         } else if (pdoType == PdoType.RPDO) {
             List<PowerlinkObject> rpdoMappableObjList = nodeObj
-                    .getRpdoMappableObjectList();
+                    .getObjectDictionary().getRpdoMappableObjectList();
 
             for (PowerlinkObject plkObj : rpdoMappableObjList) {
                 if (plkObj.isRpdoMappable()) {

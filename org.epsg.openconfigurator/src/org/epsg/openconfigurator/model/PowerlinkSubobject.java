@@ -35,6 +35,7 @@ import java.io.IOException;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
@@ -134,8 +135,8 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
         xpath = object.getXpath() + "/plk:SubObject[@subIndex='"
                 + subobjectIdRaw + "']";
         if (this.subObject.getDataType() != null) {
-            dataType = ObjectDatatype.getDatatypeName(DatatypeConverter
-                    .printHexBinary(getSubObject().getDataType()));
+            dataType = ObjectDatatype.getDatatypeName(
+                    DatatypeConverter.printHexBinary(getModel().getDataType()));
         } else {
             dataType = "";
         }
@@ -170,12 +171,21 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Deletes the actual value of given sub object of the node.
+     *
+     * Note: This does not delete from the XML file.
+     */
+    public void deleteActualValue() {
+        subObject.setActualValue(null);
+    }
+
+    /**
      * Add the force configurations to the project.
      *
      * @param force True to add and false to remove.
      * @param writeToProjectFile True to write the changes to the project file.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public synchronized void forceActualValue(boolean force, boolean writeToXdc)
             throws JDOMException, IOException {
@@ -186,12 +196,15 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
         }
 
         org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
-        forcedObj.setIndex(object.getObject().getIndex());
+        forcedObj.setIndex(object.getModel().getIndex());
         forcedObj.setSubindex(subObject.getSubIndex());
 
         nodeInstance.forceObjectActualValue(forcedObj, force);
     }
 
+    /**
+     * @return Access type of sub-object.
+     */
     public TObjectAccessType getAccessType() {
         return subObject.getAccessType();
     }
@@ -201,61 +214,121 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      *         available.
      */
     public String getActualDefaultValue() {
-        if (getActualValue() != null) {
-            return getActualValue();
+        String actualValue = subObject.getActualValue();
+        if ((actualValue != null) && !actualValue.isEmpty()) {
+            return actualValue;
         }
 
-        if (getDefaultValue() != null) {
-            return getDefaultValue();
+        String defaultValue = subObject.getDefaultValue();
+        if (defaultValue != null) {
+            return defaultValue;
         }
 
-        return null;
+        return StringUtils.EMPTY;
     }
 
+    /**
+     * @return Actual value of sub object.
+     */
     public String getActualValue() {
-        return subObject.getActualValue();
+        String actualValue = subObject.getActualValue();
+        if (actualValue == null) {
+            actualValue = StringUtils.EMPTY;
+        }
+        return actualValue;
     }
 
+    /**
+     * @return data type of sub-object.
+     */
     public String getDatatype() {
         return dataType;
     }
 
+    /**
+     * @return Default value of sub object.
+     */
     public String getDefaultValue() {
-        return subObject.getDefaultValue();
+        String defaultValue = subObject.getDefaultValue();
+        if (defaultValue == null) {
+            defaultValue = StringUtils.EMPTY;
+        }
+        return defaultValue;
     }
 
+    /**
+     * @return Model of sub object.
+     */
+    public TObject.SubObject getModel() {
+        return subObject;
+    }
+
+    /**
+     * @return Network id of node.
+     */
     public String getNetworkId() {
-        return project.getName();
+        return nodeInstance.getNetworkId();
     }
 
+    /**
+     * @return Instance of node.
+     */
     public Node getNode() {
         return nodeInstance;
     }
 
+    /**
+     * @return Id of the node.
+     */
     public short getNodeId() {
         return nodeInstance.getNodeId();
     }
 
+    /**
+     * @return Node model of node.
+     */
     public Object getNodeModel() {
         return nodeInstance.getNodeModel();
     }
 
+    /**
+     * @return Object
+     */
+    public PowerlinkObject getObject() {
+        return object;
+    }
+
+    /**
+     * @return Id of the object.
+     */
     public long getObjectId() {
         return object.getObjectId();
     }
 
+    /**
+     * @return Id of the object without hexadecimal notation (0x).
+     */
     public String getObjectIdRaw() {
         return object.getObjectIdRaw();
     }
 
+    /**
+     * @return Index of the object.
+     */
     public String getObjectIndex() {
         return object.getObjectIndex();
     }
 
+    /**
+     * @return PDO mapping of sub object.
+     */
     public TObjectPDOMapping getPdoMapping() {
         return subObject.getPDOmapping();
     }
 
+    /**
+     * @return Instance of project.
+     */
     public IProject getProject() {
         return project;
     }
@@ -278,22 +351,30 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
         return 0;
     }
 
+    /**
+     * @return Id of sub-object.
+     */
     public short getSubobjecId() {
         return subobjectIdShort;
     }
 
-    public TObject.SubObject getSubObject() {
-        return subObject;
-    }
-
+    /**
+     * @return Readable ID of sub-object.
+     */
     public String getSubobjectIdRaw() {
         return subobjectIdRaw;
     }
 
+    /**
+     * @return Index of sub object.
+     */
     public String getSubobjectIndex() {
         return subobjectId;
     }
 
+    /**
+     * @return Readable name of sub object.
+     */
     public String getText() {
         return readableName;
     }
@@ -303,23 +384,37 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      *         id and sub-object name and id.
      */
     public String getUniqueName() {
-        return object.getObject().getName() + "_" + subObject.getName() + "("
+        return object.getModel().getName() + "_" + subObject.getName() + "("
                 + object.getObjectIndex() + "/" + subobjectId + ")";
     }
 
+    /**
+     * @return Xpath.
+     */
     public String getXpath() {
         return xpath;
     }
 
+    /**
+     * Checks for forced objects.
+     *
+     * @return <true> if object is forced. <false> if object is not forced
+     */
     public boolean isObjectForced() {
-        return nodeInstance.isObjectIdForced(object.getObject().getIndex(),
+        return nodeInstance.isObjectIdForced(object.getModel().getIndex(),
                 subObject.getSubIndex());
     }
 
+    /**
+     * @return <true> if object is RPDO mappable. <false> if object is not.
+     */
     public boolean isRpdoMappable() {
         return isRpdoMappable;
     }
 
+    /**
+     * @return <true> if object is TPDO mappable. <false> if object is not.
+     */
     public boolean isTpdoMappable() {
         return isTpdoMappable;
     }
@@ -329,17 +424,27 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      *
      * @param actualValue The value to be set.
      * @param writeToXdc Writes the value immediately to XDC.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setActualValue(final String actualValue, boolean writeToXdc)
             throws JDOMException, IOException {
 
+        TObjectAccessType accessType = getModel().getAccessType();
+        if (accessType != null) {
+            if ((accessType == TObjectAccessType.RO)
+                    || (accessType == TObjectAccessType.CONST)) {
+                throw new RuntimeException("Restricted access to sub-object "
+                        + "'" + subObject.getName() + "'"
+                        + " to set the actual value.");
+            }
+        }
+
         subObject.setActualValue(actualValue);
 
         if (writeToXdc) {
-            OpenConfiguratorProjectUtils.updateObjectAttributeValue(getNode(),
-                    getObjectIdRaw(), true, getSubobjectIdRaw(), actualValue);
+            OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(
+                    getNode(), this, actualValue);
         }
     }
 }

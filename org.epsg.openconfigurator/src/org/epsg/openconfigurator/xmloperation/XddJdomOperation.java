@@ -106,30 +106,4 @@ public class XddJdomOperation {
                 POWERLINK_XDD_NAMESPACE, newAttribute);
     }
 
-    /**
-     * Update the given actual value for the given object/sub-object in the
-     * XDD/XDC.
-     *
-     * @param doc XDD/XDC file instance.
-     * @param objectId Object ID without 0x.
-     * @param subObject <code>True</code> if has valid subObject ID.
-     *            <code>False</code> otherwise.
-     * @param subObjectId SubObject ID without 0x.
-     * @param actualValue The new value to be set.
-     */
-    public static void updateActualValue(Document doc, String objectId,
-            boolean subObject, String subObjectId, String actualValue) {
-        String objXpath = "//plk:Object[@index='" + objectId + "']";
-        if (subObject) {
-            System.out.println("0x" + objectId + "/0x" + subObjectId + " : "
-                    + actualValue);
-            objXpath += "/plk:SubObject[@subIndex='" + subObjectId + "']";
-        } else {
-            System.out.println("0x" + objectId + " : " + actualValue);
-        }
-        System.out.println(objXpath);
-        Attribute newAttribute = new Attribute(ACTUAL_VALUE, actualValue);
-        JDomUtil.setAttribute(doc, objXpath, POWERLINK_XDD_NAMESPACE,
-                newAttribute);
-    }
 }

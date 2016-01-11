@@ -32,7 +32,6 @@
 package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -52,12 +51,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
-import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
-import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
-import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
-import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
-import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
 
@@ -68,6 +62,10 @@ import org.jdom2.JDOMException;
  *
  */
 public class Node {
+
+    public enum NodeType {
+        UNDEFINED, CONTROLLED_NODE, MANAGING_NODE, REDUNDANT_MANAGING_NODE
+    }
 
     /**
      * Returns the attribute name linked with the node assignment value.
@@ -154,40 +152,22 @@ public class Node {
     private final Map<Short, Node> nodeCollection;
 
     /**
-     * List of Objects available in the node.
-     */
-    private final List<PowerlinkObject> objectsList = new ArrayList<PowerlinkObject>();
-
-    /**
-     * TPDO mappable objects list.
-     */
-    private final List<PowerlinkObject> tpdoMappableObjectList = new ArrayList<PowerlinkObject>();
-
-    /**
-     * RPDO mappable objects list
-     */
-    private final List<PowerlinkObject> rpdoMappableObjectList = new ArrayList<PowerlinkObject>();
-
-    /**
-     * TPDO channels list.
-     */
-    private final List<TpdoChannel> tpdoChannelsList = new ArrayList<TpdoChannel>();
-
-    /**
-     * RPDO channels list.
-     */
-    private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
-
-    /**
      * Network ID used for the openCONFIGURATOR library.
      */
     private final String networkId;
+
+    private final ObjectDictionary objectDictionary;
 
     /**
      * Node ID in short datatype.
      */
     private short nodeId;
 
+    private final NodeType nodeType;
+
+    /**
+     * Constructor to initialize the node variables.
+     */
     public Node() {
         nodeModel = null;
         xddModel = null;
@@ -196,6 +176,8 @@ public class Node {
         nodeCollection = null;
         networkId = null;
         nodeId = 0;
+        nodeType = NodeType.UNDEFINED;
+        objectDictionary = null;
     }
 
     /**
@@ -223,92 +205,33 @@ public class Node {
 
         this.nodeModel = nodeModel;
 
-        this.xddModel = xddModel;
-
         // Calculate the node ID
         if (nodeModel instanceof TNetworkConfiguration) {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
-
             nodeId = net.getNodeCollection().getMN().getNodeID();
+            nodeType = NodeType.MANAGING_NODE;
         } else if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
 
             nodeId = Short.decode(cn.getNodeID());
+            nodeType = NodeType.CONTROLLED_NODE;
         } else if (nodeModel instanceof TRMN) {
             TRMN rmn = (TRMN) nodeModel;
 
             nodeId = rmn.getNodeID();
+            nodeType = NodeType.REDUNDANT_MANAGING_NODE;
         } else if (nodeModel instanceof TMN) {
             TMN tempMn = (TMN) nodeModel;
             nodeId = tempMn.getNodeID();
+            nodeType = NodeType.MANAGING_NODE;
         } else {
             nodeId = 0;
+
+            nodeType = NodeType.UNDEFINED;
             System.err.println("Unhandled node model type:" + nodeModel);
         }
-
-        // Calculate the objects during the object construction to improve
-        // performance. Since there are no addition and deletion of objects
-        // at runtime this is perfectly valid.
-        List<PowerlinkObject> commParamObjList = new ArrayList<PowerlinkObject>();
-        List<PowerlinkObject> mapParamObjList = new ArrayList<PowerlinkObject>();
-
-        if (xddModel != null) {
-
-            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
-            for (ISO15745Profile profile : profiles) {
-                ProfileBodyDataType profileBodyDatatype = profile
-                        .getProfileBody();
-                if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
-                    ProfileBodyCommunicationNetworkPowerlink commProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype;
-                    TApplicationLayers.ObjectList tempObjectLists = commProfile
-                            .getApplicationLayers().getObjectList();
-                    List<TObject> objList = tempObjectLists.getObject();
-                    for (TObject obj : objList) {
-                        PowerlinkObject plkObj = new PowerlinkObject(this, obj);
-                        objectsList.add(plkObj);
-
-                        if (plkObj.getObjectIndex().startsWith("0x14")
-                                || plkObj.getObjectIndex().startsWith("0x18")) {
-                            commParamObjList.add(plkObj);
-                        } else if (plkObj.getObjectIndex().startsWith("0x16")
-                                || plkObj.getObjectIndex().startsWith("0x1A")) {
-                            mapParamObjList.add(plkObj);
-                        }
-
-                        if (plkObj.hasRpdoMappableSubObjects()
-                                || plkObj.isRpdoMappable()) {
-                            rpdoMappableObjectList.add(plkObj);
-                        }
-
-                        if (plkObj.hasTpdoMappableSubObjects()
-                                || plkObj.isTpdoMappable()) {
-                            tpdoMappableObjectList.add(plkObj);
-                        }
-                    }
-                }
-            }
-
-            for (int i = 0; i < commParamObjList.size(); i++) {
-                try {
-                    PowerlinkObject commParam = commParamObjList.get(i);
-                    PowerlinkObject mapParam = mapParamObjList.get(i);
-
-                    char mapParamId = mapParam.getObjectIndex().charAt(3);
-
-                    if (mapParamId == '6') {
-                        rpdoChannelsList.add(
-                                new RpdoChannel(this, commParam, mapParam));
-                    } else if ((mapParamId == 'A') || (mapParamId == 'a')) {
-                        tpdoChannelsList.add(
-                                new TpdoChannel(this, commParam, mapParam));
-                    } else {
-                        System.err.println("Invalid PDO detected!");
-                    }
-                } catch (IndexOutOfBoundsException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        this.xddModel = xddModel;
+        objectDictionary = new ObjectDictionary(this, xddModel);
     }
 
     /**
@@ -413,62 +336,44 @@ public class Node {
         return pathToXdc;
     }
 
+    /**
+     * @return The value of AsndMaxNumber from object dictionary
+     */
     public String getAsndMaxNumber() {
-        PowerlinkSubobject asndMaxNumberObj = getSubObject(
+        String asndMaxNumberValue = getObjectDictionary().getValue(
                 IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
                 IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID);
-        if (asndMaxNumberObj != null) {
-            if (asndMaxNumberObj.getActualValue() != null) {
-                return asndMaxNumberObj.getActualValue();
-            }
-        }
-        return StringUtils.EMPTY;
+        return asndMaxNumberValue;
     }
 
     /**
-     * @return AsyncMtu value available for this node.
+     * @return The value of AsyncMtu from object dictionary.
      */
     public String getAsyncMtu() {
-
-        PowerlinkSubobject asyncMtuObj = getSubObject(
+        String asyncMtuValue = getObjectDictionary().getValue(
                 INetworkProperties.ASYNC_MTU_OBJECT_ID,
                 INetworkProperties.ASYNC_MTU_SUBOBJECT_ID);
-        if (asyncMtuObj != null) {
-            if (asyncMtuObj.getActualValue() != null) {
-                return asyncMtuObj.getActualValue();
-            }
-        }
-
-        return StringUtils.EMPTY;
-    }
-
-    public String getAsyncSlotTimeout() {
-        PowerlinkSubobject asyncSlotTimeoutObj = getSubObject(
-                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
-                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID);
-        if (asyncSlotTimeoutObj != null) {
-            if (asyncSlotTimeoutObj.getActualValue() != null) {
-                return asyncSlotTimeoutObj.getActualValue();
-            }
-        }
-
-        return StringUtils.EMPTY;
+        return asyncMtuValue;
     }
 
     /**
-     * @return Cycle time value available for this node.
+     *
+     * @return The value of AsyncSlotTimeout from object dictionary.
+     */
+    public String getAsyncSlotTimeout() {
+        String asyncSlotTimeoutValue = getObjectDictionary().getValue(
+                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
+                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID);
+        return asyncSlotTimeoutValue;
+    }
+
+    /**
+     * @return The cycle time value from object dictionary.
      */
     public String getCycleTime() {
-
-        PowerlinkObject cycleTimeObj = getObjects(
-                INetworkProperties.CYCLE_TIME_OBJECT_ID);
-        if (cycleTimeObj != null) {
-            if (cycleTimeObj.getActualValue() != null) {
-                return cycleTimeObj.getActualValue();
-            }
-        }
-
-        return StringUtils.EMPTY;
+        String cycleTimeValue = getObjectDictionary()
+                .getActualValue(INetworkProperties.CYCLE_TIME_OBJECT_ID);
+        return cycleTimeValue;
     }
 
     /**
@@ -520,32 +425,29 @@ public class Node {
      * @return Loss of SoC tolerance value available for this node.
      */
     public String getLossOfSocTolerance() {
-        PowerlinkObject lossSocToleranceObj = getObjects(
-                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
-        if (lossSocToleranceObj != null) {
-            if (lossSocToleranceObj.getActualValue() != null) {
-                return lossSocToleranceObj.getActualValue();
-            }
+        // MN: - CN: M
+        if (nodeType == NodeType.MANAGING_NODE) {
+            // FIXME: throw exception for un supported node type.
+            System.err.println("getLossOfSocTolerance: Un-supported node type:"
+                    + nodeModel);
+            // return StringUtils.EMPTY;
+            // FIXME: workaround. Specification issue. TBD. 0x1C14 N.A for MN.
         }
 
-        return StringUtils.EMPTY;
+        String lossSocToleranceValue = getObjectDictionary()
+                .getValue(IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
+        return lossSocToleranceValue;
     }
 
     /**
-     * @return Multiplexed cycle length value available for this node.
+     * @return the value of MultiplexedCycleCnt from object dictionary.
      */
-    public String getMultiplexedCycleLength() {
-
-        PowerlinkSubobject multiplexedCylCntObj = getSubObject(
+    public String getMultiplexedCycleCnt() {
+        // M for all
+        String multiplexedValue = getObjectDictionary().getValue(
                 INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
                 INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID);
-        if (multiplexedCylCntObj != null) {
-            if (multiplexedCylCntObj.getActualValue() != null) {
-                return multiplexedCylCntObj.getActualValue();
-            }
-        }
-
-        return StringUtils.EMPTY;
+        return multiplexedValue;
     }
 
     /**
@@ -617,39 +519,19 @@ public class Node {
         return nodeModel;
     }
 
-    public PowerlinkObject getObject(final byte[] objectId) {
-        if (objectId == null) {
-            return null;
-        }
-
-        String objectIdRaw = DatatypeConverter.printHexBinary(objectId);
-        long objectIdL = 0;
-        try {
-            objectIdL = Long.parseLong(objectIdRaw, 16);
-        } catch (NumberFormatException ex) {
-            return null;
-        }
-        return getObjects(objectIdL);
+    /**
+     * @return The node type.
+     */
+    public NodeType getNodeType() {
+        return nodeType;
     }
 
     /**
-     * @param objectId object ID
-     * @return Object with ID equals to objectId null otherwise.
+     *
+     * @return Instance of object dictionary.
      */
-    public PowerlinkObject getObjects(final long objectId) {
-        for (PowerlinkObject obj : objectsList) {
-            if (obj.getObjectId() == objectId) {
-                return obj;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @return The list of objects available in the Node.
-     */
-    public List<PowerlinkObject> getObjectsList() {
-        return objectsList;
+    public ObjectDictionary getObjectDictionary() {
+        return objectDictionary;
     }
 
     /**
@@ -683,6 +565,9 @@ public class Node {
         return pathToXdc;
     }
 
+    /**
+     * @return Normal or Multiplexed or chained mode of node.
+     */
     public PlkOperationMode getPlkOperationMode() {
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
@@ -703,34 +588,30 @@ public class Node {
      * @return Prescaler value available for this node.
      */
     public String getPrescaler() {
-
-        PowerlinkSubobject prescalerObj = getSubObject(
+        // MN: M; CN: O
+        String preScalerValue = getObjectDictionary().getValue(
                 INetworkProperties.PRESCALER_OBJECT_ID,
                 INetworkProperties.PRESCALER_SUBOBJECT_ID);
-        if (prescalerObj != null) {
-            if (prescalerObj.getActualValue() != null) {
-                return prescalerObj.getActualValue();
-            }
-        }
-
-        return StringUtils.EMPTY;
+        return preScalerValue;
     }
 
     /**
-     * @return The PRes MaxLatency value of a CN node
+     *
+     * @return PresMaxLatencyValue from object dictionary.
      */
     public String getPresMaxLatencyValue() {
-        if (nodeModel instanceof TCN) {
-            PowerlinkSubobject presMaxLatencyObj = getSubObject(
-                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
-            if (presMaxLatencyObj != null) {
-                if (presMaxLatencyObj.getActualValue() != null) {
-                    return presMaxLatencyObj.getActualValue();
-                }
-            }
+        if (nodeType == NodeType.MANAGING_NODE) {
+            // FIXME: throw exception for un supported node type.
+            System.err.println("getPresMaxLatencyValue Un-supported node type:"
+                    + nodeModel);
+            return StringUtils.EMPTY;
         }
-        return StringUtils.EMPTY;
+
+        // CN: M; MN:-
+        String latencyValue = getObjectDictionary().getValue(
+                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
+                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
+        return latencyValue;
     }
 
     /**
@@ -741,8 +622,10 @@ public class Node {
         if (nodeModel instanceof TCN) {
             Node mnNode = nodeCollection
                     .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
-            PowerlinkSubobject pollresponseSubObj = mnNode.getSubObject(
-                    INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID, nodeId);
+            PowerlinkSubobject pollresponseSubObj = mnNode.getObjectDictionary()
+                    .getSubObject(
+                            INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                            nodeId);
             if (pollresponseSubObj != null) {
 
                 String presTimeOutValueInNs = pollresponseSubObj
@@ -794,83 +677,34 @@ public class Node {
     }
 
     /**
-     * @return The priority value of an RMN.
+     * @return Priority value of RMN node from object dictionary.
      */
     public String getRmnPriority() {
-        if (nodeModel instanceof TRMN) {
-            PowerlinkSubobject priorityObj = getSubObject(
-                    IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
-                    IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID);
-            if (priorityObj != null) {
-                if (priorityObj.getActualValue() != null) {
-                    return priorityObj.getActualValue();
-                }
-            }
+        if (nodeType != NodeType.REDUNDANT_MANAGING_NODE) {
+            // throw new UnsupportedOperationException();
+            // FIXME: throw exception as un supported operation.
         }
-        return StringUtils.EMPTY;
+
+        String priorityValue = getObjectDictionary().getValue(
+                IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
+                IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID);
+        return priorityValue;
     }
 
     /**
-     * @return The wait not active value of an RMN.
+     * @return WaitNotActive value of RMN node from object dictionary.
      */
-    public String getRmnWaitNotActive() {
-        if (nodeModel instanceof TRMN) {
-            PowerlinkSubobject waitNotActiveObj = getSubObject(
-                    IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
-                    IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID);
-            if (waitNotActiveObj != null) {
-                if (waitNotActiveObj.getActualValue() != null) {
-                    return waitNotActiveObj.getActualValue();
-                }
-            }
-        }
-        return StringUtils.EMPTY;
-    }
-
-    public List<RpdoChannel> getRpdoChannelsList() {
-        return rpdoChannelsList;
-    }
-
-    public List<PowerlinkObject> getRpdoMappableObjectList() {
-        return rpdoMappableObjectList;
-    }
-
-    public PowerlinkSubobject getSubObject(final byte[] objectId,
-            final byte[] subObjectId) {
-        PowerlinkObject object = getObject(objectId);
-        if ((object == null) || (subObjectId == null)) {
-            return null;
-        }
-
-        return object.getSubObject(subObjectId);
+    public String getWaitNotActive() {
+        // M for all
+        String waitNotActiveValue = getObjectDictionary().getValue(
+                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
+                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID);
+        return waitNotActiveValue;
     }
 
     /**
-     * Retrieves the subobject instance for the given objectId and subObjectId
-     * available in this node.
-     *
-     * @param objectId Object ID.
-     * @param subObjectId Subobject ID.
-     *
-     * @return Subobject instance.
+     * @return Xpath of node.
      */
-    public PowerlinkSubobject getSubObject(final long objectId,
-            final short subObjectId) {
-        PowerlinkObject obj = getObjects(objectId);
-        if (obj == null) {
-            return null;
-        }
-        return obj.getSubObject(subObjectId);
-    }
-
-    public List<TpdoChannel> getTpdoChannelsList() {
-        return tpdoChannelsList;
-    }
-
-    public List<PowerlinkObject> getTpdoMappableObjectList() {
-        return tpdoMappableObjectList;
-    }
-
     public String getXpath() {
         String xpath = "//oc:";
 
@@ -940,6 +774,14 @@ public class Node {
         return nodeIdAvailable;
     }
 
+    /**
+     * Checks if the object is forced.
+     *
+     * @param objectId The object index in arrays of bytes.
+     * @param subObjectId The sub object index in arrays of bytes.
+     * @return <code> True</code> if Object forced. <code>False</code>
+     *         otherwise.
+     */
     public boolean isObjectIdForced(byte[] objectId, byte[] subObjectId) {
 
         ForcedObjects forcedObjTag = null;
@@ -1006,86 +848,90 @@ public class Node {
     /**
      * Set ASnd max number
      *
-     * @param value value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value AsndMaxNumber value in ns.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setAsndMaxNumber(Short value)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkSubobject asndMaxNumberObj = getSubObject(
-                    IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
-                    IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID);
-
-            if (asndMaxNumberObj != null) {
-                asndMaxNumberObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("AsndMaxNumber object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // TBD about the category.
+        getObjectDictionary().setActualValue(
+                IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
+                IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID,
+                value.toString());
     }
 
     /**
      * Set the asyncMtuValue to the node.
      *
-     * @param value Value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value AsyncMtu value in bytes.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setAsyncMtu(Integer value) throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkSubobject asyncMtuObj = getSubObject(
-                    INetworkProperties.ASYNC_MTU_OBJECT_ID,
-                    INetworkProperties.ASYNC_MTU_SUBOBJECT_ID);
-            if (asyncMtuObj != null) {
-                asyncMtuObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("AsyncMtu object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // M for all.
+        getObjectDictionary().setActualValue(
+                INetworkProperties.ASYNC_MTU_OBJECT_ID,
+                INetworkProperties.ASYNC_MTU_SUBOBJECT_ID, value.toString());
     }
 
     /**
      * Set AsyncTimeout value for MN
      *
-     * @param value Value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value AsyncTimeout value in ns.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setAsyncSlotTimeout(Long value)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkSubobject asyncSlotTimeoutObj = getSubObject(
-                    IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
-                    IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID);
-
-            if (asyncSlotTimeoutObj != null) {
-                asyncSlotTimeoutObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("AsyncTimeout object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // O for TBD.
+        getObjectDictionary().setActualValue(
+                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
+                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
+                value.toString());
     }
 
     /**
      * Set the PRes MaxLatency value for a CN node.
      *
-     * @param value PRes MaxLatency value to set.
+     * @param value PRes MaxLatency value in ns.
      * @throws IOException
      * @throws JDOMException
      */
     public void setCnPresMaxLatency(Long value)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TCN) {
-            PowerlinkSubobject presMaxLatencyObj = getSubObject(
-                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                    IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
-            if (presMaxLatencyObj != null) {
-                presMaxLatencyObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("PresMaxLatency object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // CN: M MN: -
+        if (nodeType == NodeType.MANAGING_NODE) {
+            // FIXME: throw exception for un supported node type.
+            System.err.println(
+                    "setCnPresMaxLatency Un-supported node type:" + nodeModel);
+            return;
+        }
+
+        getObjectDictionary().setActualValue(
+                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
+                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID,
+                value.toString());
     }
 
     /**
@@ -1094,18 +940,24 @@ public class Node {
      * Supported for a CN only.
      *
      * @param value PRes timeout value in ns.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setCnPresTimeout(String value)
             throws JDOMException, IOException {
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
+        }
+
         if (nodeModel instanceof TCN) {
             Node mnNode = nodeCollection
                     .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
             if (mnNode != null) {
-                PowerlinkSubobject prestimeoutsubobj = mnNode.getSubObject(
-                        INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
-                        nodeId);
+                PowerlinkSubobject prestimeoutsubobj = mnNode
+                        .getObjectDictionary().getSubObject(
+                                INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                                nodeId);
                 if (prestimeoutsubobj != null) {
                     prestimeoutsubobj.setActualValue(value, true);
                 } else {
@@ -1118,20 +970,19 @@ public class Node {
     /**
      * Set the cycleTimeValue to the node.
      *
-     * @param value Value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value cycleTimeValue in micro seconds.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setCycleTime(Long value) throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkObject cycleTimeObj = getObjects(
-                    INetworkProperties.CYCLE_TIME_OBJECT_ID);
-            if (cycleTimeObj != null) {
-                cycleTimeObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("CycleTime object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // M for all
+        getObjectDictionary().setActualValue(
+                INetworkProperties.CYCLE_TIME_OBJECT_ID, value.toString());
     }
 
     /**
@@ -1139,8 +990,8 @@ public class Node {
      * enabled.
      *
      * @param enabled True to enable the node, false to disable the node.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setEnabled(boolean enabled) throws JDOMException, IOException {
         if (nodeModel instanceof TCN) {
@@ -1157,50 +1008,59 @@ public class Node {
     /**
      * Set the loss of SoC tolerance value.
      *
-     * @param value Value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value loss of SoC tolerance value in micro seconds.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setLossOfSocTolerance(Long value)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkObject lossOfSocToleranceObj = getObjects(
-                    IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
-            if (lossOfSocToleranceObj != null) {
-                lossOfSocToleranceObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("LossOfSocTolerance object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // MN: - CN: M
+        if (nodeType == NodeType.MANAGING_NODE) {
+            // FIXME: throw exception for un supported node type.
+            System.err.println("setLossOfSocTolerance Un-supported node type:"
+                    + nodeModel);
+            // WORKAROUND for specificatin issue. MN shall not contain 0x1C14
+            // object
+            // return;
+        }
+
+        getObjectDictionary().setActualValue(
+                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID,
+                value.toString());
     }
 
     /**
      * Set the multiplexed cycle length value.
      *
-     * @param value Value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value Value to be set in cycles.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setMultiplexedCycleLength(Integer value)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkSubobject multiplexedCylCntObj = getSubObject(
-                    INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
-                    INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID);
-            if (multiplexedCylCntObj != null) {
-                multiplexedCylCntObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("MultiplexedCycleLength object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // M for all
+        getObjectDictionary().setActualValue(
+                INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
+                INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID,
+                value.toString());
     }
 
     /**
      * Set new name to this node.
      *
      * @param newName New name.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setName(final String newName)
             throws JDOMException, IOException {
@@ -1412,7 +1272,7 @@ public class Node {
      * @param newNodeId The node id to be updated.
      *
      * @throws IOException Errors with project file or XDC file modifications.
-     * @throws JDOMException
+     * @throws JDOMException Errors with time modifications.
      */
     public void setNodeId(final short newNodeId)
             throws IOException, JDOMException {
@@ -1493,68 +1353,89 @@ public class Node {
     /**
      * Set the prescalerValue to the node.
      *
-     * @param value Value to be set.
-     * @throws IOException
-     * @throws JDOMException
+     * @param value Value to be set in cycles.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public void setPrescaler(Integer value) throws JDOMException, IOException {
-        if (nodeModel instanceof TNetworkConfiguration) {
-            PowerlinkSubobject prescalerObj = getSubObject(
-                    INetworkProperties.PRESCALER_OBJECT_ID,
-                    INetworkProperties.PRESCALER_SUBOBJECT_ID);
-            if (prescalerObj != null) {
-                prescalerObj.setActualValue(value.toString(), true);
-            } else {
-                System.err.println("Prescaler object not found.");
-            }
+        if (value == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // MN: M; CN:O
+        getObjectDictionary().setActualValue(
+                INetworkProperties.PRESCALER_OBJECT_ID,
+                INetworkProperties.PRESCALER_SUBOBJECT_ID, value.toString());
     }
 
     /**
      * Set the priority to an RMN node.
      *
-     * @param priority Priority value.
-     * @throws IOException
-     * @throws JDOMException
+     * @param priority Priority value (no units).
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      * @See IRedundantManagingNodeProperties.RMN_PRIORITY_DESCRIPTION
      */
     public void setRmnPriority(Long priority)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TRMN) {
-            PowerlinkSubobject priorityObj = getSubObject(
-                    IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
-                    IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID);
-            if (priorityObj != null) {
-                priorityObj.setActualValue(priority.toString(), true);
-            } else {
-                System.err.println("Priority object not found in RMN.");
-            }
+        if (priority == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // M for RMN
+        if (nodeType != NodeType.REDUNDANT_MANAGING_NODE) {
+            // FIXME: throw exception for un supported node type.
+            System.err.println(
+                    "setRmnPriority Un-supported node type:" + nodeModel);
+            return;
+        }
+
+        getObjectDictionary().setActualValue(
+                IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
+                IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID,
+                priority.toString());
     }
 
     /**
      * Set the wait not active value to an RMN.
      *
-     * @param waitNotActive Wait not active value.
-     * @throws IOException
-     * @throws JDOMException
+     * @param waitNotActive Wait not active value (no units).
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      *
      * @See IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_DESCRIPTION
      */
     public void setRmnWaitNotActive(Long waitNotActive)
             throws JDOMException, IOException {
-        if (nodeModel instanceof TRMN) {
-            PowerlinkSubobject waitNotActiveObj = getSubObject(
-                    IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
-                    IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID);
-            if (waitNotActiveObj != null) {
-                waitNotActiveObj.setActualValue(waitNotActive.toString(), true);
-            } else {
-                System.err.println("WaitNotActive object not found.");
-            }
+        if (waitNotActive == null) {
+            // FIXME: throw invalid argument.
+            return;
         }
+
+        // M for RMN
+        if (nodeType != NodeType.REDUNDANT_MANAGING_NODE) {
+            // FIXME: throw exception for un supported node type.
+            System.err.println(
+                    "setRmnWaitNotActive Un-supported node type:" + nodeModel);
+            return;
+        }
+
+        getObjectDictionary().setActualValue(
+                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
+                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID,
+                waitNotActive.toString());
     }
 
+    /**
+     * Updates the actual value of objects in XDD file.
+     *
+     * @param objectJCollection The list of objects with its actual value.
+     * @param document The instance of XDD/XDC document.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
     public void writeObjectActualValues(
             java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection,
             org.jdom2.Document document) throws JDOMException, IOException {
@@ -1569,7 +1450,8 @@ public class Node {
                 isSubObject = true;
             }
 
-            PowerlinkObject object = getObjects(objectIdLong);
+            PowerlinkObject object = getObjectDictionary()
+                    .getObject(objectIdLong);
             if (object != null) {
 
                 if (!isSubObject) {

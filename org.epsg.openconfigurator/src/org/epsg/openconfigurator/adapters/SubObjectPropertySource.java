@@ -397,6 +397,6 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
 
     public void setSubObjectData(PowerlinkSubobject adaptableObject) {
         plkSubObject = adaptableObject;
-        subObject = plkSubObject.getSubObject();
+        subObject = plkSubObject.getModel();
     }
 }

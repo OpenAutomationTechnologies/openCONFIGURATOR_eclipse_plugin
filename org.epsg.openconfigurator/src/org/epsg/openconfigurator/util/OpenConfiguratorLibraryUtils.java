@@ -77,11 +77,9 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TKeyValuePair;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
-import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
@@ -110,24 +108,6 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
  *
  */
 public class OpenConfiguratorLibraryUtils {
-
-    /**
-     * Adds a Controlled node in the project file into the library.
-     *
-     * @param networkId Network ID.
-     * @param cn The controlled node instance.
-     *
-     * @return Result instance from the library.
-     */
-    private static Result addControlledNode(final String networkId,
-            final TCN cn) {
-        Result libApiRes = OpenConfiguratorCore.GetInstance()
-                .CreateNode(networkId, new Short(cn.getNodeID()), cn.getName());
-        if (!libApiRes.IsSuccessful()) {
-            return libApiRes;
-        }
-        return libApiRes;
-    }
 
     /**
      * Add the datatype list from the XDC into the library.
@@ -288,35 +268,6 @@ public class OpenConfiguratorLibraryUtils {
                 System.err.println("WARN: " + getErrorMessage(libApiRes));
             }
         }
-        return libApiRes;
-    }
-
-    /**
-     * Add managing node into the library.
-     *
-     * @param networkId Network ID.
-     * @param networkConfiguration The network configuration available in the
-     *            project file.
-     * @return Result instance from the library.
-     */
-    private static Result addManagingNode(final String networkId,
-            final TNetworkConfiguration networkConfiguration) {
-
-        Result libApiRes = new Result();
-
-        TNodeCollection nodeCollection = networkConfiguration
-                .getNodeCollection();
-        if (nodeCollection != null) {
-            TMN mn = nodeCollection.getMN();
-            if (mn != null) {
-                libApiRes = OpenConfiguratorCore.GetInstance()
-                        .CreateNode(networkId, mn.getNodeID(), mn.getName());
-                if (!libApiRes.IsSuccessful()) {
-                    return libApiRes;
-                }
-            }
-        }
-
         return libApiRes;
     }
 
@@ -756,26 +707,41 @@ public class OpenConfiguratorLibraryUtils {
      * @param node Node instance.
      * @return Result instance from the library.
      */
-    public static Result addNode(final String networkId, final short nodeId,
-            Node node) {
+    public static Result addNode(Node node) {
         Result libApiRes = new Result();
+
+        libApiRes = createNode(node);
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
+        libApiRes = addNodeAssignments(node);
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
+        libApiRes = updateForcedObjectsIntoLibary(node);
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
+        return libApiRes;
+    }
+
+    /**
+     * Add node assignment value bit into library.
+     *
+     * @param node Node instance.
+     * @return Result instance from the library.
+     */
+    public static Result addNodeAssignments(final Node node) {
+        Result libApiRes = null;
         TAbstractNode abstractNode = null;
         OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
         if (node.getNodeModel() instanceof TNetworkConfiguration) {
             TNetworkConfiguration net = (TNetworkConfiguration) node
                     .getNodeModel();
             abstractNode = net.getNodeCollection().getMN();
-
-            libApiRes = addManagingNode(node.getNetworkId(), net);
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-            libApiRes = importXddModel(node.getNetworkId(), node.getNodeId(),
-                    node.getISO15745ProfileContainer());
-
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
 
             TMN mnInst = net.getNodeCollection().getMN();
             libApiRes = setNodeAssignment(NodeAssignment.NMT_NODEASSIGN_MN_PRES,
@@ -787,23 +753,6 @@ public class OpenConfiguratorLibraryUtils {
         } else if (node.getNodeModel() instanceof TCN) {
             TCN cnModel = (TCN) node.getNodeModel();
             abstractNode = cnModel;
-
-            libApiRes = addControlledNode(node.getNetworkId(), cnModel);
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-
-            libApiRes = OpenConfiguratorCore.GetInstance().EnableNode(
-                    node.getNetworkId(), node.getNodeId(), cnModel.isEnabled());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-
-            libApiRes = importXddModel(node.getNetworkId(), node.getNodeId(),
-                    node.getISO15745ProfileContainer());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
 
             libApiRes = setNodeAssignment(
                     NodeAssignment.NMT_NODEASSIGN_NODE_IS_CN, node, true);
@@ -866,17 +815,6 @@ public class OpenConfiguratorLibraryUtils {
         } else if (node.getNodeModel() instanceof TRMN) {
             abstractNode = (TRMN) node.getNodeModel();
 
-            libApiRes = addRmnIntoLibrary(node.getNetworkId(),
-                    (TRMN) node.getNodeModel());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-            libApiRes = importXddModel(node.getNetworkId(), node.getNodeId(),
-                    node.getISO15745ProfileContainer());
-            if (!libApiRes.IsSuccessful()) {
-                return libApiRes;
-            }
-
             libApiRes = setNodeAssignment(
                     NodeAssignment.NMT_NODEASSIGN_NODE_IS_CN, node, true);
             if (!libApiRes.IsSuccessful()) {
@@ -917,11 +855,6 @@ public class OpenConfiguratorLibraryUtils {
 
         libApiRes = setNodeAssignment(NodeAssignment.NMT_NODEASSIGN_RT2, node,
                 abstractNode.isIsType2Router());
-        if (!libApiRes.IsSuccessful()) {
-            return libApiRes;
-        }
-
-        libApiRes = updateForcedObjectsIntoLibary(node);
         if (!libApiRes.IsSuccessful()) {
             return libApiRes;
         }
@@ -1049,7 +982,7 @@ public class OpenConfiguratorLibraryUtils {
      *
      * @param networkId Network ID.
      * @param nodeId The node ID.
-     * @param parameterListElement The paramerter list instance.
+     * @param parameterListElement The parameter list instance.
      * @return Result instance from the library.
      */
     private static Result addParameterList(final String networkId,
@@ -1075,6 +1008,7 @@ public class OpenConfiguratorLibraryUtils {
                             + getErrorMessage(libApiRes));
                 }
             } else {
+                // FIXME: could be variableRef also
                 Object dataTypeObj = parameter.getDataTypeIDRef()
                         .getUniqueIDRef();
                 if (dataTypeObj instanceof TDataTypeList.Struct) {
@@ -1146,24 +1080,6 @@ public class OpenConfiguratorLibraryUtils {
                 networkId,
                 projectConfiguration.getActiveAutoGenerationSetting());
 
-        return libApiRes;
-    }
-
-    /**
-     * Add the redundant MN into the library.
-     *
-     * @param networkId Network ID.
-     * @param rmn Redundant MN instance.
-     * @return Result instance from the library.
-     */
-    private static Result addRmnIntoLibrary(final String networkId,
-            final TRMN rmn) {
-        Result libApiRes;
-        libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(networkId,
-                rmn.getNodeID(), rmn.getName(), true);
-        if (!libApiRes.IsSuccessful()) {
-            return libApiRes;
-        }
         return libApiRes;
     }
 
@@ -1299,6 +1215,35 @@ public class OpenConfiguratorLibraryUtils {
                 channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
                 getDirection(channel.getPdoType()), channel.getChannelNumber(),
                 mappingSubObject.getSubobjecId());
+    }
+
+    private static Result createNode(final Node node) {
+        Result libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(
+                node.getNetworkId(), node.getNodeId(), node.getName(),
+                (node.getNodeType() == Node.NodeType.REDUNDANT_MANAGING_NODE
+                        ? true : false));
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
+        libApiRes = importXddModel(node);
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
+        // FIXME: this is a workaround for the issue with the library.
+        // The library returns error if the node is set "enabled" for MN.
+        if (node.getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+            return libApiRes;
+        }
+
+        libApiRes = OpenConfiguratorCore.GetInstance().EnableNode(
+                node.getNetworkId(), node.getNodeId(), node.isEnabled());
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
+        return libApiRes;
     }
 
     /**
@@ -1826,66 +1771,68 @@ public class OpenConfiguratorLibraryUtils {
         return pdoMapping;
     }
 
-    /**
-     * Import the details available in the XDD into the library.
-     *
-     * @param networkId Network ID.
-     * @param nodeId The node ID.
-     * @param xdd The XDC/XDD instance.
-     * @return Result instance from the library.
-     */
-    private static Result importXddModel(final String networkId,
-            final short nodeId, ISO15745ProfileContainer xdd) {
+    private static Result importProfileBodyCommunicationNetworkPowerlink(
+            final Node node,
+            final ProfileBodyCommunicationNetworkPowerlink commProfile) {
+        Result libApiRes = new Result();
+        libApiRes = addObjectList(node.getNetworkId(), node.getNodeId(),
+                commProfile.getApplicationLayers().getObjectList());
+        if (!libApiRes.IsSuccessful()) {
+            System.err.println("WARN: " + getErrorMessage(libApiRes));
+        }
+
+        if (node.getNodeId() > 239) {
+            libApiRes = addDynamicChannels(node.getNetworkId(),
+                    node.getNodeId(),
+                    commProfile.getApplicationLayers().getDynamicChannels());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+        }
+
+        libApiRes = addNetworkManagement(node.getNetworkId(), node.getNodeId(),
+                commProfile.getNetworkManagement());
+        return libApiRes;
+    }
+
+    private static Result importProfileBodyDevicePowerlink(final Node node,
+            final ProfileBodyDevicePowerlink devProfile) {
+        Result libApiRes = new Result();
+        List<TApplicationProcess> appProcessList = devProfile
+                .getApplicationProcess();
+        for (TApplicationProcess appProcess : appProcessList) {
+
+            // FIXME: Move datatype list first
+            libApiRes = addParameterList(node.getNetworkId(), node.getNodeId(),
+                    appProcess.getParameterList());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+
+            libApiRes = addDataTypeList(node.getNetworkId(), node.getNodeId(),
+                    appProcess.getDataTypeList());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+
+        }
+        return libApiRes;
+    }
+
+    private static Result importXddModel(final Node node) {
 
         Result libApiRes = new Result();
 
-        List<ISO15745Profile> profiles = xdd.getISO15745Profile();
+        List<ISO15745Profile> profiles = node.getISO15745ProfileContainer()
+                .getISO15745Profile();
         for (ISO15745Profile profile : profiles) {
             ProfileBodyDataType profileBodyDatatype = profile.getProfileBody();
             if (profileBodyDatatype instanceof ProfileBodyDevicePowerlink) {
-                ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBodyDatatype;
-                List<TApplicationProcess> appProcessList = devProfile
-                        .getApplicationProcess();
-                for (TApplicationProcess appProcess : appProcessList) {
-
-                    libApiRes = addParameterList(networkId, nodeId,
-                            appProcess.getParameterList());
-                    if (!libApiRes.IsSuccessful()) {
-                        System.err
-                                .println("WARN: " + getErrorMessage(libApiRes));
-                    }
-
-                    libApiRes = addDataTypeList(networkId, nodeId,
-                            appProcess.getDataTypeList());
-                    if (!libApiRes.IsSuccessful()) {
-                        System.err
-                                .println("WARN: " + getErrorMessage(libApiRes));
-                    }
-
-                }
-            } else if (profile
-                    .getProfileBody() instanceof ProfileBodyCommunicationNetworkPowerlink) {
-                ProfileBodyCommunicationNetworkPowerlink commProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype;
-
-                libApiRes = addObjectList(networkId, nodeId,
-                        commProfile.getApplicationLayers().getObjectList());
-                if (!libApiRes.IsSuccessful()) {
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
-                }
-
-                if (nodeId > 239) {
-                    libApiRes = addDynamicChannels(networkId, nodeId,
-                            commProfile.getApplicationLayers()
-                                    .getDynamicChannels());
-                    if (!libApiRes.IsSuccessful()) {
-                        System.err
-                                .println("WARN: " + getErrorMessage(libApiRes));
-                    }
-                }
-
-                libApiRes = addNetworkManagement(networkId, nodeId,
-                        commProfile.getNetworkManagement());
-
+                importProfileBodyDevicePowerlink(node,
+                        (ProfileBodyDevicePowerlink) profileBodyDatatype);
+            } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
+                importProfileBodyCommunicationNetworkPowerlink(node,
+                        (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype);
             } else {
                 System.err.println(
                         "Unknown profile body datatype:" + profileBodyDatatype);
@@ -2185,7 +2132,8 @@ public class OpenConfiguratorLibraryUtils {
                 .getObject()) {
 
             if (forcedObj.getSubindex() == null) {
-                PowerlinkObject plkObj = node.getObject(forcedObj.getIndex());
+                PowerlinkObject plkObj = node.getObjectDictionary()
+                        .getObject(forcedObj.getIndex());
                 if (plkObj == null) {
                     OpenConfiguratorMessageConsole.getInstance()
                             .printErrorMessage("Object ID 0x"
@@ -2198,8 +2146,9 @@ public class OpenConfiguratorLibraryUtils {
                 libApiRes = OpenConfiguratorLibraryUtils.forceObject(plkObj,
                         true);
             } else {
-                PowerlinkSubobject plkSubObj = node.getSubObject(
-                        forcedObj.getIndex(), forcedObj.getSubindex());
+                PowerlinkSubobject plkSubObj = node.getObjectDictionary()
+                        .getSubObject(forcedObj.getIndex(),
+                                forcedObj.getSubindex());
 
                 if (plkSubObj == null) {
                     System.err.println(

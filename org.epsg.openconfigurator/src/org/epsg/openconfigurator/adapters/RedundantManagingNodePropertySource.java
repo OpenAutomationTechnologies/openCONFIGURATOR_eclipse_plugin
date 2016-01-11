@@ -34,8 +34,7 @@ package org.epsg.openconfigurator.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.bind.DatatypeConverter;
-
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -220,78 +219,71 @@ public class RedundantManagingNodePropertySource
     @Override
     public Object getPropertyValue(Object id) {
         Object retObj = null;
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                    if (rmn.getName() != null) {
-                        retObj = rmn.getName();
-                    } else {
-                        retObj = new String();
-                    }
-                    break;
-                case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
-                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
-                    retObj = redundantManagingNode.getNodeIdString();
-                    break;
-                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
-                    retObj = rmn.getPathToXDC();
-                    break;
-                case IAbstractNodeProperties.NODE_ERROR_OBJECT:
-                    retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
-                    break;
-                case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
-                    retObj = redundantManagingNode.getRmnWaitNotActive();
-                    break;
-                case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
-                    retObj = redundantManagingNode.getRmnPriority();
-                    break;
-                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                    int value = (rmn.isIsAsyncOnly() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                    int value = (rmn.isIsType1Router() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                    int value = (rmn.isIsType2Router() == true) ? 0 : 1;
-                    retObj = new Integer(value);
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
-                    String objectText = "";
-                    if (rmn.getForcedObjects() != null) {
-                        List<org.epsg.openconfigurator.xmlbinding.projectfile.Object> forcedObjList = rmn
-                                .getForcedObjects().getObject();
-                        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object obj : forcedObjList) {
-                            objectText = objectText.concat("0x");
-
-                            objectText = objectText.concat(DatatypeConverter
-                                    .printHexBinary(obj.getIndex()));
-                            if (obj.getSubindex() != null) {
-                                objectText = objectText.concat("/0x");
-                                objectText = objectText.concat(DatatypeConverter
-                                        .printHexBinary(obj.getSubindex()));
-                            }
-                            objectText = objectText.concat(";");
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                        if (rmn.getName() != null) {
+                            retObj = rmn.getName();
+                        } else {
+                            retObj = new String();
                         }
+                        break;
+                    case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                        retObj = redundantManagingNode.getNodeIdString();
+                        break;
+                    case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        retObj = rmn.getPathToXDC();
+                        break;
+                    case IAbstractNodeProperties.NODE_ERROR_OBJECT:
+                        retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
+                        break;
+                    case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
+                        retObj = redundantManagingNode.getWaitNotActive();
+                        break;
+                    case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
+                        retObj = redundantManagingNode.getRmnPriority();
+                        break;
+                    case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                        int value = (rmn.isIsAsyncOnly() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
                     }
-                    retObj = objectText;
-                    break;
-                case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
-                    retObj = redundantManagingNode.getLossOfSocTolerance();
-                    break;
-                default:
-                    System.err.println("Invalid object string ID:" + objectId);
-                    break;
+                    case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                        int value = (rmn.isIsType1Router() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                        int value = (rmn.isIsType2Router() == true) ? 0 : 1;
+                        retObj = new Integer(value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        retObj = redundantManagingNode.getForcedObjectsString();
+                        break;
+                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
+                        long val = Long.decode(
+                                redundantManagingNode.getLossOfSocTolerance());
+                        long valInUs = val / 1000;
+                        retObj = String.valueOf(valInUs);
+                        break;
+                    }
+                    default:
+                        System.err.println(
+                                "Invalid object string ID:" + objectId);
+                        break;
+                }
+            } else {
+                System.err.println("Invalid object ID:" + id);
             }
-        } else {
-            System.err.println("Invalid object ID:" + id);
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Property: " + id + " " + e.getMessage());
+            retObj = StringUtils.EMPTY;
         }
-
         return retObj;
     }
 
