@@ -48,6 +48,8 @@ import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IManagingNodeProperties;
 import org.epsg.openconfigurator.model.INetworkProperties;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
@@ -423,12 +425,26 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 if ((resultVal < 1) || (resultVal > 254)) {
                     return INVALID_RANGE_ASND_MAX_NR;
                 }
-
-                Result res = OpenConfiguratorCore.GetInstance().SetAsndMaxNr(
-                        mnNode.getNetworkId(), mnNode.getNodeId(), resultVal);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject asndMaxNumberSubobj = mnNode
+                        .getObjectDictionary().getSubObject(
+                                IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
+                                IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID);
+                if (asndMaxNumberSubobj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
                 }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
+                                IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID,
+                                String.valueOf(resultVal), false);
+
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
+                }
+
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_ASND_MAX_NR;
             }
@@ -455,11 +471,22 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 if ((asyncMtuValue < 300) && (asyncMtuValue > 1500)) {
                     return INVALID_RANGE_ASYNC_MTU;
                 }
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetAsyncMtu(mnNode.getNetworkId(), asyncMtuValue);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject asyncMtuSubobj = mnNode.getObjectDictionary()
+                        .getSubObject(INetworkProperties.ASYNC_MTU_OBJECT_ID,
+                                INetworkProperties.ASYNC_MTU_SUBOBJECT_ID);
+                if (asyncMtuSubobj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                INetworkProperties.ASYNC_MTU_OBJECT_ID,
+                                INetworkProperties.ASYNC_MTU_SUBOBJECT_ID,
+                                String.valueOf(asyncMtuValue), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
                 }
 
             } catch (NumberFormatException e) {
@@ -489,13 +516,26 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 if ((resultVal < 250)) {
                     return INVALID_RANGE_ASYNC_SLOT_TIMEOUT;
                 }
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetAsyncSlotTimeout(mnNode.getNetworkId(),
-                                mnNode.getNodeId(), resultVal);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject asyncslotTimeoutSubobj = mnNode
+                        .getObjectDictionary().getSubObject(
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID);
+                if (asyncslotTimeoutSubobj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
                 }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
+                                String.valueOf(resultVal), false);
+
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
+                }
+
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_ASYNCT_SLOT_TIMEOUT;
             }
@@ -520,18 +560,27 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 long cycleTime = Long.decode((String) value);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkObject cycleTimeObj = mnNode.getObjectDictionary()
+                        .getObject(INetworkProperties.CYCLE_TIME_OBJECT_ID);
+                if (cycleTimeObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateObjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                INetworkProperties.CYCLE_TIME_OBJECT_ID,
+                                (String) value, false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
+                }
                 if ((cycleTime < 1)) {
                     return INVALID_RANGE_CYCLE_TIME;
                 }
 
                 if ((cycleTime < 250)) {
                     return MINIMIUM_PLK_SUPPORTED_CYCLE_TIME;
-                }
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetCycleTime(mnNode.getNetworkId(), cycleTime);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
 
             } catch (NumberFormatException e) {
@@ -557,14 +606,23 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 long longValue = Long.decode((String) value);
-
-                // Converted us to ns
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetLossOfSocTolerance(mnNode.getNetworkId(),
-                                mnNode.getNodeId(), longValue * 1000);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkObject lossOfSocToleranceObj = mnNode
+                        .getObjectDictionary().getObject(
+                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
+                if (lossOfSocToleranceObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
                 }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateObjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID,
+                                String.valueOf(longValue * 1000), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
+                }
+
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE;
             }
@@ -594,12 +652,23 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 if ((multiplxCyclVal < 0)) {
                     return INVALID_RANGE_MULTIPLEXED_CYCLE_CNT;
                 }
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetMultiplexedCycleCount(mnNode.getNetworkId(),
-                                multiplxCyclVal);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject multiplxdCycleLngthSubObj = mnNode
+                        .getObjectDictionary().getSubObject(
+                                INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
+                                INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID);
+                if (multiplxdCycleLngthSubObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
+                                INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID,
+                                String.valueOf(multiplxCyclVal), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
                 }
 
             } catch (NumberFormatException e) {
@@ -626,6 +695,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         if (value instanceof Integer) {
             int val = ((Integer) value).intValue();
             boolean result = (val == 0) ? true : false;
+            // TODO: validate the value with openCONFIGURATOR library.
+
             Result res = OpenConfiguratorLibraryUtils
                     .setNodeAssignment(nodeAssign, mnNode, result);
             if (!res.IsSuccessful()) {
@@ -657,11 +728,23 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 if ((preScalarVal < 0) && (preScalarVal > 1000)) {
                     return INVALID_RANGE_PRE_SCALER;
                 }
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetPrescaler(mnNode.getNetworkId(), preScalarVal);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject preScalerSubObj = mnNode
+                        .getObjectDictionary()
+                        .getSubObject(INetworkProperties.PRESCALER_OBJECT_ID,
+                                INetworkProperties.PRESCALER_SUBOBJECT_ID);
+                if (preScalerSubObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(mnNode.getNetworkId(),
+                                mnNode.getNodeId(),
+                                INetworkProperties.PRESCALER_OBJECT_ID,
+                                INetworkProperties.PRESCALER_SUBOBJECT_ID,
+                                String.valueOf(preScalarVal), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
                 }
 
             } catch (NumberFormatException e) {
@@ -751,8 +834,20 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         System.err.println(objectId + " made editable");
                         break;
                     case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
-                        mnNode.setLossOfSocTolerance(
-                                Long.decode((String) value) * 1000);
+                        // Converted us to ns
+                        Long lossOfSocTolerance = Long.decode((String) value)
+                                * 1000;
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetLossOfSocTolerance(mnNode.getNetworkId(),
+                                        mnNode.getNodeId(), lossOfSocTolerance);
+                        if (res.IsSuccessful()) {
+                            mnNode.setLossOfSocTolerance(lossOfSocTolerance);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
                         break;
                     case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT:
                         if (value instanceof Integer) {
@@ -768,10 +863,35 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
 
                         break;
                     case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
-                        mnNode.setAsyncSlotTimeout(Long.decode((String) value));
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetAsyncSlotTimeout(mnNode.getNetworkId(),
+                                        mnNode.getNodeId(),
+                                        Long.decode((String) value));
+                        if (res.IsSuccessful()) {
+                            mnNode.setAsyncSlotTimeout(
+                                    Long.decode((String) value));
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
                     case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
-                        mnNode.setAsndMaxNumber(Short.decode((String) value));
+                        res = OpenConfiguratorCore.GetInstance().SetAsndMaxNr(
+                                mnNode.getNetworkId(), mnNode.getNodeId(),
+                                Short.decode((String) value));
+                        if (res.IsSuccessful()) {
+                            mnNode.setAsndMaxNumber(
+                                    Short.decode((String) value));
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT:
                         if (value instanceof Integer) {
@@ -817,23 +937,63 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     case INetworkProperties.NET_CYCLE_TIME_OBJECT:
                         Long cycleTimeValue = Long.decode((String) value);
-                        mnNode.setCycleTime(cycleTimeValue);
+                        res = OpenConfiguratorCore.GetInstance().SetCycleTime(
+                                mnNode.getNetworkId(), cycleTimeValue);
+                        if (res.IsSuccessful()) {
+                            mnNode.setCycleTime(cycleTimeValue);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
 
                         break;
                     case INetworkProperties.NET_ASYNC_MTU_OBJECT:
                         Integer asyncMtuValue = Integer.decode((String) value);
-                        mnNode.setAsyncMtu(asyncMtuValue);
+                        res = OpenConfiguratorCore.GetInstance().SetAsyncMtu(
+                                mnNode.getNetworkId(), asyncMtuValue);
+                        if (res.IsSuccessful()) {
+                            mnNode.setAsyncMtu(asyncMtuValue);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
 
                     case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
                         Integer multiplxCyclCntVal = Integer
                                 .decode((String) value);
-                        mnNode.setMultiplexedCycleLength(multiplxCyclCntVal);
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetMultiplexedCycleCount(mnNode.getNetworkId(),
+                                        multiplxCyclCntVal);
+                        if (res.IsSuccessful()) {
+                            mnNode.setMultiplexedCycleLength(
+                                    multiplxCyclCntVal);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
                     case INetworkProperties.NET_PRESCALER_OBJECT:
 
                         Integer preScalarVal = Integer.decode((String) value);
-                        mnNode.setPrescaler(preScalarVal);
+                        res = OpenConfiguratorCore.GetInstance().SetPrescaler(
+                                mnNode.getNetworkId(), preScalarVal);
+                        if (res.IsSuccessful()) {
+                            mnNode.setPrescaler(preScalarVal);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
 
                         break;
                     default:

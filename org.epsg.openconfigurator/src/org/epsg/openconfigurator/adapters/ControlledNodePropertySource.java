@@ -50,8 +50,10 @@ import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
+import org.epsg.openconfigurator.model.INetworkProperties;
 import org.epsg.openconfigurator.model.Node;
-import org.epsg.openconfigurator.model.PowerlinkSubobject;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -581,13 +583,21 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 long longValue = Long.decode((String) value);
-
-                // us converted to ns
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetLossOfSocTolerance(cnNode.getNetworkId(),
-                                cnNode.getNodeId(), longValue * 1000);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                PowerlinkObject lossOfSocToleranceObj = cnNode
+                        .getObjectDictionary().getObject(
+                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
+                if (lossOfSocToleranceObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
+                }
+                // validate the value with openCONFIGURATOR library.
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateObjectActualValue(cnNode.getNetworkId(),
+                                cnNode.getNodeId(),
+                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID,
+                                String.valueOf(longValue * 1000), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
                 }
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE;
@@ -605,6 +615,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         if (value instanceof Integer) {
             int val = ((Integer) value).intValue();
             boolean result = (val == 0) ? true : false;
+            // TODO: validate the value with openCONFIGURATOR library.
+
             Result res = OpenConfiguratorLibraryUtils
                     .setNodeAssignment(nodeAssign, cnNode, result);
             if (!res.IsSuccessful()) {
@@ -714,11 +726,18 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             if (((String) value).isEmpty()) {
                 return ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY;
             }
-            Result res = OpenConfiguratorCore.GetInstance().SetPResTimeOut(
-                    cnNode.getNetworkId(), cnNode.getNodeId(),
-                    Long.decode((String) value).longValue() * 1000);
-            if (!res.IsSuccessful()) {
-                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            // validate the value with openCONFIGURATOR library.
+            long presTimeoutInNs = Long.decode((String) value).longValue()
+                    * 1000;
+            Result validateResult = OpenConfiguratorLibraryUtils
+                    .validateSubobjectActualValue(cnNode.getNetworkId(),
+                            IPowerlinkConstants.MN_DEFAULT_NODE_ID,
+                            INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                            cnNode.getNodeId(), String.valueOf(presTimeoutInNs),
+                            false);
+            if (!validateResult.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils
+                        .getErrorMessage(validateResult);
             }
         } else {
             System.err
@@ -1066,13 +1085,37 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
                         long presTimeoutInNs = Long.decode((String) value)
                                 .longValue() * 1000;
-                        cnNode.setCnPresTimeout(
-                                String.valueOf(presTimeoutInNs));
+                        res = OpenConfiguratorCore.GetInstance().SetPResTimeOut(
+                                cnNode.getNetworkId(), cnNode.getNodeId(),
+                                presTimeoutInNs);
+                        if (res.IsSuccessful()) {
+                            cnNode.setCnPresTimeout(
+                                    String.valueOf(presTimeoutInNs));
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
                     }
                     case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                        cnNode.setLossOfSocTolerance(
-                                Long.decode((String) value) * 1000);
+                        // us converted to ns
+                        Long lossSocTolerance = Long.decode((String) value)
+                                * 1000;
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetLossOfSocTolerance(cnNode.getNetworkId(),
+                                        cnNode.getNodeId(),
+                                        lossSocTolerance.longValue());
+                        if (res.IsSuccessful()) {
+                            cnNode.setLossOfSocTolerance(lossSocTolerance);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
                         break;
                     }
                     default:

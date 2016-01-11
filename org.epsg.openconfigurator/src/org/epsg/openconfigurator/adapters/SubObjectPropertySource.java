@@ -275,7 +275,11 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
      *         being the error message to display to the end user.
      */
     protected String handleActualValue(Object value) {
-        // TODO: Test the inputs.
+        Result res = OpenConfiguratorLibraryUtils
+                .validateSubobjectActualValue(plkSubObject, (String) value);
+        if (!res.IsSuccessful()) {
+            return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+        }
         return null;
     }
 
@@ -290,6 +294,12 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
     protected String handleForceActualValue(Object value) {
         if (plkSubObject.getActualValue() == null) {
             return "Set some value in the actual value field.";
+        } else {
+            Result res = OpenConfiguratorLibraryUtils
+                    .validateForceSubObjectActualValue(plkSubObject);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
         }
         return null;
     }

@@ -47,6 +47,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -316,6 +317,8 @@ public class RedundantManagingNodePropertySource
         if (value instanceof Integer) {
             int val = ((Integer) value).intValue();
             boolean result = (val == 0) ? true : false;
+            // TODO: validate the value with openCONFIGURATOR library.
+
             Result res = OpenConfiguratorLibraryUtils.setNodeAssignment(
                     nodeAssign, redundantManagingNode, result);
             if (!res.IsSuccessful()) {
@@ -386,13 +389,25 @@ public class RedundantManagingNodePropertySource
 
             try {
                 long longValue = Long.decode((String) value);
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetRedundantManagingNodePriority(
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject rmnPrioritySubObj = redundantManagingNode
+                        .getObjectDictionary().getSubObject(
+                                IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
+                                IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID);
+                if (rmnPrioritySubObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getNodeId(), longValue);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                                redundantManagingNode.getNodeId(),
+                                IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
+                                IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID,
+                                String.valueOf(longValue), false);
+
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
                 }
 
             } catch (NumberFormatException e) {
@@ -459,14 +474,26 @@ public class RedundantManagingNodePropertySource
                 if (longValue < 250) {
                     return INVALID_RANGE_WAIT_NOT_ACTIVE;
                 }
-
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetRedundantManagingNodeWaitNotActive(
-                                redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getNodeId(), longValue);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject waitNotActiveSubObj = redundantManagingNode
+                        .getObjectDictionary().getSubObject(
+                                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
+                                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID);
+                if (waitNotActiveSubObj == null) {
+                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
                 }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(
+                                redundantManagingNode.getNetworkId(),
+                                redundantManagingNode.getNodeId(),
+                                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
+                                IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID,
+                                String.valueOf(longValue), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
+                }
+
             } catch (NumberFormatException e) {
                 return ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE;
             }
@@ -538,12 +565,38 @@ public class RedundantManagingNodePropertySource
                         System.err.println(objectId + " made editable");
                         break;
                     case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
-                        redundantManagingNode.setRmnWaitNotActive(
-                                Long.decode((String) value));
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetRedundantManagingNodeWaitNotActive(
+                                        redundantManagingNode.getNetworkId(),
+                                        redundantManagingNode.getNodeId(),
+                                        Long.decode((String) value));
+                        if (res.IsSuccessful()) {
+                            redundantManagingNode.setRmnWaitNotActive(
+                                    Long.decode((String) value));
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
                     case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
-                        redundantManagingNode
-                                .setRmnPriority(Long.decode((String) value));
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetRedundantManagingNodePriority(
+                                        redundantManagingNode.getNetworkId(),
+                                        redundantManagingNode.getNodeId(),
+                                        Long.decode((String) value));
+                        if (res.IsSuccessful()) {
+                            redundantManagingNode.setRmnPriority(
+                                    Long.decode((String) value));
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        }
+
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
                         if (value instanceof Integer) {

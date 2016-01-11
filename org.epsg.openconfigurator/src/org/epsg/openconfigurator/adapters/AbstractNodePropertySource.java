@@ -66,6 +66,7 @@ public abstract class AbstractNodePropertySource {
     public static final String ERROR_NODE_ID_DECEEDS_RANGE = "Node id deceeds the range.";
     public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
     public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value";
+    public static final String ERROR_OBJECT_NOT_FOUND = "Object not found!";
 
     protected TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_NAME_OBJECT, NODE_NAME_LABEL);

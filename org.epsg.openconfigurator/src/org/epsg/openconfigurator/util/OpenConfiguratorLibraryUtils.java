@@ -1261,7 +1261,7 @@ public class OpenConfiguratorLibraryUtils {
 
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
                 plkObject.getNetworkId(), plkObject.getNodeId(),
-                plkObject.getObjectId(), actualValue, force);
+                plkObject.getObjectId(), actualValue, force, false);
         return res;
     }
 
@@ -1282,7 +1282,7 @@ public class OpenConfiguratorLibraryUtils {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
                 plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
-                actualValue, force);
+                actualValue, force, false);
         return res;
     }
 
@@ -2061,7 +2061,7 @@ public class OpenConfiguratorLibraryUtils {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
                 plkObject.getNetworkId(), plkObject.getNodeId(),
                 plkObject.getObjectId(), actualValue,
-                plkObject.isObjectForced());
+                plkObject.isObjectForced(), false);
         return res;
     }
 
@@ -2080,7 +2080,7 @@ public class OpenConfiguratorLibraryUtils {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
                 plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
-                actualValue, plkSubObject.isObjectForced());
+                actualValue, plkSubObject.isObjectForced(), false);
 
         return res;
     }
@@ -2176,5 +2176,103 @@ public class OpenConfiguratorLibraryUtils {
         }
 
         return libApiRes;
+    }
+
+    /**
+     * Validate the value of forced object.
+     *
+     * @param plkObject The instance of POWERLINK object.
+     * @return The result from openCONFIGURATOR library
+     */
+    public static Result validateForceObjectActualValue(
+            PowerlinkObject plkObject) {
+        return validateObjectActualValue(plkObject, plkObject.getActualValue());
+    }
+
+    /**
+     * Validate the value of forced sub-object.
+     *
+     * @param plkSubObject The instance of POWERLINK sub-object.
+     * @return The result from openCONFIGURATOR library.
+     */
+    public static Result validateForceSubObjectActualValue(
+            PowerlinkSubobject plkSubObject) {
+        return validateSubobjectActualValue(plkSubObject,
+                plkSubObject.getActualValue());
+    }
+
+    /**
+     * Validate the actual value of POWERLINK object.
+     *
+     * @param plkObject The instance of POWERLINK object.
+     * @param actualValue The value given to the object.
+     * @return The result from openCONFIGURATOR library.
+     */
+    public static Result validateObjectActualValue(PowerlinkObject plkObject,
+            String actualValue) {
+        Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
+                plkObject.getNetworkId(), plkObject.getNodeId(),
+                plkObject.getObjectId(), actualValue,
+                plkObject.isObjectForced(), true);
+        return res;
+    }
+
+    /**
+     * validate the actual value of POWERLINK object related with node
+     * properties.
+     *
+     * @param networkId The ID of the project
+     * @param nodeId The instance of node to which the value should be
+     *            validated.
+     * @param objectId The complete ID of object.
+     * @param actualValue Value given for validation.
+     * @param isForced <True> If the value of object is forced. <False> If the
+     *            value of object is not forced
+     * @return The result from openCONFIGURATOR library.
+     */
+    public static Result validateObjectActualValue(String networkId,
+            short nodeId, long objectId, String actualValue, boolean isForced) {
+        Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
+                networkId, nodeId, objectId, actualValue, isForced, true);
+        return res;
+    }
+
+    /**
+     * Validate the actual value of POWERLINK sub-object.
+     *
+     * @param plkSubObject The instance of POWERLINK sub-object.
+     * @param actualValue The value given to the sub-object.
+     * @return The result from openCONFIGURATOR library.
+     */
+    public static Result validateSubobjectActualValue(
+            PowerlinkSubobject plkSubObject, String actualValue) {
+        Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
+                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
+                actualValue, plkSubObject.isObjectForced(), true);
+        return res;
+    }
+
+    /**
+     * validate the actual value of POWERLINK sub object related with node
+     * properties.
+     *
+     * @param networkId The ID of the project
+     * @param nodeId The instance of node to which the value should be
+     *            validated.
+     * @param objectId The complete ID of object.
+     * @param subObjectId The complete ID of sub object.
+     * @param actualValue Value given for validation.
+     * @param isForced <True> If the value of object is forced. <False> If the
+     *            value of object is not forced
+     * @return The result from openCONFIGURATOR library.
+     */
+    public static Result validateSubobjectActualValue(String networkId,
+            short nodeId, long objectId, short subObjectId, String actualValue,
+            boolean isForced) {
+        Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
+                networkId, nodeId, objectId, subObjectId, actualValue, isForced,
+                true);
+        return res;
     }
 }
