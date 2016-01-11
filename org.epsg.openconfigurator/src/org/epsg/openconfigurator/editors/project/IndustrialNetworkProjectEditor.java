@@ -149,7 +149,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     /**
      * PowerlinkRoot node instance.
      */
-    private PowerlinkRootNode rootNode = new PowerlinkRootNode();
+    private PowerlinkRootNode rootNode;
 
     /**
      * Flag to check for the library initialization
@@ -510,6 +510,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             throw new PartInitException(
                     IndustrialNetworkProjectEditor.INVALID_INPUT_ERROR);
         }
+        rootNode = new PowerlinkRootNode(currentProject);
 
         upgradeFlag = OpenConfiguratorProjectUtils
                 .upgradeOpenConfiguratorProject(currentProject);
@@ -678,6 +679,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             InputStream is = new ByteArrayInputStream(input.getBytes());
             currentProject = OpenConfiguratorProjectMarshaller
                     .unmarshallOpenConfiguratorProject(is);
+
         } catch (FileNotFoundException | MalformedURLException | JAXBException
                 | SAXException | ParserConfigurationException e) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
@@ -764,6 +766,14 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             case IResourceDelta.CHANGED:
                 if (oldDelta.getFlags() == IResourceDelta.CONTENT) {
                     setInput(new FileEditorInput(currentProjectFile));
+                    Display.getDefault().asyncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            editorPage
+                                    .setOpenCONFIGURATORProject(currentProject);
+                        }
+                    });
+
                 }
 
                 break;

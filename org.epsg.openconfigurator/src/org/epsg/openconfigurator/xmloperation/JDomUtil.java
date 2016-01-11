@@ -287,7 +287,7 @@ public class JDomUtil {
 
         List<Element> elementsList = xpath.evaluate(doc);
         for (Element emt : elementsList) {
-            emt.setAttribute(newAttribute);
+            emt.setAttribute(newAttribute.clone());
         }
     }
 
@@ -331,7 +331,8 @@ public class JDomUtil {
      * @param xmlFile The Project or XDD file instance.
      * @throws IOException Error with XDD/ XDC file modification.
      */
-    public static void writeToXmlFile(org.jdom2.Document document,            final File xmlFile) throws IOException {
+    public static void writeToProjectXmlDocument(org.jdom2.Document document,
+            final File xmlFile) throws IOException {
         XMLOutputter xmlOutput = new XMLOutputter();
         // display nice
         xmlOutput.setFormat(Format.getPrettyFormat());

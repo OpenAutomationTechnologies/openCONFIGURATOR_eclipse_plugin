@@ -32,12 +32,15 @@
 package org.epsg.openconfigurator.util;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -80,6 +83,8 @@ import org.epsg.openconfigurator.xmloperation.JDomUtil;
 import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 
 public final class OpenConfiguratorProjectUtils {
 
@@ -94,6 +99,9 @@ public final class OpenConfiguratorProjectUtils {
     public static final String GENERATOR_TOOL_NAME = "Ethernet POWERLINK openCONFIGURATOR"; ////$NON-NLS-1$
     public static final String GENERATOR_TOOL_VERSION = "2.0.0"; ////$NON-NLS-1$
     public static final String SYSTEM_USER_NAME_ID = "user.name";
+    public static final String MODIFIED_ON_ATTRIBUTE = "modifiedOn";
+    public static final String TOOL_VERSION_ATTRIBUTE = "toolVersion";
+    public static final String MODIFIED_BY_ATTRIBUTE = "modifiedBy";
 
     private static ArrayList<String> defaultBuildConfigurationIdList;
 
@@ -189,7 +197,7 @@ public final class OpenConfiguratorProjectUtils {
 
         ProjectJDomOperation.deleteNode(document, node);
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
 
         // Delete the XDC file from the deviceConfiguration directory.
         // File localFile = new File(node.getAbsolutePathToXdc());
@@ -203,7 +211,8 @@ public final class OpenConfiguratorProjectUtils {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
         return retVal;
     }
 
@@ -232,7 +241,9 @@ public final class OpenConfiguratorProjectUtils {
             ProjectJDomOperation.removeForcedObject(document, node, object,
                     subObject);
         }
-        JDomUtil.writeToXmlDocument(document, xmlFile);
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
     }
 
     /**
@@ -254,6 +265,43 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         return null;
+    }
+
+    /**
+     * Get the current date to update XDD/XDC file modification date.
+     *
+     * @return Current date.
+     */
+    private static String getCurrentDate() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat(
+                IPowerlinkConstants.DATE_FORMAT);
+        String strDate = sdfDate.format(new Date());
+        return strDate;
+    }
+
+    /**
+     * Get the current time to update XDD/XDC file modification time.
+     *
+     * @return Current Time.
+     */
+    private static String getCurrentTime() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat(
+                IPowerlinkConstants.TIME_FORMAT);
+        String strDate = sdfDate.format(new Date());
+        return strDate;
+    }
+
+    /**
+     * Get the current time and date to update in the project XML file.
+     *
+     * @return Current time and date.
+     */
+    public static String getCurrentTimeandDate() {
+        SimpleDateFormat sdfDate = new SimpleDateFormat(
+                IPowerlinkConstants.DATE_TIME_FORMAT);
+        Date now = new Date();
+        String strDate = sdfDate.format(now);
+        return strDate;
     }
 
     /**
@@ -490,9 +538,9 @@ public final class OpenConfiguratorProjectUtils {
     public static Result persistNodeData(Node node)
             throws JDOMException, IOException {
 
-        File xmlFile = new File(node.getAbsolutePathToXdc());
+        File xdcFile = new File(node.getAbsolutePathToXdc());
 
-        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
         // Delete the actual value from the model.
         for (PowerlinkObject obj : node.getObjectDictionary()
@@ -523,8 +571,9 @@ public final class OpenConfiguratorProjectUtils {
 
         node.writeObjectActualValues(objectJCollection, document);
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
-
+        writeToXddXmlDocument(document, xdcFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
         return res;
     }
 
@@ -575,6 +624,54 @@ public final class OpenConfiguratorProjectUtils {
             monitor.worked(1);
         }
         return res;
+    }
+
+    /**
+     * Update date, time, tool version and modified by attributes on project
+     * file.
+     *
+     * @param node Instance of node.
+     * @param attributeName The name of the attribute to be updated.
+     * @param attributeValue The value for the given attribute name.
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
+     */
+    public static void updateGeneratorAttribute(final Node node,
+            final String attributeName, final String attributeValue)
+                    throws JDOMException, IOException {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        ProjectJDomOperation.updateModifiedTime(document, attributeName,
+                attributeValue);
+
+        OpenCONFIGURATORProject openConfiguratorProject = node
+                .getCurrentProject();
+        updateGeneratorInformation(openConfiguratorProject);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+    }
+
+    /**
+     * Update date , time , tool version and modified by attributes on project
+     * file.
+     *
+     * @param node Instance of node.
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
+     */
+    public static void updateGeneratorInfo(Node node)
+            throws JDOMException, IOException {
+        updateGeneratorAttribute(node, MODIFIED_ON_ATTRIBUTE,
+                getCurrentTimeandDate());
+        updateGeneratorAttribute(node, TOOL_VERSION_ATTRIBUTE,
+                GENERATOR_TOOL_VERSION);
+        String modifiedByName = System
+                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID);
+        updateGeneratorAttribute(node, MODIFIED_BY_ATTRIBUTE, modifiedByName);
     }
 
     /**
@@ -630,7 +727,10 @@ public final class OpenConfiguratorProjectUtils {
         ProjectJDomOperation.updateNetworkAttributeValue(document,
                 attributeName, attributeValue);
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -685,7 +785,9 @@ public final class OpenConfiguratorProjectUtils {
             }
         }
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
     }
 
     /**
@@ -710,8 +812,9 @@ public final class OpenConfiguratorProjectUtils {
         ProjectJDomOperation.updateNodeAttributeValue(document, node,
                 attributeName, attributeValue);
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
-
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
                     new NullProgressMonitor());
@@ -729,9 +832,10 @@ public final class OpenConfiguratorProjectUtils {
      * @param newNodeId The new node id to be set.
      *
      * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
      */
     public static void updateNodeConfigurationPath(Node node, String newNodeId)
-            throws IOException {
+            throws IOException, JDOMException {
 
         java.nio.file.Path nodeImportFile = new File(node.getPathToXDC())
                 .toPath();
@@ -769,28 +873,54 @@ public final class OpenConfiguratorProjectUtils {
         // Set the relative path to the CN object
         node.setPathToXDC(relativePath);
 
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
     }
 
+    /**
+     * Update the actual value of object in XDD/XDC file.
+     *
+     * @param node The node instance
+     * @param object The object instance
+     * @param actualValue The modified value of object
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications
+     */
     public static void updateObjectAttributeActualValue(final Node node,
             final PowerlinkObject object, String actualValue)
                     throws IOException, JDOMException {
-        File xmlFile = new File(node.getAbsolutePathToXdc());
-        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+        File xdcFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
         XddJdomOperation.updateActualValue(document, object, actualValue);
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
     }
 
+    /**
+     * Update the actual value of sub-object in XDD/XDC file.
+     *
+     * @param node The node instance
+     * @param object The sub-object instance
+     * @param actualValue The modified value of object
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications
+     */
     public static void updateObjectAttributeActualValue(final Node node,
             final PowerlinkSubobject object, String actualValue)
                     throws IOException, JDOMException {
-        File xmlFile = new File(node.getAbsolutePathToXdc());
-        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+        File xdcFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
         XddJdomOperation.updateActualValue(document, object, actualValue);
 
-        JDomUtil.writeToXmlDocument(document, xmlFile);
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
     }
 
     /**
@@ -799,8 +929,8 @@ public final class OpenConfiguratorProjectUtils {
      *
      * @param pdoChannel The channel to be updated.
      * @return The result from the library.
-     * @throws JDOMException
-     * @throws IOException
+     * @throws JDOMExceptionErrors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications
      */
     public static Result updatePdoChannelActualValue(
             final PdoChannel pdoChannel) throws JDOMException, IOException {
@@ -836,7 +966,9 @@ public final class OpenConfiguratorProjectUtils {
 
         node.writeObjectActualValues(objectJCollection, document);
 
-        JDomUtil.writeToXmlDocument(document, xdcFile);
+        writeToXddXmlDocument(document, xdcFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -943,11 +1075,10 @@ public final class OpenConfiguratorProjectUtils {
                 }
             }
             OpenConfiguratorProjectUtils.updateGeneratorInformation(project);
+            return true;
         } else {
             return false;
         }
-
-        return true;
     }
     /**
      * Write the values modified into XDD/XDC file.

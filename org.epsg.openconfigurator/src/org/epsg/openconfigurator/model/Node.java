@@ -43,6 +43,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObjects;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -378,6 +379,13 @@ public class Node {
     }
 
     /**
+     * @return Instance of openCONFIGURATOR project from POWERLINK root node.
+     */
+    public OpenCONFIGURATORProject getCurrentProject() {
+        return rootNode.getOpenConfiguratorProject();
+    }
+
+    /**
      * @return The cycle time value from object dictionary.
      */
     public String getCycleTime() {
@@ -594,6 +602,9 @@ public class Node {
         return PlkOperationMode.NORMAL;
     }
 
+    /**
+     * @return Instance of POWERLINK root node.
+     */
     public PowerlinkRootNode getPowerlinkRootNode() {
         return rootNode;
     }

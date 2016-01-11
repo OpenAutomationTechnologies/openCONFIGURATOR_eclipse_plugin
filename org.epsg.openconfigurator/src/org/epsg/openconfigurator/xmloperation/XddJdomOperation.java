@@ -46,7 +46,17 @@ import org.jdom2.Namespace;
 public class XddJdomOperation {
 
     static final Namespace POWERLINK_XDD_NAMESPACE;
+
     private static final String ACTUAL_VALUE = "actualValue";
+    private static final String FILE_MODIFICATION_TIME = "fileModificationTime";
+    private static final String FILE_MODIFICATION_DATE = "fileModificationDate";
+    private static final String FILE_MODIFIED_BY = "fileModifiedBy";
+    private static final String FILE_MODIFICATION_TIME_XPATH = "//plk:ProfileBody[@"
+            + FILE_MODIFICATION_TIME + "]";
+    private static final String FILE_MODIFICATION_DATE_XPATH = "//plk:ProfileBody[@"
+            + FILE_MODIFICATION_DATE + "]";
+    private static final String FILE_MODIFIED_BY_XPATH = "//plk:ProfileBody[@"
+            + FILE_MODIFIED_BY + "]";
 
     static {
         POWERLINK_XDD_NAMESPACE = Namespace.getNamespace("plk",
@@ -67,6 +77,13 @@ public class XddJdomOperation {
                 POWERLINK_XDD_NAMESPACE, ACTUAL_VALUE);
     }
 
+    /**
+     * Removes the actual value of sub-objects from the XDD/XDC file.
+     *
+     * @param document XDD/XDC file instance.
+     * @param powerlinkObj PowerlinkObject instance to get the path of
+     *        sub-object.
+     */
     public static void deletePowerlinkObjectActualValue(Document document,
             PowerlinkObject powerlinkObj) {
 
@@ -106,4 +123,43 @@ public class XddJdomOperation {
                 POWERLINK_XDD_NAMESPACE, newAttribute);
     }
 
+    /**
+     * Update the given name for the given file modified by attribute in the
+     * XDD/XDC document
+     *
+     * @param document XDD/XDC file instance.
+     * @param value The user name to be set.
+     */
+    public static void updateFileModifiedBy(Document document, String value) {
+        Attribute newAttribute = new Attribute(FILE_MODIFIED_BY, value);
+        JDomUtil.setAttribute(document, FILE_MODIFIED_BY_XPATH,
+                POWERLINK_XDD_NAMESPACE, newAttribute);
+    }
+
+    /**
+     * Update the given date for the given file modified date attribute in the
+     * XDD/XDC document
+     *
+     * @param document XDD/XDC file instance.
+     * @param value The current date to be set.
+     */
+    public static void updateFileModifiedDate(Document document, String value) {
+        Attribute newAttribute = new Attribute(FILE_MODIFICATION_DATE, value);
+        JDomUtil.setAttribute(document, FILE_MODIFICATION_DATE_XPATH,
+                POWERLINK_XDD_NAMESPACE, newAttribute);
+    }
+
+    /**
+     * Update the given time for the given file modified time attribute in the
+     * XDD/XDC document
+     *
+     * @param document XDD/XDC file instance.
+     * @param value The current time to be set.
+     */
+    public static void updateFileModifiedTime(Document document, String time) {
+        Attribute newAttribute = new Attribute(FILE_MODIFICATION_TIME, time);
+        JDomUtil.setAttribute(document, FILE_MODIFICATION_TIME_XPATH,
+                POWERLINK_XDD_NAMESPACE, newAttribute);
+
+    }
 }

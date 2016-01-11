@@ -67,6 +67,8 @@ public class ProjectJDomOperation {
 
     static final XPathExpression<Element> NETWORKCONFIGURATION_XPATH_EXPR;
 
+    static final XPathExpression<Element> GENERATOR_XPATH_EXPR;
+
     static {
         XPATH_FACTORY_INSTANCE = XPathFactory.instance();
 
@@ -89,6 +91,12 @@ public class ProjectJDomOperation {
                 "//oc:NetworkConfiguration", Filters.element());
         netCfgXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
         NETWORKCONFIGURATION_XPATH_EXPR = netCfgXpathelementBuilder
+                .compileWith(XPATH_FACTORY_INSTANCE);
+
+        XPathBuilder<Element> generatorXpathelementBuilder = new XPathBuilder<Element>(
+                "//oc:Generator", Filters.element());
+        generatorXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
+        GENERATOR_XPATH_EXPR = generatorXpathelementBuilder
                 .compileWith(XPATH_FACTORY_INSTANCE);
     }
 
@@ -359,6 +367,20 @@ public class ProjectJDomOperation {
             JDomUtil.removeElement(document, forcedTagXpath,
                     OPENCONFIGURATOR_NAMESPACE);
         }
+    }
+
+    /**
+     * Update modified time values in project file.
+     *
+     * @param document Project file instance.
+     * @param attributeName Generator attribute name.
+     * @param attributeValue value to be set.
+     */
+    public static void updateModifiedTime(Document document,
+            final String attributeName, final String attributeValue) {
+
+        JDomUtil.updateAttribute(document, GENERATOR_XPATH_EXPR,
+                new Attribute(attributeName, attributeValue));
     }
 
     /**

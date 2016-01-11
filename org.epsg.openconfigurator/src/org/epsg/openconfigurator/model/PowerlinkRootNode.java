@@ -58,6 +58,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
@@ -81,8 +82,13 @@ public class PowerlinkRootNode {
     private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project. XDC Path: {1}";
 
     private Map<Short, Node> nodeCollection = new HashMap<Short, Node>();
+    private OpenCONFIGURATORProject currentProject;
 
     public PowerlinkRootNode() {
+    }
+
+    public PowerlinkRootNode(OpenCONFIGURATORProject currentProject) {
+        this.currentProject = currentProject;
     }
 
     /**
@@ -118,12 +124,10 @@ public class PowerlinkRootNode {
 
         ProjectJDomOperation.addNode(document, node);
 
-        JDomUtil.writeToXmlFile(document, xmlFile);
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
 
-        // Updates modified time in project file.
-        OpenConfiguratorProjectUtils.updatemodifiedTime(node,
-                OpenConfiguratorProjectUtils.MODIFIED_ON_ATTRIBUTE,
-                OpenConfiguratorProjectUtils.getCurrentTimeandDate());
+        // Updates generator attributes in project file.
+        OpenConfiguratorProjectUtils.updateGeneratorInfo(node);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -211,6 +215,13 @@ public class PowerlinkRootNode {
             }
         }
         return returnNodeList.toArray();
+    }
+
+    /**
+     * @return OpenCONFIGURATORProject instance.
+     */
+    public OpenCONFIGURATORProject getOpenConfiguratorProject() {
+        return currentProject;
     }
 
     /**
