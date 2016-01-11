@@ -40,6 +40,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
+import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -115,17 +116,18 @@ public class IndustrialNetworkView extends ViewPart
     }
 
     /**
-     * Node ID based comparator.
+     * Node station type and ID based comparator.
      *
      * An exception the MN node id will remain at the top.
      *
      * @author Ramakrishnan P
      *
      */
-    private class NodeIdBasedSorter extends ViewerComparator {
+    private class NodeBasedSorter extends ViewerComparator {
 
         @Override
         public int compare(Viewer viewer, Object e1, Object e2) {
+            int compare = 0;
             if ((e1 instanceof Node) && (e2 instanceof Node)) {
 
                 Node nodeFirst = (Node) e1;
@@ -134,9 +136,43 @@ public class IndustrialNetworkView extends ViewPart
                 if (nodeSecond
                         .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
+                }
+                compare = nodeFirst.getPlkOperationMode()
+                        .compareTo(nodeSecond.getPlkOperationMode());
+                if (compare == 0) {
+                    return nodeFirst.getNodeId() - nodeSecond.getNodeId();
+                }
+
+            } else {
+                compare = e1.toString().compareTo(e2.toString());
+            }
+            return compare;
+        }
+    }
+
+    /**
+     * Node ID based comparator.
+     *
+     * An exception the MN node id will remain at the top.
+     *
+     * @author Ramakrishnan P
+     *
+     */
+    private class NodeIdSorter extends ViewerComparator {
+
+        @Override
+        public int compare(Viewer viewer, Object e1, Object e2) {
+            if ((e1 instanceof Node) && (e2 instanceof Node)) {
+
+                Node nodeFirst = (Node) e1;
+                Node nodeSecond = (Node) e2;
+                if (nodeSecond
+                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                    return 255;
                 } else {
                     return nodeFirst.getNodeId() - nodeSecond.getNodeId();
                 }
+
             }
             return super.compare(viewer, e1, e2);
         }
@@ -337,6 +373,37 @@ public class IndustrialNetworkView extends ViewPart
      */
     public static final String ID = "org.epsg.openconfigurator.views.IndustrialNetworkView";
 
+    // Add new node message strings.
+    public static final String ADD_NEW_NODE_ACTION_MESSAGE = "Add Node...";
+    public static final String ADD_NEW_NODE_ERROR_MESSAGE = "Internal error occurred. Please try again later";
+    public static final String ADD_NEW_NODE_INVALID_SELECTION_MESSAGE = "Invalid selection";
+    public static final String ADD_NEW_NODE_TOOL_TIP_TEXT = "Add a node in the network.";
+
+    // Enable/disable action message string.
+    public static final String ENABLE_DISABLE_ACTION_MESSAGE = "Enable/Disable";
+
+    // Object dictionary action message strings.
+    public static final String SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE = "Show Object Dictionary";
+    public static final String SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE = "Error openning Object Dictionary";
+
+    // Mapping view action message strings.
+    public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
+    public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error openning MappingView";
+
+    // Properties actions message strings.
+    public static final String PROPERTIES_ACTION_MESSAGE = "Properties";
+    public static final String PROPERTIES_ERROR_MESSAGE = "Error opening properties view";
+
+    // Remove node action message string.
+    public static final String DELETE_NODE_ACTION_MESSAGE = "Remove";
+
+    // Sort node action message string.
+    public static final String SORT_NODE_BY_ID_MESSAGE = "Sort by Id";
+    public static final String SORT_NODE_BY_STATION_TYPE_MESSAGE = "Sort by station type";
+
+    // Refresh action message string.
+    public static final String REFRESH_ACTION_MESSAGE = "Refresh (F5)";
+
     /**
      * The root node of the Industrial network view.
      */
@@ -351,14 +418,17 @@ public class IndustrialNetworkView extends ViewPart
      * Add new node.
      */
     private Action addNewNode;
+
     /**
      * Show object dictionary.
      */
     private Action showObjectDictionary;
+
     /**
      * Show Properties action.
      */
     private Action showProperties;
+
     /**
      * Delete node action.
      */
@@ -378,7 +448,10 @@ public class IndustrialNetworkView extends ViewPart
      * Show PDO mapping action.
      */
     private Action showPdoMapping;
-
+    /**
+     * Sort Node action.
+     */
+    private Action sortNode;
     /**
      * Call back to handle the selection changed events.
      */
@@ -437,7 +510,7 @@ public class IndustrialNetworkView extends ViewPart
         viewer.setLabelProvider(new DecoratingLabelProvider(
                 new ViewLabelProvider(), PlatformUI.getWorkbench()
                         .getDecoratorManager().getLabelDecorator()));
-        viewer.setComparator(new NodeIdBasedSorter());
+        viewer.setComparator(new NodeIdSorter());
         viewer.expandAll();
 
         makeActions();
@@ -542,6 +615,8 @@ public class IndustrialNetworkView extends ViewPart
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.removeAll();
+        manager.add(sortNode);
+        manager.add(new Separator());
         manager.add(refreshAction);
         manager.add(showPdoMapping);
         manager.add(showObjectDictionary);
@@ -717,7 +792,7 @@ public class IndustrialNetworkView extends ViewPart
     }
 
     private void makeActions() {
-        addNewNode = new Action("Add Node...") {
+        addNewNode = new Action(ADD_NEW_NODE_ACTION_MESSAGE) {
             @Override
             public void run() {
                 ISelection nodeTreeSelection = viewer.getSelection();
@@ -736,23 +811,22 @@ public class IndustrialNetworkView extends ViewPart
                             wd.setTitle(newNodeWizard.getWindowTitle());
                             wd.open();
                         } else {
-                            showMessage(
-                                    "Internal error occurred. Please try again later");
+                            showMessage(ADD_NEW_NODE_ERROR_MESSAGE);
                         }
 
                         handleRefresh();
                     }
                 } else {
-                    showMessage("Invalid selection");
+                    showMessage(ADD_NEW_NODE_INVALID_SELECTION_MESSAGE);
                 }
             }
         };
-        addNewNode.setToolTipText("Add a node in the network.");
+        addNewNode.setToolTipText(ADD_NEW_NODE_TOOL_TIP_TEXT);
         addNewNode
                 .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                         .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 
-        enableDisableNode = new Action("Enable/Disable") {
+        enableDisableNode = new Action(ENABLE_DISABLE_ACTION_MESSAGE) {
             @Override
             public void run() {
                 ISelection selection = PlatformUI.getWorkbench()
@@ -764,11 +838,12 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
         };
-        enableDisableNode.setToolTipText("Enable/Disable");
+        enableDisableNode.setToolTipText(ENABLE_DISABLE_ACTION_MESSAGE);
         enableDisableNode.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
 
-        showObjectDictionary = new Action("Show Object Dictionary") {
+        showObjectDictionary = new Action(
+                SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE) {
             @Override
             public void run() {
                 try {
@@ -779,16 +854,18 @@ public class IndustrialNetworkView extends ViewPart
 
                 } catch (PartInitException e) {
                     e.printStackTrace();
-                    showMessage("Error openning Object Dictionary");
+                    showMessage(SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE);
                 }
             }
         };
-        showObjectDictionary.setToolTipText("Show Object Dictionary");
+        showObjectDictionary
+                .setToolTipText(SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE);
         showObjectDictionary
                 .setImageDescriptor(org.epsg.openconfigurator.Activator
                         .getImageDescriptor(IPluginImages.OBD_ICON));
 
-        showPdoMapping = new Action("Show Mapping View") {
+        showPdoMapping = new Action(SHOW_MAPING_VIEW_ACTION_MESSAGE) {
+
             @Override
             public void run() {
 
@@ -798,15 +875,15 @@ public class IndustrialNetworkView extends ViewPart
                     viewer.setSelection(viewer.getSelection());
                 } catch (PartInitException e) {
                     e.printStackTrace();
-                    showMessage("Error openning MappingView");
+                    showMessage(SHOW_MAPING_VIEW_ERROR_MESSAGE);
                 }
             }
         };
-        showPdoMapping.setToolTipText("Show Mapping View");
+        showPdoMapping.setToolTipText(SHOW_MAPING_VIEW_ACTION_MESSAGE);
         showPdoMapping.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.MAPPING_ICON));
 
-        showProperties = new Action("Properties") {
+        showProperties = new Action(PROPERTIES_ACTION_MESSAGE) {
 
             @Override
             public void run() {
@@ -818,15 +895,15 @@ public class IndustrialNetworkView extends ViewPart
                     viewer.setSelection(viewer.getSelection());
                 } catch (PartInitException e) {
                     e.printStackTrace();
-                    showMessage("Error opening properties view");
+                    showMessage(PROPERTIES_ERROR_MESSAGE);
                 }
             }
         };
-        showProperties.setToolTipText("Properties");
+        showProperties.setToolTipText(PROPERTIES_ACTION_MESSAGE);
         showProperties.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.PROPERTIES_ICON));
 
-        deleteNode = new Action("Remove") {
+        deleteNode = new Action(DELETE_NODE_ACTION_MESSAGE) {
             @Override
             public void run() {
 
@@ -839,18 +916,36 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
         };
-        deleteNode.setToolTipText("Remove");
+        deleteNode.setToolTipText(DELETE_NODE_ACTION_MESSAGE);
         deleteNode
                 .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                         .getImageDescriptor(ISharedImages.IMG_TOOL_DELETE));
 
-        refreshAction = new Action("Refresh (F5)") {
+        sortNode = new Action(SORT_NODE_BY_STATION_TYPE_MESSAGE,
+                IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                if (sortNode.isChecked()) {
+                    sortNode.setToolTipText(SORT_NODE_BY_ID_MESSAGE);
+                    viewer.setComparator(new NodeBasedSorter());
+                } else {
+                    sortNode.setToolTipText(SORT_NODE_BY_STATION_TYPE_MESSAGE);
+                    viewer.setComparator(new NodeIdSorter());
+                }
+
+            }
+        };
+        sortNode.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.SORT_ICON));
+        // sortNode.setChecked(true);
+
+        refreshAction = new Action(REFRESH_ACTION_MESSAGE) {
             @Override
             public void run() {
                 handleRefresh();
             }
         };
-        refreshAction.setToolTipText("Refresh (F5)");
+        refreshAction.setToolTipText(REFRESH_ACTION_MESSAGE);
         refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.REFRESH_ICON));
     }

@@ -47,6 +47,7 @@ public interface IPluginImages {
     public final static String MAPPING_ICON = "icons/mapping.gif";
 
     // POWERLINK Network view icons
+    public final static String SORT_ICON = "icons/sort.gif";
     public final static String REFRESH_ICON = "icons/refresh.gif";
     public final static String RMN_ICON = "icons/rmn.gif";
     public final static String MN_ICON = "icons/mn.gif";
