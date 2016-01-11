@@ -58,6 +58,8 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkP
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
+import org.jdom2.JDOMException;
 
 /**
  * Wrapper class for a POWERLINK node.
@@ -976,8 +978,11 @@ public class Node {
      * Set ASnd max number
      *
      * @param value value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setAsndMaxNumber(Short value) {
+    public void setAsndMaxNumber(Short value)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkSubobject asndMaxNumberObj = getSubObject(
                     IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
@@ -995,8 +1000,10 @@ public class Node {
      * Set the asyncMtuValue to the node.
      *
      * @param value Value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setAsyncMtu(Integer value) {
+    public void setAsyncMtu(Integer value) throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkSubobject asyncMtuObj = getSubObject(
                     INetworkProperties.ASYNC_MTU_OBJECT_ID,
@@ -1013,8 +1020,11 @@ public class Node {
      * Set AsyncTimeout value for MN
      *
      * @param value Value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setAsyncSlotTimeout(Long value) {
+    public void setAsyncSlotTimeout(Long value)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkSubobject asyncSlotTimeoutObj = getSubObject(
                     IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
@@ -1032,8 +1042,11 @@ public class Node {
      * Set the PRes MaxLatency value for a CN node.
      *
      * @param value PRes MaxLatency value to set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setCnPresMaxLatency(Long value) {
+    public void setCnPresMaxLatency(Long value)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TCN) {
             PowerlinkSubobject presMaxLatencyObj = getSubObject(
                     IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
@@ -1052,8 +1065,11 @@ public class Node {
      * Supported for a CN only.
      *
      * @param value PRes timeout value in ns.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setCnPresTimeout(String value) {
+    public void setCnPresTimeout(String value)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TCN) {
             Node mnNode = nodeCollection
                     .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
@@ -1074,8 +1090,10 @@ public class Node {
      * Set the cycleTimeValue to the node.
      *
      * @param value Value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setCycleTime(Long value) {
+    public void setCycleTime(Long value) throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkObject cycleTimeObj = getObjects(
                     INetworkProperties.CYCLE_TIME_OBJECT_ID);
@@ -1092,10 +1110,14 @@ public class Node {
      * enabled.
      *
      * @param enabled True to enable the node, false to disable the node.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setEnabled(boolean enabled) {
+    public void setEnabled(boolean enabled) throws JDOMException, IOException {
         if (nodeModel instanceof TCN) {
             TCN cnModel = (TCN) nodeModel;
+            OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
+                    "enabled", String.valueOf(enabled));
             cnModel.setEnabled(enabled);
         } else {
             System.err.println(
@@ -1107,8 +1129,11 @@ public class Node {
      * Set the loss of SoC tolerance value.
      *
      * @param value Value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setLossOfSocTolerance(Long value) {
+    public void setLossOfSocTolerance(Long value)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkObject lossOfSocToleranceObj = getObjects(
                     IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
@@ -1124,8 +1149,11 @@ public class Node {
      * Set the multiplexed cycle length value.
      *
      * @param value Value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setMultiplexedCycleLength(Integer value) {
+    public void setMultiplexedCycleLength(Integer value)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkSubobject multiplexedCylCntObj = getSubObject(
                     INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
@@ -1142,8 +1170,11 @@ public class Node {
      * Set new name to this node.
      *
      * @param newName New name.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setName(final String newName) {
+    public void setName(final String newName)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
             net.getNodeCollection().getMN().setName(newName);
@@ -1352,37 +1383,45 @@ public class Node {
      * @param newNodeId The node id to be updated.
      *
      * @throws IOException Errors with project file or XDC file modifications.
+     * @throws JDOMException
      */
-    public void setNodeId(final short newNodeId) throws IOException {
-        if (nodeModel instanceof TCN) {
-            TCN cn = (TCN) nodeModel;
-            OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
-                    String.valueOf(newNodeId));
-
-            cn.setNodeID(String.valueOf(newNodeId));
-        } else if (nodeModel instanceof TRMN) {
-            TRMN rmn = (TRMN) nodeModel;
-            OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
-                    String.valueOf(newNodeId));
-            rmn.setNodeID(newNodeId);
-        } else {
+    public void setNodeId(final short newNodeId)
+            throws IOException, JDOMException {
+        if (!((nodeModel instanceof TCN) || (nodeModel instanceof TRMN))) {
             System.err.println("setNodeID(newID) ; Unhandled node model type:"
                     + nodeModel);
             return;
         }
 
+        // Update the new node id in the XDC file.
+        OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
+                String.valueOf(newNodeId));
+
+        // Update the node configuration path in the project file.
+        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXDC());
+
+        // Set the new node id into the project file.
         OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
                 IAbstractNodeProperties.NODE_ID_OBJECT,
                 String.valueOf(newNodeId));
 
-        nodeCollection.remove(new Short(nodeId));
+        synchronized (this) {
+            nodeCollection.remove(new Short(nodeId));
 
-        nodeId = newNodeId;
+            // Update the new node id.
+            if (nodeModel instanceof TCN) {
+                TCN cn = (TCN) nodeModel;
+                cn.setNodeID(String.valueOf(newNodeId));
+            } else if (nodeModel instanceof TRMN) {
+                TRMN rmn = (TRMN) nodeModel;
+                rmn.setNodeID(newNodeId);
+            }
 
-        nodeCollection.put(new Short(nodeId), this);
+            nodeId = newNodeId;
 
-        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
-                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXDC());
+            nodeCollection.put(new Short(nodeId), this);
+        }
     }
 
     /**
@@ -1411,8 +1450,10 @@ public class Node {
      * Set the prescalerValue to the node.
      *
      * @param value Value to be set.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setPrescaler(Integer value) {
+    public void setPrescaler(Integer value) throws JDOMException, IOException {
         if (nodeModel instanceof TNetworkConfiguration) {
             PowerlinkSubobject prescalerObj = getSubObject(
                     INetworkProperties.PRESCALER_OBJECT_ID,
@@ -1429,9 +1470,12 @@ public class Node {
      * Set the priority to an RMN node.
      *
      * @param priority Priority value.
+     * @throws IOException
+     * @throws JDOMException
      * @See IRedundantManagingNodeProperties.RMN_PRIORITY_DESCRIPTION
      */
-    public void setRmnPriority(Long priority) {
+    public void setRmnPriority(Long priority)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TRMN) {
             PowerlinkSubobject priorityObj = getSubObject(
                     IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
@@ -1448,10 +1492,13 @@ public class Node {
      * Set the wait not active value to an RMN.
      *
      * @param waitNotActive Wait not active value.
+     * @throws IOException
+     * @throws JDOMException
      *
      * @See IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_DESCRIPTION
      */
-    public void setRmnWaitNotActive(Long waitNotActive) {
+    public void setRmnWaitNotActive(Long waitNotActive)
+            throws JDOMException, IOException {
         if (nodeModel instanceof TRMN) {
             PowerlinkSubobject waitNotActiveObj = getSubObject(
                     IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
@@ -1460,6 +1507,49 @@ public class Node {
                 waitNotActiveObj.setActualValue(waitNotActive.toString(), true);
             } else {
                 System.err.println("WaitNotActive object not found.");
+            }
+        }
+    }
+
+    public void writeObjectActualValues(
+            java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection,
+            org.jdom2.Document document) throws JDOMException, IOException {
+        for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
+                .entrySet()) {
+            String actualValue = objectJcollectionEntry.getValue();
+            long objectIdLong = objectJcollectionEntry.getKey().getKey();
+
+            boolean isSubObject = false;
+            int subObjectIdShort = objectJcollectionEntry.getKey().getValue();
+            if (subObjectIdShort != -1) {
+                isSubObject = true;
+            }
+
+            PowerlinkObject object = getObjects(objectIdLong);
+            if (object != null) {
+
+                if (!isSubObject) {
+                    object.setActualValue(actualValue, false);
+                    XddJdomOperation.updateActualValue(document, object,
+                            actualValue);
+                } else {
+                    PowerlinkSubobject subObj = object
+                            .getSubObject((short) subObjectIdShort);
+                    if (subObj != null) {
+                        subObj.setActualValue(actualValue, false);
+                        XddJdomOperation.updateActualValue(document, subObj,
+                                actualValue);
+                    } else {
+                        System.err.println("SubObject 0x"
+                                + String.format("%04X", objectIdLong) + "/0x"
+                                + String.format("%02X", subObjectIdShort)
+                                + "does not exists in the XDC");
+                    }
+                }
+            } else {
+                System.err.println(
+                        "Object 0x" + String.format("%04X", objectIdLong)
+                                + "does not exists in the XDC");
             }
         }
     }

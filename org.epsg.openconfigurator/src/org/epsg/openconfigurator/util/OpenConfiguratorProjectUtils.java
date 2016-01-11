@@ -32,16 +32,11 @@
 package org.epsg.openconfigurator.util;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
 import java.util.LinkedHashMap;
@@ -66,9 +61,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
-import org.epsg.openconfigurator.lib.wrapper.MapIterator;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
-import org.epsg.openconfigurator.lib.wrapper.ObjectCollection;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
@@ -89,14 +82,10 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmloperation.JDomUtil;
 import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
-import org.jdom2.Document;
 import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public final class OpenConfiguratorProjectUtils {
@@ -146,9 +135,11 @@ public final class OpenConfiguratorProjectUtils {
      * @param node New node.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
      * @throws IOException
+     * @throws JDOMException
      */
     public static boolean addNode(Map<Short, Node> nodeList,
-            TNodeCollection nodeCollection, Node node) throws IOException {
+            TNodeCollection nodeCollection, Node node)
+                    throws IOException, JDOMException {
 
         importNodeConfigurationFile(node);
 
@@ -166,33 +157,14 @@ public final class OpenConfiguratorProjectUtils {
 
         nodeList.put(new Short(node.getNodeId()), node);
 
-        try {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-            String projectXmlLocation = node.getProjectXml().getLocation()
-                    .toString();
-            File xmlFile = new File(projectXmlLocation);
+        ProjectJDomOperation.addNode(document, node);
 
-            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                    IPowerlinkProjectSupport.UTF8_ENCODING);
-            InputSource input = new InputSource(reader);
-            input.setSystemId(xmlFile.toURI().toString());
-
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(input);
-
-            ProjectJDomOperation.addNode(document, node);
-
-            XMLOutputter xmlOutput = new XMLOutputter();
-
-            // display nice
-            xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(document, new FileWriter(projectXmlLocation));
-
-        } catch (JDOMException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-            return false;
-        }
+        JDomUtil.writeToXmlDocument(document, xmlFile);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -213,10 +185,12 @@ public final class OpenConfiguratorProjectUtils {
      * @param node The node to be removed.
      * @param monitor Monitor instance to report the progress.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws IOException
+     * @throws JDOMException
      */
     public static boolean deleteNode(Map<Short, Node> nodeCollection, Node node,
-            IProgressMonitor monitor) {
-        // FIXME: Proper return type and handle all returns.
+            IProgressMonitor monitor) throws JDOMException, IOException {
+
         boolean retVal = false;
         if (node == null) {
             return retVal;
@@ -234,17 +208,7 @@ public final class OpenConfiguratorProjectUtils {
             return retVal;
         } else {
             retVal = localFile.delete();
-            if (retVal) {
-                try {
-
-                    currentProject.refreshLocal(IResource.DEPTH_INFINITE,
-                            monitor);
-                } catch (CoreException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                    return false;
-                }
-            } else {
+            if (!retVal) {
                 System.err.println("File delete unsuccessful. File:"
                         + node.getAbsolutePathToXdc());
             }
@@ -288,31 +252,15 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         // Remove from the openconfigurator project xml.
-        try {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
 
-            String projectXmlLocation = node.getProjectXml().getLocation()
-                    .toString();
-            File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                    IPowerlinkProjectSupport.UTF8_ENCODING);
-            InputSource input = new InputSource(reader);
-            input.setSystemId(xmlFile.toURI().toString());
+        ProjectJDomOperation.deleteNode(document, node);
 
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(input);
-
-            ProjectJDomOperation.deleteNode(document, node);
-
-            XMLOutputter xmlOutput = new XMLOutputter();
-
-            // display nice
-            xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(document, new FileWriter(projectXmlLocation));
-        } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        JDomUtil.writeToXmlDocument(document, xmlFile);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -341,14 +289,7 @@ public final class OpenConfiguratorProjectUtils {
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
         File xmlFile = new File(projectXmlLocation);
-
-        Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                IPowerlinkProjectSupport.UTF8_ENCODING);
-        InputSource input = new InputSource(reader);
-        input.setSystemId(xmlFile.toURI().toString());
-
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(input);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
         if (force) {
             ProjectJDomOperation.forceActualValue(document, node, object,
@@ -357,12 +298,7 @@ public final class OpenConfiguratorProjectUtils {
             ProjectJDomOperation.removeForcedObject(document, node, object,
                     subObject);
         }
-
-        XMLOutputter xmlOutput = new XMLOutputter();
-
-        // display nice
-        xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(document, new FileWriter(projectXmlLocation));
+        JDomUtil.writeToXmlDocument(document, xmlFile);
     }
 
     /**
@@ -778,18 +714,9 @@ public final class OpenConfiguratorProjectUtils {
     public static Result persistNodeData(Node node)
             throws JDOMException, IOException {
 
-        Result res = new Result();
-
         File xmlFile = new File(node.getAbsolutePathToXdc());
 
-        Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                IPowerlinkProjectSupport.UTF8_ENCODING);
-
-        InputSource input = new InputSource(reader);
-        input.setSystemId(xmlFile.toURI().toString());
-
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(input);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
         // Delete the actual value from the model.
         for (PowerlinkObject obj : node.getObjectsList()) {
@@ -807,73 +734,19 @@ public final class OpenConfiguratorProjectUtils {
         // file.
         XddJdomOperation.deleteActualValue(document);
 
-        ObjectCollection objectCollection = new ObjectCollection();
-        res = OpenConfiguratorCore.GetInstance().GetObjectsWithActualValue(
-                node.getNetworkId(), node.getNodeId(), objectCollection);
+        // Prepare the Java based object collection.
+        java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
+        Result res = OpenConfiguratorLibraryUtils
+                .getObjectsWithActualValue(node, objectJCollection);
         if (!res.IsSuccessful()) {
-            // Continue operation for other nodes
-            System.err
-                    .println(OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
             return res;
         }
 
-        // Prepare the Java based object collection.
-        java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
-        for (MapIterator iterator = objectCollection.iterator(); iterator
-                .hasNext();) {
-            String actualValue = iterator.GetValue();
+        node.writeObjectActualValues(objectJCollection, document);
 
-            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
-                    iterator.GetKey().getFirst(),
-                    iterator.GetKey().getSecond());
-            objectJCollection.put(entryVal, actualValue);
-            iterator.next();
-        }
-
-        for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
-                .entrySet()) {
-            String actualValue = objectJcollectionEntry.getValue();
-            long objectIdLong = objectJcollectionEntry.getKey().getKey();
-
-            boolean isSubObject = false;
-            int subObjectIdShort = objectJcollectionEntry.getKey().getValue();
-            if (subObjectIdShort != -1) {
-                isSubObject = true;
-            }
-
-            PowerlinkObject object = node.getObjects(objectIdLong);
-            if (object != null) {
-
-                if (!isSubObject) {
-                    object.setActualValue(actualValue, false);
-                    XddJdomOperation.updateActualValue(document, object,
-                            actualValue);
-                } else {
-                    PowerlinkSubobject subObj = object
-                            .getSubObject((short) subObjectIdShort);
-                    if (subObj != null) {
-                        subObj.setActualValue(actualValue, false);
-                        XddJdomOperation.updateActualValue(document, subObj,
-                                actualValue);
-                    } else {
-                        System.err.println("SubObject 0x"
-                                + String.format("%04X", objectIdLong) + "/0x"
-                                + String.format("%02X", subObjectIdShort)
-                                + "does not exists in the XDC");
-                    }
-                }
-            } else {
-                System.err.println(
-                        "Object 0x" + String.format("%04X", objectIdLong)
-                                + "does not exists in the XDC");
-            }
-        }
-
-        XMLOutputter xmlOutput = new XMLOutputter();
-
-        // display nice nice
-        xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(document, new FileWriter(node.getAbsolutePathToXdc()));
+        JDomUtil.writeToXmlDocument(document, xmlFile);
 
         return res;
     }
@@ -959,36 +832,23 @@ public final class OpenConfiguratorProjectUtils {
      * @param node The node
      * @param attributeName The attribute tag name.
      * @param attributeValue The value to be applied.
+     * @throws IOException
+     * @throws JDOMException
      */
     public static void updateNetworkAttributeValue(final Node node,
-            final String attributeName, final String attributeValue) {
-        try {
+            final String attributeName, final String attributeValue)
+                    throws JDOMException, IOException {
 
-            String projectXmlLocation = node.getProjectXml().getLocation()
-                    .toString();
-            File xmlFile = new File(projectXmlLocation);
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
 
-            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                    IPowerlinkProjectSupport.UTF8_ENCODING);
-            InputSource input = new InputSource(reader);
-            input.setSystemId(xmlFile.toURI().toString());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(input);
+        ProjectJDomOperation.updateNetworkAttributeValue(document,
+                attributeName, attributeValue);
 
-            ProjectJDomOperation.updateNetworkAttributeValue(document,
-                    attributeName, attributeValue);
-
-            XMLOutputter xmlOutput = new XMLOutputter();
-
-            // display nice
-            xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(document, new FileWriter(projectXmlLocation));
-
-        } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        JDomUtil.writeToXmlDocument(document, xmlFile);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -1016,13 +876,7 @@ public final class OpenConfiguratorProjectUtils {
                 .toString();
         File xmlFile = new File(projectXmlLocation);
 
-        Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                IPowerlinkProjectSupport.UTF8_ENCODING);
-        InputSource input = new InputSource(reader);
-        input.setSystemId(xmlFile.toURI().toString());
-
-        SAXBuilder builder = new SAXBuilder();
-        Document document = builder.build(input);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
         NodeAssignment[] nodeAssignList = NodeAssignment.values();
 
@@ -1049,10 +903,7 @@ public final class OpenConfiguratorProjectUtils {
             }
         }
 
-        XMLOutputter xmlOutput = new XMLOutputter();
-        // display nice
-        xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(document, new FileWriter(projectXmlLocation));
+        JDomUtil.writeToXmlDocument(document, xmlFile);
     }
 
     /**
@@ -1061,35 +912,23 @@ public final class OpenConfiguratorProjectUtils {
      * @param node The node to apply the attributes.
      * @param attributeName The attribute tag name.
      * @param attributeValue The value to be applied.
+     * @throws IOException
+     * @throws JDOMException
      */
     public static void updateNodeAttributeValue(final Node node,
-            final String attributeName, final String attributeValue) {
-        try {
+            final String attributeName, final String attributeValue)
+                    throws JDOMException, IOException {
 
-            String projectXmlLocation = node.getProjectXml().getLocation()
-                    .toString();
-            File xmlFile = new File(projectXmlLocation);
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
 
-            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                    IPowerlinkProjectSupport.UTF8_ENCODING);
-            InputSource input = new InputSource(reader);
-            input.setSystemId(xmlFile.toURI().toString());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(input);
+        ProjectJDomOperation.updateNodeAttributeValue(document, node,
+                attributeName, attributeValue);
 
-            ProjectJDomOperation.updateNodeAttributeValue(document, node,
-                    attributeName, attributeValue);
-
-            XMLOutputter xmlOutput = new XMLOutputter();
-            // display nice
-            xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(document, new FileWriter(projectXmlLocation));
-
-        } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        JDomUtil.writeToXmlDocument(document, xmlFile);
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -1152,32 +991,15 @@ public final class OpenConfiguratorProjectUtils {
 
     public static void updateObjectAttributeValue(final Node node,
             final String objectId, final boolean isSubObject,
-            final String subObjectId, final String actualValue) {
-        try {
+            final String subObjectId, final String actualValue)
+                    throws JDOMException, IOException {
+        File xmlFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-            File xmlFile = new File(node.getAbsolutePathToXdc());
+        XddJdomOperation.updateActualValue(document, objectId, isSubObject,
+                subObjectId, actualValue);
 
-            Reader reader = new InputStreamReader(new FileInputStream(xmlFile),
-                    IPowerlinkProjectSupport.UTF8_ENCODING);
-            InputSource input = new InputSource(reader);
-            input.setSystemId(xmlFile.toURI().toString());
-
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(input);
-
-            XddJdomOperation.updateActualValue(document, objectId, isSubObject,
-                    subObjectId, actualValue);
-
-            XMLOutputter xmlOutput = new XMLOutputter();
-            // display nice
-            xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(document,
-                    new FileWriter(node.getAbsolutePathToXdc()));
-
-        } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        JDomUtil.writeToXmlDocument(document, xmlFile);
     }
 
     /**
@@ -1185,128 +1007,55 @@ public final class OpenConfiguratorProjectUtils {
      * channel.
      *
      * @param pdoChannel The channel to be updated.
+     * @return The result from the library.
+     * @throws JDOMException
+     * @throws IOException
      */
-    public static void updatePdoChannelActualValue(
-            final PdoChannel pdoChannel) {
+    public static Result updatePdoChannelActualValue(
+            final PdoChannel pdoChannel) throws JDOMException, IOException {
 
-        try {
+        Node node = pdoChannel.getNode();
+        File xdcFile = new File(node.getAbsolutePathToXdc());
 
-            File xdcFile = new File(
-                    pdoChannel.getNode().getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
-            Reader reader = new InputStreamReader(new FileInputStream(xdcFile),
-                    IPowerlinkProjectSupport.UTF8_ENCODING);
-            InputSource input = new InputSource(reader);
-            input.setSystemId(xdcFile.toURI().toString());
-
-            SAXBuilder builder = new SAXBuilder();
-            Document document = builder.build(input);
-
-            // Delete the mapping actual values from the model.
-            List<PowerlinkSubobject> subObjList = pdoChannel.getMappingParam()
-                    .getSubObjects();
-            if (!subObjList.isEmpty()) {
-                for (PowerlinkSubobject subObj : subObjList) {
-                    subObj.setActualValue(null, false);
-                }
+        // Delete the mapping actual values from the model.
+        List<PowerlinkSubobject> subObjList = pdoChannel.getMappingParam()
+                .getSubObjects();
+        if (!subObjList.isEmpty()) {
+            for (PowerlinkSubobject subObj : subObjList) {
+                subObj.setActualValue(null, false);
             }
-            // Delete the mapping actual values from the XDC file.
-            XddJdomOperation.deleteMappingChannelActualValue(document,
-                    pdoChannel);
-
-            ObjectCollection objectCollection = new ObjectCollection();
-
-            Result res = OpenConfiguratorCore.GetInstance()
-                    .GetChannelActualValues(pdoChannel.getNode().getNetworkId(),
-                            pdoChannel.getNode().getNodeId(),
-                            OpenConfiguratorLibraryUtils
-                                    .getDirection(pdoChannel.getPdoType()),
-                            pdoChannel.getChannelNumber(), objectCollection);
-
-            if (!res.IsSuccessful()) {
-                System.err.println("--GetChannelActualValues:"
-                        + OpenConfiguratorLibraryUtils.getErrorMessage(res));
-                return;
-            }
-
-            System.err.println("Size of the object to be written to XDC= "
-                    + objectCollection.size());
-
-            java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
-
-            for (MapIterator iterator = objectCollection.iterator(); iterator
-                    .hasNext();) {
-                String actualValue = iterator.GetValue();
-
-                Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
-                        iterator.GetKey().getFirst(),
-                        iterator.GetKey().getSecond());
-                objectJCollection.put(entryVal, actualValue);
-                iterator.next();
-            }
-
-            for (Map.Entry<Map.Entry<Long, Integer>, String> objectJcollectionEntry : objectJCollection
-                    .entrySet()) {
-                String actualValue = objectJcollectionEntry.getValue();
-                System.out.println("Actual value ---------" + actualValue);
-                long objectIdLong = objectJcollectionEntry.getKey().getKey();
-
-                boolean isSubObject = false;
-                int subObjectIdShort = objectJcollectionEntry.getKey()
-                        .getValue();
-                if (subObjectIdShort != -1) {
-                    isSubObject = true;
-                }
-
-                PowerlinkObject object = pdoChannel.getNode()
-                        .getObjects(objectIdLong);
-                if (object != null) {
-
-                    if (!isSubObject) {
-                        object.setActualValue(actualValue, false);
-                        XddJdomOperation.updateActualValue(document, object,
-                                actualValue);
-                    } else {
-                        PowerlinkSubobject subObj = object
-                                .getSubObject((short) subObjectIdShort);
-                        if (subObj != null) {
-                            subObj.setActualValue(actualValue, false);
-                            XddJdomOperation.updateActualValue(document, subObj,
-                                    actualValue);
-                        } else {
-                            System.err.println("SubObject 0x"
-                                    + String.format("%04X", objectIdLong)
-                                    + "/0x"
-                                    + String.format("%02X", subObjectIdShort)
-                                    + "does not exists in the XDC");
-                        }
-                    }
-                } else {
-                    System.err.println(
-                            "Object 0x" + String.format("%04X", objectIdLong)
-                                    + "does not exists in the XDC");
-                }
-            }
-
-            XMLOutputter xmlOutput = new XMLOutputter();
-
-            // display nice
-            xmlOutput.setFormat(Format.getPrettyFormat());
-            xmlOutput.output(document,
-                    new FileWriter(xdcFile.getAbsolutePath()));
-
-        } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
         }
 
+        // Delete the mapping actual values from the XDC file.
+        XddJdomOperation.deletePowerlinkObjectActualValue(document,
+                pdoChannel.getMappingParam());
+
+        // Prepare the Java based object collection.
+        java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
+        Result res = OpenConfiguratorLibraryUtils
+                .getChannelObjectsWithActualValue(pdoChannel,
+                        objectJCollection);
+        if (!res.IsSuccessful()) {
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            return res;
+        }
+
+        node.writeObjectActualValues(objectJCollection, document);
+
+        JDomUtil.writeToXmlDocument(document, xdcFile);
+
         try {
-            pdoChannel.getNode().getProject().refreshLocal(
-                    IResource.DEPTH_INFINITE, new NullProgressMonitor());
+            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
         } catch (CoreException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
+        return res;
     }
 
     /**

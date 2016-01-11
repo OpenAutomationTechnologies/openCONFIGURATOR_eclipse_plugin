@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.views;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.jdom2.JDOMException;
 
 /**
  * Wrapper class to act as a POWERLINK root node.
@@ -133,8 +135,10 @@ public class PowerlinkRootNode {
      *
      * @param node The node to be removed.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public boolean removeNode(Node node) {
+    public boolean removeNode(Node node) throws JDOMException, IOException {
         return OpenConfiguratorProjectUtils.deleteNode(nodeCollection, node,
                 null);
     }
@@ -153,25 +157,11 @@ public class PowerlinkRootNode {
      *
      * @param node The node to enabled or disabled.
      *
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public boolean toggleEnableDisable(Node node) {
-        boolean retVal = false;
-        if (node == null) {
-            return retVal;
-        }
-
-        Object nodeObjectModel = node.getNodeModel();
-        if (nodeObjectModel instanceof TCN) {
-            TCN cnModel = (TCN) nodeObjectModel;
-            cnModel.setEnabled(!cnModel.isEnabled());
-            OpenConfiguratorProjectUtils.updateNodeAttributeValue(node,
-                    "enabled", String.valueOf(cnModel.isEnabled()));
-        } else {
-            System.err.println("Enable disable not supported for nodeType"
-                    + nodeObjectModel);
-        }
-
-        return retVal;
+    public void toggleEnableDisable(Node node)
+            throws JDOMException, IOException {
+        node.setEnabled(!node.isEnabled());
     }
 }

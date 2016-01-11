@@ -31,6 +31,8 @@
 
 package org.epsg.openconfigurator.views.mapping;
 
+import java.io.IOException;
+
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -38,11 +40,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.jdom2.JDOMException;
 
 /**
  * Selection listener to handle the up button selection change events.
@@ -93,8 +97,16 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
                                                 + res.GetErrorMessage());
                                 MappingView.showMessage(res);
                             }
-                            OpenConfiguratorProjectUtils
-                                    .updatePdoChannelActualValue(pdoChannel);
+
+                            try {
+                                OpenConfiguratorProjectUtils
+                                        .updatePdoChannelActualValue(
+                                                pdoChannel);
+                            } catch (JDOMException | IOException e1) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(e1.getMessage());
+                                e1.printStackTrace();
+                            }
 
                             ISelection previousRowDataSelection = new StructuredSelection(
                                     previousRowData);

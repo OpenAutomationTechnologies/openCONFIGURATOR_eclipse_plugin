@@ -31,18 +31,22 @@
 
 package org.epsg.openconfigurator.views.mapping;
 
+import java.io.IOException;
+
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.jdom2.JDOMException;
 
 /**
  * Listener to handle the Node Id combobox selection changes events.
@@ -110,7 +114,13 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
                             return;
                         }
 
-                        subObj.setActualValue(node.getNodeIdString(), true);
+                        try {
+                            subObj.setActualValue(node.getNodeIdString(), true);
+                        } catch (JDOMException | IOException e) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(e.getMessage());
+                            e.printStackTrace();
+                        }
                     }
                 }
             }

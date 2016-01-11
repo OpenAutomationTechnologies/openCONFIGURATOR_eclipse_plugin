@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.views.mapping;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -113,6 +114,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
+import org.jdom2.JDOMException;
 
 /**
  * Mapping editor based view to handle the mapping operations for the nodes
@@ -199,8 +201,14 @@ public class MappingView extends ViewPart {
                         showMessage(res);
                     }
 
-                    OpenConfiguratorProjectUtils
-                            .updatePdoChannelActualValue(rpdoChannel);
+                    try {
+                        OpenConfiguratorProjectUtils
+                                .updatePdoChannelActualValue(rpdoChannel);
+                    } catch (JDOMException | IOException e1) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(e1.getMessage());
+                        e1.printStackTrace();
+                    }
 
                     tableViewer.refresh();
 
@@ -257,6 +265,7 @@ public class MappingView extends ViewPart {
                                             + enabledEntriesActValue
                                             + ") exceeds the available subobjects("
                                             + availableSubObjects + ")");
+                            return;
                         }
 
                         PowerlinkSubobject numberOfEntriesSubObject = pdoChannel
@@ -272,8 +281,14 @@ public class MappingView extends ViewPart {
 
                         updateChannelSize(pdoChannel);
 
-                        numberOfEntriesSubObject
-                                .setActualValue(enabledEntriesActValue, true);
+                        try {
+                            numberOfEntriesSubObject.setActualValue(
+                                    enabledEntriesActValue, true);
+                        } catch (JDOMException | IOException e1) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(e1.getMessage());
+                            e1.printStackTrace();
+                        }
 
                         tableViewer.refresh();
                     }
@@ -316,8 +331,14 @@ public class MappingView extends ViewPart {
                         showMessage(res);
                     }
 
-                    OpenConfiguratorProjectUtils
-                            .updatePdoChannelActualValue(pdoChannel);
+                    try {
+                        OpenConfiguratorProjectUtils
+                                .updatePdoChannelActualValue(pdoChannel);
+                    } catch (JDOMException | IOException e) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(e.getMessage());
+                        e.printStackTrace();
+                    }
                     tableViewer.refresh();
                     resizeTable(tableViewer, new int[] { 4, 5 });
                     updateEnabledMappingEntries(pdoChannel);
@@ -408,8 +429,15 @@ public class MappingView extends ViewPart {
                                 showMessage(res);
                             }
 
-                            OpenConfiguratorProjectUtils
-                                    .updatePdoChannelActualValue(pdoChannel);
+                            try {
+                                OpenConfiguratorProjectUtils
+                                        .updatePdoChannelActualValue(
+                                                pdoChannel);
+                            } catch (JDOMException | IOException e1) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(e1.getMessage());
+                                e1.printStackTrace();
+                            }
 
                             tableViewer.refresh();
                             resizeTable(tableViewer, new int[] { 4, 5 });
@@ -538,8 +566,14 @@ public class MappingView extends ViewPart {
                             }
                         }
 
-                        OpenConfiguratorProjectUtils
-                                .updatePdoChannelActualValue(pdoChannel);
+                        try {
+                            OpenConfiguratorProjectUtils
+                                    .updatePdoChannelActualValue(pdoChannel);
+                        } catch (JDOMException | IOException e) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(e.getMessage());
+                            e.printStackTrace();
+                        }
 
                         updateEnabledMappingEntries(pdoChannel);
                         updateChannelSize(pdoChannel);

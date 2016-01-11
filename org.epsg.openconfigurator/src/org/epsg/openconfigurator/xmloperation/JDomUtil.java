@@ -31,16 +31,28 @@
 
 package org.epsg.openconfigurator.xmloperation;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.List;
 
+import org.apache.commons.io.input.BOMInputStream;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
+import org.jdom2.JDOMException;
 import org.jdom2.Namespace;
 import org.jdom2.filter.Filters;
+import org.jdom2.input.SAXBuilder;
+import org.jdom2.output.Format;
+import org.jdom2.output.XMLOutputter;
 import org.jdom2.xpath.XPathBuilder;
 import org.jdom2.xpath.XPathExpression;
 import org.jdom2.xpath.XPathFactory;
+import org.xml.sax.InputSource;
 
 /**
  * Util class for JDOM2 operations.
@@ -124,6 +136,20 @@ public class JDomUtil {
                 namespace);
         Element parentElement = xpathExpr.evaluateFirst(document);
         return parentElement.getChildren().size();
+    }
+
+    public static org.jdom2.Document getXmlDocument(final File xmlFile)
+            throws JDOMException, IOException {
+
+        BOMInputStream bomIn = new BOMInputStream(new FileInputStream(xmlFile),
+                false);
+        Reader reader = new InputStreamReader(bomIn);
+        InputSource input = new InputSource(reader);
+        input.setSystemId(xmlFile.toURI().toString());
+
+        SAXBuilder builder = new SAXBuilder();
+        org.jdom2.Document document = builder.build(input);
+        return document;
     }
 
     public static XPathExpression<Element> getXPathExpressionElement(
@@ -298,5 +324,13 @@ public class JDomUtil {
         } else {
             System.err.println(xpathExpr.getExpression() + "Element null");
         }
+    }
+
+    public static void writeToXmlDocument(org.jdom2.Document document,
+            final File xmlFile) throws IOException {
+        XMLOutputter xmlOutput = new XMLOutputter();
+        // display nice
+        xmlOutput.setFormat(Format.getPrettyFormat());
+        xmlOutput.output(document, new FileWriter(xmlFile));
     }
 }

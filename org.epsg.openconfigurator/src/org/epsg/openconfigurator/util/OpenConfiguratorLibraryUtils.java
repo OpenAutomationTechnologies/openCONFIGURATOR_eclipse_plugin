@@ -35,7 +35,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.AbstractMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -52,7 +54,9 @@ import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.GeneralFeatureEnum;
 import org.epsg.openconfigurator.lib.wrapper.IEC_Datatype;
 import org.epsg.openconfigurator.lib.wrapper.MNFeatureEnum;
+import org.epsg.openconfigurator.lib.wrapper.MapIterator;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
+import org.epsg.openconfigurator.lib.wrapper.ObjectCollection;
 import org.epsg.openconfigurator.lib.wrapper.ObjectType;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.PDOMapping;
@@ -1367,6 +1371,35 @@ public class OpenConfiguratorLibraryUtils {
         return accessType;
     }
 
+    public static Result getChannelObjectsWithActualValue(
+            final PdoChannel pdoChannel,
+            java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection) {
+        ObjectCollection objectCollection = new ObjectCollection();
+        Result res = OpenConfiguratorCore.GetInstance().GetChannelActualValues(
+                pdoChannel.getNode().getNetworkId(),
+                pdoChannel.getNode().getNodeId(),
+                OpenConfiguratorLibraryUtils
+                        .getDirection(pdoChannel.getPdoType()),
+                pdoChannel.getChannelNumber(), objectCollection);
+
+        if (!res.IsSuccessful()) {
+            return res;
+        }
+
+        for (MapIterator iterator = objectCollection.iterator(); iterator
+                .hasNext();) {
+            String actualValue = iterator.GetValue();
+
+            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+                    iterator.GetKey().getFirst(),
+                    iterator.GetKey().getSecond());
+            objectJCollection.put(entryVal, actualValue);
+            iterator.next();
+        }
+
+        return res;
+    }
+
     /**
      * @param channel The mapping channel.
      * @return The total size of channel.
@@ -1666,6 +1699,30 @@ public class OpenConfiguratorLibraryUtils {
         }
 
         return plkDataType;
+    }
+
+    public static Result getObjectsWithActualValue(final Node node,
+            java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection) {
+        ObjectCollection objectCollection = new ObjectCollection();
+        Result res = OpenConfiguratorCore.GetInstance()
+                .GetObjectsWithActualValue(node.getNetworkId(),
+                        node.getNodeId(), objectCollection);
+        if (!res.IsSuccessful()) {
+            return res;
+        }
+
+        for (MapIterator iterator = objectCollection.iterator(); iterator
+                .hasNext();) {
+            String actualValue = iterator.GetValue();
+
+            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+                    iterator.GetKey().getFirst(),
+                    iterator.GetKey().getSecond());
+            objectJCollection.put(entryVal, actualValue);
+            iterator.next();
+        }
+
+        return res;
     }
 
     /**

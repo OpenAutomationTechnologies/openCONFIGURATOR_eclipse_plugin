@@ -31,7 +31,6 @@
 
 package org.epsg.openconfigurator.adapters;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,7 +49,6 @@ import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
-import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 
 /**
@@ -500,112 +498,101 @@ public class RedundantManagingNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                    redundantManagingNode.setName((String) value);
-                    break;
-                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                        redundantManagingNode.setName((String) value);
+                        break;
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
 
-                    short nodeIDvalue = 0;
-                    try {
-                        nodeIDvalue = Short.valueOf(((String) value));
-                    } catch (NumberFormatException e) {
+                        short nodeIDvalue = Short.valueOf(((String) value));
 
-                        OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(
-                                        "Invalid node id. " + e.getMessage());
-                        return;
-                    }
-
-                    Result res = OpenConfiguratorCore.GetInstance().SetNodeId(
-                            redundantManagingNode.getNetworkId(),
-                            redundantManagingNode.getNodeId(), nodeIDvalue);
-                    if (!res.IsSuccessful()) {
-                        PluginErrorDialogUtils.displayErrorMessageDialog(
-                                "Properties - NodeId", res);
-                    } else {
-                        try {
-                            redundantManagingNode.setNodeId(nodeIDvalue);
-                        } catch (IOException e) {
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetNodeId(redundantManagingNode.getNetworkId(),
+                                        redundantManagingNode.getNodeId(),
+                                        nodeIDvalue);
+                        if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(
-                                            "Error occurred while setting the node id. "
-                                                    + e.getMessage());
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        } else {
+                            redundantManagingNode.setNodeId(nodeIDvalue);
                         }
-                    }
 
-                    break;
-                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
-                    System.err.println(objectId + " made editable");
-                    break;
-                case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
-                    try {
+                        break;
+                    case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        System.err.println(objectId + " made editable");
+                        break;
+                    case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
                         redundantManagingNode.setRmnWaitNotActive(
                                 Long.decode((String) value));
-                    } catch (NumberFormatException e) {
-                        System.err.println(
-                                objectId + " Number format exception" + e);
-                    }
-                    break;
-                case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
-                    try {
+                        break;
+                    case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
                         redundantManagingNode
                                 .setRmnPriority(Long.decode((String) value));
-                    } catch (NumberFormatException e) {
+                        break;
+                    case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            rmn.setIsAsyncOnly(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(
+                                            redundantManagingNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err
+                                    .println(objectId + " Invalid value type");
+                        }
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            rmn.setIsType1Router(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(
+                                            redundantManagingNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err
+                                    .println(objectId + " Invalid value type");
+                        }
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            rmn.setIsType2Router(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(
+                                            redundantManagingNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err
+                                    .println(objectId + " Invalid value type");
+                        }
+                        break;
+                    }
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        // Ignore
+                        break;
+                    default:
                         System.err.println(
-                                objectId + " Number format exception" + e);
-                    }
-                    break;
-                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        rmn.setIsAsyncOnly(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                redundantManagingNode, objectId,
-                                String.valueOf(result));
-                    } else {
-                        System.err.println(objectId + " Invalid value type");
-                    }
-                    break;
+                                "Invalid object string ID:" + objectId);
+                        break;
                 }
-                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        rmn.setIsType1Router(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                redundantManagingNode, objectId,
-                                String.valueOf(result));
-                    } else {
-                        System.err.println(objectId + " Invalid value type");
-                    }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        rmn.setIsType2Router(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                redundantManagingNode, objectId,
-                                String.valueOf(result));
-                    } else {
-                        System.err.println(objectId + " Invalid value type");
-                    }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
-                    // Ignore
-                    break;
-                default:
-                    System.err.println("Invalid object string ID:" + objectId);
-                    break;
+            } else {
+                System.err.println("Invalid object ID:" + id);
             }
-        } else {
-            System.err.println("Invalid object ID:" + id);
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printErrorMessage(e.getMessage());
         }
     }
 }

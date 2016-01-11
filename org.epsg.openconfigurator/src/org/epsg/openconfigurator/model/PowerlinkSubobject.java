@@ -329,14 +329,17 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      *
      * @param actualValue The value to be set.
      * @param writeToXdc Writes the value immediately to XDC.
+     * @throws IOException
+     * @throws JDOMException
      */
-    public void setActualValue(final String actualValue, boolean writeToXdc) {
+    public void setActualValue(final String actualValue, boolean writeToXdc)
+            throws JDOMException, IOException {
+
+        subObject.setActualValue(actualValue);
 
         if (writeToXdc) {
             OpenConfiguratorProjectUtils.updateObjectAttributeValue(getNode(),
                     getObjectIdRaw(), true, getSubobjectIdRaw(), actualValue);
         }
-
-        subObject.setActualValue(actualValue);
     }
 }

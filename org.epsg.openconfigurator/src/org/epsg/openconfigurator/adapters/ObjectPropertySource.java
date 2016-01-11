@@ -31,7 +31,6 @@
 
 package org.epsg.openconfigurator.adapters;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -47,7 +46,6 @@ import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
-import org.jdom2.JDOMException;
 
 /**
  * Describes the properties for a POWERLINK object.
@@ -331,30 +329,14 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
     @Override
     public void setPropertyValue(Object id, Object value) {
 
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
-                    Result res = OpenConfiguratorLibraryUtils
-                            .setObjectActualValue(plkObject, (String) value);
-                    if (!res.IsSuccessful()) {
-                        OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res));
-                    } else {
-                        // Success - update the OBD
-                        plkObject.setActualValue((String) value, true);
-                    }
-                    break;
-                }
-                case OBJ_FORCE_ACTUAL_VALUE_ID: {
-
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
                         Result res = OpenConfiguratorLibraryUtils
-                                .forceObject(plkObject, result);
+                                .setObjectActualValue(plkObject,
+                                        (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(
@@ -362,26 +344,42 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                                     .getErrorMessage(res));
                         } else {
                             // Success - update the OBD
-                            try {
-                                plkObject.forceActualValue(result, true);
-                            } catch (JDOMException | IOException e) {
-                                e.printStackTrace();
+                            plkObject.setActualValue((String) value, true);
+                        }
+                        break;
+                    }
+                    case OBJ_FORCE_ACTUAL_VALUE_ID: {
+
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .forceObject(plkObject, result);
+                            if (!res.IsSuccessful()) {
                                 OpenConfiguratorMessageConsole.getInstance()
                                         .printErrorMessage(
-                                                "Could not write to file."
-                                                        + e.getMessage());
+                                                OpenConfiguratorLibraryUtils
+                                                        .getErrorMessage(res));
+                            } else {
+                                // Success - update the OBD
+                                plkObject.forceActualValue(result, true);
                             }
+
+                        } else {
+                            System.err.println("Invalid value type" + value);
                         }
 
-                    } else {
-                        System.err.println("Invalid value type" + value);
+                        break;
                     }
-
-                    break;
+                    default:
+                        // others are not editable.
                 }
-                default:
-                    // others are not editable.
             }
+
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printErrorMessage(e.getMessage());
         }
 
         try {

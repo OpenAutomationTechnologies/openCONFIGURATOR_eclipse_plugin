@@ -33,6 +33,7 @@
 
 package org.epsg.openconfigurator.views;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -75,6 +76,7 @@ import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
@@ -86,6 +88,7 @@ import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.jdom2.JDOMException;
 
 /**
  * Industrial network view to list all the nodes available in the project.
@@ -555,7 +558,13 @@ public class IndustrialNetworkView extends ViewPart
                 Result res = OpenConfiguratorLibraryUtils
                         .toggleEnableDisable(node);
                 if (res.IsSuccessful()) {
-                    rootNode.toggleEnableDisable(node);
+                    try {
+                        rootNode.toggleEnableDisable(node);
+                    } catch (JDOMException | IOException e) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(e.getMessage());
+                        e.printStackTrace();
+                    }
 
                     handleRefresh();
                 } else {
@@ -599,7 +608,14 @@ public class IndustrialNetworkView extends ViewPart
                                 .removeNode(node);
                         if (res.IsSuccessful()) {
 
-                            boolean retVal = rootNode.removeNode(node);
+                            boolean retVal = false;
+                            try {
+                                retVal = rootNode.removeNode(node);
+                            } catch (JDOMException | IOException e) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(e.getMessage());
+                                e.printStackTrace();
+                            }
                             if (!retVal) {
                                 System.err.println("Remove node Failed.");
                             }

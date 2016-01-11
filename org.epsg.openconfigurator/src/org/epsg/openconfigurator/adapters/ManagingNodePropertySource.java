@@ -40,6 +40,7 @@ import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
@@ -738,140 +739,117 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
-
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                    mnNode.setName((String) value);
-                    break;
-                case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
-                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
-                    System.err.println(objectId + " made editable");
-                    break;
-                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
-                    System.err.println(objectId + " made editable");
-                    break;
-                case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
-                    try {
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                        mnNode.setName((String) value);
+                        break;
+                    case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                        System.err.println(objectId + " made editable");
+                        break;
+                    case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        System.err.println(objectId + " made editable");
+                        break;
+                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
                         mnNode.setLossOfSocTolerance(
                                 Long.decode((String) value) * 1000);
-                    } catch (NumberFormatException e) {
-                        System.err.println(
-                                objectId + " Number format exception" + e);
-                    }
-                    break;
-                case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT:
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        mn.setTransmitsPRes(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                mnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
-                    }
+                        break;
+                    case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT:
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            mn.setTransmitsPRes(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(mnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
 
-                    break;
-                case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
-                    try {
+                        break;
+                    case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
                         mnNode.setAsyncSlotTimeout(Long.decode((String) value));
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception:" + e);
-                    }
-                    break;
-                case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
-                    try {
+                        break;
+                    case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
                         mnNode.setAsndMaxNumber(Short.decode((String) value));
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception" + e);
-                    }
-                    break;
-                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT:
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
+                        break;
+                    case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT:
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
 
-                        mn.setIsAsyncOnly(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                mnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
-                    }
-                    break;
-                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT:
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
+                            mn.setIsAsyncOnly(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(mnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
+                    case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT:
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
 
-                        mn.setIsType1Router(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                mnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
-                    }
-                    break;
-                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT:
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
+                            mn.setIsType1Router(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(mnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
+                    case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT:
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
 
-                        mn.setIsType2Router(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                mnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
-                    }
-                    break;
-                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
-                    // ignore. Not editable.
-                    break;
-                case INetworkProperties.NET_CYCLE_TIME_OBJECT:
-
-                    try {
+                            mn.setIsType2Router(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(mnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        // ignore. Not editable.
+                        break;
+                    case INetworkProperties.NET_CYCLE_TIME_OBJECT:
                         Long cycleTimeValue = Long.decode((String) value);
                         mnNode.setCycleTime(cycleTimeValue);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception" + e);
-                    }
 
-                    break;
-                case INetworkProperties.NET_ASYNC_MTU_OBJECT:
-
-                    try {
+                        break;
+                    case INetworkProperties.NET_ASYNC_MTU_OBJECT:
                         Integer asyncMtuValue = Integer.decode((String) value);
                         mnNode.setAsyncMtu(asyncMtuValue);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception" + e);
-                    }
-                    break;
+                        break;
 
-                case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
-                    try {
+                    case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
                         Integer multiplxCyclCntVal = Integer
                                 .decode((String) value);
                         mnNode.setMultiplexedCycleLength(multiplxCyclCntVal);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception" + e);
-                    }
-                    break;
-                case INetworkProperties.NET_PRESCALER_OBJECT:
+                        break;
+                    case INetworkProperties.NET_PRESCALER_OBJECT:
 
-                    try {
                         Integer preScalarVal = Integer.decode((String) value);
                         mnNode.setPrescaler(preScalarVal);
 
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception" + e);
-                    }
-
-                    break;
-                default:
-                    System.err.println("Invalid object string ID:" + objectId);
-                    break;
+                        break;
+                    default:
+                        System.err.println(
+                                "Invalid object string ID:" + objectId);
+                        break;
+                }
+            } else {
+                System.err.println("Invalid object ID:" + id);
             }
-        } else {
-            System.err.println("Invalid object ID:" + id);
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printErrorMessage(e.getMessage());
         }
     }
 }

@@ -43,6 +43,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
+import org.jdom2.JDOMException;
 
 /**
  * Wizard dialog to add a new POWERLINK node.
@@ -118,7 +119,7 @@ public class NewNodeWizard extends Wizard {
             try {
                 OpenConfiguratorProjectUtils.addNode(nodeList, nodeCollection,
                         newNode);
-            } catch (IOException e) {
+            } catch (IOException | JDOMException e) {
                 PluginErrorDialogUtils
                         .displayErrorMessageDialog(
                                 org.epsg.openconfigurator.Activator.getDefault()

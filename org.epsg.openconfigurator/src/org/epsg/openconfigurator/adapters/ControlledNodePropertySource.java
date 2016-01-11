@@ -31,7 +31,6 @@
 
 package org.epsg.openconfigurator.adapters;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,9 +52,7 @@ import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
-import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
-import org.jdom2.JDOMException;
 
 /**
  * Describes the node properties for a Controlled node.
@@ -795,301 +792,271 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     @Override
     public void setPropertyValue(Object id, Object value) {
 
-        if (id instanceof String) {
-            String objectId = (String) id;
-            switch (objectId) {
-                case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                    cnNode.setName((String) value);
-                    break;
-                case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
-                    short nodeIDvalue = 0;
-                    try {
-                        nodeIDvalue = Short.valueOf(((String) value));
-                    } catch (NumberFormatException e) {
-                        OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(
-                                        "Invalid node id. " + e.getMessage());
-                        return;
-                    }
+        try {
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                        cnNode.setName((String) value);
+                        break;
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
+                        short nodeIDvalue = Short.valueOf(((String) value));
 
-                    Result res = OpenConfiguratorCore.GetInstance().SetNodeId(
-                            cnNode.getNetworkId(), cnNode.getNodeId(),
-                            nodeIDvalue);
-                    if (!res.IsSuccessful()) {
-                        PluginErrorDialogUtils.displayErrorMessageDialog(
-                                "Properties - NodeId", res);
-                    } else {
-                        try {
-                            cnNode.setNodeId(nodeIDvalue);
-                        } catch (IOException e) {
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetNodeId(cnNode.getNetworkId(),
+                                        cnNode.getNodeId(), nodeIDvalue);
+                        if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(
-                                            "Error occurred while setting the node id. "
-                                                    + e.getMessage());
-                        }
-                    }
-
-                    break;
-                case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
-                    System.err.println(objectId + " made editable");
-                    break;
-                case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {
-
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        if (val == 0) { // Normal Station.
-                            tcn.setIsChained(false);
-                            tcn.setIsMultiplexed(false);
-                        } else if (val == 1) {
-
-                            tcn.setIsChained(true);
-                            tcn.setIsMultiplexed(false);
-                        } else if (val == 2) {
-
-                            tcn.setIsChained(false);
-                            tcn.setIsMultiplexed(true);
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        } else {
+                            cnNode.setNodeId(nodeIDvalue);
                         }
 
-                        // Node Assignment values will be modified by the
-                        // library. So refresh the project file data.
-                        try {
+                        break;
+                    case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        System.err.println(objectId + " made editable");
+                        break;
+                    case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {
+
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            if (val == 0) { // Normal Station.
+                                tcn.setIsChained(false);
+                                tcn.setIsMultiplexed(false);
+                            } else if (val == 1) {
+
+                                tcn.setIsChained(true);
+                                tcn.setIsMultiplexed(false);
+                            } else if (val == 2) {
+
+                                tcn.setIsChained(false);
+                                tcn.setIsMultiplexed(true);
+                            }
+
+                            // Node Assignment values will be modified by the
+                            // library. So refresh the project file data.
                             OpenConfiguratorProjectUtils
                                     .updateNodeAssignmentValues(cnNode);
-                        } catch (JDOMException | IOException e2) {
-                            e2.printStackTrace();
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            "Failed to update the project file."
-                                                    + e2.getMessage());
-                        }
-
-                        try {
 
                             // RPDO nodeID will be changed by the library. So
                             // refresh the node XDD data
                             OpenConfiguratorProjectUtils
                                     .persistNodeData(cnNode);
 
-                        } catch (JDOMException | IOException e1) {
-                            e1.printStackTrace();
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            "Failed to update the XDC."
-                                                    + e1.getMessage());
+                        } else {
+                            System.err.println("Invalid value type");
                         }
-
-                    } else {
-                        System.err.println("Invalid value type");
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT:
-                    try {
+                    case IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT:
+
                         tcn.setForcedMultiplexedCycle(
                                 Integer.decode((String) value));
                         OpenConfiguratorProjectUtils.updateNodeAttributeValue(
                                 cnNode, objectId, (String) value);
-                    } catch (NumberFormatException e) {
-                        System.err.println("Number format exception" + e);
+                        break;
+                    case IControlledNodeProperties.CN_IS_MANDATORY_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setIsMandatory(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                case IControlledNodeProperties.CN_IS_MANDATORY_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setIsMandatory(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
-                    }
-                    break;
-                }
-                case IControlledNodeProperties.CN_AUTO_START_NODE_OBJECT: {
+                    case IControlledNodeProperties.CN_AUTO_START_NODE_OBJECT: {
 
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setAutostartNode(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setAutostartNode(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_RESET_IN_OPERATIONAL_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setResetInOperational(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_RESET_IN_OPERATIONAL_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setResetInOperational(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setVerifyAppSwVersion(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setVerifyAppSwVersion(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setAutoAppSwUpdateAllowed(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setAutoAppSwUpdateAllowed(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setVerifyDeviceType(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setVerifyDeviceType(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_VENDOR_ID_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setVerifyVendorId(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_VERIFY_VENDOR_ID_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setVerifyVendorId(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_REVISION_NUMBER_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setVerifyRevisionNumber(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_VERIFY_REVISION_NUMBER_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setVerifyRevisionNumber(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_PRODUCT_CODE_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setVerifyProductCode(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_VERIFY_PRODUCT_CODE_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setVerifyProductCode(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setVerifySerialNumber(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setVerifySerialNumber(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setIsAsyncOnly(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setIsAsyncOnly(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setIsType1Router(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setIsType1Router(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                    if (value instanceof Integer) {
-                        int val = ((Integer) value).intValue();
-                        boolean result = (val == 0) ? true : false;
-                        tcn.setIsType2Router(result);
-                        OpenConfiguratorProjectUtils.updateNodeAttributeValue(
-                                cnNode, objectId, String.valueOf(result));
-                    } else {
-                        System.err.println("Invalid value type");
+                    case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
+                        if (value instanceof Integer) {
+                            int val = ((Integer) value).intValue();
+                            boolean result = (val == 0) ? true : false;
+                            tcn.setIsType2Router(result);
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAttributeValue(cnNode, objectId,
+                                            String.valueOf(result));
+                        } else {
+                            System.err.println("Invalid value type");
+                        }
+                        break;
                     }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
-                    // Ignore
-                    break;
-                case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT: {
-                    try {
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        // Ignore
+                        break;
+                    case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT: {
                         cnNode.setCnPresMaxLatency(Long.decode((String) value));
-                    } catch (NumberFormatException e) {
-                        System.err.println(
-                                objectId + " Number format exception" + e);
+                        break;
                     }
-                    break;
-                }
-                case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
-                    try {
+                    case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
                         long presTimeoutInNs = Long.decode((String) value)
                                 .longValue() * 1000;
                         cnNode.setCnPresTimeout(
                                 String.valueOf(presTimeoutInNs));
-                    } catch (NumberFormatException e) {
-                        System.err.println(
-                                objectId + " Number format exception" + e);
+                        break;
                     }
-                    break;
-                }
-                case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                    try {
+                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
                         cnNode.setLossOfSocTolerance(
                                 Long.decode((String) value) * 1000);
-                    } catch (NumberFormatException e) {
-                        System.err.println(
-                                objectId + " Number format exception" + e);
+                        break;
                     }
-                    break;
+                    default:
+                        System.err.println(
+                                "Invalid object string ID:" + objectId);
+                        break;
                 }
-                default:
-                    System.err.println("Invalid object string ID:" + objectId);
-                    break;
+            } else {
+                System.err.println("Invalid object ID:" + id);
             }
-        } else {
-            System.err.println("Invalid object ID:" + id);
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printErrorMessage(e.getMessage());
         }
 
         try {

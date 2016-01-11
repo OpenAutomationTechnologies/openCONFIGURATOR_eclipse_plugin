@@ -54,7 +54,7 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.apache.commons.io.input.BOMInputStream;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.xml.sax.InputSource;
@@ -164,8 +164,9 @@ public final class XddMarshaller {
             throws JAXBException, SAXException, ParserConfigurationException,
             FileNotFoundException, UnsupportedEncodingException {
 
-        Reader reader = new InputStreamReader(new FileInputStream(file),
-                IPowerlinkProjectSupport.UTF8_ENCODING);
+        BOMInputStream bomIn = new BOMInputStream(new FileInputStream(file),
+                false);
+        Reader reader = new InputStreamReader(bomIn);
         final InputSource input = new InputSource(reader);
         input.setSystemId(file.toURI().toString());
         return unmarshallXDD(input);
