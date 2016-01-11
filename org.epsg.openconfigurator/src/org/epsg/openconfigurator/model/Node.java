@@ -148,15 +148,15 @@ public class Node {
      * openCONFIGURATOR project file.
      */
     private final IFile projectXml;
-
     /**
      * List of nodes from a collection.
      */
     private final Map<Short, Node> nodeCollection;
+
     /**
      * List of Objects available in the node.
      */
-    private final List<PowerlinkObject> objectsList = new ArrayList<PowerlinkObject>();;
+    private final List<PowerlinkObject> objectsList = new ArrayList<PowerlinkObject>();
 
     /**
      * TPDO mappable objects list.
@@ -681,6 +681,22 @@ public class Node {
         }
 
         return pathToXdc;
+    }
+
+    public PlkOperationMode getPlkOperationMode() {
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+
+            if (cn.isIsChained()) {
+                return PlkOperationMode.CHAINED;
+            } else if (cn.isIsMultiplexed()) {
+                return PlkOperationMode.MULTIPLEXED;
+
+            }
+            // Else normal.
+        }
+
+        return PlkOperationMode.NORMAL;
     }
 
     /**
@@ -1444,6 +1460,21 @@ public class Node {
 
             rmn.setPathToXDC(pathToXdc);
         }
+    }
+
+    public void setPlkOperationMode() {
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            if (cn.isIsChained()) {
+                cn.setIsChained(true);
+            } else if (cn.isIsMultiplexed()) {
+                cn.setIsMultiplexed(true);
+            }
+        } else {
+            System.err.println("setPlkoperationmode; Unhandled node model type:"
+                    + nodeModel);
+        }
+
     }
 
     /**

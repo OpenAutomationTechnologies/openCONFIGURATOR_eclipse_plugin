@@ -275,4 +275,20 @@
          </enablement>
       </decorator>
    </extension>
+   <extension
+         point="org.eclipse.ui.decorators">
+      <decorator
+            class="org.epsg.openconfigurator.views.NodeLabelDecorator"
+            id="org.epsg.openconfigurator.decorator.stationtype"
+            label="stationtype"
+            lightweight="true"
+            location="BOTTOM_RIGHT"
+            state="true">
+         <enablement>
+            <objectClass
+                  name="org.epsg.openconfigurator.model.Node">
+            </objectClass>
+         </enablement>
+      </decorator>
+   </extension>
 </plugin>

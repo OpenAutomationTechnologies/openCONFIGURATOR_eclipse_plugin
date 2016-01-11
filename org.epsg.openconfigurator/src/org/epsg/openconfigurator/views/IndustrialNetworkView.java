@@ -46,6 +46,7 @@ import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -433,7 +434,9 @@ public class IndustrialNetworkView extends ViewPart
         viewer = new TreeViewer(parent,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
         viewer.setContentProvider(new ViewContentProvider());
-        viewer.setLabelProvider(new ViewLabelProvider());
+        viewer.setLabelProvider(new DecoratingLabelProvider(
+                new ViewLabelProvider(), PlatformUI.getWorkbench()
+                        .getDecoratorManager().getLabelDecorator()));
         viewer.setComparator(new NodeIdBasedSorter());
         viewer.expandAll();
 
