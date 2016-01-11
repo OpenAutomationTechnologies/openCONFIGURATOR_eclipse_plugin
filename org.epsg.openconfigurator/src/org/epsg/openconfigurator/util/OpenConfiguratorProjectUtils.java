@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -202,18 +203,6 @@ public final class OpenConfiguratorProjectUtils {
             return retVal;
         }
 
-        File localFile = new File(node.getAbsolutePathToXdc());
-        if (!localFile.exists()) {
-            System.err.println("XDC file does not exists");
-            return retVal;
-        } else {
-            retVal = localFile.delete();
-            if (!retVal) {
-                System.err.println("File delete unsuccessful. File:"
-                        + node.getAbsolutePathToXdc());
-            }
-        }
-
         Node mnNode = nodeCollection.get(new Short((short) 240));
 
         // Remove from the viewer node collection.
@@ -261,6 +250,11 @@ public final class OpenConfiguratorProjectUtils {
         ProjectJDomOperation.deleteNode(document, node);
 
         JDomUtil.writeToXmlDocument(document, xmlFile);
+
+        // Delete the XDC file from the deviceConfiguration directory.
+        // File localFile = new File(node.getAbsolutePathToXdc());
+        // retVal = localFile.delete();
+        Files.delete(Paths.get(node.getAbsolutePathToXdc()));
 
         try {
             node.getProject().refreshLocal(IResource.DEPTH_INFINITE,

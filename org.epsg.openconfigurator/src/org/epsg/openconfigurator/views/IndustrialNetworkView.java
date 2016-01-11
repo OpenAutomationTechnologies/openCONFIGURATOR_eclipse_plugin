@@ -34,6 +34,7 @@
 package org.epsg.openconfigurator.views;
 
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -607,17 +608,19 @@ public class IndustrialNetworkView extends ViewPart
                         Result res = OpenConfiguratorLibraryUtils
                                 .removeNode(node);
                         if (res.IsSuccessful()) {
-
-                            boolean retVal = false;
                             try {
-                                retVal = rootNode.removeNode(node);
+                                rootNode.removeNode(node);
                             } catch (JDOMException | IOException e) {
-                                OpenConfiguratorMessageConsole.getInstance()
-                                        .printErrorMessage(e.getMessage());
+                                if (e instanceof NoSuchFileException) {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage("The file "
+                                                    + e.getMessage()
+                                                    + " cannot be found.");
+                                } else {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage(e.getMessage());
+                                }
                                 e.printStackTrace();
-                            }
-                            if (!retVal) {
-                                System.err.println("Remove node Failed.");
                             }
                             handleRefresh();
                         } else {
