@@ -266,8 +266,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         propertyList.add(transmitPres);
 
         propertyList.add(asyncSlotTimeout);
-
-        propertyList.add(asndMaxNumber);
+        // AsndMaxnumber is not supported by POWERLINK stack
+        // propertyList.add(asndMaxNumber);
         propertyList.add(isAsyncOnly);
         propertyList.add(isType1Router);
         propertyList.add(isType2Router);

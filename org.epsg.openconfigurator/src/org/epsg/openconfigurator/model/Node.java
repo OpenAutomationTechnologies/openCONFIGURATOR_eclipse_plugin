@@ -596,25 +596,6 @@ public class Node {
     }
 
     /**
-     *
-     * @return PresMaxLatencyValue from object dictionary.
-     */
-    public String getPresMaxLatencyValue() {
-        if (nodeType == NodeType.MANAGING_NODE) {
-            // FIXME: throw exception for un supported node type.
-            System.err.println("getPresMaxLatencyValue Un-supported node type:"
-                    + nodeModel);
-            return StringUtils.EMPTY;
-        }
-
-        // CN: M; MN:-
-        String latencyValue = getObjectDictionary().getValue(
-                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
-        return latencyValue;
-    }
-
-    /**
      * @return PresTimeoutvalue of CN node in ns
      */
     public long getPresTimeoutvalue() {
@@ -903,34 +884,6 @@ public class Node {
         getObjectDictionary().setActualValue(
                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
-                value.toString());
-    }
-
-    /**
-     * Set the PRes MaxLatency value for a CN node.
-     *
-     * @param value PRes MaxLatency value in ns.
-     * @throws IOException
-     * @throws JDOMException
-     */
-    public void setCnPresMaxLatency(Long value)
-            throws JDOMException, IOException {
-        if (value == null) {
-            // FIXME: throw invalid argument.
-            return;
-        }
-
-        // CN: M MN: -
-        if (nodeType == NodeType.MANAGING_NODE) {
-            // FIXME: throw exception for un supported node type.
-            System.err.println(
-                    "setCnPresMaxLatency Un-supported node type:" + nodeModel);
-            return;
-        }
-
-        getObjectDictionary().setActualValue(
-                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID,
                 value.toString());
     }
 

@@ -59,7 +59,6 @@ public interface IControlledNodeProperties extends IAbstractNodeProperties {
     public static final String CN_VERIFY_PRODUCT_CODE_OBJECT = "verifyProductCode"; //$NON-NLS-1$
     public static final String CN_VERIFY_SERIAL_NUMBER_OBJECT = "verifySerialNumber"; /////$NON-NLS-1$
 
-    public static final String CN_POLL_RESPONSE_MAX_LATENCY_OBJECT = "presMaxLatency"; //$NON-NLS-1$
     public static final String CN_POLL_RESPONSE_TIMEOUT_OBJECT = "presTimeout"; //$NON-NLS-1$
 
     /** Descriptions **/
@@ -69,8 +68,4 @@ public interface IControlledNodeProperties extends IAbstractNodeProperties {
     public static final String CN_VERIFY_APP_SW_VERSION_DESCRIPTION = "Yes -> Application software version verification is required. See  0x1F81, Bit 5.";
     public static final String CN_VERIFY_DEVICE_TYPE_DESCRIPTION = "Yes -> Automatic update of application software allowed. See 0x1F81, Bit 6.";
 
-    public static final String CN_POLL_RESPONSE_MAX_LATENCY_DESCRIPTION = "Provides the maximum time in ns, that is required by the CN to respond to PReq. See 0x1F98/0x3";
-
-    public static final long CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID = 0x1F98;
-    public static final short CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID = 0x03;
 }

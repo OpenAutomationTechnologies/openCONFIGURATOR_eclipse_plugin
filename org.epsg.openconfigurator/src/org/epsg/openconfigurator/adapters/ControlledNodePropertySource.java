@@ -83,7 +83,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_PRODUCT_CODE_LABEL = "Verify Product Code";
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
 
-    private static final String CN_POLL_RESPONSE_MAX_LATENCY_LABEL = "PollResponse Max Latency(ns)";
     private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout("
             + "\u00B5" + "s)";
 
@@ -135,9 +134,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final ComboBoxPropertyDescriptor verifySerialNumber = new ComboBoxPropertyDescriptor(
             IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT,
             CN_VERIFY_SERIAL_NUMBER_LABEL, IPropertySourceSupport.YES_NO);
-    private static final TextPropertyDescriptor presMaxLatencyDescriptor = new TextPropertyDescriptor(
-            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT,
-            CN_POLL_RESPONSE_MAX_LATENCY_LABEL);
 
     private static final TextPropertyDescriptor presTimeoutDescriptor = new TextPropertyDescriptor(
             IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT,
@@ -204,18 +200,11 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         verifySerialNumber
                 .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
 
-        presMaxLatencyDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        presMaxLatencyDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
-        presMaxLatencyDescriptor.setDescription(
-                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_DESCRIPTION);
         presTimeoutDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
     }
 
     // Error messages.
-    private static final String ERROR_PRES_MAX_LATENCY_CANNOT_BE_EMPTY = "PRes max latency value cannot be empty.";
     private static final String ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY = "PRes TimeOut value cannot be empty.";
 
     private Node cnNode;
@@ -337,13 +326,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         isType2Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
         forcedObjects.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
 
-        presMaxLatencyDescriptor.setValidator(new ICellEditorValidator() {
-            @Override
-            public String isValid(Object value) {
-                return handlePresMaxLatency(value);
-            }
-        });
-
         presTimeoutDescriptor.setValidator(new ICellEditorValidator() {
             @Override
             public String isValid(Object value) {
@@ -379,7 +361,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
 
             propertyList.add(nodeTypeDescriptor);
-            propertyList.add(forcedMultiplexedCycle);
+            // ForcedMultiplexedCycle is not supported by POWERLINK stack
+            // propertyList.add(forcedMultiplexedCycle);
             propertyList.add(isMandatory);
             propertyList.add(autostartNode);
             propertyList.add(resetInOperational);
@@ -394,7 +377,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             propertyList.add(isType1Router);
             propertyList.add(isType2Router);
 
-            propertyList.add(presMaxLatencyDescriptor);
             propertyList.add(presTimeoutDescriptor);
             // propertyList.add(lossSocToleranceDescriptor);
             if (tcn.getForcedObjects() != null) {
@@ -535,9 +517,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
                         retObj = cnNode.getForcedObjectsString();
                         break;
-                    case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT:
-                        retObj = cnNode.getPresMaxLatencyValue();
-                        break;
                     case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
                         long presTimeoutinNs = cnNode.getPresTimeoutvalue();
                         long presTimeoutInMs = presTimeoutinNs / 1000;
@@ -668,47 +647,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
         } else {
             System.err.println("Invalid value type" + value);
-        }
-        return null;
-    }
-
-    /**
-     * Handle PRes max latency changes in the properties.
-     *
-     * @param value New value for the PRes max latency.
-     * @return Returns a string indicating whether the given value is valid;
-     *         null means valid, and non-null means invalid, with the result
-     *         being the error message to display to the end user.
-     */
-    protected String handlePresMaxLatency(Object value) {
-        if (value instanceof String) {
-            if (((String) value).isEmpty()) {
-                return ERROR_PRES_MAX_LATENCY_CANNOT_BE_EMPTY;
-            }
-
-            PowerlinkSubobject presMaxLatencySubObj = cnNode
-                    .getObjectDictionary().getSubObject(
-                            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID,
-                            IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID);
-            if (presMaxLatencySubObj == null) {
-                return "Object 0x"
-                        + Long.toHexString(
-                                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT_ID)
-                        + "/0x"
-                        + Integer.toHexString(
-                                IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_SUBOBJECT_ID)
-                        + " not found.";
-            }
-
-            Result res = OpenConfiguratorLibraryUtils.setSubObjectActualValue(
-                    presMaxLatencySubObj, (String) value);
-
-            if (!res.IsSuccessful()) {
-                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
-            }
-        } else {
-            System.err.println(
-                    "handlePresMaxLatencyValue: Invalid value type:" + value);
         }
         return null;
     }
@@ -1078,10 +1016,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
                         // Ignore
                         break;
-                    case IControlledNodeProperties.CN_POLL_RESPONSE_MAX_LATENCY_OBJECT: {
-                        cnNode.setCnPresMaxLatency(Long.decode((String) value));
-                        break;
-                    }
                     case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
                         long presTimeoutInNs = Long.decode((String) value)
                                 .longValue() * 1000;
