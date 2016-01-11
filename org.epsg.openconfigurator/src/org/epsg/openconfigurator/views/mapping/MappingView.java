@@ -38,6 +38,9 @@ import java.util.List;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuManager;
@@ -102,6 +105,7 @@ import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PdoType;
 import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.RpdoChannel;
 import org.epsg.openconfigurator.model.TpdoChannel;
@@ -109,7 +113,6 @@ import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
-import org.epsg.openconfigurator.views.PowerlinkRootNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
@@ -284,7 +287,11 @@ public class MappingView extends ViewPart {
                         try {
                             numberOfEntriesSubObject.setActualValue(
                                     enabledEntriesActValue, true);
-                        } catch (JDOMException | IOException e1) {
+                            pdoChannel.getNode().getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (JDOMException | IOException
+                                | CoreException e1) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(e1.getMessage());
                             e1.printStackTrace();

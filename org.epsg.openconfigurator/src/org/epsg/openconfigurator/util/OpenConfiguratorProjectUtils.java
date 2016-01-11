@@ -32,11 +32,10 @@
 package org.epsg.openconfigurator.util;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.GregorianCalendar;
@@ -44,23 +43,18 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.bind.JAXBException;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FilenameUtils;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Status;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
@@ -82,12 +76,10 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
-import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmloperation.JDomUtil;
 import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
-import org.xml.sax.SAXException;
 
 public final class OpenConfiguratorProjectUtils {
 
@@ -104,8 +96,6 @@ public final class OpenConfiguratorProjectUtils {
     public static final String SYSTEM_USER_NAME_ID = "user.name";
 
     private static ArrayList<String> defaultBuildConfigurationIdList;
-    private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid. XDC Path: {1}";
-    private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project. XDC Path: {1}";
 
     private static final String UPGRADE_MESSAGE = "Upgrading openCONFIGURATOR project version {0} to version {1}.";
 
@@ -129,54 +119,6 @@ public final class OpenConfiguratorProjectUtils {
     }
 
     /**
-     * Add node into the node collection and the node list.
-     *
-     * @param nodeList The list of available nodes.
-     * @param nodeCollection The node collection instance.
-     * @param node New node.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws IOException
-     * @throws JDOMException
-     */
-    public static boolean addNode(Map<Short, Node> nodeList,
-            TNodeCollection nodeCollection, Node node)
-                    throws IOException, JDOMException {
-
-        Object nodeModel = node.getNodeModel();
-        if (nodeModel instanceof TCN) {
-            TCN cn = (TCN) nodeModel;
-            nodeCollection.getCN().add(cn);
-        } else if (nodeModel instanceof TRMN) {
-            TRMN rmn = (TRMN) nodeModel;
-            nodeCollection.getRMN().add(rmn);
-        } else {
-            // Invalid node
-            return false;
-        }
-
-        nodeList.put(new Short(node.getNodeId()), node);
-
-        String projectXmlLocation = node.getProjectXml().getLocation()
-                .toString();
-        File xmlFile = new File(projectXmlLocation);
-        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
-
-        ProjectJDomOperation.addNode(document, node);
-
-        JDomUtil.writeToXmlDocument(document, xmlFile);
-
-        try {
-            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
-                    new NullProgressMonitor());
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
-        return true;
-    }
-
-    /**
      * Removes the node from the node collection provided and from the project
      * XML file.
      *
@@ -184,8 +126,8 @@ public final class OpenConfiguratorProjectUtils {
      * @param node The node to be removed.
      * @param monitor Monitor instance to report the progress.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications.
      */
     public static boolean deleteNode(Map<Short, Node> nodeCollection, Node node,
             IProgressMonitor monitor) throws JDOMException, IOException {
@@ -272,8 +214,8 @@ public final class OpenConfiguratorProjectUtils {
      * @param object The POWERLINK object to be forced.
      * @param subObject The sub-object to be forced. Can be null.
      * @param force True to force and False to remove.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
      */
     public static void forceActualValue(final Node node, PowerlinkObject object,
             PowerlinkSubobject subObject, boolean force)
@@ -382,7 +324,7 @@ public final class OpenConfiguratorProjectUtils {
      * update to relative.
      *
      * @param newNode The node XDC to be imported.
-     * @throws IOException
+     * @throws Error with XDC/XDD file modification.
      */
     public static void importNodeConfigurationFile(Node newNode)
             throws IOException {
@@ -433,194 +375,6 @@ public final class OpenConfiguratorProjectUtils {
         relativePath = relativePath.replace('\\', '/');
 
         newNode.setPathToXDC(relativePath);
-    }
-
-    /**
-     * Import the nodes available in the project XML file. Add the created node
-     * into the nodeCollection.
-     *
-     * @param projectFile The project file instance.
-     * @param networkCfg The network configuration instance from the project XML
-     *            file.
-     * @param nodeCollection The node collection list used for the project.
-     * @param monitor The monitor instance to display the current status.
-     * @return Status of the import nodes.
-     */
-    public static Status importNodes(IFile projectFile,
-            TNetworkConfiguration networkCfg, Map<Short, Node> nodeCollection,
-            IProgressMonitor monitor) {
-        Node processingNode = new Node();
-
-        try {
-            // MN section
-            {
-                TMN mnNode = networkCfg.getNodeCollection().getMN();
-
-                monitor.subTask("Import MN node XDC:" + mnNode.getName() + "("
-                        + mnNode.getNodeID() + ")");
-
-                File mnXddFile = new File(projectFile.getProject().getLocation()
-                        + File.separator + mnNode.getPathToXDC());
-                System.out.println(
-                        "MN XDD file path:" + mnXddFile.getAbsolutePath());
-                processingNode = new Node(nodeCollection, projectFile,
-                        networkCfg, null);
-
-                ISO15745ProfileContainer xdd = XddMarshaller
-                        .unmarshallXDDFile(mnXddFile);
-                // add TNetworkManagement Not TMN
-                Node newNode = new Node(nodeCollection, projectFile, networkCfg,
-                        xdd);
-                processingNode = newNode;
-
-                Result res = OpenConfiguratorLibraryUtils.addNode(
-                        newNode.getNetworkId(), newNode.getNodeId(), newNode);
-                if (res.IsSuccessful()) {
-                    nodeCollection.put(newNode.getNodeId(), newNode);
-                } else {
-                    return new Status(IStatus.ERROR,
-                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                            OpenConfiguratorLibraryUtils.getErrorMessage(res),
-                            null);
-                }
-            }
-
-            // Import the CN nodes
-            for (TCN cnNode : networkCfg.getNodeCollection().getCN()) {
-
-                if (monitor.isCanceled()) {
-                    return new Status(IStatus.OK,
-                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                            "Cancelled", null);
-                }
-
-                monitor.subTask("Import CN node XDC:" + cnNode.getName() + "("
-                        + cnNode.getNodeID() + ")");
-
-                File cnXddFile = new File(projectFile.getProject().getLocation()
-                        + File.separator + cnNode.getPathToXDC());
-                System.out.println(
-                        "CN XDD file path:" + cnXddFile.getAbsolutePath());
-
-                processingNode = new Node(nodeCollection, projectFile, cnNode,
-                        null);
-                try {
-
-                    ISO15745ProfileContainer xdd = XddMarshaller
-                            .unmarshallXDDFile(cnXddFile);
-
-                    Node newNode = new Node(nodeCollection, projectFile, cnNode,
-                            xdd);
-
-                    processingNode = newNode;
-
-                    Result res = OpenConfiguratorLibraryUtils.addNode(
-                            newNode.getNetworkId(),
-                            new Short(newNode.getNodeId()), newNode);
-                    if (res.IsSuccessful()) {
-                        nodeCollection.put(new Short(newNode.getNodeId()),
-                                newNode);
-                    } else {
-                        return new Status(IStatus.ERROR,
-                                org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                                OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res),
-                                null);
-                    }
-
-                } catch (JAXBException | SAXException
-                        | ParserConfigurationException | FileNotFoundException
-                        | UnsupportedEncodingException e) {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(e.getCause().getMessage()
-                                    + " for the node " + "'" + cnNode.getName()
-                                    + "(" + cnNode.getNodeID() + ")" + "'");
-                }
-                nodeCollection.put(new Short(processingNode.getNodeId()),
-                        processingNode);
-                monitor.worked(1);
-            }
-
-            // Import the RMN nodes
-            for (TRMN rmnNode : networkCfg.getNodeCollection().getRMN()) {
-
-                if (monitor.isCanceled()) {
-                    return new Status(IStatus.OK,
-                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                            "Cancelled", null);
-                }
-
-                monitor.subTask("Import RMN node XDC:" + rmnNode.getName() + "("
-                        + rmnNode.getNodeID() + ")");
-
-                File rmnXddFile = new File(
-                        projectFile.getProject().getLocation() + File.separator
-                                + rmnNode.getPathToXDC());
-                System.out.println(
-                        "RMN XDD file path:" + rmnXddFile.getAbsolutePath());
-                processingNode = new Node(nodeCollection, projectFile, rmnNode,
-                        null);
-                try {
-                    ISO15745ProfileContainer xdd = XddMarshaller
-                            .unmarshallXDDFile(rmnXddFile);
-
-                    Node newNode = new Node(nodeCollection, projectFile,
-                            rmnNode, xdd);
-                    processingNode = newNode;
-
-                    Result res = OpenConfiguratorLibraryUtils.addNode(
-                            newNode.getNetworkId(), newNode.getNodeId(),
-                            newNode);
-                    if (res.IsSuccessful()) {
-                        nodeCollection.put(new Short(newNode.getNodeId()),
-                                newNode);
-                    } else {
-                        return new Status(IStatus.ERROR,
-                                org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                                OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res),
-                                null);
-                    }
-                } catch (JAXBException | SAXException
-                        | ParserConfigurationException | FileNotFoundException
-                        | UnsupportedEncodingException e) {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(e.getCause().getMessage()
-                                    + " for the node " + "'" + rmnNode.getName()
-                                    + "(" + rmnNode.getNodeID() + ")" + "'");
-                }
-                nodeCollection.put(new Short(processingNode.getNodeId()),
-                        processingNode);
-                monitor.worked(1);
-            }
-
-        } catch (JAXBException | SAXException | ParserConfigurationException
-                | UnsupportedEncodingException e) {
-            e.printStackTrace();
-
-            String xdcPath = processingNode.getPathToXDC();
-
-            String errorMessage = MessageFormat.format(
-                    INVALID_XDC_CONTENTS_ERROR,
-                    processingNode.getNodeIDWithName(), xdcPath);
-            return new Status(IStatus.ERROR,
-                    org.epsg.openconfigurator.Activator.PLUGIN_ID, errorMessage,
-                    e);
-        } catch (FileNotFoundException e1) {
-            e1.printStackTrace();
-            String xdcPath = processingNode.getPathToXDC();
-
-            String errorMessage = MessageFormat.format(XDC_FILE_NOT_FOUND_ERROR,
-                    processingNode.getNodeIDWithName(), xdcPath);
-
-            return new Status(IStatus.ERROR,
-                    org.epsg.openconfigurator.Activator.PLUGIN_ID, errorMessage,
-                    e1);
-        }
-
-        monitor.done();
-        return new Status(IStatus.OK,
-                org.epsg.openconfigurator.Activator.PLUGIN_ID, "OK", null);
     }
 
     public static boolean isPathIdAlreadyPresent(
@@ -730,8 +484,8 @@ public final class OpenConfiguratorProjectUtils {
      *
      * @param node The node instance.
      * @return Result from the library.
-     * @throws JDOMException
-     * @throws IOException
+     * @throws Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
      */
     public static Result persistNodeData(Node node)
             throws JDOMException, IOException {
@@ -780,8 +534,8 @@ public final class OpenConfiguratorProjectUtils {
      * @param nodeCollection The node list.
      * @param monitor Progress monitor instance.
      * @return The result from the library.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
      */
     public static Result persistNodes(final Map<Short, Node> nodeCollection,
             IProgressMonitor monitor) throws JDOMException, IOException {
@@ -826,7 +580,7 @@ public final class OpenConfiguratorProjectUtils {
     /**
      * Update the Generator informations to the current values.
      *
-     * @param project
+     * @param project The current openCONFIGURATOR project instance.
      */
     public static void updateGeneratorInformation(
             OpenCONFIGURATORProject project) {
@@ -860,8 +614,8 @@ public final class OpenConfiguratorProjectUtils {
      * @param node The node
      * @param attributeName The attribute tag name.
      * @param attributeValue The value to be applied.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
      */
     public static void updateNetworkAttributeValue(final Node node,
             final String attributeName, final String attributeValue)
@@ -892,8 +646,8 @@ public final class OpenConfiguratorProjectUtils {
      * file.
      *
      * @param node The node instance.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
      */
     public static void updateNodeAssignmentValues(final Node node)
             throws JDOMException, IOException {
@@ -940,8 +694,8 @@ public final class OpenConfiguratorProjectUtils {
      * @param node The node to apply the attributes.
      * @param attributeName The attribute tag name.
      * @param attributeValue The value to be applied.
-     * @throws IOException
-     * @throws JDOMException
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications
      */
     public static void updateNodeAttributeValue(final Node node,
             final String attributeName, final String attributeValue)
@@ -1006,15 +760,15 @@ public final class OpenConfiguratorProjectUtils {
         File unModifiedfile = new File(projectRootPath + "/" + nodeImportFile);
         File updatedfile = new File(projectRootPath + "/" + pathRelative);
 
+        Files.move(unModifiedfile.toPath(), updatedfile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
+
         String relativePath = pathRelative.toString();
         relativePath = relativePath.replace('\\', '/');
 
         // Set the relative path to the CN object
         node.setPathToXDC(relativePath);
-        if (unModifiedfile.renameTo(updatedfile)) {
-            System.out.println(
-                    "Name of File Modified with respect to change in nodeId");
-        }
+
     }
 
     public static void updateObjectAttributeActualValue(final Node node,
@@ -1194,5 +948,22 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         return true;
+    }
+    /**
+     * Write the values modified into XDD/XDC file.
+     *
+     * @param document The Document instance.
+     * @param xmlFile The instance of XDD/XDC file.
+     * @throws IOException Errors with XDC file modifications.
+     */
+
+    public static void writeToXddXmlDocument(org.jdom2.Document document,
+            final File xmlFile) throws IOException {
+        String name = System
+                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID);
+        XddJdomOperation.updateFileModifiedTime(document, getCurrentTime());
+        XddJdomOperation.updateFileModifiedDate(document, getCurrentDate());
+        XddJdomOperation.updateFileModifiedBy(document, name);
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
     }
 }

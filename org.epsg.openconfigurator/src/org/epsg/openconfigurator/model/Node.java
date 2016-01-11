@@ -34,7 +34,6 @@ package org.epsg.openconfigurator.model;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 
@@ -43,7 +42,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
-import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObjects;
@@ -63,6 +61,12 @@ import org.jdom2.JDOMException;
  */
 public class Node {
 
+    /**
+     * Node type ENUM constants.
+     *
+     * @author Ramakrishnan P
+     *
+     */
     public enum NodeType {
         UNDEFINED, CONTROLLED_NODE, MANAGING_NODE, REDUNDANT_MANAGING_NODE
     }
@@ -146,16 +150,20 @@ public class Node {
      * openCONFIGURATOR project file.
      */
     private final IFile projectXml;
+
     /**
-     * List of nodes from a collection.
+     * Root node instance.
      */
-    private final Map<Short, Node> nodeCollection;
+    private final PowerlinkRootNode rootNode;
 
     /**
      * Network ID used for the openCONFIGURATOR library.
      */
     private final String networkId;
 
+    /**
+     * Object dictionary instance.
+     */
     private final ObjectDictionary objectDictionary;
 
     /**
@@ -163,6 +171,9 @@ public class Node {
      */
     private short nodeId;
 
+    /**
+     * Node type instance.
+     */
     private final NodeType nodeType;
 
     /**
@@ -173,7 +184,7 @@ public class Node {
         xddModel = null;
         project = null;
         projectXml = null;
-        nodeCollection = null;
+        rootNode = null;
         networkId = null;
         nodeId = 0;
         nodeType = NodeType.UNDEFINED;
@@ -183,16 +194,16 @@ public class Node {
     /**
      * Constructs the Node instance with the following inputs.
      *
-     * @param nodeCollection The node list.
+     * @param rootNode Instance of PowerlinkRootNode to get the list of nodes.
      * @param projectXml openCONFIGURATOR project file.
      * @param nodeModel Node instance from the openCONFIGURATOR project.
      *            Example: The Object is one of TNetworkConfiguration(only for
      *            MN), TCN, TRMN.
      * @param xddModel The memory of the XDC linked to this Node.
      */
-    public Node(Map<Short, Node> nodeCollection, IFile projectXml,
-            Object nodeModel, ISO15745ProfileContainer xddModel) {
-        this.nodeCollection = nodeCollection;
+    public Node(PowerlinkRootNode rootNode, IFile projectXml, Object nodeModel,
+            ISO15745ProfileContainer xddModel) {
+        this.rootNode = rootNode;
         this.projectXml = projectXml;
 
         if (projectXml != null) {
@@ -357,7 +368,6 @@ public class Node {
     }
 
     /**
-     *
      * @return The value of AsyncSlotTimeout from object dictionary.
      */
     public String getAsyncSlotTimeout() {
@@ -584,6 +594,10 @@ public class Node {
         return PlkOperationMode.NORMAL;
     }
 
+    public PowerlinkRootNode getPowerlinkRootNode() {
+        return rootNode;
+    }
+
     /**
      * @return Prescaler value available for this node.
      */
@@ -601,8 +615,7 @@ public class Node {
     public long getPresTimeoutvalue() {
 
         if (nodeModel instanceof TCN) {
-            Node mnNode = nodeCollection
-                    .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+            Node mnNode = rootNode.getMN();
             PowerlinkSubobject pollresponseSubObj = mnNode.getObjectDictionary()
                     .getSubObject(
                             INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
@@ -734,25 +747,6 @@ public class Node {
         }
 
         return true;
-    }
-
-    /**
-     * Checks if the node id already available in the project.
-     *
-     * @param nodeIdTobeChecked The node Id to be checked.
-     *
-     * @return <code> True</code> if already available. <code>False</code>
-     *         otherwise.
-     */
-    public boolean isNodeIdAlreadyAvailable(short nodeIdTobeChecked) {
-        Set<Short> nodeSet = nodeCollection.keySet();
-        boolean nodeIdAvailable = false;
-        for (Short tempNodeId : nodeSet) {
-            if (tempNodeId.shortValue() == nodeIdTobeChecked) {
-                nodeIdAvailable = true;
-            }
-        }
-        return nodeIdAvailable;
     }
 
     /**
@@ -904,8 +898,7 @@ public class Node {
         }
 
         if (nodeModel instanceof TCN) {
-            Node mnNode = nodeCollection
-                    .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+            Node mnNode = rootNode.getMN();
             if (mnNode != null) {
                 PowerlinkSubobject prestimeoutsubobj = mnNode
                         .getObjectDictionary().getSubObject(
@@ -1220,21 +1213,15 @@ public class Node {
     }
 
     /**
-     * Updates the id with the given node id.
+     * Set modified node Id to node model.
      *
-     * @param newNodeId The node id to be updated.
-     *
-     * @throws IOException Errors with project file or XDC file modifications.
-     * @throws JDOMException Errors with time modifications.
+     * @param newNodeId The value of node ID for modification
+     * @throws IOException Error with XDC file modifications.
+     * @throws JDOMException Error with time modifications.
+     * @throws InterruptedException Error with interrupt in thread.
      */
-    public void setNodeId(final short newNodeId)
-            throws IOException, JDOMException {
-        if (!((nodeModel instanceof TCN) || (nodeModel instanceof TRMN))) {
-            System.err.println("setNodeID(newID) ; Unhandled node model type:"
-                    + nodeModel);
-            return;
-        }
-
+    public void setNodeId(short newNodeId)
+            throws IOException, JDOMException, InterruptedException {
         // Update the new node id in the XDC file.
         OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
                 String.valueOf(newNodeId));
@@ -1248,22 +1235,16 @@ public class Node {
                 IAbstractNodeProperties.NODE_ID_OBJECT,
                 String.valueOf(newNodeId));
 
-        synchronized (this) {
-            nodeCollection.remove(new Short(nodeId));
-
-            // Update the new node id.
-            if (nodeModel instanceof TCN) {
-                TCN cn = (TCN) nodeModel;
-                cn.setNodeID(String.valueOf(newNodeId));
-            } else if (nodeModel instanceof TRMN) {
-                TRMN rmn = (TRMN) nodeModel;
-                rmn.setNodeID(newNodeId);
-            }
-
-            nodeId = newNodeId;
-
-            nodeCollection.put(new Short(nodeId), this);
+        // Update the new node id.
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            cn.setNodeID(String.valueOf(newNodeId));
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            rmn.setNodeID(newNodeId);
         }
+
+        nodeId = newNodeId;
     }
 
     /**
@@ -1288,6 +1269,9 @@ public class Node {
         }
     }
 
+    /**
+     * Set the operational mode of POWERLINK.
+     */
     public void setPlkOperationMode() {
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;

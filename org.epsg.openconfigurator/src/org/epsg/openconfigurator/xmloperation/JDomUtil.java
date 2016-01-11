@@ -88,7 +88,6 @@ public class JDomUtil {
             XPathExpression<Element> xpath, Element newElement) {
 
         List<Element> elementsList = xpath.evaluate(doc);
-        System.out.println("Size" + elementsList.size());
         for (Element element : elementsList) {
             newElement.setNamespace(element.getNamespace());
             for (Element newChildElement : newElement.getChildren()) {
@@ -131,7 +130,6 @@ public class JDomUtil {
 
     public static int getChildrenCount(Document document, String xpath,
             Namespace namespace) {
-        System.out.println("getChildrenCount: " + xpath);
         XPathExpression<Element> xpathExpr = getXPathExpressionElement(xpath,
                 namespace);
         Element parentElement = xpathExpr.evaluateFirst(document);
@@ -149,6 +147,9 @@ public class JDomUtil {
 
         SAXBuilder builder = new SAXBuilder();
         org.jdom2.Document document = builder.build(input);
+
+        reader.close();
+
         return document;
     }
 
@@ -162,12 +163,9 @@ public class JDomUtil {
 
     public static boolean isXpathPresent(Document document, String xpath,
             Namespace namespace) {
-        System.out.println("isXpathPresent: " + xpath);
         XPathExpression<Element> xpathExpr = getXPathExpressionElement(xpath,
                 namespace);
         List<Element> elements = xpathExpr.evaluate(document);
-        System.err.println("isXpathPresent" + elements.size() + " Bool:"
-                + (elements.size() > 0));
         return (elements.size() > 0);
     }
 
@@ -326,11 +324,19 @@ public class JDomUtil {
         }
     }
 
-    public static void writeToXmlDocument(org.jdom2.Document document,
-            final File xmlFile) throws IOException {
+    /**
+     * Update changes in the project xml file.
+     *
+     * @param document The file instance.
+     * @param xmlFile The Project or XDD file instance.
+     * @throws IOException Error with XDD/ XDC file modification.
+     */
+    public static void writeToXmlFile(org.jdom2.Document document,            final File xmlFile) throws IOException {
         XMLOutputter xmlOutput = new XMLOutputter();
         // display nice
         xmlOutput.setFormat(Format.getPrettyFormat());
-        xmlOutput.output(document, new FileWriter(xmlFile));
+        FileWriter fileWriter = new FileWriter(xmlFile);
+        xmlOutput.output(document, fileWriter);
+        fileWriter.close();
     }
 }

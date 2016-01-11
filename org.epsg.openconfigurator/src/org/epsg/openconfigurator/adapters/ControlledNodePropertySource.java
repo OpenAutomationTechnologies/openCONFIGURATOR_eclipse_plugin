@@ -708,7 +708,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     return null;
                 }
 
-                boolean nodeIdAvailable = cnNode
+                boolean nodeIdAvailable = cnNode.getPowerlinkRootNode()
                         .isNodeIdAlreadyAvailable(nodeIDvalue);
                 if (nodeIdAvailable) {
                     return "Node with id " + nodeIDvalue + " already exists.";
@@ -788,18 +788,19 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
                         short nodeIDvalue = Short.valueOf(((String) value));
 
+                        short oldNodeId = cnNode.getNodeId();
                         Result res = OpenConfiguratorCore.GetInstance()
-                                .SetNodeId(cnNode.getNetworkId(),
-                                        cnNode.getNodeId(), nodeIDvalue);
+                                .SetNodeId(cnNode.getNetworkId(), oldNodeId,
+                                        nodeIDvalue);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(
                                             OpenConfiguratorLibraryUtils
                                                     .getErrorMessage(res));
                         } else {
-                            cnNode.setNodeId(nodeIDvalue);
+                            cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
+                                    nodeIDvalue);
                         }
-
                         break;
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         System.err.println(objectId + " made editable");
@@ -1061,16 +1062,16 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 System.err.println("Invalid object ID:" + id);
             }
         } catch (Exception e) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printErrorMessage(e.getMessage());
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Property: " + id + " " + e.getMessage());
         }
 
         try {
             cnNode.getProject().refreshLocal(IResource.DEPTH_INFINITE,
                     new NullProgressMonitor());
         } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
         }
     }
 }

@@ -33,6 +33,9 @@ package org.epsg.openconfigurator.views.mapping;
 
 import java.io.IOException;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -120,6 +123,15 @@ import org.jdom2.JDOMException;
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(e.getMessage());
                             e.printStackTrace();
+                        }
+                        try {
+                            pdoChannel.getNode().getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            System.err.println(
+                                    "unable to refresh the resource due to "
+                                            + e.getCause().getMessage());
                         }
                     }
                 }

@@ -83,6 +83,7 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
@@ -448,10 +449,12 @@ public class IndustrialNetworkView extends ViewPart
      * Show PDO mapping action.
      */
     private Action showPdoMapping;
+
     /**
      * Sort Node action.
      */
     private Action sortNode;
+
     /**
      * Call back to handle the selection changed events.
      */
@@ -535,7 +538,7 @@ public class IndustrialNetworkView extends ViewPart
         }
 
         IndustrialNetworkProjectEditor activeEditorTemp = (IndustrialNetworkProjectEditor) activeEditor;
-        rootNode.setNodeCollection(activeEditorTemp.getNodeCollection());
+        rootNode = activeEditorTemp.getPowerlinkRootNode();
         Control control = viewer.getControl();
         if ((control != null) && !control.isDisposed()) {
             viewer.setInput(rootNode);
@@ -623,6 +626,9 @@ public class IndustrialNetworkView extends ViewPart
         manager.add(showProperties);
     }
 
+    /**
+     * @return The instance of POWERLINK root node to get the node list.
+     */
     public PowerlinkRootNode getNodeList() {
         return rootNode;
     }
@@ -802,8 +808,7 @@ public class IndustrialNetworkView extends ViewPart
                     Object selectedObject = strucSelection.getFirstElement();
                     if ((selectedObject instanceof Node)) {
                         NewNodeWizard newNodeWizard = new NewNodeWizard(
-                                rootNode.getNodeCollection(),
-                                (Node) selectedObject);
+                                rootNode, (Node) selectedObject);
                         if (!newNodeWizard.hasErrors()) {
                             WizardDialog wd = new WizardDialog(
                                     Display.getDefault().getActiveShell(),

@@ -35,6 +35,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -1007,6 +1010,14 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printErrorMessage(e.getMessage());
+        }
+
+        try {
+            mnNode.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
         }
     }
 }

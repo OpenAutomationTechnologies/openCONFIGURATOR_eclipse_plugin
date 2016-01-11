@@ -1316,6 +1316,13 @@ public class OpenConfiguratorLibraryUtils {
         return accessType;
     }
 
+    /**
+     * Get PDO channel object actual value.
+     *
+     * @param pdoChannel PDO channel instance.
+     * @param objectJCollection Collection of POWERLINK objects.
+     * @return Result from the library.
+     */
     public static Result getChannelObjectsWithActualValue(
             final PdoChannel pdoChannel,
             java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection) {
@@ -1346,6 +1353,8 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
+     * Get the size of TPDO/RPDO channels.
+     *
      * @param channel The mapping channel.
      * @return The total size of channel.
      */
@@ -1601,6 +1610,8 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
+     * Get node assignment value.
+     *
      * @param node The node.
      * @return The node assignment value available for the given node.
      */
@@ -1646,6 +1657,13 @@ public class OpenConfiguratorLibraryUtils {
         return plkDataType;
     }
 
+    /**
+     * Get actual value of POWERLINK objects.
+     *
+     * @param node Node instance.
+     * @param objectJCollection Collection of POWERLINK objects.
+     * @return Result from the openCONFIGURATOR library.
+     */
     public static Result getObjectsWithActualValue(final Node node,
             java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection) {
         ObjectCollection objectCollection = new ObjectCollection();
@@ -1830,7 +1848,8 @@ public class OpenConfiguratorLibraryUtils {
             if (profileBodyDatatype instanceof ProfileBodyDevicePowerlink) {
                 importProfileBodyDevicePowerlink(node,
                         (ProfileBodyDevicePowerlink) profileBodyDatatype);
-            } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
+            } else
+                if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
                 importProfileBodyCommunicationNetworkPowerlink(node,
                         (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype);
             } else {

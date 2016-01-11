@@ -35,7 +35,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,6 +44,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
@@ -83,10 +83,10 @@ public class NewNodeWizard extends Wizard {
      * Selected node object. The new node will be added below this node.
      */
     private Node selectedNodeObj;
-    private Map<Short, Node> nodeList;
-    private TNodeCollection nodeCollection;
+    private PowerlinkRootNode nodeList;
+    private TNodeCollection nodeCollectionModel;
 
-    public NewNodeWizard(Map<Short, Node> nodeList, Node selectedNodeObj) {
+    public NewNodeWizard(PowerlinkRootNode nodeList, Node selectedNodeObj) {
         if (selectedNodeObj == null) {
             System.err.println("Invalid node selection");
         }
@@ -96,11 +96,11 @@ public class NewNodeWizard extends Wizard {
         Object nodeModel = this.selectedNodeObj.getNodeModel();
         if (nodeModel instanceof TNetworkConfiguration) {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
-            nodeCollection = net.getNodeCollection();
+            nodeCollectionModel = net.getNodeCollection();
         }
 
         setWindowTitle(WINDOW_TITLE);
-        addNodePage = new AddControlledNodeWizardPage(nodeCollection);
+        addNodePage = new AddControlledNodeWizardPage(nodeCollectionModel);
         validateXddPage = new ValidateXddWizardPage();
     }
 
@@ -190,13 +190,11 @@ public class NewNodeWizard extends Wizard {
             e1.printStackTrace();
         }
 
-        Result res = OpenConfiguratorLibraryUtils
-                .addNode(newNode.getNetworkId(), newNode.getNodeId(), newNode);
+        Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
         if (res.IsSuccessful()) {
 
             try {
-                OpenConfiguratorProjectUtils.addNode(nodeList, nodeCollection,
-                        newNode);
+                nodeList.addNode(nodeCollectionModel, newNode);
             } catch (IOException | JDOMException e) {
                 if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
                     validateXddPage.getErrorStyledText(e.getMessage());
@@ -230,5 +228,4 @@ public class NewNodeWizard extends Wizard {
         }
         return true;
     }
-
 }

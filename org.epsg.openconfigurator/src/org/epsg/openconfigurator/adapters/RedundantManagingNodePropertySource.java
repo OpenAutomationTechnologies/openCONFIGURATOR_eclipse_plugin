@@ -361,6 +361,7 @@ public class RedundantManagingNodePropertySource
                 }
 
                 boolean nodeIdAvailable = redundantManagingNode
+                        .getPowerlinkRootNode()
                         .isNodeIdAlreadyAvailable(nodeIDvalue);
                 if (nodeIdAvailable) {
                     return "Node with id " + nodeIDvalue + " already exists.";
@@ -546,6 +547,7 @@ public class RedundantManagingNodePropertySource
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
 
                         short nodeIDvalue = Short.valueOf(((String) value));
+                        short oldNodeId = redundantManagingNode.getNodeId();
 
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetNodeId(redundantManagingNode.getNetworkId(),
@@ -557,7 +559,8 @@ public class RedundantManagingNodePropertySource
                                             OpenConfiguratorLibraryUtils
                                                     .getErrorMessage(res));
                         } else {
-                            redundantManagingNode.setNodeId(nodeIDvalue);
+                            redundantManagingNode.getPowerlinkRootNode()
+                                    .setNodeId(oldNodeId, nodeIDvalue);
                         }
 
                         break;
@@ -655,8 +658,8 @@ public class RedundantManagingNodePropertySource
                 System.err.println("Invalid object ID:" + id);
             }
         } catch (Exception e) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printErrorMessage(e.getMessage());
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Property: " + id + " " + e.getMessage());
         }
     }
 }

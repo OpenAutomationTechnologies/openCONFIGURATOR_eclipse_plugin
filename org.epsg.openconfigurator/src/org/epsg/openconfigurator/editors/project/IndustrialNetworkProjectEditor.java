@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.JAXBException;
@@ -83,6 +82,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
@@ -147,9 +147,9 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     private OpenCONFIGURATORProject currentProject;
 
     /**
-     * List of nodes available in the project.
+     * PowerlinkRoot node instance.
      */
-    private Map<Short, Node> nodeCollection = new HashMap<Short, Node>();
+    private PowerlinkRootNode rootNode = new PowerlinkRootNode();
 
     /**
      * Flag to check for the library initialization
@@ -166,8 +166,14 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     private IndustrialNetworkProjectEditorPage editorPage;
 
+    /**
+     * XDC import of node
+     */
     private Job importNodeXdcJob;
 
+    /**
+     * Upgrade project version
+     */
     private boolean upgradeFlag;
 
     /**
@@ -287,7 +293,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 }
             });
 
-            nodeCollection.clear();
+            rootNode.clearNodeCollection();
 
             Display.getDefault().syncExec(new Runnable() {
                 @Override
@@ -343,6 +349,14 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     }
 
     /**
+     *
+     * @return the instance of xdc import job
+     */
+    public Job getimportnode() {
+        return importNodeXdcJob;
+    }
+
+    /**
      * @return the openCONFIGURATOR project model contents as string
      */
     private String getModelData() {
@@ -379,10 +393,17 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     }
 
     /**
-     * @return Returns the XDD files.
+     * @return Returns the available nodes in the network.
      */
     public Map<Short, Node> getNodeCollection() {
-        return nodeCollection;
+        return rootNode.getNodeCollection();
+    }
+
+    /**
+     * @return Instance of POWERLINK rootnode.
+     */
+    public PowerlinkRootNode getPowerlinkRootNode() {
+        return rootNode;
     }
 
     /**
@@ -530,8 +551,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                         + networkCfg.getNodeCollection().getCN().size()
                         + networkCfg.getNodeCollection().getRMN().size();
                 monitor.beginTask("Import MN XDD/XDC", totalWork);
-                IStatus result = OpenConfiguratorProjectUtils.importNodes(
-                        projectFile, networkCfg, nodeCollection, monitor);
+                IStatus result = rootNode.importNodes(projectFile, networkCfg,
+                        monitor);
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {
@@ -595,7 +616,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     public void persistLibraryData(IProgressMonitor monitor)
             throws InterruptedException, InvocationTargetException {
-        monitor.beginTask("Save XDC configurations", nodeCollection.size());
+        monitor.beginTask("Save XDC configurations", rootNode.getNodeCount());
 
         WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
 
@@ -607,8 +628,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 // XDC file.
 
                 try {
-                    Result res = OpenConfiguratorProjectUtils
-                            .persistNodes(nodeCollection, monitor);
+                    Result res = rootNode.persistNodes(monitor);
                     if (!res.IsSuccessful()) {
                         System.err.println(OpenConfiguratorLibraryUtils
                                 .getErrorMessage(res));

@@ -44,13 +44,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorReference;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -111,33 +109,19 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     @Override
     protected IProject[] build(final int kind, Map args,
             IProgressMonitor monitor) throws CoreException {
-        forgetLastBuiltState();
-
         switch (kind) {
             case IncrementalProjectBuilder.FULL_BUILD:
             case IncrementalProjectBuilder.CLEAN_BUILD:
             case IncrementalProjectBuilder.INCREMENTAL_BUILD:
-                fullBuild(monitor);
-                break;
             case IncrementalProjectBuilder.AUTO_BUILD:
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        MessageDialog msd = new MessageDialog(
-                                Display.getDefault().getActiveShell(),
-                                "Build project", null,
-                                "Does not support 'Build Automatically'. Use clean then build project."
-                                        + kind,
-                                0, new String[] { "Ok" }, 0);
-                        msd.open();
-                    }
-                });
+                fullBuild(monitor);
                 break;
             default:
                 System.err.println("Un supported build type" + kind);
                 break;
         }
-
+        // Prevents build if no change has occurred in the project.
+        rememberLastBuiltState();
         return null;
     }
 
@@ -154,7 +138,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private boolean buildConciseDeviceConfiguration(final String networkId,
             java.nio.file.Path outputpath, final IProgressMonitor monitor)
                     throws CoreException {
-
         String configurationOutput[] = new String[1];
         ByteCollection cdcByteCollection = new ByteCollection();
 
@@ -164,7 +147,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+            // Displays error message in console.
+            displayErrorMessage(
                     OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
@@ -210,7 +194,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 return retVal;
             }
         }
-
         return true;
     }
 
@@ -233,7 +216,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+            // Displays error message in console.
+            displayErrorMessage(
                     OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
@@ -280,7 +264,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+            // Displays error message in console.
+            displayErrorMessage(
                     OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
@@ -327,7 +312,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+            // Displays error message in console.
+            displayErrorMessage(
                     OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
@@ -371,7 +357,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+            // Displays error message in console.
+            displayErrorMessage(
                     OpenConfiguratorLibraryUtils.getErrorMessage(res));
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
@@ -444,7 +431,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 }
             }
 
-            getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
         }
         System.out.println(
                 "Project:" + getProject().getName() + " Clean successful");
@@ -550,6 +536,28 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         return true;
     }
 
+    private void displayErrorMessage(final String message) {
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printErrorMessage(message);
+            }
+        });
+    }
+
+    private void displayInfoMessage(final String message) {
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printInfoMessage(message);
+            }
+        });
+    }
+
     /**
      * Invokes a full build process on the the available projects.
      *
@@ -573,7 +581,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         });
 
         List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
-        for (IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
+        for (final IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
 
             final String networkId = pjtEditor.getNetworkId();
             if (getProject().getName().compareTo(networkId) != 0) {
@@ -581,9 +589,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             }
 
             System.out.println("Build Started: Project: " + networkId);
-            OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
-                    "Build Started for project: " + networkId);
-            getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+            // Displays Info message in console.
+            displayInfoMessage("Build Started for project: " + networkId);
 
             long buildStartTime = System.currentTimeMillis();
 
@@ -599,7 +606,23 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 targetPath = FileSystems.getDefault()
                         .getPath(outputpath.getPath());
             }
+            // waits for the XDC file import on initialization of
+            // project.
+            Display.getDefault().syncExec(new Runnable() {
 
+                @Override
+                public void run() {
+                    try {
+                        pjtEditor.getimportnode().join();
+                    } catch (InterruptedException e1) {
+                        System.err.println("Import node error:"
+                                + e1.getCause().getMessage());
+                        e1.printStackTrace();
+                    }
+
+                }
+
+            });
             boolean buildCdcSuccess = buildConciseDeviceConfiguration(networkId,
                     targetPath, monitor);
             if (buildCdcSuccess) {
@@ -607,53 +630,47 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 boolean buildPiSuccess = buildProcessImageDescriptions(
                         networkId, targetPath, monitor);
                 if (!buildPiSuccess) {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(
+                    // Displays error message in console.
+                    displayErrorMessage(
                                     "Build failed for project: " + networkId);
                 } else {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printInfoMessage(
+                    // Displays Info message in console.
+                    displayInfoMessage(
                                     "Build finished successfully for Project: "
                                             + networkId);
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printInfoMessage("Generated output files at: "
-                                    + targetPath.toString());
+                    displayInfoMessage("Generated output files at: "
+                            + targetPath.toString());
                 }
 
-                OpenConfiguratorMessageConsole.getInstance()
-                        .printInfoMessage("Updating node configuration files.");
+                displayInfoMessage("Updating node configuration files.");
 
                 try {
                     pjtEditor.persistLibraryData(monitor);
                 } catch (InterruptedException | InvocationTargetException e) {
 
                     IStatus errorStatus = new Status(IStatus.ERROR,
-                            Activator.PLUGIN_ID, IStatus.OK, e.getMessage(), e);
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(
-                                    "Failed to update the node configuration files.\n\tError message: "
-                                            + e.getMessage());
+                            Activator.PLUGIN_ID, IStatus.OK,
+                            e.getCause().getMessage(), e);
+                    displayErrorMessage(
+                            "Failed to update the node configuration files.\n\tError message: "
+                                    + e.getCause().getMessage());
                     throw new CoreException(errorStatus);
                 }
+
             } else {
                 String errorStr = "Build failed for project: " + networkId;
-                OpenConfiguratorMessageConsole.getInstance()
-                        .printErrorMessage(errorStr);
+                displayErrorMessage(errorStr);
                 System.err.println(errorStr);
                 IStatus errorStatus = new Status(IStatus.ERROR,
                         Activator.PLUGIN_ID, IStatus.OK, errorStr, null);
                 throw new CoreException(errorStatus);
             }
 
-            getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
-
             long buildEndTime = System.currentTimeMillis();
             final long totalTimeInSeconds = (buildEndTime - buildStartTime)
                     / 1000;
-
-            OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
-                    "Completed updating node configuration files.");
-
+            // Displays Info message in console.
+            displayInfoMessage("Completed updating node configuration files.");
             System.out
                     .println("Build completed in " + totalTimeInSeconds + "s");
         }
