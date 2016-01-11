@@ -31,6 +31,8 @@
 
 package org.epsg.openconfigurator.views;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -130,6 +132,31 @@ public class ObjectDictionaryView extends ViewPart {
 
         @Override
         public void partOpened(IWorkbenchPart part) {
+        }
+    }
+
+    /**
+     * PatternFilter class to always show sub objects after filtering of
+     * objects.
+     */
+    private class PowerlinkObjectPatternFilter extends PatternFilter {
+
+        @Override
+        public Object[] filter(Viewer viewer, Object parent,
+                Object[] elements) {
+            ArrayList<Object> objList = new ArrayList<Object>();
+
+            // Display sub-object after filtering of objects.
+            if (parent instanceof PowerlinkObject) {
+                PowerlinkObject plkobj = (PowerlinkObject) parent;
+                List<PowerlinkSubobject> plksub = plkobj.getSubObjects();
+                objList.addAll(plksub);
+            } else {
+                Collections.addAll(objList,
+                        super.filter(viewer, parent, elements));
+            }
+            return objList.toArray();
+
         }
     }
 
@@ -471,7 +498,7 @@ public class ObjectDictionaryView extends ViewPart {
     @Override
     public void createPartControl(Composite parent) {
 
-        PatternFilter filter = new PatternFilter();
+        PatternFilter filter = new PowerlinkObjectPatternFilter();
         filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
@@ -595,4 +622,5 @@ public class ObjectDictionaryView extends ViewPart {
     public void setFocus() {
         treeViewer.getControl().setFocus();
     }
+
 }
