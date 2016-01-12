@@ -41,6 +41,7 @@ import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -68,9 +69,12 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
+import org.epsg.openconfigurator.model.DataTypeChoiceType;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
+import org.epsg.openconfigurator.model.VarDecleration;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 
@@ -155,8 +159,8 @@ public class ObjectDictionaryView extends ViewPart {
                 Collections.addAll(objList,
                         super.filter(viewer, parent, elements));
             }
-            return objList.toArray();
 
+            return objList.toArray();
         }
     }
 
@@ -207,6 +211,13 @@ public class ObjectDictionaryView extends ViewPart {
                 return ((PowerlinkObject) element).getNameWithId();
             } else if (element instanceof PowerlinkSubobject) {
                 return ((PowerlinkSubobject) element).getNameWithId();
+            } else if (element instanceof Parameter) {
+                Parameter param = (Parameter) element;
+                return param.getLabelDescription().getLabel();
+            } else if (element instanceof VarDecleration) {
+                VarDecleration varDecl = (VarDecleration) element;
+                System.err.println("VarDecl Label " + varDecl.getName());
+                return varDecl.getName();
             }
             return element == null ? "" : element.toString();//$NON-NLS-1$
         }
@@ -290,9 +301,27 @@ public class ObjectDictionaryView extends ViewPart {
 
         @Override
         public Object[] getChildren(Object parentElement) {
+            System.err.println("GetChildren" + parentElement);
             if (parentElement instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) parentElement;
                 return objItem.getSubObjects().toArray();
+            } else if (parentElement instanceof Parameter) {
+                Parameter param = (Parameter) parentElement;
+                System.err.println("getChildren Parameter "
+                        + param.getDataTypeChoice() + " size:"
+                        + param.getStructDataType().getVariables().size());
+                if (param.getDataTypeChoice() == DataTypeChoiceType.STRUCT) {
+                    List<VarDecleration> varDeclList = param.getStructDataType()
+                            .getVariables();
+                    for (VarDecleration var : varDeclList) {
+                        System.err.println("Name:" + var.getName());
+                    }
+                    System.err.println("Arr" + varDeclList.toArray());
+                    return varDeclList.toArray();
+                } else {
+                    System.err
+                            .println("Unhandled " + param.getDataTypeChoice());
+                }
             }
             return null;
         }
@@ -302,11 +331,19 @@ public class ObjectDictionaryView extends ViewPart {
 
             if (inputElement instanceof Node) {
                 Node nodeObj = (Node) inputElement;
-
-                List<PowerlinkObject> objectsList = nodeObj
-                        .getObjectDictionary().getObjectsList();
-
-                return objectsList.toArray();
+                // List<Object> elementsList = new ArrayList<>();
+                if (parametersVisible) {
+                    List<Parameter> parameterList = nodeObj
+                            .getObjectDictionary().getParameterList();
+                    // elementsList.addAll(parameterList);
+                    return parameterList.toArray();
+                } else {
+                    List<PowerlinkObject> objectsList = nodeObj
+                            .getObjectDictionary().getObjectsList();
+                    // elementsList.addAll(objectsList);
+                    return objectsList.toArray();
+                }
+                // return elementsList.toArray();
             }
 
             return new Object[] { new EmptyObjectDictionary() };
@@ -323,6 +360,19 @@ public class ObjectDictionaryView extends ViewPart {
             if (element instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) element;
                 return ((objItem.getSubObjects().size() > 0) ? true : false);
+            } else if (element instanceof Parameter) {
+                Parameter param = (Parameter) element;
+                switch (param.getDataTypeChoice()) {
+                    case STRUCT:
+                        System.err.println("hasChildren Parameter "
+                                + param.getDataTypeChoice() + " size:"
+                                + param.getStructDataType().getVariables()
+                                        .size());
+                        return ((param.getStructDataType().getVariables()
+                                .size() > 0) ? true : false);
+                    default:
+                        break;
+                }
             }
             return false;
         }
@@ -337,12 +387,14 @@ public class ObjectDictionaryView extends ViewPart {
     private boolean standardisedDeviceProfileObjectsVisible = true;
     private boolean nonMappableObjectsVisible = true;
     private boolean forcedObjectsVisible = true;
+    private boolean parametersVisible = false;
 
     private Action hideCommunicationProfileObjects;
     private Action hideStandardisedDeviceProfileObjects;
     private Action hideNonMappableObjects;
     private Action hideNonForcedObjects;
     private Action propertiesAction;
+    private Action toggleParameterView;
 
     /**
      * Object dictionary tree viewer.
@@ -381,6 +433,23 @@ public class ObjectDictionaryView extends ViewPart {
      * Create the actions.
      */
     private void createActions() {
+        toggleParameterView = new Action("Switch to Parameter View",
+                IAction.AS_CHECK_BOX) {
+            @Override
+            public void run() {
+                if (toggleParameterView.isChecked()) {
+                    parametersVisible = true;
+                } else {
+                    parametersVisible = false;
+                }
+                treeViewer.refresh();
+            }
+        };
+        toggleParameterView.setToolTipText("Switch to Parameter View");
+        toggleParameterView
+                .setImageDescriptor(org.epsg.openconfigurator.Activator
+                        .getImageDescriptor(IPluginImages.RMN_ICON));
+
         hideNonMappableObjects = new Action(HIDE_NON_MAPPABLE_OBJECTS,
                 IAction.AS_CHECK_BOX) {
             @Override
@@ -588,6 +657,8 @@ public class ObjectDictionaryView extends ViewPart {
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.removeAll();
+        manager.add(toggleParameterView);
+        manager.add(new Separator());
         manager.add(hideNonMappableObjects);
         manager.add(hideCommunicationProfileObjects);
         manager.add(hideStandardisedDeviceProfileObjects);

@@ -41,8 +41,11 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
+import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
 
 /**
@@ -84,6 +87,7 @@ public class ObjectDictionary {
      * RPDO channels list.
      */
     private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
+    private List<Parameter> parameterList = new ArrayList<Parameter>();
 
     /**
      * Constructs object dictionary with following inputs.
@@ -174,6 +178,10 @@ public class ObjectDictionary {
      */
     public List<PowerlinkObject> getObjectsList() {
         return objectsList;
+    }
+
+    public List<Parameter> getParameterList() {
+        return parameterList;
     }
 
     /**
@@ -335,6 +343,25 @@ public class ObjectDictionary {
             for (ISO15745Profile profile : profiles) {
                 ProfileBodyDataType profileBodyDatatype = profile
                         .getProfileBody();
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBodyDatatype;
+                    List<TApplicationProcess> appProcessList = devProfile
+                            .getApplicationProcess();
+                    for (TApplicationProcess appProcess : appProcessList) {
+                        TParameterList paramList = appProcess
+                                .getParameterList();
+                        if (paramList == null) {
+                            continue;
+                        }
+
+                        List<TParameterList.Parameter> parameterModelList = paramList
+                                .getParameter();
+                        for (TParameterList.Parameter param : parameterModelList) {
+                            parameterList.add(new Parameter(param));
+                        }
+                    }
+                }
+
                 if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
                     ProfileBodyCommunicationNetworkPowerlink commProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype;
                     TApplicationLayers.ObjectList tempObjectLists = commProfile
