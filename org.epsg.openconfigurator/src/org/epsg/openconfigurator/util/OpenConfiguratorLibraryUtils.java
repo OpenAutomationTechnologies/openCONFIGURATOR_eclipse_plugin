@@ -901,9 +901,14 @@ public class OpenConfiguratorLibraryUtils {
                     defaultValue = object.getDefaultValue();
                 }
 
-                String actualValue = StringUtils.EMPTY;
-                if (object.getActualValue() != null) {
-                    actualValue = object.getActualValue();
+                // Avoid setting actual value for non writable objects into
+                // library.
+                String actualValue = object.getActualValue();
+                if (object.getActualValue() == null) {
+                    actualValue = StringUtils.EMPTY;
+                } else if ((accessType == AccessType.CONST)
+                        || (accessType == AccessType.RO)) {
+                    actualValue = StringUtils.EMPTY;
                 }
 
                 libApiRes = core.CreateObject(networkId, nodeId, objectIdL,
@@ -1124,9 +1129,14 @@ public class OpenConfiguratorLibraryUtils {
                     defaultValue = subObject.getDefaultValue();
                 }
 
-                String actualValue = StringUtils.EMPTY;
-                if (subObject.getActualValue() != null) {
-                    actualValue = subObject.getActualValue();
+                // Avoid setting actual value for non writable sub-objects into
+                // library.
+                String actualValue = subObject.getActualValue();
+                if (subObject.getActualValue() == null) {
+                    actualValue = StringUtils.EMPTY;
+                } else if ((accessType == AccessType.CONST)
+                        || (accessType == AccessType.RO)) {
+                    actualValue = StringUtils.EMPTY;
                 }
 
                 libApiRes = core.CreateSubObject(networkId, nodeId, objectId,
