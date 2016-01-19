@@ -38,8 +38,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -86,6 +88,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
     public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_TITLE = "POWERLINK network project";
     public static final String NEW_PROJECT_WIZARD_CREATION_PAGE_DESCRIPTION = "Create a new POWERLINK network project.";
     public static final String NEW_PROJECT_WIZARD_TITLE = "New POWERLINK network project";
+    private static final String ERROR_WHILE_CREATING_PROJECT = "Failed to create a new project.";
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the XDD files.";
 
     /**
@@ -162,19 +165,22 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
             java.nio.file.Path mnXdd = validateXddPage
                     .getNodeConfigurationPath();
 
-            System.out.println("MN XDD path" + mnXdd.toString());
+            Path sourcePath = Paths.get(mnXdd.toString());
 
-            String targetImportPath = new String(projectPath + IPath.SEPARATOR
+            System.out.println("MN XDD path" + sourcePath);
+
+            String targetImportPath = projectPath + IPath.SEPARATOR
                     + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
-                    + IPath.SEPARATOR + mnXdd.getFileName().toString());
+                    + IPath.SEPARATOR + mnXdd.getFileName().toString();
+
+            Path targetPath = Paths.get(targetImportPath);
+
+            System.err.println("Target path == " + targetPath);
 
             // Copy the MN XDD to deviceImport dir
-            java.nio.file.Files.copy(
-                    new java.io.File(mnXdd.toString()).toPath(),
-                    new java.io.File(targetImportPath).toPath(),
-                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
-                    java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
-                    java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+            Files.copy(sourcePath, targetPath,
+                    StandardCopyOption.REPLACE_EXISTING);
 
             // Rename the XDD to XDC and copy the deviceImport MN XDD to
             // deviceConfiguration dir
@@ -212,7 +218,6 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
         } catch (UnsupportedOperationException | SecurityException
                 | IOException e) {
             e.printStackTrace();
-
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                     ERROR_WHILE_COPYING_XDD);
         }
@@ -225,15 +230,36 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
         if (newProjectCreationPage.getLocationURI().getPath().isEmpty()) {
             return;
         }
+        // Check if the location of project is default or custom path
+        if (newProjectCreationPage.useDefaults()) {
 
-        String projectPath = newProjectCreationPage.getLocationPath().toString()
-                + File.separator + newProjectCreationPage.getProjectName();
-        copyXddToDeviceImportDir(projectPath);
+            String projectPath = newProjectCreationPage.getLocationPath()
+                    + File.separator + newProjectCreationPage.getProjectName();
 
-        String projectFileName = newProjectCreationPage.getLocationURI()
-                .getPath() + File.separator
-                + newProjectCreationPage.getProjectName() + ".xml";
-        addDefaultMasterPage.createProject(projectFileName);
+            copyXddToDeviceImportDir(projectPath);
+
+            String projectFileName = newProjectCreationPage.getLocationURI()
+                    .getPath() + File.separator
+                    + newProjectCreationPage.getProjectName() + ".xml";
+            addDefaultMasterPage.createProject(projectFileName);
+
+        } else {
+
+            String projectURI = newProjectCreationPage.getLocationURI()
+                    .getPath() + File.separator
+                    + newProjectCreationPage.getProjectName();
+            String projectPath = projectURI.substring(1);
+            System.err.println("Project path " + projectPath);
+
+            copyXddToDeviceImportDir(projectPath);
+
+            String projectFileName = newProjectCreationPage.getLocationURI()
+                    .getPath() + File.separator
+                    + newProjectCreationPage.getProjectName() + File.separator
+                    + newProjectCreationPage.getProjectName() + ".xml";
+            addDefaultMasterPage.createProject(projectFileName);
+
+        }
     }
 
     /**
@@ -264,7 +290,12 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
         // get a project descriptor
         URI location = null;
         if (!newProjectCreationPage.useDefaults()) {
-            location = newProjectCreationPage.getLocationURI();
+            String projectURI = newProjectCreationPage.getLocationURI()
+                    .getPath() + File.separator
+                    + newProjectCreationPage.getProjectName();
+            String projectPath = projectURI.substring(1);
+            Path project = Paths.get(projectPath);
+            location = project.toUri();
         }
 
         String name = newProjectCreationPage.getProjectName();
@@ -310,9 +341,9 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow());
         } catch (CoreException ex) {
             ex.printStackTrace();
-            validateXddPage.getErrorStyledText(ex.getCause().getMessage());
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    "Failed to create a new project.");
+            PluginErrorDialogUtils.displayErrorMessageDialog(
+                    ERROR_WHILE_CREATING_PROJECT, ex);
+            getContainer().showPage(newProjectCreationPage);
             return false;
         }
 
