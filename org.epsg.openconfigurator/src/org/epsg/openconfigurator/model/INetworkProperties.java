@@ -43,12 +43,15 @@ public interface INetworkProperties {
     public static final String NET_ASYNC_MTU_OBJECT = "asyncMTU"; //$NON-NLS-1$
     public static final String NET_MUTLIPLEX_CYCLE_CNT_OBJECT = "multiplexedCycleLength"; //$NON-NLS-1$
     public static final String NET_PRESCALER_OBJECT = "prescaler"; //$NON-NLS-1$
+    public static final String NET_LOSS_OF_SOC_TOLERANCE_OBJECT = "lossSocTolerance"; //$NON-NLS-1$
+    public static final String NET_LOSS_OF_SOC_TOLERANCE_ATTRIBUTE_NAME = "lossOfSocTolerance"; //$NON-NLS-1$
 
     public static final String NETWORK_CYCLE_TIME_DESCRIPTION = "The cycle-time of the POWERLINK network in "
             + "\u00B5" + "s. See 0x1006.";
     public static final String NETWORK_ASYNC_MTU_DESCRIPTION = "The MTU for the async. slot in bytes. See 0x1F98/0x8.";
     public static final String NETWORK_MULTIPLEXED_CYCLE_CNT_DESCRIPTION = "The length of the multiplexed cycle. See 0x1F98/0x7.";
     public static final String NETWORK_PRE_SCALER_DESCRIPTION = "Toggle rate for the SoC PS flag. See 0x1F98/0x9.";
+    public static final String LOSS_SOC_TOLERANCE_DESCRIPTION = "A tolerance interval in [ns] to be applied by CN's Loss of SoC error recognition. See 0x1C14.";
 
     public static final long CYCLE_TIME_OBJECT_ID = 0x1006;
 
@@ -62,4 +65,6 @@ public interface INetworkProperties {
     public static final short PRESCALER_SUBOBJECT_ID = 0x09;
 
     public static final long POLL_RESPONSE_TIMEOUT_OBJECT_ID = 0x1F92;
+
+    public static final long LOSS_SOC_TOLERANCE_OBJECT_ID = 0x1C14;
 }

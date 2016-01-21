@@ -43,7 +43,7 @@
                 <xs:annotation>
                     <xs:documentation xml:lang="en">
                         The version of the openCONFIGURATOR project-file format. Changes in this schema require this attribute's value to be incremented.
-                        openCONFIGURATOR itself should be delivered with all versions of this XML-Schema to ensure backward compatibility.
+                        openCONFIGURATOR itself should be delivered with all versions of this XML-Schema to ensure backwards compatibility.
                     </xs:documentation>
                 </xs:annotation>
             </xs:attribute>
@@ -186,6 +186,12 @@
                 </xs:restriction>
             </xs:simpleType>
         </xs:attribute>
+        <xs:attribute name="lossOfSocTolerance" type="xs:positiveInteger" default="100000">
+            <xs:annotation>
+                <xs:documentation xml:lang="en">Provides a tolerance interval in [ns] to be applied by CN’s Loss of SoC error recognition. See EPSG DS 301,
+                    0x1C14.</xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
     <xs:complexType name="tNodeCollection">
         <xs:annotation>
@@ -293,7 +299,7 @@
             <xs:extension base="oc:tAbstractNode">
                 <xs:attribute name="nodeID" use="required">
                     <xs:simpleType>
-                        <xs:union memberTypes="oc:tRegularCNNodeID oc:tDefaultRedundantMNNodeID oc:tDiagnosticNodeID"/>
+                        <xs:union memberTypes="oc:tRegularCNNodeID"/>
                     </xs:simpleType>
                 </xs:attribute>
                 <xs:attribute name="pathToXDC" use="required">
@@ -372,6 +378,8 @@
                     <xs:annotation>
                         <xs:documentation xml:lang="en">
                             Pathname in UNIX-Style (forward slashes).
+                            Optional for MNs to support EPSG DS 302-A (High Availability).
+                            For High Availability, the MN-element contains a list of references (RMNList) to CN-elements which represent the redundant MNs.
                         </xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>
@@ -418,11 +426,17 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="oc:tAbstractNode">
-                <xs:attribute name="nodeID" type="xs:unsignedByte" use="required"/>
+                <xs:attribute name="nodeID" use="required">
+                    <xs:simpleType>
+                        <xs:union memberTypes="oc:tRegularCNNodeID oc:tDefaultRedundantMNNodeID"/>
+                    </xs:simpleType>
+                </xs:attribute>
                 <xs:attribute name="pathToXDC">
                     <xs:annotation>
                         <xs:documentation xml:lang="en">
                             Pathname in UNIX-Style (forward slashes).
+                            Optional for MNs to support EPSG DS 302-A (High Availability).
+                            For High Availability, the MN-element contains a list of references (RMNList) to CN-elements which represent the redundant MNs.
                         </xs:documentation>
                     </xs:annotation>
                     <xs:simpleType>

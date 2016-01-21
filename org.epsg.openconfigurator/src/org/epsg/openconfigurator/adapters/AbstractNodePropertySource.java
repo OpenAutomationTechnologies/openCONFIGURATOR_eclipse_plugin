@@ -55,8 +55,6 @@ public abstract class AbstractNodePropertySource {
     private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Is Type1 Router";
     private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Is Type2 Router";
     private static final String NODE_FORCED_OBJECTS_LABEL = "Forced Objects";
-    private static final String CN_LOSS_OF_SOC_TOLERANCE_LABEL = "Loss of SoC Tolerance("
-            + "\u00B5" + "s)";
 
     // ERROR messages
     public static final String NOT_SUPPORTED = "Currently not supported";
@@ -64,8 +62,6 @@ public abstract class AbstractNodePropertySource {
     public static final String ERROR_NODE_ID_CANNOT_BE_EMPTY = "Node ID cannot be empty.";
     public static final String ERROR_NODE_ID_EXCEEDS_RANGE = "Node id exceeds the range.";
     public static final String ERROR_NODE_ID_DECEEDS_RANGE = "Node id deceeds the range.";
-    public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
-    public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value";
     public static final String ERROR_OBJECT_NOT_FOUND = "Object not found!";
 
     protected TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(
@@ -94,10 +90,6 @@ public abstract class AbstractNodePropertySource {
     protected PropertyDescriptor forcedObjects = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT,
             NODE_FORCED_OBJECTS_LABEL);
-
-    protected TextPropertyDescriptor lossSocToleranceDescriptor = new TextPropertyDescriptor(
-            IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT,
-            CN_LOSS_OF_SOC_TOLERANCE_LABEL);
 
     AbstractNodePropertySource() {
         readOnlynameDescriptor
@@ -143,29 +135,7 @@ public abstract class AbstractNodePropertySource {
                         value);
             }
         });
-
-        lossSocToleranceDescriptor.setDescription(
-                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_DESCRIPTION);
-
-        lossSocToleranceDescriptor.setValidator(new ICellEditorValidator() {
-            @Override
-            public String isValid(Object value) {
-                return handleLossOfSoCTolerance(value);
-            }
-        });
-
     }
-
-    /**
-     * Handle loss of SoC tolerance assignment.
-     *
-     * @param value Value to be set.
-     *
-     * @return Returns a string indicating whether the given value is valid;
-     *         null means valid, and non-null means invalid, with the result
-     *         being the error message to display to the end user.
-     */
-    protected abstract String handleLossOfSoCTolerance(Object value);
 
     /**
      * Handle node assignment via node properties.

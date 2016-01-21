@@ -52,7 +52,6 @@ import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
 import org.epsg.openconfigurator.model.INetworkProperties;
 import org.epsg.openconfigurator.model.Node;
-import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
@@ -83,7 +82,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_PRODUCT_CODE_LABEL = "Verify Product Code";
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
 
-    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout("
+    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout ("
             + "\u00B5" + "s)";
 
     /**
@@ -332,11 +331,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 return handlePresTimeout(value);
             }
         });
-
-        lossSocToleranceDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
-        lossSocToleranceDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
     }
 
     /**
@@ -523,12 +517,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         retObj = String.valueOf(presTimeoutInMs);
                         break;
                     }
-                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                        long val = Long.decode(cnNode.getLossOfSocTolerance());
-                        long valInUs = val / 1000;
-                        retObj = String.valueOf(valInUs);
-                        break;
-                    }
                     default:
                         System.err.println(
                                 "Invalid object string ID:" + objectId);
@@ -543,49 +531,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             retObj = StringUtils.EMPTY;
         }
         return retObj;
-    }
-
-    /**
-     * Handles the loss of SoC tolerance assignment.
-     *
-     * @param value The new value of loss of SoC tolerance.
-     *
-     * @return Returns a string indicating whether the given value is valid;
-     *         null means valid, and non-null means invalid, with the result
-     *         being the error message to display to the end user.
-     */
-    @Override
-    protected String handleLossOfSoCTolerance(Object value) {
-        if (value instanceof String) {
-            if (((String) value).isEmpty()) {
-                return ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY;
-            }
-            try {
-                long longValue = Long.decode((String) value);
-                PowerlinkObject lossOfSocToleranceObj = cnNode
-                        .getObjectDictionary().getObject(
-                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
-                if (lossOfSocToleranceObj == null) {
-                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
-                }
-                // validate the value with openCONFIGURATOR library.
-                Result validateResult = OpenConfiguratorLibraryUtils
-                        .validateObjectActualValue(cnNode.getNetworkId(),
-                                cnNode.getNodeId(),
-                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID,
-                                String.valueOf(longValue * 1000), false);
-                if (!validateResult.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils
-                            .getErrorMessage(validateResult);
-                }
-            } catch (NumberFormatException e) {
-                return ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE;
-            }
-        } else {
-            System.err.println(
-                    "handleLossOfSoCTolerance: Invalid value type:" + value);
-        }
-        return null;
     }
 
     @Override
@@ -1033,24 +978,6 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                                     .getErrorMessage(res));
                         }
 
-                        break;
-                    }
-                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                        // us converted to ns
-                        Long lossSocTolerance = Long.decode((String) value)
-                                * 1000;
-                        res = OpenConfiguratorCore.GetInstance()
-                                .SetLossOfSocTolerance(cnNode.getNetworkId(),
-                                        cnNode.getNodeId(),
-                                        lossSocTolerance.longValue());
-                        if (res.IsSuccessful()) {
-                            cnNode.setLossOfSocTolerance(lossSocTolerance);
-                        } else {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
-                        }
                         break;
                     }
                     default:

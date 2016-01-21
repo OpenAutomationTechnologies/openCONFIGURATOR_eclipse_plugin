@@ -44,6 +44,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/restriction&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
+ *       &lt;attribute name="lossOfSocTolerance" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" default="100000" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -71,6 +72,9 @@ public class TNetworkConfiguration {
     protected Integer multiplexedCycleLength;
     @XmlAttribute(name = "prescaler")
     protected Integer prescaler;
+    @XmlAttribute(name = "lossOfSocTolerance")
+    @XmlSchemaType(name = "positiveInteger")
+    protected BigInteger lossOfSocTolerance;
 
     /**
      * Gets the value of the nodeCollection property.
@@ -218,6 +222,34 @@ public class TNetworkConfiguration {
      */
     public void setPrescaler(Integer value) {
         this.prescaler = value;
+    }
+
+    /**
+     * Gets the value of the lossOfSocTolerance property.
+     *
+     * @return
+     *     possible object is
+     *     {@link BigInteger }
+     *
+     */
+    public BigInteger getLossOfSocTolerance() {
+        if (lossOfSocTolerance == null) {
+            return new BigInteger("100000");
+        } else {
+            return lossOfSocTolerance;
+        }
+    }
+
+    /**
+     * Sets the value of the lossOfSocTolerance property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link BigInteger }
+     *
+     */
+    public void setLossOfSocTolerance(BigInteger value) {
+        this.lossOfSocTolerance = value;
     }
 
 }

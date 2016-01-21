@@ -64,6 +64,7 @@ import org.epsg.openconfigurator.lib.wrapper.ParameterAccess;
 import org.epsg.openconfigurator.lib.wrapper.PlkDataType;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.Node.NodeType;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PdoType;
 import org.epsg.openconfigurator.model.PowerlinkObject;
@@ -713,6 +714,29 @@ public class OpenConfiguratorLibraryUtils {
         libApiRes = createNode(node);
         if (!libApiRes.IsSuccessful()) {
             return libApiRes;
+        }
+        // Update the LossOfSocTolerance value into library during
+        // initialization of project.
+        if (node.getNodeType() == NodeType.MANAGING_NODE) {
+            if (node.getNodeModel() instanceof TNetworkConfiguration) {
+                TNetworkConfiguration ntwrkConfg = (TNetworkConfiguration) node
+                        .getNodeModel();
+                long lossOfSocTolerance = ntwrkConfg.getLossOfSocTolerance()
+                        .longValue();
+                // Workaround:
+                // only set the LossOfSocTolerance if not default value
+                if (lossOfSocTolerance != IPowerlinkConstants.LOSS_OF_SOC_TOLERANCE_DEFAULT_VALUE) {
+                    libApiRes = OpenConfiguratorCore.GetInstance()
+                            .SetLossOfSocTolerance(node.getNetworkId(),
+                                    node.getNodeId(), lossOfSocTolerance);
+                    if (!libApiRes.IsSuccessful()) {
+                        return libApiRes;
+                    }
+                } else {
+                    System.out.println(
+                            "LossOfSocTolerance has the default value(100000ns). Not setting to the library!!");
+                }
+            }
         }
 
         libApiRes = addNodeAssignments(node);

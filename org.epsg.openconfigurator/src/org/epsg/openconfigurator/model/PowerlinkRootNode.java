@@ -35,7 +35,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.text.MessageFormat;
+import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -283,6 +286,18 @@ public class PowerlinkRootNode {
                             OpenConfiguratorLibraryUtils.getErrorMessage(res),
                             null);
                 }
+
+                PowerlinkObject obj = newNode.getObjectDictionary().getObject(
+                        INetworkProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
+                if (obj != null) {
+                    String lossOfSocToleranceString = obj.getActualValue();
+                    if (!lossOfSocToleranceString.isEmpty()) {
+                        Long lossOfSocToleranceNs = Long
+                                .decode(lossOfSocToleranceString);
+                        networkCfg.setLossOfSocTolerance(
+                                BigInteger.valueOf(lossOfSocToleranceNs));
+                    }
+                }
             }
 
             // Import the CN nodes
@@ -485,7 +500,24 @@ public class PowerlinkRootNode {
             OpenConfiguratorProjectUtils.updateNodeAssignmentValues(node);
             monitor.worked(1);
         }
-        return res;
+
+        Node mnNode = getMN();
+        // Updates LossOfSoc tolerance value during build from library.
+        long[] lossOfSocToleranceValue = new long[1];
+        Result res = OpenConfiguratorCore.GetInstance().GetLossOfSocTolerance(
+                mnNode.getNetworkId(), IPowerlinkConstants.MN_DEFAULT_NODE_ID,
+                lossOfSocToleranceValue);
+        if (res.IsSuccessful()) {
+            mnNode.setLossOfSocTolerance(lossOfSocToleranceValue[0]);
+        } else {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
+        }
+
+        // Updates generator attributes in project file.
+        OpenConfiguratorProjectUtils.updateGeneratorInfo(getMN());
+
+        return new Result();
     }
 
     /**

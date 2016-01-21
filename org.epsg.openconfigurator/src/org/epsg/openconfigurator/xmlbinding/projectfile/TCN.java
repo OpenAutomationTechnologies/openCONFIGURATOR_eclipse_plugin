@@ -20,7 +20,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;extension base="{http://sourceforge.net/projects/openconf/configuration}tAbstractNode"&gt;
  *       &lt;attribute name="nodeID" use="required"&gt;
  *         &lt;simpleType&gt;
- *           &lt;union memberTypes=" {http://sourceforge.net/projects/openconf/configuration}tRegularCNNodeID {http://sourceforge.net/projects/openconf/configuration}tDefaultRedundantMNNodeID {http://sourceforge.net/projects/openconf/configuration}tDiagnosticNodeID"&gt;
+ *           &lt;union memberTypes=" {http://sourceforge.net/projects/openconf/configuration}tRegularCNNodeID"&gt;
  *           &lt;/union&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;

@@ -68,13 +68,17 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 public class ManagingNodePropertySource extends AbstractNodePropertySource
         implements IPropertySource {
 
+    private static final String CN_LOSS_OF_SOC_TOLERANCE_LABEL = "Loss of SoC Tolerance ("
+            + "\u00B5" + "s)";
+
     // Labels
     private static final String[] MN_PROPERTY_LABEL_LIST = { "Transmits PRes",
-            "Async Slot timeout(ns)", "ASnd Max Latency(ns)" };
+            "Async Slot timeout (ns)", "ASnd Max Latency (ns)" };
 
     private static final String[] NETWORK_PROPERTY_LABEL_LIST = {
-            "Cycle Time(" + "\u00B5" + "s)", "Async MTU size (bytes)",
-            "Multiplexed Cycle Count", "Pre-Scaler" };
+            "Cycle Time (" + "\u00B5" + "s)", "Async MTU size (bytes)",
+            "Multiplexed Cycle Count", "Pre-Scaler",
+            CN_LOSS_OF_SOC_TOLERANCE_LABEL };
 
     private static final String MN_CATEGORY = "Managing Node";
     private static final String NETWORK_CATEGORY = "Network";
@@ -101,6 +105,9 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     private static final TextPropertyDescriptor preScaler = new TextPropertyDescriptor(
             INetworkProperties.NET_PRESCALER_OBJECT,
             NETWORK_PROPERTY_LABEL_LIST[3]);
+    private static final TextPropertyDescriptor lossSocToleranceDescriptor = new TextPropertyDescriptor(
+            INetworkProperties.NET_LOSS_OF_SOC_TOLERANCE_OBJECT,
+            CN_LOSS_OF_SOC_TOLERANCE_LABEL);
 
     // Error messages
     private static final String ERROR_ASYNC_SLOT_TIMEOUT_CANNOT_BE_EMPTY = "Async. slot timeout cannot be empty.";
@@ -128,6 +135,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     private static final String ERROR_PRE_SCALER_CANNOT_BE_EMPTY = "PreScaler cannot be empty.";
     private static final String INVALID_RANGE_PRE_SCALER = "Invalid range for PreScaler.";
     private static final String ERROR_INVALID_VALUE_PRE_SCALER = "Invalid value for PreScaler.";
+    public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
+    public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value";
 
     static {
 
@@ -166,6 +175,11 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         preScaler.setDescription(
                 INetworkProperties.NETWORK_PRE_SCALER_DESCRIPTION);
 
+        lossSocToleranceDescriptor.setDescription(
+                INetworkProperties.LOSS_SOC_TOLERANCE_DESCRIPTION);
+        lossSocToleranceDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        lossSocToleranceDescriptor.setCategory(NETWORK_CATEGORY);
     }
 
     private Node mnNode;
@@ -248,9 +262,12 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
         });
 
-        lossSocToleranceDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
-        lossSocToleranceDescriptor.setCategory(MN_CATEGORY);
+        lossSocToleranceDescriptor.setValidator(new ICellEditorValidator() {
+            @Override
+            public String isValid(Object value) {
+                return handleLossOfSoCTolerance(value);
+            }
+        });
     }
 
     private void addManagingNodePropertyDescriptors(
@@ -274,7 +291,6 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         propertyList.add(isAsyncOnly);
         propertyList.add(isType1Router);
         propertyList.add(isType2Router);
-        propertyList.add(lossSocToleranceDescriptor);
         if (mn.getForcedObjects() != null) {
             propertyList.add(forcedObjects);
         }
@@ -291,6 +307,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         // TODO check with other multiplexing parameters.
         propertyList.add(multiplexedCycleCnt);
         propertyList.add(preScaler);
+        propertyList.add(lossSocToleranceDescriptor);
     }
 
     @Override
@@ -329,8 +346,9 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         retObj = mn.getPathToXDC();
                         break;
-                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                        long val = Long.decode(mnNode.getLossOfSocTolerance());
+                    case INetworkProperties.NET_LOSS_OF_SOC_TOLERANCE_OBJECT: {
+                        long val = networkConfiguration.getLossOfSocTolerance()
+                                .longValue();
                         long valInUs = val / 1000;
                         retObj = String.valueOf(valInUs);
                         break;
@@ -600,8 +618,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
      *
      * @param value New value for LossOfSoCTolerance
      */
-    @Override
-    protected String handleLossOfSoCTolerance(Object value) {
+    private String handleLossOfSoCTolerance(Object value) {
 
         if (value instanceof String) {
             if (((String) value).isEmpty()) {
@@ -609,21 +626,12 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 long longValue = Long.decode((String) value);
-                // validate the value with openCONFIGURATOR library.
-                PowerlinkObject lossOfSocToleranceObj = mnNode
-                        .getObjectDictionary().getObject(
-                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
-                if (lossOfSocToleranceObj == null) {
-                    return AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND;
-                }
-                Result validateResult = OpenConfiguratorLibraryUtils
-                        .validateObjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
-                                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID,
-                                String.valueOf(longValue * 1000), false);
-                if (!validateResult.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils
-                            .getErrorMessage(validateResult);
+                // validate the value
+                Long maxValue = 4294967295L;
+                if ((longValue * 1000) > maxValue) {
+                    return "[" + mnNode.getNetworkId() + "]" + " Actual value "
+                            + longValue
+                            + " with datatype UNSIGNED32 does not fit the datatype limits or format";
                 }
 
             } catch (NumberFormatException e) {
@@ -836,7 +844,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         System.err.println(objectId + " made editable");
                         break;
-                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT:
+                    case INetworkProperties.NET_LOSS_OF_SOC_TOLERANCE_OBJECT:
                         // Converted us to ns
                         Long lossOfSocTolerance = Long.decode((String) value)
                                 * 1000;

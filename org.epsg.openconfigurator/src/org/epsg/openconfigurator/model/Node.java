@@ -32,6 +32,7 @@
 package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.Map;
 
@@ -230,7 +231,7 @@ public class Node {
         } else if (nodeModel instanceof TRMN) {
             TRMN rmn = (TRMN) nodeModel;
 
-            nodeId = rmn.getNodeID();
+            nodeId = Short.parseShort(rmn.getNodeID());
             nodeType = NodeType.REDUNDANT_MANAGING_NODE;
         } else if (nodeModel instanceof TMN) {
             TMN tempMn = (TMN) nodeModel;
@@ -440,21 +441,17 @@ public class Node {
     }
 
     /**
-     * @return Loss of SoC tolerance value available for this node.
+     * @return Loss of SoC tolerance value from network configuration.
      */
     public String getLossOfSocTolerance() {
-        // MN: - CN: M
-        if (nodeType == NodeType.MANAGING_NODE) {
-            // FIXME: throw exception for un supported node type.
-            System.err.println("getLossOfSocTolerance: Un-supported node type:"
-                    + nodeModel);
-            // return StringUtils.EMPTY;
-            // FIXME: workaround. Specification issue. TBD. 0x1C14 N.A for MN.
+        if (nodeModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
+            BigInteger lossSocToleranceValue = net.getLossOfSocTolerance();
+            return String.valueOf(lossSocToleranceValue);
+        } else {
+            System.err.println("Invalid node model");
         }
-
-        String lossSocToleranceValue = getObjectDictionary()
-                .getValue(IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
-        return lossSocToleranceValue;
+        return null;
     }
 
     /**
@@ -963,32 +960,29 @@ public class Node {
     }
 
     /**
-     * Set the loss of SoC tolerance value.
+     * Update the LossOfSoc tolerance value into the node model and write into
+     * the project file.
      *
-     * @param value loss of SoC tolerance value in micro seconds.
+     * @param lossOfSocToleranceValue The value of LossOfSocTolerance to be
+     *            updated in the project file.
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public void setLossOfSocTolerance(Long value)
+    public void setLossOfSocTolerance(long lossOfSocToleranceValue)
             throws JDOMException, IOException {
-        if (value == null) {
-            // FIXME: throw invalid argument.
-            return;
+        if (nodeModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
+            net.setLossOfSocTolerance(
+                    BigInteger.valueOf(lossOfSocToleranceValue));
+        } else {
+            System.err.println(
+                    "Invalid model type. Only available in the managing node!");
         }
 
-        // MN: - CN: M
-        if (nodeType == NodeType.MANAGING_NODE) {
-            // FIXME: throw exception for un supported node type.
-            System.err.println("setLossOfSocTolerance Un-supported node type:"
-                    + nodeModel);
-            // WORKAROUND for specificatin issue. MN shall not contain 0x1C14
-            // object
-            // return;
-        }
-
-        getObjectDictionary().setActualValue(
-                IAbstractNodeProperties.LOSS_SOC_TOLERANCE_OBJECT_ID,
-                value.toString());
+        // Update LossOfSocTolerance value in the project file.
+        OpenConfiguratorProjectUtils.updateNetworkAttributeValue(this,
+                INetworkProperties.NET_LOSS_OF_SOC_TOLERANCE_ATTRIBUTE_NAME,
+                String.valueOf(lossOfSocToleranceValue));
     }
 
     /**
@@ -1252,7 +1246,7 @@ public class Node {
             cn.setNodeID(String.valueOf(newNodeId));
         } else if (nodeModel instanceof TRMN) {
             TRMN rmn = (TRMN) nodeModel;
-            rmn.setNodeID(newNodeId);
+            rmn.setNodeID(String.valueOf(newNodeId));
         }
 
         nodeId = newNodeId;

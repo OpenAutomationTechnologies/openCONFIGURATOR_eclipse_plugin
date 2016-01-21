@@ -4,7 +4,6 @@ package org.epsg.openconfigurator.xmlbinding.projectfile;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
 
@@ -19,7 +18,12 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="tRMN"&gt;
  *   &lt;complexContent&gt;
  *     &lt;extension base="{http://sourceforge.net/projects/openconf/configuration}tAbstractNode"&gt;
- *       &lt;attribute name="nodeID" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" /&gt;
+ *       &lt;attribute name="nodeID" use="required"&gt;
+ *         &lt;simpleType&gt;
+ *           &lt;union memberTypes=" {http://sourceforge.net/projects/openconf/configuration}tRegularCNNodeID {http://sourceforge.net/projects/openconf/configuration}tDefaultRedundantMNNodeID"&gt;
+ *           &lt;/union&gt;
+ *         &lt;/simpleType&gt;
+ *       &lt;/attribute&gt;
  *       &lt;attribute name="pathToXDC"&gt;
  *         &lt;simpleType&gt;
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyURI"&gt;
@@ -41,24 +45,31 @@ public class TRMN
 {
 
     @XmlAttribute(name = "nodeID", required = true)
-    @XmlSchemaType(name = "unsignedByte")
-    protected short nodeID;
+    protected String nodeID;
     @XmlAttribute(name = "pathToXDC")
     protected String pathToXDC;
 
     /**
      * Gets the value of the nodeID property.
      *
+     * @return
+     *     possible object is
+     *     {@link String }
+     *
      */
-    public short getNodeID() {
+    public String getNodeID() {
         return nodeID;
     }
 
     /**
      * Sets the value of the nodeID property.
      *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
      */
-    public void setNodeID(short value) {
+    public void setNodeID(String value) {
         this.nodeID = value;
     }
 

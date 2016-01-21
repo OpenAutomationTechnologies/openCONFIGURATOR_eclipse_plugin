@@ -50,7 +50,7 @@ public interface IPowerlinkConstants {
     public static final short ROUTER_TYPE1_DEFAUTL_NODE_ID = 0xFE; // 254
     public static final short DIAGNOSTIC_DEVICE_DEFAULT_NODE_ID = 0xFD; // 253
 
-    //Object index constants.
+    // Object index constants.
     public static final int COMMUNICATION_PROFILE_START_INDEX = 0x1000;
     public static final int COMMUNICATION_PROFILE_END_INDEX = 0x1FFF;
     public static final int MANUFACTURER_PROFILE_START_INDEX = 0x2000;
@@ -64,4 +64,7 @@ public interface IPowerlinkConstants {
     public static final String DATE_FORMAT = "yyyy-MM-dd";
     public static final String TIME_FORMAT = "HH:mm:ssXXX";
     public static final String DATE_TIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX";
+
+    // Default value of lossOfSocTolerance in nano seconds.
+    public static final long LOSS_OF_SOC_TOLERANCE_DEFAULT_VALUE = 100000L;
 }

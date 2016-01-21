@@ -62,7 +62,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 public class RedundantManagingNodePropertySource
         extends AbstractNodePropertySource implements IPropertySource {
 
-    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active("
+    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active ("
             + "\u00B5" + "s)";
     private static final String RMN_PRIORITY_LABEL = "Priority";
 
@@ -148,11 +148,6 @@ public class RedundantManagingNodePropertySource
         isType2Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
         isType2Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
         forcedObjects.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
-
-        lossSocToleranceDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
-        lossSocToleranceDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
     }
 
     /**
@@ -265,13 +260,6 @@ public class RedundantManagingNodePropertySource
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
                         retObj = redundantManagingNode.getForcedObjectsString();
                         break;
-                    case IAbstractNodeProperties.NODE_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                        long val = Long.decode(
-                                redundantManagingNode.getLossOfSocTolerance());
-                        long valInUs = val / 1000;
-                        retObj = String.valueOf(valInUs);
-                        break;
-                    }
                     default:
                         System.err.println(
                                 "Invalid object string ID:" + objectId);
@@ -286,20 +274,6 @@ public class RedundantManagingNodePropertySource
             retObj = StringUtils.EMPTY;
         }
         return retObj;
-    }
-
-    /**
-     * Handles the loss of SoC tolerance assignment.
-     *
-     * @param value The new value of loss of SoC tolerance.
-     *
-     * @return Returns a string indicating whether the given value is valid;
-     *         null means valid, and non-null means invalid, with the result
-     *         being the error message to display to the end user.
-     */
-    @Override
-    protected String handleLossOfSoCTolerance(Object value) {
-        return NOT_SUPPORTED;
     }
 
     /**

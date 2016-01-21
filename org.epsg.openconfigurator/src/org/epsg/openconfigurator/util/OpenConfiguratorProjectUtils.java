@@ -32,7 +32,6 @@
 package org.epsg.openconfigurator.util;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -83,8 +82,6 @@ import org.epsg.openconfigurator.xmloperation.JDomUtil;
 import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 
 public final class OpenConfiguratorProjectUtils {
 
@@ -157,7 +154,8 @@ public final class OpenConfiguratorProjectUtils {
         Object nodeObjectModel = node.getNodeModel();
         if (nodeObjectModel instanceof TRMN) {
             TRMN rMN = (TRMN) nodeObjectModel;
-            nodeCollection.remove(rMN.getNodeID());
+            short nodeId = Short.parseShort(rMN.getNodeID());
+            nodeCollection.remove(nodeId);
             retVal = true;
         } else if (nodeObjectModel instanceof TCN) {
             TCN cnNode = (TCN) nodeObjectModel;

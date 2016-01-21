@@ -291,7 +291,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private short getNextValidRmnNodeId(List<TRMN> rmnNodeList) {
         List<Short> rmnNodeIdList = new ArrayList<Short>();
         for (TRMN rmn : rmnNodeList) {
-            rmnNodeIdList.add(rmn.getNodeID());
+            rmnNodeIdList.add(Short.parseShort(rmn.getNodeID()));
         }
 
         for (short i = IPowerlinkConstants.RMN_MIN_NODE_ID; i <= IPowerlinkConstants.RMN_MAX_NODE_ID; i++) {
@@ -559,8 +559,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
             case REDUNDANT_MANAGING_NODE_LABEL:
                 TRMN rmnModel = new TRMN();
                 rmnModel.setName(nodeName.getText());
-                rmnModel.setNodeID(Short.parseShort(
-                        Integer.toString(nodeIdSpinner.getSelection())));
+                rmnModel.setNodeID(
+                        Integer.toString(nodeIdSpinner.getSelection()));
                 nodeModel = rmnModel;
                 break;
             default:
