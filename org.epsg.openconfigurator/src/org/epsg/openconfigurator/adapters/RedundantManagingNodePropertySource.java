@@ -237,10 +237,14 @@ public class RedundantManagingNodePropertySource
                         retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
                         break;
                     case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
-                        retObj = redundantManagingNode.getWaitNotActive();
+                        String waitNotActive = redundantManagingNode
+                                .getWaitNotActive();
+                        retObj = String.valueOf(Integer.decode(waitNotActive));
                         break;
                     case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
-                        retObj = redundantManagingNode.getRmnPriority();
+                        String priority = redundantManagingNode
+                                .getRmnPriority();
+                        retObj = String.valueOf(Integer.decode(priority));
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
                         int value = (rmn.isIsAsyncOnly() == true) ? 0 : 1;

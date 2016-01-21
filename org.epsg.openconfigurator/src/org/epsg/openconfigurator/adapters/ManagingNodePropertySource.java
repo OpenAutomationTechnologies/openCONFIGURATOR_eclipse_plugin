@@ -363,7 +363,9 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
-                        retObj = mnNode.getAsyncSlotTimeout();
+                        String asyncSlotTimeOut = mnNode.getAsyncSlotTimeout();
+                        retObj = String
+                                .valueOf(Integer.decode(asyncSlotTimeOut));
                         break;
                     case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
                         retObj = mnNode.getAsndMaxNumber();
@@ -399,17 +401,23 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         retObj = mnNode.getForcedObjectsString();
                         break;
                     case INetworkProperties.NET_CYCLE_TIME_OBJECT:
-                        retObj = mnNode.getCycleTime();
+                        String cycleTime = mnNode.getCycleTime();
+                        retObj = String.valueOf(Integer.decode(cycleTime));
                         break;
                     case INetworkProperties.NET_ASYNC_MTU_OBJECT:
-                        retObj = mnNode.getAsyncMtu();
+                        String asyncMtu = mnNode.getAsyncMtu();
+                        retObj = String.valueOf(Integer.decode(asyncMtu));
                         break;
 
                     case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
-                        retObj = mnNode.getMultiplexedCycleCnt();
+                        String multiplexCycleCount = mnNode
+                                .getMultiplexedCycleCnt();
+                        retObj = String
+                                .valueOf(Integer.decode(multiplexCycleCount));
                         break;
                     case INetworkProperties.NET_PRESCALER_OBJECT:
-                        retObj = mnNode.getPrescaler();
+                        String prescaler = mnNode.getPrescaler();
+                        retObj = String.valueOf(Integer.decode(prescaler));
                         break;
                     default:
                         System.err.println(
@@ -576,9 +584,6 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     protected String handleCycleTime(Object value) {
         if (value instanceof String) {
 
-            if (((String) value).isEmpty()) {
-                return ERROR_CYCLE_TIME_CANNOT_BE_EMPTY;
-            }
             try {
                 long cycleTime = Long.decode((String) value);
                 // validate the value with openCONFIGURATOR library.
@@ -595,13 +600,6 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 if (!validateResult.IsSuccessful()) {
                     return OpenConfiguratorLibraryUtils
                             .getErrorMessage(validateResult);
-                }
-                if ((cycleTime < 1)) {
-                    return INVALID_RANGE_CYCLE_TIME;
-                }
-
-                if ((cycleTime < 250)) {
-                    return MINIMIUM_PLK_SUPPORTED_CYCLE_TIME;
                 }
 
             } catch (NumberFormatException e) {
