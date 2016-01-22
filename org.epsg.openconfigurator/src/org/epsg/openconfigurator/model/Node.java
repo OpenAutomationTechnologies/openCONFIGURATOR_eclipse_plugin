@@ -179,6 +179,11 @@ public class Node {
     private final NodeType nodeType;
 
     /**
+     * Instance of NetworkManagement.
+     */
+    private final NetworkManagement networkmanagement;
+
+    /**
      * Constructor to initialize the node variables.
      */
     public Node() {
@@ -191,6 +196,7 @@ public class Node {
         nodeId = 0;
         nodeType = NodeType.UNDEFINED;
         objectDictionary = null;
+        networkmanagement = null;
     }
 
     /**
@@ -245,6 +251,7 @@ public class Node {
         }
         this.xddModel = xddModel;
         objectDictionary = new ObjectDictionary(this, xddModel);
+        networkmanagement = new NetworkManagement(this, xddModel);
     }
 
     /**
@@ -800,6 +807,17 @@ public class Node {
         }
 
         return alreadyForced;
+    }
+
+    /**
+     * Checks for the boolean value of self PDO receipt in XDD of the given
+     * node.
+     *
+     * @return <true>if the PDOSelfReceipt is assigned to true in XDD model,
+     *         <false>if the PDOSelfReceipt is assigned to false in XDD model
+     */
+    public boolean isPDOSelfReceipt() {
+        return networkmanagement.getGeneralFeatures().isPDOSelfReceipt();
     }
 
     private void removeForcedObject(ForcedObjects forcedObjTag,

@@ -110,9 +110,11 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.RpdoChannel;
 import org.epsg.openconfigurator.model.TpdoChannel;
 import org.epsg.openconfigurator.resources.IPluginImages;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
@@ -625,8 +627,6 @@ public class MappingView extends ViewPart {
                     if (node.getNodeId() == 0) {
                         return node.getName() + " PRes(" + node.getNodeId()
                                 + ")";
-                    } else if (nodeObj == node) {
-                        return "Self(" + node.getNodeId() + ")";
                     } else if (node.getNodeId() == 240) {
                         return node.getName() + " PRes(" + node.getNodeId()
                                 + ")";
@@ -636,8 +636,6 @@ public class MappingView extends ViewPart {
                 } else if (pdoType == PdoType.RPDO) {
                     if (node.getNodeId() == 0) {
                         return "MN" + " PReq(" + node.getNodeId() + ")";
-                    } else if (nodeObj == node) {
-                        return "Self(" + node.getNodeId() + ")";
                     } else if (node.getNodeId() == 240) {
                         return node.getName() + " PRes(" + node.getNodeId()
                                 + ")";
@@ -1531,6 +1529,7 @@ public class MappingView extends ViewPart {
      * Common application model data
      */
     private final Node emptyNode;
+    private final Node selfReceiptNode;
     private final PowerlinkObject emptyObject;
     private final ArrayList<Node> targetNodeIdList = new ArrayList<Node>();
 
@@ -1593,6 +1592,11 @@ public class MappingView extends ViewPart {
         preqMn.setName("Broadcast");
         preqMn.setNodeID((short) 0);
         emptyNode = new Node(null, null, preqMn, null);
+        TCN selfReceiptModel = new TCN();
+        selfReceiptModel.setName("Self Receipt");
+        selfReceiptModel.setNodeID(
+                String.valueOf(IPowerlinkConstants.PDO_SELF_RECEIPT_NODE_ID));
+        selfReceiptNode = new Node(null, null, selfReceiptModel, null);
 
         clearImage = org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.CLEAR_ICON).createImage();
@@ -2866,7 +2870,16 @@ public class MappingView extends ViewPart {
         if (rootNode != null) {
             targetNodeIdList.add(rootNode.getMN());
             targetNodeIdList.add(emptyNode);
-            targetNodeIdList.addAll(rootNode.getCnNodeList());
+            List<Node> tempCnNodeList = rootNode.getCnNodeList();
+            for (Node tempNode : tempCnNodeList) {
+                if (nodeObj == tempNode) {
+                    if (tempNode.isPDOSelfReceipt()) {
+                        targetNodeIdList.add(selfReceiptNode);
+                    }
+                } else {
+                    targetNodeIdList.add(tempNode);
+                }
+            }
         }
     }
 }

@@ -43,8 +43,9 @@ public interface IPowerlinkConstants {
     public static final short MN_DEFAULT_NODE_ID = 0xF0; // 240
     public static final short CN_MIN_NODE_ID = 0x01; // 1
     public static final short CN_MAX_NODE_ID = 0xEF; // 239
-    public static final short RMN_MIN_NODE_ID = 0xF1; // 251
+    public static final short RMN_MIN_NODE_ID = 0xF1; // 241
     public static final short RMN_MAX_NODE_ID = 0xFA; // 250 - Not sure
+    public static final short PDO_SELF_RECEIPT_NODE_ID = 0xFB; // 251
     public static final short BROADCAST_NODE_ID = 0xFF; // 255
     public static final short DUMMY_NODE_ID = 0xFC; // 252
     public static final short ROUTER_TYPE1_DEFAUTL_NODE_ID = 0xFE; // 254
