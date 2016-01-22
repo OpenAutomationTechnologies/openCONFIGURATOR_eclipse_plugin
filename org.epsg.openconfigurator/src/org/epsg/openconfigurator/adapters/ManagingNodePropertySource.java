@@ -828,12 +828,23 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
+        Result res = new Result();
         try {
             if (id instanceof String) {
                 String objectId = (String) id;
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                        mnNode.setName((String) value);
+                        res = OpenConfiguratorCore.GetInstance().SetNodeName(
+                                mnNode.getNetworkId(), mnNode.getNodeId(),
+                                (String) value);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        } else {
+                            mnNode.setName((String) value);
+                        }
                         break;
                     case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
@@ -846,7 +857,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         // Converted us to ns
                         Long lossOfSocTolerance = Long.decode((String) value)
                                 * 1000;
-                        Result res = OpenConfiguratorCore.GetInstance()
+                        res = OpenConfiguratorCore.GetInstance()
                                 .SetLossOfSocTolerance(mnNode.getNetworkId(),
                                         mnNode.getNodeId(), lossOfSocTolerance);
                         if (res.IsSuccessful()) {

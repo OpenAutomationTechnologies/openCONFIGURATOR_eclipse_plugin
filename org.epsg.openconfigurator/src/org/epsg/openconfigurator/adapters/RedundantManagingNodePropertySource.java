@@ -515,22 +515,33 @@ public class RedundantManagingNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
+        Result res = new Result();
         try {
             if (id instanceof String) {
                 String objectId = (String) id;
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                        redundantManagingNode.setName((String) value);
+                        res = OpenConfiguratorCore.GetInstance().SetNodeName(
+                                redundantManagingNode.getNetworkId(),
+                                redundantManagingNode.getNodeId(),
+                                (String) value);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        } else {
+                            redundantManagingNode.setName((String) value);
+                        }
                         break;
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
 
                         short nodeIDvalue = Short.valueOf(((String) value));
                         short oldNodeId = redundantManagingNode.getNodeId();
 
-                        Result res = OpenConfiguratorCore.GetInstance()
-                                .SetNodeId(redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getNodeId(),
-                                        nodeIDvalue);
+                        res = OpenConfiguratorCore.GetInstance().SetNodeId(
+                                redundantManagingNode.getNetworkId(),
+                                redundantManagingNode.getNodeId(), nodeIDvalue);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(

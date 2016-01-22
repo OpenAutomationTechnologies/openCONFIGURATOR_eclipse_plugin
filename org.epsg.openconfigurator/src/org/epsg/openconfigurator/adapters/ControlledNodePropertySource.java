@@ -722,21 +722,30 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
-
+        Result res = new Result();
         try {
             if (id instanceof String) {
                 String objectId = (String) id;
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                        cnNode.setName((String) value);
+                        res = OpenConfiguratorCore.GetInstance().SetNodeName(
+                                cnNode.getNetworkId(), cnNode.getNodeId(),
+                                (String) value);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                        } else {
+                            cnNode.setName((String) value);
+                        }
                         break;
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
                         short nodeIDvalue = Short.valueOf(((String) value));
 
                         short oldNodeId = cnNode.getNodeId();
-                        Result res = OpenConfiguratorCore.GetInstance()
-                                .SetNodeId(cnNode.getNetworkId(), oldNodeId,
-                                        nodeIDvalue);
+                        res = OpenConfiguratorCore.GetInstance().SetNodeId(
+                                cnNode.getNetworkId(), oldNodeId, nodeIDvalue);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(
