@@ -49,108 +49,83 @@ public class LinkWithEditorPartListener implements IPartListener2 {
         this.view = view;
     }
 
+    /**
+     * Notifies POWERLINK network view with state of editor as input.
+     *
+     * @param ref IWorkbenchPartReference
+     */
+    public void notifyView(IWorkbenchPartReference ref) {
+        if (ref.getPart(true) instanceof IEditorPart) {
+            System.out.println("partBroughtToTop: " + ref);
+            IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
+            if (editor != null) {
+                view.editorActivated(editor);
+            }
+        }
+    }
+
+    /**
+     * Notifies the activated state of editor to view.
+     */
     @Override
     public void partActivated(IWorkbenchPartReference ref) {
-
-        if (ref.getPart(true) instanceof IEditorPart) {
-
-            view.editorActivated((IEditorPart) ref.getPart(true));
-        }
+        notifyView(ref);
     }
 
+    /**
+     * Notifies view if the editor is brought to top.
+     */
     @Override
     public void partBroughtToTop(IWorkbenchPartReference ref) {
-
-        if (ref.getPart(true) instanceof IEditorPart) {
-            IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-            if (editor != null) {
-                view.editorActivated(editor);
-            }
-        }
-
-        // if (ref.getPart(true) == view) {
-        // view.editorActivated(view.getViewSite().getPage().getActiveEditor());
-        // }
+        notifyView(ref);
     }
 
+    /**
+     * Notifies the closed state of editor to view.
+     */
     @Override
     public void partClosed(IWorkbenchPartReference ref) {
-        // Working
-        if (ref.getPart(true) instanceof IEditorPart) {
-            view.editorClosed((IEditorPart) ref.getPart(true));
-        }
-
-        // if (ref.getPart(true) == view) {
-        // IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-        // if (editor != null) {
-        // view.editorClosed(editor);
-        // }
-        // }
+        notifyView(ref);
     }
 
+    /**
+     * Notifies the deactivated state of editor to view.
+     */
     @Override
     public void partDeactivated(IWorkbenchPartReference ref) {
-        // nothing to do when the editor is minimized or left focus.
+        notifyView(ref);
     }
 
+    /**
+     * Notifies the hidden state of editor to view.
+     */
     @Override
     public void partHidden(IWorkbenchPartReference ref) {
+        notifyView(ref);
     }
 
+    /**
+     * Notifies view if the input change occurs in the editor.
+     */
     @Override
     public void partInputChanged(IWorkbenchPartReference ref) {
-
-        if (ref.getPart(true) instanceof IEditorPart) {
-            IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-            if (editor != null) {
-                view.editorActivated(editor);
-            }
-        }
-
-        // if (ref.getPart(true) == view) {
-        // IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-        // if (editor != null) {
-        // view.editorActivated(editor);
-        // }
-        // }
+        notifyView(ref);
     }
 
+    /**
+     * Notifies the opened state of editor to view.
+     */
     @Override
     public void partOpened(IWorkbenchPartReference ref) {
-
-        if (ref.getPart(true) instanceof IEditorPart) {
-            System.out.println("Part opened: " + ref);
-            IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-            if (editor != null) {
-                view.editorActivated(editor);
-            }
-        }
-
-        // if (ref.getPart(true) == view) {
-        // IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-        // if (editor != null) {
-        // view.editorActivated(editor);
-        // }
-        // }
+        notifyView(ref);
     }
 
+    /**
+     * Notifies the visible state of editor to view.
+     */
     @Override
     public void partVisible(IWorkbenchPartReference ref) {
-
-        if (ref.getPart(true) instanceof IEditorPart) {
-            System.out.println("Part Visible: " + ref);
-            IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-            if (editor != null) {
-                view.editorActivated(editor);
-            }
-        }
-
-        // if (ref.getPart(true) == view) {
-        // IEditorPart editor = view.getViewSite().getPage().getActiveEditor();
-        // if (editor != null) {
-        // view.editorActivated(editor);
-        // }
-        // }
+        notifyView(ref);
     }
 
 }

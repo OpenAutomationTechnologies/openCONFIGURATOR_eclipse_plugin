@@ -36,7 +36,6 @@ package org.epsg.openconfigurator.views;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -543,21 +542,6 @@ public class IndustrialNetworkView extends ViewPart
         if ((control != null) && !control.isDisposed()) {
             viewer.setInput(rootNode);
         }
-    }
-
-    @Override
-    public void editorClosed(IEditorPart activeEditor) {
-
-        if (!(activeEditor instanceof IndustrialNetworkProjectEditor)) {
-            return;
-        }
-
-        rootNode.setNodeCollection(new HashMap<Short, Node>());
-        Control control = viewer.getControl();
-        if ((control != null) && !control.isDisposed()) {
-            viewer.setInput(rootNode);
-        }
-        viewer.setSelection(TreeSelection.EMPTY);
     }
 
     /**

@@ -49,13 +49,6 @@ public interface ILinkedWithEditorView {
     void editorActivated(IEditorPart activeEditor);
 
     /**
-     * Called when an editor is closed.
-     *
-     * @param activeEditor The closed editor part.
-     */
-    void editorClosed(IEditorPart activeEditor);
-
-    /**
      * @return The site for this view.
      */
     IViewSite getViewSite();
