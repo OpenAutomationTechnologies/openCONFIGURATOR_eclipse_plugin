@@ -343,12 +343,23 @@ public class PowerlinkRootNode {
                 } catch (JAXBException | SAXException
                         | ParserConfigurationException | FileNotFoundException
                         | UnsupportedEncodingException e) {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(
-                                    "XDD/XDC file is invalid for the node "
-                                            + "'" + cnNode.getName() + "("
-                                            + cnNode.getNodeID() + ")" + "'",
-                                    processingNode.getProject().getName());
+                    if (e instanceof FileNotFoundException) {
+                        String errorMessage = MessageFormat.format(
+                                XDC_FILE_NOT_FOUND_ERROR,
+                                processingNode.getNodeIDWithName(),
+                                processingNode.getAbsolutePathToXdc());
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(errorMessage,
+                                        processingNode.getProject().getName());
+                    } else {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(
+                                        e.getCause().getMessage()
+                                                + " for the XDD/XDC file of node "
+                                                + processingNode
+                                                        .getNodeIDWithName(),
+                                        processingNode.getProject().getName());
+                    }
                 }
                 nodeCollection.put(new Short(processingNode.getNodeId()),
                         processingNode);
@@ -396,7 +407,8 @@ public class PowerlinkRootNode {
                         | UnsupportedEncodingException e) {
                     OpenConfiguratorMessageConsole.getInstance()
                             .printErrorMessage(
-                                    e.getCause().getMessage() + " for the node "
+                                    e.getCause().getMessage()
+                                            + " for the XDD/XDC file of the node "
                                             + "'" + rmnNode.getName() + "("
                                             + rmnNode.getNodeID() + ")" + "'",
                                     processingNode.getProject().getName());
@@ -415,6 +427,8 @@ public class PowerlinkRootNode {
             String errorMessage = MessageFormat.format(
                     INVALID_XDC_CONTENTS_ERROR,
                     processingNode.getNodeIDWithName(), xdcPath);
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    errorMessage, processingNode.getProject().getName());
             return new Status(IStatus.ERROR,
                     org.epsg.openconfigurator.Activator.PLUGIN_ID, errorMessage,
                     e);
@@ -424,7 +438,8 @@ public class PowerlinkRootNode {
 
             String errorMessage = MessageFormat.format(XDC_FILE_NOT_FOUND_ERROR,
                     processingNode.getNodeIDWithName(), xdcPath);
-
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    errorMessage, processingNode.getProject().getName());
             return new Status(IStatus.ERROR,
                     org.epsg.openconfigurator.Activator.PLUGIN_ID, errorMessage,
                     e1);
@@ -494,8 +509,26 @@ public class PowerlinkRootNode {
 
             monitor.subTask("Updating node:" + node.getNodeIDWithName() + " ->"
                     + node.getPathToXDC());
-
-            res = OpenConfiguratorProjectUtils.persistNodeData(node);
+            try {
+                res = OpenConfiguratorProjectUtils.persistNodeData(node);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (e instanceof FileNotFoundException) {
+                    String errorMessage = MessageFormat.format(
+                            XDC_FILE_NOT_FOUND_ERROR, node.getNodeIDWithName(),
+                            node.getAbsolutePathToXdc());
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(errorMessage,
+                                    node.getProject().getName());
+                } else {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    e.getCause().getMessage()
+                                            + " for the  XDD/XDC file of node "
+                                            + node.getNodeIDWithName() + ".",
+                                    node.getProject().getName());
+                }
+            }
             if (!res.IsSuccessful()) {
                 // Continue operation for other nodes
                 continue;
