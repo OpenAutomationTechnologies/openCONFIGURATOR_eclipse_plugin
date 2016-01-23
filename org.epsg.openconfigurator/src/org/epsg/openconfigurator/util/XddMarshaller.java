@@ -83,9 +83,6 @@ public final class XddMarshaller {
             exception.printStackTrace();
 
             PluginErrorDialogUtils.displayErrorMessageDialog(
-                    org.epsg.openconfigurator.Activator.getDefault()
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(),
                     XddMarshaller.XDD_SCHEMA_NOT_FOUND, exception);
         }
 
@@ -99,9 +96,6 @@ public final class XddMarshaller {
             } catch (SAXException e) {
                 e.printStackTrace();
                 PluginErrorDialogUtils.displayErrorMessageDialog(
-                        org.epsg.openconfigurator.Activator.getDefault()
-                                .getWorkbench().getActiveWorkbenchWindow()
-                                .getShell(),
                         XddMarshaller.XDD_SCHEMA_INVALID, e);
             }
         }

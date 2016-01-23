@@ -429,7 +429,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "Property: " + id + " " + e.getMessage());
+                    "Property: " + id + " " + e.getMessage(),
+                    mnNode.getNetworkId());
             retObj = StringUtils.EMPTY;
         }
         return retObj;
@@ -839,9 +840,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         } else {
                             mnNode.setName((String) value);
                         }
@@ -864,9 +863,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             mnNode.setLossOfSocTolerance(lossOfSocTolerance);
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
                         break;
                     case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT:
@@ -892,9 +889,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                                     Long.decode((String) value));
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -907,9 +902,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                                     Short.decode((String) value));
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -963,9 +956,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             mnNode.setCycleTime(cycleTimeValue);
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -977,9 +968,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             mnNode.setAsyncMtu(asyncMtuValue);
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -995,9 +984,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                                     multiplxCyclCntVal);
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -1010,9 +997,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             mnNode.setPrescaler(preScalarVal);
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -1026,7 +1011,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance()
-                    .printErrorMessage(e.getMessage());
+                    .printErrorMessage(e.getMessage(), mnNode.getNetworkId());
         }
 
         try {

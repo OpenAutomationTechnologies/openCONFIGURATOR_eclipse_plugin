@@ -229,12 +229,14 @@ public class PdoChannel {
                 nodeIdValue = Integer.decode(targetNodeId).shortValue();
             } catch (NumberFormatException ex) {
                 OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                        "Invalid Target node Id for channel" + getText());
+                        "Invalid Target node Id for channel" + getText(),
+                        getNode().getProject().getName());
             }
         } else {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Subobject " + communicationParam.getObjectIndex()
-                            + "/0x01 not found.");
+                            + "/0x01 not found.",
+                    getNode().getProject().getName());
         }
 
         return nodeIdValue;

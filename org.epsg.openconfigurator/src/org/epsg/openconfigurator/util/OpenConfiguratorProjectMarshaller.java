@@ -80,11 +80,7 @@ public final class OpenConfiguratorProjectMarshaller {
         } catch (IOException exception) {
             exception.printStackTrace();
 
-            PluginErrorDialogUtils
-            .displayErrorMessageDialog(
-                    org.epsg.openconfigurator.Activator.getDefault()
-                    .getWorkbench().getActiveWorkbenchWindow()
-                    .getShell(),
+            PluginErrorDialogUtils.displayErrorMessageDialog(
                     OpenConfiguratorProjectMarshaller.PROJECT_XML_SCHEMA_NOT_FOUND,
                     exception);
         }
@@ -98,11 +94,7 @@ public final class OpenConfiguratorProjectMarshaller {
                         .newSchema(projectSchemaFile);
             } catch (SAXException e) {
                 e.printStackTrace();
-                PluginErrorDialogUtils
-                .displayErrorMessageDialog(
-                        org.epsg.openconfigurator.Activator
-                        .getDefault().getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
+                PluginErrorDialogUtils.displayErrorMessageDialog(
                         OpenConfiguratorProjectMarshaller.PROJECT_XML_SCHEMA_INVALID,
                         e);
             }

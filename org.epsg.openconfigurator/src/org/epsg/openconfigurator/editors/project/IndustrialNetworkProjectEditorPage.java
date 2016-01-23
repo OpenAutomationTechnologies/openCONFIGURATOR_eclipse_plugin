@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -207,9 +208,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         System.err.println(autoGenerationCombo.getText() + " "
                                 + errorMessage);
 
-                        PluginErrorDialogUtils.displayErrorMessageDialog(
-                                getSite().getShell(), errorMessage, null);
-
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, libApiRes);
                         return;
                     }
 
@@ -223,13 +223,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                     // Enable editable settings controls for only other than all
                     // and none which are by default empty.
-                    if (currentProject
-                            .getProjectConfiguration()
-                            .getActiveAutoGenerationSetting()
-                            .equalsIgnoreCase(
+                    if (currentProject.getProjectConfiguration()
+                            .getActiveAutoGenerationSetting().equalsIgnoreCase(
                                     OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-                            || currentProject
-                                    .getProjectConfiguration()
+                            || currentProject.getProjectConfiguration()
                                     .getActiveAutoGenerationSetting()
                                     .equalsIgnoreCase(
                                             OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)) {
@@ -258,24 +255,20 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                 int[] selectedIndices = agSettingsTable.getSelectionIndices();
                 if (selectedIndices.length <= 0) {
-                    System.err
-                            .println(IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR);
-                    PluginErrorDialogUtils
-                            .displayErrorMessageDialog(
-                                    getSite().getShell(),
-                                    IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR,
-                                    null);
+                    System.err.println(
+                            IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR);
+                    PluginErrorDialogUtils.displayErrorMessageDialog(
+                            IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR,
+                            new Exception());
                     return;
                 }
 
                 if (selectedIndices.length > 1) {
-                    System.err
-                            .println(IndustrialNetworkProjectEditorPage.MULTIPSE_SELECTION_NOT_ALLOWED_ERROR);
-                    PluginErrorDialogUtils
-                            .displayErrorMessageDialog(
-                                    getSite().getShell(),
-                                    IndustrialNetworkProjectEditorPage.MULTIPSE_SELECTION_NOT_ALLOWED_ERROR,
-                                    null);
+                    System.err.println(
+                            IndustrialNetworkProjectEditorPage.MULTIPSE_SELECTION_NOT_ALLOWED_ERROR);
+                    PluginErrorDialogUtils.displayErrorMessageDialog(
+                            IndustrialNetworkProjectEditorPage.MULTIPSE_SELECTION_NOT_ALLOWED_ERROR,
+                            new Exception());
                     return;
                 }
 
@@ -305,16 +298,15 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     .getErrorMessage(libApiRes);
                             System.err.println(activeAgSettings.getId() + ":"
                                     + newData.getName() + ": " + errorMessage);
-                            PluginErrorDialogUtils.displayErrorMessageDialog(
-                                    getSite().getShell(), errorMessage, null);
+                            PluginErrorDialogUtils.showMessageWindow(
+                                    MessageDialog.ERROR, libApiRes);
 
                             return;
                         }
 
                         if (!activeAgSettings.getSetting().remove(newData)) {
-                            System.err
-                                    .println(newData.getName()
-                                            + IndustrialNetworkProjectEditorPage.ERROR_MESSAGE);
+                            System.err.println(newData.getName()
+                                    + IndustrialNetworkProjectEditorPage.ERROR_MESSAGE);
                         }
 
                         IndustrialNetworkProjectEditorPage.this.setDirty(true);
@@ -337,9 +329,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     + modifiedData.getValue() + ". "
                                     + errorMessage);
 
-                            PluginErrorDialogUtils.displayErrorMessageDialog(
-                                    getSite().getShell(), errorMessage, null);
-
+                            PluginErrorDialogUtils.showMessageWindow(
+                                    MessageDialog.ERROR, libApiRes);
                             return;
                         }
 
@@ -362,9 +353,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     + modifiedData.isEnabled() + ". "
                                     + errorMessage);
 
-                            PluginErrorDialogUtils.displayErrorMessageDialog(
-                                    getSite().getShell(), errorMessage, null);
-
+                            PluginErrorDialogUtils.showMessageWindow(
+                                    MessageDialog.ERROR, libApiRes);
                             return;
                         }
 
@@ -407,9 +397,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     + newSetting.getName() + ":"
                                     + newSetting.getValue() + ". "
                                     + errorMessage);
-                            PluginErrorDialogUtils.displayErrorMessageDialog(
-                                    getSite().getShell(), errorMessage, null);
-
+                            PluginErrorDialogUtils.showMessageWindow(
+                                    MessageDialog.ERROR, libApiRes);
                             return;
                         }
 
@@ -427,9 +416,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     + newSetting.isEnabled() + ". "
                                     + errorMessage);
 
-                            PluginErrorDialogUtils.displayErrorMessageDialog(
-                                    getSite().getShell(), errorMessage, null);
-
+                            PluginErrorDialogUtils.showMessageWindow(
+                                    MessageDialog.ERROR, libApiRes);
                             return;
                         }
 
@@ -455,9 +443,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     System.err.println(
                             IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR);
                     PluginErrorDialogUtils.displayErrorMessageDialog(
-                            getSite().getShell(),
                             IndustrialNetworkProjectEditorPage.NO_ROWS_SELECTED_ERROR,
-                            null);
+                            new Exception());
                     return;
                 }
 
@@ -485,11 +472,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     System.err.println(activeAgSetting.getId()
                                             + ":" + setting.getName() + " . "
                                             + errorMessage);
-                                    PluginErrorDialogUtils
-                                            .displayErrorMessageDialog(
-                                                    getSite().getShell(),
-                                                    errorMessage, null);
-
+                                    PluginErrorDialogUtils.showMessageWindow(
+                                            MessageDialog.ERROR, libApiRes);
                                     return;
                                 }
 
@@ -505,8 +489,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 }
 
             } else {
-                System.err
-                        .println(IndustrialNetworkProjectEditorPage.NO_LISTENERS_REGISTERED_ERROR
+                System.err.println(
+                        IndustrialNetworkProjectEditorPage.NO_LISTENERS_REGISTERED_ERROR
                                 + "." + e.widget.toString());
             }
         }
@@ -531,8 +515,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     .getSetting();
 
                             for (TKeyValuePair setting : settingsList) {
-                                if (selectedItem.getText(0).equals(
-                                        setting.getName())) {
+                                if (selectedItem.getText(0)
+                                        .equals(setting.getName())) {
 
                                     Result libApiRes = OpenConfiguratorCore
                                             .GetInstance()
@@ -542,15 +526,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                                     setting.getName(),
                                                     !setting.isEnabled());
                                     if (!libApiRes.IsSuccessful()) {
-                                        String errorMessage = OpenConfiguratorLibraryUtils
-                                                .getErrorMessage(libApiRes);
                                         PluginErrorDialogUtils
-                                                .displayErrorMessageDialog(
-                                                        getSite().getShell(),
-                                                        errorMessage, null);
-
-                                        // TODO: Display a dialog to report it
-                                        // to the user
+                                                .showMessageWindow(
+                                                        MessageDialog.ERROR,
+                                                        libApiRes);
                                         return;
                                     }
 
@@ -560,8 +539,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                 }
                             }
                         }
-
-                        // IndustrialNetworkProjectEditorPage.this.firePropertyChange(IEditorPart.PROP_INPUT);
                     }
                 } else if (e.detail == SWT.NONE) {
                     // TODO Handle "Delete" button enable/disable.
@@ -622,19 +599,18 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private void createAutoGenerationSettingsSection(
             final IManagedForm managedForm) {
         Section sctnAutoGenerationSettings = managedForm.getToolkit()
-                .createSection(
-                        managedForm.getForm().getBody(),
+                .createSection(managedForm.getForm().getBody(),
                         ExpandableComposite.EXPANDED | Section.DESCRIPTION
                                 | ExpandableComposite.TWISTIE
                                 | ExpandableComposite.TITLE_BAR);
         managedForm.getToolkit().paintBordersFor(sctnAutoGenerationSettings);
-        sctnAutoGenerationSettings
-                .setText(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING);
-        sctnAutoGenerationSettings
-                .setDescription(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION);
+        sctnAutoGenerationSettings.setText(
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING);
+        sctnAutoGenerationSettings.setDescription(
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_HEADING_DESCRIPTION);
 
-        Composite clientComposite = toolkit.createComposite(
-                sctnAutoGenerationSettings, SWT.WRAP);
+        Composite clientComposite = toolkit
+                .createComposite(sctnAutoGenerationSettings, SWT.WRAP);
         GridLayout layout = new GridLayout(3, false);
         layout.marginWidth = 2;
         layout.marginHeight = 2;
@@ -643,40 +619,37 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
         sctnAutoGenerationSettings.setClient(clientComposite);
 
-        Label activeAutoGenerationSettingsLabel = toolkit
-                .createLabel(
-                        clientComposite,
-                        IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_ACTIVEGROUP_LABEL);
-        activeAutoGenerationSettingsLabel.setLayoutData(new GridData(SWT.RIGHT,
-                SWT.CENTER, false, false, 1, 1));
-        activeAutoGenerationSettingsLabel.setForeground(toolkit.getColors()
-                .getColor(IFormColors.TITLE));
+        Label activeAutoGenerationSettingsLabel = toolkit.createLabel(
+                clientComposite,
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_ACTIVEGROUP_LABEL);
+        activeAutoGenerationSettingsLabel.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        activeAutoGenerationSettingsLabel
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         autoGenerationCombo = new Combo(clientComposite, SWT.READ_ONLY);
-        autoGenerationCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        autoGenerationCombo.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(autoGenerationCombo, true, true);
 
-        btnModifyAutoGenerationSettings = toolkit
-                .createButton(
-                        clientComposite,
-                        IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_MODIFY_LABEL,
-                        SWT.PUSH);
+        btnModifyAutoGenerationSettings = toolkit.createButton(clientComposite,
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_MODIFY_LABEL,
+                SWT.PUSH);
         GridData gd = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         btnModifyAutoGenerationSettings.setLayoutData(gd);
 
         Label dummyLabel = new Label(clientComposite, SWT.WRAP);
-        dummyLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false, 3, 1));
-        dummyLabel
-                .setText(IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_INFO_LABEL);
+        dummyLabel.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 3, 1));
+        dummyLabel.setText(
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_INFO_LABEL);
         toolkit.adapt(dummyLabel, true, true);
-        dummyLabel.setForeground(toolkit.getColors()
-                .getColor(IFormColors.TITLE));
+        dummyLabel
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
-        agSettingsTable = toolkit.createTable(clientComposite, SWT.CHECK
-                | SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL
-                | SWT.FULL_SELECTION);
+        agSettingsTable = toolkit.createTable(clientComposite,
+                SWT.CHECK | SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL
+                        | SWT.H_SCROLL | SWT.FULL_SELECTION);
         gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 3);
         gd.heightHint = 100;
         agSettingsTable.setLayoutData(gd);
@@ -705,27 +678,21 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             }
         });
 
-        addSettingsButton = toolkit
-                .createButton(
-                        clientComposite,
-                        IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_ADD_LABEL,
-                        SWT.PUSH);
+        addSettingsButton = toolkit.createButton(clientComposite,
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_ADD_LABEL,
+                SWT.PUSH);
         gd = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         addSettingsButton.setLayoutData(gd);
 
-        editSettingsButton = toolkit
-                .createButton(
-                        clientComposite,
-                        IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_EDIT_LABEL,
-                        SWT.PUSH);
+        editSettingsButton = toolkit.createButton(clientComposite,
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_EDIT_LABEL,
+                SWT.PUSH);
         gd = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
         editSettingsButton.setLayoutData(gd);
 
-        deleteSettingsButton = toolkit
-                .createButton(
-                        clientComposite,
-                        IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_DELETE_LABEL,
-                        SWT.PUSH);
+        deleteSettingsButton = toolkit.createButton(clientComposite,
+                IndustrialNetworkProjectEditorPage.AUTOGENERATIONSETTINGS_SECTION_DELETE_LABEL,
+                SWT.PUSH);
         gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
         deleteSettingsButton.setLayoutData(gd);
 
@@ -770,14 +737,16 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      * @param managedForm The parent form.
      */
     private void createGeneratorWidgets(final IManagedForm managedForm) {
-        Section sctnGenerator = toolkit.createSection(managedForm.getForm()
-                .getBody(), ExpandableComposite.EXPANDED | Section.DESCRIPTION
-                | ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        Section sctnGenerator = toolkit.createSection(
+                managedForm.getForm().getBody(),
+                ExpandableComposite.EXPANDED | Section.DESCRIPTION
+                        | ExpandableComposite.TWISTIE
+                        | ExpandableComposite.TITLE_BAR);
         managedForm.getToolkit().paintBordersFor(sctnGenerator);
-        sctnGenerator
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING);
-        sctnGenerator
-                .setDescription(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING_DESCRIPTION);
+        sctnGenerator.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING);
+        sctnGenerator.setDescription(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_HEADING_DESCRIPTION);
 
         Composite client = toolkit.createComposite(sctnGenerator, SWT.WRAP);
         GridLayout layout = new GridLayout(2, false);
@@ -788,107 +757,107 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         sctnGenerator.setClient(client);
 
         Label generatorvendor = new Label(client, SWT.NONE);
-        generatorvendor.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatorvendor
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VENDOR_NAME_LABEL);
+        generatorvendor.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatorvendor.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VENDOR_NAME_LABEL);
         toolkit.adapt(generatorvendor, true, true);
-        generatorvendor.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatorvendor
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorVendorText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorVendorText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        generatorVendorText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorVendorText, true, true);
         generatorVendorText.setEnabled(false);
 
         Label generatortoolName = new Label(client, SWT.NONE);
-        generatortoolName.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatortoolName
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_TOOL_NAME_LABEL);
+        generatortoolName.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatortoolName.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_TOOL_NAME_LABEL);
         toolkit.adapt(generatortoolName, true, true);
-        generatortoolName.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatortoolName
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorToolNameText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorToolNameText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        generatorToolNameText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorToolNameText, true, true);
         generatorToolNameText.setEnabled(false);
 
         Label generatorVersion = new Label(client, SWT.NONE);
-        generatorVersion.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatorVersion
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VERSION_LABEL);
+        generatorVersion.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatorVersion.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_VERSION_LABEL);
         toolkit.adapt(generatorVersion, true, true);
-        generatorVersion.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatorVersion
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorVersionText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorVersionText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        generatorVersionText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorVersionText, true, true);
         generatorVersionText.setEnabled(false);
 
         Label generatorCreatedOn = new Label(client, SWT.NONE);
-        generatorCreatedOn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatorCreatedOn
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_ON_LABEL);
+        generatorCreatedOn.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatorCreatedOn.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_ON_LABEL);
         toolkit.adapt(generatorCreatedOn, true, true);
-        generatorCreatedOn.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatorCreatedOn
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorCreatedOnText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorCreatedOnText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        generatorCreatedOnText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorCreatedOnText, true, true);
         generatorCreatedOnText.setEnabled(false);
 
         Label generatorModifiedOn = new Label(client, SWT.NONE);
-        generatorModifiedOn.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatorModifiedOn
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_ON_LABEL);
+        generatorModifiedOn.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatorModifiedOn.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_ON_LABEL);
         toolkit.adapt(generatorModifiedOn, true, true);
-        generatorModifiedOn.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatorModifiedOn
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorModifiedOnText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorModifiedOnText.setLayoutData(new GridData(SWT.FILL,
-                SWT.CENTER, true, false, 1, 1));
+        generatorModifiedOnText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorModifiedOnText, true, true);
         generatorModifiedOnText.setEnabled(false);
 
         Label generatorCreatedBy = new Label(client, SWT.NONE);
-        generatorCreatedBy.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatorCreatedBy
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_BY_LABEL);
+        generatorCreatedBy.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatorCreatedBy.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_CREATED_BY_LABEL);
         toolkit.adapt(generatorCreatedBy, true, true);
-        generatorCreatedBy.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatorCreatedBy
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorCreatedByText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorCreatedByText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        generatorCreatedByText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorCreatedByText, true, true);
         generatorCreatedByText.setEnabled(false);
 
         Label generatorModifiedBy = new Label(client, SWT.NONE);
-        generatorModifiedBy.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER,
-                false, false, 1, 1));
-        generatorModifiedBy
-                .setText(IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_BY_LABEL);
+        generatorModifiedBy.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        generatorModifiedBy.setText(
+                IndustrialNetworkProjectEditorPage.GENERATOR_SECTION_MODIFIED_BY_LABEL);
         toolkit.adapt(generatorModifiedBy, true, true);
-        generatorModifiedBy.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        generatorModifiedBy
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         generatorModifiedByText = new Text(client, SWT.NONE | SWT.WRAP);
-        generatorModifiedByText.setLayoutData(new GridData(SWT.FILL,
-                SWT.CENTER, true, false, 1, 1));
+        generatorModifiedByText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(generatorModifiedByText, true, true);
         generatorModifiedByText.setEnabled(false);
     }
@@ -899,17 +868,18 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      *
      * @param managedForm The parent form.
      */
-    private void createProjectPathSettingsSection(final IManagedForm managedForm) {
+    private void createProjectPathSettingsSection(
+            final IManagedForm managedForm) {
         Section sctnPathSettings = managedForm.getToolkit().createSection(
                 managedForm.getForm().getBody(),
                 ExpandableComposite.EXPANDED | Section.DESCRIPTION
                         | ExpandableComposite.TWISTIE
                         | ExpandableComposite.TITLE_BAR);
         managedForm.getToolkit().paintBordersFor(sctnPathSettings);
-        sctnPathSettings
-                .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING);
-        sctnPathSettings
-                .setDescription(IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING_DESCRIPTION);
+        sctnPathSettings.setText(
+                IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING);
+        sctnPathSettings.setDescription(
+                IndustrialNetworkProjectEditorPage.PATH_SECTION_HEADING_DESCRIPTION);
 
         Composite clientComposite = toolkit.createComposite(sctnPathSettings,
                 SWT.WRAP);
@@ -922,33 +892,35 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         sctnPathSettings.setClient(clientComposite);
 
         Label lblOutputPath = new Label(clientComposite, SWT.NONE);
-        lblOutputPath.setLayoutData(new GridData(SWT.RIGHT, SWT.CENTER, false,
-                false, 1, 1));
-        lblOutputPath
-                .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_OUTPUT_PATH_LABEL);
+        lblOutputPath.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        lblOutputPath.setText(
+                IndustrialNetworkProjectEditorPage.PATH_SECTION_OUTPUT_PATH_LABEL);
         toolkit.adapt(lblOutputPath, true, true);
-        lblOutputPath.setForeground(toolkit.getColors().getColor(
-                IFormColors.TITLE));
+        lblOutputPath
+                .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
-        pathDropDown = new Combo(clientComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-        pathDropDown.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false, 1, 1));
+        pathDropDown = new Combo(clientComposite,
+                SWT.DROP_DOWN | SWT.READ_ONLY);
+        pathDropDown.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(pathDropDown, true, true);
 
         Button btnModifyOutputPath = new Button(clientComposite, SWT.PUSH);
-        btnModifyOutputPath
-                .setText(IndustrialNetworkProjectEditorPage.PATH_SECTION_ADD_LABEL);
-        btnModifyOutputPath.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                false, false, 1, 1));
+        btnModifyOutputPath.setText(
+                IndustrialNetworkProjectEditorPage.PATH_SECTION_ADD_LABEL);
+        btnModifyOutputPath.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         toolkit.adapt(btnModifyOutputPath, true, true);
         btnModifyOutputPath.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
 
                 TPath path = new TPath();
-                AddEditTPathDialog pathDialog = new AddEditTPathDialog(form
-                        .getShell(), currentProject.getProjectConfiguration()
-                        .getPathSettings(), path);
+                AddEditTPathDialog pathDialog = new AddEditTPathDialog(
+                        form.getShell(), currentProject
+                                .getProjectConfiguration().getPathSettings(),
+                        path);
                 if (pathDialog.open() == Window.OK) {
                     if (pathDialog.isDirty()) {
                         setDirty(true);
@@ -994,15 +966,14 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         });
 
         Label dummyLabel = toolkit.createLabel(clientComposite, "");
-        dummyLabel.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false, 1, 1));
+        dummyLabel.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
-        Hyperlink link = toolkit
-                .createHyperlink(
-                        clientComposite,
-                        IndustrialNetworkProjectEditorPage.PATH_SECTION_MODIFY_PATH_LIST_HYPERLINK_LABEL,
-                        SWT.RIGHT);
-        link.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        Hyperlink link = toolkit.createHyperlink(clientComposite,
+                IndustrialNetworkProjectEditorPage.PATH_SECTION_MODIFY_PATH_LIST_HYPERLINK_LABEL,
+                SWT.RIGHT);
+        link.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(link, true, true);
         link.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
         link.addHyperlinkListener(new HyperlinkAdapter() {
@@ -1112,8 +1083,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      */
     private void initProjectConfigurationData() {
         if (currentProject == null) {
-            System.err
-            .println(IndustrialNetworkProjectEditorPage.ERROR_INITIALISATION_FAILED);
+            System.err.println(
+                    IndustrialNetworkProjectEditorPage.ERROR_INITIALISATION_FAILED);
             return;
         }
 
@@ -1135,8 +1106,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         .getPathSettings().getPath().get(0);
                 pathDropDown.setText(path.getId() + " : " + path.getPath());
             } catch (IndexOutOfBoundsException e) {
-                System.err
-                        .println(IndustrialNetworkProjectEditorPage.ERROR_NO_PATH_AVAILABLE);
+                System.err.println(
+                        IndustrialNetworkProjectEditorPage.ERROR_NO_PATH_AVAILABLE);
             }
 
         }
@@ -1146,15 +1117,11 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         updateActiveAutoGenerationSetting();
         reloadAutoGenerationSettingsTable();
 
-        if (currentProject
-                .getProjectConfiguration()
-                .getActiveAutoGenerationSetting()
-                .equalsIgnoreCase(
+        if (currentProject.getProjectConfiguration()
+                .getActiveAutoGenerationSetting().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-                || currentProject
-                        .getProjectConfiguration()
-                        .getActiveAutoGenerationSetting()
-                        .equalsIgnoreCase(
+                || currentProject.getProjectConfiguration()
+                        .getActiveAutoGenerationSetting().equalsIgnoreCase(
                                 OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)) {
             setEnabledSettingsControls(false);
         } else {
@@ -1185,13 +1152,13 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         }
 
         if (getGenerator().getCreatedOn() != null) {
-            generatorCreatedOnText.setText(getGenerator().getCreatedOn()
-                    .toString());
+            generatorCreatedOnText
+                    .setText(getGenerator().getCreatedOn().toString());
         }
 
         if (getGenerator().getModifiedOn() != null) {
-            generatorModifiedOnText.setText(getGenerator().getModifiedOn()
-                    .toString());
+            generatorModifiedOnText
+                    .setText(getGenerator().getModifiedOn().toString());
         }
 
         if (getGenerator().getCreatedBy() != null) {
@@ -1295,7 +1262,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             }
         }
 
-        for (int loopIndex = 0; loopIndex < agSettingsTable.getColumnCount(); loopIndex++) {
+        for (int loopIndex = 0; loopIndex < agSettingsTable
+                .getColumnCount(); loopIndex++) {
             agSettingsTable.getColumn(loopIndex).pack();
         }
     }
@@ -1305,16 +1273,16 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      * page.
      */
     private void removeListenersToControls() {
-        autoGenerationCombo
-                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
-        btnModifyAutoGenerationSettings
-                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
-        addSettingsButton
-                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
-        editSettingsButton
-                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
-        deleteSettingsButton
-                .removeSelectionListener(autoGenerationSettingsSelectionAdapter);
+        autoGenerationCombo.removeSelectionListener(
+                autoGenerationSettingsSelectionAdapter);
+        btnModifyAutoGenerationSettings.removeSelectionListener(
+                autoGenerationSettingsSelectionAdapter);
+        addSettingsButton.removeSelectionListener(
+                autoGenerationSettingsSelectionAdapter);
+        editSettingsButton.removeSelectionListener(
+                autoGenerationSettingsSelectionAdapter);
+        deleteSettingsButton.removeSelectionListener(
+                autoGenerationSettingsSelectionAdapter);
         agSettingsTable
                 .removeSelectionListener(autoGenerationSettingsTableAdapter);
     }
@@ -1368,11 +1336,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         String activeAutoGenerationSetting = currentProject
                 .getProjectConfiguration().getActiveAutoGenerationSetting();
 
-        if (isActiveAutoGenerationSettingAvailable(activeAutoGenerationSetting)) {
+        if (isActiveAutoGenerationSettingAvailable(
+                activeAutoGenerationSetting)) {
             autoGenerationCombo.setText(activeAutoGenerationSetting);
         } else {
-            System.err
-                    .println("An error occurred in active auto generation setting. "
+            System.err.println(
+                    "An error occurred in active auto generation setting. "
                             + activeAutoGenerationSetting);
             autoGenerationCombo.select(0);
             if (!autoGenerationCombo.getText().isEmpty()) {
@@ -1383,10 +1352,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     // TODO: Display a dialog to report it to the user
                     // TODO: set the combo value back to old one.
                     System.err.println("SetActiveConfiguration: "
-                            + autoGenerationCombo.getText()
-                            + "."
+                            + autoGenerationCombo.getText() + "."
                             + OpenConfiguratorLibraryUtils
-                            .getErrorMessage(libApiRes));
+                                    .getErrorMessage(libApiRes));
                 }
 
                 currentProject.getProjectConfiguration()

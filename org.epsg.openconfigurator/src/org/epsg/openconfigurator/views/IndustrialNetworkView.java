@@ -637,7 +637,8 @@ public class IndustrialNetworkView extends ViewPart
                             rootNode.toggleEnableDisable(node);
                         } catch (JDOMException | IOException e) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(e.getMessage());
+                                    .printErrorMessage(e.getMessage(),
+                                            node.getProject().getName());
                             e.printStackTrace();
                         }
                         viewer.refresh();
@@ -650,7 +651,8 @@ public class IndustrialNetworkView extends ViewPart
                         rootNode.toggleEnableDisable(node);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(e.getMessage());
+                                .printErrorMessage(e.getMessage(),
+                                        node.getProject().getName());
                         e.printStackTrace();
                     }
                     viewer.refresh();
@@ -713,14 +715,19 @@ public class IndustrialNetworkView extends ViewPart
                                     if (e instanceof NoSuchFileException) {
                                         OpenConfiguratorMessageConsole
                                                 .getInstance()
-                                                .printErrorMessage("The file "
-                                                        + e.getMessage()
-                                                        + " cannot be found.");
+                                                .printErrorMessage(
+                                                        "The file "
+                                                                + e.getMessage()
+                                                                + " cannot be found.",
+                                                        node.getProject()
+                                                                .getName());
                                     } else {
                                         OpenConfiguratorMessageConsole
                                                 .getInstance()
                                                 .printErrorMessage(
-                                                        e.getMessage());
+                                                        e.getMessage(),
+                                                        node.getProject()
+                                                                .getName());
                                     }
                                     e.printStackTrace();
                                 }
@@ -736,12 +743,16 @@ public class IndustrialNetworkView extends ViewPart
                             } catch (JDOMException | IOException e) {
                                 if (e instanceof NoSuchFileException) {
                                     OpenConfiguratorMessageConsole.getInstance()
-                                            .printErrorMessage("The file "
-                                                    + e.getMessage()
-                                                    + " cannot be found.");
+                                            .printErrorMessage(
+                                                    "The file " + e.getMessage()
+                                                            + " cannot be found.",
+                                                    node.getProject()
+                                                            .getName());
                                 } else {
                                     OpenConfiguratorMessageConsole.getInstance()
-                                            .printErrorMessage(e.getMessage());
+                                            .printErrorMessage(e.getMessage(),
+                                                    node.getProject()
+                                                            .getName());
                                 }
                                 e.printStackTrace();
                             }

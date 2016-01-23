@@ -37,7 +37,6 @@ import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -60,7 +59,6 @@ public final class PluginErrorDialogUtils {
     /**
      * Displays an error dialog with a given error-message.
      *
-     * @param parent Parent window for the dialog.
      * @param errorMessage Error message to be shown in the dialog.
      * @param exception Exception instance if any, can be null.
      * @return the code of the button that was pressed that resulted in this
@@ -68,26 +66,6 @@ public final class PluginErrorDialogUtils {
      *         pressed, or Dialog.CANCEL if this dialog's close window
      *         decoration or the ESC key was used.
      */
-    @Deprecated
-    public static int displayErrorMessageDialog(final Shell parent,
-            final String errorMessage, final Throwable exception) {
-        IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
-                errorMessage, exception);
-        return ErrorDialog.openError(parent,
-                PluginErrorDialogUtils.INTERNAL_ERROR_MESSAGE, null,
-                errorStatus);
-    }
-
-    public static int displayErrorMessageDialog(final String title,
-            final Result result) {
-        IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
-                OpenConfiguratorLibraryUtils.getErrorMessage(result), null);
-        return ErrorDialog.openError(
-                org.epsg.openconfigurator.Activator.getDefault().getWorkbench()
-                        .getActiveWorkbenchWindow().getShell(),
-                title, null, errorStatus);
-    }
-
     public static int displayErrorMessageDialog(final String errorMessage,
             final Throwable exception) {
         IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID, 1,
@@ -121,13 +99,30 @@ public final class PluginErrorDialogUtils {
     }
 
     /**
-     * Displays the message in a dialog.
+     * Displays the library message in a dialog.
      *
      * @param messageType The message type determines the image to be displayed.
      * @param message The message to be shown.
      */
-    public static void showMessageWindow(int messageType, String message) {
-        OpenConfiguratorMessageConsole.getInstance().printErrorMessage(message);
+    public static void showMessageWindow(int messageType, Result res) {
+        OpenConfiguratorMessageConsole.getInstance()
+                .printLibraryErrorMessage(res);
+        String message = res.GetErrorMessage();
+        MessageDialog.open(messageType, Display.getDefault().getActiveShell(),
+                "Error", message, SWT.NONE);
+    }
+
+    /**
+     * Displays the message in a dialog.
+     *
+     * @param messageType The message type determines the image to be displayed.
+     * @param message The message to be shown.
+     * @param projectName The name of the project.
+     */
+    public static void showMessageWindow(int messageType, String message,
+            String projectName) {
+        OpenConfiguratorMessageConsole.getInstance().printErrorMessage(message,
+                projectName);
         MessageDialog.open(messageType, Display.getDefault().getActiveShell(),
                 "Error", message, SWT.NONE);
     }

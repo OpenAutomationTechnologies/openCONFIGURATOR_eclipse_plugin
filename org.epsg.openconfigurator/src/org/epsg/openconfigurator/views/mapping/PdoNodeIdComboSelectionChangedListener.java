@@ -121,7 +121,8 @@ import org.jdom2.JDOMException;
                             subObj.setActualValue(node.getNodeIdString(), true);
                         } catch (JDOMException | IOException e) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(e.getMessage());
+                                    .printErrorMessage(e.getMessage(),
+                                            node.getProject().getName());
                             e.printStackTrace();
                         }
                         try {

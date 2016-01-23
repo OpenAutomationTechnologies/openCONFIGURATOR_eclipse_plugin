@@ -527,7 +527,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "Property: " + id + " " + e.getMessage());
+                    "Property: " + id + " " + e.getMessage(),
+                    cnNode.getNetworkId());
             retObj = StringUtils.EMPTY;
         }
         return retObj;
@@ -645,7 +646,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 short nodeIDvalue = Short.valueOf(((String) id));
-                if ((nodeIDvalue == 0) || (nodeIDvalue >= 240)) {
+                if ((nodeIDvalue == 0)
+                        || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
                     return "Invalid node id for a Controlled node";
                 }
 
@@ -733,9 +735,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         } else {
                             cnNode.setName((String) value);
                         }
@@ -748,9 +748,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                 cnNode.getNetworkId(), oldNodeId, nodeIDvalue);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         } else {
                             cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
                                     nodeIDvalue);
@@ -982,9 +980,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                     String.valueOf(presTimeoutInNs));
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -999,7 +995,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "Property: " + id + " " + e.getMessage());
+                    "Property: " + id + " " + e.getMessage(),
+                    cnNode.getNetworkId());
         }
 
         try {

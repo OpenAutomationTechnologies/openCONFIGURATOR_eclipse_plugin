@@ -43,6 +43,7 @@ import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 
 /**
  * Displays the error or info or library message in the console view.
@@ -155,9 +156,12 @@ public class OpenConfiguratorMessageConsole {
      * Displays the given message in the error console.
      *
      * @param message The message to be updated.
+     * @param projectName The name of the project to be updated.
      */
-    public void printErrorMessage(final String message) {
-        String fullMessage = "[" + getCurrentTime() + "] [ERROR] " + message;
+    public void printErrorMessage(final String message,
+            final String projectName) {
+        String fullMessage = "[" + getCurrentTime() + "] [ERROR] " + "["
+                + projectName + "] " + message;
         MessageConsoleStream out = getErrorMessageStream();
         out.println(fullMessage);
     }
@@ -166,10 +170,25 @@ public class OpenConfiguratorMessageConsole {
      * Prints the given message in the info console.
      *
      * @param message The message to be updated.
+     * @param projectName The name of the project to be updated.
      */
-    public void printInfoMessage(final String message) {
-        String fullMessage = "[" + getCurrentTime() + "] [INFO] " + message;
+    public void printInfoMessage(final String message,
+            final String projectName) {
+        String fullMessage = "[" + getCurrentTime() + "] [INFO] " + "["
+                + projectName + "] " + message;
         MessageConsoleStream out = getInfoMessageStream();
+        out.println(fullMessage);
+    }
+
+    /**
+     * Displays the given library message in the error console.
+     *
+     * @param message The message to be updated.
+     */
+    public void printLibraryErrorMessage(final Result res) {
+        String message = res.GetErrorMessage();
+        String fullMessage = "[" + getCurrentTime() + "] [ERROR] " + message;
+        MessageConsoleStream out = getErrorMessageStream();
         out.println(fullMessage);
     }
 

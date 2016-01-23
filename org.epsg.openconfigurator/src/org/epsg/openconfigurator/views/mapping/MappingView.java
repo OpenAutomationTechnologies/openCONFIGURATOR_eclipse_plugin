@@ -211,7 +211,8 @@ public class MappingView extends ViewPart {
                                 .updatePdoChannelActualValue(rpdoChannel);
                     } catch (JDOMException | IOException e1) {
                         OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(e1.getMessage());
+                                .printErrorMessage(e1.getMessage(),
+                                        nodeObj.getProject().getName());
                         e1.printStackTrace();
                     }
 
@@ -295,7 +296,8 @@ public class MappingView extends ViewPart {
                         } catch (JDOMException | IOException
                                 | CoreException e1) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(e1.getMessage());
+                                    .printErrorMessage(e1.getMessage(),
+                                            nodeObj.getProject().getName());
                             e1.printStackTrace();
                         }
 
@@ -345,7 +347,8 @@ public class MappingView extends ViewPart {
                                 .updatePdoChannelActualValue(pdoChannel);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(e.getMessage());
+                                .printErrorMessage(e.getMessage(),
+                                        nodeObj.getProject().getName());
                         e.printStackTrace();
                     }
                     tableViewer.refresh();
@@ -444,7 +447,8 @@ public class MappingView extends ViewPart {
                                                 pdoChannel);
                             } catch (JDOMException | IOException e1) {
                                 OpenConfiguratorMessageConsole.getInstance()
-                                        .printErrorMessage(e1.getMessage());
+                                        .printErrorMessage(e1.getMessage(),
+                                                nodeObj.getProject().getName());
                                 e1.printStackTrace();
                             }
 
@@ -580,7 +584,8 @@ public class MappingView extends ViewPart {
                                     .updatePdoChannelActualValue(pdoChannel);
                         } catch (JDOMException | IOException e) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(e.getMessage());
+                                    .printErrorMessage(e.getMessage(),
+                                            nodeObj.getProject().getName());
                             e.printStackTrace();
                         }
 
@@ -624,19 +629,21 @@ public class MappingView extends ViewPart {
             if (element instanceof Node) {
                 Node node = (Node) element;
                 if (pdoType == PdoType.TPDO) {
-                    if (node.getNodeId() == 0) {
+                    if (node.getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
                         return node.getName() + " PRes(" + node.getNodeId()
                                 + ")";
-                    } else if (node.getNodeId() == 240) {
+                    } else if (node
+                            .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                         return node.getName() + " PRes(" + node.getNodeId()
                                 + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
                 } else if (pdoType == PdoType.RPDO) {
-                    if (node.getNodeId() == 0) {
+                    if (node.getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
                         return "MN" + " PReq(" + node.getNodeId() + ")";
-                    } else if (node.getNodeId() == 240) {
+                    } else if (node
+                            .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                         return node.getName() + " PRes(" + node.getNodeId()
                                 + ")";
                     } else {
@@ -769,13 +776,15 @@ public class MappingView extends ViewPart {
                         if (targetNode != null) {
 
                             if (pdoType == PdoType.TPDO) {
-                                if (targetNode.getNodeId() == 0) {
+                                if (targetNode
+                                        .getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return targetNode.getName() + " PRes("
                                             + targetNode.getNodeId() + ")";
                                 } else if (nodeObj == targetNode) {
                                     return "Self(" + targetNode.getNodeId()
                                             + ")";
-                                } else if (targetNode.getNodeId() == 240) {
+                                } else if (targetNode
+                                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     // TODO Check;
                                     return targetNode.getName() + " PRes("
                                             + targetNode.getNodeId() + ")";
@@ -783,13 +792,15 @@ public class MappingView extends ViewPart {
                                     return targetNode.getNodeIDWithName();
                                 }
                             } else if (pdoType == PdoType.RPDO) {
-                                if (targetNode.getNodeId() == 0) {
+                                if (targetNode
+                                        .getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return "MN" + " PReq("
                                             + targetNode.getNodeId() + ")";
                                 } else if (nodeObj == targetNode) {
                                     return "Self(" + targetNode.getNodeId()
                                             + ")";
-                                } else if (targetNode.getNodeId() == 240) {
+                                } else if (targetNode
+                                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     return targetNode.getName() + " PRes("
                                             + targetNode.getNodeId() + ")";
                                 } else {
@@ -1085,6 +1096,12 @@ public class MappingView extends ViewPart {
     public static final String PDO_CLEAR_ALL_MAPPING_LABEL = "Clear All";
 
     /**
+     * The corresponding node instance for which the mapping editor corresponds
+     * to.
+     */
+    private static Node nodeObj;
+
+    /**
      * Resize table based on columns content width.
      *
      * @param tblViewer The viewer which holds the SWT table.
@@ -1135,13 +1152,26 @@ public class MappingView extends ViewPart {
     }
 
     /**
+     * Displays the library message in a dialog.
+     *
+     * @param messageTypeThe message type determines the image to be displayed.
+     * @param libraryMessage The message to be shown
+     */
+    public static void showLibraryMessageWindow(int messageType, Result res) {
+        OpenConfiguratorMessageConsole.getInstance()
+                .printLibraryErrorMessage(res);
+        String libraryMessage = res.GetErrorMessage();
+        MessageDialog.open(messageType, Display.getDefault().getActiveShell(),
+                "Mapping View", libraryMessage, SWT.NONE);
+    }
+
+    /**
      * Displays the message based on the openCONFIGURATOR library.
      *
      * @param res
      */
     public static void showMessage(Result res) {
-        showMessageWindow(MessageDialog.ERROR,
-                OpenConfiguratorLibraryUtils.getErrorMessage(res));
+        showLibraryMessageWindow(MessageDialog.ERROR, res);
     }
 
     /**
@@ -1151,7 +1181,9 @@ public class MappingView extends ViewPart {
      * @param message The message to be shown.
      */
     public static void showMessageWindow(int messageType, String message) {
-        OpenConfiguratorMessageConsole.getInstance().printErrorMessage(message);
+        String projectName = nodeObj.getProject().getName();
+        OpenConfiguratorMessageConsole.getInstance().printErrorMessage(message,
+                projectName);
         MessageDialog.open(messageType, Display.getDefault().getActiveShell(),
                 "Mapping View", message, SWT.NONE);
     }
@@ -1361,8 +1393,8 @@ public class MappingView extends ViewPart {
                     rpdoSummaryTableViewer.setInput(nodeObj);
 
                     // TPDO page
-                    List<TpdoChannel> tpdoChannels = nodeObj.getObjectDictionary()
-                            .getTpdoChannelsList();
+                    List<TpdoChannel> tpdoChannels = nodeObj
+                            .getObjectDictionary().getTpdoChannelsList();
                     tpdoChannelComboViewer.setInput(tpdoChannels);
                     if (tpdoChannels.size() > 0) {
                         ISelection channelSelection = new StructuredSelection(
@@ -1381,8 +1413,8 @@ public class MappingView extends ViewPart {
                             showAdvancedview.isChecked());
 
                     // RPDO Page
-                    List<RpdoChannel> rpdoChannels = nodeObj.getObjectDictionary()
-                            .getRpdoChannelsList();
+                    List<RpdoChannel> rpdoChannels = nodeObj
+                            .getObjectDictionary().getRpdoChannelsList();
                     rpdoChannelComboViewer.setInput(rpdoChannels);
                     if (rpdoChannels.size() > 0) {
                         ISelection channelSelection = new StructuredSelection(
@@ -1411,11 +1443,6 @@ public class MappingView extends ViewPart {
         }
     };
 
-    /**
-     * The corresponding node instance for which the mapping editor corresponds
-     * to.
-     */
-    private Node nodeObj;
     /**
      * Source workbench part.
      */

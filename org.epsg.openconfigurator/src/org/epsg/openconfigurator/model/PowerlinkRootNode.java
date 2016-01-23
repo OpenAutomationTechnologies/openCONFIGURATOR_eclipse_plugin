@@ -286,7 +286,8 @@ public class PowerlinkRootNode {
                             OpenConfiguratorLibraryUtils.getErrorMessage(res),
                             null);
                 }
-
+                // Workaround to update lossOfSoctolerance value in the network
+                // property
                 PowerlinkObject obj = newNode.getObjectDictionary().getObject(
                         INetworkProperties.LOSS_SOC_TOLERANCE_OBJECT_ID);
                 if (obj != null) {
@@ -346,7 +347,8 @@ public class PowerlinkRootNode {
                             .printErrorMessage(
                                     "XDD/XDC file is invalid for the node "
                                             + "'" + cnNode.getName() + "("
-                                            + cnNode.getNodeID() + ")" + "'");
+                                            + cnNode.getNodeID() + ")" + "'",
+                                    processingNode.getProject().getName());
                 }
                 nodeCollection.put(new Short(processingNode.getNodeId()),
                         processingNode);
@@ -393,9 +395,11 @@ public class PowerlinkRootNode {
                         | ParserConfigurationException | FileNotFoundException
                         | UnsupportedEncodingException e) {
                     OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(e.getCause().getMessage()
-                                    + " for the node " + "'" + rmnNode.getName()
-                                    + "(" + rmnNode.getNodeID() + ")" + "'");
+                            .printErrorMessage(
+                                    e.getCause().getMessage() + " for the node "
+                                            + "'" + rmnNode.getName() + "("
+                                            + rmnNode.getNodeID() + ")" + "'",
+                                    processingNode.getProject().getName());
                 }
                 nodeCollection.put(new Short(processingNode.getNodeId()),
                         processingNode);

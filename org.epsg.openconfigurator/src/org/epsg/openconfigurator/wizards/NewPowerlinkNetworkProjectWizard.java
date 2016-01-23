@@ -219,7 +219,8 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                 | IOException e) {
             e.printStackTrace();
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    ERROR_WHILE_COPYING_XDD);
+                    ERROR_WHILE_COPYING_XDD,
+                    newProjectCreationPage.getProjectName());
         }
     }
 
@@ -319,7 +320,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                 | ParserConfigurationException e2) {
             validateXddPage.getErrorStyledText(e2.getCause().getMessage());
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    e2.getCause().getMessage());
+                    e2.getCause().getMessage(), name);
             e2.printStackTrace();
             return false;
         }

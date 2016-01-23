@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -213,8 +214,8 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
             String errorMessage = OpenConfiguratorLibraryUtils
                     .getErrorMessage(libApiRes);
             System.err.println(errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
-                    errorMessage, null);
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    libApiRes);
             return;
         }
 

@@ -349,9 +349,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                         (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         } else {
                             // Success - update the OBD
                             plkObject.setActualValue((String) value, true);
@@ -368,9 +366,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                     .forceObject(plkObject, result);
                             if (!res.IsSuccessful()) {
                                 OpenConfiguratorMessageConsole.getInstance()
-                                        .printErrorMessage(
-                                                OpenConfiguratorLibraryUtils
-                                                        .getErrorMessage(res));
+                                        .printLibraryErrorMessage(res);
                             } else {
                                 // Success - update the OBD
                                 plkObject.forceActualValue(result, true);
@@ -388,8 +384,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             }
 
         } catch (Exception e) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printErrorMessage(e.getMessage());
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    e.getMessage(), plkObject.getNode().getNetworkId());
         }
 
         try {

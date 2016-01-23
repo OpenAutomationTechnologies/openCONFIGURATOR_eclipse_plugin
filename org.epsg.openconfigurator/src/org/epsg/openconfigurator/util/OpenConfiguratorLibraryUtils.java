@@ -2189,10 +2189,12 @@ public class OpenConfiguratorLibraryUtils {
                         .getObject(forcedObj.getIndex());
                 if (plkObj == null) {
                     OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage("Object ID 0x"
-                                    + DatatypeConverter.printHexBinary(
-                                            forcedObj.getIndex())
-                                    + " is forced and is not available in the XDD/XDC file.");
+                            .printErrorMessage(
+                                    "Object ID 0x"
+                                            + DatatypeConverter.printHexBinary(
+                                                    forcedObj.getIndex())
+                                    + " is forced and is not available in the XDD/XDC file.",
+                                    node.getProject().getName());
                     continue;
                 }
 
@@ -2208,13 +2210,15 @@ public class OpenConfiguratorLibraryUtils {
                             "Object is forced which is not available in the XDD/XDC file");
 
                     OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage("Object ID 0x"
-                                    + DatatypeConverter.printHexBinary(
-                                            forcedObj.getIndex())
+                            .printErrorMessage(
+                                    "Object ID 0x"
+                                            + DatatypeConverter.printHexBinary(
+                                                    forcedObj.getIndex())
                                     + "/0x"
                                     + DatatypeConverter.printHexBinary(
                                             forcedObj.getSubindex())
-                                    + " is forced and is not available in the XDD/XDC file.");
+                                    + " is forced and is not available in the XDD/XDC file.",
+                                    node.getProject().getName());
 
                     continue;
                 }

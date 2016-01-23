@@ -35,6 +35,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.jface.viewers.CellEditor;
 import org.eclipse.jface.viewers.ColumnLabelProvider;
@@ -149,8 +150,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                             .getErrorMessage(libApiRes);
                     System.err.println(oldAgSettingId + ":" + (String) value
                             + ". " + errorMessage);
-                    PluginErrorDialogUtils.displayErrorMessageDialog(
-                            getShell(), errorMessage, null);
+                    PluginErrorDialogUtils
+                            .showMessageWindow(MessageDialog.ERROR, libApiRes);
                     return;
                 }
 
@@ -167,8 +168,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                         final String errorMessage = OpenConfiguratorLibraryUtils
                                 .getErrorMessage(libApiRes);
                         System.err.println(errorMessage);
-                        PluginErrorDialogUtils.displayErrorMessageDialog(
-                                getShell(), errorMessage, null);
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, libApiRes);
                         return;
                     }
 
@@ -390,8 +391,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                     System.err.println("AddConfiguration '"
                             + newAutoGenerationSettingsID + "' fails. "
                             + errorMessage);
-                    PluginErrorDialogUtils.displayErrorMessageDialog(
-                            getShell(), errorMessage, null);
+                    PluginErrorDialogUtils
+                            .showMessageWindow(MessageDialog.ERROR, libApiRes);
                     return;
                 }
 
@@ -588,8 +589,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                     .getErrorMessage(libApiRes);
 
             System.err.println("RemoveConfiguation failed. " + errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
-                    errorMessage, null);
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    libApiRes);
 
             return libApiRes.IsSuccessful();
         }
@@ -610,8 +611,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                 System.err.println("SetActiveConfiguration failed. "
                         + errorMessage);
 
-                PluginErrorDialogUtils.displayErrorMessageDialog(getShell(),
-                        errorMessage, null);
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        libApiRes);
 
                 return libApiRes.IsSuccessful();
             }

@@ -42,6 +42,7 @@ import org.apache.commons.io.input.Tailer;
 import org.apache.commons.lang.SystemUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.epsg.openconfigurator.console.LogFileTailListener;
@@ -144,7 +145,8 @@ public class Activator extends AbstractUIPlugin {
             e.printStackTrace();
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     Activator.PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR
-                            + e.getMessage());
+                            + e.getMessage(),
+                    "");
             PluginErrorDialogUtils.displayErrorMessageDialog(
                     Activator.PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR, e);
         }
@@ -154,11 +156,9 @@ public class Activator extends AbstractUIPlugin {
                 .initOpenConfiguratorLibrary();
         if (!libApiRes.IsSuccessful()) {
             // Report error to the user using the dialog.
-            String errorMessage = OpenConfiguratorLibraryUtils
-                    .getErrorMessage(libApiRes);
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "InitOpenConfigurator library failed. " + errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(errorMessage,
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(libApiRes);
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                     libApiRes);
         }
 

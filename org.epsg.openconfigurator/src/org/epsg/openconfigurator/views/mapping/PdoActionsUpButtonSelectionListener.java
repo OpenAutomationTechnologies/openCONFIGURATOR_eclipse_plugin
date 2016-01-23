@@ -104,7 +104,10 @@ import org.jdom2.JDOMException;
                                                 pdoChannel);
                             } catch (JDOMException | IOException e1) {
                                 OpenConfiguratorMessageConsole.getInstance()
-                                        .printErrorMessage(e1.getMessage());
+                                        .printErrorMessage(e1.getMessage(),
+                                                pdoChannel.getNode()
+                                                        .getProject()
+                                                        .getName());
                                 e1.printStackTrace();
                             }
 

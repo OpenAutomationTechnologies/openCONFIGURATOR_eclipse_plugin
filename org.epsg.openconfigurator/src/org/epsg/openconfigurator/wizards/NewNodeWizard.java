@@ -172,7 +172,8 @@ public class NewNodeWizard extends Wizard {
                     && !e2.getCause().getMessage().isEmpty()) {
                 validateXddPage.getErrorStyledText(e2.getCause().getMessage());
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        e2.getCause().getMessage(), "");
+                        e2.getCause().getMessage(),
+                        selectedNodeObj.getNetworkId());
             }
             e2.printStackTrace();
             return false;
@@ -186,7 +187,7 @@ public class NewNodeWizard extends Wizard {
         } catch (IOException e1) {
             validateXddPage.getErrorStyledText(e1.getCause().getMessage());
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    e1.getCause().getMessage());
+                    e1.getCause().getMessage(), newNode.getProject().getName());
             e1.printStackTrace();
         }
 
@@ -211,8 +212,7 @@ public class NewNodeWizard extends Wizard {
                 }
             }
         } else {
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR, res);
 
             // Try removing the node.
             // FIXME: do we need this?

@@ -48,6 +48,7 @@ import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -274,7 +275,8 @@ public class RedundantManagingNodePropertySource
             }
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "Property: " + id + " " + e.getMessage());
+                    "Property: " + id + " " + e.getMessage(),
+                    redundantManagingNode.getNetworkId());
             retObj = StringUtils.EMPTY;
         }
         return retObj;
@@ -326,11 +328,12 @@ public class RedundantManagingNodePropertySource
             }
             try {
                 short nodeIDvalue = Short.valueOf(((String) id));
-                if ((nodeIDvalue == 0) || (nodeIDvalue == 240)
-                        || (nodeIDvalue > 250)) {
+                if ((nodeIDvalue == 0)
+                        || (nodeIDvalue == IPowerlinkConstants.MN_DEFAULT_NODE_ID)
+                        || (nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID)) {
                     return "Invalid node id for a Redundant Managing node.";
                 }
-                if (nodeIDvalue < 240) {
+                if (nodeIDvalue < IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return "Redundant Managing node with id 0-240 is not supported.";
                 }
 
@@ -450,7 +453,7 @@ public class RedundantManagingNodePropertySource
                 long longValue = Long.decode((String) value);
 
                 // Check the minInclusive available in the Schema
-                if (longValue < 250) {
+                if (longValue < IPowerlinkConstants.RMN_MAX_NODE_ID) {
                     return INVALID_RANGE_WAIT_NOT_ACTIVE;
                 }
                 // validate the value with openCONFIGURATOR library.
@@ -527,9 +530,7 @@ public class RedundantManagingNodePropertySource
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         } else {
                             redundantManagingNode.setName((String) value);
                         }
@@ -544,9 +545,7 @@ public class RedundantManagingNodePropertySource
                                 redundantManagingNode.getNodeId(), nodeIDvalue);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         } else {
                             redundantManagingNode.getPowerlinkRootNode()
                                     .setNodeId(oldNodeId, nodeIDvalue);
@@ -567,9 +566,7 @@ public class RedundantManagingNodePropertySource
                                     Long.decode((String) value));
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -584,9 +581,7 @@ public class RedundantManagingNodePropertySource
                                     Long.decode((String) value));
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res));
+                                    .printLibraryErrorMessage(res);
                         }
 
                         break;
@@ -648,7 +643,8 @@ public class RedundantManagingNodePropertySource
             }
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "Property: " + id + " " + e.getMessage());
+                    "Property: " + id + " " + e.getMessage(),
+                    redundantManagingNode.getProject().getName());
         }
     }
 }

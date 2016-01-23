@@ -155,7 +155,7 @@ public class ValidateXddWizardPage extends WizardPage {
         } catch (IOException e) {
             e.printStackTrace();
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    ERROR_DEFAULT_CN_XDD_NOT_FOUND);
+                    ERROR_DEFAULT_CN_XDD_NOT_FOUND, "");
         }
 
         defaultCnXDD = cnXddPath;
@@ -167,7 +167,7 @@ public class ValidateXddWizardPage extends WizardPage {
         } catch (IOException e) {
             e.printStackTrace();
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    ERROR_DEFAULT_RMN_XDD_NOT_FOUND);
+                    ERROR_DEFAULT_RMN_XDD_NOT_FOUND, "");
         }
 
         defaultMnXDD = mnXddPath;

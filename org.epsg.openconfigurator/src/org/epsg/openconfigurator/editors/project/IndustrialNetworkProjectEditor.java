@@ -58,6 +58,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -316,8 +317,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 String errorMessage = OpenConfiguratorLibraryUtils
                         .getErrorMessage(libApiRes);
                 System.err.println(errorMessage);
-                PluginErrorDialogUtils.displayErrorMessageDialog(
-                        getSite().getShell(), errorMessage, null);
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        libApiRes);
             }
         }
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(this);
@@ -522,8 +523,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             String errorMessage = OpenConfiguratorLibraryUtils
                     .getErrorMessage(libApiRes);
             System.err.println(errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(
-                    getSite().getShell(), errorMessage, null);
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    libApiRes);
             return;
         }
 
@@ -534,8 +535,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             String errorMessage = OpenConfiguratorLibraryUtils
                     .getErrorMessage(libApiRes);
             System.err.println(errorMessage);
-            PluginErrorDialogUtils.displayErrorMessageDialog(
-                    getSite().getShell(), errorMessage, null);
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    libApiRes);
             return;
         }
 

@@ -148,7 +148,8 @@ public final class OpenConfiguratorProjectUtils {
             return retVal;
         }
 
-        Node mnNode = nodeCollection.get(new Short((short) 240));
+        Node mnNode = nodeCollection
+                .get(IPowerlinkConstants.MN_DEFAULT_NODE_ID);
 
         // Remove from the viewer node collection.
         Object nodeObjectModel = node.getNodeModel();
@@ -562,8 +563,8 @@ public final class OpenConfiguratorProjectUtils {
         Result res = OpenConfiguratorLibraryUtils
                 .getObjectsWithActualValue(node, objectJCollection);
         if (!res.IsSuccessful()) {
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
             return res;
         }
 
@@ -598,7 +599,8 @@ public final class OpenConfiguratorProjectUtils {
             if (node.hasXdd()) {
                 OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                         "The Node " + "'" + node.getNodeIDWithName() + "'"
-                                + " has invalid XDD file.");
+                                + " has invalid XDD file.",
+                        node.getProject().getName());
                 continue;
             }
             if (monitor.isCanceled()) {
@@ -957,8 +959,8 @@ public final class OpenConfiguratorProjectUtils {
                 .getChannelObjectsWithActualValue(pdoChannel,
                         objectJCollection);
         if (!res.IsSuccessful()) {
-            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
             return res;
         }
 
@@ -997,7 +999,7 @@ public final class OpenConfiguratorProjectUtils {
         if (toolVersionAvailable.equalsIgnoreCase("2.0.0-pre-release")) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printInfoMessage(MessageFormat.format(UPGRADE_MESSAGE,
-                            toolVersionAvailable, GENERATOR_TOOL_VERSION));
+                            toolVersionAvailable, GENERATOR_TOOL_VERSION), "");
 
             generator.setToolName(GENERATOR_TOOL_NAME);
             generator.setVendor(GENERATOR_VENDOR);
@@ -1007,7 +1009,7 @@ public final class OpenConfiguratorProjectUtils {
                 || toolVersionAvailable.equalsIgnoreCase("1.4.0"))) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printInfoMessage(MessageFormat.format(UPGRADE_MESSAGE,
-                            toolVersionAvailable, GENERATOR_TOOL_VERSION));
+                            toolVersionAvailable, GENERATOR_TOOL_VERSION), "");
 
             generator.setToolName(GENERATOR_TOOL_NAME);
             generator.setVendor(GENERATOR_VENDOR);
@@ -1078,6 +1080,7 @@ public final class OpenConfiguratorProjectUtils {
             return false;
         }
     }
+
     /**
      * Write the values modified into XDD/XDC file.
      *

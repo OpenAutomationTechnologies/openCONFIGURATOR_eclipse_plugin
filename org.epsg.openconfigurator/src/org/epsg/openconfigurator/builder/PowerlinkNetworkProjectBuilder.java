@@ -61,6 +61,7 @@ import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Path;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 
 /**
@@ -148,8 +149,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
             // Displays error message in console.
-            displayErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            displayLibraryErrorMessage(res);
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -217,8 +217,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
             // Displays error message in console.
-            displayErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            displayLibraryErrorMessage(res);
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -265,8 +264,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
             // Displays error message in console.
-            displayErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            displayLibraryErrorMessage(res);
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -313,8 +311,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
             // Displays error message in console.
-            displayErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            displayLibraryErrorMessage(res);
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -324,7 +321,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         for (int i = 0; i < nodeIdCollection.size(); i++) {
             short value = nodeIdCollection.get(i);
             java.nio.file.Path processImagePath = targetPath;
-            if (value != 240) {
+            if (value != IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                 processImagePath = processImagePath
                         .resolve(String.valueOf(value));
                 // NOTE: Remove 'continue' to generate the Individual CN's PI
@@ -358,8 +355,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     IStatus.OK,
                     OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
             // Displays error message in console.
-            displayErrorMessage(
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            displayLibraryErrorMessage(res);
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
@@ -542,7 +538,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             @Override
             public void run() {
                 OpenConfiguratorMessageConsole.getInstance()
-                        .printErrorMessage(message);
+                        .printErrorMessage(message, getProject().getName());
             }
         });
     }
@@ -553,7 +549,18 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             @Override
             public void run() {
                 OpenConfiguratorMessageConsole.getInstance()
-                        .printInfoMessage(message);
+                        .printInfoMessage(message, getProject().getName());
+            }
+        });
+    }
+
+    private void displayLibraryErrorMessage(final Result res) {
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
             }
         });
     }
@@ -632,12 +639,12 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 if (!buildPiSuccess) {
                     // Displays error message in console.
                     displayErrorMessage(
-                                    "Build failed for project: " + networkId);
+                            "Build failed for project: " + networkId);
                 } else {
                     // Displays Info message in console.
                     displayInfoMessage(
-                                    "Build finished successfully for Project: "
-                                            + networkId);
+                            "Build finished successfully for Project: "
+                                    + networkId);
                     displayInfoMessage("Generated output files at: "
                             + targetPath.toString());
                 }
