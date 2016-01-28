@@ -435,6 +435,11 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IControlledNodeProperties.CN_FORCED_MULTIPLEXED_CYCLE_OBJECT:
+                        String forcedMultiplexedCycle = String
+                                .valueOf(tcn.getForcedMultiplexedCycle());
+                        if (forcedMultiplexedCycle.isEmpty()) {
+                            return "";
+                        }
                         retObj = String
                                 .valueOf(tcn.getForcedMultiplexedCycle());
                         break;
@@ -509,11 +514,20 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        String forcedObjectsString = cnNode
+                                .getForcedObjectsString();
+                        if (forcedObjectsString.isEmpty()) {
+                            return "";
+                        }
                         retObj = cnNode.getForcedObjectsString();
                         break;
                     case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
                         long presTimeoutinNs = cnNode.getPresTimeoutvalue();
                         long presTimeoutInMs = presTimeoutinNs / 1000;
+                        String value = String.valueOf(presTimeoutInMs);
+                        if (value.isEmpty()) {
+                            return "";
+                        }
                         retObj = String.valueOf(presTimeoutInMs);
                         break;
                     }

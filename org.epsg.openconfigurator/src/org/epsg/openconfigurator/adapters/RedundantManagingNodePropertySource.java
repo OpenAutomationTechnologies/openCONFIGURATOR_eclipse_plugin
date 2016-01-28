@@ -63,7 +63,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 public class RedundantManagingNodePropertySource
         extends AbstractNodePropertySource implements IPropertySource {
 
-    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait not active ("
+    private static final String RMN_WAIT_NOT_ACTIVE_LABEL = "Wait Not Active ("
             + "\u00B5" + "s)";
     private static final String RMN_PRIORITY_LABEL = "Priority";
 
@@ -240,11 +240,17 @@ public class RedundantManagingNodePropertySource
                     case IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT:
                         String waitNotActive = redundantManagingNode
                                 .getWaitNotActive();
+                        if (waitNotActive.isEmpty()) {
+                            return "";
+                        }
                         retObj = String.valueOf(Integer.decode(waitNotActive));
                         break;
                     case IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT:
                         String priority = redundantManagingNode
                                 .getRmnPriority();
+                        if (priority.isEmpty()) {
+                            return "";
+                        }
                         retObj = String.valueOf(Integer.decode(priority));
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
@@ -263,6 +269,11 @@ public class RedundantManagingNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        String forcedObjectString = redundantManagingNode
+                                .getForcedObjectsString();
+                        if (forcedObjectString.isEmpty()) {
+                            return "";
+                        }
                         retObj = redundantManagingNode.getForcedObjectsString();
                         break;
                     default:

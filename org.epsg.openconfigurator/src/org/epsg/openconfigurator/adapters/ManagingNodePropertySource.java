@@ -73,7 +73,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
 
     // Labels
     private static final String[] MN_PROPERTY_LABEL_LIST = { "Transmits PRes",
-            "Async Slot timeout (ns)", "ASnd Max Latency (ns)" };
+            "Async Slot Timeout (ns)", "ASnd Max Latency (ns)" };
 
     private static final String[] NETWORK_PROPERTY_LABEL_LIST = {
             "Cycle Time (" + "\u00B5" + "s)", "Async MTU size (bytes)",
@@ -118,10 +118,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     private static final String INVALID_RANGE_ASND_MAX_NR = "Invalid range for ASnd max number.";
     private static final String ERROR_INVALID_VALUE_ASND_MAX_NR = "Invalid value for ASnd max number.";
 
-    private static final String ERROR_CYCLE_TIME_CANNOT_BE_EMPTY = "Cycle-time cannot be empty.";
-    private static final String INVALID_RANGE_CYCLE_TIME = "Invalid range for Cycle-time.";
-    private static final String MINIMIUM_PLK_SUPPORTED_CYCLE_TIME = "Minumum Cycle-time should be 250("
-            + "\u00B5" + "s) or above";
+    private static final String ERROR_CYCLE_TIME_CANNOT_BE_EMPTY = "Cycle Time cannot be empty.";
     private static final String ERROR_INVALID_VALUE_CYCLE_TIME = "Invalid value for Cycle-time.";
 
     private static final String ERROR_ASYNC_MTU_CANNOT_BE_EMPTY = "AsyncMtu cannot be empty.";
@@ -364,11 +361,18 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                     }
                     case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
                         String asyncSlotTimeOut = mnNode.getAsyncSlotTimeout();
+                        if (asyncSlotTimeOut.isEmpty()) {
+                            return "";
+                        }
                         retObj = String
                                 .valueOf(Integer.decode(asyncSlotTimeOut));
                         break;
                     case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
-                        retObj = mnNode.getAsndMaxNumber();
+                        String asndMaxNumber = mnNode.getAsndMaxNumber();
+                        if (asndMaxNumber.isEmpty()) {
+                            return "";
+                        }
+                        retObj = asndMaxNumber;
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
                         int val = 0;
@@ -398,25 +402,42 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                        String forcedObjectString = mnNode
+                                .getForcedObjectsString();
+                        if (forcedObjectString.isEmpty()) {
+                            return "";
+                        }
                         retObj = mnNode.getForcedObjectsString();
                         break;
                     case INetworkProperties.NET_CYCLE_TIME_OBJECT:
                         String cycleTime = mnNode.getCycleTime();
+                        if (cycleTime.isEmpty()) {
+                            return "";
+                        }
                         retObj = String.valueOf(Integer.decode(cycleTime));
                         break;
                     case INetworkProperties.NET_ASYNC_MTU_OBJECT:
                         String asyncMtu = mnNode.getAsyncMtu();
+                        if (asyncMtu.isEmpty()) {
+                            return "";
+                        }
                         retObj = String.valueOf(Integer.decode(asyncMtu));
                         break;
 
                     case INetworkProperties.NET_MUTLIPLEX_CYCLE_CNT_OBJECT:
                         String multiplexCycleCount = mnNode
                                 .getMultiplexedCycleCnt();
+                        if (multiplexCycleCount.isEmpty()) {
+                            return "";
+                        }
                         retObj = String
                                 .valueOf(Integer.decode(multiplexCycleCount));
                         break;
                     case INetworkProperties.NET_PRESCALER_OBJECT:
                         String prescaler = mnNode.getPrescaler();
+                        if (prescaler.isEmpty()) {
+                            return "";
+                        }
                         retObj = String.valueOf(Integer.decode(prescaler));
                         break;
                     default:
@@ -584,7 +605,9 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
      */
     protected String handleCycleTime(Object value) {
         if (value instanceof String) {
-
+            if (((String) value).isEmpty()) {
+                return ERROR_CYCLE_TIME_CANNOT_BE_EMPTY;
+            }
             try {
                 long cycleTime = Long.decode((String) value);
                 // validate the value with openCONFIGURATOR library.
