@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -70,8 +71,11 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
 import org.epsg.openconfigurator.model.DataTypeChoiceType;
+import org.epsg.openconfigurator.model.LabelDescription;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Parameter;
+import org.epsg.openconfigurator.model.ParameterGroup;
+import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.VarDecleration;
@@ -213,11 +217,33 @@ public class ObjectDictionaryView extends ViewPart {
                 return ((PowerlinkSubobject) element).getNameWithId();
             } else if (element instanceof Parameter) {
                 Parameter param = (Parameter) element;
-                return param.getLabelDescription().getLabel();
+                LabelDescription labelDesc = param.getLabelDescription();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
+                }
+            } else if (element instanceof ParameterReference) {
+                ParameterReference paramRef = (ParameterReference) element;
+                LabelDescription labelDesc = paramRef.getLabelDescription();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
+                }
             } else if (element instanceof VarDecleration) {
                 VarDecleration varDecl = (VarDecleration) element;
-                System.err.println("VarDecl Label " + varDecl.getName());
-                return varDecl.getName();
+                if (varDecl.getName() != null) {
+                    return varDecl.getName();
+                } else {
+                    LabelDescription labelDesc = varDecl.getLabelDescription();
+                    if (labelDesc != null) {
+                        return labelDesc.getText();
+                    }
+                }
+            } else if (element instanceof ParameterGroup) {
+                ParameterGroup pgmGrp = (ParameterGroup) element;
+                LabelDescription labelDesc = pgmGrp.getLabel();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
+                }
+                return pgmGrp.getUniqueId();
             }
             return element == null ? "" : element.toString();//$NON-NLS-1$
         }
@@ -301,27 +327,33 @@ public class ObjectDictionaryView extends ViewPart {
 
         @Override
         public Object[] getChildren(Object parentElement) {
-            System.err.println("GetChildren" + parentElement);
+
             if (parentElement instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) parentElement;
                 return objItem.getSubObjects().toArray();
+            } else if (parentElement instanceof ParameterReference) {
+                ParameterReference paramRef = (ParameterReference) parentElement;
             } else if (parentElement instanceof Parameter) {
                 Parameter param = (Parameter) parentElement;
-                System.err.println("getChildren Parameter "
-                        + param.getDataTypeChoice() + " size:"
-                        + param.getStructDataType().getVariables().size());
                 if (param.getDataTypeChoice() == DataTypeChoiceType.STRUCT) {
                     List<VarDecleration> varDeclList = param.getStructDataType()
                             .getVariables();
                     for (VarDecleration var : varDeclList) {
                         System.err.println("Name:" + var.getName());
                     }
-                    System.err.println("Arr" + varDeclList.toArray());
                     return varDeclList.toArray();
+                } else if (param
+                        .getDataTypeChoice() == DataTypeChoiceType.SIMPLE) {
+                    // Ignore; This does not have any child variables.
                 } else {
                     System.err
                             .println("Unhandled " + param.getDataTypeChoice());
                 }
+            } else if (parentElement instanceof ParameterGroup) {
+                ParameterGroup paramGrp = (ParameterGroup) parentElement;
+                return paramGrp.getVisibleObjects().toArray();
+            } else {
+                System.err.println("GetChildren" + parentElement);
             }
             return null;
         }
@@ -333,10 +365,28 @@ public class ObjectDictionaryView extends ViewPart {
                 Node nodeObj = (Node) inputElement;
                 // List<Object> elementsList = new ArrayList<>();
                 if (parametersVisible) {
-                    List<Parameter> parameterList = nodeObj
-                            .getObjectDictionary().getParameterList();
+
+                    LinkedHashSet<Object> visibleObjectsList = new LinkedHashSet<>();
+                    List<ParameterGroup> paramGrupList = nodeObj
+                            .getObjectDictionary().getParameterGroupList();
+                    for (ParameterGroup pgmGrp : paramGrupList) {
+                        if (pgmGrp.isGroupLevelVisible()) {
+                            visibleObjectsList.add(pgmGrp);
+                        } else {
+                            visibleObjectsList
+                                    .addAll(pgmGrp.getVisibleObjects());
+
+                            List<ParameterReference> prmRefList = pgmGrp
+                                    .getParameterRefList();
+                            for (ParameterReference prmRef : prmRefList) {
+                                if (prmRef.isVisible()) {
+                                    visibleObjectsList.add(prmRef);
+                                }
+                            }
+                        }
+                    }
                     // elementsList.addAll(parameterList);
-                    return parameterList.toArray();
+                    return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj
                             .getObjectDictionary().getObjectsList();
@@ -373,6 +423,9 @@ public class ObjectDictionaryView extends ViewPart {
                     default:
                         break;
                 }
+            } else if (element instanceof ParameterGroup) {
+                ParameterGroup paramGrp = (ParameterGroup) element;
+                return paramGrp.hasVisibleObjects();
             }
             return false;
         }
@@ -568,6 +621,7 @@ public class ObjectDictionaryView extends ViewPart {
     public void createPartControl(Composite parent) {
 
         PatternFilter filter = new PowerlinkObjectPatternFilter();
+        // PatternFilter filter = new PatternFilter();
         filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);

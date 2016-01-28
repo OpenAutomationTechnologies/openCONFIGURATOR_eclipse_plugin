@@ -32,7 +32,13 @@
 package org.epsg.openconfigurator.model;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 
 /**
  *
@@ -40,14 +46,157 @@ import java.util.List;
  *
  */
 public class ParameterGroup {
-    private LabelDescription label;
-    String uniqueId;
-    boolean groupLevelVisible;
-    // private Parameter conditionalParameter;
-    // TODO: ConditionalSupport is ignored as of now.
-    String conditionalValue;
-    BigInteger bitOffset;
 
-    List<ParameterGroup> parameterGroups;
-    List<ParameterReference> parameterRefList;
+    private String uniqueId;
+
+    private LabelDescription label;
+    private boolean groupLevelVisible;
+
+    private BigInteger bitOffset;
+
+    private Parameter conditionalParameter;
+    private String conditionalValue;
+    private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<String, ParameterGroup>();
+
+    private HashMap<String, ParameterReference> parameterRefMap = new HashMap<String, ParameterReference>();
+
+    private ObjectDictionary objectDictionary;
+
+    public ParameterGroup(ObjectDictionary objectDictionary,
+            TParameterGroup grp) {
+        this.objectDictionary = objectDictionary;
+
+        uniqueId = grp.getUniqueID();
+
+        label = new LabelDescription(grp.getLabelOrDescriptionOrLabelRef());
+        groupLevelVisible = grp.isGroupLevelVisible();
+
+        bitOffset = grp.getBitOffset();
+        conditionalValue = grp.getConditionalValue();
+
+        Object conditionalObjectModel = grp.getConditionalUniqueIDRef();
+        if (conditionalObjectModel != null) {
+            if (conditionalObjectModel instanceof TParameterList.Parameter) {
+                TParameterList.Parameter parameterModel = (TParameterList.Parameter) conditionalObjectModel;
+                conditionalParameter = objectDictionary
+                        .getParameter(parameterModel.getUniqueID());
+            }
+        }
+
+        List<Object> parameterGroupReferenceList = grp
+                .getParameterGroupOrParameterRef();
+        if (parameterGroupReferenceList != null) {
+            for (Object parameterGroupReference : parameterGroupReferenceList) {
+                if (parameterGroupReference instanceof TParameterGroup) {
+                    TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
+                    ParameterGroup paramGrpModel = new ParameterGroup(
+                            objectDictionary, paramGrp);
+                    parameterGroupMap.put(paramGrpModel.getUniqueId(),
+                            paramGrpModel);
+                } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
+                    TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
+                    ParameterReference paramRef = new ParameterReference(this,
+                            objectDictionary, parameterReferenceModel);
+                    parameterRefMap.put(paramRef.getUniqueId(), paramRef);
+                }
+            }
+        }
+    }
+
+    public BigInteger getBitOffset() {
+        return bitOffset;
+    }
+
+    public LabelDescription getLabel() {
+        return label;
+    }
+
+    public List<ParameterGroup> getParameterGroupList() {
+        List<ParameterGroup> valueList = new ArrayList<ParameterGroup>(
+                parameterGroupMap.values());
+        return valueList;
+    }
+
+    public List<ParameterReference> getParameterRefList() {
+        List<ParameterReference> valueList = new ArrayList<ParameterReference>(
+                parameterRefMap.values());
+        return valueList;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public LinkedHashSet<Object> getVisibleObjects() {
+        LinkedHashSet<Object> vSet = new LinkedHashSet<>();
+
+        List<Object> visibleObjects = new ArrayList<>();
+        List<ParameterGroup> pgmGrpList = getParameterGroupList();
+        for (ParameterGroup pgmGrp : pgmGrpList) {
+            if (pgmGrp.isGroupLevelVisible()) {
+                visibleObjects.add(pgmGrp);
+                vSet.add(pgmGrp);
+            } else {
+
+                visibleObjects.addAll(pgmGrp.getVisibleObjects());
+                vSet.addAll(pgmGrp.getVisibleObjects());
+
+                List<ParameterReference> prmRefList = pgmGrp
+                        .getParameterRefList();
+                for (ParameterReference prmRef : prmRefList) {
+                    if (prmRef.isVisible()) {
+                        visibleObjects.add(prmRef);
+                        vSet.add(prmRef);
+                    }
+                }
+            }
+        }
+
+        List<ParameterReference> prmRefList = getParameterRefList();
+        for (ParameterReference prmRef : prmRefList) {
+            if (prmRef.isVisible()) {
+                visibleObjects.add(prmRef);
+                vSet.add(prmRef);
+            }
+        }
+
+        System.out.println("=========================" + uniqueId);
+        for (Object a : vSet) {
+            if (a instanceof ParameterGroup) {
+                ParameterGroup b = (ParameterGroup) a;
+                System.out.println("--------> " + b.getLabel().getText());
+            } else if (a instanceof ParameterReference) {
+                ParameterReference b = (ParameterReference) a;
+                System.out.println(
+                        "--------> " + b.getLabelDescription().getText());
+            }
+        }
+        return vSet;
+    }
+
+    public boolean hasVisibleObjects() {
+        boolean retVal = false;
+        List<ParameterReference> prmRefList = getParameterRefList();
+        for (ParameterReference prmRef : prmRefList) {
+            if (prmRef.isVisible()) {
+                retVal = true;
+                break; // For optimization. Atleast one is visible.
+            }
+        }
+
+        // FIXME: I might missing parameterGroups here!
+
+        // TODO: Check
+        if ((conditionalParameter != null) && (conditionalValue != null)) {
+            if (conditionalParameter.getActualValue() == conditionalValue) {
+                retVal = true;
+            }
+        }
+
+        return retVal;
+    }
+
+    public boolean isGroupLevelVisible() {
+        return groupLevelVisible;
+    }
 }

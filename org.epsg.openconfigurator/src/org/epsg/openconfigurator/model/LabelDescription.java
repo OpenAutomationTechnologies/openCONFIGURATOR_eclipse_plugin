@@ -31,8 +31,9 @@
 
 package org.epsg.openconfigurator.model;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 
 import org.epsg.openconfigurator.xmlbinding.xdd.Connector;
 
@@ -42,19 +43,26 @@ import org.epsg.openconfigurator.xmlbinding.xdd.Connector;
  *
  */
 public class LabelDescription {
-    private List<String> labelOrDescription = new ArrayList<>();
+    static String displayLang = Locale.getDefault().getDisplayLanguage();
+
+    private HashMap<String, String> labelMap = new HashMap<String, String>();
+    private HashMap<String, String> descriptionMap = new HashMap<String, String>();
 
     public LabelDescription(List<Object> labelDescriptionList) {
+        if (labelDescriptionList == null) {
+            return;
+        }
+
         for (Object obj : labelDescriptionList) {
             if (obj instanceof Connector.Label) {
                 Connector.Label lbl = (Connector.Label) obj;
                 if (lbl.getValue() != null) {
-                    labelOrDescription.add(lbl.getValue());
+                    labelMap.put(lbl.getLang(), lbl.getValue());
                 }
             } else if (obj instanceof Connector.Description) {
                 Connector.Description desc = (Connector.Description) obj;
                 if (desc.getValue() != null) {
-                    labelOrDescription.add(desc.getValue());
+                    descriptionMap.put(desc.getLang(), desc.getValue());
                 }
             } else if (obj instanceof Connector.LabelRef) {
                 // FIXME;
@@ -64,15 +72,32 @@ public class LabelDescription {
         }
     }
 
-    public String getLabel() {
-        if (labelOrDescription.size() > 0) {
-            return labelOrDescription.get(0);
+    public String getDescription() {
+        if (descriptionMap.containsKey(displayLang)) {
+            return descriptionMap.get(displayLang);
         } else {
-            return "";
+            return descriptionMap.getOrDefault("en", "");
         }
     }
 
-    public List<String> getLabelOrDescription() {
-        return labelOrDescription;
+    public String getLabel() {
+        if (labelMap.containsKey(displayLang)) {
+            return labelMap.get(displayLang);
+        } else {
+            return labelMap.getOrDefault("en", "");
+        }
+    }
+
+    public String getText() {
+        String label = getLabel();
+        String desc = getDescription();
+        if ((label != null) && !label.isEmpty()) {
+            return label;
+        } else if ((desc != null) && !desc.isEmpty()) {
+            return desc;
+        } else {
+            return "";
+        }
+
     }
 }

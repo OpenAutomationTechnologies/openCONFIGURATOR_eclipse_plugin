@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file   AllowedValues.java
+ * @file   IParameter.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -31,63 +31,39 @@
 
 package org.epsg.openconfigurator.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.epsg.openconfigurator.xmlbinding.xdd.TAllowedValues;
-import org.epsg.openconfigurator.xmlbinding.xdd.TAllowedValuesTemplate;
-import org.epsg.openconfigurator.xmlbinding.xdd.TRange;
-import org.epsg.openconfigurator.xmlbinding.xdd.TValue;
+import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
+import org.epsg.openconfigurator.model.Parameter.Property;
 
 /**
  *
  * @author Ramakrishnan P
  *
  */
-public class AllowedValues {
-    private List<String> valuesList = new ArrayList<>();
-    private List<Range> rangeList = new ArrayList<>();
+public interface IParameter {
 
-    public AllowedValues(TAllowedValues allowedValuesModel) {
-        if (allowedValuesModel != null) {
-            Object templateIdRef = allowedValuesModel.getTemplateIDRef();
-            if (templateIdRef == null) {
-                addRangeList(allowedValuesModel.getRange());
-                addValueList(allowedValuesModel.getValue());
-            } else {
-                if (templateIdRef instanceof TAllowedValuesTemplate) {
-                    TAllowedValuesTemplate allowedValuesTemplate = (TAllowedValuesTemplate) templateIdRef;
-                    addRangeList(allowedValuesTemplate.getRange());
-                    addValueList(allowedValuesTemplate.getValue());
-                } else {
-                    System.err.println(
-                            "Allowed values has undefined templateIdRef. Type:"
-                                    + templateIdRef);
-                }
-            }
-        } else {
-            // ignore.
-        }
-    }
+    public ParameterAccess getAccess();
 
-    private void addRangeList(List<TRange> rangeElements) {
-        for (TRange rangeModel : rangeElements) {
-            Range range = new Range(rangeModel);
-            rangeList.add(range);
-        }
-    }
+    public String getActualValue();
 
-    private void addValueList(List<TValue> valueElements) {
-        for (TValue valueModel : valueElements) {
-            valuesList.add(valueModel.getValue());
-        }
-    }
+    public AllowedValues getAllowedValues();
 
-    public List<Range> getRangeList() {
-        return rangeList;
-    }
+    public DataTypeChoice getDataType();
 
-    public List<String> getValuesList() {
-        return valuesList;
-    }
+    public DataTypeChoiceType getDataTypeChoice();
+
+    public String getDefaultValue();
+
+    public LabelDescription getLabelDescription();
+
+    public List<Property> getPropertyList();
+
+    public SimpleDataType getSimpleDataType();
+
+    public StructType getStructDataType();
+
+    public String getUniqueId();
+
+    public LabelDescription getUnitLabel();
 }

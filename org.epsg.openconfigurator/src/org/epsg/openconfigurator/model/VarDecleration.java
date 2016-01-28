@@ -70,7 +70,7 @@ public class VarDecleration {
         return initialValue;
     }
 
-    public LabelDescription getLabel() {
+    public LabelDescription getLabelDescription() {
         return label;
     }
 

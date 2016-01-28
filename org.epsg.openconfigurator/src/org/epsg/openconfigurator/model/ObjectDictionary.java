@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
@@ -45,6 +46,8 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroupList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
 
@@ -87,7 +90,9 @@ public class ObjectDictionary {
      * RPDO channels list.
      */
     private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
-    private List<Parameter> parameterList = new ArrayList<Parameter>();
+
+    private HashMap<String, Parameter> parameterListMap = new HashMap<String, Parameter>();
+    private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<String, ParameterGroup>();
 
     /**
      * Constructs object dictionary with following inputs.
@@ -180,8 +185,20 @@ public class ObjectDictionary {
         return objectsList;
     }
 
+    public Parameter getParameter(String uniqueId) {
+        return parameterListMap.getOrDefault(uniqueId, null);
+    }
+
+    public List<ParameterGroup> getParameterGroupList() {
+        List<ParameterGroup> valueList = new ArrayList<ParameterGroup>(
+                parameterGroupMap.values());
+        return valueList;
+    }
+
     public List<Parameter> getParameterList() {
-        return parameterList;
+        List<Parameter> valueList = new ArrayList<Parameter>(
+                parameterListMap.values());
+        return valueList;
     }
 
     /**
@@ -328,6 +345,9 @@ public class ObjectDictionary {
      */
     public void setXddModel(ISO15745ProfileContainer xddModel) {
 
+        parameterListMap.clear();
+        parameterGroupMap.clear();
+
         objectsList.clear();
         rpdoMappableObjectList.clear();
         tpdoMappableObjectList.clear();
@@ -348,16 +368,29 @@ public class ObjectDictionary {
                     List<TApplicationProcess> appProcessList = devProfile
                             .getApplicationProcess();
                     for (TApplicationProcess appProcess : appProcessList) {
+                        // Parameter List
                         TParameterList paramList = appProcess
                                 .getParameterList();
-                        if (paramList == null) {
-                            continue;
+                        if (paramList != null) {
+                            List<TParameterList.Parameter> parameterModelList = paramList
+                                    .getParameter();
+                            for (TParameterList.Parameter param : parameterModelList) {
+                                Parameter p = new Parameter(param);
+                                parameterListMap.put(p.getUniqueId(), p);
+                            }
                         }
 
-                        List<TParameterList.Parameter> parameterModelList = paramList
-                                .getParameter();
-                        for (TParameterList.Parameter param : parameterModelList) {
-                            parameterList.add(new Parameter(param));
+                        // Parameter Groups List
+                        TParameterGroupList paramGroupList = appProcess
+                                .getParameterGroupList();
+                        if (paramGroupList != null) {
+                            List<TParameterGroup> paramGroup = paramGroupList
+                                    .getParameterGroup();
+                            for (TParameterGroup grp : paramGroup) {
+                                ParameterGroup pg = new ParameterGroup(this,
+                                        grp);
+                                parameterGroupMap.put(pg.getUniqueId(), pg);
+                            }
                         }
                     }
                 }

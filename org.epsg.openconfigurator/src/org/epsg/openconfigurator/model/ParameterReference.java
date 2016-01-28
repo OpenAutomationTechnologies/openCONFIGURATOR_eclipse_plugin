@@ -32,22 +32,169 @@
 package org.epsg.openconfigurator.model;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
+import org.epsg.openconfigurator.model.Parameter.Property;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup.ParameterRef;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 
 /**
  *
  * @author Ramakrishnan P
  *
  */
-public class ParameterReference {
+public class ParameterReference implements IParameter {
 
     private Parameter parameter;
 
-    protected String actualValue;
-    protected boolean visible;
-    protected boolean locked;
-    protected BigInteger bitOffset;
+    private String actualValue;
+    private boolean visible;
+    private boolean locked;
+    private BigInteger bitOffset;
 
-    ParameterReference() {
+    private ObjectDictionary objectDictionary;
+    private ParameterGroup parameterGroup;
 
+    public ParameterReference(ParameterGroup parameterGroup,
+            ObjectDictionary objectDictionary,
+            ParameterRef parameterReferenceModel) {
+        this.parameterGroup = parameterGroup;
+        this.objectDictionary = objectDictionary;
+
+        if (parameterReferenceModel != null) {
+            actualValue = parameterReferenceModel.getActualValue();
+            visible = parameterReferenceModel.isVisible();
+            locked = parameterReferenceModel.isLocked();
+            bitOffset = parameterReferenceModel.getBitOffset();
+            Object paramModelObj = parameterReferenceModel.getUniqueIDRef();
+            if (paramModelObj != null) {
+                if (paramModelObj instanceof TParameterList.Parameter) {
+
+                    TParameterList.Parameter paramModel = (TParameterList.Parameter) paramModelObj;
+                    parameter = this.objectDictionary
+                            .getParameter(paramModel.getUniqueID());
+                }
+            }
+        }
+    }
+
+    @Override
+    public ParameterAccess getAccess() {
+        if (parameter != null) {
+            return parameter.getAccess();
+        }
+
+        return ParameterAccess.READ; // TODO: Confirm
+    }
+
+    @Override
+    public String getActualValue() {
+        if (actualValue != null) {
+            return actualValue;
+        } else {
+            if (parameter != null) {
+                return parameter.getActualValue();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public AllowedValues getAllowedValues() {
+        if (parameter != null) {
+            return parameter.getAllowedValues();
+        }
+        return null;
+    }
+
+    public BigInteger getBitOffset() {
+        return bitOffset;
+    }
+
+    @Override
+    public DataTypeChoice getDataType() {
+        if (parameter != null) {
+            return parameter.getDataType();
+        }
+        return null;
+    }
+
+    @Override
+    public DataTypeChoiceType getDataTypeChoice() {
+        if (parameter != null) {
+            return parameter.getDataTypeChoice();
+        }
+        return null;
+    }
+
+    @Override
+    public String getDefaultValue() {
+        if (parameter != null) {
+            return parameter.getDefaultValue();
+        }
+        return null;
+    }
+
+    @Override
+    public LabelDescription getLabelDescription() {
+        if (parameter != null) {
+            return parameter.getLabelDescription();
+        }
+        return null;
+    }
+
+    public ParameterGroup getParameterGroup() {
+        return parameterGroup;
+    }
+
+    @Override
+    public List<Property> getPropertyList() {
+        if (parameter != null) {
+            return parameter.getPropertyList();
+        }
+        return new ArrayList<Parameter.Property>();
+    }
+
+    @Override
+    public SimpleDataType getSimpleDataType() {
+        if (parameter != null) {
+            return parameter.getSimpleDataType();
+        }
+        return null;
+    }
+
+    @Override
+    public StructType getStructDataType() {
+        if (parameter != null) {
+            return parameter.getStructDataType();
+        }
+        return null;
+    }
+
+    @Override
+    public String getUniqueId() {
+        if (parameter != null) {
+            return parameter.getUniqueId();
+        } else {
+            return null;
+        }
+    }
+
+    @Override
+    public LabelDescription getUnitLabel() {
+        if (parameter != null) {
+            return parameter.getUnitLabel();
+        }
+        return null;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public boolean isVisible() {
+        return visible;
     }
 }

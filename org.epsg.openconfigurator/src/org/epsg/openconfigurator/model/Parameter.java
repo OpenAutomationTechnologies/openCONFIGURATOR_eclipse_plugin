@@ -42,7 +42,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TProperty;
  * @author Ramakrishnan P
  *
  */
-public class Parameter {
+public class Parameter implements IParameter {
 
     public enum ParameterAccess {
         UNDEFINED("undefined"), NO_ACCESS("noAccess"), CONST("const"), READ(
@@ -109,7 +109,7 @@ public class Parameter {
     private String defaultValue;
 
     private LabelDescription unitLabel;
-    private List<Property> propertyList;
+    private List<Property> propertyList = new ArrayList<>();
     private AllowedValues allowedValues;
 
     public Parameter(TParameterList.Parameter param) {
@@ -137,7 +137,6 @@ public class Parameter {
                         param.getUnit().getLabelOrDescriptionOrLabelRef());
             }
 
-            propertyList = new ArrayList<>();
             for (TProperty propertyModel : param.getProperty()) {
                 propertyList.add(new Property(propertyModel));
             }
@@ -148,54 +147,62 @@ public class Parameter {
         }
     }
 
+    @Override
     public ParameterAccess getAccess() {
         return access;
     }
 
+    @Override
     public String getActualValue() {
         return actualValue;
     }
 
+    @Override
     public AllowedValues getAllowedValues() {
         return allowedValues;
     }
 
+    @Override
     public DataTypeChoice getDataType() {
         return dataType;
     }
 
+    @Override
     public DataTypeChoiceType getDataTypeChoice() {
         return dataType.getChoiceType();
     }
 
+    @Override
     public String getDefaultValue() {
         return defaultValue;
     }
 
-    public LabelDescription getLabel() {
-        return label;
-    }
-
+    @Override
     public LabelDescription getLabelDescription() {
         return label;
     }
 
+    @Override
     public List<Property> getPropertyList() {
         return propertyList;
     }
 
+    @Override
     public SimpleDataType getSimpleDataType() {
         return dataType.getSimpleDataType();
     }
 
+    @Override
     public StructType getStructDataType() {
         return dataType.getStructDataType();
     }
 
+    @Override
     public String getUniqueId() {
         return uniqueId;
     }
 
+    @Override
     public LabelDescription getUnitLabel() {
         return unitLabel;
     }
