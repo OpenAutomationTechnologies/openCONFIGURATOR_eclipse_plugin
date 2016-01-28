@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.builder;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
@@ -367,7 +368,11 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 if (!Files.exists(targetPath)) {
                     Files.createDirectory(targetPath);
                 }
-                Files.write(targetFilePath, piDataOutput[0].getBytes());
+                // Write XAP.xml file in UTF-8 encoding.
+                Charset charset = Charset.forName("UTF-8");
+                ArrayList<String> lines = new ArrayList<>();
+                lines.add(piDataOutput[0]);
+                Files.write(targetFilePath, lines, charset);
             } catch (IOException e) {
                 e.printStackTrace();
                 IStatus errorStatus = new Status(IStatus.ERROR,
