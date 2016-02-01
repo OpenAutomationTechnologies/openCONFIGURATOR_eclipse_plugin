@@ -178,6 +178,7 @@ public class Node {
      */
     private final NodeType nodeType;
 
+    private String configurationError;
     /**
      * Instance of NetworkManagement.
      */
@@ -197,6 +198,7 @@ public class Node {
         nodeType = NodeType.UNDEFINED;
         objectDictionary = null;
         networkmanagement = null;
+        configurationError = "";
     }
 
     /**
@@ -249,6 +251,11 @@ public class Node {
             nodeType = NodeType.UNDEFINED;
             System.err.println("Unhandled node model type:" + nodeModel);
         }
+
+        if (xddModel == null) {
+            configurationError = "XDD parse not successful";
+        }
+
         this.xddModel = xddModel;
         objectDictionary = new ObjectDictionary(this, xddModel);
         networkmanagement = new NetworkManagement(this, xddModel);
@@ -400,6 +407,10 @@ public class Node {
         String cycleTimeValue = getObjectDictionary()
                 .getActualValue(INetworkProperties.CYCLE_TIME_OBJECT_ID);
         return cycleTimeValue;
+    }
+
+    public String getError() {
+        return configurationError;
     }
 
     /**
@@ -645,7 +656,7 @@ public class Node {
             if (pollresponseSubObj != null) {
 
                 String presTimeOutValueInNs = pollresponseSubObj
-                        .getActualValue();
+                        .getActualDefaultValue();
                 if (presTimeOutValueInNs != null) {
 
                     if (!presTimeOutValueInNs.isEmpty()) {
@@ -653,19 +664,10 @@ public class Node {
                     }
 
                 } else {
-
-                    presTimeOutValueInNs = pollresponseSubObj.getDefaultValue();
-                    if (presTimeOutValueInNs != null) {
-
-                        if (!presTimeOutValueInNs.isEmpty()) {
-                            return Long.decode(presTimeOutValueInNs);
-                        }
-                    } else {
-                        System.err.println("PresTimeout sub-object "
-                                + INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID
-                                + "/" + pollresponseSubObj.getSubobjectIdRaw()
-                                + " has no value.");
-                    }
+                    System.err.println("PresTimeout sub-object "
+                            + INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID
+                            + "/" + pollresponseSubObj.getSubobjectIdRaw()
+                            + " has no value.");
                 }
 
             } else {
@@ -743,11 +745,11 @@ public class Node {
      * @return <code>True</code> if node has no XDD/XDC file. <code>False</code>
      *         if node has XDD/XDC file
      */
-    public boolean hasXdd() {
-        if (getISO15745ProfileContainer() == null) {
-            return true;
+    public boolean hasError() {
+        if (configurationError == null) {
+            return false;
         }
-        return false;
+        return !configurationError.isEmpty();
     }
 
     /**
@@ -820,8 +822,9 @@ public class Node {
      * Checks for the boolean value of self PDO receipt in XDD of the given
      * node.
      *
-     * @return <true>if the PDOSelfReceipt is assigned to true in XDD model,
-     *         <false>if the PDOSelfReceipt is assigned to false in XDD model
+     * @return <code>True</code>if the PDOSelfReceipt is assigned to true in XDD
+     *         model, <code>False</code>if the PDOSelfReceipt is assigned to
+     *         false in XDD model
      */
     public boolean isPDOSelfReceipt() {
         return networkmanagement.getGeneralFeatures().isPDOSelfReceipt();
@@ -982,6 +985,10 @@ public class Node {
             System.err.println(
                     "Enable disable not supported for nodeType" + nodeModel);
         }
+    }
+
+    public void setError(String errorDescription) {
+        configurationError = errorDescription;
     }
 
     /**

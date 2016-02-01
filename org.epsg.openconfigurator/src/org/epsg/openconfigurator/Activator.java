@@ -61,7 +61,7 @@ public class Activator extends AbstractUIPlugin {
 
     // The plug-in ID
     public static final String PLUGIN_ID = "org.epsg.openconfigurator"; //$NON-NLS-1$
-    private static final String PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR = "openCONFIGURATOR plugin\nError loading shared libraries";
+    private static final String PLUGIN_DEPENDENT_LIBRARY_LOAD_ERROR = "openCONFIGURATOR plugin\n Error loading shared libraries";
 
     private static final String FILE_NOT_FOUND = "Requested file not found in the plugin. File: {0}";
 

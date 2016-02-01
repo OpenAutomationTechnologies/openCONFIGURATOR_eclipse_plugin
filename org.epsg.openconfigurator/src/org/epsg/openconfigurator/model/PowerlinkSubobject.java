@@ -183,7 +183,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      * Add the force configurations to the project.
      *
      * @param force True to add and false to remove.
-     * @param writeToProjectFile True to write the changes to the project file.
+     * @param writeToXdc True to write the changes to the XDC file.
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
@@ -398,7 +398,8 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * Checks for forced objects.
      *
-     * @return <true> if object is forced. <false> if object is not forced
+     * @return <code>True</code> if object is forced. <code>False</code> if
+     *         object is not forced
      */
     public boolean isObjectForced() {
         return nodeInstance.isObjectIdForced(object.getModel().getIndex(),
@@ -406,14 +407,16 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     }
 
     /**
-     * @return <true> if object is RPDO mappable. <false> if object is not.
+     * @return <code>True</code> if object is RPDO mappable. <code>False</code>
+     *         if object is not.
      */
     public boolean isRpdoMappable() {
         return isRpdoMappable;
     }
 
     /**
-     * @return <true> if object is TPDO mappable. <false> if object is not.
+     * @return <code>True</code> if object is TPDO mappable. <code>False</code>
+     *         if object is not.
      */
     public boolean isTpdoMappable() {
         return isTpdoMappable;

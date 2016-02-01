@@ -128,10 +128,9 @@ public class PowerlinkNetworkProjectSupport {
      * For this marvelous project we need to: - create the default Eclipse
      * project - add the custom project nature - create the folder structure
      *
-     * @param projectName
-     * @param location
-     * @param natureId
-     * @return
+     * @param projectName The name of project to be created.
+     * @param location The file path to specify the location of project.
+     * @return Project that has been created.
      * @throws CoreException
      */
     public static IProject createProject(String projectName, URI location)

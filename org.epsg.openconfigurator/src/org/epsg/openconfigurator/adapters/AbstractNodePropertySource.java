@@ -57,11 +57,11 @@ public abstract class AbstractNodePropertySource {
     private static final String NODE_FORCED_OBJECTS_LABEL = "Forced Objects";
 
     // ERROR messages
-    public static final String NOT_SUPPORTED = "Currently not supported";
+    public static final String NOT_SUPPORTED = "Currently not supported.";
     public static final String ERROR_NODE_NAME_CANNOT_BE_EMPTY = "Node name cannot be empty.";
     public static final String ERROR_NODE_ID_CANNOT_BE_EMPTY = "Node ID cannot be empty.";
-    public static final String ERROR_NODE_ID_EXCEEDS_RANGE = "Node id exceeds the range.";
-    public static final String ERROR_NODE_ID_DECEEDS_RANGE = "Node id deceeds the range.";
+    public static final String ERROR_NODE_ID_EXCEEDS_RANGE = "Node ID exceeds the range.";
+    public static final String ERROR_NODE_ID_DECEEDS_RANGE = "Node ID deceeds the range.";
     public static final String ERROR_OBJECT_NOT_FOUND = "Object not found!";
 
     protected TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(

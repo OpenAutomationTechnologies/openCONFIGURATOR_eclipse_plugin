@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -133,7 +134,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     private static final String INVALID_RANGE_PRE_SCALER = "Invalid range for PreScaler.";
     private static final String ERROR_INVALID_VALUE_PRE_SCALER = "Invalid value for PreScaler.";
     public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
-    public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value";
+    public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value.";
+    public static final String INVALID_RANGE_LOSS_SOC_TOLERANCE = "[{0}] Actual value {1} with datatype UNSIGNED32 does not fit the datatype limits or format.";
 
     static {
 
@@ -651,9 +653,9 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 // validate the value
                 Long maxValue = 4294967295L;
                 if ((longValue * 1000) > maxValue) {
-                    return "[" + mnNode.getNetworkId() + "]" + " Actual value "
-                            + longValue
-                            + " with datatype UNSIGNED32 does not fit the datatype limits or format";
+                    return MessageFormat.format(
+                            INVALID_RANGE_LOSS_SOC_TOLERANCE,
+                            mnNode.getNetworkId(), longValue);
                 }
 
             } catch (NumberFormatException e) {

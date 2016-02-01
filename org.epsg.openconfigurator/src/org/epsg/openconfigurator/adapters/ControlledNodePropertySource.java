@@ -78,17 +78,17 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_APP_SW_VERSION_LABEL = "Do Verify App S/W Version";
     private static final String CN_AUTO_APP_SW_UPDATE_ALLOWED_LABEL = "Auto App S/W Update Allowed";
     private static final String CN_VERIFY_DEVICE_TYPE_LABEL = "Verify Device Type";
-    private static final String CN_VERIFY_VENDOR_ID_LABEL = "Verify Vendor Id";
+    private static final String CN_VERIFY_VENDOR_ID_LABEL = "Verify Vendor ID";
     private static final String CN_VERIFY_REVISION_NUMBER_LABEL = "Verify Revision Number";
     private static final String CN_VERIFY_PRODUCT_CODE_LABEL = "Verify Product Code";
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
     private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
     private static final String CNPRES_CHAINING_ERROR_MESSAGE = "The node {0} does not support PRes Chaining operation.";
     private static final String MNPRES_CHAINING_ERROR_MESSAGE = "The MN {0} does not support PRes Chaining operation.";
-    private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported";
-    private static final String INVALID_CN_NODE_ID = "Invalid node id for a Controlled node";
+    private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported.";
+    private static final String INVALID_CN_NODE_ID = "Invalid node ID for a Controlled node.";
 
-    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout ("
+    private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PRes Timeout ("
             + "\u00B5" + "s)";
 
     /**
@@ -351,7 +351,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             return;
         }
         // checks whether the XDC import has occurred
-        if (!cnNode.hasXdd()) {
+        if (!cnNode.hasError()) {
             propertyList.add(nameDescriptor);
             propertyList.add(nodeIdEditableDescriptor);
 
@@ -519,21 +519,26 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         retObj = new Integer(value);
                         break;
                     }
-                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
+                    case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT: {
                         String forcedObjectsString = cnNode
                                 .getForcedObjectsString();
-                        if (forcedObjectsString.isEmpty()) {
-                            return "";
+                        if (!forcedObjectsString.isEmpty()) {
+                            retObj = cnNode.getForcedObjectsString();
+                        } else {
+                            retObj = StringUtils.EMPTY;
                         }
-                        retObj = cnNode.getForcedObjectsString();
                         break;
+                    }
                     case IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT: {
-                        long presTimeoutinNs = cnNode.getPresTimeoutvalue();
-                        long presTimeoutInMs = presTimeoutinNs / 1000;
-                        String value = String.valueOf(presTimeoutInMs);
-                        if (value.isEmpty()) {
-                            return "";
+                        long[] presTimeOutInNs = new long[1];
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .GetPResTimeOut(cnNode.getNetworkId(),
+                                        cnNode.getNodeId(), presTimeOutInNs);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
                         }
+                        long presTimeoutInMs = presTimeOutInNs[0] / 1000;
                         retObj = String.valueOf(presTimeoutInMs);
                         break;
                     }

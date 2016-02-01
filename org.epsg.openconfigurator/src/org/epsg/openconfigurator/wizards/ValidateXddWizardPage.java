@@ -93,7 +93,6 @@ public class ValidateXddWizardPage extends WizardPage {
     private static final String ERROR_DEFAULT_RMN_XDD_NOT_FOUND = "Default Redundant managing XDD not found.";
     private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
     private static final String ERROR_CHOOSE_VALID_PATH_MESSAGE = "XDD/XDC file does not exist in the path: ";
-    private static final String ERROR_INVALID_FILE = "Invalid XDD/XDC file.";
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
 
     /**

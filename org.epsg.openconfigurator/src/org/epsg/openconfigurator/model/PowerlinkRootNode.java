@@ -37,8 +37,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.InvocationTargetException;
 import java.math.BigInteger;
+import java.net.URLDecoder;
 import java.nio.file.Files;
-import java.nio.file.Paths;import java.text.MessageFormat;
+import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -91,8 +93,8 @@ import org.xml.sax.SAXException;
  */
 public class PowerlinkRootNode {
 
-    private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid. XDC Path: {1}";
-    private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project. XDC Path: {1}";
+    private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid.\n XDC Path: {1}";
+    private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
 
     private Map<Short, Node> nodeCollection = new HashMap<Short, Node>();
     private OpenCONFIGURATORProject currentProject;
@@ -260,9 +262,10 @@ public class PowerlinkRootNode {
 
                 monitor.subTask("Import MN node XDC:" + mnNode.getName() + "("
                         + mnNode.getNodeID() + ")");
-
+                String decodedXdcPath = URLDecoder.decode(mnNode.getPathToXDC(),
+                        "UTF-8");
                 File mnXddFile = new File(projectFile.getProject().getLocation()
-                        + File.separator + mnNode.getPathToXDC());
+                        + File.separator + decodedXdcPath);
                 System.out.println(
                         "MN XDD file path:" + mnXddFile.getAbsolutePath());
                 processingNode = new Node(this, projectFile, networkCfg, null);
@@ -313,11 +316,14 @@ public class PowerlinkRootNode {
                 monitor.subTask("Import CN node XDC:" + cnNode.getName() + "("
                         + cnNode.getNodeID() + ")");
 
+                String decodedXdcPath = URLDecoder.decode(cnNode.getPathToXDC(),
+                        "UTF-8");
+
                 File cnXddFile = new File(projectFile.getProject().getLocation()
-                        + File.separator + cnNode.getPathToXDC());
+                        + File.separator + decodedXdcPath);
                 System.out.println(
                         "CN XDD file path:" + cnXddFile.getAbsolutePath());
-
+                System.out.println("CN path to XDC: " + cnNode.getPathToXDC());
                 processingNode = new Node(this, projectFile, cnNode, null);
                 try {
 
@@ -329,10 +335,11 @@ public class PowerlinkRootNode {
                     processingNode = newNode;
 
                     Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
-                    if (res.IsSuccessful()) {
-                        nodeCollection.put(new Short(newNode.getNodeId()),
-                                newNode);
-                    } else {
+                    if (!res.IsSuccessful()) {
+                        newNode.setError(OpenConfiguratorLibraryUtils
+                                .getErrorMessage(res));
+                        nodeCollection.put(
+                                new Short(processingNode.getNodeId()), newNode);
                         return new Status(IStatus.ERROR,
                                 org.epsg.openconfigurator.Activator.PLUGIN_ID,
                                 OpenConfiguratorLibraryUtils
@@ -348,17 +355,18 @@ public class PowerlinkRootNode {
                                 XDC_FILE_NOT_FOUND_ERROR,
                                 processingNode.getNodeIDWithName(),
                                 processingNode.getAbsolutePathToXdc());
+                        processingNode.setError(errorMessage);
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(errorMessage,
                                         processingNode.getProject().getName());
                     } else {
+                        String errorMessage = e.getCause().getMessage()
+                                + " for the XDD/XDC file of node "
+                                + processingNode.getNodeIDWithName();
                         OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(
-                                        e.getCause().getMessage()
-                                                + " for the XDD/XDC file of node "
-                                                + processingNode
-                                                        .getNodeIDWithName(),
+                                .printErrorMessage(errorMessage,
                                         processingNode.getProject().getName());
+                        processingNode.setError(errorMessage);
                     }
                 }
                 nodeCollection.put(new Short(processingNode.getNodeId()),
@@ -379,10 +387,11 @@ public class PowerlinkRootNode {
                 TRMN rmnNode = rmnIterator.next();
                 monitor.subTask("Import RMN node XDC:" + rmnNode.getName() + "("
                         + rmnNode.getNodeID() + ")");
-
+                String decodedXdcPath = URLDecoder
+                        .decode(rmnNode.getPathToXDC(), "UTF-8");
                 File rmnXddFile = new File(
                         projectFile.getProject().getLocation() + File.separator
-                                + rmnNode.getPathToXDC());
+                                + decodedXdcPath);
                 System.out.println(
                         "RMN XDD file path:" + rmnXddFile.getAbsolutePath());
                 processingNode = new Node(this, projectFile, rmnNode, null);
@@ -394,10 +403,11 @@ public class PowerlinkRootNode {
                     processingNode = newNode;
 
                     Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
-                    if (res.IsSuccessful()) {
+                    if (!res.IsSuccessful()) {
+                        newNode.setError(OpenConfiguratorLibraryUtils
+                                .getErrorMessage(res));
                         nodeCollection.put(new Short(newNode.getNodeId()),
                                 newNode);
-                    } else {
                         return new Status(IStatus.ERROR,
                                 org.epsg.openconfigurator.Activator.PLUGIN_ID,
                                 OpenConfiguratorLibraryUtils
@@ -407,13 +417,14 @@ public class PowerlinkRootNode {
                 } catch (JAXBException | SAXException
                         | ParserConfigurationException | FileNotFoundException
                         | UnsupportedEncodingException e) {
+                    String errorMessage = e.getCause().getMessage()
+                            + " for the XDD/XDC file of the node " + "'"
+                            + rmnNode.getName() + "(" + rmnNode.getNodeID()
+                            + ")" + "'";
                     OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(
-                                    e.getCause().getMessage()
-                                            + " for the XDD/XDC file of the node "
-                                            + "'" + rmnNode.getName() + "("
-                                            + rmnNode.getNodeID() + ")" + "'",
+                            .printErrorMessage(errorMessage,
                                     processingNode.getProject().getName());
+                    processingNode.setError(errorMessage);
                 }
                 nodeCollection.put(new Short(processingNode.getNodeId()),
                         processingNode);
@@ -493,11 +504,9 @@ public class PowerlinkRootNode {
                 continue;
             }
 
-            if (node.hasXdd()) {
+            if (node.hasError()) {
                 OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                        "The XDD/XDC file cannot be found for the node " + "'"
-                                + node.getNodeIDWithName() + "'",
-                        node.getProject().getName());
+                        node.getError(), node.getProject().getName());
                 continue;
             }
 
@@ -593,7 +602,7 @@ public class PowerlinkRootNode {
 
                 Node mnNode = getMN();
 
-                if (!node.hasXdd()) {
+                if (!node.hasError()) {
                     Result libResult = OpenConfiguratorLibraryUtils
                             .removeNode(node);
                     if (!libResult.IsSuccessful()) {
@@ -658,7 +667,8 @@ public class PowerlinkRootNode {
                     // Updates generator attributes in project file.
                     OpenConfiguratorProjectUtils.updateGeneratorInfo(node);
 
-                    // Delete the XDC file from the deviceConfiguration directory.
+                    // Delete the XDC file from the deviceConfiguration
+                    // directory.
                     Files.delete(Paths.get(node.getAbsolutePathToXdc()));
 
                 } catch (JDOMException | IOException ex) {
@@ -752,8 +762,8 @@ public class PowerlinkRootNode {
                         monitor.done();
                     }
                 } else {
-                    System.err.println(
-                            "Node id not found in the network. ID:" + oldNodeId);
+                    System.err.println("Node id not found in the network. ID:"
+                            + oldNodeId);
                 }
             }
         };

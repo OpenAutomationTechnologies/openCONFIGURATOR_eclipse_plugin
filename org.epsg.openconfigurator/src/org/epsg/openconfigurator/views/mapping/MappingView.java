@@ -231,7 +231,6 @@ public class MappingView extends ViewPart {
      * Listener to handle the the update no.of entries modification events..
      *
      * @author Ramakrishnan P
-     *
      */
     private class EnabledEntriesTextModifyListener implements ModifyListener {
 
@@ -1154,8 +1153,8 @@ public class MappingView extends ViewPart {
     /**
      * Displays the library message in a dialog.
      *
-     * @param messageTypeThe message type determines the image to be displayed.
-     * @param libraryMessage The message to be shown
+     * @param messageType The message type determines the image to be displayed.
+     * @param res The message to be shown from the library.
      */
     public static void showLibraryMessageWindow(int messageType, Result res) {
         OpenConfiguratorMessageConsole.getInstance()

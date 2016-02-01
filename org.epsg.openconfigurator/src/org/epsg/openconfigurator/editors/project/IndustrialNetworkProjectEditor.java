@@ -117,11 +117,11 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * Editor strings and messages.
      */
     private static final String PROJECT_EDITOR_PAGE_NAME = "POWERLINK Project";
-    private static final String PROJECT_EDITOR_CREATION_ERROR_MESSAGE = "Error creating project editor overview page";
+    private static final String PROJECT_EDITOR_CREATION_ERROR_MESSAGE = "Error creating project editor overview page.";
     private static final String PROJECT_SOURCE_PAGE_NAME = "Source";
-    private static final String PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE = "Error creating nested XML editor";
-    private static final String MARSHALL_ERROR = "Error marshalling the openCONFIGURATOR project";
-    private static final String UNMARSHALL_ERROR = "Error unmarshalling the openCONFIGURATOR project";
+    private static final String PROJECT_SOURCE_PAGE_CREATION_ERROR_MESSAGE = "Error creating nested XML editor.";
+    private static final String MARSHALL_ERROR = "Error marshalling the openCONFIGURATOR project.";
+    private static final String UNMARSHALL_ERROR = "Error unmarshalling the openCONFIGURATOR project.";
     private static final String INVALID_INPUT_ERROR = "Invalid input: Must be a valid openCONFIGURATOR project file.";
 
     /**

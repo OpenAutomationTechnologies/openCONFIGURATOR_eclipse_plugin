@@ -67,7 +67,7 @@ public class NewNodeWizard extends Wizard {
 
     private static final String WINDOW_TITLE = "POWERLINK node wizard";
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
-    public static final String ERROR_NODE_MODEL = "Invalid node model";
+    public static final String ERROR_NODE_MODEL = "Invalid node model.";
 
     /**
      * Add new node wizard page.

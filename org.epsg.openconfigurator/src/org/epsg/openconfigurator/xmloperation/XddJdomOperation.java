@@ -154,7 +154,7 @@ public class XddJdomOperation {
      * XDD/XDC document
      *
      * @param document XDD/XDC file instance.
-     * @param value The current time to be set.
+     * @param time The current time to be set.
      */
     public static void updateFileModifiedTime(Document document, String time) {
         Attribute newAttribute = new Attribute(FILE_MODIFICATION_TIME, time);

@@ -78,7 +78,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
     public static final String DEFAULT_MN_WIZARDPAGE_DEFAULT_LABEL = "Default";
     public static final String DEFAULT_MN_WIZARDPAGE_CUSTOM_LABEL = "Custom";
 
-    public static final String DEFAULT_MN_WIZARDPAGE_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file";
+    public static final String DEFAULT_MN_WIZARDPAGE_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
     public static final String DEFAULT_MN_WIZARDPAGE_MN_PATH_TIP = "Path for the managing node device configuration file.\n"
             + "If you are new to POWERLINK use 'Default' MN XDD.";
     public static final String DEFAULT_MN_WIZARDPAGE_NODEID_TIP = "ID of the managing node.";
@@ -86,7 +86,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
     public static final String DEFAULT_MN_WIZARDPAGE_XDD_XDC_FILE_LABEL = "XDD/XDC file:";
     public static final String DEFAULT_MN_WIZARDPAGE_NAME_LABEL = "Name:";
     public static final String DEFAULT_MN_WIZARDPAGE_NAME_TIP = "Name of the managing node";
-    public static final String DEFAULT_MN_WIZARDPAGE_NAME_MESSAGE = "Enter a valid node name";
+    public static final String DEFAULT_MN_WIZARDPAGE_NAME_MESSAGE = "Enter a valid node name.";
 
     /**
      * Default managing node name.
@@ -153,7 +153,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
                 AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_LABEL);
 
         txtNodeName = new Text(composite, SWT.BORDER);
-        txtNodeName.setBounds(92, 34, 159, 21);
+        txtNodeName.setBounds(92, 34, 198, 21);
         txtNodeName.setText(defaultMasterName);
         txtNodeName.setToolTipText(
                 AddDefaultMasterNodeWizardPage.DEFAULT_MN_WIZARDPAGE_NAME_TIP);
@@ -179,7 +179,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         lblNewLabel.setText("Node ID:");
 
         Spinner spinnerNodeId = new Spinner(composite, SWT.BORDER);
-        spinnerNodeId.setBounds(92, 103, 61, 22);
+        spinnerNodeId.setBounds(92, 103, 159, 22);
         spinnerNodeId.setMaximum(255);
         spinnerNodeId.setSelection(defaultMnNodeId);
         spinnerNodeId.setEnabled(false);

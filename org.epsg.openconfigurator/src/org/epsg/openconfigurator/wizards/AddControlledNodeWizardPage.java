@@ -157,7 +157,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
         lblNodeType.setText(NODE_TYPE_LABEL);
 
         nodeTypeCombo = new Combo(container, SWT.READ_ONLY);
-        nodeTypeCombo.setBounds(121, 10, 191, 23);
+        nodeTypeCombo.setBounds(121, 10, 219, 23);
         nodeTypeCombo.setItems(NODE_TYPES);
         nodeTypeCombo.select(0);
         nodeTypeCombo.addSelectionListener(new SelectionAdapter() {
@@ -176,7 +176,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
         nodeIdSpinner.setMaximum(IPowerlinkConstants.CN_MAX_NODE_ID);
         nodeIdSpinner.setMinimum(IPowerlinkConstants.CN_MIN_NODE_ID);
         nodeIdSpinner.setSelection(getNewCnNodeId());
-        nodeIdSpinner.setBounds(121, 45, 63, 22);
+        nodeIdSpinner.setBounds(121, 45, 117, 22);
         nodeIdSpinner.addModifyListener(new ModifyListener() {
 
             @Override
@@ -207,12 +207,12 @@ public class AddControlledNodeWizardPage extends WizardPage {
         nodeName.setFocus();
 
         lblNodeIdRangeValue = new Label(container, SWT.LEFT);
-        lblNodeIdRangeValue.setBounds(268, 48, 133, 15);
+        lblNodeIdRangeValue.setBounds(301, 48, 133, 15);
         lblNodeIdRangeValue.setText(
                 nodeIdSpinner.getMinimum() + "-" + nodeIdSpinner.getMaximum());
 
         Label lblRange = new Label(container, SWT.NONE);
-        lblRange.setBounds(211, 48, 51, 19);
+        lblRange.setBounds(244, 48, 51, 19);
         lblRange.setText(RANGE_LABEL);
 
     }

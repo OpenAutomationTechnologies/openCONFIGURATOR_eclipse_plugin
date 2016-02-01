@@ -102,7 +102,7 @@ public final class PluginErrorDialogUtils {
      * Displays the library message in a dialog.
      *
      * @param messageType The message type determines the image to be displayed.
-     * @param message The message to be shown.
+     * @param res The message from the library.
      */
     public static void showMessageWindow(int messageType, Result res) {
         OpenConfiguratorMessageConsole.getInstance()

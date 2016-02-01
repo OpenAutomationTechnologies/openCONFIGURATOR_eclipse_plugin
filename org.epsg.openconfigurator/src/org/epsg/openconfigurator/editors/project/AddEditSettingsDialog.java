@@ -149,9 +149,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     private final String NAME_LABEL = "Name:";
     private final String VALUE_LABEL = "Value:";
     private final String ACTIVE_LABEL = "Active:";
-    private final String INVALID_SETTINGS_TYPE = "Select a valid Settings type";
+    private final String INVALID_SETTINGS_TYPE = "Select a valid Settings type.";
     private final String EMPTY_SETTINGS_TYPE_ERROR = "No new settings are available. Try editing from the settings table.";
-    private final String ERROR_INVALID_NODE_ID = "{0} is not a valid node ID";
+    private final String ERROR_INVALID_NODE_ID = "{0} is not a valid node ID.";
 
     /**
      * Builder settings value.
@@ -228,8 +228,8 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
         // configured in the AutoGenerationSettings.
         for (BuilderConfiguration builderConfig : builderConfig) {
             for (TKeyValuePair tempSetting : agSettings.getSetting()) {
-                if (tempSetting.getName().equalsIgnoreCase(
-                        builderConfig.getName())) {
+                if (tempSetting.getName()
+                        .equalsIgnoreCase(builderConfig.getName())) {
                     builderConfig.setAlreadyAvailable(true);
                 }
             }
@@ -362,31 +362,31 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
 
         Label lblSettingsName = new Label(container, SWT.CENTER);
         lblSettingsName.setText(NAME_LABEL);
-        lblSettingsName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false, 1, 1));
+        lblSettingsName.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
         settingsTypeCombo = new Combo(container, SWT.READ_ONLY);
-        settingsTypeCombo.setLayoutData(new GridData(SWT.FILL, SWT.CENTER,
-                true, false, 1, 1));
+        settingsTypeCombo.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
 
         Label lblValue = new Label(container, SWT.CENTER);
         lblValue.setText(VALUE_LABEL);
-        lblValue.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false,
-                1, 1));
+        lblValue.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
         value = new Text(container, SWT.LEFT | SWT.SINGLE | SWT.BORDER);
-        value.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1,
-                1));
+        value.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         value.setToolTipText(VALUE_TOOL_TIP);
 
         Label lblActive = new Label(container, SWT.CENTER);
         lblActive.setText(ACTIVE_LABEL);
-        lblActive.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false, 1, 1));
+        lblActive.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
         bntActive = new Button(container, SWT.CHECK);
-        bntActive.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false, 1, 1));
+        bntActive.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         bntActive.setSelection(true);
 
         /**
@@ -522,8 +522,8 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
                     if ((shortValue > 0) && (shortValue < 256)) {
                         retValue = true;
                     } else {
-                        setErrorMessage(MessageFormat.format(
-                                ERROR_INVALID_NODE_ID, element));
+                        setErrorMessage(MessageFormat
+                                .format(ERROR_INVALID_NODE_ID, element));
                     }
                 } catch (NumberFormatException exception) {
                     setErrorMessage(MessageFormat.format(ERROR_INVALID_NODE_ID,

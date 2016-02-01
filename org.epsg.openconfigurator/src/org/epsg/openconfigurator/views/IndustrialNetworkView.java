@@ -544,6 +544,7 @@ public class IndustrialNetworkView extends ViewPart
         Control control = viewer.getControl();
         if ((control != null) && !control.isDisposed()) {
             viewer.setInput(rootNode);
+            viewer.expandAll();
         }
     }
 
@@ -634,7 +635,7 @@ public class IndustrialNetworkView extends ViewPart
 
                 Result res = new Result();
                 // checks for valid XDC file
-                if (!node.hasXdd()) {
+                if (!node.hasError()) {
                     res = OpenConfiguratorLibraryUtils
                             .toggleEnableDisable(node);
                     if (!res.IsSuccessful()) {
@@ -683,7 +684,8 @@ public class IndustrialNetworkView extends ViewPart
     }
 
     private void handleRefresh() {
-        viewer.setInput(viewer.getInput());
+        viewer.setInput(rootNode);
+        viewer.expandAll();
     }
 
     public void handleRemoveNode(IStructuredSelection selection) {

@@ -40,6 +40,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +75,12 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
     public static final String BUILDER_ID = "org.epsg.openconfigurator.industrialNetworkBuilder";
+    private static final String BUILD_START_MESSAGE = "Build Started for project: {0}";
+    private static final String BUILD_FAILED_ERROR_MESSAGE = "Build failed for project: {0}";
+    private static final String BUILD_COMPLETED_MESSAGE = "Build finished successfully for Project: {0}";
+    private static final String UPDATING_NODE_CONFIGURATION_MESSAGE = "Updating node configuration files.";
+    private static final String UPDATING_NODE_CONFIGURATION__ERROR_MESSAGE = "Failed to update the node configuration files.\n\tError message: ";
+    private static final String UPDATING_NODE_CONFIGURATION__COMPLETED_MESSAGE = "Completed updating node configuration files.";
 
     /**
      * The list of Industrial network project editors wherein the library has
@@ -295,7 +302,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      * Build the ProcessImage descriptions for currently active project.
      *
      * @param networkId The network ID.
-     * @param outputpath The location to save the output files.
+     * @param targetPath The location to save the output files.
      * @param monitor Monitor instance to update the progress activity.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
      * @throws CoreException
@@ -479,10 +486,13 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         StringBuilder sb = new StringBuilder();
         byte[] txtArray = buffer.array();
         short lineBreakCount = 0;
-        for (Byte bs : txtArray) {
+
+        for (int cnt = 0; cnt < txtArray.length; ++cnt) {
             sb.append("0x"); //$NON-NLS-1$
-            sb.append(String.format("%02X", bs)); //$NON-NLS-1$
-            sb.append(","); //$NON-NLS-1$
+            sb.append(String.format("%02X", txtArray[cnt])); //$NON-NLS-1$
+            if (cnt != (txtArray.length - 1)) {
+                sb.append(","); //$NON-NLS-1$
+            }
             lineBreakCount++;
 
             if (lineBreakCount == 16) {
@@ -602,7 +612,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             System.out.println("Build Started: Project: " + networkId);
             // Displays Info message in console.
-            displayInfoMessage("Build Started for project: " + networkId);
+            displayInfoMessage(
+                    MessageFormat.format(BUILD_START_MESSAGE, networkId));
 
             long buildStartTime = System.currentTimeMillis();
 
@@ -643,18 +654,17 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         networkId, targetPath, monitor);
                 if (!buildPiSuccess) {
                     // Displays error message in console.
-                    displayErrorMessage(
-                            "Build failed for project: " + networkId);
+                    displayErrorMessage(MessageFormat
+                            .format(BUILD_FAILED_ERROR_MESSAGE, networkId));
                 } else {
                     // Displays Info message in console.
-                    displayInfoMessage(
-                            "Build finished successfully for Project: "
-                                    + networkId);
+                    displayInfoMessage(MessageFormat
+                            .format(BUILD_COMPLETED_MESSAGE, networkId));
                     displayInfoMessage("Generated output files at: "
                             + targetPath.toString());
                 }
 
-                displayInfoMessage("Updating node configuration files.");
+                displayInfoMessage(UPDATING_NODE_CONFIGURATION_MESSAGE);
 
                 try {
                     pjtEditor.persistLibraryData(monitor);
@@ -664,7 +674,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                             Activator.PLUGIN_ID, IStatus.OK,
                             e.getCause().getMessage(), e);
                     displayErrorMessage(
-                            "Failed to update the node configuration files.\n\tError message: "
+                            UPDATING_NODE_CONFIGURATION__ERROR_MESSAGE
                                     + e.getCause().getMessage());
                     throw new CoreException(errorStatus);
                 }
@@ -682,7 +692,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             final long totalTimeInSeconds = (buildEndTime - buildStartTime)
                     / 1000;
             // Displays Info message in console.
-            displayInfoMessage("Completed updating node configuration files.");
+            displayInfoMessage(UPDATING_NODE_CONFIGURATION__COMPLETED_MESSAGE);
             System.out
                     .println("Build completed in " + totalTimeInSeconds + "s");
         }

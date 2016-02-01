@@ -76,7 +76,7 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
                 default:
             }
             // Error overlay image to node with invalid XDC file.
-            if (nodeObj.hasXdd()) {
+            if (nodeObj.hasError()) {
                 decoration.addOverlay(
                         org.epsg.openconfigurator.Activator.getImageDescriptor(
                                 IPluginImages.ERROR_OVERLAY_NODE_ICON),

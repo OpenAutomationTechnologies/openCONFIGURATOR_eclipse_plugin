@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -78,12 +79,15 @@ public class RedundantManagingNodePropertySource
     private static final TextPropertyDescriptor nodeIdEditableDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
 
-    private static final String ERROR_WAIT_NOT_ACTIVE_CANNOT_BE_EMPTY = "Wait NOT_ACTIVE value cannot be empty.";
-    private static final String INVALID_RANGE_WAIT_NOT_ACTIVE = "Invalid range for Wait NOT_ACTIVE";
-    private static final String ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE = "Invalid value for Wait NOT_ACTIVE";
+    private static final String ERROR_WAIT_NOT_ACTIVE_CANNOT_BE_EMPTY = "Wait Not Active value cannot be empty.";
+    private static final String INVALID_RANGE_WAIT_NOT_ACTIVE = "Invalid range for Wait Not Active.";
+    private static final String ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE = "Invalid value for Wait Not Active.";
 
     private static final String ERROR_RMN_PRIORITY_CANNOT_BE_EMPTY = "Priority value cannot be empty.";
-    private static final String ERROR_INVALID_VALUE_RMN_PRIORITY = "Invalid value for Priority";
+    private static final String ERROR_INVALID_VALUE_RMN_PRIORITY = "Invalid value for Priority.";
+    private static final String ERROR_INVALID_RMN_NODE_ID = "Invalid node ID for a Redundant Managing node.";
+    private static final String ERROR_RMN_ID_RANGE = "Redundant Managing node with id 0-240 is not supported.";
+    private static final String ERROR_RMN_ID_EXISTS = "Node with ID {0} already exists.";
 
     static {
         waitNotActiveDescriptor
@@ -163,7 +167,7 @@ public class RedundantManagingNodePropertySource
             return;
         }
         // checks whether XDC import of node has occurred
-        if (!redundantManagingNode.hasXdd()) {
+        if (!redundantManagingNode.hasError()) {
             propertyList.add(nameDescriptor);
             propertyList.add(nodeIdEditableDescriptor);
 
@@ -342,10 +346,10 @@ public class RedundantManagingNodePropertySource
                 if ((nodeIDvalue == 0)
                         || (nodeIDvalue == IPowerlinkConstants.MN_DEFAULT_NODE_ID)
                         || (nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID)) {
-                    return "Invalid node id for a Redundant Managing node.";
+                    return ERROR_INVALID_RMN_NODE_ID;
                 }
                 if (nodeIDvalue < IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                    return "Redundant Managing node with id 0-240 is not supported.";
+                    return ERROR_RMN_ID_RANGE;
                 }
 
                 if (nodeIDvalue == redundantManagingNode.getNodeId()) {
@@ -356,10 +360,11 @@ public class RedundantManagingNodePropertySource
                         .getPowerlinkRootNode()
                         .isNodeIdAlreadyAvailable(nodeIDvalue);
                 if (nodeIdAvailable) {
-                    return "Node with id " + nodeIDvalue + " already exists.";
+                    return MessageFormat.format(ERROR_RMN_ID_EXISTS,
+                            nodeIDvalue);
                 }
             } catch (NumberFormatException ex) {
-                return "Invalid node id for a Redundant Managing node.";
+                return ERROR_INVALID_RMN_NODE_ID;
             }
         }
 

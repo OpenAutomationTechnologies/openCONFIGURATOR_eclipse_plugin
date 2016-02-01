@@ -703,8 +703,6 @@ public class OpenConfiguratorLibraryUtils {
     /**
      * Add node into the library.
      *
-     * @param networkId Network ID.
-     * @param nodeId The node ID.
      * @param node Node instance.
      * @return Result instance from the library.
      */
@@ -1882,8 +1880,7 @@ public class OpenConfiguratorLibraryUtils {
             if (profileBodyDatatype instanceof ProfileBodyDevicePowerlink) {
                 importProfileBodyDevicePowerlink(node,
                         (ProfileBodyDevicePowerlink) profileBodyDatatype);
-            } else
-                if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
+            } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
                 importProfileBodyCommunicationNetworkPowerlink(node,
                         (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype);
             } else {
@@ -2283,8 +2280,8 @@ public class OpenConfiguratorLibraryUtils {
      *            validated.
      * @param objectId The complete ID of object.
      * @param actualValue Value given for validation.
-     * @param isForced <True> If the value of object is forced. <False> If the
-     *            value of object is not forced
+     * @param isForced <code>True</code> If the value of object is forced.
+     *            <code>False</code> If the value of object is not forced
      * @return The result from openCONFIGURATOR library.
      */
     public static Result validateObjectActualValue(String networkId,
@@ -2320,8 +2317,8 @@ public class OpenConfiguratorLibraryUtils {
      * @param objectId The complete ID of object.
      * @param subObjectId The complete ID of sub object.
      * @param actualValue Value given for validation.
-     * @param isForced <True> If the value of object is forced. <False> If the
-     *            value of object is not forced
+     * @param isForced <code>True</code> If the value of object is forced.
+     *            <code>False</code> If the value of object is not forced
      * @return The result from openCONFIGURATOR library.
      */
     public static Result validateSubobjectActualValue(String networkId,

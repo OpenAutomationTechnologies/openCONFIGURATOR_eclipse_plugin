@@ -148,7 +148,9 @@ public class OpenConfiguratorMessageConsole {
             libraryMessageConsole = myConsole.newMessageStream();
             libraryMessageConsole
                     .setColor(new Color(Display.getDefault(), 255, 0, 0));
-            libraryMessageConsole.setActivateOnWrite(true);
+            // Avoid switching into the library log while library messages are
+            // displayed.
+            libraryMessageConsole.setActivateOnWrite(false);
         }
         return libraryMessageConsole;
     }
@@ -184,7 +186,7 @@ public class OpenConfiguratorMessageConsole {
     /**
      * Displays the given library message in the error console.
      *
-     * @param message The message to be updated.
+     * @param res The result from openCONFIGURATOR library.
      */
     public void printLibraryErrorMessage(final Result res) {
 
