@@ -61,11 +61,15 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -140,6 +144,29 @@ public class ValidateXddWizardPage extends WizardPage {
      */
     boolean retVal = false;
 
+    // Node configuration path listener
+    private ModifyListener nodeConfigurationPathModifyListener = new ModifyListener() {
+        @Override
+        public void modifyText(ModifyEvent e) {
+            setErrorMessage(null);
+            getInfoStyledText("");
+            setPageComplete(true);
+            if (!isNodeConfigurationValid(nodeConfigurationPath.getText())) {
+                setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
+                getErrorStyledText(ERROR_CHOOSE_VALID_FILE_MESSAGE);
+                setPageComplete(false);
+            }
+
+            if (btnCustom.getSelection()) {
+                customConfiguration = nodeConfigurationPath.getText();
+            }
+            nodeConfigurationPath
+                    .setToolTipText(nodeConfigurationPath.getText());
+            getWizard().getContainer().updateButtons();
+
+        }
+    };
+
     /**
      * Create the wizard and initializes the path of xdd.
      */
@@ -188,6 +215,63 @@ public class ValidateXddWizardPage extends WizardPage {
 
                 ISO15745ProfileContainer xddModel = XddMarshaller
                         .unmarshallXDDFile(xddFile);
+
+                // Checks for the valid XDD/XDC file of respective node.
+                Object node = getNodeModel();
+                Node newNode = new Node(getNodeList(), null, node, xddModel);
+                NetworkManagement netWrkMgmt = newNode.getNetworkManagement();
+                switch (newNode.getNodeType()) {
+                    case CONTROLLED_NODE: {
+                        if (!netWrkMgmt.getGeneralFeatures().isDLLFeatureCN()) {
+                            getErrorStyledText(ERROR_INVALID_CN_FILE_MESSAGE);
+                            return false;
+                        }
+                        break;
+                    }
+                    case MANAGING_NODE: {
+                        if (!netWrkMgmt.getGeneralFeatures().isDLLFeatureMN()) {
+                            getErrorStyledText(ERROR_INVALID_MN_FILE_MESSAGE);
+                            return false;
+                        }
+                        break;
+                    }
+                    case REDUNDANT_MANAGING_NODE: {
+                        if (newNode
+                                .getNodeId() > IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                            // This is an RMN
+                            if (netWrkMgmt.getGeneralFeatures()
+                                    .isDLLFeatureMN()) {
+                                TMNFeatures mnFeatures = netWrkMgmt
+                                        .getMnFeatures();
+                                if (mnFeatures != null) {
+                                    if (!mnFeatures.isNMTMNRedundancy()) {
+                                        getErrorStyledText(
+                                                ERROR_INVALID_XDD_XDC_FILE_RMN_MESSAGE);
+                                        return false;
+                                    }
+                                } else {
+                                    getErrorStyledText(
+                                            ERROR_INVALID_XDD_XDC_FILE_RMN_MESSAGE);
+                                    return false;
+                                }
+                            } else {
+                                getErrorStyledText(
+                                        ERROR_INVALID_XDD_XDC_FILE_MN_MESSAGE);
+                                return false;
+                            }
+                        } else {
+                            // This RMN is added as a CN
+                            // FIXME:
+                        }
+                        break;
+                    }
+                    case UNDEFINED: /// Fall-Through
+                    default: {
+                        getErrorStyledText(INTERNAL_ERROR_MESSAGE);
+                        return false;
+                    }
+                }
+
                 getInfoStyledText(VALID_FILE_MESSAGE + getNodeNamewithId());
             } else {
                 setErrorMessage(ERROR_CHOOSE_VALID_PATH_MESSAGE
@@ -239,8 +323,8 @@ public class ValidateXddWizardPage extends WizardPage {
         headerFrame.setLayout(new GridLayout(1, false));
 
         Group grpConfigurationFile = new Group(headerFrame, SWT.NONE);
-        GridData gd_grpConfigurationFile = new GridData(SWT.LEFT, SWT.CENTER,
-                false, false, 1, 1);
+        GridData gd_grpConfigurationFile = new GridData(SWT.FILL, SWT.FILL,
+                true, false, 1, 1);
         gd_grpConfigurationFile.widthHint = 558;
         grpConfigurationFile.setLayoutData(gd_grpConfigurationFile);
         grpConfigurationFile.setText(CONFIGURATION_FILE_LABEL);
@@ -270,28 +354,8 @@ public class ValidateXddWizardPage extends WizardPage {
                 new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
         nodeConfigurationPath.setToolTipText(nodeConfigurationPath.getText());
-        nodeConfigurationPath.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                setErrorMessage(null);
-                getInfoStyledText("");
-                setPageComplete(true);
-                if (!isNodeConfigurationValid(
-                        nodeConfigurationPath.getText())) {
-                    setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
-                    getErrorStyledText(ERROR_CHOOSE_VALID_FILE_MESSAGE);
-                    setPageComplete(false);
-                }
-
-                if (btnCustom.getSelection()) {
-                    customConfiguration = nodeConfigurationPath.getText();
-                }
-                nodeConfigurationPath
-                        .setToolTipText(nodeConfigurationPath.getText());
-                getWizard().getContainer().updateButtons();
-
-            }
-        });
+        nodeConfigurationPath
+                .addModifyListener(nodeConfigurationPathModifyListener);
 
         btnBrowse = new Button(grpConfigurationFile, SWT.NONE);
         btnBrowse.setLayoutData(
@@ -340,7 +404,8 @@ public class ValidateXddWizardPage extends WizardPage {
                 handleDefaultRadioButtonSelectionChanged(e);
             }
         });
-
+        nodeConfigurationPath
+                .addModifyListener(nodeConfigurationPathModifyListener);
         TextViewer textViewer = new TextViewer(headerFrame,
                 SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
         errorinfo = textViewer.getTextWidget();
@@ -371,6 +436,32 @@ public class ValidateXddWizardPage extends WizardPage {
     }
 
     /**
+     * @return The path of MN XDC file.
+     */
+    public String getMnXdcPath() {
+        PowerlinkRootNode rootNode = getNodeList();
+        String mnXdcPath = rootNode.getMN().getAbsolutePathToXdc();
+        return mnXdcPath;
+    }
+
+    /**
+     * Node model values of previous wizard page.
+     *
+     * @return node model of previous page.
+     */
+    public Object getnode() {
+        IWizardPage previousPage = getPreviousPage();
+        if (previousPage instanceof AddControlledNodeWizardPage) {
+            AddControlledNodeWizardPage adCnPage = (AddControlledNodeWizardPage) previousPage;
+            return adCnPage.getNode();
+        } else if (previousPage instanceof AddDefaultMasterNodeWizardPage) {
+            AddDefaultMasterNodeWizardPage adMnPage = (AddDefaultMasterNodeWizardPage) previousPage;
+            return adMnPage.getNode();
+        }
+        return null;
+    }
+
+    /**
      * Receive nodeConfiguration path.
      *
      * @return Path of nodeConfiguration.
@@ -380,12 +471,45 @@ public class ValidateXddWizardPage extends WizardPage {
     }
 
     /**
+     * Get the node list available from POWERLINK root node.
+     *
+     * @return The list of nodes
+     */
+    public PowerlinkRootNode getNodeList() {
+        IViewPart viewPart = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage()
+                .findView(IndustrialNetworkView.ID);
+        if (viewPart instanceof IndustrialNetworkView) {
+            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
+            return industrialView.getNodeList();
+        }
+        return null;
+    }
+
+    /**
+     * Node model values of previous wizard page.
+     *
+     * @return node model of previous page or null otherwise.
+     */
+    public Object getNodeModel() {
+        IWizardPage previousPage = getPreviousPage();
+        if (previousPage instanceof AddControlledNodeWizardPage) {
+            AddControlledNodeWizardPage adCnPage = (AddControlledNodeWizardPage) previousPage;
+            return adCnPage.getNode();
+        } else if (previousPage instanceof AddDefaultMasterNodeWizardPage) {
+            AddDefaultMasterNodeWizardPage adMnPage = (AddDefaultMasterNodeWizardPage) previousPage;
+            return adMnPage.getNode();
+        }
+        return null;
+    }
+
+    /**
      * Receive node name with ID.
      *
      * @return Name and ID of node.
      */
     public String getNodeNamewithId() {
-        Object nodeobj = setnode();
+        Object nodeobj = getNodeModel();
         if (nodeobj instanceof TCN) {
             TCN cnmodel = (TCN) nodeobj;
             return cnmodel.getName() + "(" + cnmodel.getNodeID() + ")";
@@ -407,22 +531,30 @@ public class ValidateXddWizardPage extends WizardPage {
             nodeConfigurationPath.setEnabled(false);
             btnBrowse.setEnabled(false);
 
-            Object nodeobj = setnode();
+            String tempXddPath = "";
+            Object nodeobj = getNodeModel();
             if (nodeobj instanceof TCN) {
                 TCN cnmodel = (TCN) nodeobj;
-                cnmodel.setPathToXDC(defaultCnXDD);
-                nodeConfigurationPath.setText(defaultCnXDD);
+                tempXddPath = defaultCnXDD;
+                cnmodel.setPathToXDC(tempXddPath);
+                nodeConfigurationPath.removeModifyListener(
+                        nodeConfigurationPathModifyListener);
             } else if (nodeobj instanceof TRMN) {
                 TRMN rmnmodel = (TRMN) nodeobj;
-                rmnmodel.setPathToXDC(defaultMnXDD);
-                nodeConfigurationPath.setText(defaultMnXDD);
+                tempXddPath = getMnXdcPath();
+                rmnmodel.setPathToXDC(tempXddPath);
+                nodeConfigurationPath.removeModifyListener(
+                        nodeConfigurationPathModifyListener);
             } else if (nodeobj instanceof TMN) {
                 TMN mnmodel = (TMN) nodeobj;
-                mnmodel.setPathToXDC(defaultMnXDD);
-                nodeConfigurationPath.setText(defaultMnXDD);
+                tempXddPath = defaultMnXDD;
+                mnmodel.setPathToXDC(tempXddPath);
             } else {
                 System.err.println("Invalid node model.");
             }
+            nodeConfigurationPath.setText(tempXddPath);
+            nodeConfigurationPath
+                    .addModifyListener(nodeConfigurationPathModifyListener);
         }
     }
 
@@ -475,19 +607,23 @@ public class ValidateXddWizardPage extends WizardPage {
     }
 
     /**
-     * Node model values of previous wizard page.
-     *
-     * @return node model of previous page.
+     * Update validate wizard page buttons for CN node type.
      */
-    public Object setnode() {
-        IWizardPage previousPage = getPreviousPage();
-        if (previousPage instanceof AddControlledNodeWizardPage) {
-            AddControlledNodeWizardPage adCnPage = (AddControlledNodeWizardPage) previousPage;
-            return adCnPage.getNode();
-        } else if (previousPage instanceof AddDefaultMasterNodeWizardPage) {
-            AddDefaultMasterNodeWizardPage adMnPage = (AddDefaultMasterNodeWizardPage) previousPage;
-            return adMnPage.getNode();
+    public void resetCnWizard() {
+        if (!btnCustom.isEnabled()) {
+            btnCustom.setEnabled(true);
         }
-        return null;
+        handleDefaultRadioButtonSelectionChanged(null);
+    }
+
+    /**
+     * Update validate wizard page buttons for RMN node type.
+     */
+    public void resetRmnWizard() {
+
+        btnCustom.setSelection(false);
+        btnCustom.setEnabled(false);
+        btnDefault.setSelection(true);
+        handleDefaultRadioButtonSelectionChanged(null);
     }
 }

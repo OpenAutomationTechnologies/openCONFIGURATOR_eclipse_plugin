@@ -35,6 +35,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -508,7 +509,38 @@ public class AddControlledNodeWizardPage extends WizardPage {
                 pageComplete = false;
             }
         }
+        // Refresh the wizard page based on the node type.
+        IWizardPage nextPage = getNextPage();
+        if (nextPage instanceof ValidateXddWizardPage) {
+            ValidateXddWizardPage validatePage = (ValidateXddWizardPage) nextPage;
+            if (nodeTypeCombo.getText().equals(REDUNDANT_MANAGING_NODE_LABEL)) {
+                Node mnNode = getNodelist().getMN();
+                if (!mnNode.getNetworkManagement().getMnFeatures()
+                        .isNMTMNRedundancy()) {
+                    setErrorMessage(
+                            MessageFormat.format(ERROR_RMN_NOT_SUPPORTED,
+                                    mnNode.getNodeIDWithName()));
+                    pageComplete = false;
+                    return pageComplete;
+                }
+                List<Node> cnNodes = getNodelist().getCnNodeList();
+                for (Node cnNode : cnNodes) {
+                    if (cnNode
+                            .getPlkOperationMode() == org.epsg.openconfigurator.model.PlkOperationMode.CHAINED) {
+                        setErrorMessage(ERROR_RMN_WITH_CHAINED_STATION);
+                        pageComplete = false;
+                        return pageComplete;
+                    }
+                }
 
+                validatePage.resetRmnWizard();
+
+            } else {
+                validatePage.resetCnWizard();
+            }
+        } else {
+            System.err.println("Invalid wizard page.");
+        }
         return pageComplete;
     }
 
