@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<introContent>
+	<extensionContent id="orgepsgopenconfigurator-introExtension" style="help/welcome.css" name="openCONFIGURATOR" path="overview/@">
+		<group style-id="content-group" id="orgepsgopenconfigurator-introLink-group">
+			<link label="openCONFIGURATOR" url="http://sourceforge.net/projects/openconf/" id="orgepsgopenconfigurator-introLink" style-id="content-link">
+				<text>An Open Source POWERLINK network configuration toolkit.
+				Learn how to use openCONFIGURATOR with eclipse.</text>
+			</link>
+		</group>
+	</extensionContent>
+</introContent>

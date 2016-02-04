@@ -291,4 +291,17 @@
          </enablement>
       </decorator>
    </extension>
+      <extension point="org.eclipse.ui.intro.configExtension">
+     <configExtension
+           configId="org.eclipse.ui.intro.universalConfig"
+           content="welcome.xml" >
+     </configExtension>
+     <theme default="false"
+           id="org.epsg.openconfigurator.theme"
+           name="%theme.name.0"
+           path="."
+           previewImage="icons/window_16.gif">
+           <property name="launchbarOverviewIcon" value="icons/window_32.png"/>
+     </theme>
+  </extension>
 </plugin>
