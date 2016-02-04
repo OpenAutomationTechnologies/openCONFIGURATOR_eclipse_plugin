@@ -170,37 +170,6 @@ public class JDomUtil {
     }
 
     /**
-     * Removes the attribute from the document.
-     *
-     * @param document The file instance.
-     * @param xpath The parent path.
-     * @param namespace The namespace of the attribute.
-     * @param attributeName The attribute name to be removed.
-     */
-    public static void removeAttribute(Document document, String xpath,
-            Namespace namespace, String attributeName) {
-        JDomUtil.removeAttribute(document,
-                getXPathExpressionElement(xpath, namespace), attributeName);
-    }
-
-    /**
-     * Removes the attribute from the document.
-     *
-     * @param document The file instance.
-     * @param xpathExpr The parent path.
-     * @param attributeName The attribute name to be removed.
-     */
-    public static void removeAttribute(Document document,
-            XPathExpression<Element> xpathExpr, String attributeName) {
-        Element emt = xpathExpr.evaluateFirst(document);
-        if (emt != null) {
-            emt.removeAttribute(attributeName);
-        } else {
-            System.err.println(xpathExpr.getExpression() + "Element null");
-        }
-    }
-
-    /**
      * Removes the attributes found on the result of the Xpath from the
      * document.
      *

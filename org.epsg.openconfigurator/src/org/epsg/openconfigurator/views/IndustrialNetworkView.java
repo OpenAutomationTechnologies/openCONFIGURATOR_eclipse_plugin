@@ -38,6 +38,9 @@ import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -628,35 +631,30 @@ public class IndustrialNetworkView extends ViewPart
         for (Object selectedObject : selectedObjectsList) {
             if (selectedObject instanceof Node) {
                 Node node = (Node) selectedObject;
+
+                Result res = new Result();
                 // checks for valid XDC file
                 if (!node.hasXdd()) {
-                    Result res = OpenConfiguratorLibraryUtils
+                    res = OpenConfiguratorLibraryUtils
                             .toggleEnableDisable(node);
-                    if (res.IsSuccessful()) {
-                        try {
-                            rootNode.toggleEnableDisable(node);
-                        } catch (JDOMException | IOException e) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printErrorMessage(e.getMessage(),
-                                            node.getProject().getName());
-                            e.printStackTrace();
-                        }
-                        viewer.refresh();
-                    } else {
+                    if (!res.IsSuccessful()) {
                         showMessage(OpenConfiguratorLibraryUtils
                                 .getErrorMessage(res));
+                        return;
                     }
-                } else {
-                    try {
-                        rootNode.toggleEnableDisable(node);
-                    } catch (JDOMException | IOException e) {
-                        OpenConfiguratorMessageConsole.getInstance()
-                                .printErrorMessage(e.getMessage(),
-                                        node.getProject().getName());
-                        e.printStackTrace();
-                    }
-                    viewer.refresh();
                 }
+
+                try {
+                    node.setEnabled(!node.isEnabled());
+                } catch (JDOMException | IOException ex) {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(ex.getMessage(),
+                                    node.getProject().getName());
+                    ex.printStackTrace();
+                }
+
+                viewer.refresh();
+
                 // Set empty selection when node is disabled.
                 if (!node.isEnabled()) {
                     viewer.setSelection(TreeSelection.EMPTY);
@@ -671,6 +669,14 @@ public class IndustrialNetworkView extends ViewPart
                         e.printStackTrace();
                     }
                     setFocus();
+                }
+
+                try {
+                    node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                            new NullProgressMonitor());
+                } catch (CoreException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         }
@@ -705,58 +711,34 @@ public class IndustrialNetworkView extends ViewPart
                     int result = dialog.open();
                     if (result == 0) {
                         // checks for valid XDC file
-                        if (!node.hasXdd()) {
-                            Result res = OpenConfiguratorLibraryUtils
-                                    .removeNode(node);
-                            if (res.IsSuccessful()) {
-                                try {
-                                    rootNode.removeNode(node);
-                                } catch (JDOMException | IOException e) {
-                                    if (e instanceof NoSuchFileException) {
-                                        OpenConfiguratorMessageConsole
-                                                .getInstance()
-                                                .printErrorMessage(
-                                                        "The file "
-                                                                + e.getMessage()
-                                                                + " cannot be found.",
-                                                        node.getProject()
-                                                                .getName());
-                                    } else {
-                                        OpenConfiguratorMessageConsole
-                                                .getInstance()
-                                                .printErrorMessage(
-                                                        e.getMessage(),
-                                                        node.getProject()
-                                                                .getName());
-                                    }
-                                    e.printStackTrace();
-                                }
 
-                                handleRefresh();
+                        try {
+                            rootNode.removeNode(node);
+                        } catch (JDOMException | IOException e) {
+                            if (e instanceof NoSuchFileException) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(
+                                                "The file " + e.getMessage()
+                                                        + " cannot be found.",
+                                                node.getProject().getName());
                             } else {
-                                showMessage(OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res));
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(e.getMessage(),
+                                                node.getProject().getName());
                             }
-                        } else {
-                            try {
-                                rootNode.removeNode(node);
-                            } catch (JDOMException | IOException e) {
-                                if (e instanceof NoSuchFileException) {
-                                    OpenConfiguratorMessageConsole.getInstance()
-                                            .printErrorMessage(
-                                                    "The file " + e.getMessage()
-                                                            + " cannot be found.",
-                                                    node.getProject()
-                                                            .getName());
-                                } else {
-                                    OpenConfiguratorMessageConsole.getInstance()
-                                            .printErrorMessage(e.getMessage(),
-                                                    node.getProject()
-                                                            .getName());
-                                }
-                                e.printStackTrace();
-                            }
-                            handleRefresh();
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                        viewer.refresh();
+
+                        try {
+                            node.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
                         }
                     }
                 } else {
@@ -802,6 +784,7 @@ public class IndustrialNetworkView extends ViewPart
                     IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
                     Object selectedObject = strucSelection.getFirstElement();
                     if ((selectedObject instanceof Node)) {
+                        Node selectedNode = (Node) selectedObject;
                         NewNodeWizard newNodeWizard = new NewNodeWizard(
                                 rootNode, (Node) selectedObject);
                         if (!newNodeWizard.hasErrors()) {
@@ -812,6 +795,15 @@ public class IndustrialNetworkView extends ViewPart
                             wd.open();
                         } else {
                             showMessage(ADD_NEW_NODE_ERROR_MESSAGE);
+                        }
+
+                        try {
+                            selectedNode.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
                         }
 
                         handleRefresh();
@@ -913,6 +905,7 @@ public class IndustrialNetworkView extends ViewPart
                 if ((selection != null)
                         && (selection instanceof IStructuredSelection)) {
                     handleRemoveNode((IStructuredSelection) selection);
+                    viewer.refresh();
                 }
             }
         };

@@ -68,11 +68,11 @@ public class XddJdomOperation {
      *
      * @param document XDD/XDC file instance.
      */
-    public static void deleteActualValue(Document document) {
-        JDomUtil.removeAttribute(document,
+    public static void deleteActualValues(Document document) {
+        JDomUtil.removeAttributes(document,
                 "//plk:Object[@" + ACTUAL_VALUE + "]", POWERLINK_XDD_NAMESPACE,
                 ACTUAL_VALUE);
-        JDomUtil.removeAttribute(document,
+        JDomUtil.removeAttributes(document,
                 "//plk:SubObject[@ " + ACTUAL_VALUE + "]",
                 POWERLINK_XDD_NAMESPACE, ACTUAL_VALUE);
     }
@@ -82,7 +82,7 @@ public class XddJdomOperation {
      *
      * @param document XDD/XDC file instance.
      * @param powerlinkObj PowerlinkObject instance to get the path of
-     *        sub-object.
+     *            sub-object.
      */
     public static void deletePowerlinkObjectActualValue(Document document,
             PowerlinkObject powerlinkObj) {

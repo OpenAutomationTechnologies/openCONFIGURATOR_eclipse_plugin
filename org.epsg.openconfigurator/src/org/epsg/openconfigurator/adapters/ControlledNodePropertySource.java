@@ -758,15 +758,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         short nodeIDvalue = Short.valueOf(((String) value));
 
                         short oldNodeId = cnNode.getNodeId();
-                        res = OpenConfiguratorCore.GetInstance().SetNodeId(
-                                cnNode.getNetworkId(), oldNodeId, nodeIDvalue);
-                        if (!res.IsSuccessful()) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printLibraryErrorMessage(res);
-                        } else {
-                            cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
-                                    nodeIDvalue);
-                        }
+                        cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
+                                nodeIDvalue);
                         break;
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         System.err.println(objectId + " made editable");
@@ -798,6 +791,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                             OpenConfiguratorProjectUtils
                                     .persistNodeData(cnNode);
 
+                            // Updates the generator attributes in project file.
+                            OpenConfiguratorProjectUtils
+                                    .updateGeneratorInfo(cnNode);
                         } else {
                             System.err.println("Invalid value type");
                         }

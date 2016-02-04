@@ -44,6 +44,7 @@ import org.eclipse.ui.console.IConsoleManager;
 import org.eclipse.ui.console.MessageConsole;
 import org.eclipse.ui.console.MessageConsoleStream;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 
 /**
  * Displays the error or info or library message in the console view.
@@ -186,10 +187,19 @@ public class OpenConfiguratorMessageConsole {
      * @param message The message to be updated.
      */
     public void printLibraryErrorMessage(final Result res) {
-        String message = res.GetErrorMessage();
-        String fullMessage = "[" + getCurrentTime() + "] [ERROR] " + message;
-        MessageConsoleStream out = getErrorMessageStream();
-        out.println(fullMessage);
+
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                String message = OpenConfiguratorLibraryUtils
+                        .getErrorMessage(res);
+                String fullMessage = "[" + getCurrentTime() + "] [ERROR] "
+                        + message;
+                MessageConsoleStream out = getErrorMessageStream();
+                out.println(fullMessage);
+            }
+        });
     }
 
     /**
@@ -198,7 +208,14 @@ public class OpenConfiguratorMessageConsole {
      * @param message The message to be updated.
      */
     public void printLibraryMessage(final String message) {
-        MessageConsoleStream out = getLibraryMessageStream();
-        out.println(message);
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+
+                MessageConsoleStream out = getLibraryMessageStream();
+                out.println(message);
+            }
+        });
     }
 }

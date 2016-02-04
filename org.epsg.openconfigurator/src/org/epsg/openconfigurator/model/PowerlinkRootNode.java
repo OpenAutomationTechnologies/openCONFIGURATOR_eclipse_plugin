@@ -40,23 +40,33 @@ import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.Paths;import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.ui.actions.WorkspaceModifyOperation;
+import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.Node.NodeType;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
@@ -132,30 +142,24 @@ public class PowerlinkRootNode {
         // Updates generator attributes in project file.
         OpenConfiguratorProjectUtils.updateGeneratorInfo(node);
 
-        try {
-            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
-                    new NullProgressMonitor());
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-
         return true;
     }
 
     /**
      * Clear collection of nodes and set to empty.
      */
-    public synchronized void clearNodeCollection() {
-        nodeCollection.clear();
+    public void clearNodeCollection() {
+        synchronized (nodeCollection) {
+            nodeCollection.clear();
+        }
     }
 
     /**
      * @return The list of CN nodes available in the project.
      */
-    public synchronized ArrayList<Node> getCnNodeList() {
+    public ArrayList<Node> getCnNodeList() {
         ArrayList<Node> returnNodeList = new ArrayList<Node>();
-        ArrayList<Node> nodeList = new ArrayList<Node>(nodeCollection.values());
+        Collection<Node> nodeList = nodeCollection.values();
 
         for (Node node : nodeList) {
             Object nodeModel = node.getNodeModel();
@@ -169,24 +173,19 @@ public class PowerlinkRootNode {
     /**
      * @return The MN node if available in the project, null otherwise.
      */
-    public synchronized Node getMN() {
+    public Node getMN() {
         Node mnNode = nodeCollection
                 .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
         return mnNode;
     }
 
     /**
-     * @return NodeCollection instance.
-     */
-    public synchronized Map<Short, Node> getNodeCollection() {
-        return nodeCollection;
-    }
-
-    /**
      * @return The number of nodes available.
      */
-    public synchronized int getNodeCount() {
-        return nodeCollection.size();
+    public int getNodeCount() {
+        synchronized (nodeCollection) {
+            return nodeCollection.size();
+        }
     }
 
     /**
@@ -195,22 +194,19 @@ public class PowerlinkRootNode {
      * @param inputElement The parent instance.
      * @return The nodes list.
      */
-    public synchronized Object[] getNodeList(Object inputElement) {
+    public Object[] getNodeList(Object inputElement) {
         ArrayList<Node> returnNodeList = new ArrayList<Node>();
         if (inputElement instanceof PowerlinkRootNode) {
 
-            ArrayList<Node> nodeList = new ArrayList<Node>(
-                    nodeCollection.values());
+            Collection<Node> nodeList = nodeCollection.values();
 
-            Node mnNode = nodeCollection
-                    .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+            Node mnNode = getMN();
             if (mnNode != null) {
                 returnNodeList.add(mnNode);
             }
 
             for (Node node : nodeList) {
-                Object nodeModel = node.getNodeModel();
-                if (nodeModel instanceof TCN) {
+                if (node.getNodeType() == NodeType.CONTROLLED_NODE) {
                     returnNodeList.add(node);
                 }
 
@@ -230,13 +226,13 @@ public class PowerlinkRootNode {
     /**
      * @return Returns the list of RMNs available in the project.
      */
-    public synchronized ArrayList<Node> getRmnNodeList() {
+    public ArrayList<Node> getRmnNodeList() {
         ArrayList<Node> returnNodeList = new ArrayList<Node>();
-        ArrayList<Node> nodeList = new ArrayList<Node>(nodeCollection.values());
+
+        Collection<Node> nodeList = nodeCollection.values();
 
         for (Node node : nodeList) {
-            Object nodeModel = node.getNodeModel();
-            if (nodeModel instanceof TRMN) {
+            if (node.getNodeType() == NodeType.REDUNDANT_MANAGING_NODE) {
                 returnNodeList.add(node);
             }
         }
@@ -253,7 +249,7 @@ public class PowerlinkRootNode {
      * @param monitor The monitor instance to display the current status.
      * @return Status of the import nodes.
      */
-    public synchronized Status importNodes(IFile projectFile,
+    public Status importNodes(IFile projectFile,
             TNetworkConfiguration networkCfg, IProgressMonitor monitor) {
         Node processingNode = new Node();
 
@@ -285,6 +281,7 @@ public class PowerlinkRootNode {
                             org.epsg.openconfigurator.Activator.PLUGIN_ID,
                             OpenConfiguratorLibraryUtils.getErrorMessage(res),
                             null);
+
                 }
                 // Workaround to update lossOfSoctolerance value in the network
                 // property
@@ -301,14 +298,17 @@ public class PowerlinkRootNode {
                 }
             }
 
-            // Import the CN nodes
-            for (TCN cnNode : networkCfg.getNodeCollection().getCN()) {
+            Iterator<TCN> cnNodeIterator = networkCfg.getNodeCollection()
+                    .getCN().iterator();
+            while (cnNodeIterator.hasNext()) {
 
                 if (monitor.isCanceled()) {
                     return new Status(IStatus.OK,
                             org.epsg.openconfigurator.Activator.PLUGIN_ID,
                             "Cancelled", null);
                 }
+
+                TCN cnNode = cnNodeIterator.next();
 
                 monitor.subTask("Import CN node XDC:" + cnNode.getName() + "("
                         + cnNode.getNodeID() + ")");
@@ -367,14 +367,16 @@ public class PowerlinkRootNode {
             }
 
             // Import the RMN nodes
-            for (TRMN rmnNode : networkCfg.getNodeCollection().getRMN()) {
+            Iterator<TRMN> rmnIterator = networkCfg.getNodeCollection().getRMN()
+                    .iterator();
+            while (rmnIterator.hasNext()) {
 
                 if (monitor.isCanceled()) {
                     return new Status(IStatus.OK,
                             org.epsg.openconfigurator.Activator.PLUGIN_ID,
                             "Cancelled", null);
                 }
-
+                TRMN rmnNode = rmnIterator.next();
                 monitor.subTask("Import RMN node XDC:" + rmnNode.getName() + "("
                         + rmnNode.getNodeID() + ")");
 
@@ -444,7 +446,6 @@ public class PowerlinkRootNode {
                     org.epsg.openconfigurator.Activator.PLUGIN_ID, errorMessage,
                     e1);
         }
-
         monitor.done();
         return new Status(IStatus.OK,
                 org.epsg.openconfigurator.Activator.PLUGIN_ID, "OK", null);
@@ -458,8 +459,7 @@ public class PowerlinkRootNode {
      * @return <code> True</code> if already available. <code>False</code>
      *         otherwise.
      */
-    public synchronized boolean isNodeIdAlreadyAvailable(
-            short nodeIdTobeChecked) {
+    public boolean isNodeIdAlreadyAvailable(short nodeIdTobeChecked) {
         Set<Short> nodeSet = nodeCollection.keySet();
         boolean nodeIdAvailable = false;
         for (Short tempNodeId : nodeSet) {
@@ -479,12 +479,14 @@ public class PowerlinkRootNode {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public synchronized Result persistNodes(IProgressMonitor monitor)
+    public Result persistNodes(IProgressMonitor monitor)
             throws JDOMException, IOException {
-        Result res = new Result();
 
-        for (Map.Entry<Short, Node> entry : nodeCollection.entrySet()) {
+        final Iterator<Entry<Short, Node>> entries = nodeCollection.entrySet()
+                .iterator();
+        while (entries.hasNext()) {
 
+            Map.Entry<Short, Node> entry = entries.next();
             Node node = entry.getValue();
             if (node == null) {
                 System.err.println("Node" + entry.getKey() + " is null");
@@ -510,7 +512,13 @@ public class PowerlinkRootNode {
             monitor.subTask("Updating node:" + node.getNodeIDWithName() + " ->"
                     + node.getPathToXDC());
             try {
-                res = OpenConfiguratorProjectUtils.persistNodeData(node);
+
+                Result res = OpenConfiguratorProjectUtils.persistNodeData(node);
+                if (!res.IsSuccessful()) {
+                    // Continue operation for other nodes
+                    continue;
+                }
+                OpenConfiguratorProjectUtils.updateNodeAssignmentValues(node);
             } catch (Exception e) {
                 e.printStackTrace();
                 if (e instanceof FileNotFoundException) {
@@ -529,12 +537,7 @@ public class PowerlinkRootNode {
                                     node.getProject().getName());
                 }
             }
-            if (!res.IsSuccessful()) {
-                // Continue operation for other nodes
-                continue;
-            }
 
-            OpenConfiguratorProjectUtils.updateNodeAssignmentValues(node);
             monitor.worked(1);
         }
 
@@ -565,20 +568,137 @@ public class PowerlinkRootNode {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public synchronized boolean removeNode(Node node)
+    public boolean removeNode(final Node node)
             throws JDOMException, IOException {
-        return OpenConfiguratorProjectUtils.deleteNode(nodeCollection, node,
-                null);
-    }
+        boolean retVal = false;
+        if (node == null) {
+            return retVal;
+        }
 
-    /**
-     * Updates the new node collection.
-     *
-     * @param nodeCollection The new node collection
-     */
-    public synchronized void setNodeCollection(
-            Map<Short, Node> nodeCollection) {
-        this.nodeCollection = nodeCollection;
+        IProject currentProject = node.getProject();
+        if (currentProject == null) {
+            System.err.println("Current project null. returned null");
+            return retVal;
+        }
+
+        System.err.println("Remove node....");
+        final WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
+
+            @Override
+            protected void execute(IProgressMonitor monitor)
+                    throws CoreException, InvocationTargetException,
+                    InterruptedException {
+
+                System.err.println("Remove node.... entered critical section");
+
+                Node mnNode = getMN();
+
+                if (!node.hasXdd()) {
+                    Result libResult = OpenConfiguratorLibraryUtils
+                            .removeNode(node);
+                    if (!libResult.IsSuccessful()) {
+                        System.err.println(OpenConfiguratorLibraryUtils
+                                .getErrorMessage(libResult));
+                        return;
+                    }
+                }
+
+                // Remove from the viewer node collection.
+                Object nodeObjectModel = node.getNodeModel();
+                if (nodeObjectModel instanceof TRMN) {
+                    TRMN rMN = (TRMN) nodeObjectModel;
+                    short nodeId = Short.parseShort(rMN.getNodeID());
+                    nodeCollection.remove(nodeId);
+                    // retVal = true;
+                } else if (nodeObjectModel instanceof TCN) {
+                    TCN cnNode = (TCN) nodeObjectModel;
+                    short nodeId = Short.parseShort(cnNode.getNodeID());
+                    nodeCollection.remove(nodeId);
+                    // retVal = true;
+                } else {
+                    System.err.println("Un-supported node" + nodeObjectModel);
+                    // return false;
+                    // FIXME: Throw an exception
+                }
+
+                // Remove from the openconfigurator model.
+                if (mnNode.getNodeModel() instanceof TNetworkConfiguration) {
+                    TNetworkConfiguration net = (TNetworkConfiguration) mnNode
+                            .getNodeModel();
+                    if (nodeObjectModel instanceof TRMN) {
+                        List<TRMN> rmn = net.getNodeCollection().getRMN();
+                        rmn.remove(nodeObjectModel);
+                    } else if (nodeObjectModel instanceof TCN) {
+                        List<TCN> cn = net.getNodeCollection().getCN();
+                        cn.remove(nodeObjectModel);
+                    } else {
+                        System.err.println(
+                                "Remove from openCONF model failed. Node ID:"
+                                        + node.getNodeId() + " modelType:"
+                                        + nodeObjectModel);
+                        // return false;
+                        // FIXME: Throw an exception
+                    }
+                } else {
+                    System.err.println("Node model has been changed");
+                }
+
+                // Remove from the openconfigurator project xml.
+                String projectXmlLocation = node.getProjectXml().getLocation()
+                        .toString();
+                File xmlFile = new File(projectXmlLocation);
+
+                try {
+                    org.jdom2.Document document = JDomUtil
+                            .getXmlDocument(xmlFile);
+                    ProjectJDomOperation.deleteNode(document, node);
+
+                    JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+                    // Updates generator attributes in project file.
+                    OpenConfiguratorProjectUtils.updateGeneratorInfo(node);
+
+                    // Delete the XDC file from the deviceConfiguration directory.
+                    Files.delete(Paths.get(node.getAbsolutePathToXdc()));
+
+                } catch (JDOMException | IOException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                    IStatus errorStatus = new Status(IStatus.ERROR,
+                            Activator.PLUGIN_ID, IStatus.OK,
+                            "Error ocurred while delete a node", ex);
+                    throw new CoreException(errorStatus);
+                }
+
+                System.err.println("Remove node.... leaving critical section");
+            }
+        };
+
+        WorkspaceJob job = new WorkspaceJob("Delete a Node") {
+
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor)
+                    throws CoreException {
+                try {
+                    wmo.run(monitor);
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    Status errStatus = new Status(IStatus.ERROR,
+                            Activator.PLUGIN_ID, e.getMessage(),
+                            e.getTargetException());
+                    throw new CoreException(errStatus);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+
+                return Status.OK_STATUS;
+            }
+        };
+
+        job.setUser(true);
+        job.schedule();
+
+        return true;
     }
 
     /**
@@ -589,37 +709,63 @@ public class PowerlinkRootNode {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      * @throws InterruptedException Errors with interrupt in the thread.
+     * @throws InvocationTargetException
      */
-    public synchronized void setNodeId(final short oldNodeId,
-            final short newNodeId)
-                    throws IOException, JDOMException, InterruptedException {
+    public void setNodeId(final short oldNodeId, final short newNodeId)
+            throws IOException, JDOMException, InterruptedException,
+            InvocationTargetException {
 
-        Node oldNode = nodeCollection.get(oldNodeId);
+        final WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
 
-        oldNode.setNodeId(newNodeId);
-        // Remove the old node ID from node collection.
-        nodeCollection.remove(new Short(oldNodeId));
-        // Add the modified node ID into node collection.
-        nodeCollection.put(new Short(newNodeId), oldNode);
+            @Override
+            protected void execute(IProgressMonitor monitor)
+                    throws CoreException, InvocationTargetException,
+                    InterruptedException {
+
+                if (nodeCollection.containsKey(oldNodeId)) {
+                    Node oldNode = nodeCollection.get(oldNodeId);
+
+                    try {
+                        oldNode.setNodeId(newNodeId);
+
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetNodeId(oldNode.getNetworkId(), oldNodeId,
+                                        newNodeId);
+                        if (!res.IsSuccessful()) {
+                            System.err.println("RES set Node ID:"
+                                    + OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res));
+                        }
+
+                        // Remove the old node ID from node collection.
+                        nodeCollection.remove(new Short(oldNodeId));
+                        // Add the modified node ID into node collection.
+                        nodeCollection.put(new Short(newNodeId), oldNode);
+                    } catch (IOException | JDOMException ex) {
+                        ex.printStackTrace();
+                        IStatus errorStatus = new Status(IStatus.ERROR,
+                                Activator.PLUGIN_ID, IStatus.OK,
+                                "Error ocurred while setting the new node id",
+                                ex);
+                        throw new CoreException(errorStatus);
+                    } finally {
+                        monitor.done();
+                    }
+                } else {
+                    System.err.println(
+                            "Node id not found in the network. ID:" + oldNodeId);
+                }
+            }
+        };
+        wmo.run(new NullProgressMonitor());
+
         try {
-            oldNode.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+            getMN().getProject().refreshLocal(IResource.DEPTH_INFINITE,
                     new NullProgressMonitor());
         } catch (CoreException e) {
             System.err.println("unable to refresh the resource due to "
                     + e.getCause().getMessage());
         }
-    }
 
-    /**
-     * Enables or disables the node.
-     *
-     * @param node The node to enabled or disabled.
-     *
-     * @throws IOException Errors with XDC file modifications.
-     * @throws JDOMException Errors with time modifications.
-     */
-    public synchronized void toggleEnableDisable(Node node)
-            throws JDOMException, IOException {
-        node.setEnabled(!node.isEnabled());
     }
 }

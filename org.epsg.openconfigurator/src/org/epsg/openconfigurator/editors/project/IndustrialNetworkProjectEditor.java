@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.net.MalformedURLException;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -71,7 +70,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.eclipse.ui.forms.editor.FormEditor;
 import org.eclipse.ui.forms.editor.IFormPage;
 import org.eclipse.ui.ide.IDE;
@@ -81,7 +79,6 @@ import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
-import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
@@ -394,13 +391,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     }
 
     /**
-     * @return Returns the available nodes in the network.
-     */
-    public Map<Short, Node> getNodeCollection() {
-        return rootNode.getNodeCollection();
-    }
-
-    /**
      * @return Instance of POWERLINK rootnode.
      */
     public PowerlinkRootNode getPowerlinkRootNode() {
@@ -617,44 +607,28 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * @throws InvocationTargetException
      */
     public void persistLibraryData(IProgressMonitor monitor)
-            throws InterruptedException, InvocationTargetException {
+            throws CoreException, InvocationTargetException,
+            InterruptedException {
         monitor.beginTask("Save XDC configurations", rootNode.getNodeCount());
 
-        WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
-
-            @Override
-            protected void execute(IProgressMonitor monitor)
-                    throws CoreException, InvocationTargetException,
-                    InterruptedException {
-                // Write the XDC configuration Changes from the library to the
-                // XDC file.
-
-                try {
-                    Result res = rootNode.persistNodes(monitor);
-                    if (!res.IsSuccessful()) {
-                        System.err.println(OpenConfiguratorLibraryUtils
-                                .getErrorMessage(res));
-                        IStatus errorStatus = new Status(IStatus.ERROR,
-                                Activator.PLUGIN_ID, IStatus.OK,
-                                OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res),
-                                null);
-                        throw new CoreException(errorStatus);
-                    }
-                } catch (JDOMException | IOException exception) {
-                    exception.printStackTrace();
-                    IStatus errorStatus = new Status(IStatus.ERROR,
-                            Activator.PLUGIN_ID, IStatus.OK,
-                            "Error while saving the XDC", exception);
-
-                    throw new CoreException(errorStatus);
-                }
+        try {
+            Result res = rootNode.persistNodes(monitor);
+            if (!res.IsSuccessful()) {
+                System.err.println(
+                        OpenConfiguratorLibraryUtils.getErrorMessage(res));
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK,
+                        OpenConfiguratorLibraryUtils.getErrorMessage(res),
+                        null);
+                throw new CoreException(errorStatus);
             }
-        };
+        } catch (JDOMException | IOException exception) {
+            exception.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK, "Error while saving the XDC", exception);
 
-        wmo.run(monitor);
-
-        monitor.done();
+            throw new CoreException(errorStatus);
+        }
     }
 
     @Override

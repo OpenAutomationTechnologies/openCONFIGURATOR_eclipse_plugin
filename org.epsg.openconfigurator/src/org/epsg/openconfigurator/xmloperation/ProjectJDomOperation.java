@@ -376,7 +376,7 @@ public class ProjectJDomOperation {
      * @param attributeName Generator attribute name.
      * @param attributeValue value to be set.
      */
-    public static void updateModifiedTime(Document document,
+    public static void updateGeneratorAttribute(Document document,
             final String attributeName, final String attributeValue) {
 
         JDomUtil.updateAttribute(document, GENERATOR_XPATH_EXPR,

@@ -534,7 +534,7 @@ public class RedundantManagingNodePropertySource
             if (id instanceof String) {
                 String objectId = (String) id;
                 switch (objectId) {
-                    case IAbstractNodeProperties.NODE_NAME_OBJECT:
+                    case IAbstractNodeProperties.NODE_NAME_OBJECT: {
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
                                 redundantManagingNode.getNetworkId(),
                                 redundantManagingNode.getNodeId(),
@@ -546,23 +546,14 @@ public class RedundantManagingNodePropertySource
                             redundantManagingNode.setName((String) value);
                         }
                         break;
-                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
-
+                    }
+                    case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT: {
                         short nodeIDvalue = Short.valueOf(((String) value));
                         short oldNodeId = redundantManagingNode.getNodeId();
-
-                        res = OpenConfiguratorCore.GetInstance().SetNodeId(
-                                redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getNodeId(), nodeIDvalue);
-                        if (!res.IsSuccessful()) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printLibraryErrorMessage(res);
-                        } else {
-                            redundantManagingNode.getPowerlinkRootNode()
-                                    .setNodeId(oldNodeId, nodeIDvalue);
-                        }
-
+                        redundantManagingNode.getPowerlinkRootNode()
+                                .setNodeId(oldNodeId, nodeIDvalue);
                         break;
+                    }
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         System.err.println(objectId + " made editable");
                         break;

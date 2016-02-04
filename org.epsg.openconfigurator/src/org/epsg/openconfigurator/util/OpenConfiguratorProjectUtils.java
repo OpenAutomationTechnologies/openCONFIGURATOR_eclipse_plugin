@@ -56,7 +56,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
@@ -556,7 +555,7 @@ public final class OpenConfiguratorProjectUtils {
 
         // Delete the actual value field on all objects available in the
         // file.
-        XddJdomOperation.deleteActualValue(document);
+        XddJdomOperation.deleteActualValues(document);
 
         // Prepare the Java based object collection.
         java.util.LinkedHashMap<java.util.Map.Entry<Long, Integer>, String> objectJCollection = new LinkedHashMap<Map.Entry<Long, Integer>, String>();
@@ -571,58 +570,7 @@ public final class OpenConfiguratorProjectUtils {
         node.writeObjectActualValues(objectJCollection, document);
 
         writeToXddXmlDocument(document, xdcFile);
-        // Updates generator attributes in project file.
-        updateGeneratorInfo(node);
-        return res;
-    }
 
-    /**
-     * Saves the actual value changes in the library to the XDD/XDC.
-     *
-     * @param nodeCollection The node list.
-     * @param monitor Progress monitor instance.
-     * @return The result from the library.
-     * @throws Error with XDC/XDD file modification.
-     * @throws JDOMException Error with time modifications
-     */
-    public static Result persistNodes(final Map<Short, Node> nodeCollection,
-            IProgressMonitor monitor) throws JDOMException, IOException {
-        Result res = new Result();
-
-        for (Map.Entry<Short, Node> entry : nodeCollection.entrySet()) {
-
-            Node node = entry.getValue();
-            if (node == null) {
-                System.err.println("Node" + entry.getKey() + " is null");
-                continue;
-            }
-            if (node.hasXdd()) {
-                OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                        "The Node " + "'" + node.getNodeIDWithName() + "'"
-                                + " has invalid XDD file.",
-                        node.getProject().getName());
-                continue;
-            }
-            if (monitor.isCanceled()) {
-                throw new OperationCanceledException(
-                        "Operation cancelled by user. Not all data is saved to the XDC.");
-            }
-
-            System.out.println(
-                    entry.getKey() + "----" + node.getAbsolutePathToXdc());
-
-            monitor.subTask("Updating node:" + node.getNodeIDWithName() + " ->"
-                    + node.getPathToXDC());
-
-            res = persistNodeData(node);
-            if (!res.IsSuccessful()) {
-                // Continue operation for other nodes
-                continue;
-            }
-
-            updateNodeAssignmentValues(node);
-            monitor.worked(1);
-        }
         return res;
     }
 
@@ -631,47 +579,32 @@ public final class OpenConfiguratorProjectUtils {
      * file.
      *
      * @param node Instance of node.
-     * @param attributeName The name of the attribute to be updated.
-     * @param attributeValue The value for the given attribute name.
      * @throws IOException Error with XDC/XDD file modification.
      * @throws JDOMException Error with time modifications
      */
-    public static void updateGeneratorAttribute(final Node node,
-            final String attributeName, final String attributeValue)
-                    throws JDOMException, IOException {
+    public static void updateGeneratorInfo(Node node)
+            throws JDOMException, IOException {
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
         File xmlFile = new File(projectXmlLocation);
 
         org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
 
-        ProjectJDomOperation.updateModifiedTime(document, attributeName,
-                attributeValue);
+        ProjectJDomOperation.updateGeneratorAttribute(document,
+                MODIFIED_ON_ATTRIBUTE, getCurrentTimeandDate());
+
+        ProjectJDomOperation.updateGeneratorAttribute(document,
+                TOOL_VERSION_ATTRIBUTE, GENERATOR_TOOL_VERSION);
+        String modifiedByName = System
+                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID);
+        ProjectJDomOperation.updateGeneratorAttribute(document,
+                MODIFIED_BY_ATTRIBUTE, modifiedByName);
 
         OpenCONFIGURATORProject openConfiguratorProject = node
                 .getCurrentProject();
         updateGeneratorInformation(openConfiguratorProject);
 
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
-    }
-
-    /**
-     * Update date , time , tool version and modified by attributes on project
-     * file.
-     *
-     * @param node Instance of node.
-     * @throws IOException Error with XDC/XDD file modification.
-     * @throws JDOMException Error with time modifications
-     */
-    public static void updateGeneratorInfo(Node node)
-            throws JDOMException, IOException {
-        updateGeneratorAttribute(node, MODIFIED_ON_ATTRIBUTE,
-                getCurrentTimeandDate());
-        updateGeneratorAttribute(node, TOOL_VERSION_ATTRIBUTE,
-                GENERATOR_TOOL_VERSION);
-        String modifiedByName = System
-                .getProperty(OpenConfiguratorProjectUtils.SYSTEM_USER_NAME_ID);
-        updateGeneratorAttribute(node, MODIFIED_BY_ATTRIBUTE, modifiedByName);
     }
 
     /**
@@ -731,19 +664,13 @@ public final class OpenConfiguratorProjectUtils {
 
         // Updates generator attributes in project file.
         updateGeneratorInfo(node);
-
-        try {
-            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
-                    new NullProgressMonitor());
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**
      * Persists the node Assignment values in the model and the project XML
      * file.
+     *
+     * Note: User has to updates the generator attributes in project file.
      *
      * @param node The node instance.
      * @throws IOException Error with XDC/XDD file modification.
@@ -786,8 +713,6 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
-        // Updates generator attributes in project file.
-        updateGeneratorInfo(node);
     }
 
     /**
@@ -815,13 +740,6 @@ public final class OpenConfiguratorProjectUtils {
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
         // Updates generator attributes in project file.
         updateGeneratorInfo(node);
-        try {
-            node.getProject().refreshLocal(IResource.DEPTH_INFINITE,
-                    new NullProgressMonitor());
-        } catch (CoreException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**
