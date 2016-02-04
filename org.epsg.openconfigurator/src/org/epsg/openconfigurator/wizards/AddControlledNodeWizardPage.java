@@ -47,8 +47,13 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
+import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
+import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -80,6 +85,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String ERROR_NODE_ALREADY_EXISTS = "Node already exists.";
     private static final String ERROR_INVALID_NODE_ID = "Invalid node ID.";
     private static final String ERROR_INVALID_NODE_NAME = "Enter a valid node name.";
+    private static final String ERROR_RMN_NOT_SUPPORTED = "{0} does not support RMN.";
+    private static final String ERROR_RMN_WITH_CHAINED_STATION = "POWERLINK network with chained station cannot have RMN.";
 
     /**
      * Control to display the Node name.
@@ -345,6 +352,21 @@ public class AddControlledNodeWizardPage extends WizardPage {
             nodeIdList.add(rmnNodeId);
         }
         return nodeIdList;
+    }
+
+    /**
+     * @return The list of nodes from POWERLINK root node.
+     */
+    private PowerlinkRootNode getNodelist() {
+        IViewPart viewPart = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage()
+                .findView(IndustrialNetworkView.ID);
+        if (viewPart instanceof IndustrialNetworkView) {
+            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
+            PowerlinkRootNode nodeList = industrialView.getNodeList();
+            return nodeList;
+        }
+        return null;
     }
 
     /**

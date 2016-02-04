@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -81,6 +82,11 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final String CN_VERIFY_REVISION_NUMBER_LABEL = "Verify Revision Number";
     private static final String CN_VERIFY_PRODUCT_CODE_LABEL = "Verify Product Code";
     private static final String CN_VERIFY_SERIAL_NUMBER_LABEL = "Verify Serial Number";
+    private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
+    private static final String CNPRES_CHAINING_ERROR_MESSAGE = "The node {0} does not support PRes Chaining operation.";
+    private static final String MNPRES_CHAINING_ERROR_MESSAGE = "The MN {0} does not support PRes Chaining operation.";
+    private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported";
+    private static final String INVALID_CN_NODE_ID = "Invalid node id for a Controlled node";
 
     private static final String CN_POLL_RESPONSE_TIMEOUT_LABEL = "PollResponse Timeout ("
             + "\u00B5" + "s)";
@@ -580,33 +586,35 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     protected String handleNodeTypeChange(Object value) {
         if (value instanceof Integer) {
             int val = ((Integer) value).intValue();
-            if (val == 0) { // Normal Station.
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .ResetOperationMode(cnNode.getNetworkId(),
-                                cnNode.getNodeId());
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            if (val == 1) {
+                // Checks the value of PresChaining from the XDD
+                // model of MN and CN.
+                Node mnNode = cnNode.getPowerlinkRootNode().getMN();
+                boolean mnPresChaining = mnNode.getNetworkManagement()
+                        .getMnFeatures().isDLLMNPResChaining();
+                if (!mnPresChaining) {
+                    return MessageFormat.format(MNPRES_CHAINING_ERROR_MESSAGE,
+                            mnNode.getNodeIDWithName());
                 }
-            } else if (val == 1) { // Chained
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetOperationModeChained(cnNode.getNetworkId(),
-                                cnNode.getNodeId());
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+
+                boolean cnPresChaining = cnNode.getNetworkManagement()
+                        .getCnFeatures().isDLLCNPResChaining();
+                if (!cnPresChaining) {
+                    // do not allow
+                    return MessageFormat.format(CNPRES_CHAINING_ERROR_MESSAGE,
+                            cnNode.getNodeIDWithName());
                 }
-            } else if (val == 2) { // Multiplexed
-                Result res = OpenConfiguratorCore.GetInstance()
-                        .SetOperationModeMultiplexed(cnNode.getNetworkId(),
-                                cnNode.getNodeId(),
-                                (short) tcn.getForcedMultiplexedCycle());
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+
+                List<Node> rmnNodes = cnNode.getPowerlinkRootNode()
+                        .getRmnNodeList();
+                if (rmnNodes.size() > 0) {
+                    return CHAINED_STATION_ERROR_MESSAGE;
                 }
-            } else {
-                System.err.println("Invalid node type:" + val);
+            } else if (val == 2) {
+                return MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR;
             }
         } else {
-            System.err.println("Invalid value type" + value);
+            System.err.println("Invalid value type");
         }
         return null;
     }
@@ -662,7 +670,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 short nodeIDvalue = Short.valueOf(((String) id));
                 if ((nodeIDvalue == 0)
                         || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
-                    return "Invalid node id for a Controlled node";
+                    return INVALID_CN_NODE_ID;
                 }
 
                 if (nodeIDvalue == cnNode.getNodeId()) {
@@ -675,7 +683,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     return "Node with id " + nodeIDvalue + " already exists.";
                 }
             } catch (NumberFormatException ex) {
-                return "Invalid node id for a Controlled node";
+                return INVALID_CN_NODE_ID;
             }
         }
         return null;
@@ -769,16 +777,41 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         if (value instanceof Integer) {
                             int val = ((Integer) value).intValue();
                             if (val == 0) { // Normal Station.
-                                tcn.setIsChained(false);
-                                tcn.setIsMultiplexed(false);
+                                res = OpenConfiguratorCore.GetInstance()
+                                        .ResetOperationMode(
+                                                cnNode.getNetworkId(),
+                                                cnNode.getNodeId());
+                                if (res.IsSuccessful()) {
+                                    cnNode.setPlkOperationMode(value);
+                                } else {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                }
+
                             } else if (val == 1) {
+                                res = OpenConfiguratorCore.GetInstance()
+                                        .SetOperationModeChained(
+                                                cnNode.getNetworkId(),
+                                                cnNode.getNodeId());
+                                if (res.IsSuccessful()) {
+                                    cnNode.setPlkOperationMode(value);
+                                } else {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                }
 
-                                tcn.setIsChained(true);
-                                tcn.setIsMultiplexed(false);
                             } else if (val == 2) {
-
-                                tcn.setIsChained(false);
-                                tcn.setIsMultiplexed(true);
+                                res = OpenConfiguratorCore.GetInstance()
+                                        .SetOperationModeMultiplexed(
+                                                cnNode.getNetworkId(),
+                                                cnNode.getNodeId(), (short) tcn
+                                                        .getForcedMultiplexedCycle());
+                                if (res.IsSuccessful()) {
+                                    cnNode.setPlkOperationMode(value);
+                                } else {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                }
                             }
 
                             // Node Assignment values will be modified by the

@@ -512,6 +512,13 @@ public class Node {
     }
 
     /**
+     * @return Instance of NetworkManagement to access TNetworkManagement.
+     */
+    public NetworkManagement getNetworkManagement() {
+        return networkmanagement;
+    }
+
+    /**
      * @return The node ID.
      */
     public short getNodeId() {
@@ -1294,14 +1301,26 @@ public class Node {
 
     /**
      * Set the operational mode of POWERLINK.
+     *
+     * @param value The
      */
-    public void setPlkOperationMode() {
+    public void setPlkOperationMode(Object value) {
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
-            if (cn.isIsChained()) {
-                cn.setIsChained(true);
-            } else if (cn.isIsMultiplexed()) {
-                cn.setIsMultiplexed(true);
+            if (value instanceof Integer) {
+                Integer val = (Integer) value;
+                if (val == 0) {
+                    cn.setIsChained(false);
+                    cn.setIsMultiplexed(false);
+                } else if (val == 1) {
+                    cn.setIsChained(true);
+                    cn.setIsMultiplexed(false);
+                } else if (val == 2) {
+                    cn.setIsChained(false);
+                    cn.setIsMultiplexed(true);
+                }
+            } else {
+                System.err.println("Invalid value type");
             }
         } else {
             System.err.println("setPlkoperationmode; Unhandled node model type:"
