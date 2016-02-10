@@ -33,6 +33,9 @@ package org.epsg.openconfigurator.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.epsg.openconfigurator.model.Parameter;
+import org.epsg.openconfigurator.model.ParameterGroup;
+import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 
@@ -48,12 +51,18 @@ public class ObjectAdapterFactory implements IAdapterFactory {
     /**
      * Property source for objects.
      */
-    ObjectPropertySource objectPropertySource;
+    private ObjectPropertySource objectPropertySource;
 
     /**
      * Property source for sub-objects.
      */
-    SubObjectPropertySource subObjectPropertySource;
+    private SubObjectPropertySource subObjectPropertySource;
+
+    private ParameterRefPropertySource parameterRefPropertySource;
+
+    private ParameterPropertySource parameterPropertySource;
+
+    private ParameterGroupPropertySource parameterGroupPropertySource;
 
     @Override
     public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -77,6 +86,33 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                             (PowerlinkSubobject) adaptableObject);
                 }
                 return subObjectPropertySource;
+            } else if (adaptableObject instanceof ParameterReference) {
+                if (parameterRefPropertySource == null) {
+                    parameterRefPropertySource = new ParameterRefPropertySource(
+                            (ParameterReference) adaptableObject);
+                } else {
+                    parameterRefPropertySource
+                            .setModelData((ParameterReference) adaptableObject);
+                }
+                return parameterRefPropertySource;
+            } else if (adaptableObject instanceof Parameter) {
+                if (parameterPropertySource == null) {
+                    parameterPropertySource = new ParameterPropertySource(
+                            (Parameter) adaptableObject);
+                } else {
+                    parameterPropertySource
+                            .setModelData((Parameter) adaptableObject);
+                }
+                return parameterPropertySource;
+            } else if (adaptableObject instanceof ParameterGroup) {
+                if (parameterGroupPropertySource == null) {
+                    parameterGroupPropertySource = new ParameterGroupPropertySource(
+                            (ParameterGroup) adaptableObject);
+                } else {
+                    parameterGroupPropertySource
+                            .setModelData((ParameterGroup) adaptableObject);
+                }
+                return parameterGroupPropertySource;
             } else {
                 System.err.println("Un supported");
             }

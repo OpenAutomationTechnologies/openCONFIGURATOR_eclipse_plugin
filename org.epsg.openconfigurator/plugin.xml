@@ -257,6 +257,27 @@
                type="org.eclipse.ui.views.properties.IPropertySource">
          </adapter>
       </factory>
+      <factory
+            adaptableType="org.epsg.openconfigurator.model.ParameterReference"
+            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.epsg.openconfigurator.model.Parameter"
+            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.epsg.openconfigurator.model.ParameterGroup"
+            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+         <adapter
+               type="org.eclipse.ui.views.properties.IPropertySource">
+         </adapter>
+      </factory>
    </extension>
    <extension
          point="org.eclipse.ui.decorators">
