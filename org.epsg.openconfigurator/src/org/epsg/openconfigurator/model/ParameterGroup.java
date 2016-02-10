@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.model;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -47,7 +48,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
  */
 public class ParameterGroup {
 
-    private String uniqueId;
+    private final String uniqueId;
 
     private LabelDescription label;
     private boolean groupLevelVisible;
@@ -107,8 +108,20 @@ public class ParameterGroup {
         return bitOffset;
     }
 
+    public Parameter getConditionalParameter() {
+        return conditionalParameter;
+    }
+
+    public String getConditionalValue() {
+        return conditionalValue;
+    }
+
     public LabelDescription getLabel() {
         return label;
+    }
+
+    public ObjectDictionary getObjectDictionary() {
+        return objectDictionary;
     }
 
     public List<ParameterGroup> getParameterGroupList() {
@@ -128,72 +141,101 @@ public class ParameterGroup {
     }
 
     public LinkedHashSet<Object> getVisibleObjects() {
+
         LinkedHashSet<Object> vSet = new LinkedHashSet<>();
+        if (!isConditionsMet()) {
+            return vSet;
+        }
 
-        List<Object> visibleObjects = new ArrayList<>();
-        List<ParameterGroup> pgmGrpList = getParameterGroupList();
+        Collection<ParameterGroup> pgmGrpList = getParameterGroupList();
         for (ParameterGroup pgmGrp : pgmGrpList) {
-            if (pgmGrp.isGroupLevelVisible()) {
-                visibleObjects.add(pgmGrp);
-                vSet.add(pgmGrp);
-            } else {
+            if (pgmGrp.isConditionsMet()) {
+                if (pgmGrp.isGroupLevelVisible()) {
+                    vSet.add(pgmGrp);
+                } else {
 
-                visibleObjects.addAll(pgmGrp.getVisibleObjects());
-                vSet.addAll(pgmGrp.getVisibleObjects());
+                    // TODO: Check the below addAll.
+                    vSet.addAll(pgmGrp.getVisibleObjects());
 
-                List<ParameterReference> prmRefList = pgmGrp
-                        .getParameterRefList();
-                for (ParameterReference prmRef : prmRefList) {
-                    if (prmRef.isVisible()) {
-                        visibleObjects.add(prmRef);
-                        vSet.add(prmRef);
+                    List<ParameterReference> prmRefList = pgmGrp
+                            .getParameterRefList();
+                    for (ParameterReference prmRef : prmRefList) {
+                        if (prmRef.isVisible()) {
+                            vSet.add(prmRef);
+                        }
                     }
                 }
             }
         }
 
-        List<ParameterReference> prmRefList = getParameterRefList();
+        Collection<ParameterReference> prmRefList = getParameterRefList();
         for (ParameterReference prmRef : prmRefList) {
             if (prmRef.isVisible()) {
-                visibleObjects.add(prmRef);
                 vSet.add(prmRef);
             }
         }
 
-        System.out.println("=========================" + uniqueId);
+        System.out.println("=========================" + uniqueId + " m:"
+                + isConditionsMet() + " v:" + isGroupLevelVisible());
         for (Object a : vSet) {
             if (a instanceof ParameterGroup) {
                 ParameterGroup b = (ParameterGroup) a;
-                System.out.println("--------> " + b.getLabel().getText());
+                System.out.println("--------> " + b.getLabel().getText() + " m:"
+                        + b.isConditionsMet() + " v:"
+                        + b.isGroupLevelVisible());
             } else if (a instanceof ParameterReference) {
                 ParameterReference b = (ParameterReference) a;
                 System.out.println(
                         "--------> " + b.getLabelDescription().getText());
             }
         }
+
+        System.out.println("==========END===============");
         return vSet;
     }
 
     public boolean hasVisibleObjects() {
         boolean retVal = false;
-        List<ParameterReference> prmRefList = getParameterRefList();
-        for (ParameterReference prmRef : prmRefList) {
-            if (prmRef.isVisible()) {
-                retVal = true;
-                break; // For optimization. Atleast one is visible.
-            }
+
+        if (!isConditionsMet()) {
+            return retVal;
         }
 
-        // FIXME: I might missing parameterGroups here!
+        // Check all the parameterReferences
+        Collection<ParameterReference> prmRefList = getParameterRefList();
+        for (ParameterReference prmRef : prmRefList) {
+            retVal = retVal || prmRef.isVisible();
+        }
 
-        // TODO: Check
-        if ((conditionalParameter != null) && (conditionalValue != null)) {
-            if (conditionalParameter.getActualValue() == conditionalValue) {
-                retVal = true;
-            }
+        // Check all the parameterGroups also
+        Collection<ParameterGroup> paramGrp = getParameterGroupList();
+        for (ParameterGroup grp : paramGrp) {
+            retVal = retVal
+                    || (grp.isConditionsMet() && grp.isGroupLevelVisible());
         }
 
         return retVal;
+    }
+
+    public boolean isConditionsMet() {
+        boolean conditionalParameterAllowed = false;
+        if ((conditionalParameter != null) && (conditionalValue != null)) {
+            if (conditionalParameter.getActualValue() != null) {
+                if (conditionalValue.equalsIgnoreCase(
+                        conditionalParameter.getActualValue())) {
+                    conditionalParameterAllowed = true;
+                }
+            } else if (conditionalParameter.getDefaultValue() != null) {
+                if (conditionalValue.equalsIgnoreCase(
+                        conditionalParameter.getDefaultValue())) {
+                    conditionalParameterAllowed = true;
+                }
+            }
+        } else {
+            // Conditional parameter not available. Thus conditions are met.
+            conditionalParameterAllowed = true;
+        }
+        return conditionalParameterAllowed;
     }
 
     public boolean isGroupLevelVisible() {

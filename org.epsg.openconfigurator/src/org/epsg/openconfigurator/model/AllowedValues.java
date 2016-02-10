@@ -45,6 +45,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TValue;
  *
  */
 public class AllowedValues {
+
     private List<String> valuesList = new ArrayList<>();
     private List<Range> rangeList = new ArrayList<>();
 

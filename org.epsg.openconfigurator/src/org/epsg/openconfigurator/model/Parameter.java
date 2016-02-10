@@ -206,4 +206,8 @@ public class Parameter implements IParameter {
     public LabelDescription getUnitLabel() {
         return unitLabel;
     }
+
+    public void setActualValue(String value) {
+        actualValue = value;
+    }
 }

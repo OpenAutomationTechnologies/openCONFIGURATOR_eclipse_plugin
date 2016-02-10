@@ -197,4 +197,8 @@ public class ParameterReference implements IParameter {
     public boolean isVisible() {
         return visible;
     }
+
+    public void setActualValue(final String value) {
+        actualValue = value;
+    }
 }

@@ -333,6 +333,7 @@ public class ObjectDictionaryView extends ViewPart {
                 return objItem.getSubObjects().toArray();
             } else if (parentElement instanceof ParameterReference) {
                 ParameterReference paramRef = (ParameterReference) parentElement;
+                // Do nothing.
             } else if (parentElement instanceof Parameter) {
                 Parameter param = (Parameter) parentElement;
                 if (param.getDataTypeChoice() == DataTypeChoiceType.STRUCT) {
@@ -370,22 +371,32 @@ public class ObjectDictionaryView extends ViewPart {
                     List<ParameterGroup> paramGrupList = nodeObj
                             .getObjectDictionary().getParameterGroupList();
                     for (ParameterGroup pgmGrp : paramGrupList) {
-                        if (pgmGrp.isGroupLevelVisible()) {
-                            visibleObjectsList.add(pgmGrp);
-                        } else {
-                            visibleObjectsList
-                                    .addAll(pgmGrp.getVisibleObjects());
+                        System.err.println(
+                                "--------> " + pgmGrp.getLabel().getText()
+                                        + " m:" + pgmGrp.isConditionsMet()
+                                        + " v:" + pgmGrp.isGroupLevelVisible());
 
-                            List<ParameterReference> prmRefList = pgmGrp
-                                    .getParameterRefList();
-                            for (ParameterReference prmRef : prmRefList) {
-                                if (prmRef.isVisible()) {
-                                    visibleObjectsList.add(prmRef);
+                        if (pgmGrp.isConditionsMet()) {
+                            if (pgmGrp.isGroupLevelVisible()) {
+                                visibleObjectsList.add(pgmGrp);
+                            } else {
+                                visibleObjectsList
+                                        .addAll(pgmGrp.getVisibleObjects());
+
+                                List<ParameterReference> prmRefList = pgmGrp
+                                        .getParameterRefList();
+                                for (ParameterReference prmRef : prmRefList) {
+                                    if (prmRef.isVisible()) {
+                                        visibleObjectsList.add(prmRef);
+                                    }
                                 }
                             }
                         }
                     }
-                    // elementsList.addAll(parameterList);
+
+                    visibleObjectsList.addAll(
+                            nodeObj.getObjectDictionary().getParameterList());
+
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj
@@ -448,6 +459,7 @@ public class ObjectDictionaryView extends ViewPart {
     private Action hideNonForcedObjects;
     private Action propertiesAction;
     private Action toggleParameterView;
+    private Action refreshAction;
 
     /**
      * Object dictionary tree viewer.
@@ -486,6 +498,16 @@ public class ObjectDictionaryView extends ViewPart {
      * Create the actions.
      */
     private void createActions() {
+        refreshAction = new Action("Refresh") {
+            @Override
+            public void run() {
+                treeViewer.refresh();
+            }
+        };
+        refreshAction.setToolTipText("Refresh");
+        refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.REFRESH_ICON));
+
         toggleParameterView = new Action("Switch to Parameter View",
                 IAction.AS_CHECK_BOX) {
             @Override
@@ -711,6 +733,7 @@ public class ObjectDictionaryView extends ViewPart {
 
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.removeAll();
+        manager.add(refreshAction);
         manager.add(toggleParameterView);
         manager.add(new Separator());
         manager.add(hideNonMappableObjects);

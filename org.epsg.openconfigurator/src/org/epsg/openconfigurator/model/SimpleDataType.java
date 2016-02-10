@@ -42,7 +42,13 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
  */
 public enum SimpleDataType {
 
-    UNDEFINED, BITSTRING, BOOL, BYTE, _CHAR, DINT, DWORD, INT, LINT, LREAL, LWORD, REAL, SINT, STRING, UDINT, UINT, ULINT, USINT, WORD, WSTRING;
+    UNDEFINED("UNDEFINED"), BITSTRING("BITSTRING"), BOOL("BOOL"), BYTE(
+            "BYTE"), _CHAR("_CHAR"), DINT("DINT"), DWORD("DWORD"), INT(
+                    "INT"), LINT("LINT"), LREAL("LREAL"), LWORD("LWORD"), REAL(
+                            "REAL"), SINT("SINT"), STRING("STRING"), UDINT(
+                                    "UDINT"), UINT("UINT"), ULINT(
+                                            "ULINT"), USINT("USINT"), WORD(
+                                                    "WORD"), WSTRING("WSTRING");
 
     public static IEC_Datatype getIEC_DataType(Parameter parameter) {
 
@@ -258,5 +264,16 @@ public enum SimpleDataType {
         }
 
         return UNDEFINED;
+    }
+
+    private final String text;
+
+    SimpleDataType(final String name) {
+        text = name;
+    }
+
+    @Override
+    public String toString() {
+        return text;
     }
 }
