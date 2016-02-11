@@ -53,6 +53,7 @@ import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
 import org.epsg.openconfigurator.model.INetworkProperties;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.PlkOperationMode;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
@@ -778,7 +779,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         System.err.println(objectId + " made editable");
                         break;
                     case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {
-
+                        PlkOperationMode plkMode = null;
                         if (value instanceof Integer) {
                             int val = ((Integer) value).intValue();
                             if (val == 0) { // Normal Station.
@@ -786,39 +787,32 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                         .ResetOperationMode(
                                                 cnNode.getNetworkId(),
                                                 cnNode.getNodeId());
-                                if (res.IsSuccessful()) {
-                                    cnNode.setPlkOperationMode(value);
-                                } else {
-                                    OpenConfiguratorMessageConsole.getInstance()
-                                            .printLibraryErrorMessage(res);
-                                }
-
+                                plkMode = PlkOperationMode.NORMAL;
                             } else if (val == 1) {
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetOperationModeChained(
                                                 cnNode.getNetworkId(),
                                                 cnNode.getNodeId());
-                                if (res.IsSuccessful()) {
-                                    cnNode.setPlkOperationMode(value);
-                                } else {
-                                    OpenConfiguratorMessageConsole.getInstance()
-                                            .printLibraryErrorMessage(res);
-                                }
-
+                                plkMode = PlkOperationMode.CHAINED;
                             } else if (val == 2) {
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetOperationModeMultiplexed(
                                                 cnNode.getNetworkId(),
                                                 cnNode.getNodeId(), (short) tcn
                                                         .getForcedMultiplexedCycle());
+                                plkMode = PlkOperationMode.MULTIPLEXED;
+                            }
+                            if (plkMode != null) {
                                 if (res.IsSuccessful()) {
-                                    cnNode.setPlkOperationMode(value);
+                                    cnNode.setPlkOperationMode(plkMode);
                                 } else {
                                     OpenConfiguratorMessageConsole.getInstance()
                                             .printLibraryErrorMessage(res);
                                 }
+                            } else {
+                                System.err.println(
+                                        "Invalid POWERLINK operation mode");
                             }
-
                             // Node Assignment values will be modified by the
                             // library. So refresh the project file data.
                             OpenConfiguratorProjectUtils

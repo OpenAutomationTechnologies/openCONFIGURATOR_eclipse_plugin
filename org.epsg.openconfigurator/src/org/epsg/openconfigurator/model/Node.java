@@ -42,6 +42,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
@@ -179,6 +180,7 @@ public class Node {
     private final NodeType nodeType;
 
     private String configurationError;
+
     /**
      * Instance of NetworkManagement.
      */
@@ -409,6 +411,9 @@ public class Node {
         return cycleTimeValue;
     }
 
+    /**
+     * @return Error in configuration file.
+     */
     public String getError() {
         return configurationError;
     }
@@ -1063,6 +1068,8 @@ public class Node {
 
         OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
                 IAbstractNodeProperties.NODE_NAME_OBJECT, newName);
+
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
     }
 
     /**
@@ -1309,30 +1316,35 @@ public class Node {
     /**
      * Set the operational mode of POWERLINK.
      *
-     * @param value The
+     * @param value The POWERLINK operational mode selected in the property
+     *            source.
      */
-    public void setPlkOperationMode(Object value) {
+    public void setPlkOperationMode(PlkOperationMode value) {
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
-            if (value instanceof Integer) {
-                Integer val = (Integer) value;
-                if (val == 0) {
+            switch (value) {
+                case NORMAL:
                     cn.setIsChained(false);
                     cn.setIsMultiplexed(false);
-                } else if (val == 1) {
+                    break;
+                case CHAINED:
                     cn.setIsChained(true);
                     cn.setIsMultiplexed(false);
-                } else if (val == 2) {
+                    break;
+                case MULTIPLEXED:
                     cn.setIsChained(false);
                     cn.setIsMultiplexed(true);
-                }
-            } else {
-                System.err.println("Invalid value type");
+                    break;
+                default:
+                    System.err.println("Invalid value type");
+                    break;
             }
         } else {
             System.err.println("setPlkoperationmode; Unhandled node model type:"
                     + nodeModel);
         }
+
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
 
     }
 

@@ -60,12 +60,16 @@ import org.eclipse.core.resources.WorkspaceJob;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.ListenerList;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.util.SafeRunnable;
 import org.eclipse.ui.actions.WorkspaceModifyOperation;
 import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.event.INodePropertyChangeListener;
+import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node.NodeType;
@@ -98,6 +102,9 @@ public class PowerlinkRootNode {
 
     private Map<Short, Node> nodeCollection = new HashMap<Short, Node>();
     private OpenCONFIGURATORProject currentProject;
+
+    private ListenerList nodePropertyChangeListeners = new ListenerList(
+            ListenerList.IDENTITY);
 
     public PowerlinkRootNode() {
     }
@@ -148,11 +155,51 @@ public class PowerlinkRootNode {
     }
 
     /**
+     * Adds the property change event to the change listener.
+     *
+     * @param listener Instance of INodePropertyChangeListener to listen the
+     *            change event
+     */
+    public void addNodePropertyChangeListener(
+            INodePropertyChangeListener listener) {
+        // Store the listener object
+        nodePropertyChangeListeners.add(listener);
+    }
+
+    /**
      * Clear collection of nodes and set to empty.
      */
     public void clearNodeCollection() {
         synchronized (nodeCollection) {
+            clearPropertyChangeListeners();
             nodeCollection.clear();
+        }
+    }
+
+    /**
+     * Clears the node property change in listeners.
+     */
+    public void clearPropertyChangeListeners() {
+        nodePropertyChangeListeners.clear();
+    }
+
+    /**
+     * Reports a bound indexed property update to listeners that have been
+     * registered to track updates of all properties or a property with the
+     * specified event.
+     *
+     * @param event Instance of NodePropertyChangeEvent
+     */
+    public void fireNodePropertyChanged(final NodePropertyChangeEvent event) {
+        Object[] listeners = nodePropertyChangeListeners.getListeners();
+        for (Object listener : listeners) {
+            final INodePropertyChangeListener l = (INodePropertyChangeListener) listener;
+            SafeRunnable.run(new SafeRunnable() {
+                @Override
+                public void run() {
+                    l.nodePropertyChanged(event);
+                }
+            });
         }
     }
 
@@ -691,6 +738,10 @@ public class PowerlinkRootNode {
                     throws CoreException {
                 try {
                     wmo.run(monitor);
+
+                    fireNodePropertyChanged(
+                            new NodePropertyChangeEvent(new Object()));
+
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                     Status errStatus = new Status(IStatus.ERROR,
@@ -709,6 +760,17 @@ public class PowerlinkRootNode {
         job.schedule();
 
         return true;
+    }
+
+    /**
+     * Removes the listener object from NodePropertychange event
+     *
+     * @param listener
+     */
+    public void removeNodePropertyChangeListener(
+            INodePropertyChangeListener listener) {
+        // Remove the listener object
+        nodePropertyChangeListeners.remove(listener);
     }
 
     /**
@@ -751,6 +813,10 @@ public class PowerlinkRootNode {
                         nodeCollection.remove(new Short(oldNodeId));
                         // Add the modified node ID into node collection.
                         nodeCollection.put(new Short(newNodeId), oldNode);
+
+                        fireNodePropertyChanged(
+                                new NodePropertyChangeEvent(oldNode));
+
                     } catch (IOException | JDOMException ex) {
                         ex.printStackTrace();
                         IStatus errorStatus = new Status(IStatus.ERROR,

@@ -83,6 +83,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
+import org.epsg.openconfigurator.event.INodePropertyChangeListener;
+import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
@@ -487,6 +489,19 @@ public class IndustrialNetworkView extends ViewPart
     private LinkWithEditorPartListener linkWithEditorPartListener = new LinkWithEditorPartListener(
             this);
 
+    INodePropertyChangeListener nodePropertyChangeListener = new INodePropertyChangeListener() {
+        @Override
+        public void nodePropertyChanged(NodePropertyChangeEvent event) {
+            Display.getDefault().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    handleRefresh();
+                }
+            });
+        }
+    };
+
     /**
      * The constructor.
      */
@@ -541,6 +556,8 @@ public class IndustrialNetworkView extends ViewPart
 
         IndustrialNetworkProjectEditor activeEditorTemp = (IndustrialNetworkProjectEditor) activeEditor;
         rootNode = activeEditorTemp.getPowerlinkRootNode();
+        rootNode.addNodePropertyChangeListener(nodePropertyChangeListener);
+
         Control control = viewer.getControl();
         if ((control != null) && !control.isDisposed()) {
             viewer.setInput(rootNode);
