@@ -63,8 +63,10 @@ import org.epsg.openconfigurator.lib.wrapper.PDOMapping;
 import org.epsg.openconfigurator.lib.wrapper.ParameterAccess;
 import org.epsg.openconfigurator.lib.wrapper.PlkDataType;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.NetworkManagement;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Node.NodeType;
+import org.epsg.openconfigurator.model.ObjectDictionary;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PdoType;
 import org.epsg.openconfigurator.model.PowerlinkObject;
@@ -84,7 +86,6 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
-import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers.DynamicChannels;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
@@ -92,8 +93,6 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TDynamicChannel;
 import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
-import org.epsg.openconfigurator.xmlbinding.xdd.TNetworkManagement;
-import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
@@ -277,12 +276,12 @@ public class OpenConfiguratorLibraryUtils {
      *
      * @param networkId Network ID.
      * @param nodeId The node ID.
-     * @param networkManagement The network management instance from the project
-     *            XML.
+     * @param networkManagement The network management instance from the
+     *            XDD/XDC.
      * @return Result instance from the library.
      */
     private static Result addNetworkManagement(String networkId, short nodeId,
-            TNetworkManagement networkManagement) {
+            NetworkManagement networkManagement) {
         Result libApiRes = new Result();
         if (networkManagement == null) {
             return libApiRes;
@@ -290,9 +289,9 @@ public class OpenConfiguratorLibraryUtils {
         libApiRes = addNetworkManagementGeneralFeatures(networkId, nodeId,
                 networkManagement.getGeneralFeatures());
         libApiRes = addNetworkManagementMnFeatures(networkId, nodeId,
-                networkManagement.getMNFeatures());
+                networkManagement.getMnFeatures());
         libApiRes = addNetworkManagementCnFeatures(networkId, nodeId,
-                networkManagement.getCNFeatures());
+                networkManagement.getCnFeatures());
         return libApiRes;
     }
 
@@ -884,104 +883,93 @@ public class OpenConfiguratorLibraryUtils {
         return libApiRes;
     }
 
-    /**
-     * Add the list of Objects into the library.
-     *
-     * @param networkId Network ID.
-     * @param nodeId The node ID.
-     * @param objectList Object list instance from the XDC.
-     * @return Result instance from the library.
-     */
-    public static Result addObjectList(final String networkId,
-            final short nodeId, TApplicationLayers.ObjectList objectList) {
+    private static Result addObjectDictionary(Node node,
+            ObjectDictionary objectDict) {
         Result libApiRes = null;
         OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
 
-        List<TObject> objects = objectList.getObject();
-        for (TObject object : objects) {
-            String objectID = DatatypeConverter
-                    .printHexBinary(object.getIndex());
-            long objectIdL = Long.parseLong(objectID, 16);
-
+        List<PowerlinkObject> plkObjects = objectDict.getObjectsList();
+        for (PowerlinkObject object : plkObjects) {
             ObjectType objectType = getObjectType(object.getObjectType());
+            PDOMapping mapping = getPdoMapping(object.getPdoMapping());
 
-            String objectName = StringUtils.EMPTY;
-            if (object.getName() != null) {
-                objectName = object.getName();
-            }
+            if (((object.getObjectType() != 7) || ((object.getObjectType() == 7)
+                    && (object.getModel().getDataType() != null)))
+                    && (object.getUniqueIDRef() == null)) {
+                // Normal objects with dataType and without uniqueIdRef.
 
-            PDOMapping mapping = getPdoMapping(object.getPDOmapping());
+                PlkDataType dataType = getObjectDatatype(
+                        object.getModel().getDataType());
+                AccessType accessType = getAccessType(
+                        object.getModel().getAccessType());
 
-            if (object.getUniqueIDRef() == null) {
-                // Non-Domain objects
-
-                PlkDataType dataType = getObjectDatatype(object.getDataType());
-                AccessType accessType = getAccessType(object.getAccessType());
-
-                String defaultValue = StringUtils.EMPTY;
-                if (object.getDefaultValue() != null) {
-                    defaultValue = object.getDefaultValue();
-                }
-
-                // Avoid setting actual value for non writable objects into
-                // library.
                 String actualValue = object.getActualValue();
-                if (object.getActualValue() == null) {
-                    actualValue = StringUtils.EMPTY;
-                } else if ((accessType == AccessType.CONST)
+
+                // An workaround to avoid the library setting the actualValue
+                // for non writable sub-objects.
+                if ((accessType == AccessType.CONST)
                         || (accessType == AccessType.RO)) {
                     actualValue = StringUtils.EMPTY;
                 }
 
-                libApiRes = core.CreateObject(networkId, nodeId, objectIdL,
-                        objectType, objectName, dataType, accessType, mapping,
-                        defaultValue, actualValue);
+                libApiRes = core.CreateObject(node.getNetworkId(),
+                        node.getNodeId(), object.getId(), objectType,
+                        object.getName(), dataType, accessType, mapping,
+                        object.getDefaultValue(), actualValue);
                 if (libApiRes.IsSuccessful()) {
-                    String highLimit = object.getHighLimit();
-                    if (highLimit == null) {
-                        highLimit = "";
-                    }
-
-                    String lowLimit = object.getLowLimit();
-                    if (lowLimit == null) {
-                        lowLimit = "";
-                    }
-
-                    libApiRes = core.SetObjectLimits(networkId, nodeId,
-                            objectIdL, lowLimit, highLimit);
+                    libApiRes = core.SetObjectLimits(node.getNetworkId(),
+                            node.getNodeId(), object.getId(),
+                            object.getLowLimit(), object.getHighLimit());
                     if (!libApiRes.IsSuccessful()) {
+                        object.setError(getErrorMessage(libApiRes));
                         System.err.println("SetObjectLimits WARN: "
                                 + getErrorMessage(libApiRes));
                     }
                 } else {
+                    object.setError(getErrorMessage(libApiRes));
                     System.err.println("WARN: " + getErrorMessage(libApiRes));
                 }
-            } else {
-                // Domain objects.
-
+            } else if ((object.getModel().getDataType() == null)
+                    && (object.getUniqueIDRef() != null)) {
+                // Domain objects with uniqueIdRef and without dataType
                 if (object
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
-                    Parameter parameter = (Parameter) object.getUniqueIDRef();
+                    Parameter parameter = (Parameter) object.getModel()
+                            .getUniqueIDRef();
 
-                    libApiRes = core.CreateDomainObject(networkId, nodeId,
-                            objectIdL, objectType, object.getName(), mapping,
-                            parameter.getUniqueID());
+                    libApiRes = core.CreateDomainObject(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), objectType,
+                            object.getName(), mapping, parameter.getUniqueID());
                     if (!libApiRes.IsSuccessful()) {
+                        object.setError(getErrorMessage(libApiRes));
                         System.err.println("CreateDomainObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
                 } else {
+                    // FIXME
                     System.err.println("ERROR: Invalid object.getUniqueIDRef():"
                             + object.getUniqueIDRef());
                 }
+            } else if ((object.getModel().getDataType() != null)
+                    && (object.getUniqueIDRef() != null)) {
+                // ParameterGroup Objects with uniqueIdRef and with dataType
+                // FIXME
+                System.err.println(
+                        "UNHANDLED: ParameterGroup Objects with uniqueIdRef and with dataTyp:"
+                                + object.getUniqueIDRef());
+            } else {
+                // Cannot happen
+                System.err.println(
+                        "ERROR: Invalid object without dataType and UniqueIdRef. Id:"
+                                + object.getIdHex());
             }
 
-            libApiRes = addSubObjectList(networkId, nodeId, objectIdL,
-                    object.getSubObject());
+            libApiRes = addSubObjects(node, object);
             if (!libApiRes.IsSuccessful()) {
                 System.err.println("WARN: " + getErrorMessage(libApiRes));
             }
         }
+
         return libApiRes;
     }
 
@@ -1111,79 +1099,56 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
-     * Add the list of sub-objects into the library.
+     * Add the list of sub-objects available in the object into the library.
      *
-     * @param networkId Network ID.
-     * @param nodeId The node ID.
-     * @param objectId Object ID.
-     * @param subObjectList The list of subObjects to be added.
+     * @param Node Instance of Node.
+     * @param object Instance of POWERLINK Object to get list of objects.
      * @return Result instance from the library.
      */
-    public static Result addSubObjectList(final String networkId,
-            final short nodeId, long objectId,
-            List<TObject.SubObject> subObjectList) {
+    private static Result addSubObjects(final Node node,
+            PowerlinkObject object) {
+
         Result libApiRes = new Result();
         OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
-        for (TObject.SubObject subObject : subObjectList) {
-
-            String subObjectID = DatatypeConverter
-                    .printHexBinary(subObject.getSubIndex());
-            short subObjectIDL = Short.parseShort(subObjectID, 16);
+        List<PowerlinkSubobject> subObjectsList = object.getSubObjects();
+        for (PowerlinkSubobject subObject : subObjectsList) {
 
             ObjectType subObjectType = getObjectType(subObject.getObjectType());
+            PDOMapping pdoMapping = getPdoMapping(subObject.getPdoMapping());
 
-            String subObjectName = StringUtils.EMPTY;
-            if (subObject.getName() != null) {
-                subObjectName = subObject.getName();
-            }
-
-            PDOMapping pdoMapping = getPdoMapping(subObject.getPDOmapping());
             if (subObject.getUniqueIDRef() == null) {
 
                 PlkDataType dataType = getObjectDatatype(
-                        subObject.getDataType());
+                        subObject.getModel().getDataType());
 
                 AccessType accessType = getAccessType(
                         subObject.getAccessType());
 
-                String defaultValue = StringUtils.EMPTY;
-                if (subObject.getDefaultValue() != null) {
-                    defaultValue = subObject.getDefaultValue();
-                }
-
-                // Avoid setting actual value for non writable sub-objects into
-                // library.
                 String actualValue = subObject.getActualValue();
-                if (subObject.getActualValue() == null) {
-                    actualValue = StringUtils.EMPTY;
-                } else if ((accessType == AccessType.CONST)
+
+                // An workaround to avoid the library setting the actualValue
+                // for non writable sub-objects.
+                if ((accessType == AccessType.CONST)
                         || (accessType == AccessType.RO)) {
                     actualValue = StringUtils.EMPTY;
                 }
 
-                libApiRes = core.CreateSubObject(networkId, nodeId, objectId,
-                        subObjectIDL, subObjectType, subObjectName, dataType,
-                        accessType, pdoMapping, defaultValue, actualValue);
-
+                libApiRes = core.CreateSubObject(node.getNetworkId(),
+                        node.getNodeId(), object.getId(), subObject.getId(),
+                        subObjectType, subObject.getName(), dataType,
+                        accessType, pdoMapping, subObject.getDefaultValue(),
+                        actualValue);
                 if (libApiRes.IsSuccessful()) {
-                    String highLimit = StringUtils.EMPTY;
-                    if (subObject.getHighLimit() != null) {
-                        highLimit = subObject.getHighLimit();
-                    }
-
-                    String lowLimit = StringUtils.EMPTY;
-                    if (subObject.getLowLimit() != null) {
-                        lowLimit = subObject.getLowLimit();
-                    }
-
-                    libApiRes = core.SetSubObjectLimits(networkId, nodeId,
-                            objectId, subObjectIDL, lowLimit, highLimit);
+                    libApiRes = core.SetSubObjectLimits(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), subObject.getId(),
+                            subObject.getLowLimit(), subObject.getHighLimit());
                     if (!libApiRes.IsSuccessful()) {
+                        subObject.setError(getErrorMessage(libApiRes));
                         System.err
                                 .println("WARN: " + getErrorMessage(libApiRes));
                     }
-
                 } else {
+                    subObject.setError(getErrorMessage(libApiRes));
                     System.err.println("WARN: " + getErrorMessage(libApiRes));
                 }
             } else {
@@ -1193,10 +1158,12 @@ public class OpenConfiguratorLibraryUtils {
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
                     Parameter parameter = (Parameter) subObject
                             .getUniqueIDRef();
-                    libApiRes = core.CreateDomainSubObject(networkId, nodeId,
-                            objectId, subObjectIDL, subObjectType,
-                            subObjectName, pdoMapping, parameter.getUniqueID());
+                    libApiRes = core.CreateDomainSubObject(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), subObject.getId(),
+                            subObjectType, subObject.getName(), pdoMapping,
+                            parameter.getUniqueID());
                     if (!libApiRes.IsSuccessful()) {
+                        subObject.setError(getErrorMessage(libApiRes));
                         System.err
                                 .println("WARN: " + getErrorMessage(libApiRes));
                     }
@@ -1207,6 +1174,7 @@ public class OpenConfiguratorLibraryUtils {
                 }
             }
         }
+
         return libApiRes;
     }
 
@@ -1820,8 +1788,8 @@ public class OpenConfiguratorLibraryUtils {
             final Node node,
             final ProfileBodyCommunicationNetworkPowerlink commProfile) {
         Result libApiRes = new Result();
-        libApiRes = addObjectList(node.getNetworkId(), node.getNodeId(),
-                commProfile.getApplicationLayers().getObjectList());
+
+        libApiRes = addObjectDictionary(node, node.getObjectDictionary());
         if (!libApiRes.IsSuccessful()) {
             System.err.println("WARN: " + getErrorMessage(libApiRes));
         }
@@ -1836,7 +1804,7 @@ public class OpenConfiguratorLibraryUtils {
         }
 
         libApiRes = addNetworkManagement(node.getNetworkId(), node.getNodeId(),
-                commProfile.getNetworkManagement());
+                node.getNetworkManagement());
         return libApiRes;
     }
 
@@ -1873,10 +1841,10 @@ public class OpenConfiguratorLibraryUtils {
         for (ISO15745Profile profile : profiles) {
             ProfileBodyDataType profileBodyDatatype = profile.getProfileBody();
             if (profileBodyDatatype instanceof ProfileBodyDevicePowerlink) {
-                importProfileBodyDevicePowerlink(node,
+                libApiRes = importProfileBodyDevicePowerlink(node,
                         (ProfileBodyDevicePowerlink) profileBodyDatatype);
             } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
-                importProfileBodyCommunicationNetworkPowerlink(node,
+                libApiRes = importProfileBodyCommunicationNetworkPowerlink(node,
                         (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype);
             } else {
                 System.err.println(
@@ -2175,6 +2143,7 @@ public class OpenConfiguratorLibraryUtils {
                 .getObject()) {
             byte[] forcedObjectId = forcedObj.getIndex();
             byte[] forcedSubObjectId = forcedObj.getSubindex();
+
             if (forcedSubObjectId == null) {
                 PowerlinkObject plkObj = node.getObjectDictionary()
                         .getObject(forcedObjectId);
@@ -2209,7 +2178,6 @@ public class OpenConfiguratorLibraryUtils {
                                             .printHexBinary(forcedSubObjectId)
                                     + " is forced and is not available in the XDD/XDC file.",
                                     node.getNetworkId());
-
                     continue;
                 }
 
