@@ -88,8 +88,8 @@ import org.jdom2.JDOMException;
 
                             Result res = OpenConfiguratorLibraryUtils
                                     .moveMappingObject(pdoChannel,
-                                            currentRowData.getSubobjecId(),
-                                            nextRowData.getSubobjecId());
+                                            currentRowData.getId(),
+                                            nextRowData.getId());
                             if (!res.IsSuccessful()) {
                                 System.err.println(
                                         "moveMappingObject to the next position Error:"

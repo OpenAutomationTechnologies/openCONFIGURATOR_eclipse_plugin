@@ -208,10 +208,10 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case OBJ_INDEX_ID:
-                    retObj = plkSubObject.getObjectIndex();
+                    retObj = plkSubObject.getObject().getIdHex();
                     break;
                 case OBJ_SUB_INDEX_ID:
-                    retObj = plkSubObject.getSubobjectIndex();
+                    retObj = plkSubObject.getIdHex();
                     break;
                 case OBJ_NAME_ID:
                     retObj = subObject.getName();
@@ -220,7 +220,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     retObj = String.valueOf(subObject.getObjectType());
                     break;
                 case OBJ_DATATYPE_ID:
-                    retObj = plkSubObject.getDatatype();
+                    retObj = plkSubObject.getDataTypeReadable();
                     break;
                 case OBJ_LOW_LIMIT_ID:
                     retObj = subObject.getLowLimit();

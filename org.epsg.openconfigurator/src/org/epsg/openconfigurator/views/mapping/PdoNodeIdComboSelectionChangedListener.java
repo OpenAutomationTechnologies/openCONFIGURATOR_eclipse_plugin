@@ -105,7 +105,7 @@ import org.jdom2.JDOMException;
                                 .getSubObject((short) 01);
                         if (subObj == null) {
                             MappingView.showMessageWindow(MessageDialog.ERROR,
-                                    "Object " + commParam.getObjectIndex()
+                                    "Object " + commParam.getIdHex()
                                             + "/0x1 does not exists!");
                         }
 

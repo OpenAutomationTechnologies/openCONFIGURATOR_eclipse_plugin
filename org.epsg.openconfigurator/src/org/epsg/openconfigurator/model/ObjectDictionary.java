@@ -162,7 +162,7 @@ public class ObjectDictionary {
      */
     public PowerlinkObject getObject(final long objectId) {
         for (PowerlinkObject obj : getObjectsList()) {
-            if (obj.getObjectId() == objectId) {
+            if (obj.getId() == objectId) {
                 return obj;
             }
         }
@@ -344,11 +344,11 @@ public class ObjectDictionary {
                         PowerlinkObject plkObj = new PowerlinkObject(node, obj);
                         objectsList.add(plkObj);
 
-                        if (plkObj.getObjectIndex().startsWith("0x14")
-                                || plkObj.getObjectIndex().startsWith("0x18")) {
+                        if (plkObj.getIdHex().startsWith("0x14")
+                                || plkObj.getIdHex().startsWith("0x18")) {
                             commParamObjList.add(plkObj);
-                        } else if (plkObj.getObjectIndex().startsWith("0x16")
-                                || plkObj.getObjectIndex().startsWith("0x1A")) {
+                        } else if (plkObj.getIdHex().startsWith("0x16")
+                                || plkObj.getIdHex().startsWith("0x1A")) {
                             mapParamObjList.add(plkObj);
                         }
 
@@ -370,7 +370,7 @@ public class ObjectDictionary {
                     PowerlinkObject commParam = commParamObjList.get(cnt);
                     PowerlinkObject mapParam = mapParamObjList.get(cnt);
 
-                    char mapParamId = mapParam.getObjectIndex().charAt(3);
+                    char mapParamId = mapParam.getIdHex().charAt(3);
 
                     if (mapParamId == '6') {
                         rpdoChannelsList.add(

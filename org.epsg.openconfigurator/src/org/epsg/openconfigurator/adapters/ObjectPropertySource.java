@@ -199,7 +199,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case OBJ_INDEX_ID:
-                    retObj = plkObject.getObjectIndex();
+                    retObj = plkObject.getIdHex();
                     break;
                 case OBJ_NAME_ID:
                     retObj = object.getName();
@@ -208,7 +208,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     retObj = String.valueOf(object.getObjectType());
                     break;
                 case OBJ_DATATYPE_ID:
-                    retObj = plkObject.getDataType();
+                    retObj = plkObject.getDataTypeReadable();
                     break;
                 case OBJ_LOW_LIMIT_ID:
                     retObj = object.getLowLimit();

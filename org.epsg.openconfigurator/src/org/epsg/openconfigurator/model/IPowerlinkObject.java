@@ -1,9 +1,9 @@
 /*******************************************************************************
- * @file   PdoTableContentProvider.java
+ * @file   IPowerlinkObject.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
- * @copyright (c) 2015, Kalycito Infotech Private Limited
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
  *                    All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,48 +29,17 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.epsg.openconfigurator.views.mapping;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.eclipse.jface.viewers.IStructuredContentProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.epsg.openconfigurator.model.PowerlinkObject;
-import org.epsg.openconfigurator.model.PowerlinkSubobject;
+package org.epsg.openconfigurator.model;
 
 /**
- * Content provider for the PDO table.
+ * Property values of POWERLINK object
  *
  * @author Ramakrishnan P
  *
  */
-/* Default */ class PdoTableContentProvider
-        implements IStructuredContentProvider {
-    @Override
-    public void dispose() {
-    }
-
-    @Override
-    public Object[] getElements(Object inputElement) {
-        if (inputElement instanceof PowerlinkObject) {
-            PowerlinkObject mappParamObj = (PowerlinkObject) inputElement;
-            List<PowerlinkSubobject> subObjList = mappParamObj.getSubObjects();
-
-            List<PowerlinkSubobject> commParamSubObjList = new ArrayList<>();
-            for (PowerlinkSubobject subObj : subObjList) {
-                if (subObj.getId() != 0) {
-                    commParamSubObjList.add(subObj);
-                }
-            }
-
-            return commParamSubObjList.toArray();
-        }
-
-        return new Object[0];
-    }
-
-    @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-    }
+public interface IPowerlinkObject extends IPowerlinkBaseObject {
+    /**
+     * @return ID of POWERLINK object.
+     */
+    public long getId();
 }

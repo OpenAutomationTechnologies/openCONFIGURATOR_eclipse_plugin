@@ -206,7 +206,7 @@ public class ObjectDictionaryView extends ViewPart {
             if (element instanceof PowerlinkObject) {
                 return ((PowerlinkObject) element).getNameWithId();
             } else if (element instanceof PowerlinkSubobject) {
-                return ((PowerlinkSubobject) element).getText();
+                return ((PowerlinkSubobject) element).getNameWithId();
             }
             return element == null ? "" : element.toString();//$NON-NLS-1$
         }
@@ -530,16 +530,16 @@ public class ObjectDictionaryView extends ViewPart {
                 if (element instanceof PowerlinkObject) {
                     PowerlinkObject obj = (PowerlinkObject) element;
                     if (!communicationProfileObjectsVisible) {
-                        if ((obj.getObjectId() >= IPowerlinkConstants.COMMUNICATION_PROFILE_START_INDEX)
-                                && (obj.getObjectId() < IPowerlinkConstants.MANUFACTURER_PROFILE_START_INDEX)) {
+                        if ((obj.getId() >= IPowerlinkConstants.COMMUNICATION_PROFILE_START_INDEX)
+                                && (obj.getId() < IPowerlinkConstants.MANUFACTURER_PROFILE_START_INDEX)) {
                             return false;
                         }
 
                     }
 
                     if (!standardisedDeviceProfileObjectsVisible) {
-                        if ((obj.getObjectId() >= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
-                                && (obj.getObjectId() <= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                        if ((obj.getId() >= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                && (obj.getId() <= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
                             return false;
                         }
                     }

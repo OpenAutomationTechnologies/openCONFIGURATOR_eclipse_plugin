@@ -671,7 +671,7 @@ public class Node {
                 } else {
                     System.err.println("PresTimeout sub-object "
                             + INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID
-                            + "/" + pollresponseSubObj.getSubobjectIdRaw()
+                            + "/" + pollresponseSubObj.getIdRaw()
                             + " has no value.");
                 }
 

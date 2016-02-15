@@ -758,9 +758,8 @@ public class MappingView extends ViewPart {
                         retValue = pdoChannel.getName();
                         break;
                     case 1:
-                        retValue = pdoChannel.getCommunicationParam()
-                                .getObjectIndex() + "/"
-                                + pdoChannel.getMappingParam().getObjectIndex();
+                        retValue = pdoChannel.getCommunicationParam().getIdHex()
+                                + "/" + pdoChannel.getMappingParam().getIdHex();
                         break;
                     case 2:
                         short targetNodeId = pdoChannel.getTargetNodeId();
@@ -963,7 +962,7 @@ public class MappingView extends ViewPart {
                 case 0: {
                     if (element instanceof PowerlinkSubobject) {
                         PowerlinkSubobject mappParamSubObj = (PowerlinkSubobject) element;
-                        return String.valueOf(mappParamSubObj.getSubobjecId());
+                        return String.valueOf(mappParamSubObj.getId());
                     }
                     break;
                 }

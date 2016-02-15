@@ -1241,12 +1241,12 @@ public class OpenConfiguratorLibraryUtils {
                 .println("ClearMappingObject: " + channel.getNode().getNodeId()
                         + " Direction:" + getDirection(channel.getPdoType())
                         + " ChannelNumber:" + channel.getChannelNumber()
-                        + " Position:" + mappingSubObject.getSubobjecId());
+                        + " Position:" + mappingSubObject.getId());
 
         return OpenConfiguratorCore.GetInstance().ClearMappingObject(
                 channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
                 getDirection(channel.getPdoType()), channel.getChannelNumber(),
-                mappingSubObject.getSubobjecId());
+                mappingSubObject.getId());
     }
 
     private static Result createNode(final Node node) {
@@ -1286,14 +1286,9 @@ public class OpenConfiguratorLibraryUtils {
      * @return The result from the library.
      */
     public static Result forceObject(PowerlinkObject plkObject, boolean force) {
-        String actualValue = plkObject.getActualValue();
-        if (actualValue == null) {
-            actualValue = "";
-        }
-
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
                 plkObject.getNetworkId(), plkObject.getNodeId(),
-                plkObject.getObjectId(), actualValue, force, false);
+                plkObject.getId(), plkObject.getActualValue(), force, false);
         return res;
     }
 
@@ -1313,7 +1308,7 @@ public class OpenConfiguratorLibraryUtils {
 
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
-                plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
+                plkSubObject.getObject().getId(), plkSubObject.getId(),
                 actualValue, force, false);
         return res;
     }
@@ -2002,16 +1997,15 @@ public class OpenConfiguratorLibraryUtils {
             PowerlinkObject objectToBeMapped) {
         System.out.println("mappObjectToChannel ->ChannelNumber:"
                 + channel.getChannelNumber() + channel.getPdoType() + " "
-                + mappingSubObject.getObjectIndex() + "/"
-                + mappingSubObject.getSubobjectIndex() + " --- "
-                + objectToBeMapped.getObjectIndex());
+                + mappingSubObject.getObject().getIdHex() + "/"
+                + mappingSubObject.getIdHex() + " --- "
+                + objectToBeMapped.getIdHex());
 
         return OpenConfiguratorCore.GetInstance().MapObjectToChannel(
                 channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
                 getDirection(channel.getPdoType()), channel.getChannelNumber(),
-                mappingSubObject.getSubobjecId(),
-                objectToBeMapped.getObjectId(), channel.getTargetNodeId(),
-                true);
+                mappingSubObject.getId(), objectToBeMapped.getId(),
+                channel.getTargetNodeId(), true);
     }
 
     /**
@@ -2029,18 +2023,17 @@ public class OpenConfiguratorLibraryUtils {
 
         System.out.println("MappSubObjectToChannel ->ChannelNumber:"
                 + channel.getChannelNumber() + channel.getPdoType() + " "
-                + mappingSubObject.getObjectIndex() + "/"
-                + mappingSubObject.getSubobjectIndex() + " --- "
-                + subObjectTobeMapped.getObjectIndex() + "/"
-                + subObjectTobeMapped.getSubobjectIndex());
+                + mappingSubObject.getObject().getIdHex() + "/"
+                + mappingSubObject.getIdHex() + " --- "
+                + subObjectTobeMapped.getObject().getIdHex() + "/"
+                + subObjectTobeMapped.getIdHex());
 
         return OpenConfiguratorCore.GetInstance().MapSubObjectToChannel(
                 channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
                 getDirection(channel.getPdoType()), channel.getChannelNumber(),
-                mappingSubObject.getSubobjecId(),
-                subObjectTobeMapped.getObjectId(),
-                subObjectTobeMapped.getSubobjecId(), channel.getTargetNodeId(),
-                true);
+                mappingSubObject.getId(),
+                subObjectTobeMapped.getObject().getId(),
+                subObjectTobeMapped.getId(), channel.getTargetNodeId(), true);
     }
 
     /**
@@ -2110,8 +2103,8 @@ public class OpenConfiguratorLibraryUtils {
             String actualValue) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
                 plkObject.getNetworkId(), plkObject.getNodeId(),
-                plkObject.getObjectId(), actualValue,
-                plkObject.isObjectForced(), false);
+                plkObject.getId(), actualValue, plkObject.isObjectForced(),
+                false);
         return res;
     }
 
@@ -2125,11 +2118,11 @@ public class OpenConfiguratorLibraryUtils {
     public static Result setSubObjectActualValue(
             PowerlinkSubobject plkSubObject, String actualValue) {
         System.out.println("Set SubObject ActualValue--- "
-                + plkSubObject.getObjectIdRaw() + "/"
-                + plkSubObject.getSubobjectIdRaw() + " Value:" + actualValue);
+                + plkSubObject.getObject().getIdHex() + "/"
+                + plkSubObject.getIdHex() + " Value:" + actualValue);
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
-                plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
+                plkSubObject.getObject().getId(), plkSubObject.getId(),
                 actualValue, plkSubObject.isObjectForced(), false);
 
         return res;
@@ -2180,16 +2173,17 @@ public class OpenConfiguratorLibraryUtils {
 
         for (org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj : forcedObjects
                 .getObject()) {
-
-            if (forcedObj.getSubindex() == null) {
+            byte[] forcedObjectId = forcedObj.getIndex();
+            byte[] forcedSubObjectId = forcedObj.getSubindex();
+            if (forcedSubObjectId == null) {
                 PowerlinkObject plkObj = node.getObjectDictionary()
-                        .getObject(forcedObj.getIndex());
+                        .getObject(forcedObjectId);
                 if (plkObj == null) {
                     OpenConfiguratorMessageConsole.getInstance()
                             .printErrorMessage(
                                     "Object ID 0x"
                                             + DatatypeConverter.printHexBinary(
-                                                    forcedObj.getIndex())
+                                                    forcedObjectId)
                                     + " is forced and is not available in the XDD/XDC file.",
                                     node.getProject().getName());
                     continue;
@@ -2199,8 +2193,7 @@ public class OpenConfiguratorLibraryUtils {
                         true);
             } else {
                 PowerlinkSubobject plkSubObj = node.getObjectDictionary()
-                        .getSubObject(forcedObj.getIndex(),
-                                forcedObj.getSubindex());
+                        .getSubObject(forcedObjectId, forcedSubObjectId);
 
                 if (plkSubObj == null) {
                     System.err.println(
@@ -2210,12 +2203,12 @@ public class OpenConfiguratorLibraryUtils {
                             .printErrorMessage(
                                     "Object ID 0x"
                                             + DatatypeConverter.printHexBinary(
-                                                    forcedObj.getIndex())
+                                                    forcedObjectId)
                                     + "/0x"
-                                    + DatatypeConverter.printHexBinary(
-                                            forcedObj.getSubindex())
+                                    + DatatypeConverter
+                                            .printHexBinary(forcedSubObjectId)
                                     + " is forced and is not available in the XDD/XDC file.",
-                                    node.getProject().getName());
+                                    node.getNetworkId());
 
                     continue;
                 }
@@ -2266,8 +2259,8 @@ public class OpenConfiguratorLibraryUtils {
             String actualValue) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
                 plkObject.getNetworkId(), plkObject.getNodeId(),
-                plkObject.getObjectId(), actualValue,
-                plkObject.isObjectForced(), true);
+                plkObject.getId(), actualValue, plkObject.isObjectForced(),
+                true);
         return res;
     }
 
@@ -2302,7 +2295,7 @@ public class OpenConfiguratorLibraryUtils {
             PowerlinkSubobject plkSubObject, String actualValue) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
-                plkSubObject.getObjectId(), plkSubObject.getSubobjecId(),
+                plkSubObject.getObject().getId(), plkSubObject.getId(),
                 actualValue, plkSubObject.isObjectForced(), true);
         return res;
     }

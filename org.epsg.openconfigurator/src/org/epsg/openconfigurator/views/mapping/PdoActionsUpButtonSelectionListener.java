@@ -87,8 +87,8 @@ import org.jdom2.JDOMException;
                         if (previousRowData != null) {
                             Result res = OpenConfiguratorLibraryUtils
                                     .moveMappingObject(pdoChannel,
-                                            currentRowData.getSubobjecId(),
-                                            previousRowData.getSubobjecId());
+                                            currentRowData.getId(),
+                                            previousRowData.getId());
                             if (!res.IsSuccessful()) {
                                 System.err.println(
                                         "moveMappingObject to the previous position Error:"

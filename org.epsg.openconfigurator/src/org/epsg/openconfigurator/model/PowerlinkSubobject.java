@@ -52,7 +52,8 @@ import org.jdom2.JDOMException;
  * @author Ramakrishnan P
  *
  */
-public class PowerlinkSubobject extends AbstractPowerlinkObject {
+public class PowerlinkSubobject extends AbstractPowerlinkObject
+        implements IPowerlinkSubObject {
 
     /**
      * Object associated with the sub-object.
@@ -72,17 +73,17 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * SubObject ID in hex without 0x.
      */
-    private final String subobjectIdRaw; // SubObject ID without 0x prefix
+    private final String idRaw; // SubObject ID without 0x prefix
 
     /**
      * SubObject ID.
      */
-    private final short subobjectIdShort;
+    private final short idShort;
 
     /**
      * SubObject ID in hex with 0x.
      */
-    private final String subobjectId;
+    private final String idHex;
 
     /**
      * XPath to find this SubObject in the XDC.
@@ -97,7 +98,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * Datatype in the human readable format.
      */
-    private final String dataType;
+    private final String dataTypeReadable;
 
     /**
      * Flag to indicate that this object is TPDO mappable or not.
@@ -108,6 +109,22 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      * Flag to indicate that this object is RPDO mappable or not.
      */
     private boolean isRpdoMappable = false;
+
+    /**
+     * Error message string to identify configuration error of POWERLINK
+     * sub-object.
+     */
+    private String configurationError;
+
+    /**
+     * POWERLINK sub-object capable of mapping with PDO channels
+     */
+    private TObjectPDOMapping pdoMapping;
+
+    /**
+     * Access type of POWERLINK sub-object from XDC model.
+     */
+    private TObjectAccessType accessType;
 
     /**
      * Constructs a POWERLINK SubObject.
@@ -127,22 +144,20 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
         this.object = object;
         this.subObject = subObject;
 
-        subobjectIdRaw = DatatypeConverter
-                .printHexBinary(this.subObject.getSubIndex());
-        subobjectIdShort = Short.parseShort(subobjectIdRaw, 16);
-        subobjectId = "0x" + subobjectIdRaw;
-        readableName = (this.subObject.getName() + " (" + subobjectId + ")");
-        xpath = object.getXpath() + "/plk:SubObject[@subIndex='"
-                + subobjectIdRaw + "']";
+        idRaw = DatatypeConverter.printHexBinary(this.subObject.getSubIndex());
+        idShort = Short.parseShort(idRaw, 16);
+        idHex = "0x" + idRaw;
+        readableName = (this.subObject.getName() + " (" + idHex + ")");
+        xpath = object.getXpath() + "/plk:SubObject[@subIndex='" + idRaw + "']";
         if (this.subObject.getDataType() != null) {
-            dataType = ObjectDatatype.getDatatypeName(
+            dataTypeReadable = ObjectDatatype.getDatatypeName(
                     DatatypeConverter.printHexBinary(getModel().getDataType()));
         } else {
-            dataType = "";
+            dataTypeReadable = StringUtils.EMPTY;
         }
 
-        TObjectPDOMapping pdoMapping = subObject.getPDOmapping();
-        TObjectAccessType accessType = subObject.getAccessType();
+        pdoMapping = subObject.getPDOmapping();
+        accessType = subObject.getAccessType();
         if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.RPDO))) {
@@ -205,14 +220,16 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * @return Access type of sub-object.
      */
+    @Override
     public TObjectAccessType getAccessType() {
-        return subObject.getAccessType();
+        return accessType;
     }
 
     /**
      * @return The actual value or default value if actual value is not
      *         available.
      */
+    @Override
     public String getActualDefaultValue() {
         String actualValue = subObject.getActualValue();
         if ((actualValue != null) && !actualValue.isEmpty()) {
@@ -230,6 +247,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * @return Actual value of sub object.
      */
+    @Override
     public String getActualValue() {
         String actualValue = subObject.getActualValue();
         if (actualValue == null) {
@@ -239,15 +257,26 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Returns error message string to identify configuration error of POWERLINK
+     * sub-object
+     */
+    @Override
+    public String getConfigurationError() {
+        return configurationError;
+    }
+
+    /**
      * @return data type of sub-object.
      */
-    public String getDatatype() {
-        return dataType;
+    @Override
+    public String getDataTypeReadable() {
+        return dataTypeReadable;
     }
 
     /**
      * @return Default value of sub object.
      */
+    @Override
     public String getDefaultValue() {
         String defaultValue = subObject.getDefaultValue();
         if (defaultValue == null) {
@@ -257,15 +286,93 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Returns maximum value range of POWERLINK sub-object
+     */
+    @Override
+    public String getHighLimit() {
+        String highLimit = subObject.getHighLimit();
+        if (highLimit == null) {
+            highLimit = StringUtils.EMPTY;
+        }
+        return highLimit;
+    }
+
+    /**
+     * Returns ID of POWERLINK sub-object
+     */
+    @Override
+    public short getId() {
+        return idShort;
+    }
+
+    /**
+     * Returns ID of POWERLINK sub-object in hexadecimal format.
+     */
+    @Override
+    public String getIdHex() {
+        return idHex;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getIdRaw()
+     */
+    @Override
+    public String getIdRaw() {
+        return idRaw;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getLowLimit()
+     */
+    @Override
+    public String getLowLimit() {
+        String lowLimit = subObject.getLowLimit();
+        if (lowLimit == null) {
+            lowLimit = StringUtils.EMPTY;
+        }
+        return lowLimit;
+    }
+
+    /**
      * @return Model of sub object.
      */
+    @Override
     public TObject.SubObject getModel() {
         return subObject;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getName()
+     */
+    @Override
+    public String getName() {
+        String name = subObject.getName();
+        if (name == null) {
+            name = StringUtils.EMPTY;
+        }
+        return name;
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getNameWithId()
+     */
+    @Override
+    public String getNameWithId() {
+        return readableName;
     }
 
     /**
      * @return Network id of node.
      */
+    @Override
     public String getNetworkId() {
         return nodeInstance.getNetworkId();
     }
@@ -273,6 +380,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * @return Instance of node.
      */
+    @Override
     public Node getNode() {
         return nodeInstance;
     }
@@ -280,6 +388,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * @return Id of the node.
      */
+    @Override
     public short getNodeId() {
         return nodeInstance.getNodeId();
     }
@@ -294,41 +403,33 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     /**
      * @return Object
      */
+    @Override
     public PowerlinkObject getObject() {
         return object;
     }
 
-    /**
-     * @return Id of the object.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getObjectType()
      */
-    public long getObjectId() {
-        return object.getObjectId();
-    }
-
-    /**
-     * @return Id of the object without hexadecimal notation (0x).
-     */
-    public String getObjectIdRaw() {
-        return object.getObjectIdRaw();
-    }
-
-    /**
-     * @return Index of the object.
-     */
-    public String getObjectIndex() {
-        return object.getObjectIndex();
+    @Override
+    public short getObjectType() {
+        return subObject.getObjectType();
     }
 
     /**
      * @return PDO mapping of sub object.
      */
+    @Override
     public TObjectPDOMapping getPdoMapping() {
-        return subObject.getPDOmapping();
+        return pdoMapping;
     }
 
     /**
      * @return Instance of project.
      */
+    @Override
     public IProject getProject() {
         return project;
     }
@@ -339,8 +440,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
     public long getSize() {
         long size[] = new long[2];
         Result res = OpenConfiguratorCore.GetInstance().GetObjectSize(
-                nodeInstance.getNetworkId(), nodeInstance.getNodeId(),
-                object.getObjectId(), size);
+                getNetworkId(), getNodeId(), object.getId(), size);
         if (!res.IsSuccessful()) {
             System.err.println("Error getting the Size "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
@@ -351,32 +451,15 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
         return 0;
     }
 
-    /**
-     * @return Id of sub-object.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.epsg.openconfigurator.model.IPowerlinkBaseObject#getUniqueIDRef()
      */
-    public short getSubobjecId() {
-        return subobjectIdShort;
-    }
-
-    /**
-     * @return Readable ID of sub-object.
-     */
-    public String getSubobjectIdRaw() {
-        return subobjectIdRaw;
-    }
-
-    /**
-     * @return Index of sub object.
-     */
-    public String getSubobjectIndex() {
-        return subobjectId;
-    }
-
-    /**
-     * @return Readable name of sub object.
-     */
-    public String getText() {
-        return readableName;
+    @Override
+    public Object getUniqueIDRef() {
+        return subObject.getUniqueIDRef();
     }
 
     /**
@@ -384,13 +467,14 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      *         id and sub-object name and id.
      */
     public String getUniqueName() {
-        return object.getModel().getName() + "_" + subObject.getName() + "("
-                + object.getObjectIndex() + "/" + subobjectId + ")";
+        return object.getName() + "_" + getName() + "(" + object.getIdHex()
+                + "/" + getIdHex() + ")";
     }
 
     /**
      * @return Xpath.
      */
+    @Override
     public String getXpath() {
         return xpath;
     }
@@ -401,6 +485,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      * @return <code>True</code> if object is forced. <code>False</code> if
      *         object is not forced
      */
+    @Override
     public boolean isObjectForced() {
         return nodeInstance.isObjectIdForced(object.getModel().getIndex(),
                 subObject.getSubIndex());
@@ -410,6 +495,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      * @return <code>True</code> if object is RPDO mappable. <code>False</code>
      *         if object is not.
      */
+    @Override
     public boolean isRpdoMappable() {
         return isRpdoMappable;
     }
@@ -418,6 +504,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      * @return <code>True</code> if object is TPDO mappable. <code>False</code>
      *         if object is not.
      */
+    @Override
     public boolean isTpdoMappable() {
         return isTpdoMappable;
     }
@@ -430,6 +517,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
+    @Override
     public void setActualValue(final String actualValue, boolean writeToXdc)
             throws JDOMException, IOException {
 
@@ -449,5 +537,17 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject {
             OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(
                     getNode(), this, actualValue);
         }
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.epsg.openconfigurator.model.IPowerlinkBaseObject#setError(java.lang.
+     * String)
+     */
+    @Override
+    public void setError(String errorMessage) {
+        configurationError = errorMessage;
     }
 }

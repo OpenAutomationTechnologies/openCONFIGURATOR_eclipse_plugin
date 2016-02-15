@@ -246,11 +246,11 @@ public class ProjectJDomOperation {
             PowerlinkObject object, PowerlinkSubobject subObject) {
 
         if (subObject != null) {
-            System.out.println("Force object actual value:"
-                    + object.getObjectIdRaw() + subObject.getSubobjectIdRaw());
+            System.out.println("Force object actual value:" + object.getIdRaw()
+                    + subObject.getIdRaw());
         } else {
-            System.out.println(
-                    "Force object actual value:" + object.getObjectIdRaw());
+            System.out
+                    .println("Force object actual value:" + object.getIdRaw());
         }
 
         if (isObjectAlreadyForced(document, node, object, subObject)) {
@@ -265,13 +265,13 @@ public class ProjectJDomOperation {
                     IAbstractNodeProperties.NODE_OBJECTS_OBJECT);
             Attribute objAttr = new Attribute(
                     IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT,
-                    object.getObjectIdRaw());
+                    object.getIdRaw());
             newObjElement.setAttribute(objAttr);
 
             if (subObject != null) {
                 Attribute subObjAttr = new Attribute(
                         IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT,
-                        subObject.getSubobjectIdRaw());
+                        subObject.getIdRaw());
                 newObjElement.setAttribute(subObjAttr);
             }
 
@@ -283,13 +283,13 @@ public class ProjectJDomOperation {
                     IAbstractNodeProperties.NODE_OBJECTS_OBJECT);
             Attribute objAttr = new Attribute(
                     IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT,
-                    object.getObjectIdRaw());
+                    object.getIdRaw());
             newObjElement.setAttribute(objAttr);
 
             if (subObject != null) {
                 Attribute subObjAttr = new Attribute(
                         IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT,
-                        subObject.getSubobjectIdRaw());
+                        subObject.getIdRaw());
                 newObjElement.setAttribute(subObjAttr);
             }
 
@@ -318,10 +318,10 @@ public class ProjectJDomOperation {
                 + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT + "/oc:"
                 + IAbstractNodeProperties.NODE_OBJECTS_OBJECT + "[@"
                 + IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT + "='"
-                + object.getObjectIdRaw() + "']";
+                + object.getIdRaw() + "']";
         if (subObject != null) {
             xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT
-                    + "='" + subObject.getSubobjectIdRaw() + "']";
+                    + "='" + subObject.getIdRaw() + "']";
         }
 
         return JDomUtil.isXpathPresent(document, xpath,
@@ -341,20 +341,20 @@ public class ProjectJDomOperation {
 
         if (subObject != null) {
             System.out.println("removeForcedObject actual value:"
-                    + object.getObjectIdRaw() + subObject.getSubobjectIdRaw());
+                    + object.getIdRaw() + subObject.getIdRaw());
         } else {
-            System.out.println("removeForcedObject actual value:"
-                    + object.getObjectIdRaw());
+            System.out.println(
+                    "removeForcedObject actual value:" + object.getIdRaw());
         }
 
         String xpath = node.getXpath() + "/oc:"
                 + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT + "/oc:"
                 + IAbstractNodeProperties.NODE_OBJECTS_OBJECT + "[@"
                 + IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT + "='"
-                + object.getObjectIdRaw() + "']";
+                + object.getIdRaw() + "']";
         if (subObject != null) {
             xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT
-                    + "='" + subObject.getSubobjectIdRaw() + "']";
+                    + "='" + subObject.getIdRaw() + "']";
         }
 
         JDomUtil.removeElement(document, xpath, OPENCONFIGURATOR_NAMESPACE);

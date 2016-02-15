@@ -51,7 +51,8 @@ import org.jdom2.JDOMException;
  * @author Ramakrishnan P
  *
  */
-public class PowerlinkObject extends AbstractPowerlinkObject {
+public class PowerlinkObject extends AbstractPowerlinkObject
+        implements IPowerlinkObject {
 
     /**
      * Object model from the XDC.
@@ -101,7 +102,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * Datatype in the human readable format.
      */
-    private final String dataType;
+    private final String dataTypeReadable;
 
     /**
      * Flag to indicate that this object is TPDO mappable or not.
@@ -112,6 +113,21 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      * Flag to indicate that this object is RPDO mappable or not.
      */
     private boolean isRpdoMappable = false;
+
+    /**
+     * Error message string to identify configuration error of POWERLINK object
+     */
+    private String configurationError;
+
+    /**
+     * POWERLINK object capable of mapping with PDO channels
+     */
+    private TObjectPDOMapping pdoMapping;
+
+    /**
+     * Access type of POWERLINK object from XDC model.
+     */
+    private TObjectAccessType accessType;
 
     /**
      * Constructs a POWERLINK object.
@@ -134,10 +150,10 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
         objectId = "0x" + objectIdRaw;
         xpath = "//plk:Object[@index='" + objectIdRaw + "']";
         if (this.object.getDataType() != null) {
-            dataType = ObjectDatatype.getDatatypeName(DatatypeConverter
+            dataTypeReadable = ObjectDatatype.getDatatypeName(DatatypeConverter
                     .printHexBinary(this.object.getDataType()));
         } else {
-            dataType = "";
+            dataTypeReadable = StringUtils.EMPTY;
         }
 
         // Calculate the subobjects available in this object.
@@ -153,8 +169,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
             }
         }
 
-        TObjectPDOMapping pdoMapping = object.getPDOmapping();
-        TObjectAccessType accessType = object.getAccessType();
+        pdoMapping = object.getPDOmapping();
+        accessType = object.getAccessType();
         if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.RPDO))) {
@@ -212,8 +228,17 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Access type of POWERLINK object from XDC model.
+     */
+    @Override
+    public TObjectAccessType getAccessType() {
+        return accessType;
+    }
+
+    /**
      * @return Actual or Default value of the object
      */
+    @Override
     public String getActualDefaultValue() {
         String actualValue = object.getActualValue();
         if ((actualValue != null) && !actualValue.isEmpty()) {
@@ -231,6 +256,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return Actual value of the object
      */
+    @Override
     public String getActualValue() {
         String actualValue = object.getActualValue();
         if (actualValue == null) {
@@ -240,15 +266,26 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Returns error message string to identify configuration error of POWERLINK
+     * object
+     */
+    @Override
+    public String getConfigurationError() {
+        return configurationError;
+    }
+
+    /**
      * @return Data type of the object
      */
-    public String getDataType() {
-        return dataType;
+    @Override
+    public String getDataTypeReadable() {
+        return dataTypeReadable;
     }
 
     /**
      * @return Default value of the object
      */
+    @Override
     public String getDefaultValue() {
         String defaultValue = object.getDefaultValue();
         if (defaultValue == null) {
@@ -260,6 +297,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return High limit value of object.
      */
+    @Override
     public String getHighLimit() {
         String highLimit = object.getHighLimit();
         if (highLimit == null) {
@@ -269,8 +307,33 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Returns the ID of POWERLINK object.
+     */
+    @Override
+    public long getId() {
+        return objectIdL;
+    }
+
+    /**
+     * Returns POWERLINK object ID in hexa decimal format
+     */
+    @Override
+    public String getIdHex() {
+        return objectId;
+    }
+
+    /**
+     * Returns POWERLINK object ID without 0x.
+     */
+    @Override
+    public String getIdRaw() {
+        return objectIdRaw;
+    }
+
+    /**
      * @return Low limit value of object
      */
+    @Override
     public String getLowLimit() {
         String lowLimit = object.getLowLimit();
         if (lowLimit == null) {
@@ -282,6 +345,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return Instance of Object from the object model.
      */
+    @Override
     public TObject getModel() {
         return object;
     }
@@ -289,6 +353,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return Name of the object from the object model.
      */
+    @Override
     public String getName() {
         String objectName = object.getName();
         if (objectName == null) {
@@ -300,6 +365,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return Name with its ID of object.
      */
+    @Override
     public String getNameWithId() {
         return (getName() + " (" + objectId + ")");
     }
@@ -307,6 +373,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return name of the project.
      */
+    @Override
     public String getNetworkId() {
         return project.getName();
     }
@@ -314,6 +381,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return Instance of node from the node model.
      */
+    @Override
     public Node getNode() {
         return nodeInstance;
     }
@@ -321,6 +389,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     /**
      * @return Id of the node from the node model.
      */
+    @Override
     public short getNodeId() {
         return nodeInstance.getNodeId();
     }
@@ -333,36 +402,25 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
-     * @return Object ID of the given object.
-     */
-    public long getObjectId() {
-        return objectIdL;
-    }
-
-    /**
-     * @return Short Object ID of the given object.
-     */
-    public String getObjectIdRaw() {
-        return objectIdRaw;
-    }
-
-    /**
-     * @return Index of the given object.
-     */
-    public String getObjectIndex() {
-        return objectId;
-    }
-
-    /**
      * @return DataType of the given object.
      */
+    @Override
     public short getObjectType() {
         return object.getObjectType();
     }
 
     /**
+     * Returns Mapping object from the XDC model
+     */
+    @Override
+    public TObjectPDOMapping getPdoMapping() {
+        return pdoMapping;
+    }
+
+    /**
      * @return Instance of project.
      */
+    @Override
     public IProject getProject() {
         return project;
     }
@@ -404,8 +462,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      * @return The subObject instance.
      */
     public PowerlinkSubobject getSubObject(short subObjectId) {
-        for (PowerlinkSubobject subObj : subObjectsList) {
-            if (subObj.getSubobjecId() == subObjectId) {
+        for (PowerlinkSubobject subObj : getSubObjects()) {
+            if (subObj.getId() == subObjectId) {
                 return subObj;
             }
         }
@@ -427,8 +485,18 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
     }
 
     /**
+     * Returns value of Unique Id reference from the POWERLINK object attribute
+     * in XDC.
+     */
+    @Override
+    public Object getUniqueIDRef() {
+        return object.getUniqueIDRef();
+    }
+
+    /**
      * @return The XPath to find this object in the XDC.
      */
+    @Override
     public String getXpath() {
         return xpath;
     }
@@ -459,6 +527,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      * @return <code>true</code> if object is forced. <code>false</code> if
      *         object is not forced
      */
+    @Override
     public boolean isObjectForced() {
         return nodeInstance.isObjectIdForced(object.getIndex(), null);
     }
@@ -467,6 +536,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      * @return <code>true</code> if object is RPDO mappable. <code>false</code>
      *         if object is not.
      */
+    @Override
     public boolean isRpdoMappable() {
         return isRpdoMappable;
     }
@@ -475,6 +545,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      * @return <code>true</code> if object is TPDO mappable. <code>false</code>
      *         if object is not.
      */
+    @Override
     public boolean isTpdoMappable() {
         return isTpdoMappable;
     }
@@ -487,6 +558,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
+    @Override
     public void setActualValue(final String actualValue, boolean writeToXdc)
             throws JDOMException, IOException {
 
@@ -506,4 +578,14 @@ public class PowerlinkObject extends AbstractPowerlinkObject {
                     getNode(), this, actualValue);
         }
     }
+
+    /**
+     * Updates the given message string as a POWERLINK object configuration
+     * error.
+     */
+    @Override
+    public void setError(final String errorMessage) {
+        configurationError = errorMessage;
+    }
+
 }

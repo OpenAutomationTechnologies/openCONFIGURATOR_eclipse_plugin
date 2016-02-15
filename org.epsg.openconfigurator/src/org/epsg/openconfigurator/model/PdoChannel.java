@@ -85,12 +85,11 @@ public class PdoChannel {
         this.pdoType = pdoType;
         this.communicationParam = communicationParam;
         this.mappingParam = mappingParam;
-        channelNumber = Integer.decode("0x"
-                + this.communicationParam.getObjectIdRaw().substring(2, 4));
+        channelNumber = Integer.decode(
+                "0x" + this.communicationParam.getIdRaw().substring(2, 4));
 
         name = this.pdoType.toString() + "#" + getChannelNumber();
-        nameWithObjectId = name + " " + "(" + mappingParam.getObjectIndex()
-                + ")";
+        nameWithObjectId = name + " " + "(" + mappingParam.getIdHex() + ")";
     }
 
     /**
@@ -176,7 +175,7 @@ public class PdoChannel {
     public PowerlinkSubobject getNextSubObject(
             PowerlinkSubobject currentSubObject) {
 
-        int nextrowindex = (currentSubObject.getSubobjecId() + 1);
+        int nextrowindex = (currentSubObject.getId() + 1);
 
         return currentSubObject.getObject().getSubObject((short) nextrowindex);
     }
@@ -206,7 +205,7 @@ public class PdoChannel {
     public PowerlinkSubobject getPreviousSubObject(
             PowerlinkSubobject currentSubObject) {
 
-        short previousrowindex = (short) (currentSubObject.getSubobjecId() - 1);
+        short previousrowindex = (short) (currentSubObject.getId() - 1);
 
         return currentSubObject.getObject().getSubObject(previousrowindex);
     }
@@ -234,7 +233,7 @@ public class PdoChannel {
             }
         } else {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                    "Subobject " + communicationParam.getObjectIndex()
+                    "Subobject " + communicationParam.getIdHex()
                             + "/0x01 not found.",
                     getNode().getProject().getName());
         }
