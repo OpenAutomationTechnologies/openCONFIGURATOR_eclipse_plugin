@@ -65,8 +65,11 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.NetworkManagement;
+import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
+import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
@@ -74,6 +77,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
 import org.xml.sax.SAXException;
 
 public class ValidateXddWizardPage extends WizardPage {
@@ -94,6 +98,11 @@ public class ValidateXddWizardPage extends WizardPage {
     private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
     private static final String ERROR_CHOOSE_VALID_PATH_MESSAGE = "XDD/XDC file does not exist in the path: ";
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
+    private static final String ERROR_INVALID_MN_FILE_MESSAGE = "The imported XDD/XDC is not a valid MN XDD/XDC. \nChoose a valid MN XDD/XDC file.";
+    private static final String ERROR_INVALID_CN_FILE_MESSAGE = "The imported XDD/XDC is not a valid CN XDD/XDC. \nChoose a valid CN XDD/XDC file.";
+    private static final String ERROR_INVALID_XDD_XDC_FILE_RMN_MESSAGE = "The imported XDD/XDC cannot function as an Redundant Managing Node!";
+    private static final String ERROR_INVALID_XDD_XDC_FILE_MN_MESSAGE = "The imported XDD/XDC cannot function as an MN!";
+    private static final String INTERNAL_ERROR_MESSAGE = "Internal error!";
 
     /**
      * Control to display the node configuration path.
@@ -441,23 +450,6 @@ public class ValidateXddWizardPage extends WizardPage {
         PowerlinkRootNode rootNode = getNodeList();
         String mnXdcPath = rootNode.getMN().getAbsolutePathToXdc();
         return mnXdcPath;
-    }
-
-    /**
-     * Node model values of previous wizard page.
-     *
-     * @return node model of previous page.
-     */
-    public Object getnode() {
-        IWizardPage previousPage = getPreviousPage();
-        if (previousPage instanceof AddControlledNodeWizardPage) {
-            AddControlledNodeWizardPage adCnPage = (AddControlledNodeWizardPage) previousPage;
-            return adCnPage.getNode();
-        } else if (previousPage instanceof AddDefaultMasterNodeWizardPage) {
-            AddDefaultMasterNodeWizardPage adMnPage = (AddDefaultMasterNodeWizardPage) previousPage;
-            return adMnPage.getNode();
-        }
-        return null;
     }
 
     /**
