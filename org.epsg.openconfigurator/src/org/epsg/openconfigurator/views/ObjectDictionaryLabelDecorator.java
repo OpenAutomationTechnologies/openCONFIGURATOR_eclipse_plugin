@@ -82,7 +82,15 @@ public class ObjectDictionaryLabelDecorator
                     }
                 }
             }
-            return;
+
+            // Error overlay image if object configuration is invalid in
+            // the XDC file.
+            if (!obj.getConfigurationError().isEmpty()) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.ERROR_OVERLAY_NODE_ICON),
+                        IDecoration.BOTTOM_LEFT);
+            }
         } else if (element instanceof PowerlinkSubobject) {
             PowerlinkSubobject subObj = (PowerlinkSubobject) element;
 
@@ -110,19 +118,46 @@ public class ObjectDictionaryLabelDecorator
                     }
                 }
             }
-            return;
+
+            // Error overlay image if sub-object configuration is invalid in
+            // the XDC file.
+            if (!subObj.getConfigurationError().isEmpty()) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.ERROR_OVERLAY_NODE_ICON),
+                        IDecoration.BOTTOM_LEFT);
+            }
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.jface.viewers.IBaseLabelProvider#dispose()
+     */
     @Override
     public void dispose() {
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.jface.viewers.IBaseLabelProvider#isLabelProperty(java.lang.
+     * Object, java.lang.String)
+     */
     @Override
     public boolean isLabelProperty(Object element, String property) {
         return true;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.jface.viewers.IBaseLabelProvider#removeListener(org.eclipse.
+     * jface.viewers.ILabelProviderListener)
+     */
     @Override
     public void removeListener(ILabelProviderListener listener) {
         // Do nothing

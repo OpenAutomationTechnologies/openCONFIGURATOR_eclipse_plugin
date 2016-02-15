@@ -271,7 +271,11 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public String getConfigurationError() {
-        return configurationError;
+        String cfgError = configurationError;
+        if (cfgError == null) {
+            cfgError = StringUtils.EMPTY;
+        }
+        return cfgError;
     }
 
     /**

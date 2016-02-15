@@ -262,7 +262,11 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getConfigurationError() {
-        return configurationError;
+        String cfgError = configurationError;
+        if (cfgError == null) {
+            cfgError = StringUtils.EMPTY;
+        }
+        return cfgError;
     }
 
     /**
@@ -315,7 +319,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getIdRaw()
      */
     @Override
@@ -325,7 +329,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getLowLimit()
      */
     @Override
@@ -347,7 +351,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getName()
      */
     @Override
@@ -361,7 +365,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getNameWithId()
      */
     @Override
@@ -410,7 +414,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getObjectType()
      */
     @Override
@@ -453,7 +457,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.epsg.openconfigurator.model.IPowerlinkBaseObject#getUniqueIDRef()
      */
@@ -541,7 +545,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.epsg.openconfigurator.model.IPowerlinkBaseObject#setError(java.lang.
      * String)

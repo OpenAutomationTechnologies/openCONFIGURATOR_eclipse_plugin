@@ -59,6 +59,7 @@ public class AbstractObjectPropertySource {
     public static final String OBJ_PDO_MAPPING_ID = "Obj.PDOmapping"; //$NON-NLS-1$
     public static final String OBJ_OBJFLAGS_ID = "Obj.objFlags"; //$NON-NLS-1$
     public static final String OBJ_UNIQUEIDREF_ID = "Obj.uniqueIDRef"; //$NON-NLS-1$
+    public static final String OBJ_ERROR_ID = "Obj.error"; //$NON-NLS-1$
 
     // Common labels
     private static final String OBJ_INDEX_LABEL = "Object ID"; //$NON-NLS-1$
@@ -109,4 +110,7 @@ public class AbstractObjectPropertySource {
             OBJ_OBJFLAGS_ID, OBJ_OBJFLAGS_LABEL);
     protected PropertyDescriptor uniqueIDRefDescriptor = new PropertyDescriptor(
             OBJ_UNIQUEIDREF_ID, OBJ_UNIQUEIDREF_LABEL);
+
+    protected PropertyDescriptor objectErrorDescriptor = new PropertyDescriptor(
+            OBJ_ERROR_ID, "Error");
 }

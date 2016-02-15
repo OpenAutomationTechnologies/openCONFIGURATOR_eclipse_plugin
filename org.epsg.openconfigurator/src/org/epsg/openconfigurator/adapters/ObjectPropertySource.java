@@ -129,6 +129,11 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
         uniqueIDRefDescriptor
                 .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+
+        objectErrorDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        objectErrorDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
     }
 
     private void addObjectPropertyDescriptors(
@@ -171,11 +176,17 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         if (object.getPDOmapping() != null) {
             propertyList.add(pdoMappingDescriptor);
         }
+
         if (object.getObjFlags() != null) {
             propertyList.add(objFlagsDescriptor);
         }
+
         if (object.getUniqueIDRef() != null) {
             propertyList.add(uniqueIDRefDescriptor);
+        }
+
+        if (!plkObject.getConfigurationError().isEmpty()) {
+            propertyList.add(objectErrorDescriptor);
         }
     }
 
@@ -253,6 +264,9 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     } else {
                         retObj = StringUtils.EMPTY;
                     }
+                    break;
+                case OBJ_ERROR_ID:
+                    retObj = plkObject.getConfigurationError();
                     break;
                 default:
                     break;
