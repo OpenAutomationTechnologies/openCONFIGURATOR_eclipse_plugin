@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -47,6 +48,7 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject.SubObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 
 /**
  * Describes the properties for a POWERLINK sub-object.
@@ -214,33 +216,29 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     retObj = plkSubObject.getIdHex();
                     break;
                 case OBJ_NAME_ID:
-                    retObj = subObject.getName();
+                    retObj = plkSubObject.getName();
                     break;
                 case OBJ_TYPE_ID:
-                    retObj = String.valueOf(subObject.getObjectType());
+                    retObj = String.valueOf(plkSubObject.getObjectType());
                     break;
                 case OBJ_DATATYPE_ID:
                     retObj = plkSubObject.getDataTypeReadable();
                     break;
                 case OBJ_LOW_LIMIT_ID:
-                    retObj = subObject.getLowLimit();
+                    retObj = plkSubObject.getLowLimit();
                     break;
                 case OBJ_HIGH_LIMIT_ID:
-                    retObj = subObject.getHighLimit();
+                    retObj = plkSubObject.getHighLimit();
                     break;
                 case OBJ_ACCESS_TYPE_ID:
-                    retObj = subObject.getAccessType().value();
+                    retObj = plkSubObject.getAccessType().value();
                     break;
                 case OBJ_DEFAULT_VALUE_ID:
-                    retObj = subObject.getDefaultValue();
+                    retObj = plkSubObject.getDefaultValue();
                     break;
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
-                    if (plkSubObject.getActualValue() != null) {
-                        retObj = plkSubObject.getActualValue();
-                    } else {
-                        retObj = new String();
-                    }
+                    retObj = plkSubObject.getActualValue();
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:
 
@@ -251,13 +249,21 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     retObj = subObject.getDenotation();
                     break;
                 case OBJ_PDO_MAPPING_ID:
-                    retObj = subObject.getPDOmapping().value();
+                    retObj = plkSubObject.getPdoMapping().value();
                     break;
                 case OBJ_OBJFLAGS_ID:
                     retObj = subObject.getObjFlags();
                     break;
                 case OBJ_UNIQUEIDREF_ID:
-                    retObj = subObject.getUniqueIDRef();
+                    // Get value of unique Id reference value from the POWERLINK
+                    // sub-object model.
+                    Object uniqueIdRef = plkSubObject.getUniqueIDRef();
+                    if (uniqueIdRef instanceof TParameterList.Parameter) {
+                        TParameterList.Parameter param = (TParameterList.Parameter) uniqueIdRef;
+                        retObj = param.getUniqueID();
+                    } else {
+                        retObj = StringUtils.EMPTY;
+                    }
                     break;
                 default:
                     break;
