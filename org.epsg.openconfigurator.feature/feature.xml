@@ -52,8 +52,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       <import plugin="org.eclipse.ui.ide"/>
       <import plugin="org.eclipse.ui.views"/>
       <import plugin="org.eclipse.ui.forms"/>
-      <import plugin="org.apache.commons.io"/>
-      <import plugin="org.apache.commons.lang"/>
       <import plugin="org.eclipse.ui.intro"/>
    </requires>
 
