@@ -35,7 +35,7 @@ IMPROVEMENTS IN 2.6
     * [LANG-596] - StrSubstitutor: add a replace(String, Properties) variant
     * [LANG-482] - StrSubstitutor: support substitution in variable names
     * [LANG-669] - Use StrBuilder instead of StringBuffer to improve performance where sync. is not an issue
-    
+
 BUG FIXES IN 2.6
 ================
 

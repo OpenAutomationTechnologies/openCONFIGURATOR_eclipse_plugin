@@ -183,7 +183,7 @@ public interface IPowerlinkBaseObject {
     /**
      * Updates the error flag based on error identified from configuration of
      * POWERLINK object
-     * 
+     *
      * @param errorMessage Message description of error
      */
     public void setError(final String errorMessage);
