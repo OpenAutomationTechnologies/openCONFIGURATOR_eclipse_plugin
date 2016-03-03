@@ -152,7 +152,7 @@ public class OpenConfiguratorLibraryUtils {
 
                         long varDeclSize = 0;
                         if (varDecl.getSize() != null) {
-                            varDeclSize = Long.parseLong(varDecl.getSize());
+                            varDeclSize = varDecl.getSize().longValue();
                         }
 
                         String varDeclName = StringUtils.EMPTY;
@@ -194,8 +194,8 @@ public class OpenConfiguratorLibraryUtils {
 
                 libApiRes = core.CreateArrayDatatype(networkId, nodeId,
                         arrayDt.getUniqueID(), arrayDt.getName(),
-                        subRange.getLowerLimit(), subRange.getUpperLimit(),
-                        iecDataType);
+                        subRange.getLowerLimit().longValue(),
+                        subRange.getUpperLimit().longValue(), iecDataType);
                 if (!libApiRes.IsSuccessful()) {
                     System.err.println("CreateArrayDatatype WARN: "
                             + getErrorMessage(libApiRes));
