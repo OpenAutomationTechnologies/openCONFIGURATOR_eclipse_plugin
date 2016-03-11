@@ -375,7 +375,7 @@ public class ObjectDictionary {
                             List<TParameterList.Parameter> parameterModelList = paramList
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
-                                Parameter p = new Parameter(param);
+                                Parameter p = new Parameter(node, param);
                                 parameterListMap.put(p.getUniqueId(), p);
                             }
                         }
@@ -387,8 +387,8 @@ public class ObjectDictionary {
                             List<TParameterGroup> paramGroup = paramGroupList
                                     .getParameterGroup();
                             for (TParameterGroup grp : paramGroup) {
-                                ParameterGroup pg = new ParameterGroup(this,
-                                        grp);
+                                ParameterGroup pg = new ParameterGroup(node,
+                                        this, grp);
                                 parameterGroupMap.put(pg.getUniqueId(), pg);
                             }
                         }

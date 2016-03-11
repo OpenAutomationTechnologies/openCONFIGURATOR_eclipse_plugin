@@ -31,14 +31,17 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.Parameter.Property;
-import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup.ParameterRef;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
+import org.jdom2.JDOMException;
 
 /**
  *
@@ -54,12 +57,16 @@ public class ParameterReference implements IParameter {
     private boolean locked;
     private BigInteger bitOffset;
 
+    private Node node;
+    private String xpath;
+    private String uniqueIdRef;
+
     private ObjectDictionary objectDictionary;
     private ParameterGroup parameterGroup;
 
-    public ParameterReference(ParameterGroup parameterGroup,
+    public ParameterReference(Node nodeinstance, ParameterGroup parameterGroup,
             ObjectDictionary objectDictionary,
-            ParameterRef parameterReferenceModel) {
+            TParameterGroup.ParameterRef parameterReferenceModel) {
         this.parameterGroup = parameterGroup;
         this.objectDictionary = objectDictionary;
 
@@ -75,9 +82,15 @@ public class ParameterReference implements IParameter {
                     TParameterList.Parameter paramModel = (TParameterList.Parameter) paramModelObj;
                     parameter = this.objectDictionary
                             .getParameter(paramModel.getUniqueID());
+                    uniqueIdRef = paramModel.getUniqueID();
                 }
             }
         }
+        node = nodeinstance;
+
+        xpath = parameterGroup.getXpath() + "/plk:parameterRef[@uniqueIDRef='"
+                + uniqueIdRef + "']";
+
     }
 
     @Override
@@ -145,6 +158,13 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /**
+     * @return Instance of Node.
+     */
+    public Node getNode() {
+        return node;
+    }
+
     public ParameterGroup getParameterGroup() {
         return parameterGroup;
     }
@@ -190,6 +210,13 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /**
+     * @return Xpath of parameter reference using parameter group xpath.
+     */
+    public String getXpath() {
+        return xpath;
+    }
+
     public boolean isLocked() {
         return locked;
     }
@@ -198,7 +225,17 @@ public class ParameterReference implements IParameter {
         return visible;
     }
 
-    public void setActualValue(final String value) {
+    /**
+     * Update actual value attribute with the given value of parameter.
+     *
+     * @param value The value to be updated in the XDD/XDC file.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void setActualValue(final String value)
+            throws JDOMException, IOException {
         actualValue = value;
+        OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
+                this, actualValue);
     }
 }

@@ -31,11 +31,14 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TProperty;
+import org.jdom2.JDOMException;
 
 /**
  *
@@ -99,6 +102,11 @@ public class Parameter implements IParameter {
         }
     }
 
+    private TParameterList.Parameter parameter;
+    private Node node;
+    private String xpath;
+    private String actualValueXpath;
+
     private LabelDescription label;
     private String uniqueId;
     private ParameterAccess access = ParameterAccess.READ;
@@ -112,7 +120,7 @@ public class Parameter implements IParameter {
     private List<Property> propertyList = new ArrayList<>();
     private AllowedValues allowedValues;
 
-    public Parameter(TParameterList.Parameter param) {
+    public Parameter(Node nodeinstance, TParameterList.Parameter param) {
         if (param != null) {
             label = new LabelDescription(
                     param.getLabelOrDescriptionOrLabelRef());
@@ -121,6 +129,10 @@ public class Parameter implements IParameter {
             if (param.getAccess() != null) {
                 access = ParameterAccess.fromValue(param.getAccess());
             }
+            parameter = param;
+            node = nodeinstance;
+            xpath = "//plk:parameter[@uniqueID='" + uniqueId + "']";
+            actualValueXpath = xpath + "/plk:actualValue";
 
             dataType = new DataTypeChoice(param);
 
@@ -182,6 +194,17 @@ public class Parameter implements IParameter {
         return label;
     }
 
+    public Node getNode() {
+        return node;
+    }
+
+    /**
+     * @return The actual value element XPath of Parameter.
+     */
+    public String getParameterActualValueXpath() {
+        return actualValueXpath;
+    }
+
     @Override
     public List<Property> getPropertyList() {
         return propertyList;
@@ -207,7 +230,24 @@ public class Parameter implements IParameter {
         return unitLabel;
     }
 
-    public void setActualValue(String value) {
+    /**
+     * @return The XPath of parameter based on UniqueID.
+     */
+    public String getXpath() {
+        return xpath;
+    }
+
+    /**
+     * Update the actual value element of parameter from the given value.
+     *
+     * @param value The value to be updated into the XDC file.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void setActualValue(String value) throws JDOMException, IOException {
         actualValue = value;
+        // Update the value in XDC file
+        OpenConfiguratorProjectUtils.updateParameterActualValue(node, this,
+                actualValue);
     }
 }

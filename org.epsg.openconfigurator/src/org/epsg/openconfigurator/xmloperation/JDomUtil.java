@@ -128,6 +128,52 @@ public class JDomUtil {
         }
     }
 
+    /**
+     * Add new child element into the parameter of XDD/XDC file.
+     *
+     * @param doc XDD/XDC file instance.
+     * @param xpath Path value where the actual value element has to be placed.
+     * @param namespace The namespace of the attribute.
+     * @param newElement The new element to be added.
+     * @param index The position where the element has to be added.
+     */
+    public static void addNewParameterElement(Document doc, String xpath,
+            Namespace namespace, Element newElement, int index) {
+        System.out.println("addNewElement: " + xpath);
+        addNewParameterElement(doc, getXPathExpressionElement(xpath, namespace),
+                newElement, index);
+    }
+
+    /**
+     * Add new child element into the parameter of XDD/XDC file.
+     *
+     * @param doc XDD/XDC file instance.
+     * @param xpath The parent Xpath.
+     * @param newElement The new element to be added.
+     * @param index The position where the element has to be added.
+     */
+    public static void addNewParameterElement(Document doc,
+            XPathExpression<Element> xpath, Element newElement, int index) {
+
+        List<Element> elementsList = xpath.evaluate(doc);
+
+        for (Element element : elementsList) {
+            newElement.setNamespace(element.getNamespace());
+            for (Element newChildElement : newElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
+            element.addContent(index, newElement);
+        }
+    }
+
+    /**
+     * Get the count of child elements under parent element.
+     *
+     * @param document XDD/XDC file instance.
+     * @param xpath The parent Xpath.
+     * @param namespace The namespace of the attribute.
+     * @return The total number of child elements available.
+     */
     public static int getChildrenCount(Document document, String xpath,
             Namespace namespace) {
         XPathExpression<Element> xpathExpr = getXPathExpressionElement(xpath,
@@ -136,6 +182,14 @@ public class JDomUtil {
         return parentElement.getChildren().size();
     }
 
+    /**
+     * Get the XDD/XDC file
+     *
+     * @param xmlFile File instance
+     * @return XDD/XDC file instance
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
     public static org.jdom2.Document getXmlDocument(final File xmlFile)
             throws JDOMException, IOException {
 
@@ -153,6 +207,13 @@ public class JDomUtil {
         return document;
     }
 
+    /**
+     * Get the Xpath expression from the given element.
+     *
+     * @param xpathValue The element value of Xpath.
+     * @param namespace The namespace of the attribute.
+     * @return The Xpath value element from the given expression.
+     */
     public static XPathExpression<Element> getXPathExpressionElement(
             String xpathValue, Namespace namespace) {
         XPathBuilder<Element> elementBuilder = new XPathBuilder<Element>(
@@ -161,6 +222,15 @@ public class JDomUtil {
         return elementBuilder.compileWith(XPathFactory.instance());
     }
 
+    /**
+     * Check the availability of given xpath element from the XDD/XDC file.
+     *
+     * @param document XDD/XDC file instance
+     * @param xpath
+     * @param namespace
+     * @return <code>True</code> if element is present, <code>False</code> false
+     *         otherwise.
+     */
     public static boolean isXpathPresent(Document document, String xpath,
             Namespace namespace) {
         XPathExpression<Element> xpathExpr = getXPathExpressionElement(xpath,

@@ -63,6 +63,8 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.Parameter;
+import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
@@ -839,6 +841,57 @@ public final class OpenConfiguratorProjectUtils {
 
         // Updates generator attributes in project file.
         updateGeneratorInfo(node);
+    }
+
+    /**
+     * Update actual value of parameter into the device configuration file.
+     *
+     * @param node Instance of Node.
+     * @param parameter Parameter instance
+     * @param actualValue The value to be updated into the parameter.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateParameterActualValue(Node node,
+            Parameter parameter, String actualValue)
+                    throws JDOMException, IOException {
+        File xdcFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateParameterActualValue(document, parameter,
+                actualValue);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+
+    }
+
+    /**
+     * Update actual value of parameter reference into the device configuration
+     * file.
+     *
+     * @param node Instance of Node.
+     * @param parameterReference ParameterReference instance
+     * @param actualValue The value to be updated into the parameter.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateParameterReferenceActualValue(Node node,
+            ParameterReference parameterReference, String actualValue)
+                    throws JDOMException, IOException {
+        File xdcFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateParameterReferenceActualValue(document,
+                parameterReference, actualValue);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+
     }
 
     /**

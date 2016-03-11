@@ -31,11 +31,17 @@
 
 package org.epsg.openconfigurator.xmloperation;
 
+import java.util.List;
+
+import org.epsg.openconfigurator.model.Parameter;
+import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
+import org.jdom2.Element;
 import org.jdom2.Namespace;
+import org.jdom2.xpath.XPathExpression;
 
 /**
  * Class that performs JDom operations on an XDD/XDC file.
@@ -47,7 +53,14 @@ public class XddJdomOperation {
 
     static final Namespace POWERLINK_XDD_NAMESPACE;
 
-    private static final String ACTUAL_VALUE = "actualValue";
+    private static final String OBJECT_ACTUAL_VALUE = "actualValue";
+    private static final String PARAMETER_VALUE = "value";
+    public static final String PARAMETER_ACTUAL_VALUE = "actualValue";
+    public static final String PARAMETER_DEFAULT_VALUE = "defaultValue";
+    public static final String PARAMETER_SUBSTITUTE_VALUE = "substituteValue";
+    public static final String PARAMETER_ALLOWED_VALUE = "allowedValues";
+    public static final String PARAMETER_UNIT_ELEMENT = "unit";
+    public static final String PARAMETER_PROPERTY_ELEMENT = "property";
     private static final String FILE_MODIFICATION_TIME = "fileModificationTime";
     private static final String FILE_MODIFICATION_DATE = "fileModificationDate";
     private static final String FILE_MODIFIED_BY = "fileModifiedBy";
@@ -70,11 +83,11 @@ public class XddJdomOperation {
      */
     public static void deleteActualValues(Document document) {
         JDomUtil.removeAttributes(document,
-                "//plk:Object[@" + ACTUAL_VALUE + "]", POWERLINK_XDD_NAMESPACE,
-                ACTUAL_VALUE);
+                "//plk:Object[@" + OBJECT_ACTUAL_VALUE + "]",
+                POWERLINK_XDD_NAMESPACE, OBJECT_ACTUAL_VALUE);
         JDomUtil.removeAttributes(document,
-                "//plk:SubObject[@ " + ACTUAL_VALUE + "]",
-                POWERLINK_XDD_NAMESPACE, ACTUAL_VALUE);
+                "//plk:SubObject[@ " + OBJECT_ACTUAL_VALUE + "]",
+                POWERLINK_XDD_NAMESPACE, OBJECT_ACTUAL_VALUE);
     }
 
     /**
@@ -88,9 +101,54 @@ public class XddJdomOperation {
             PowerlinkObject powerlinkObj) {
 
         String xpath = powerlinkObj.getXpath() + "/plk:SubObject[@"
-                + ACTUAL_VALUE + "]";
+                + OBJECT_ACTUAL_VALUE + "]";
         JDomUtil.removeAttributes(document, xpath, POWERLINK_XDD_NAMESPACE,
-                ACTUAL_VALUE);
+                OBJECT_ACTUAL_VALUE);
+    }
+
+    /**
+     * Get the sequence order or index position of child elements in the
+     * parameter of XDD/XDC file.
+     *
+     * @param document XDD/XDC file instance.
+     * @param parameter Instance of parameter.
+     * @return The position of parameter child elements.
+     */
+    public static int getChildIndexbelowActualvalue(Document document,
+            Parameter parameter) {
+        XPathExpression<Element> xpath = JDomUtil.getXPathExpressionElement(
+                parameter.getXpath(), POWERLINK_XDD_NAMESPACE);
+        List<Element> elementsList = xpath.evaluate(document);
+        Element parentElement = elementsList.get(0);
+        List<Element> childElement = parentElement.getChildren();
+        if (!childElement.isEmpty()) {
+            for (int childCount = 1; childCount <= childElement
+                    .size(); childCount++) {
+                for (Element child : childElement) {
+                    int index = parentElement.indexOf(child);
+                    if (child.getQualifiedName() == PARAMETER_DEFAULT_VALUE) {
+                        return index;
+                    } else if (child
+                            .getQualifiedName() == PARAMETER_SUBSTITUTE_VALUE) {
+                        return index;
+                    } else if (child
+                            .getQualifiedName() == PARAMETER_ALLOWED_VALUE) {
+                        return index;
+                    } else if (child
+                            .getQualifiedName() == PARAMETER_UNIT_ELEMENT) {
+                        return index;
+                    } else if (child
+                            .getQualifiedName() == PARAMETER_PROPERTY_ELEMENT) {
+                        return index;
+                    }
+                }
+            }
+        } else {
+            System.err.println(
+                    "No child elements are available for the given parameter with uniqueID = "
+                            + parameter.getUniqueId());
+        }
+        return 0;
     }
 
     /**
@@ -103,7 +161,8 @@ public class XddJdomOperation {
      */
     public static void updateActualValue(Document document,
             PowerlinkObject object, String actualValue) {
-        Attribute newAttribute = new Attribute(ACTUAL_VALUE, actualValue);
+        Attribute newAttribute = new Attribute(OBJECT_ACTUAL_VALUE,
+                actualValue);
         JDomUtil.setAttribute(document, object.getXpath(),
                 POWERLINK_XDD_NAMESPACE, newAttribute);
     }
@@ -118,7 +177,8 @@ public class XddJdomOperation {
      */
     public static void updateActualValue(Document document,
             PowerlinkSubobject subobject, String actualValue) {
-        Attribute newAttribute = new Attribute(ACTUAL_VALUE, actualValue);
+        Attribute newAttribute = new Attribute(OBJECT_ACTUAL_VALUE,
+                actualValue);
         JDomUtil.setAttribute(document, subobject.getXpath(),
                 POWERLINK_XDD_NAMESPACE, newAttribute);
     }
@@ -160,6 +220,66 @@ public class XddJdomOperation {
         Attribute newAttribute = new Attribute(FILE_MODIFICATION_TIME, time);
         JDomUtil.setAttribute(document, FILE_MODIFICATION_TIME_XPATH,
                 POWERLINK_XDD_NAMESPACE, newAttribute);
+
+    }
+
+    /**
+     * Update actual value element of parameter with the given value.
+     *
+     * @param document XDD/XDC file instance.
+     * @param parameter Instance of parameter.
+     * @param actualValue The value to be updated in the XDD/XDC file.
+     */
+    public static void updateParameterActualValue(Document document,
+            Parameter parameter, String actualValue) {
+        String Xpath = parameter.getParameterActualValueXpath();
+        if (JDomUtil.isXpathPresent(document, Xpath, POWERLINK_XDD_NAMESPACE)) {
+            JDomUtil.updateAttribute(document, Xpath, POWERLINK_XDD_NAMESPACE,
+                    new Attribute(PARAMETER_VALUE, actualValue));
+        } else if (JDomUtil.isXpathPresent(document, parameter.getXpath(),
+                POWERLINK_XDD_NAMESPACE)) {
+            Element newObjElement = new Element(PARAMETER_ACTUAL_VALUE);
+            Attribute paramAttr = new Attribute(PARAMETER_VALUE, actualValue);
+            newObjElement.setAttribute(paramAttr);
+            // Check for the sequence order of child elements available in the
+            // parameter.
+            if (getChildIndexbelowActualvalue(document, parameter) != 0) {
+                int index = getChildIndexbelowActualvalue(document, parameter)
+                        - 1;
+                JDomUtil.addNewParameterElement(document, parameter.getXpath(),
+                        POWERLINK_XDD_NAMESPACE, newObjElement, index);
+            } else {
+                JDomUtil.addNewElement(document, parameter.getXpath(),
+                        POWERLINK_XDD_NAMESPACE, newObjElement);
+            }
+
+        } else {
+            System.err.println("Parameter Xpath not present");
+        }
+    }
+
+    /**
+     * Update the actual value attribute of parameter reference with the given
+     * value.
+     *
+     * @param document XDD/XDC file instance.
+     * @param parameterReference Instance of Parameter reference.
+     * @param actualValue The value to be updated into the XDD/XDC file.
+     */
+    public static void updateParameterReferenceActualValue(Document document,
+            ParameterReference parameterReference, String actualValue) {
+        System.err.println("Parameter reference Xpath == "
+                + parameterReference.getXpath());
+        if (JDomUtil.isXpathPresent(document, parameterReference.getXpath(),
+                POWERLINK_XDD_NAMESPACE)) {
+            Attribute newAttribute = new Attribute(OBJECT_ACTUAL_VALUE,
+                    actualValue);
+            JDomUtil.setAttribute(document, parameterReference.getXpath(),
+                    POWERLINK_XDD_NAMESPACE, newAttribute);
+            System.err.println("Parameter reference value updated");
+        } else {
+            System.err.println("Parameter reference xpath not found");
+        }
 
     }
 }

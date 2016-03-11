@@ -55,6 +55,9 @@ public class ParameterGroup {
 
     private BigInteger bitOffset;
 
+    private Node node;
+    private String xpath;
+
     private Parameter conditionalParameter;
     private String conditionalValue;
     private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<String, ParameterGroup>();
@@ -63,12 +66,13 @@ public class ParameterGroup {
 
     private ObjectDictionary objectDictionary;
 
-    public ParameterGroup(ObjectDictionary objectDictionary,
+    public ParameterGroup(Node nodeInstance, ObjectDictionary objectDictionary,
             TParameterGroup grp) {
         this.objectDictionary = objectDictionary;
 
         uniqueId = grp.getUniqueID();
-
+        node = nodeInstance;
+        xpath = "//plk:parameterGroup[@uniqueID='" + uniqueId + "']";
         label = new LabelDescription(grp.getLabelOrDescriptionOrLabelRef());
         groupLevelVisible = grp.isGroupLevelVisible();
 
@@ -90,14 +94,14 @@ public class ParameterGroup {
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
-                    ParameterGroup paramGrpModel = new ParameterGroup(
+                    ParameterGroup paramGrpModel = new ParameterGroup(node,
                             objectDictionary, paramGrp);
                     parameterGroupMap.put(paramGrpModel.getUniqueId(),
                             paramGrpModel);
                 } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
                     TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
-                    ParameterReference paramRef = new ParameterReference(this,
-                            objectDictionary, parameterReferenceModel);
+                    ParameterReference paramRef = new ParameterReference(node,
+                            this, objectDictionary, parameterReferenceModel);
                     parameterRefMap.put(paramRef.getUniqueId(), paramRef);
                 }
             }
@@ -192,6 +196,13 @@ public class ParameterGroup {
 
         System.out.println("==========END===============");
         return vSet;
+    }
+
+    /**
+     * @return XPath of Parameter group in the given XDD/XDC file.
+     */
+    public String getXpath() {
+        return xpath;
     }
 
     public boolean hasVisibleObjects() {

@@ -31,15 +31,18 @@
 
 package org.epsg.openconfigurator.adapters;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
+import org.jdom2.JDOMException;
 
 /**
  *
@@ -176,7 +179,14 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ID:
-                    param.setActualValue((String) value);
+                    try {
+                        param.setActualValue((String) value);
+                    } catch (JDOMException | IOException e) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(e.getCause().getMessage(),
+                                        param.getNode().getNetworkId());
+                        e.printStackTrace();
+                    }
                     break;
                 default:
                     System.err.println(id + " not supported!");
