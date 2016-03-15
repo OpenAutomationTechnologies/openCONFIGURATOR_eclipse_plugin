@@ -41,11 +41,15 @@ import javax.xml.bind.DatatypeConverter;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
+import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtensionHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroupList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
@@ -91,7 +95,14 @@ public class ObjectDictionary {
      */
     private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
 
+    /**
+     * Parameter with uniqueID and parameter model.
+     */
     private HashMap<String, Parameter> parameterListMap = new HashMap<String, Parameter>();
+
+    /**
+     * Parameter group with uniqueID and parameter model.
+     */
     private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<String, ParameterGroup>();
 
     /**
@@ -185,16 +196,28 @@ public class ObjectDictionary {
         return objectsList;
     }
 
+    /**
+     * Returns parameter variable for the given unique ID.
+     *
+     * @param uniqueId The unique ID given to each parameter.
+     * @return Parameter based on given unique ID.
+     */
     public Parameter getParameter(String uniqueId) {
         return parameterListMap.getOrDefault(uniqueId, null);
     }
 
+    /**
+     * @return Parameter group available in the given XDD file.
+     */
     public List<ParameterGroup> getParameterGroupList() {
         List<ParameterGroup> valueList = new ArrayList<ParameterGroup>(
                 parameterGroupMap.values());
         return valueList;
     }
 
+    /**
+     * @return List of parameters available in the given XDD file.
+     */
     public List<Parameter> getParameterList() {
         List<Parameter> valueList = new ArrayList<Parameter>(
                 parameterListMap.values());
@@ -395,6 +418,38 @@ public class ObjectDictionary {
                     }
                 }
 
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead modularDevProfile = (ProfileBodyDevicePowerlinkModularHead) profileBodyDatatype;
+                    List<TApplicationProcess> appProcessList = modularDevProfile
+                            .getApplicationProcess();
+                    for (TApplicationProcess appProcess : appProcessList) {
+                        // Parameter List
+                        TParameterList paramList = appProcess
+                                .getParameterList();
+                        if (paramList != null) {
+                            List<TParameterList.Parameter> parameterModelList = paramList
+                                    .getParameter();
+                            for (TParameterList.Parameter param : parameterModelList) {
+                                Parameter p = new Parameter(node, param);
+                                parameterListMap.put(p.getUniqueId(), p);
+                            }
+                        }
+
+                        // Parameter Groups List
+                        TParameterGroupList paramGroupList = appProcess
+                                .getParameterGroupList();
+                        if (paramGroupList != null) {
+                            List<TParameterGroup> paramGroup = paramGroupList
+                                    .getParameterGroup();
+                            for (TParameterGroup grp : paramGroup) {
+                                ParameterGroup pg = new ParameterGroup(node,
+                                        this, grp);
+                                parameterGroupMap.put(pg.getUniqueId(), pg);
+                            }
+                        }
+                    }
+                }
+
                 if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
                     ProfileBodyCommunicationNetworkPowerlink commProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype;
                     TApplicationLayers.ObjectList tempObjectLists = commProfile
@@ -423,6 +478,37 @@ public class ObjectDictionary {
                         }
                     }
                 }
+                if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularHead modularCommProfile = (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBodyDatatype;
+                    TApplicationLayersModularHead.ObjectList tempObjectLists = modularCommProfile
+                            .getApplicationLayers().getObjectList();
+                    List<TObjectExtensionHead> objList = tempObjectLists
+                            .getObject();
+                    for (TObjectExtensionHead obj : objList) {
+                        System.err.println("Tobject instance == " + obj);
+                        PowerlinkObject plkObj = new PowerlinkObject(node, obj);
+                        objectsList.add(plkObj);
+
+                        if (plkObj.getIdHex().startsWith("0x14")
+                                || plkObj.getIdHex().startsWith("0x18")) {
+                            commParamObjList.add(plkObj);
+                        } else if (plkObj.getIdHex().startsWith("0x16")
+                                || plkObj.getIdHex().startsWith("0x1A")) {
+                            mapParamObjList.add(plkObj);
+                        }
+
+                        if (plkObj.hasRpdoMappableSubObjects()
+                                || plkObj.isRpdoMappable()) {
+                            rpdoMappableObjectList.add(plkObj);
+                        }
+
+                        if (plkObj.hasTpdoMappableSubObjects()
+                                || plkObj.isTpdoMappable()) {
+                            tpdoMappableObjectList.add(plkObj);
+                        }
+                    }
+                }
+
             }
 
             for (int cnt = 0; cnt < commParamObjList.size(); cnt++) {

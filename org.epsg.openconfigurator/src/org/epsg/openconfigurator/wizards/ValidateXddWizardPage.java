@@ -230,9 +230,13 @@ public class ValidateXddWizardPage extends WizardPage {
                 NetworkManagement netWrkMgmt = newNode.getNetworkManagement();
                 switch (newNode.getNodeType()) {
                     case CONTROLLED_NODE: {
-                        if (!netWrkMgmt.getGeneralFeatures().isDLLFeatureCN()) {
-                            getErrorStyledText(ERROR_INVALID_CN_FILE_MESSAGE);
-                            return false;
+                        if (netWrkMgmt.getGeneralFeatures() != null) {
+                            if (!netWrkMgmt.getGeneralFeatures()
+                                    .isDLLFeatureCN()) {
+                                getErrorStyledText(
+                                        ERROR_INVALID_CN_FILE_MESSAGE);
+                                return false;
+                            }
                         }
                         break;
                     }

@@ -46,7 +46,6 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
-import org.epsg.openconfigurator.xmlbinding.xdd.TObject.SubObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 
@@ -71,7 +70,6 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
     }
 
-    private SubObject subObject;
     private PowerlinkSubobject plkSubObject;
 
     public SubObjectPropertySource(final PowerlinkSubobject plkSubObject) {
@@ -152,20 +150,23 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
         propertyList.add(nameDescriptor);
         propertyList.add(objectTypeDescriptor);
 
-        if (subObject.getDataType() != null) {
+        if (plkSubObject.getDataType() != null) {
             propertyList.add(dataTypeDescriptor);
         }
-        if (subObject.getLowLimit() != null) {
+
+        if (!plkSubObject.getLowLimit().isEmpty()) {
             propertyList.add(lowLimitDescriptor);
         }
-        if (subObject.getHighLimit() != null) {
+
+        if (!plkSubObject.getHighLimit().isEmpty()) {
             propertyList.add(highLimitDescriptor);
         }
-        if (subObject.getAccessType() != null) {
+
+        if (plkSubObject.getAccessType() != null) {
             propertyList.add(accessTypeDescriptor);
         }
 
-        if (subObject.getDefaultValue() != null) {
+        if (!plkSubObject.getDefaultValue().isEmpty()) {
             propertyList.add(defaultValueDescriptor);
         }
 
@@ -173,24 +174,24 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
             propertyList.add(actualValueEditableDescriptor);
             propertyList.add(forceActualValue);
         } else {
-            if (subObject.getActualValue() != null) {
+            if (!plkSubObject.getActualValue().isEmpty()) {
                 propertyList.add(actualValueReadOnlyDescriptor);
             }
         }
 
-        if (subObject.getDenotation() != null) {
+        if (plkSubObject.getDenotation() != null) {
             propertyList.add(denotationDescriptor);
         }
 
-        if (subObject.getPDOmapping() != null) {
+        if (plkSubObject.getPdoMapping() != null) {
             propertyList.add(pdoMappingDescriptor);
         }
 
-        if (subObject.getObjFlags() != null) {
+        if (plkSubObject.getObjFlags() != null) {
             propertyList.add(objFlagsDescriptor);
         }
 
-        if (subObject.getUniqueIDRef() != null) {
+        if (plkSubObject.getUniqueIDRef() != null) {
             propertyList.add(uniqueIDRefDescriptor);
         }
 
@@ -201,7 +202,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
 
     @Override
     public Object getEditableValue() {
-        return subObject;
+        return plkSubObject;
     }
 
     @Override
@@ -257,13 +258,13 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     retObj = new Integer(val);
                     break;
                 case OBJ_DENOTATION_ID:
-                    retObj = subObject.getDenotation();
+                    retObj = plkSubObject.getDenotation();
                     break;
                 case OBJ_PDO_MAPPING_ID:
                     retObj = plkSubObject.getPdoMapping().value();
                     break;
                 case OBJ_OBJFLAGS_ID:
-                    retObj = subObject.getObjFlags();
+                    retObj = plkSubObject.getObjFlags();
                     break;
                 case OBJ_UNIQUEIDREF_ID:
                     // Get value of unique Id reference value from the POWERLINK
@@ -327,18 +328,19 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
     private boolean isActualValueEditable() {
         boolean retVal = false;
         // Only VAR type is allowed to be edited.
-        if ((subObject.getObjectType() != 7)) {
+        if ((plkSubObject.getObjectType() != 7)) {
             return retVal;
         }
 
-        if (subObject.getDataType() == null) {
+        if (plkSubObject.getDataType() == null) {
             return retVal;
         }
 
-        if (subObject.getAccessType() == null) {
+        if (plkSubObject.getAccessType() == null) {
             return retVal;
         }
-        String accessType = subObject.getAccessType().value();
+
+        String accessType = plkSubObject.getAccessType().value();
         // Only RW and WO types are allowed to be edited.
         if (!(accessType.equalsIgnoreCase(TObjectAccessType.WO.value())
                 || accessType.equalsIgnoreCase(TObjectAccessType.RW.value()))) {
@@ -424,6 +426,5 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
 
     public void setSubObjectData(PowerlinkSubobject adaptableObject) {
         plkSubObject = adaptableObject;
-        subObject = plkSubObject.getModel();
     }
 }

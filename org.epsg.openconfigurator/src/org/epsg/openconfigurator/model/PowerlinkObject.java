@@ -42,6 +42,7 @@ import org.eclipse.core.resources.IProject;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtensionHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
 import org.jdom2.JDOMException;
 
@@ -53,11 +54,6 @@ import org.jdom2.JDOMException;
  */
 public class PowerlinkObject extends AbstractPowerlinkObject
         implements IPowerlinkObject {
-
-    /**
-     * Object model from the XDC.
-     */
-    private final TObject object;
 
     /**
      * Associated Eclipse project.
@@ -83,6 +79,11 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      * Object ID in hex without 0x.
      */
     private final String objectIdRaw;
+
+    /**
+     * Index of Object
+     */
+    private final byte[] idByte;
 
     /**
      * Object ID.
@@ -130,7 +131,57 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     private TObjectAccessType accessType;
 
     /**
-     * Constructs a POWERLINK object.
+     * Actual value of POWERLINK object from the TObject model.
+     */
+    private String actualValue;
+
+    /**
+     * Default value of POWERLINK object from the TObject model
+     */
+    private final String defaultValue;
+
+    /**
+     * Name of the SubObject.
+     */
+    private final String name;
+
+    /**
+     * Unique ID value of POWERLINK object.
+     */
+    private final Object uniqueIDRef;
+
+    /**
+     * Higher value limit of POWERLINK object given in the XDD/XDC file.
+     */
+    private final String highLimit;
+
+    /**
+     * Lower value of limit of POWERLINK object given in the XDD/XDC file.
+     */
+    private final String lowLimit;
+
+    /**
+     * Type of POWERLINK object given in the XDD/XDC file.
+     */
+    private final short objectType;
+
+    /**
+     * The data type of POWERLINK object given in the XDD/XDC file.
+     */
+    private final byte[] dataType;
+
+    /**
+     * The denotation variable of POWERLINK object.
+     */
+    private final String denotation;
+
+    /**
+     * The flag object for POWERLINK object.
+     */
+    private final byte[] objFlags;
+
+    /**
+     * Constructs a POWERLINK object based on TObject model.
      *
      * @param nodeInstance Node linked with the object.
      * @param object The Object model available in the XDC.
@@ -144,20 +195,28 @@ public class PowerlinkObject extends AbstractPowerlinkObject
 
         project = nodeInstance.getProject();
 
-        this.object = object;
-        objectIdRaw = DatatypeConverter.printHexBinary(this.object.getIndex());
+        idByte = object.getIndex();
+        objectIdRaw = DatatypeConverter.printHexBinary(idByte);
         objectIdL = Long.parseLong(objectIdRaw, 16);
         objectId = "0x" + objectIdRaw;
         xpath = "//plk:Object[@index='" + objectIdRaw + "']";
-        if (this.object.getDataType() != null) {
-            dataTypeReadable = ObjectDatatype.getDatatypeName(DatatypeConverter
-                    .printHexBinary(this.object.getDataType()));
+
+        name = object.getName();
+
+        denotation = object.getDenotation();
+        objFlags = object.getObjFlags();
+
+        objectType = object.getObjectType();
+        dataType = object.getDataType();
+        if (dataType != null) {
+            dataTypeReadable = ObjectDatatype.getDatatypeName(
+                    DatatypeConverter.printHexBinary(dataType));
         } else {
             dataTypeReadable = StringUtils.EMPTY;
         }
 
         // Calculate the subobjects available in this object.
-        for (TObject.SubObject subObject : this.object.getSubObject()) {
+        for (TObject.SubObject subObject : object.getSubObject()) {
             PowerlinkSubobject obj = new PowerlinkSubobject(nodeInstance, this,
                     subObject);
             subObjectsList.add(obj);
@@ -168,6 +227,12 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                 tpdoMappableObjectList.add(obj);
             }
         }
+
+        highLimit = object.getHighLimit();
+        lowLimit = object.getLowLimit();
+
+        actualValue = object.getActualValue();
+        defaultValue = object.getDefaultValue();
 
         pdoMapping = object.getPDOmapping();
         accessType = object.getAccessType();
@@ -197,13 +262,101 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                 }
             }
         }
+
+        uniqueIDRef = object.getUniqueIDRef();
+    }
+
+    /**
+     * Constructs a POWERLINK object based on TObjectExtensionHead model.
+     *
+     * @param nodeInstance Node linked with the object.
+     * @param object The Object model available in the XDC.
+     */
+    public PowerlinkObject(Node nodeInstance, TObjectExtensionHead object) {
+        super(nodeInstance);
+
+        if ((nodeInstance == null) || (object == null)) {
+            throw new IllegalArgumentException();
+        }
+
+        project = nodeInstance.getProject();
+
+        idByte = object.getIndex();
+        objectIdRaw = DatatypeConverter.printHexBinary(idByte);
+        objectIdL = Long.parseLong(objectIdRaw, 16);
+        objectId = "0x" + objectIdRaw;
+        xpath = "//plk:Object[@index='" + objectIdRaw + "']";
+
+        name = object.getName();
+
+        denotation = object.getDenotation();
+        objFlags = object.getObjFlags();
+
+        objectType = object.getObjectType();
+        dataType = object.getDataType();
+        if (dataType != null) {
+            dataTypeReadable = ObjectDatatype.getDatatypeName(
+                    DatatypeConverter.printHexBinary(dataType));
+        } else {
+            dataTypeReadable = StringUtils.EMPTY;
+        }
+
+        // Calculate the subobjects available in this object.
+        for (TObjectExtensionHead.SubObject subObject : object.getSubObject()) {
+            PowerlinkSubobject obj = new PowerlinkSubobject(nodeInstance, this,
+                    subObject);
+            subObjectsList.add(obj);
+
+            if (obj.isRpdoMappable()) {
+                rpdoMappableObjectList.add(obj);
+            } else if (obj.isTpdoMappable()) {
+                tpdoMappableObjectList.add(obj);
+            }
+        }
+
+        highLimit = object.getHighLimit();
+        lowLimit = object.getLowLimit();
+
+        actualValue = object.getActualValue();
+        defaultValue = object.getDefaultValue();
+
+        pdoMapping = object.getPDOmapping();
+        accessType = object.getAccessType();
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.RPDO))) {
+
+            if (object.getUniqueIDRef() != null) {
+                isRpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RW)
+                        || (accessType == TObjectAccessType.WO)) {
+                    isRpdoMappable = true;
+                }
+            }
+        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.TPDO))) {
+
+            if (object.getUniqueIDRef() != null) {
+                isTpdoMappable = true;
+            } else {
+
+                if ((accessType == TObjectAccessType.RO)
+                        || (accessType == TObjectAccessType.RW)) {
+                    isTpdoMappable = true;
+                }
+            }
+        }
+
+        uniqueIDRef = object.getUniqueIDRef();
     }
 
     /**
      * Note: This does not delete from the XML file.
      */
     public void deleteActualValue() {
-        object.setActualValue(null);
+        actualValue = null;
     }
 
     /**
@@ -223,7 +376,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
         }
 
         org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
-        forcedObj.setIndex(getModel().getIndex());
+        forcedObj.setIndex(getIndex());
         nodeInstance.forceObjectActualValue(forcedObj, force);
     }
 
@@ -240,12 +393,10 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public String getActualDefaultValue() {
-        String actualValue = object.getActualValue();
         if ((actualValue != null) && !actualValue.isEmpty()) {
             return actualValue;
         }
 
-        String defaultValue = object.getDefaultValue();
         if (defaultValue != null) {
             return defaultValue;
         }
@@ -258,11 +409,11 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public String getActualValue() {
-        String actualValue = object.getActualValue();
-        if (actualValue == null) {
-            actualValue = StringUtils.EMPTY;
+        String value = actualValue;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return actualValue;
+        return value;
     }
 
     /**
@@ -279,6 +430,13 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     }
 
     /**
+     * @return Data type of POWERLINK object given in the XDD/XDC file.
+     */
+    public byte[] getDataType() {
+        return dataType;
+    }
+
+    /**
      * @return Data type of the object
      */
     @Override
@@ -291,11 +449,19 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public String getDefaultValue() {
-        String defaultValue = object.getDefaultValue();
-        if (defaultValue == null) {
-            defaultValue = StringUtils.EMPTY;
+        String value = defaultValue;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return defaultValue;
+        return value;
+    }
+
+    /**
+     * @return Denotation variable of POWERLINK object given in the XDD/XDC
+     *         file.
+     */
+    public String getDenotation() {
+        return denotation;
     }
 
     /**
@@ -303,11 +469,11 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public String getHighLimit() {
-        String highLimit = object.getHighLimit();
-        if (highLimit == null) {
-            highLimit = StringUtils.EMPTY;
+        String value = highLimit;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return highLimit;
+        return value;
     }
 
     /**
@@ -335,23 +501,33 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     }
 
     /**
+     * @return Index of POWERLINK object in bytes.
+     */
+    public byte[] getIndex() {
+        return idByte;
+    }
+
+    /**
      * @return Low limit value of object
      */
     @Override
     public String getLowLimit() {
-        String lowLimit = object.getLowLimit();
-        if (lowLimit == null) {
-            lowLimit = StringUtils.EMPTY;
+        String value = lowLimit;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return lowLimit;
+        return value;
     }
 
-    /**
-     * @return Instance of Object from the object model.
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getModel()
      */
     @Override
-    public TObject getModel() {
-        return object;
+    public Object getModel() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /**
@@ -359,7 +535,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public String getName() {
-        String objectName = object.getName();
+        String objectName = name;
         if (objectName == null) {
             objectName = StringUtils.EMPTY;
         }
@@ -410,7 +586,14 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public short getObjectType() {
-        return object.getObjectType();
+        return objectType;
+    }
+
+    /**
+     * @return Flag variable of POWERLINK object from the given XDD/XDC file.
+     */
+    public byte[] getObjFlags() {
+        return objFlags;
     }
 
     /**
@@ -494,7 +677,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public Object getUniqueIDRef() {
-        return object.getUniqueIDRef();
+        return uniqueIDRef;
     }
 
     /**
@@ -533,7 +716,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public boolean isObjectForced() {
-        return nodeInstance.isObjectIdForced(object.getIndex(), null);
+        return nodeInstance.isObjectIdForced(idByte, null);
     }
 
     /**
@@ -566,16 +749,16 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     public void setActualValue(final String actualValue, boolean writeToXdc)
             throws JDOMException, IOException {
 
-        TObjectAccessType accessType = getModel().getAccessType();
+        TObjectAccessType accessType = getAccessType();
         if (accessType != null) {
             if ((accessType == TObjectAccessType.RO)
                     || (accessType == TObjectAccessType.CONST)) {
                 throw new RuntimeException("Restricted access to object " + "'"
-                        + object.getName() + "'" + " to set the actual value.");
+                        + getName() + "'" + " to set the actual value.");
             }
         }
 
-        object.setActualValue(actualValue);
+        this.actualValue = actualValue;
 
         if (writeToXdc) {
             OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(

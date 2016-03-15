@@ -43,6 +43,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtensionHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
 import org.jdom2.JDOMException;
 
@@ -58,22 +59,22 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     /**
      * Object associated with the sub-object.
      */
-    private PowerlinkObject object;
-
-    /**
-     * SubObject model from the XDC.
-     */
-    private TObject.SubObject subObject;
+    private final PowerlinkObject object;
 
     /**
      * Associated Eclipse project.
      */
-    private IProject project;
+    private final IProject project;
 
     /**
      * SubObject ID in hex without 0x.
      */
     private final String idRaw; // SubObject ID without 0x prefix
+
+    /**
+     * Index of sub-Object
+     */
+    private final byte[] idByte;
 
     /**
      * SubObject ID.
@@ -89,11 +90,6 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      * XPath to find this SubObject in the XDC.
      */
     private final String xpath;
-
-    /**
-     * Name of the SubObject with ID.
-     */
-    private final String readableName;
 
     /**
      * Datatype in the human readable format.
@@ -119,15 +115,65 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     /**
      * POWERLINK sub-object capable of mapping with PDO channels
      */
-    private TObjectPDOMapping pdoMapping;
+    private final TObjectPDOMapping pdoMapping;
 
     /**
      * Access type of POWERLINK sub-object from XDC model.
      */
-    private TObjectAccessType accessType;
+    private final TObjectAccessType accessType;
 
     /**
-     * Constructs a POWERLINK SubObject.
+     * Actual value of POWERLINK sub-object from the TObject model.
+     */
+    private String actualValue;
+
+    /**
+     * Default value of POWERLINK sub-object from the TObject model
+     */
+    private final String defaultValue;
+
+    /**
+     * Name of the SubObject.
+     */
+    private final String name;
+
+    /**
+     * Unique ID value of POWERLINK sub-object.
+     */
+    private final Object uniqueIDRef;
+
+    /**
+     * Higher value limit of POWERLINK sub-object given in the XDD/XDC file.
+     */
+    private final String highLimit;
+
+    /**
+     * Lower value of limit of POWERLINK sub-object given in the XDD/XDC file.
+     */
+    private final String lowLimit;
+
+    /**
+     * Type of POWERLINK sub-object given in the XDD/XDC file.
+     */
+    private final short objectType;
+
+    /**
+     * The data type of POWERLINK sub-object given in the XDD/XDC file.
+     */
+    private final byte[] dataType;
+
+    /**
+     * The denotation variable of POWERLINK sub-object.
+     */
+    private final String denotation;
+
+    /**
+     * The flag object for POWERLINK sub-object.
+     */
+    private final byte[] objFlags;
+
+    /**
+     * Constructs a POWERLINK SubObject based on TObject.SubObject model
      *
      * @param nodeInstance Node linked with the subobject.
      * @param object The Object linked with the subobject.
@@ -139,22 +185,35 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
         if (nodeInstance != null) {
             project = nodeInstance.getProject();
+        } else {
+            project = null;
         }
 
         this.object = object;
-        this.subObject = subObject;
-
-        idRaw = DatatypeConverter.printHexBinary(this.subObject.getSubIndex());
+        idByte = subObject.getSubIndex();
+        idRaw = DatatypeConverter.printHexBinary(idByte);
         idShort = Short.parseShort(idRaw, 16);
         idHex = "0x" + idRaw;
-        readableName = (this.subObject.getName() + " (" + idHex + ")");
+        name = subObject.getName();
         xpath = object.getXpath() + "/plk:SubObject[@subIndex='" + idRaw + "']";
-        if (this.subObject.getDataType() != null) {
+
+        denotation = subObject.getDenotation();
+        objFlags = subObject.getObjFlags();
+
+        objectType = subObject.getObjectType();
+        dataType = subObject.getDataType();
+        if (dataType != null) {
             dataTypeReadable = ObjectDatatype.getDatatypeName(
-                    DatatypeConverter.printHexBinary(getModel().getDataType()));
+                    DatatypeConverter.printHexBinary(dataType));
         } else {
             dataTypeReadable = StringUtils.EMPTY;
         }
+
+        highLimit = subObject.getHighLimit();
+        lowLimit = subObject.getLowLimit();
+
+        actualValue = subObject.getActualValue();
+        defaultValue = subObject.getDefaultValue();
 
         pdoMapping = subObject.getPDOmapping();
         accessType = subObject.getAccessType();
@@ -183,6 +242,82 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                 }
             }
         }
+
+        uniqueIDRef = subObject.getUniqueIDRef();
+    }
+
+    /**
+     * Constructs a POWERLINK sub-object based on TObjectExtensionHead.SubObject
+     * model
+     *
+     * @param nodeInstance Node linked with the subobject.
+     * @param object The Object linked with the subobject.
+     * @param subObject The SubObject model available in the XDC.
+     */
+    public PowerlinkSubobject(Node nodeInstance, PowerlinkObject object,
+            TObjectExtensionHead.SubObject subObject) {
+        super(nodeInstance);
+
+        if (nodeInstance != null) {
+            project = nodeInstance.getProject();
+        } else {
+            project = null;
+        }
+
+        this.object = object;
+        idByte = subObject.getSubIndex();
+        idRaw = DatatypeConverter.printHexBinary(idByte);
+        idShort = Short.parseShort(idRaw, 16);
+        idHex = "0x" + idRaw;
+        name = subObject.getName();
+        xpath = object.getXpath() + "/plk:SubObject[@subIndex='" + idRaw + "']";
+
+        denotation = subObject.getDenotation();
+        objFlags = subObject.getObjFlags();
+
+        objectType = subObject.getObjectType();
+        dataType = subObject.getDataType();
+        if (dataType != null) {
+            dataTypeReadable = ObjectDatatype.getDatatypeName(
+                    DatatypeConverter.printHexBinary(dataType));
+        } else {
+            dataTypeReadable = StringUtils.EMPTY;
+        }
+
+        highLimit = subObject.getHighLimit();
+        lowLimit = subObject.getLowLimit();
+
+        actualValue = subObject.getActualValue();
+        defaultValue = subObject.getDefaultValue();
+
+        pdoMapping = subObject.getPDOmapping();
+        accessType = subObject.getAccessType();
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.RPDO))) {
+
+            if (subObject.getUniqueIDRef() != null) {
+                isRpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RW)
+                        || (accessType == TObjectAccessType.WO)) {
+                    isRpdoMappable = true;
+                }
+            }
+        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.TPDO))) {
+            if (subObject.getUniqueIDRef() != null) {
+                isTpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RO)
+                        || (accessType == TObjectAccessType.RW)) {
+                    isTpdoMappable = true;
+                }
+            }
+        }
+
+        uniqueIDRef = subObject.getUniqueIDRef();
     }
 
     /**
@@ -191,7 +326,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      * Note: This does not delete from the XML file.
      */
     public void deleteActualValue() {
-        subObject.setActualValue(null);
+        actualValue = null;
     }
 
     /**
@@ -211,8 +346,8 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         }
 
         org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
-        forcedObj.setIndex(object.getModel().getIndex());
-        forcedObj.setSubindex(subObject.getSubIndex());
+        forcedObj.setIndex(object.getIndex());
+        forcedObj.setSubindex(idByte);
 
         nodeInstance.forceObjectActualValue(forcedObj, force);
     }
@@ -231,12 +366,10 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getActualDefaultValue() {
-        String actualValue = subObject.getActualValue();
         if ((actualValue != null) && !actualValue.isEmpty()) {
             return actualValue;
         }
 
-        String defaultValue = subObject.getDefaultValue();
         if (defaultValue != null) {
             return defaultValue;
         }
@@ -249,11 +382,11 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getActualValue() {
-        String actualValue = subObject.getActualValue();
-        if (actualValue == null) {
-            actualValue = StringUtils.EMPTY;
+        String value = actualValue;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return actualValue;
+        return value;
     }
 
     /**
@@ -270,6 +403,13 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     }
 
     /**
+     * @return Data type of the sub-object.
+     */
+    public byte[] getDataType() {
+        return dataType;
+    }
+
+    /**
      * @return data type of sub-object.
      */
     @Override
@@ -282,11 +422,19 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getDefaultValue() {
-        String defaultValue = subObject.getDefaultValue();
-        if (defaultValue == null) {
-            defaultValue = StringUtils.EMPTY;
+        String value = defaultValue;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return defaultValue;
+        return value;
+    }
+
+    /**
+     * @return Denotation variable of POWERLINK sub-object given in the XDD/XDC
+     *         file.
+     */
+    public String getDenotation() {
+        return denotation;
     }
 
     /**
@@ -294,11 +442,11 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getHighLimit() {
-        String highLimit = subObject.getHighLimit();
-        if (highLimit == null) {
-            highLimit = StringUtils.EMPTY;
+        String value = highLimit;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return highLimit;
+        return value;
     }
 
     /**
@@ -334,19 +482,22 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getLowLimit() {
-        String lowLimit = subObject.getLowLimit();
-        if (lowLimit == null) {
-            lowLimit = StringUtils.EMPTY;
+        String value = lowLimit;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return lowLimit;
+        return value;
     }
 
-    /**
-     * @return Model of sub object.
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getModel()
      */
     @Override
-    public TObject.SubObject getModel() {
-        return subObject;
+    public Object getModel() {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     /*
@@ -356,11 +507,11 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getName() {
-        String name = subObject.getName();
-        if (name == null) {
-            name = StringUtils.EMPTY;
+        String value = name;
+        if (value == null) {
+            value = StringUtils.EMPTY;
         }
-        return name;
+        return value;
     }
 
     /*
@@ -370,7 +521,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public String getNameWithId() {
-        return readableName;
+        return (getName() + " (" + getIdHex() + ")");
     }
 
     /**
@@ -419,7 +570,15 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public short getObjectType() {
-        return subObject.getObjectType();
+        return objectType;
+    }
+
+    /**
+     * @return Flag variable of POWERLINK sub-object from the given XDD/XDC
+     *         file.
+     */
+    public byte[] getObjFlags() {
+        return objFlags;
     }
 
     /**
@@ -463,7 +622,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public Object getUniqueIDRef() {
-        return subObject.getUniqueIDRef();
+        return uniqueIDRef;
     }
 
     /**
@@ -491,8 +650,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public boolean isObjectForced() {
-        return nodeInstance.isObjectIdForced(object.getModel().getIndex(),
-                subObject.getSubIndex());
+        return nodeInstance.isObjectIdForced(object.getIndex(), idByte);
     }
 
     /**
@@ -525,17 +683,16 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public void setActualValue(final String actualValue, boolean writeToXdc)
             throws JDOMException, IOException {
 
-        TObjectAccessType accessType = getModel().getAccessType();
+        TObjectAccessType accessType = getAccessType();
         if (accessType != null) {
             if ((accessType == TObjectAccessType.RO)
                     || (accessType == TObjectAccessType.CONST)) {
                 throw new RuntimeException("Restricted access to sub-object "
-                        + "'" + subObject.getName() + "'"
-                        + " to set the actual value.");
+                        + "'" + getName() + "'" + " to set the actual value.");
             }
         }
 
-        subObject.setActualValue(actualValue);
+        this.actualValue = actualValue;
 
         if (writeToXdc) {
             OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(

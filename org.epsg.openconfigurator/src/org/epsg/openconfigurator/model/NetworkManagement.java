@@ -36,6 +36,7 @@ import java.util.List;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TDeviceCommissioning;
@@ -120,6 +121,22 @@ public class NetworkManagement {
                         diagnositc = nmtMgmt.getDiagnostic();
                         deviceComissioning = nmtMgmt.getDeviceCommissioning();
                     }
+                    // XDD model for modular head node
+                } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularHead commProfile = (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBodyDatatype;
+                    TNetworkManagement nmtMgmt = commProfile
+                            .getNetworkManagement();
+
+                    if (nmtMgmt != null) {
+                        generalFeatures = nmtMgmt.getGeneralFeatures();
+                        mnFeatures = nmtMgmt.getMNFeatures();
+                        cnFeatures = nmtMgmt.getCNFeatures();
+                        diagnositc = nmtMgmt.getDiagnostic();
+                        deviceComissioning = nmtMgmt.getDeviceCommissioning();
+                    }
+                } else {
+                    System.out.println("ERROR unhandled Profile body datatype"
+                            + profileBodyDatatype);
                 }
             }
         }

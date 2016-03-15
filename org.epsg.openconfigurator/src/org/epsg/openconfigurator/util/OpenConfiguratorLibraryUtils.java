@@ -84,8 +84,10 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers.DynamicChannels;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
@@ -211,15 +213,77 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     /**
-     * Add dynamic channels into the library.
+     * Add dynamic channels into the library for TApplication layer model.
      *
      * @param networkId Network ID.
      * @param nodeId The node ID.
-     * @param dynamicChannels
+     * @param dynamicChannels Instance of TApplication layer model.
      * @return Result instance from the library.
      */
     private static Result addDynamicChannels(String networkId, short nodeId,
             DynamicChannels dynamicChannels) {
+        Result libApiRes = new Result();
+        if (dynamicChannels == null) {
+            return libApiRes;
+        }
+
+        OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
+        List<TDynamicChannel> dynamicChannelsList = dynamicChannels
+                .getDynamicChannel();
+        for (TDynamicChannel dynamicChannel : dynamicChannelsList) {
+
+            PlkDataType dataType = getObjectDatatype(
+                    dynamicChannel.getDataType());
+
+            DynamicChannelAccessType accessType = getDynamicChannelAccessType(
+                    dynamicChannel.getAccessType());
+
+            long startIndex = 0;
+            if (dynamicChannel.getStartIndex() != null) {
+                String startIndexStr = DatatypeConverter
+                        .printHexBinary(dynamicChannel.getStartIndex());
+                startIndex = Long.parseLong(startIndexStr, 16);
+            }
+
+            long endIndex = 0;
+            if (dynamicChannel.getEndIndex() != null) {
+                String endIndexStr = DatatypeConverter
+                        .printHexBinary(dynamicChannel.getEndIndex());
+                endIndex = Long.parseLong(endIndexStr, 16);
+            }
+
+            long addressOffset = 0;
+            if (dynamicChannel.getAddressOffset() != null) {
+                String addressOffsetStr = DatatypeConverter
+                        .printHexBinary(dynamicChannel.getAddressOffset());
+                addressOffset = Long.parseLong(addressOffsetStr, 16);
+            }
+
+            short bitAlignment = 0;
+            if (dynamicChannel.getBitAlignment() != null) {
+                bitAlignment = dynamicChannel.getBitAlignment().shortValue();
+            }
+            libApiRes = core.CreateDynamicChannel(networkId, nodeId, dataType,
+                    accessType, startIndex, endIndex,
+                    dynamicChannel.getMaxNumber(), addressOffset, bitAlignment);
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+        }
+        return libApiRes;
+    }
+
+    /**
+     * Add dynamic channels into the library for TApplicationLayersModularHead
+     * model.
+     *
+     * @param networkId Network ID.
+     * @param nodeId The node ID.
+     * @param dynamicChannels Instance of TApplicationLayersModularHead.
+     * @return Result instance from the library.
+     */
+    private static Result addDynamicChannels(String networkId, short nodeId,
+            org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead.DynamicChannels dynamicChannels) {
         Result libApiRes = new Result();
         if (dynamicChannels == null) {
             return libApiRes;
@@ -894,14 +958,12 @@ public class OpenConfiguratorLibraryUtils {
             PDOMapping mapping = getPdoMapping(object.getPdoMapping());
 
             if (((object.getObjectType() != 7) || ((object.getObjectType() == 7)
-                    && (object.getModel().getDataType() != null)))
+                    && (object.getDataType() != null)))
                     && (object.getUniqueIDRef() == null)) {
                 // Normal objects with dataType and without uniqueIdRef.
 
-                PlkDataType dataType = getObjectDatatype(
-                        object.getModel().getDataType());
-                AccessType accessType = getAccessType(
-                        object.getModel().getAccessType());
+                PlkDataType dataType = getObjectDatatype(object.getDataType());
+                AccessType accessType = getAccessType(object.getAccessType());
 
                 String actualValue = object.getActualValue();
 
@@ -929,13 +991,12 @@ public class OpenConfiguratorLibraryUtils {
                     object.setError(getErrorMessage(libApiRes));
                     System.err.println("WARN: " + getErrorMessage(libApiRes));
                 }
-            } else if ((object.getModel().getDataType() == null)
+            } else if ((object.getDataType() == null)
                     && (object.getUniqueIDRef() != null)) {
                 // Domain objects with uniqueIdRef and without dataType
                 if (object
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
-                    Parameter parameter = (Parameter) object.getModel()
-                            .getUniqueIDRef();
+                    Parameter parameter = (Parameter) object.getUniqueIDRef();
 
                     libApiRes = core.CreateDomainObject(node.getNetworkId(),
                             node.getNodeId(), object.getId(), objectType,
@@ -950,7 +1011,7 @@ public class OpenConfiguratorLibraryUtils {
                     System.err.println("ERROR: Invalid object.getUniqueIDRef():"
                             + object.getUniqueIDRef());
                 }
-            } else if ((object.getModel().getDataType() != null)
+            } else if ((object.getDataType() != null)
                     && (object.getUniqueIDRef() != null)) {
                 // ParameterGroup Objects with uniqueIdRef and with dataType
                 // FIXME
@@ -1119,7 +1180,7 @@ public class OpenConfiguratorLibraryUtils {
             if (subObject.getUniqueIDRef() == null) {
 
                 PlkDataType dataType = getObjectDatatype(
-                        subObject.getModel().getDataType());
+                        subObject.getDataType());
 
                 AccessType accessType = getAccessType(
                         subObject.getAccessType());
@@ -1808,6 +1869,30 @@ public class OpenConfiguratorLibraryUtils {
         return libApiRes;
     }
 
+    private static Result importProfileBodyCommunicationNetworkPowerlinkModularHead(
+            Node node,
+            ProfileBodyCommunicationNetworkPowerlinkModularHead modularCommProfile) {
+        Result libApiRes = new Result();
+
+        libApiRes = addObjectDictionary(node, node.getObjectDictionary());
+        if (!libApiRes.IsSuccessful()) {
+            System.err.println("WARN: " + getErrorMessage(libApiRes));
+        }
+
+        if (node.getNodeId() > 239) {
+            libApiRes = addDynamicChannels(node.getNetworkId(),
+                    node.getNodeId(), modularCommProfile.getApplicationLayers()
+                            .getDynamicChannels());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+        }
+
+        libApiRes = addNetworkManagement(node.getNetworkId(), node.getNodeId(),
+                node.getNetworkManagement());
+        return libApiRes;
+    }
+
     private static Result importProfileBodyDevicePowerlink(final Node node,
             final ProfileBodyDevicePowerlink devProfile) {
         Result libApiRes = new Result();
@@ -1816,6 +1901,29 @@ public class OpenConfiguratorLibraryUtils {
         for (TApplicationProcess appProcess : appProcessList) {
 
             // FIXME: Move datatype list first
+            libApiRes = addParameterList(node.getNetworkId(), node.getNodeId(),
+                    appProcess.getParameterList());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+
+            libApiRes = addDataTypeList(node.getNetworkId(), node.getNodeId(),
+                    appProcess.getDataTypeList());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("WARN: " + getErrorMessage(libApiRes));
+            }
+
+        }
+        return libApiRes;
+    }
+
+    private static Result importProfileBodyDevicePowerlinkModularHead(Node node,
+            final ProfileBodyDevicePowerlinkModularHead modularDevProfile) {
+        Result libApiRes = new Result();
+        List<TApplicationProcess> appProcessList = modularDevProfile
+                .getApplicationProcess();
+        for (TApplicationProcess appProcess : appProcessList) {
+
             libApiRes = addParameterList(node.getNetworkId(), node.getNodeId(),
                     appProcess.getParameterList());
             if (!libApiRes.IsSuccessful()) {
@@ -1846,6 +1954,13 @@ public class OpenConfiguratorLibraryUtils {
             } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink) {
                 libApiRes = importProfileBodyCommunicationNetworkPowerlink(node,
                         (ProfileBodyCommunicationNetworkPowerlink) profileBodyDatatype);
+            } else if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                libApiRes = importProfileBodyDevicePowerlinkModularHead(node,
+                        (ProfileBodyDevicePowerlinkModularHead) profileBodyDatatype);
+            } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                libApiRes = importProfileBodyCommunicationNetworkPowerlinkModularHead(
+                        node,
+                        (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBodyDatatype);
             } else {
                 System.err.println(
                         "Unknown profile body datatype:" + profileBodyDatatype);
