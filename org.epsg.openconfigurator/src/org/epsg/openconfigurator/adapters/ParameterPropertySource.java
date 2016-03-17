@@ -36,12 +36,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
+import org.epsg.openconfigurator.model.Range;
 import org.jdom2.JDOMException;
 
 /**
@@ -56,6 +59,15 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
 
     public ParameterPropertySource(final Parameter param) {
         setModelData(param);
+        actualValueTextDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleParameterActualValue(value);
+            }
+
+        });
+
     }
 
     private void addPropertyDescriptors(
@@ -158,6 +170,44 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
         return retObj;
     }
 
+    /**
+     * Validate actual value based on the range given in the XDD/XDC file.
+     *
+     * @param value The value of parameter to be validated.
+     * @return String error message for invalid values.
+     */
+    private String handleParameterActualValue(Object value) {
+        if ((param.getActualValue() != null)) {
+            List<Range> rangeList = param.getRangeList();
+            if (rangeList != null) {
+                for (Range range : rangeList) {
+                    if (value instanceof String) {
+                        String val = (String) value;
+                        try {
+                            int maxValue = Integer
+                                    .parseInt(range.getMaxValue());
+                            int minValue = Integer
+                                    .parseInt(range.getMinValue());
+                            if (Integer.parseInt(val) < minValue) {
+                                return "Actual value (" + val
+                                        + ") does not fit within the range ("
+                                        + minValue + " to " + maxValue + ")";
+                            }
+                            if (Integer.parseInt(val) > maxValue) {
+                                return "Actual value (" + val
+                                        + ") does not fit within the range ("
+                                        + minValue + " to " + maxValue + ")";
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
@@ -177,9 +227,11 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
     public void setPropertyValue(Object id, Object value) {
         if (id instanceof String) {
             String objectId = (String) id;
+            Result res = new Result();
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ID:
                     try {
+
                         param.setActualValue((String) value);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()

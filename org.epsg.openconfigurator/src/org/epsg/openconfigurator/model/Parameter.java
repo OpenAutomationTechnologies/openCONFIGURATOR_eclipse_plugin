@@ -411,19 +411,12 @@ public class Parameter implements IParameter {
         if (parameterTemplate != null) {
             if ((allowedValues.getRangeList() == null)
                     || (allowedValues.getRangeList().isEmpty())) {
-                if (getParameterTemplateAllowedValues() != null) {
-                    return getParameterTemplateAllowedValues().getRangeList();
-                }
+                return getParameterTemplateAllowedValues().getRangeList();
             }
         }
         return allowedValues.getRangeList();
     }
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see org.epsg.openconfigurator.model.IParameter#getSimpleDataType()
-     */
     @Override
     public SimpleDataType getSimpleDataType() {
         return dataType.getSimpleDataType();

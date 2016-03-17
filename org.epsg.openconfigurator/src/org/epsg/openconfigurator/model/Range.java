@@ -44,7 +44,8 @@ public class Range {
     private String step;
 
     public Range(TRange range) {
-
+        maxValue = range.getMaxValue().getValue();
+        minValue = range.getMinValue().getValue();
     }
 
     public String getMaxValue() {
