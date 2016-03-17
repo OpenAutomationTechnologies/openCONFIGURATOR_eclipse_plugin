@@ -40,11 +40,13 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.Range;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.jdom2.JDOMException;
 
 /**
@@ -231,8 +233,17 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ID:
                     try {
-
-                        param.setActualValue((String) value);
+                        String actualValue = (String) value;
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetParameterActualValue(
+                                        param.getNode().getNetworkId(),
+                                        param.getNode().getNodeId(),
+                                        param.getUniqueId(), actualValue);
+                        if (!res.IsSuccessful()) {
+                            System.err.println(OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(res));
+                        }
+                        param.setActualValue(actualValue);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(e.getCause().getMessage(),

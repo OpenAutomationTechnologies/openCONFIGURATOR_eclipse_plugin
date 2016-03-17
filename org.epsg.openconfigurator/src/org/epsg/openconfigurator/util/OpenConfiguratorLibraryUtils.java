@@ -63,6 +63,7 @@ import org.epsg.openconfigurator.lib.wrapper.PDOMapping;
 import org.epsg.openconfigurator.lib.wrapper.ParameterAccess;
 import org.epsg.openconfigurator.lib.wrapper.PlkDataType;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.lib.wrapper.StringCollection;
 import org.epsg.openconfigurator.model.NetworkManagement;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Node.NodeType;
@@ -88,18 +89,27 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkP
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
-import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers.DynamicChannels;
+import org.epsg.openconfigurator.xmlbinding.xdd.TAllowedValues;
+import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
+import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TDynamicChannel;
+import org.epsg.openconfigurator.xmlbinding.xdd.TEnumValue;
 import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroupList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList.Parameter;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterTemplate;
+import org.epsg.openconfigurator.xmlbinding.xdd.TRange;
 import org.epsg.openconfigurator.xmlbinding.xdd.TSubrange;
+import org.epsg.openconfigurator.xmlbinding.xdd.TTemplateList;
+import org.epsg.openconfigurator.xmlbinding.xdd.TValue;
 import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
 
 /**
@@ -110,6 +120,129 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
  *
  */
 public class OpenConfiguratorLibraryUtils {
+
+    private static Result addChildParameterGroupReference(String networkId,
+            short nodeId, TParameterGroup parentParameterGroup) {
+        OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
+        Result libApiRes = new Result();
+
+        List<Object> parameterGroupReferenceList = parentParameterGroup
+                .getParameterGroupOrParameterRef();
+
+        if (parameterGroupReferenceList.isEmpty()) {
+            return libApiRes;
+        }
+
+        String parentParameterGroupUniqueId = parentParameterGroup
+                .getUniqueID();
+
+        for (Object parameterGroupReference : parameterGroupReferenceList) {
+            if (parameterGroupReference instanceof TParameterGroup) {
+                TParameterGroup parameterGrp = (TParameterGroup) parameterGroupReference;
+
+                String parameterGroupUniqueId = parameterGrp.getUniqueID();
+                if (parameterGroupUniqueId == null) {
+                    // FIXME:
+                    System.err.println("ERROR");
+                    continue;
+                }
+
+                System.out.println(
+                        "Create Parameter Group : Child parameter goup uniqueID = "
+                                + parameterGroupUniqueId
+                                + "\n Parent param group unique ID = "
+                                + parentParameterGroupUniqueId);
+
+                int bitOffset = parameterGrp.getBitOffset().intValue();
+
+                Object conditionalObjectModel = parameterGrp
+                        .getConditionalUniqueIDRef();
+                String conditionalUniqueId = StringUtils.EMPTY;
+                if (conditionalObjectModel != null) {
+                    if (conditionalObjectModel instanceof TParameterList.Parameter) {
+                        TParameterList.Parameter parameter = (TParameterList.Parameter) conditionalObjectModel;
+                        conditionalUniqueId = parameter.getUniqueID();
+                    } else {
+                        System.err.println(
+                                "ParameterGroup conditional unique id is not an instance of Parameter.! ");
+                        continue;
+                    }
+
+                    String conditionalValue = parameterGrp
+                            .getConditionalValue();
+                    if (conditionalValue == null) {
+                        conditionalValue = StringUtils.EMPTY;
+                    }
+
+                    libApiRes = core.CreateParameterGroup(networkId, nodeId,
+                            parameterGroupUniqueId,
+                            parentParameterGroupUniqueId, conditionalUniqueId,
+                            conditionalValue, bitOffset);
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("Create parameter group WARN: "
+                                + getErrorMessage(libApiRes));
+                        continue;
+                    }
+                } else {
+                    libApiRes = core.CreateParameterGroup(networkId, nodeId,
+                            parameterGroupUniqueId,
+                            parentParameterGroupUniqueId, bitOffset);
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("Create parameter group WARN: "
+                                + getErrorMessage(libApiRes));
+                        continue;
+                    }
+                }
+
+                libApiRes = addChildParameterGroupReference(networkId, nodeId,
+                        parameterGrp);
+                if (!libApiRes.IsSuccessful()) {
+                    System.err.println("Create parameter group WARN: "
+                            + getErrorMessage(libApiRes));
+                }
+            } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
+                TParameterGroup.ParameterRef paramRef = (TParameterGroup.ParameterRef) parameterGroupReference;
+                Object paramRefUniqueIdRef = paramRef.getUniqueIDRef();
+                if (paramRefUniqueIdRef instanceof Parameter) {
+                    Parameter referencedParameter = (Parameter) paramRefUniqueIdRef;
+
+                    String referencedParamUId = referencedParameter
+                            .getUniqueID();
+                    String paramRefActualValue = paramRef.getActualValue();
+
+                    if (paramRefActualValue == null) {
+                        libApiRes = core.CreateParameterReference(networkId,
+                                nodeId, parentParameterGroupUniqueId,
+                                referencedParamUId);
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err.println(
+                                    "Create parameter Reference without actual value WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    } else {
+                        libApiRes = core.CreateParameterReference(networkId,
+                                nodeId, parentParameterGroupUniqueId,
+                                referencedParamUId, paramRefActualValue,
+                                paramRef.getBitOffset().intValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err.println(
+                                    "Create parameter Reference with actual value WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    }
+                } else {
+                    System.err.println(
+                            "ERRROR: ParameterGroupRef contains invalid paramRefUniqueId instance"
+                                    + paramRefUniqueIdRef);
+                }
+            } else {
+                System.err.println(
+                        "ERRROR: ParameterGroup contains invalid instance"
+                                + parameterGroupReference);
+            }
+        }
+        return libApiRes;
+    }
 
     /**
      * Add the datatype list from the XDC into the library.
@@ -133,57 +266,66 @@ public class OpenConfiguratorLibraryUtils {
             if (dtObject instanceof TDataTypeList.Struct) {
 
                 TDataTypeList.Struct structDt = (TDataTypeList.Struct) dtObject;
-                String structUniqueId = StringUtils.EMPTY;
-                if (structDt.getUniqueID() != null) {
-                    structUniqueId = structDt.getUniqueID();
+                String structUniqueId = structDt.getUniqueID();
+                if (structUniqueId == null) {
+                    structUniqueId = StringUtils.EMPTY;
                 }
 
-                String structName = StringUtils.EMPTY;
-                if (structDt.getName() != null) {
-                    structName = structDt.getName();
+                String structName = structDt.getName();
+                if (structName == null) {
+                    structName = StringUtils.EMPTY;
                 }
+
+                System.out.println("CreateStructDatatype" + " nodeId:" + nodeId
+                        + " structUniqueId:" + structUniqueId + " structName:"
+                        + structName);
 
                 libApiRes = core.CreateStructDatatype(networkId, nodeId,
                         structUniqueId, structName);
-
-                if (libApiRes.IsSuccessful()) {
-
-                    List<TVarDeclaration> varDeclList = structDt
-                            .getVarDeclaration();
-                    for (TVarDeclaration varDecl : varDeclList) {
-
-                        long varDeclSize = 0;
-                        if (varDecl.getSize() != null) {
-                            varDeclSize = varDecl.getSize().longValue();
-                        }
-
-                        String varDeclName = StringUtils.EMPTY;
-                        if (varDecl.getName() != null) {
-                            varDeclName = varDecl.getName();
-                        }
-
-                        String initialValue = StringUtils.EMPTY;
-                        if (varDecl.getInitialValue() != null) {
-                            initialValue = varDecl.getInitialValue();
-                        }
-
-                        String varDeclUniqueId = StringUtils.EMPTY;
-                        if (varDecl.getUniqueID() != null) {
-                            varDeclUniqueId = varDecl.getUniqueID();
-                        }
-
-                        IEC_Datatype iecDataType = getIEC_DataType(varDecl);
-                        libApiRes = core.CreateVarDeclaration(networkId, nodeId,
-                                structUniqueId, varDeclUniqueId, varDeclName,
-                                iecDataType, varDeclSize, initialValue);
-                        if (!libApiRes.IsSuccessful()) {
-                            System.err.println("CreateVarDeclaration WARN: "
-                                    + getErrorMessage(libApiRes));
-                        }
-                    }
-                } else {
+                if (!libApiRes.IsSuccessful()) {
                     System.err.println("CreateStructDatatype WARN: "
                             + getErrorMessage(libApiRes));
+                    continue;
+                }
+
+                List<TVarDeclaration> varDeclList = structDt
+                        .getVarDeclaration();
+                for (TVarDeclaration varDecl : varDeclList) {
+
+                    long varDeclSize = 0;
+                    if (varDecl.getSize() != null) {
+                        varDeclSize = varDecl.getSize().longValue();
+                    }
+
+                    String varDeclName = varDecl.getName();
+                    if (varDeclName == null) {
+                        varDeclName = StringUtils.EMPTY;
+                    }
+
+                    String initialValue = varDecl.getInitialValue();
+                    if (initialValue == null) {
+                        initialValue = StringUtils.EMPTY;
+                    }
+
+                    String varDeclUniqueId = varDecl.getUniqueID();
+                    if (varDeclUniqueId == null) {
+                        varDeclUniqueId = StringUtils.EMPTY;
+                    }
+
+                    IEC_Datatype iecDataType = getIEC_DataType(varDecl);
+
+                    System.out.println("CreateVarDeclaration: varDeclUniqueId:"
+                            + varDeclUniqueId + " varDeclName:" + varDeclName
+                            + " Dt:" + iecDataType + " size:" + varDeclSize
+                            + " value:" + initialValue);
+
+                    libApiRes = core.CreateVarDeclaration(networkId, nodeId,
+                            structUniqueId, varDeclUniqueId, varDeclName,
+                            iecDataType, varDeclSize, initialValue);
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("CreateVarDeclaration WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
                 }
             } else if (dtObject instanceof TDataTypeList.Array) {
 
@@ -204,8 +346,47 @@ public class OpenConfiguratorLibraryUtils {
                 }
             } else if (dtObject instanceof TDataTypeList.Enum) {
 
-            } else if (dtObject instanceof TDataTypeList.Derived) {
+                TDataTypeList.Enum enumDt = (TDataTypeList.Enum) dtObject;
+                if (enumDt.getUniqueID() != null) {
+                    List<TEnumValue> enumValueList = enumDt.getEnumValue();
+                    for (TEnumValue value : enumValueList) {
+                        if ((value.getValue() != null)
+                                || (!value.getValue().isEmpty())) {
+                            libApiRes = core.CreateEnumValue(networkId, nodeId,
+                                    enumDt.getUniqueID(), enumDt.getName(),
+                                    value.getValue());
+                            if (!libApiRes.IsSuccessful()) {
+                                System.err.println("CreateEnumDatatype WARN: "
+                                        + getErrorMessage(libApiRes));
+                            }
+                        }
+                    }
 
+                    IEC_Datatype iecDataType = getIEC_DataType(enumDt);
+
+                    if (iecDataType != null) {
+                        libApiRes = core.CreateEnumDatatype(networkId, nodeId,
+                                enumDt.getUniqueID(), enumDt.getName(),
+                                iecDataType);
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err.println("CreateEnumDatatype WARN: "
+                                    + getErrorMessage(libApiRes));
+                        }
+
+                        if (enumDt.getSize() != null) {
+                            libApiRes = core.CreateEnumDatatype(networkId,
+                                    nodeId, enumDt.getUniqueID(),
+                                    enumDt.getName(), iecDataType,
+                                    enumDt.getSize().intValue());
+                            if (!libApiRes.IsSuccessful()) {
+                                System.err.println("CreateEnumDatatype WARN: "
+                                        + getErrorMessage(libApiRes));
+                            }
+                        }
+                    }
+                }
+            } else if (dtObject instanceof TDataTypeList.Derived) {
+                // TODO: Add derived datatype list
             }
         }
 
@@ -221,7 +402,7 @@ public class OpenConfiguratorLibraryUtils {
      * @return Result instance from the library.
      */
     private static Result addDynamicChannels(String networkId, short nodeId,
-            DynamicChannels dynamicChannels) {
+            TApplicationLayers.DynamicChannels dynamicChannels) {
         Result libApiRes = new Result();
         if (dynamicChannels == null) {
             return libApiRes;
@@ -283,7 +464,7 @@ public class OpenConfiguratorLibraryUtils {
      * @return Result instance from the library.
      */
     private static Result addDynamicChannels(String networkId, short nodeId,
-            org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead.DynamicChannels dynamicChannels) {
+            TApplicationLayersModularHead.DynamicChannels dynamicChannels) {
         Result libApiRes = new Result();
         if (dynamicChannels == null) {
             return libApiRes;
@@ -1013,11 +1194,22 @@ public class OpenConfiguratorLibraryUtils {
                 }
             } else if ((object.getDataType() != null)
                     && (object.getUniqueIDRef() != null)) {
-                // ParameterGroup Objects with uniqueIdRef and with dataType
-                // FIXME
-                System.err.println(
-                        "UNHANDLED: ParameterGroup Objects with uniqueIdRef and with dataTyp:"
-                                + object.getUniqueIDRef());
+                if (object
+                        .getUniqueIDRef() instanceof TParameterList.Parameter) {
+                    Parameter parameter = (Parameter) object.getUniqueIDRef();
+
+                    libApiRes = core.CreateParameterObject(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), objectType,
+                            object.getName(),
+                            getObjectDatatype(object.getDataType()), mapping,
+                            parameter.getUniqueID());
+                    if (!libApiRes.IsSuccessful()) {
+                        object.setError(getErrorMessage(libApiRes));
+                        System.err.println("CreateParameterObject WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                }
+
             } else {
                 // Cannot happen
                 System.err.println(
@@ -1053,6 +1245,44 @@ public class OpenConfiguratorLibraryUtils {
         return libApiRes;
     }
 
+    private static Result addParameterGroup(String networkId, short nodeId,
+            TParameterGroupList parameterGroupElement) {
+        OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
+        Result libApiRes = new Result();
+
+        List<TParameterGroup> parameterGroup = parameterGroupElement
+                .getParameterGroup();
+
+        for (TParameterGroup parameterGrp : parameterGroup) {
+            String parameterGroupUniqueId = parameterGrp.getUniqueID();
+
+            if (parameterGroupUniqueId == null) {
+                // FIXME:
+                System.err.println("ERRR......");
+                continue;
+            }
+
+            libApiRes = core.CreateParameterGroup(networkId, nodeId,
+                    parameterGroupUniqueId);
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("Create parameter group WARN: "
+                        + getErrorMessage(libApiRes));
+                continue;
+            }
+
+            // Add child parameterGroup/parameterReferenceList...
+            libApiRes = addChildParameterGroupReference(networkId, nodeId,
+                    parameterGrp);
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("Create parameter group WARN: "
+                        + getErrorMessage(libApiRes));
+                continue;
+            }
+        }
+
+        return libApiRes;
+    }
+
     /**
      * Add the list of Parameter instances from the XDC into the library.
      *
@@ -1062,25 +1292,154 @@ public class OpenConfiguratorLibraryUtils {
      * @return Result instance from the library.
      */
     private static Result addParameterList(final String networkId,
-            final short nodeId, TParameterList parameterListElement) {
+            final short nodeId,
+            List<TParameterList.Parameter> parameterListModel) {
         OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
         Result libApiRes = new Result();
 
-        if (parameterListElement == null) {
-            return libApiRes;
-        }
-
-        List<Parameter> parameterList = parameterListElement.getParameter();
-        for (Parameter parameter : parameterList) {
+        for (TParameterList.Parameter parameter : parameterListModel) {
             ParameterAccess access = getParameterAccess(parameter.getAccess());
+            if (access == null) {
+                access = ParameterAccess.undefined;
+            }
+            String parameterUniqueId = parameter.getUniqueID();
+
+            Object paramTempladeIDRef = parameter.getTemplateIDRef();
+            if (paramTempladeIDRef != null) {
+
+                if (paramTempladeIDRef instanceof TParameterTemplate) {
+                    TParameterTemplate parameteratemplateModel = (TParameterTemplate) paramTempladeIDRef;
+                    System.out.println(
+                            "Create Parameter template : Parameter UID = "
+                                    + parameterUniqueId
+                                    + " \nParameter template UID = "
+                                    + parameteratemplateModel.getUniqueID());
+                    libApiRes = core.CreateParameter(networkId, nodeId,
+                            parameterUniqueId, access,
+                            parameteratemplateModel.getUniqueID());
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("CreateParameter Template WARN: "
+                                + getErrorMessage(libApiRes));
+                        continue;
+                    }
+
+                    TAllowedValues allowedValuesModel = parameter
+                            .getAllowedValues();
+                    if (allowedValuesModel != null) {
+                        List<TValue> parameterAllowedValuesList = allowedValuesModel
+                                .getValue();
+                        // Create a string collection with allowed values list.
+                        StringCollection allowedValues = new StringCollection();
+                        for (TValue parameterAllowedValue : parameterAllowedValuesList) {
+
+                            allowedValues.add(parameterAllowedValue.getValue());
+                        }
+
+                        libApiRes = core.SetParameterAllowedValues(networkId,
+                                nodeId, parameterUniqueId, allowedValues);
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err.println(
+                                    "SetParameter Allowed Values list WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+
+                        List<TRange> rangeList = allowedValuesModel.getRange();
+                        for (TRange range : rangeList) {
+
+                            TRange.MinValue minValueModel = range.getMinValue();
+                            TRange.MaxValue maxValueModel = range.getMaxValue();
+
+                            String minValue = StringUtils.EMPTY;
+                            String maxValue = StringUtils.EMPTY;
+
+                            if (minValueModel != null) {
+                                minValue = minValueModel.getValue();
+                            }
+
+                            if (maxValueModel != null) {
+                                maxValue = maxValueModel.getValue();
+                            }
+
+                            libApiRes = core.SetParameterAllowedRange(networkId,
+                                    nodeId, parameterUniqueId, minValue,
+                                    maxValue);
+                            if (!libApiRes.IsSuccessful()) {
+                                System.err.println(
+                                        "SetParameter Allowed Range WARN: "
+                                                + getErrorMessage(libApiRes));
+                            }
+                        }
+                    }
+
+                    TValue defaultValueModel = parameter.getDefaultValue();
+                    if (defaultValueModel != null) {
+                        libApiRes = core.SetParameterDefaultValue(networkId,
+                                nodeId, parameterUniqueId,
+                                defaultValueModel.getValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err
+                                    .println("SetParameter Default value WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    }
+                }
+            } else {
+
+                if (parameter.getDataTypeIDRef() == null) {
+
+                    IEC_Datatype iecDataType = getIEC_DataType(parameter);
+                    libApiRes = core.CreateParameter(networkId, nodeId,
+                            parameter.getUniqueID(), access, iecDataType,
+                            false);
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("CreateParameter data type WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                } else {
+                    // FIXME: could be variableRef also
+                    Object dataTypeObj = parameter.getDataTypeIDRef()
+                            .getUniqueIDRef();
+                    if (dataTypeObj instanceof TDataTypeList.Struct) {
+                        TDataTypeList.Struct structDt = (TDataTypeList.Struct) dataTypeObj;
+                        String uniqueIdRef = structDt.getUniqueID();
+                        libApiRes = core.CreateParameter(networkId, nodeId,
+                                parameter.getUniqueID(), uniqueIdRef, access,
+                                false);
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err.println("CreateParameter UID WARN: "
+                                    + getErrorMessage(libApiRes));
+                        }
+                    } else {
+                        System.err.println(
+                                "Unhandled datatypeObj: " + dataTypeObj);
+                    }
+                }
+            }
+        }
+        return libApiRes;
+    }
+
+    private static Result addParameterTemplateList(String networkId,
+            short nodeId, List<TParameterTemplate> parameterTemplate) {
+        OpenConfiguratorCore core = OpenConfiguratorCore.GetInstance();
+        Result libApiRes = new Result();
+
+        for (TParameterTemplate parameter : parameterTemplate) {
+            ParameterAccess access = getParameterAccess(parameter.getAccess());
+            if (access == null) {
+                access = ParameterAccess.undefined;
+            }
+            String parameterUniqueId = parameter.getUniqueID();
+
+            Object paramTempladeIDRef = parameter.getTemplateIDRef();
 
             if (parameter.getDataTypeIDRef() == null) {
 
                 IEC_Datatype iecDataType = getIEC_DataType(parameter);
                 libApiRes = core.CreateParameter(networkId, nodeId,
-                        parameter.getUniqueID(), access, iecDataType);
+                        parameter.getUniqueID(), access, iecDataType, true);
                 if (!libApiRes.IsSuccessful()) {
-                    System.err.println("CreateParameter WARN: "
+                    System.err.println("CreateParameter data type WARN: "
                             + getErrorMessage(libApiRes));
                 }
             } else {
@@ -1091,7 +1450,7 @@ public class OpenConfiguratorLibraryUtils {
                     TDataTypeList.Struct structDt = (TDataTypeList.Struct) dataTypeObj;
                     String uniqueIdRef = structDt.getUniqueID();
                     libApiRes = core.CreateParameter(networkId, nodeId,
-                            parameter.getUniqueID(), uniqueIdRef, access);
+                            parameter.getUniqueID(), uniqueIdRef, access, true);
                     if (!libApiRes.IsSuccessful()) {
                         System.err.println("CreateParameter UID WARN: "
                                 + getErrorMessage(libApiRes));
@@ -1100,6 +1459,88 @@ public class OpenConfiguratorLibraryUtils {
                     System.err.println("Unhandled datatypeObj: " + dataTypeObj);
                 }
             }
+
+            if (paramTempladeIDRef != null) {
+                if (paramTempladeIDRef instanceof TParameterTemplate) {
+                    TParameterTemplate parameteratemplateModel = (TParameterTemplate) paramTempladeIDRef;
+                    System.out.println(
+                            "Create Parameter template : Parameter UID = "
+                                    + parameterUniqueId
+                                    + " \nParameter template UID = "
+                                    + parameteratemplateModel.getUniqueID());
+                    libApiRes = core.CreateParameter(networkId, nodeId,
+                            parameterUniqueId, access,
+                            parameteratemplateModel.getUniqueID());
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("CreateParameter Template WARN: "
+                                + getErrorMessage(libApiRes));
+                        continue;
+                    }
+
+                    TAllowedValues allowedValuesModel = parameter
+                            .getAllowedValues();
+                    if (allowedValuesModel != null) {
+                        List<TValue> parameterAllowedValuesList = allowedValuesModel
+                                .getValue();
+                        // Create a string collection with allowed values list.
+                        StringCollection allowedValues = new StringCollection();
+                        for (TValue parameterAllowedValue : parameterAllowedValuesList) {
+
+                            allowedValues.add(parameterAllowedValue.getValue());
+                        }
+
+                        libApiRes = core.SetParameterAllowedValues(networkId,
+                                nodeId, parameterUniqueId, allowedValues);
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err.println(
+                                    "SetParameter Allowed Values list WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+
+                        List<TRange> rangeList = allowedValuesModel.getRange();
+                        for (TRange range : rangeList) {
+
+                            TRange.MinValue minValueModel = range.getMinValue();
+                            TRange.MaxValue maxValueModel = range.getMaxValue();
+
+                            String minValue = StringUtils.EMPTY;
+                            String maxValue = StringUtils.EMPTY;
+
+                            if (minValueModel != null) {
+                                minValue = minValueModel.getValue();
+                            }
+
+                            if (maxValueModel != null) {
+                                maxValue = maxValueModel.getValue();
+                            }
+
+                            libApiRes = core.SetParameterAllowedRange(networkId,
+                                    nodeId, parameterUniqueId, minValue,
+                                    maxValue);
+                            if (!libApiRes.IsSuccessful()) {
+                                System.err.println(
+                                        "SetParameter Allowed Range WARN: "
+                                                + getErrorMessage(libApiRes));
+                            }
+                        }
+                    }
+
+                    TValue defaultValueModel = parameter.getDefaultValue();
+                    if (defaultValueModel != null) {
+                        libApiRes = core.SetParameterDefaultValue(networkId,
+                                nodeId, parameterUniqueId,
+                                defaultValueModel.getValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err
+                                    .println("SetParameter Default value WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    }
+                }
+            } else {
+                System.err.println("Parameter template ID  == null");
+            }
+
         }
 
         return libApiRes;
@@ -1225,10 +1666,50 @@ public class OpenConfiguratorLibraryUtils {
                             parameter.getUniqueID());
                     if (!libApiRes.IsSuccessful()) {
                         subObject.setError(getErrorMessage(libApiRes));
-                        System.err
-                                .println("WARN: " + getErrorMessage(libApiRes));
+                        System.err.println(
+                                "Create Domain sub-object of parameter WARN: "
+                                        + getErrorMessage(libApiRes));
+                    }
+                } else if ((subObject.getUniqueIDRef() != null)
+                        && (subObject.getDataType() != null)) {
+                    if (subObject
+                            .getUniqueIDRef() instanceof TParameterList.Parameter) {
+                        Parameter parameter = (Parameter) subObject
+                                .getUniqueIDRef();
+                        libApiRes = core.CreateParameterSubObject(
+                                node.getNetworkId(), node.getNodeId(),
+                                object.getId(), subObject.getId(),
+                                subObjectType, subObject.getName(),
+                                getObjectDatatype(subObject.getDataType()),
+                                pdoMapping, parameter.getUniqueID());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            System.err.println(
+                                    "Create Parameter sub-Object WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    } else if (subObject
+                            .getUniqueIDRef() instanceof TParameterGroup) {
+                        TParameterGroup parameter = (TParameterGroup) subObject
+                                .getUniqueIDRef();
+                        libApiRes = core.CreateDomainSubObject(
+                                node.getNetworkId(), node.getNodeId(),
+                                object.getId(), subObject.getId(),
+                                subObjectType, subObject.getName(), pdoMapping,
+                                parameter.getUniqueID());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            System.err.println(
+                                    "Create Domain sub-object of parameter group WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    } else {
+                        System.err.println(
+                                "ERROR: New instance available as a UniqueIdReference");
                     }
                 } else {
+                    subObject.setError(
+                            "Invalid subObject.getUniqueIDRef() + subObject.getDataType() ");
                     System.err.println(
                             "ERROR: Invalid subObject.getUniqueIDRef():"
                                     + subObject.getUniqueIDRef());
@@ -1606,6 +2087,108 @@ public class OpenConfiguratorLibraryUtils {
         return IEC_Datatype.UNDEFINED;
     }
 
+    private static IEC_Datatype getIEC_DataType(TDataTypeList.Enum enumDt) {
+
+        if (enumDt.getBITSTRING() != null) {
+            return IEC_Datatype.BITSTRING;
+        } else if (enumDt.getBOOL() != null) {
+            return IEC_Datatype.BOOL;
+        } else if (enumDt.getBYTE() != null) {
+            return IEC_Datatype.BYTE;
+        } else if (enumDt.getCHAR() != null) {
+            return IEC_Datatype._CHAR;
+        } else if (enumDt.getDINT() != null) {
+            return IEC_Datatype.DINT;
+        } else if (enumDt.getDWORD() != null) {
+            return IEC_Datatype.DWORD;
+        } else if (enumDt.getINT() != null) {
+            return IEC_Datatype.INT;
+        } else if (enumDt.getLINT() != null) {
+            return IEC_Datatype.LINT;
+        } else if (enumDt.getLREAL() != null) {
+            return IEC_Datatype.LREAL;
+        } else if (enumDt.getLWORD() != null) {
+            return IEC_Datatype.LWORD;
+        } else if (enumDt.getREAL() != null) {
+            return IEC_Datatype.REAL;
+        } else if (enumDt.getSINT() != null) {
+            return IEC_Datatype.SINT;
+        } else if (enumDt.getSTRING() != null) {
+            return IEC_Datatype.STRING;
+        } else if (enumDt.getUDINT() != null) {
+            return IEC_Datatype.UDINT;
+        } else if (enumDt.getUINT() != null) {
+            return IEC_Datatype.UINT;
+        } else if (enumDt.getULINT() != null) {
+            return IEC_Datatype.ULINT;
+        } else if (enumDt.getUSINT() != null) {
+            return IEC_Datatype.USINT;
+        } else if (enumDt.getWORD() != null) {
+            return IEC_Datatype.WORD;
+        } else if (enumDt.getWSTRING() != null) {
+            return IEC_Datatype.WSTRING;
+        } else {
+            System.err.println("Array Un handled IEC_Datatype value");
+        }
+
+        return IEC_Datatype.UNDEFINED;
+    }
+
+    private static IEC_Datatype getIEC_DataType(
+            TParameterTemplate parameterTemplate) {
+        // TODO: Provide support for datatypeID ref also.
+
+        // parameter.getDataTypeIDRef()
+        if (parameterTemplate.getBITSTRING() != null) {
+            return IEC_Datatype.BITSTRING;
+        } else if (parameterTemplate.getBOOL() != null) {
+            return IEC_Datatype.BOOL;
+        } else if (parameterTemplate.getBYTE() != null) {
+            return IEC_Datatype.BYTE;
+        } else if (parameterTemplate.getCHAR() != null) {
+            return IEC_Datatype._CHAR;
+        } else if (parameterTemplate.getDINT() != null) {
+            return IEC_Datatype.DINT;
+        } else if (parameterTemplate.getDWORD() != null) {
+            return IEC_Datatype.DWORD;
+        } else if (parameterTemplate.getINT() != null) {
+            return IEC_Datatype.INT;
+        } else if (parameterTemplate.getLINT() != null) {
+            return IEC_Datatype.LINT;
+        } else if (parameterTemplate.getLREAL() != null) {
+            return IEC_Datatype.LREAL;
+        } else if (parameterTemplate.getLWORD() != null) {
+            return IEC_Datatype.LWORD;
+        } else if (parameterTemplate.getREAL() != null) {
+            return IEC_Datatype.REAL;
+        } else if (parameterTemplate.getSINT() != null) {
+            return IEC_Datatype.SINT;
+        } else if (parameterTemplate.getSTRING() != null) {
+            return IEC_Datatype.STRING;
+        } else if (parameterTemplate.getUDINT() != null) {
+            return IEC_Datatype.UDINT;
+        } else if (parameterTemplate.getUINT() != null) {
+            return IEC_Datatype.UINT;
+        } else if (parameterTemplate.getULINT() != null) {
+            return IEC_Datatype.ULINT;
+        } else if (parameterTemplate.getUSINT() != null) {
+            return IEC_Datatype.USINT;
+        } else if (parameterTemplate.getWORD() != null) {
+            return IEC_Datatype.WORD;
+        } else if (parameterTemplate.getWSTRING() != null) {
+            return IEC_Datatype.WSTRING;
+        } else {
+            System.err.println("Parameter Un handled IEC_Datatype value");
+            if (parameterTemplate.getDataTypeIDRef() != null) {
+                System.err.println(parameterTemplate.getDataTypeIDRef());
+            } else {
+                System.err.println("No uniqueIDRef");
+            }
+        }
+
+        return IEC_Datatype.UNDEFINED;
+    }
+
     /**
      * Returns the IEC datatype associated with the Array.
      *
@@ -1900,19 +2483,39 @@ public class OpenConfiguratorLibraryUtils {
                 .getApplicationProcess();
         for (TApplicationProcess appProcess : appProcessList) {
 
-            // FIXME: Move datatype list first
-            libApiRes = addParameterList(node.getNetworkId(), node.getNodeId(),
-                    appProcess.getParameterList());
-            if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
-            }
-
             libApiRes = addDataTypeList(node.getNetworkId(), node.getNodeId(),
                     appProcess.getDataTypeList());
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println(
+                        "Datatype WARN: " + getErrorMessage(libApiRes));
             }
 
+            TTemplateList templateList = appProcess.getTemplateList();
+            if (templateList != null) {
+                libApiRes = addParameterTemplateList(node.getNetworkId(),
+                        node.getNodeId(), templateList.getParameterTemplate());
+                if (!libApiRes.IsSuccessful()) {
+                    System.err.println(
+                            "Template WARN: " + getErrorMessage(libApiRes));
+                }
+            }
+
+            TParameterList parameterList = appProcess.getParameterList();
+            if (parameterList != null) {
+                libApiRes = addParameterList(node.getNetworkId(),
+                        node.getNodeId(), parameterList.getParameter());
+                if (!libApiRes.IsSuccessful()) {
+                    System.err.println(
+                            "Parameter WARN: " + getErrorMessage(libApiRes));
+                }
+            }
+
+            libApiRes = addParameterGroup(node.getNetworkId(), node.getNodeId(),
+                    appProcess.getParameterGroupList());
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println(
+                        "Parameter group WARN: " + getErrorMessage(libApiRes));
+            }
         }
         return libApiRes;
     }
@@ -1924,18 +2527,39 @@ public class OpenConfiguratorLibraryUtils {
                 .getApplicationProcess();
         for (TApplicationProcess appProcess : appProcessList) {
 
-            libApiRes = addParameterList(node.getNetworkId(), node.getNodeId(),
-                    appProcess.getParameterList());
-            if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
-            }
-
             libApiRes = addDataTypeList(node.getNetworkId(), node.getNodeId(),
                     appProcess.getDataTypeList());
             if (!libApiRes.IsSuccessful()) {
                 System.err.println("WARN: " + getErrorMessage(libApiRes));
             }
 
+            TTemplateList templateList = appProcess.getTemplateList();
+            if (templateList != null) {
+                libApiRes = addParameterTemplateList(node.getNetworkId(),
+                        node.getNodeId(), templateList.getParameterTemplate());
+                if (!libApiRes.IsSuccessful()) {
+                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                }
+            }
+
+            TParameterList parameterList = appProcess.getParameterList();
+            if (parameterList != null) {
+                libApiRes = addParameterList(node.getNetworkId(),
+                        node.getNodeId(), parameterList.getParameter());
+                if (!libApiRes.IsSuccessful()) {
+                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                }
+            }
+
+            TParameterGroupList parameterGroupList = appProcess
+                    .getParameterGroupList();
+            if (parameterGroupList != null) {
+                libApiRes = addParameterGroup(node.getNetworkId(),
+                        node.getNodeId(), parameterGroupList);
+                if (!libApiRes.IsSuccessful()) {
+                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                }
+            }
         }
         return libApiRes;
     }
@@ -2025,27 +2649,34 @@ public class OpenConfiguratorLibraryUtils {
             System.loadLibrary("boost_log"); //$NON-NLS-1$
             System.loadLibrary("boost_log_setup"); //$NON-NLS-1$
         } else if (SystemUtils.IS_OS_WINDOWS) {
-            System.loadLibrary("boost_date_time-vc110-mt-1_54"); //$NON-NLS-1$
-            System.loadLibrary("boost_system-vc110-mt-1_54"); //$NON-NLS-1$
-            System.loadLibrary("boost_chrono-vc110-mt-1_54"); //$NON-NLS-1$
-            System.loadLibrary("boost_filesystem-vc110-mt-1_54"); //$NON-NLS-1$
-            System.loadLibrary("boost_thread-vc110-mt-1_54"); //$NON-NLS-1$
-            System.loadLibrary("boost_log-vc110-mt-1_54"); //$NON-NLS-1$
-            System.loadLibrary("boost_log_setup-vc110-mt-1_54"); //$NON-NLS-1$
+
+            System.loadLibrary("boost_regex-vc110-mt-1_58");
+            System.loadLibrary("boost_date_time-vc110-mt-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_system-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_chrono-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_filesystem-vc110-mt-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_thread-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_log-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_log_setup-vc110-mt-1_58");
+            // $NON-NLS-1$
             // Temporarily debug versions.
-            // System.loadLibrary("boost_date_time-vc110-mt-gd-1_54");
-            // //$NON-NLS-1$
-            // System.loadLibrary("boost_system-vc110-mt-gd-1_54");
-            // //$NON-NLS-1$
-            // System.loadLibrary("boost_chrono-vc110-mt-gd-1_54");
-            // //$NON-NLS-1$
-            // System.loadLibrary("boost_filesystem-vc110-mt-gd-1_54");
-            // //$NON-NLS-1$
-            // System.loadLibrary("boost_thread-vc110-mt-gd-1_54");
-            // //$NON-NLS-1$
-            // System.loadLibrary("boost_log-vc110-mt-gd-1_54"); //$NON-NLS-1$
-            // System.loadLibrary("boost_log_setup-vc110-mt-gd-1_54");
-            // //$NON-NLS-1$
+
+            // System.loadLibrary("boost_regex-vc110-mt-gd-1_58");
+            // System.loadLibrary("boost_date_time-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_system-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_chrono-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_filesystem-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_thread-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_log-vc110-mt-gd-1_58"); //$NON-NLS-1$
+            // System.loadLibrary("boost_log_setup-vc110-mt-gd-1_58");
+            // // // $NON-NLS-1$
         } else {
             System.err.println("Unsupported system");
         }

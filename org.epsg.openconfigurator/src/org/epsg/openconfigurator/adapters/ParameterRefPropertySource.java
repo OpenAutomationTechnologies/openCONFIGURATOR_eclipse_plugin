@@ -39,8 +39,11 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.ParameterReference;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.jdom2.JDOMException;
 
 /**
@@ -181,9 +184,20 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
         if (id instanceof String) {
             String objectId = (String) id;
+            Result res = new Result();
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ID:
                     try {
+                        String actualValue = (String) value;
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetParameterActualValue(
+                                        paramRef.getNode().getNetworkId(),
+                                        paramRef.getNode().getNodeId(),
+                                        paramRef.getUniqueId(), actualValue);
+                        if (!res.IsSuccessful()) {
+                            System.err.println(OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(res));
+                        }
                         paramRef.setActualValue((String) value);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
