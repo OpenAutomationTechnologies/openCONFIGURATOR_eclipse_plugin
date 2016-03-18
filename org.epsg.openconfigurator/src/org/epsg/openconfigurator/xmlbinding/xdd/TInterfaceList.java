@@ -34,10 +34,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *                 &lt;sequence&gt;
  *                   &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
  *                   &lt;element ref="{http://www.ethernet-powerlink.org}fileList"/&gt;
- *                   &lt;element ref="{http://www.ethernet-powerlink.org}moduleTypeList"/&gt;
  *                   &lt;element ref="{http://www.ethernet-powerlink.org}connectedModuleList" minOccurs="0"/&gt;
  *                 &lt;/sequence&gt;
  *                 &lt;attribute name="uniqueID" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *                 &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
  *                 &lt;attribute name="maxModules" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
  *                 &lt;attribute name="unusedSlots" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
  *                 &lt;attribute name="moduleAddressing" use="required" type="{http://www.ethernet-powerlink.org}t_moduleAddressingHead" /&gt;
@@ -107,10 +107,10 @@ public class TInterfaceList {
      *       &lt;sequence&gt;
      *         &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
      *         &lt;element ref="{http://www.ethernet-powerlink.org}fileList"/&gt;
-     *         &lt;element ref="{http://www.ethernet-powerlink.org}moduleTypeList"/&gt;
      *         &lt;element ref="{http://www.ethernet-powerlink.org}connectedModuleList" minOccurs="0"/&gt;
      *       &lt;/sequence&gt;
      *       &lt;attribute name="uniqueID" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+     *       &lt;attribute name="type" use="required" type="{http://www.w3.org/2001/XMLSchema}NCName" /&gt;
      *       &lt;attribute name="maxModules" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
      *       &lt;attribute name="unusedSlots" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" /&gt;
      *       &lt;attribute name="moduleAddressing" use="required" type="{http://www.ethernet-powerlink.org}t_moduleAddressingHead" /&gt;
@@ -128,7 +128,6 @@ public class TInterfaceList {
     @XmlType(name = "", propOrder = {
         "labelOrDescriptionOrLabelRef",
         "fileList",
-        "moduleTypeList",
         "connectedModuleList"
     })
     public static class Interface {
@@ -142,14 +141,16 @@ public class TInterfaceList {
         protected List<Object> labelOrDescriptionOrLabelRef;
         @XmlElement(required = true)
         protected FileList fileList;
-        @XmlElement(required = true)
-        protected ModuleTypeList moduleTypeList;
         protected ConnectedModuleList connectedModuleList;
         @XmlAttribute(name = "uniqueID", required = true)
         @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
         @XmlID
         @XmlSchemaType(name = "ID")
         protected String uniqueID;
+        @XmlAttribute(name = "type", required = true)
+        @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
+        @XmlSchemaType(name = "NCName")
+        protected String type;
         @XmlAttribute(name = "maxModules", required = true)
         @XmlSchemaType(name = "positiveInteger")
         protected BigInteger maxModules;
@@ -223,30 +224,6 @@ public class TInterfaceList {
         }
 
         /**
-         * Gets the value of the moduleTypeList property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link ModuleTypeList }
-         *     
-         */
-        public ModuleTypeList getModuleTypeList() {
-            return moduleTypeList;
-        }
-
-        /**
-         * Sets the value of the moduleTypeList property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link ModuleTypeList }
-         *     
-         */
-        public void setModuleTypeList(ModuleTypeList value) {
-            this.moduleTypeList = value;
-        }
-
-        /**
          * Gets the value of the connectedModuleList property.
          * 
          * @return
@@ -292,6 +269,30 @@ public class TInterfaceList {
          */
         public void setUniqueID(String value) {
             this.uniqueID = value;
+        }
+
+        /**
+         * Gets the value of the type property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getType() {
+            return type;
+        }
+
+        /**
+         * Sets the value of the type property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setType(String value) {
+            this.type = value;
         }
 
         /**

@@ -28,8 +28,8 @@ public enum TModuleAddressingHead {
 
     /**
      * 
-     *                     User can provide an address for the module manually.
-     *                     
+     * 					User can provide an address for the module manually.
+     * 					
      * 
      */
     @XmlEnumValue("manual")
@@ -37,8 +37,8 @@ public enum TModuleAddressingHead {
 
     /**
      * 
-     *                     Modules shall receive an address which is equal with the position on the bus.
-     *                     
+     * 					Modules shall receive an address which is equal with the position on the bus.
+     * 					
      * 
      */
     @XmlEnumValue("position")

@@ -33,107 +33,107 @@
 *******************************************************************************
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xdd="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
-    <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
-    <xsd:include schemaLocation="CommonElements_Modular.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd"/>
-    <!-- POWERLINK profile body communication network -->
-    <xsd:complexType name="ProfileBody_CommunicationNetwork_Powerlink_Modular_Child">
-        <xsd:complexContent>
-            <xsd:extension base="xdd:ProfileBody_DataType">
-                <xsd:choice>
-                    <xsd:group ref="xdd:g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Child"/>
-                    <xsd:element name="ExternalProfileHandle" type="xdd:ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:choice>
-                <xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <!-- Definition of profile body elements -->
-    <xsd:group name="g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Child">
-        <xsd:sequence>
-            <!-- POWERLINK application layers -->
-            <xsd:element name="ApplicationLayers" type="xdd:t_ApplicationLayers_Extension">
-                <xsd:annotation>
-                    <xsd:documentation>
+	<xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+	<xsd:include schemaLocation="CommonElements_Modular.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd"/>
+	<!-- POWERLINK profile body communication network -->
+	<xsd:complexType name="ProfileBody_CommunicationNetwork_Powerlink_Modular_Child">
+		<xsd:complexContent>
+			<xsd:extension base="xdd:ProfileBody_DataType">
+				<xsd:choice>
+					<xsd:group ref="xdd:g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Child"/>
+					<xsd:element name="ExternalProfileHandle" type="xdd:ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:choice>
+				<xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- Definition of profile body elements -->
+	<xsd:group name="g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Child">
+		<xsd:sequence>
+			<!-- POWERLINK application layers -->
+			<xsd:element name="ApplicationLayers" type="xdd:t_ApplicationLayers_Extension">
+				<xsd:annotation>
+					<xsd:documentation>
             The ApplicationLayers element represents POWERLINK application layer,
             e.g. gives detailed information about a devices object dictionary.
           </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <!-- POWERLINK transport layers (empty) -->
-            <xsd:element name="TransportLayers">
-                <xsd:annotation>
-                    <xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<!-- POWERLINK transport layers (empty) -->
+			<xsd:element name="TransportLayers">
+				<xsd:annotation>
+					<xsd:documentation>
             The TransportLayers element is present for compatibility to the
             CANopen XML device description. For POWERLINK this element is
             empty.
           </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-        </xsd:sequence>
-    </xsd:group>
-    <!-- POWERLINK application layers -->
-    <xsd:complexType name="t_ApplicationLayers_Extension">
-        <xsd:sequence>
-            <xsd:element name="identity" minOccurs="0">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="vendorID" type="xdd:t_vendorID" minOccurs="0"/>
-                        <xsd:element name="deviceFamily" type="xdd:t_deviceFamily" minOccurs="0"/>
-                        <xsd:element name="productID" type="xdd:t_productID" minOccurs="0"/>
-                        <xsd:element name="version" type="xdd:t_version" minOccurs="0" maxOccurs="unbounded"/>
-                        <xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
-                        <xsd:element name="specificationRevision" type="xdd:t_specificationRevision" minOccurs="0"/>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-            <xsd:element name="ObjectList">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="Object" type="xdd:t_Object_Extension" maxOccurs="65535"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="mandatoryObjects" type="xsd:unsignedInt" use="optional"/>
-                    <xsd:attribute name="optionalObjects" type="xsd:unsignedInt" use="optional"/>
-                    <xsd:attribute name="manufacturerObjects" type="xsd:unsignedInt" use="optional"/>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="conformanceClass" type="xsd:string" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- POWERLINK application layers -->
+	<xsd:complexType name="t_ApplicationLayers_Extension">
+		<xsd:sequence>
+			<xsd:element name="identity" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="vendorID" type="xdd:t_vendorID" minOccurs="0"/>
+						<xsd:element name="deviceFamily" type="xdd:t_deviceFamily" minOccurs="0"/>
+						<xsd:element name="productID" type="xdd:t_productID" minOccurs="0"/>
+						<xsd:element name="version" type="xdd:t_version" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
+						<xsd:element name="specificationRevision" type="xdd:t_specificationRevision" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ObjectList">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Object" type="xdd:t_Object_Extension" maxOccurs="65535"/>
+					</xsd:sequence>
+					<xsd:attribute name="mandatoryObjects" type="xsd:unsignedInt" use="optional"/>
+					<xsd:attribute name="optionalObjects" type="xsd:unsignedInt" use="optional"/>
+					<xsd:attribute name="manufacturerObjects" type="xsd:unsignedInt" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="conformanceClass" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
           Conformance class of the device type. Using that attribute it is
           possible to classify the device according to the supported services
           of the communication protocol.
         </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="communicationEntityType" type="xsd:NMTOKENS" default="slave">
-            <xsd:annotation>
-                <xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="communicationEntityType" type="xsd:NMTOKENS" default="slave">
+			<xsd:annotation>
+				<xsd:documentation>
           Shall not be used. Provided for compatibility to CANopen.
         </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-    <!-- POWERLINK object -->
-    <xsd:complexType name="t_Object_Extension">
-        <xsd:sequence>
-            <xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
-                <xsd:complexType>
-                    <xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
-                    <xsd:attribute name="subIndex" type="xdd:dt_ParameterSubIndex" use="required"/>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="index" type="xdd:dt_ParameterIndex" use="optional"/>
-        <xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
-        <xsd:attribute name="rangeSelector" type="xsd:string" use="required">
-            <xsd:annotation>
-                <xsd:documentation xml:lang="en">A module index may reference a range in the modular head node.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
-    </xsd:complexType>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!-- POWERLINK object -->
+	<xsd:complexType name="t_Object_Extension">
+		<xsd:sequence>
+			<xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
+				<xsd:complexType>
+					<xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
+					<xsd:attribute name="subIndex" type="xdd:dt_ParameterSubIndex" use="required"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="index" type="xdd:dt_ParameterIndex" use="optional"/>
+		<xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
+		<xsd:attribute name="rangeSelector" type="xsd:string" use="required">
+			<xsd:annotation>
+				<xsd:documentation xml:lang="en">A module index may reference a range in the modular head node.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
+	</xsd:complexType>
 </xsd:schema>

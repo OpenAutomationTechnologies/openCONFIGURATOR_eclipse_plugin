@@ -754,6 +754,38 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link TModularChildConnectorList }
+     * 
+     */
+    public TModularChildConnectorList createTModularChildConnectorList() {
+        return new TModularChildConnectorList();
+    }
+
+    /**
+     * Create an instance of {@link TModularChildConnector }
+     * 
+     */
+    public TModularChildConnector createTModularChildConnector() {
+        return new TModularChildConnector();
+    }
+
+    /**
+     * Create an instance of {@link TModularHeadConnectorList }
+     * 
+     */
+    public TModularHeadConnectorList createTModularHeadConnectorList() {
+        return new TModularHeadConnectorList();
+    }
+
+    /**
+     * Create an instance of {@link TModularHeadConnector }
+     * 
+     */
+    public TModularHeadConnector createTModularHeadConnector() {
+        return new TModularHeadConnector();
+    }
+
+    /**
      * Create an instance of {@link ProfileBodyDevicePowerlinkModularHead }
      * 
      */
@@ -778,6 +810,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link TModularHeadDeviceFunction }
+     * 
+     */
+    public TModularHeadDeviceFunction createTModularHeadDeviceFunction() {
+        return new TModularHeadDeviceFunction();
+    }
+
+    /**
      * Create an instance of {@link ProfileBodyDevicePowerlinkModularChild }
      * 
      */
@@ -799,6 +839,14 @@ public class ObjectFactory {
      */
     public TModuleManagementModularChild createTModuleManagementModularChild() {
         return new TModuleManagementModularChild();
+    }
+
+    /**
+     * Create an instance of {@link TModularChildDeviceFunction }
+     * 
+     */
+    public TModularChildDeviceFunction createTModularChildDeviceFunction() {
+        return new TModularChildDeviceFunction();
     }
 
     /**

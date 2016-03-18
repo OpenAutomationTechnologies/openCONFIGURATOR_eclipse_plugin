@@ -47,6 +47,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="uniqueID" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
  *       &lt;attribute name="kindOfAccess" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
+ *       &lt;attribute name="configParameter" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="groupLevelVisible" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="conditionalUniqueIDRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" /&gt;
  *       &lt;attribute name="conditionalValue" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
@@ -84,6 +85,8 @@ public class TParameterGroup {
     protected String uniqueID;
     @XmlAttribute(name = "kindOfAccess")
     protected String kindOfAccess;
+    @XmlAttribute(name = "configParameter")
+    protected Boolean configParameter;
     @XmlAttribute(name = "groupLevelVisible")
     protected Boolean groupLevelVisible;
     @XmlAttribute(name = "conditionalUniqueIDRef")
@@ -204,6 +207,34 @@ public class TParameterGroup {
      */
     public void setKindOfAccess(String value) {
         this.kindOfAccess = value;
+    }
+
+    /**
+     * Gets the value of the configParameter property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isConfigParameter() {
+        if (configParameter == null) {
+            return false;
+        } else {
+            return configParameter;
+        }
+    }
+
+    /**
+     * Sets the value of the configParameter property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setConfigParameter(Boolean value) {
+        this.configParameter = value;
     }
 
     /**

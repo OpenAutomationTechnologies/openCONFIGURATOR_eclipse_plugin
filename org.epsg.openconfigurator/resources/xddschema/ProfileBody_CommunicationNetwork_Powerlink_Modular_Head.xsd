@@ -33,265 +33,265 @@
 *******************************************************************************
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xdd="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
-    <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
-    <xsd:include schemaLocation="CommonElements_Modular.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
-    <!-- POWERLINK profile body communication network -->
-    <xsd:complexType name="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head">
-        <xsd:complexContent>
-            <xsd:extension base="xdd:ProfileBody_DataType">
-                <xsd:choice>
-                    <xsd:group ref="xdd:g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Head"/>
-                    <xsd:element name="ExternalProfileHandle" type="xdd:ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
-                </xsd:choice>
-                <xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
-            </xsd:extension>
-        </xsd:complexContent>
-    </xsd:complexType>
-    <!-- Definition of profile body elements -->
-    <xsd:group name="g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Head">
-        <xsd:sequence>
-            <!-- POWERLINK application layers -->
-            <xsd:element name="ApplicationLayers" type="xdd:t_ApplicationLayers_Modular_Head">
-                <xsd:annotation>
-                    <xsd:documentation>
+	<xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+	<xsd:include schemaLocation="CommonElements_Modular.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
+	<!-- POWERLINK profile body communication network -->
+	<xsd:complexType name="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head">
+		<xsd:complexContent>
+			<xsd:extension base="xdd:ProfileBody_DataType">
+				<xsd:choice>
+					<xsd:group ref="xdd:g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Head"/>
+					<xsd:element name="ExternalProfileHandle" type="xdd:ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
+				</xsd:choice>
+				<xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
+			</xsd:extension>
+		</xsd:complexContent>
+	</xsd:complexType>
+	<!-- Definition of profile body elements -->
+	<xsd:group name="g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Head">
+		<xsd:sequence>
+			<!-- POWERLINK application layers -->
+			<xsd:element name="ApplicationLayers" type="xdd:t_ApplicationLayers_Modular_Head">
+				<xsd:annotation>
+					<xsd:documentation>
             The ApplicationLayers element represents POWERLINK application layer,
             e.g. gives detailed information about a devices object dictionary.
           </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <!-- POWERLINK transport layers (empty) -->
-            <xsd:element name="TransportLayers">
-                <xsd:annotation>
-                    <xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<!-- POWERLINK transport layers (empty) -->
+			<xsd:element name="TransportLayers">
+				<xsd:annotation>
+					<xsd:documentation>
             The TransportLayers element is present for compatibility to the
             CANopen XML device description. For POWERLINK this element is
             empty.
           </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-            <!-- POWERLINK network management -->
-            <xsd:element name="NetworkManagement" type="xdd:t_NetworkManagement" minOccurs="0">
-                <xsd:annotation>
-                    <xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+			<!-- POWERLINK network management -->
+			<xsd:element name="NetworkManagement" type="xdd:t_NetworkManagement" minOccurs="0">
+				<xsd:annotation>
+					<xsd:documentation>
             The NetworkManagement element is used to store specific device
             features and diagnostic capabilities.
           </xsd:documentation>
-                </xsd:annotation>
-            </xsd:element>
-        </xsd:sequence>
-    </xsd:group>
-    <!-- POWERLINK application layers -->
-    <xsd:complexType name="t_ApplicationLayers_Modular_Head">
-        <xsd:sequence>
-            <xsd:element name="identity" minOccurs="0">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="vendorID" type="xdd:t_vendorID" minOccurs="0"/>
-                        <xsd:element name="deviceFamily" type="xdd:t_deviceFamily" minOccurs="0"/>
-                        <xsd:element name="productID" type="xdd:t_productID" minOccurs="0"/>
-                        <xsd:element name="version" type="xdd:t_version" minOccurs="0" maxOccurs="unbounded"/>
-                        <xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
-                        <xsd:element name="specificationRevision" type="xdd:t_specificationRevision" minOccurs="0"/>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-            <xsd:element name="DataTypeList">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">DataTypeList has to be present in the modular head node.
-                    </xsd:documentation>
-                </xsd:annotation>
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="defType" type="xdd:t_DataTypes" maxOccurs="unbounded"/>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-            <xsd:element name="ObjectList">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="Object" type="xdd:t_Object_Extension_Head" maxOccurs="65535"/>
-                    </xsd:sequence>
-                    <xsd:attribute name="mandatoryObjects" type="xsd:unsignedInt" use="optional"/>
-                    <xsd:attribute name="optionalObjects" type="xsd:unsignedInt" use="optional"/>
-                    <xsd:attribute name="manufacturerObjects" type="xsd:unsignedInt" use="optional"/>
-                </xsd:complexType>
-            </xsd:element>
-            <xsd:element name="dynamicChannels" minOccurs="0">
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element name="dynamicChannel" type="xdd:t_dynamicChannel" maxOccurs="unbounded"/>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-            <!-- Modular device support -->
-            <xsd:element name="moduleManagement">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Defines the communication network module management element of the modular head node.
-                    </xsd:documentation>
-                </xsd:annotation>
-                <xsd:complexType>
-                    <xsd:sequence>
-                        <xsd:element ref="xdd:interfaceList" minOccurs="1" maxOccurs="1">
-                            <xsd:annotation>
-                                <xsd:documentation xml:lang="en">The modular head node shall define one to many subbus interfaces.
-                                </xsd:documentation>
-                            </xsd:annotation>
-                        </xsd:element>
-                    </xsd:sequence>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="conformanceClass" type="xsd:string" use="optional">
-            <xsd:annotation>
-                <xsd:documentation>
+				</xsd:annotation>
+			</xsd:element>
+		</xsd:sequence>
+	</xsd:group>
+	<!-- POWERLINK application layers -->
+	<xsd:complexType name="t_ApplicationLayers_Modular_Head">
+		<xsd:sequence>
+			<xsd:element name="identity" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="vendorID" type="xdd:t_vendorID" minOccurs="0"/>
+						<xsd:element name="deviceFamily" type="xdd:t_deviceFamily" minOccurs="0"/>
+						<xsd:element name="productID" type="xdd:t_productID" minOccurs="0"/>
+						<xsd:element name="version" type="xdd:t_version" minOccurs="0" maxOccurs="unbounded"/>
+						<xsd:element name="buildDate" type="xsd:date" minOccurs="0"/>
+						<xsd:element name="specificationRevision" type="xdd:t_specificationRevision" minOccurs="0"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="DataTypeList">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">DataTypeList has to be present in the modular head node.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="defType" type="xdd:t_DataTypes" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="ObjectList">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="Object" type="xdd:t_Object_Extension_Head" maxOccurs="65535"/>
+					</xsd:sequence>
+					<xsd:attribute name="mandatoryObjects" type="xsd:unsignedInt" use="optional"/>
+					<xsd:attribute name="optionalObjects" type="xsd:unsignedInt" use="optional"/>
+					<xsd:attribute name="manufacturerObjects" type="xsd:unsignedInt" use="optional"/>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="dynamicChannels" minOccurs="0">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element name="dynamicChannel" type="xdd:t_dynamicChannel" maxOccurs="unbounded"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<!-- Modular device support -->
+			<xsd:element name="moduleManagement">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Defines the communication network module management element of the modular head node.
+					</xsd:documentation>
+				</xsd:annotation>
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element ref="xdd:interfaceList" minOccurs="1" maxOccurs="1">
+							<xsd:annotation>
+								<xsd:documentation xml:lang="en">The modular head node shall define one to many subbus interfaces.
+								</xsd:documentation>
+							</xsd:annotation>
+						</xsd:element>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="conformanceClass" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation>
           Conformance class of the device type. Using that attribute it is
           possible to classify the device according to the supported services
           of the communication protocol.
         </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attribute name="communicationEntityType" type="xsd:NMTOKENS" default="slave">
-            <xsd:annotation>
-                <xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attribute name="communicationEntityType" type="xsd:NMTOKENS" default="slave">
+			<xsd:annotation>
+				<xsd:documentation>
           Shall not be used. Provided for compatibility to CANopen.
         </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-    </xsd:complexType>
-    <xsd:element name="interfaceList">
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="xdd:interface" maxOccurs="unbounded">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">Defines a subbus interface of the modular head node.</xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-    <xsd:element name="interface">
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="xdd:rangeList">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">An interface shall define a range list to define the indices that can be assigned to module objects.
-                    </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-            </xsd:sequence>
-            <xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="required">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">References the interface in the device profile.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-        </xsd:complexType>
-    </xsd:element>
-    <xsd:element name="rangeList">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">Defines the list of ranges assigned to an interface.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="xdd:range" maxOccurs="unbounded">
-                    <xsd:annotation>
-                        <xsd:documentation xml:lang="en">Defines one index range for the interface.
-                        </xsd:documentation>
-                    </xsd:annotation>
-                </xsd:element>
-            </xsd:sequence>
-        </xsd:complexType>
-        <xsd:unique name="uniqueRangeName">
-            <xsd:annotation>
-                <xsd:documentation xml:lang="en">Checks that a range name is not used multiple times.
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:selector xpath="xdd:range"/>
-            <xsd:field xpath="@name"/>
-        </xsd:unique>
-        <xsd:unique name="uniqueBaseIndex">
-            <xsd:annotation>
-                <xsd:documentation xml:lang="en">Checks that a range base index is not used multiple times.
-                </xsd:documentation>
-            </xsd:annotation>
-            <xsd:selector xpath="xdd:range"/>
-            <xsd:field xpath="@baseIndex"/>
-        </xsd:unique>
-    </xsd:element>
-    <xsd:element name="range">
-        <xsd:complexType>
-            <xsd:attribute name="name" type="xsd:string" use="required">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Defines the unique name of an interface range.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="baseIndex" type="xdd:dt_ParameterIndex" use="required">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Defines the base index for the interface range.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="maxIndex" type="xdd:dt_ParameterIndex" use="optional">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Defines the maximum index that can be used in the interface range. Can be omitted if the sortMode attribute value "subindex" is chosen.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="maxSubIndex" type="xdd:dt_ParameterSubIndex" use="required">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Defines the maximum number of subindices that can be used for every index in the range.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="sortMode" type="xdd:t_sortMode" use="required">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Sort mode according to either a new index or a new subindex is created for any new object.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="sortNumber" type="xdd:t_addressingAttribute" use="required">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Defines the rule how a new index or subindex is created:
-                    <br/>continuous - A new index or subindex is created continuously for module objects.
-                    <br/>address - A new index is created by appending the address of the module to the baseIndex (starting with the baseIndex for the first module.
-                    Attribute sortMode value is "index" only.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="sortStep" type="xsd:positiveInteger" default="1">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Step width for the next module indices. Default value is set to 1.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="PDOmapping" type="xdd:t_ObjectPDOMapping" use="optional">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">Optional PDOMapping for the created range objects.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-        </xsd:complexType>
-    </xsd:element>
-    <xsd:complexType name="t_Object_Extension_Head">
-        <xsd:sequence>
-            <xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
-                <xsd:complexType>
-                    <xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
-                    <xsd:attribute name="subIndex" type="xdd:dt_ParameterSubIndex" use="required"/>
-                </xsd:complexType>
-            </xsd:element>
-        </xsd:sequence>
-        <xsd:attribute name="index" type="xdd:dt_ParameterIndex" use="optional"/>
-        <xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
-        <xsd:attribute name="rangeSelector" type="xsd:string" use="optional">
-            <xsd:annotation>
-                <xsd:documentation xml:lang="en">A module index may reference a range in the modular head node.
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
-        <xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
-    </xsd:complexType>
+			</xsd:annotation>
+		</xsd:attribute>
+	</xsd:complexType>
+	<xsd:element name="interfaceList">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xdd:interface" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Defines a subbus interface of the modular head node.</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="interface">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xdd:rangeList">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">An interface shall define a range list to define the indices that can be assigned to module objects.
+					</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+			<xsd:attribute name="uniqueIDRef" type="xsd:IDREF" use="required">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">References the interface in the device profile.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="rangeList">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Defines the list of ranges assigned to an interface.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xdd:range" maxOccurs="unbounded">
+					<xsd:annotation>
+						<xsd:documentation xml:lang="en">Defines one index range for the interface.
+						</xsd:documentation>
+					</xsd:annotation>
+				</xsd:element>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:unique name="uniqueRangeName">
+			<xsd:annotation>
+				<xsd:documentation xml:lang="en">Checks that a range name is not used multiple times.
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:selector xpath="xdd:range"/>
+			<xsd:field xpath="@name"/>
+		</xsd:unique>
+		<xsd:unique name="uniqueBaseIndex">
+			<xsd:annotation>
+				<xsd:documentation xml:lang="en">Checks that a range base index is not used multiple times.
+				</xsd:documentation>
+			</xsd:annotation>
+			<xsd:selector xpath="xdd:range"/>
+			<xsd:field xpath="@baseIndex"/>
+		</xsd:unique>
+	</xsd:element>
+	<xsd:element name="range">
+		<xsd:complexType>
+			<xsd:attribute name="name" type="xsd:string" use="required">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Defines the unique name of an interface range.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="baseIndex" type="xdd:dt_ParameterIndex" use="required">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Defines the base index for the interface range.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="maxIndex" type="xdd:dt_ParameterIndex" use="optional">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Defines the maximum index that can be used in the interface range. Can be omitted if the sortMode attribute value "subindex" is chosen.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="maxSubIndex" type="xdd:dt_ParameterSubIndex" use="required">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Defines the maximum number of subindices that can be used for every index in the range.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="sortMode" type="xdd:t_sortMode" use="required">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Sort mode according to either a new index or a new subindex is created for any new object.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="sortNumber" type="xdd:t_addressingAttribute" use="required">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Defines the rule how a new index or subindex is created:
+					<br/>continuous - A new index or subindex is created continuously for module objects.
+					<br/>address - A new index is created by appending the address of the module to the baseIndex (starting with the baseIndex for the first module.
+					Attribute sortMode value is "index" only.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="sortStep" type="xsd:positiveInteger" default="1">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Step width for the next module indices. Default value is set to 1.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+			<xsd:attribute name="PDOmapping" type="xdd:t_ObjectPDOMapping" use="optional">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">Optional PDOMapping for the created range objects.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:attribute>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:complexType name="t_Object_Extension_Head">
+		<xsd:sequence>
+			<xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
+				<xsd:complexType>
+					<xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
+					<xsd:attribute name="subIndex" type="xdd:dt_ParameterSubIndex" use="required"/>
+				</xsd:complexType>
+			</xsd:element>
+		</xsd:sequence>
+		<xsd:attribute name="index" type="xdd:dt_ParameterIndex" use="optional"/>
+		<xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
+		<xsd:attribute name="rangeSelector" type="xsd:string" use="optional">
+			<xsd:annotation>
+				<xsd:documentation xml:lang="en">A module index may reference a range in the modular head node.
+				</xsd:documentation>
+			</xsd:annotation>
+		</xsd:attribute>
+		<xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
+	</xsd:complexType>
 </xsd:schema>

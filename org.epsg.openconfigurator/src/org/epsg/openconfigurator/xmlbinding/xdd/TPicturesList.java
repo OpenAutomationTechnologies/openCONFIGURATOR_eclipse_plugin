@@ -8,7 +8,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlID;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.CollapsedStringAdapter;
@@ -31,7 +30,16 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *                 &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
  *                 &lt;attribute name="URI" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
- *                 &lt;attribute name="uniqueID" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+ *                 &lt;attribute name="type" default="none"&gt;
+ *                   &lt;simpleType&gt;
+ *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}NMTOKEN"&gt;
+ *                       &lt;enumeration value="frontPicture"/&gt;
+ *                       &lt;enumeration value="icon"/&gt;
+ *                       &lt;enumeration value="additional"/&gt;
+ *                       &lt;enumeration value="none"/&gt;
+ *                     &lt;/restriction&gt;
+ *                   &lt;/simpleType&gt;
+ *                 &lt;/attribute&gt;
  *                 &lt;attribute name="number" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" /&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -95,7 +103,16 @@ public class TPicturesList {
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
      *       &lt;group ref="{http://www.ethernet-powerlink.org}g_labels"/&gt;
      *       &lt;attribute name="URI" use="required" type="{http://www.w3.org/2001/XMLSchema}anyURI" /&gt;
-     *       &lt;attribute name="uniqueID" type="{http://www.w3.org/2001/XMLSchema}ID" /&gt;
+     *       &lt;attribute name="type" default="none"&gt;
+     *         &lt;simpleType&gt;
+     *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}NMTOKEN"&gt;
+     *             &lt;enumeration value="frontPicture"/&gt;
+     *             &lt;enumeration value="icon"/&gt;
+     *             &lt;enumeration value="additional"/&gt;
+     *             &lt;enumeration value="none"/&gt;
+     *           &lt;/restriction&gt;
+     *         &lt;/simpleType&gt;
+     *       &lt;/attribute&gt;
      *       &lt;attribute name="number" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" /&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
@@ -120,11 +137,9 @@ public class TPicturesList {
         @XmlAttribute(name = "URI", required = true)
         @XmlSchemaType(name = "anyURI")
         protected String uri;
-        @XmlAttribute(name = "uniqueID")
+        @XmlAttribute(name = "type")
         @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
-        @XmlID
-        @XmlSchemaType(name = "ID")
-        protected String uniqueID;
+        protected String type;
         @XmlAttribute(name = "number")
         @XmlSchemaType(name = "unsignedInt")
         protected Long number;
@@ -186,27 +201,31 @@ public class TPicturesList {
         }
 
         /**
-         * Gets the value of the uniqueID property.
+         * Gets the value of the type property.
          * 
          * @return
          *     possible object is
          *     {@link String }
          *     
          */
-        public String getUniqueID() {
-            return uniqueID;
+        public String getType() {
+            if (type == null) {
+                return "none";
+            } else {
+                return type;
+            }
         }
 
         /**
-         * Sets the value of the uniqueID property.
+         * Sets the value of the type property.
          * 
          * @param value
          *     allowed object is
          *     {@link String }
          *     
          */
-        public void setUniqueID(String value) {
-            this.uniqueID = value;
+        public void setType(String value) {
+            this.type = value;
         }
 
         /**

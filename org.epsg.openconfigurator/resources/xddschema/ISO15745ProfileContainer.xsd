@@ -33,145 +33,145 @@
 *******************************************************************************
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
-    <!-- Container that contains profiles according to ISO 15745 -->
-    <xsd:element name="ISO15745ProfileContainer">
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="ISO15745Profile" maxOccurs="unbounded"/>
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-    <!-- ISO 15745 profile -->
-    <xsd:element name="ISO15745Profile">
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element name="ProfileHeader" type="ProfileHeader_DataType"/>
-                <xsd:element name="ProfileBody" type="ProfileBody_DataType"/>
-            </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-    <!-- ISO 15745 profile header -->
-    <xsd:complexType name="ProfileHeader_DataType">
-        <xsd:sequence>
-            <xsd:element name="ProfileIdentification" type="xsd:string"/>
-            <xsd:element name="ProfileRevision" type="xsd:string"/>
-            <xsd:element name="ProfileName" type="xsd:string"/>
-            <xsd:element name="ProfileSource" type="xsd:string"/>
-            <xsd:element name="ProfileClassID" type="ProfileClassID_DataType"/>
-            <xsd:element name="ProfileDate" type="xsd:date" minOccurs="0"/>
-            <xsd:element name="AdditionalInformation" type="xsd:anyURI" minOccurs="0"/>
-            <xsd:element name="ISO15745Reference" type="ISO15745Reference_DataType"/>
-            <xsd:element name="IASInterfaceType" type="IASInterface_DataType" minOccurs="0" maxOccurs="unbounded"/>
-        </xsd:sequence>
-    </xsd:complexType>
-    <!-- ISO 15745 profile body -->
-    <xsd:complexType name="ProfileBody_DataType" abstract="true">
-        <xsd:attribute name="formatName" type="xsd:string" fixed="DDXML"/>
-        <xsd:attribute name="formatVersion" type="xsd:string" fixed="2.0"/>
-        <xsd:attribute name="fileName" type="xsd:string" use="required"/>
-        <xsd:attribute name="fileCreator" type="xsd:string" use="required"/>
-        <xsd:attribute name="fileCreationDate" type="xsd:date" use="required"/>
-        <xsd:attribute name="fileCreationTime" type="xsd:time" use="optional"/>
-        <xsd:attribute name="fileModifiedBy" type="xsd:string" use="optional"/>
-        <xsd:attribute name="fileModificationDate" type="xsd:date" use="optional"/>
-        <xsd:attribute name="fileModificationTime" type="xsd:time" use="optional"/>
-        <xsd:attribute name="fileVersion" type="xsd:string" use="required"/>
-        <xsd:attribute name="supportedLanguages" use="optional">
-            <xsd:simpleType>
-                <xsd:list itemType="xsd:language"/>
-            </xsd:simpleType>
-        </xsd:attribute>
-    </xsd:complexType>
-    <!-- Profile header data types -->
-    <xsd:simpleType name="ProfileClassID_DataType">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="AIP"/>
-            <xsd:enumeration value="Process"/>
-            <xsd:enumeration value="InformationExchange"/>
-            <xsd:enumeration value="Resource"/>
-            <xsd:enumeration value="Device"/>
-            <xsd:enumeration value="CommunicationNetwork"/>
-            <xsd:enumeration value="Equipment"/>
-            <xsd:enumeration value="Human"/>
-            <xsd:enumeration value="Material"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:complexType name="ISO15745Reference_DataType">
-        <xsd:sequence>
-            <xsd:element name="ISO15745Part" type="xsd:positiveInteger"/>
-            <xsd:element name="ISO15745Edition" type="xsd:positiveInteger"/>
-            <xsd:element name="ProfileTechnology" type="xsd:string"/>
-        </xsd:sequence>
-    </xsd:complexType>
-    <xsd:simpleType name="IASInterface_DataType">
-        <xsd:union>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:enumeration value="CSI">
-                        <xsd:annotation>
-                            <xsd:documentation>Communication Services Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="HCI">
-                        <xsd:annotation>
-                            <xsd:documentation>Human/Computer Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="ISI">
-                        <xsd:annotation>
-                            <xsd:documentation>Information Services Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="API">
-                        <xsd:annotation>
-                            <xsd:documentation>Application Program Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="CMI">
-                        <xsd:annotation>
-                            <xsd:documentation>Configuration Management Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="ESI">
-                        <xsd:annotation>
-                            <xsd:documentation>Engineering Support Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="FSI">
-                        <xsd:annotation>
-                            <xsd:documentation>Facility Services Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="MTI">
-                        <xsd:annotation>
-                            <xsd:documentation>Material Transport Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="SEI">
-                        <xsd:annotation>
-                            <xsd:documentation>Safety and Environmental Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                    <xsd:enumeration value="USI">
-                        <xsd:annotation>
-                            <xsd:documentation>Utility Services Interface</xsd:documentation>
-                        </xsd:annotation>
-                    </xsd:enumeration>
-                </xsd:restriction>
-            </xsd:simpleType>
-            <xsd:simpleType>
-                <xsd:restriction base="xsd:string">
-                    <xsd:length value="4"/>
-                </xsd:restriction>
-            </xsd:simpleType>
-        </xsd:union>
-    </xsd:simpleType>
-    <!-- ISO 15745 defined data types -->
-    <xsd:complexType name="ProfileHandle_DataType">
-        <xsd:sequence>
-            <xsd:element name="ProfileIdentification" type="xsd:string"/>
-            <xsd:element name="ProfileRevision" type="xsd:string"/>
-            <xsd:element name="ProfileLocation" type="xsd:anyURI" minOccurs="0"/>
-        </xsd:sequence>
-    </xsd:complexType>
+	<!-- Container that contains profiles according to ISO 15745 -->
+	<xsd:element name="ISO15745ProfileContainer">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="ISO15745Profile" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- ISO 15745 profile -->
+	<xsd:element name="ISO15745Profile">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element name="ProfileHeader" type="ProfileHeader_DataType"/>
+				<xsd:element name="ProfileBody" type="ProfileBody_DataType"/>
+			</xsd:sequence>
+		</xsd:complexType>
+	</xsd:element>
+	<!-- ISO 15745 profile header -->
+	<xsd:complexType name="ProfileHeader_DataType">
+		<xsd:sequence>
+			<xsd:element name="ProfileIdentification" type="xsd:string"/>
+			<xsd:element name="ProfileRevision" type="xsd:string"/>
+			<xsd:element name="ProfileName" type="xsd:string"/>
+			<xsd:element name="ProfileSource" type="xsd:string"/>
+			<xsd:element name="ProfileClassID" type="ProfileClassID_DataType"/>
+			<xsd:element name="ProfileDate" type="xsd:date" minOccurs="0"/>
+			<xsd:element name="AdditionalInformation" type="xsd:anyURI" minOccurs="0"/>
+			<xsd:element name="ISO15745Reference" type="ISO15745Reference_DataType"/>
+			<xsd:element name="IASInterfaceType" type="IASInterface_DataType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<!-- ISO 15745 profile body -->
+	<xsd:complexType name="ProfileBody_DataType" abstract="true">
+		<xsd:attribute name="formatName" type="xsd:string" fixed="DDXML"/>
+		<xsd:attribute name="formatVersion" type="xsd:string" fixed="2.0"/>
+		<xsd:attribute name="fileName" type="xsd:string" use="required"/>
+		<xsd:attribute name="fileCreator" type="xsd:string" use="required"/>
+		<xsd:attribute name="fileCreationDate" type="xsd:date" use="required"/>
+		<xsd:attribute name="fileCreationTime" type="xsd:time" use="optional"/>
+		<xsd:attribute name="fileModifiedBy" type="xsd:string" use="optional"/>
+		<xsd:attribute name="fileModificationDate" type="xsd:date" use="optional"/>
+		<xsd:attribute name="fileModificationTime" type="xsd:time" use="optional"/>
+		<xsd:attribute name="fileVersion" type="xsd:string" use="required"/>
+		<xsd:attribute name="supportedLanguages" use="optional">
+			<xsd:simpleType>
+				<xsd:list itemType="xsd:language"/>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
+	<!-- Profile header data types -->
+	<xsd:simpleType name="ProfileClassID_DataType">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="AIP"/>
+			<xsd:enumeration value="Process"/>
+			<xsd:enumeration value="InformationExchange"/>
+			<xsd:enumeration value="Resource"/>
+			<xsd:enumeration value="Device"/>
+			<xsd:enumeration value="CommunicationNetwork"/>
+			<xsd:enumeration value="Equipment"/>
+			<xsd:enumeration value="Human"/>
+			<xsd:enumeration value="Material"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="ISO15745Reference_DataType">
+		<xsd:sequence>
+			<xsd:element name="ISO15745Part" type="xsd:positiveInteger"/>
+			<xsd:element name="ISO15745Edition" type="xsd:positiveInteger"/>
+			<xsd:element name="ProfileTechnology" type="xsd:string"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:simpleType name="IASInterface_DataType">
+		<xsd:union>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="CSI">
+						<xsd:annotation>
+							<xsd:documentation>Communication Services Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="HCI">
+						<xsd:annotation>
+							<xsd:documentation>Human/Computer Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="ISI">
+						<xsd:annotation>
+							<xsd:documentation>Information Services Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="API">
+						<xsd:annotation>
+							<xsd:documentation>Application Program Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="CMI">
+						<xsd:annotation>
+							<xsd:documentation>Configuration Management Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="ESI">
+						<xsd:annotation>
+							<xsd:documentation>Engineering Support Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="FSI">
+						<xsd:annotation>
+							<xsd:documentation>Facility Services Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="MTI">
+						<xsd:annotation>
+							<xsd:documentation>Material Transport Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="SEI">
+						<xsd:annotation>
+							<xsd:documentation>Safety and Environmental Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+					<xsd:enumeration value="USI">
+						<xsd:annotation>
+							<xsd:documentation>Utility Services Interface</xsd:documentation>
+						</xsd:annotation>
+					</xsd:enumeration>
+				</xsd:restriction>
+			</xsd:simpleType>
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:length value="4"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:union>
+	</xsd:simpleType>
+	<!-- ISO 15745 defined data types -->
+	<xsd:complexType name="ProfileHandle_DataType">
+		<xsd:sequence>
+			<xsd:element name="ProfileIdentification" type="xsd:string"/>
+			<xsd:element name="ProfileRevision" type="xsd:string"/>
+			<xsd:element name="ProfileLocation" type="xsd:anyURI" minOccurs="0"/>
+		</xsd:sequence>
+	</xsd:complexType>
 </xsd:schema>

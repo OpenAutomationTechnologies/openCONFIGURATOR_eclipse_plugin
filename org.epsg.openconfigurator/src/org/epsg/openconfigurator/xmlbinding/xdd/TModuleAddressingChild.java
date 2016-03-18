@@ -29,8 +29,8 @@ public enum TModuleAddressingChild {
 
     /**
      * 
-     *                         Module address can be assigned manually by the user. Requires modular head interface attribute module addressing to be manual.
-     *                         
+     * 						Module address can be assigned manually by the user. Requires modular head interface attribute module addressing to be manual.
+     * 						
      * 
      */
     @XmlEnumValue("manual")
@@ -38,8 +38,8 @@ public enum TModuleAddressingChild {
 
     /**
      * 
-     *                         Module address shall be assigned according to the position of the module.
-     *                         
+     * 						Module address shall be assigned according to the position of the module.
+     * 						
      * 
      */
     @XmlEnumValue("position")
@@ -47,8 +47,8 @@ public enum TModuleAddressingChild {
 
     /**
      * 
-     *                         Module address shall be assigned to the next address after its preceding module address.
-     *                         
+     * 						Module address shall be assigned to the next address after its preceding module address.
+     * 						
      * 
      */
     @XmlEnumValue("next")

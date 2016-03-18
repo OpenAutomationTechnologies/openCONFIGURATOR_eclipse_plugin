@@ -17,7 +17,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Defines the single module interface.
- *             
+ * 			
  * 
  * <p>Java class for t_moduleInterface complex type.
  * 

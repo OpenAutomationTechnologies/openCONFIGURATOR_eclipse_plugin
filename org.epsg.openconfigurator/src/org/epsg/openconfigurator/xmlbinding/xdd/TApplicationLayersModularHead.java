@@ -638,7 +638,7 @@ public class TApplicationLayersModularHead {
 
         /**
          * The modular head node shall define one to many subbus interfaces.
-         *                                 
+         * 								
          * 
          * @return
          *     possible object is

@@ -47,7 +47,7 @@ public class Interface {
 
     /**
      * An interface shall define a range list to define the indices that can be assigned to module objects.
-     *                     
+     * 					
      * 
      * @return
      *     possible object is

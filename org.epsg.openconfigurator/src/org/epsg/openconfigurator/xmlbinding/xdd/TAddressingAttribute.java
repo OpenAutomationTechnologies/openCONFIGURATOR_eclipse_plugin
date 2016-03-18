@@ -35,7 +35,7 @@ public enum TAddressingAttribute {
 
     /**
      * A new index is created depending on the address of the module.
-     *                     This address can be assigned according to moduleAddressing attribute in the moduleInterface element.
+     * 					This address can be assigned according to moduleAddressing attribute in the moduleInterface element.
      * 
      */
     @XmlEnumValue("address")

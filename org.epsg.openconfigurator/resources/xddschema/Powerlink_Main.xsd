@@ -33,12 +33,12 @@
 *******************************************************************************
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
-    <xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_Device_Powerlink_Modular_Head.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_Device_Powerlink_Modular_Child.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd"/>
-    <xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd"/>
-    <xsd:include schemaLocation="TextResource.xsd"/>
+	<xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_Device_Powerlink_Modular_Head.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_Device_Powerlink_Modular_Child.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Head.xsd"/>
+	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink_Modular_Child.xsd"/>
+	<xsd:include schemaLocation="TextResource.xsd"/>
 </xsd:schema>

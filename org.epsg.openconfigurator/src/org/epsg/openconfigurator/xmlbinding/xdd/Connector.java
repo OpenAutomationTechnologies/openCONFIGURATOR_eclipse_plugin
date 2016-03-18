@@ -9,7 +9,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlIDREF;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
@@ -31,7 +30,6 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;attribute name="id" use="required" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="posX" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
  *       &lt;attribute name="posY" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
- *       &lt;attribute name="pictureIDRef" type="{http://www.w3.org/2001/XMLSchema}IDREF" /&gt;
  *       &lt;attribute name="connectorType" type="{http://www.w3.org/2001/XMLSchema}string" default="POWERLINK" /&gt;
  *       &lt;attribute name="interfaceIDRef" type="{http://www.w3.org/2001/XMLSchema}string" /&gt;
  *       &lt;attribute name="positioning" default="remote"&gt;
@@ -74,10 +72,6 @@ public class Connector {
     @XmlAttribute(name = "posY")
     @XmlSchemaType(name = "nonNegativeInteger")
     protected BigInteger posY;
-    @XmlAttribute(name = "pictureIDRef")
-    @XmlIDREF
-    @XmlSchemaType(name = "IDREF")
-    protected Object pictureIDRef;
     @XmlAttribute(name = "connectorType")
     protected String connectorType;
     @XmlAttribute(name = "interfaceIDRef")
@@ -187,30 +181,6 @@ public class Connector {
      */
     public void setPosY(BigInteger value) {
         this.posY = value;
-    }
-
-    /**
-     * Gets the value of the pictureIDRef property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
-     */
-    public Object getPictureIDRef() {
-        return pictureIDRef;
-    }
-
-    /**
-     * Sets the value of the pictureIDRef property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
-     */
-    public void setPictureIDRef(Object value) {
-        this.pictureIDRef = value;
     }
 
     /**

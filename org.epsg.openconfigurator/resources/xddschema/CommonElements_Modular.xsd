@@ -33,131 +33,180 @@
 *******************************************************************************
 -->
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xdd="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
-    <xsd:include schemaLocation="TextResource.xsd"/>
-    <xsd:include schemaLocation="CommonElements.xsd"/>
-    <xsd:simpleType name="dt_ParameterIndex">
-        <xsd:restriction base="xsd:hexBinary">
-            <xsd:length value="2"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:simpleType name="dt_ParameterSubIndex">
-        <xsd:restriction base="xsd:hexBinary">
-            <xsd:length value="1"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:element name="file">
-        <xsd:complexType>
-            <xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
-        </xsd:complexType>
-    </xsd:element>
-    <xsd:element name="fileList">
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="xdd:file" maxOccurs="unbounded"/>
-            </xsd:sequence>
-        </xsd:complexType>
-        <xsd:unique name="uniqueFileURI">
-            <xsd:selector xpath="./file"/>
-            <xsd:field xpath="@URI"/>
-        </xsd:unique>
-    </xsd:element>
-    <xsd:element name="moduleTypeList">
-        <xsd:complexType>
-            <xsd:sequence>
-                <xsd:element ref="xdd:moduleType" maxOccurs="unbounded"/>
-            </xsd:sequence>
-        </xsd:complexType>
-        <xsd:unique name="uniqueModuleType">
-            <xsd:selector xpath="./moduleType"/>
-            <xsd:field xpath="@type"/>
-        </xsd:unique>
-    </xsd:element>
-    <xsd:element name="moduleType">
-        <xsd:complexType>
-            <xsd:attribute name="type" type="xsd:NCName" use="required"/>
-        </xsd:complexType>
-    </xsd:element>
-    <xsd:simpleType name="t_sortMode">
-        <xsd:restriction base="xsd:NMTOKEN">
-            <xsd:enumeration value="index"/>
-            <xsd:enumeration value="subindex"/>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:simpleType name="t_addressingAttribute">
-        <xsd:restriction base="xsd:NMTOKEN">
-            <xsd:enumeration value="continuous">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">A new index or subindex is created following the other.</xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-            <xsd:enumeration value="address">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">A new index is created depending on the address of the module.
-                    This address can be assigned according to moduleAddressing attribute in the moduleInterface element.</xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:simpleType name="t_moduleAddressingChild">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="manual">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">
-                        Module address can be assigned manually by the user. Requires modular head interface attribute module addressing to be manual.
-                        </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-            <xsd:enumeration value="position">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">
-                        Module address shall be assigned according to the position of the module.
-                        </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-            <xsd:enumeration value="next">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">
-                        Module address shall be assigned to the next address after its preceding module address.
-                        </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:simpleType name="t_moduleAddressingHead">
-        <xsd:restriction base="xsd:string">
-            <xsd:enumeration value="manual">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">
-                    User can provide an address for the module manually.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-            <xsd:enumeration value="position">
-                <xsd:annotation>
-                    <xsd:documentation xml:lang="en">
-                    Modules shall receive an address which is equal with the position on the bus.
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:enumeration>
-        </xsd:restriction>
-    </xsd:simpleType>
-    <xsd:complexType name="t_moduleInterface">
-        <xsd:annotation>
-            <xsd:documentation xml:lang="en">Defines the single module interface.
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:sequence>
-            <xsd:group ref="xdd:g_labels"/>
-            <xsd:element ref="xdd:fileList"/>
-            <xsd:element ref="xdd:moduleTypeList"/>
-        </xsd:sequence>
-        <xsd:attribute name="childID" type="xsd:string" use="required"/>
-        <xsd:attribute name="type" type="xsd:NCName" use="required"/>
-        <xsd:attribute name="moduleAddressing" type="xdd:t_moduleAddressingChild" use="required"/>
-        <xsd:attribute name="minAddress" type="xsd:nonNegativeInteger" use="optional" default="1"/>
-        <xsd:attribute name="maxAddress" type="xsd:nonNegativeInteger" use="optional"/>
-        <xsd:attribute name="minPosition" type="xsd:nonNegativeInteger" default="1"/>
-        <xsd:attribute name="maxPosition" type="xsd:nonNegativeInteger" use="optional"/>
-        <xsd:attribute name="maxCount" type="xsd:nonNegativeInteger" default="0"/>
-    </xsd:complexType>
+	<xsd:include schemaLocation="TextResource.xsd"/>
+	<xsd:include schemaLocation="CommonElements.xsd"/>
+	<xsd:simpleType name="dt_ParameterIndex">
+		<xsd:restriction base="xsd:hexBinary">
+			<xsd:length value="2"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="dt_ParameterSubIndex">
+		<xsd:restriction base="xsd:hexBinary">
+			<xsd:length value="1"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:element name="file">
+		<xsd:complexType>
+			<xsd:attribute name="URI" type="xsd:anyURI" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:element name="fileList">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xdd:file" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:unique name="uniqueFileURI">
+			<xsd:selector xpath="./file"/>
+			<xsd:field xpath="@URI"/>
+		</xsd:unique>
+	</xsd:element>
+	<xsd:element name="moduleTypeList">
+		<xsd:complexType>
+			<xsd:sequence>
+				<xsd:element ref="xdd:moduleType" maxOccurs="unbounded"/>
+			</xsd:sequence>
+		</xsd:complexType>
+		<xsd:unique name="uniqueModuleType">
+			<xsd:selector xpath="./moduleType"/>
+			<xsd:field xpath="@uniqueID"/>
+		</xsd:unique>
+	</xsd:element>
+	<xsd:element name="moduleType">
+		<xsd:complexType>
+			<xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
+			<xsd:attribute name="type" type="xsd:NCName" use="required"/>
+		</xsd:complexType>
+	</xsd:element>
+	<xsd:simpleType name="t_sortMode">
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="index"/>
+			<xsd:enumeration value="subindex"/>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="t_addressingAttribute">
+		<xsd:restriction base="xsd:NMTOKEN">
+			<xsd:enumeration value="continuous">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">A new index or subindex is created following the other.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="address">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">A new index is created depending on the address of the module.
+					This address can be assigned according to moduleAddressing attribute in the moduleInterface element.</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="t_moduleAddressingChild">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="manual">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						Module address can be assigned manually by the user. Requires modular head interface attribute module addressing to be manual.
+						</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="position">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						Module address shall be assigned according to the position of the module.
+						</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="next">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+						Module address shall be assigned to the next address after its preceding module address.
+						</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:simpleType name="t_moduleAddressingHead">
+		<xsd:restriction base="xsd:string">
+			<xsd:enumeration value="manual">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+					User can provide an address for the module manually.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="position">
+				<xsd:annotation>
+					<xsd:documentation xml:lang="en">
+					Modules shall receive an address which is equal with the position on the bus.
+					</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+	<xsd:complexType name="t_moduleInterface">
+		<xsd:annotation>
+			<xsd:documentation xml:lang="en">Defines the single module interface.
+			</xsd:documentation>
+		</xsd:annotation>
+		<xsd:sequence>
+			<xsd:group ref="xdd:g_labels"/>
+			<xsd:element ref="xdd:fileList"/>
+			<xsd:element ref="xdd:moduleTypeList"/>
+		</xsd:sequence>
+		<xsd:attribute name="childID" type="xsd:string" use="required"/>
+		<xsd:attribute name="type" type="xsd:NCName" use="required"/>
+		<xsd:attribute name="moduleAddressing" type="xdd:t_moduleAddressingChild" use="required"/>
+		<xsd:attribute name="minAddress" type="xsd:nonNegativeInteger" use="optional" default="1"/>
+		<xsd:attribute name="maxAddress" type="xsd:nonNegativeInteger" use="optional"/>
+		<xsd:attribute name="minPosition" type="xsd:nonNegativeInteger" default="1"/>
+		<xsd:attribute name="maxPosition" type="xsd:nonNegativeInteger" use="optional"/>
+		<xsd:attribute name="maxCount" type="xsd:nonNegativeInteger" default="0"/>
+	</xsd:complexType>
+	<xsd:complexType name="t_modularChildConnectorList">
+		<xsd:sequence>
+			<xsd:element name="connector" type="xdd:t_modularChildConnector" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+		<xsd:complexType name="t_modularChildConnector">
+			<xsd:group ref="xdd:g_labels"/>
+			<xsd:attribute name="id" type="xsd:ID" use="required"/>
+			<xsd:attribute name="posX" type="xsd:nonNegativeInteger"/>
+			<xsd:attribute name="posY" type="xsd:nonNegativeInteger"/>
+			<xsd:attribute name="connectorType" type="xsd:string" use="required"/>
+			<xsd:attribute name="interfaceIDRef" type="xsd:string" use="required"/>
+			<xsd:attribute name="positioning" use="optional" default="remote">
+				<xsd:simpleType>
+					<xsd:restriction base="xsd:string">
+						<xsd:enumeration value="remote"/>
+						<xsd:enumeration value="localAbove"/>
+						<xsd:enumeration value="localBelow"/>
+						<xsd:enumeration value="localLeft"/>
+						<xsd:enumeration value="localRight"/>
+					</xsd:restriction>
+				</xsd:simpleType>
+			</xsd:attribute>
+		</xsd:complexType>
+			<xsd:complexType name="t_modularHeadConnectorList">
+		<xsd:sequence>
+			<xsd:element name="connector" type="xdd:t_modularHeadConnector" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="t_modularHeadConnector">
+		<xsd:group ref="xdd:g_labels"/>
+		<xsd:attribute name="id" type="xsd:ID" use="required"/>
+		<xsd:attribute name="posX" type="xsd:nonNegativeInteger"/>
+		<xsd:attribute name="posY" type="xsd:nonNegativeInteger"/>
+		<xsd:attribute name="connectorType" type="xsd:string" use="required"/>
+		<xsd:attribute name="interfaceIDRef" type="xsd:string" use="optional"/>
+		<xsd:attribute name="positioning" use="optional" default="remote">
+			<xsd:simpleType>
+				<xsd:restriction base="xsd:string">
+					<xsd:enumeration value="remote"/>
+					<xsd:enumeration value="localAbove"/>
+					<xsd:enumeration value="localBelow"/>
+					<xsd:enumeration value="localLeft"/>
+					<xsd:enumeration value="localRight"/>
+				</xsd:restriction>
+			</xsd:simpleType>
+		</xsd:attribute>
+	</xsd:complexType>
 </xsd:schema>

@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *       &lt;sequence&gt;
  *         &lt;element name="DeviceIdentity" type="{http://www.ethernet-powerlink.org}t_DeviceIdentity" minOccurs="0"/&gt;
  *         &lt;element name="DeviceManager" type="{http://www.ethernet-powerlink.org}t_DeviceManager_Modular_Child" minOccurs="0"/&gt;
- *         &lt;element name="DeviceFunction" type="{http://www.ethernet-powerlink.org}t_DeviceFunction" maxOccurs="unbounded"/&gt;
+ *         &lt;element name="DeviceFunction" type="{http://www.ethernet-powerlink.org}t_modularChildDeviceFunction" maxOccurs="unbounded"/&gt;
  *         &lt;element name="ApplicationProcess" type="{http://www.ethernet-powerlink.org}t_ApplicationProcess" maxOccurs="unbounded" minOccurs="0"/&gt;
  *         &lt;element name="ExternalProfileHandle" type="{http://www.ethernet-powerlink.org}ProfileHandle_DataType" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
@@ -62,7 +62,7 @@ public class ProfileBodyDevicePowerlinkModularChild
     @XmlElement(name = "DeviceManager")
     protected TDeviceManagerModularChild deviceManager;
     @XmlElement(name = "DeviceFunction", required = true)
-    protected List<TDeviceFunction> deviceFunction;
+    protected List<TModularChildDeviceFunction> deviceFunction;
     @XmlElement(name = "ApplicationProcess")
     protected List<TApplicationProcess> applicationProcess;
     @XmlElement(name = "ExternalProfileHandle")
@@ -139,13 +139,13 @@ public class ProfileBodyDevicePowerlinkModularChild
      * 
      * <p>
      * Objects of the following type(s) are allowed in the list
-     * {@link TDeviceFunction }
+     * {@link TModularChildDeviceFunction }
      * 
      * 
      */
-    public List<TDeviceFunction> getDeviceFunction() {
+    public List<TModularChildDeviceFunction> getDeviceFunction() {
         if (deviceFunction == null) {
-            deviceFunction = new ArrayList<TDeviceFunction>();
+            deviceFunction = new ArrayList<TModularChildDeviceFunction>();
         }
         return this.deviceFunction;
     }
