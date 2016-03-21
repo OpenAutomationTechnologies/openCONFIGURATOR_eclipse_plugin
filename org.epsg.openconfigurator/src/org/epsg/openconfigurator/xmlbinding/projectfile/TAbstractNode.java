@@ -12,7 +12,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * An abstract type for a POWERLINK node (MN or CN). 
+ * An abstract type for a POWERLINK node (MN or CN).
  * 
  * <p>Java class for tAbstractNode complex type.
  * 
@@ -34,7 +34,6 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent&gt;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
- *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *       &lt;attribute name="isAsyncOnly" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -49,8 +48,7 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tAbstractNode", propOrder = {
-    "forcedObjects",
-    "interfaceList"
+    "forcedObjects"
 })
 @XmlSeeAlso({
     TCN.class,
@@ -61,8 +59,6 @@ public abstract class TAbstractNode {
 
     @XmlElement(name = "ForcedObjects")
     protected TAbstractNode.ForcedObjects forcedObjects;
-    @XmlElement(name = "InterfaceList")
-    protected InterfaceList interfaceList;
     @XmlAttribute(name = "name")
     protected String name;
     @XmlAttribute(name = "isAsyncOnly")
@@ -94,30 +90,6 @@ public abstract class TAbstractNode {
      */
     public void setForcedObjects(TAbstractNode.ForcedObjects value) {
         this.forcedObjects = value;
-    }
-
-    /**
-     * Gets the value of the interfaceList property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link InterfaceList }
-     *     
-     */
-    public InterfaceList getInterfaceList() {
-        return interfaceList;
-    }
-
-    /**
-     * Sets the value of the interfaceList property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link InterfaceList }
-     *     
-     */
-    public void setInterfaceList(InterfaceList value) {
-        this.interfaceList = value;
     }
 
     /**

@@ -11,8 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Specifies configuration options which apply to the openCONFIGURATOR project
- *                 itself.
+ * Specifies configuration options which apply to the openCONFIGURATOR project itself.
  * 
  * <p>Java class for tProjectConfiguration complex type.
  * 

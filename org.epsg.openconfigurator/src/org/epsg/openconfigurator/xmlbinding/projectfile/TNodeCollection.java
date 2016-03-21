@@ -10,8 +10,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * The Node collection element is a container for all nodes in a POWERLINK
- *                 network.
+ * The Node collection element is a container for all nodes in a POWERLINK network.
  * 
  * <p>Java class for tNodeCollection complex type.
  * 

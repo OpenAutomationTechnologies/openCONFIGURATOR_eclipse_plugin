@@ -11,8 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Element to define communication relationships in a POWERLINK network. I.e.:
- *                 How is an object transferred from node X to node Y. 
+ * Element to define communication relationships in a POWERLINK network. I.e.: How is an object transferred from node X to node Y.
  * 
  * <p>Java class for tNetworkConfiguration complex type.
  * 

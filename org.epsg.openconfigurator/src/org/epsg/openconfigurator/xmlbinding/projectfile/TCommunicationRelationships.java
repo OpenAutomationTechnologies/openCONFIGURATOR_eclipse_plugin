@@ -9,8 +9,7 @@ import org.w3c.dom.Element;
 
 
 /**
- * Element to define communication relationships in a POWERLINK network. I.e.
- *                 how objects are transferred between nodes.
+ * Element to define communication relationships in a POWERLINK network. I.e. how objects are transferred between nodes.
  * 
  * <p>Java class for tCommunicationRelationships complex type.
  * 

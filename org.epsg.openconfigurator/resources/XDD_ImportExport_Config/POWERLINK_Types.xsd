@@ -1,127 +1,111 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema elementFormDefault="qualified"
-    targetNamespace="http://ethernet-powerlink.org/POWERLINK"
-    xmlns:ppc="http://ethernet-powerlink.org/POWERLINK"
-    xmlns:xs="http://www.w3.org/2001/XMLSchema">
-
-    <xs:simpleType name="tNonEmptyString">
-        <xs:restriction base="xs:string">
-            <xs:pattern value="\S+[\S\s]*" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:element name="Descriptions">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">The element includes a list of internationalized
+<xs:schema elementFormDefault="qualified" targetNamespace="http://ethernet-powerlink.org/POWERLINK" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+	<xs:simpleType name="tNonEmptyString">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\S+[\S\s]*"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:element name="Descriptions">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The element includes a list of internationalized
                 descriptions.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence maxOccurs="unbounded">
-                <xs:element ref="ppc:Description" />
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="Description">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="ppc:tNonEmptyString">
-                    <xs:attribute name="type" type="ppc:tDescriptionType" use="required" />
-                    <xs:attribute name="lang" type="xs:language" use="required" />
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="Names">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">The element includes a list of internationalized
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="ppc:Description"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Description">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="ppc:tNonEmptyString">
+					<xs:attribute name="type" type="ppc:tDescriptionType" use="required"/>
+					<xs:attribute name="lang" type="xs:language" use="required"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Names">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">The element includes a list of internationalized
                 Names.</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence maxOccurs="unbounded">
-                <xs:element ref="ppc:Name" />
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:element name="Name">
-        <xs:complexType>
-            <xs:simpleContent>
-                <xs:extension base="ppc:tNonEmptyString">
-                    <xs:attribute name="lang" type="xs:language" use="required" />
-                </xs:extension>
-            </xs:simpleContent>
-        </xs:complexType>
-    </xs:element>
-
-    <xs:simpleType name="tDescriptionType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="SHORT" />
-            <xs:enumeration value="LONG" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tFeatureFlagBitOffset">
-        <xs:restriction base="xs:nonNegativeInteger">
-            <xs:maxInclusive value="31" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tIECValueType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">IEC-Datatype to be specified for a
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence maxOccurs="unbounded">
+				<xs:element ref="ppc:Name"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Name">
+		<xs:complexType>
+			<xs:simpleContent>
+				<xs:extension base="ppc:tNonEmptyString">
+					<xs:attribute name="lang" type="xs:language" use="required"/>
+				</xs:extension>
+			</xs:simpleContent>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="tDescriptionType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SHORT"/>
+			<xs:enumeration value="LONG"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tFeatureFlagBitOffset">
+		<xs:restriction base="xs:nonNegativeInteger">
+			<xs:maxInclusive value="31"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tIECValueType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">IEC-Datatype to be specified for a
                 Parameter.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="BOOL" />
-            <xs:enumeration value="BITSTRING" />
-            <xs:enumeration value="BYTE" />
-            <xs:enumeration value="CHAR" />
-            <xs:enumeration value="WORD" />
-            <xs:enumeration value="DWORD" />
-            <xs:enumeration value="LWORD" />
-            <xs:enumeration value="SINT" />
-            <xs:enumeration value="INT" />
-            <xs:enumeration value="DINT" />
-            <xs:enumeration value="LINT" />
-            <xs:enumeration value="USINT" />
-            <xs:enumeration value="UINT" />
-            <xs:enumeration value="UDINT" />
-            <xs:enumeration value="ULINT" />
-            <xs:enumeration value="REAL" />
-            <xs:enumeration value="LREAL" />
-            <xs:enumeration value="STRING" />
-            <xs:enumeration value="WSTRING" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tParameterIndex">
-        <xs:restriction base="xs:hexBinary">
-            <xs:length value="2" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tParameterSubIndex">
-        <xs:annotation>
-            <xs:documentation>Restrict subIndices of Parameters to value range 0-254 (255 is
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="BOOL"/>
+			<xs:enumeration value="BITSTRING"/>
+			<xs:enumeration value="BYTE"/>
+			<xs:enumeration value="CHAR"/>
+			<xs:enumeration value="WORD"/>
+			<xs:enumeration value="DWORD"/>
+			<xs:enumeration value="LWORD"/>
+			<xs:enumeration value="SINT"/>
+			<xs:enumeration value="INT"/>
+			<xs:enumeration value="DINT"/>
+			<xs:enumeration value="LINT"/>
+			<xs:enumeration value="USINT"/>
+			<xs:enumeration value="UINT"/>
+			<xs:enumeration value="UDINT"/>
+			<xs:enumeration value="ULINT"/>
+			<xs:enumeration value="REAL"/>
+			<xs:enumeration value="LREAL"/>
+			<xs:enumeration value="STRING"/>
+			<xs:enumeration value="WSTRING"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tParameterIndex">
+		<xs:restriction base="xs:hexBinary">
+			<xs:length value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tParameterSubIndex">
+		<xs:annotation>
+			<xs:documentation>Restrict subIndices of Parameters to value range 0-254 (255 is
                 reserved).</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:hexBinary">
-            <xs:length value="1" />
-            <xs:pattern value="[0-9A-F]{1,1}[0-9A-E]{1,1}" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tPOWERLINKDatatype">
-        <xs:restriction base="xs:hexBinary">
-            <xs:length value="2" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tNodeAssignment">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Type to define on which type of node a parameter is
+		</xs:annotation>
+		<xs:restriction base="xs:hexBinary">
+			<xs:length value="1"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tPOWERLINKDatatype">
+		<xs:restriction base="xs:hexBinary">
+			<xs:length value="2"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tNodeAssignment">
+		<xs:annotation>
+			<xs:documentation xml:lang="en"> Type to define on which type of node a parameter is
                 mandatory. Note: A parameter can contain nested FeatureRef- or
                 ParameterRef-Elements. In this case, whether a Parameter is mandatory or not (and
                 where) refers to the support/non-support of the referenced Feature or Parameter.
@@ -133,44 +117,40 @@
                 Parameter is always mandatory if there is no feature-dependency, and that it depends
                 on support/non-support of a Feature if there is a feature-dependency.
             </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="MN" />
-            <xs:enumeration value="CN" />
-            <xs:enumeration value="MNCN" />
-            <xs:enumeration value="NONE" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tParameterType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en">Type to define to which type of node a parameter is
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="MN"/>
+			<xs:enumeration value="CN"/>
+			<xs:enumeration value="MNCN"/>
+			<xs:enumeration value="NONE"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tParameterType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en">Type to define to which type of node a parameter is
                 applicable.</xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="ppc:tNodeAssignment">
-            <xs:enumeration value="MN" />
-            <xs:enumeration value="CN" />
-            <xs:enumeration value="MNCN" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tFeatureType">
-        <xs:annotation>
-            <xs:documentation xml:lang="en"> Defines to which type of node a feature belongs.
+		</xs:annotation>
+		<xs:restriction base="ppc:tNodeAssignment">
+			<xs:enumeration value="MN"/>
+			<xs:enumeration value="CN"/>
+			<xs:enumeration value="MNCN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tFeatureType">
+		<xs:annotation>
+			<xs:documentation xml:lang="en"> Defines to which type of node a feature belongs.
             </xs:documentation>
-        </xs:annotation>
-        <xs:restriction base="ppc:tNodeAssignment">
-            <xs:enumeration value="MN" />
-            <xs:enumeration value="CN" />
-            <xs:enumeration value="MNCN" />
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="tNodeId">
-        <xs:restriction base="xs:short">
-            <xs:minInclusive value="0"/>
-            <xs:maxInclusive value="240"/>
-        </xs:restriction>
-    </xs:simpleType>
-
+		</xs:annotation>
+		<xs:restriction base="ppc:tNodeAssignment">
+			<xs:enumeration value="MN"/>
+			<xs:enumeration value="CN"/>
+			<xs:enumeration value="MNCN"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tNodeId">
+		<xs:restriction base="xs:short">
+			<xs:minInclusive value="0"/>
+			<xs:maxInclusive value="240"/>
+		</xs:restriction>
+	</xs:simpleType>
 </xs:schema>

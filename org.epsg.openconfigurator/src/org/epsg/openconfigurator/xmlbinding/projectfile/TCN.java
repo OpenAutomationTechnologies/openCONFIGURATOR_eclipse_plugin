@@ -4,11 +4,12 @@ package org.epsg.openconfigurator.xmlbinding.projectfile;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * A concrete type for a POWERLINK CN. 
+ * A concrete type for a POWERLINK CN.
  * 
  * <p>Java class for tCN complex type.
  * 
@@ -18,6 +19,9 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="tCN"&gt;
  *   &lt;complexContent&gt;
  *     &lt;extension base="{http://sourceforge.net/projects/openconf/configuration}tAbstractNode"&gt;
+ *       &lt;sequence&gt;
+ *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
+ *       &lt;/sequence&gt;
  *       &lt;attribute name="nodeID" use="required"&gt;
  *         &lt;simpleType&gt;
  *           &lt;union memberTypes=" {http://sourceforge.net/projects/openconf/configuration}tRegularCNNodeID"&gt;
@@ -53,11 +57,15 @@ import javax.xml.bind.annotation.XmlType;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tCN")
+@XmlType(name = "tCN", propOrder = {
+    "interfaceList"
+})
 public class TCN
     extends TAbstractNode
 {
 
+    @XmlElement(name = "InterfaceList")
+    protected InterfaceList interfaceList;
     @XmlAttribute(name = "nodeID", required = true)
     protected String nodeID;
     @XmlAttribute(name = "pathToXDC", required = true)
@@ -90,6 +98,30 @@ public class TCN
     protected Boolean verifySerialNumber;
     @XmlAttribute(name = "enabled")
     protected Boolean enabled;
+
+    /**
+     * Gets the value of the interfaceList property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link InterfaceList }
+     *     
+     */
+    public InterfaceList getInterfaceList() {
+        return interfaceList;
+    }
+
+    /**
+     * Sets the value of the interfaceList property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link InterfaceList }
+     *     
+     */
+    public void setInterfaceList(InterfaceList value) {
+        this.interfaceList = value;
+    }
 
     /**
      * Gets the value of the nodeID property.

@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * openCONFIGURATOR auto-generation settings for the MN-OD. 
+ * openCONFIGURATOR auto-generation settings for the MN-OD.
  * 
  * <p>Java class for tAutoGenerationSettings complex type.
  * 

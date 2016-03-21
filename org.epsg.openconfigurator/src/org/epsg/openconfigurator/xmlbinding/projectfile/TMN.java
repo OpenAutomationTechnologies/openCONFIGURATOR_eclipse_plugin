@@ -10,13 +10,11 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * 
- *                 
+ * 				
  * <pre>
- * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;p xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt; One Node to rule them all,&lt;br/&gt; One Node to find them,&lt;br/&gt; One Node to bring them all and in the
- *                     darkness bind them.&lt;br/&gt; In the Land of Mordor where the Shadows lie. &lt;/p&gt;
+ * &lt;?xml version="1.0" encoding="UTF-8"?&gt;&lt;p xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema"&gt;One Node to rule them all,&lt;br/&gt;One Node to find them,&lt;br/&gt;One Node to bring them all and in the darkness bind them.&lt;br/&gt;In the Land of Mordor where the Shadows lie.&lt;/p&gt;
  * </pre>
- *  A concrete type for a
- *                 POWERLINK MN. 
+ * A concrete type for a POWERLINK MN.
  * 
  * <p>Java class for tMN complex type.
  * 

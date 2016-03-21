@@ -10,8 +10,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * Specifies information about the tool that generated this
- *                 project-file.
+ * Specifies information about the tool that generated this project-file.
  * 
  * <p>Java class for tGenerator complex type.
  * 

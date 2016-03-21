@@ -11,8 +11,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * Specifies optional configuration options which apply to the IDE
- *                 only.
+ * Specifies optional configuration options which apply to the IDE only.
  * 
  * <p>Java class for tIDEConfiguration complex type.
  * 

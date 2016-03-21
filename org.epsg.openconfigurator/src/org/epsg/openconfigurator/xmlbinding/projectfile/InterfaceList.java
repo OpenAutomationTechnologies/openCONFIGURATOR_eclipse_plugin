@@ -32,9 +32,10 @@ import javax.xml.bind.annotation.XmlType;
  *                     &lt;complexType&gt;
  *                       &lt;complexContent&gt;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *                           &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
- *                           &lt;attribute name="position" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
- *                           &lt;attribute name="pathToXDC"&gt;
+ *                           &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+ *                           &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *                           &lt;attribute name="address" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+ *                           &lt;attribute name="pathToXDC" use="required"&gt;
  *                             &lt;simpleType&gt;
  *                               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyURI"&gt;
  *                                 &lt;minLength value="1"/&gt;
@@ -47,7 +48,7 @@ import javax.xml.bind.annotation.XmlType;
  *                     &lt;/complexType&gt;
  *                   &lt;/element&gt;
  *                 &lt;/sequence&gt;
- *                 &lt;attribute name="id" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+ *                 &lt;attribute name="id" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
  *           &lt;/complexType&gt;
@@ -114,9 +115,10 @@ public class InterfaceList {
      *           &lt;complexType&gt;
      *             &lt;complexContent&gt;
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-     *                 &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
-     *                 &lt;attribute name="position" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
-     *                 &lt;attribute name="pathToXDC"&gt;
+     *                 &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+     *                 &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+     *                 &lt;attribute name="address" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+     *                 &lt;attribute name="pathToXDC" use="required"&gt;
      *                   &lt;simpleType&gt;
      *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyURI"&gt;
      *                       &lt;minLength value="1"/&gt;
@@ -129,7 +131,7 @@ public class InterfaceList {
      *           &lt;/complexType&gt;
      *         &lt;/element&gt;
      *       &lt;/sequence&gt;
-     *       &lt;attribute name="id" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+     *       &lt;attribute name="id" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
      * &lt;/complexType&gt;
@@ -145,7 +147,7 @@ public class InterfaceList {
 
         @XmlElement(name = "Module", required = true)
         protected List<InterfaceList.Interface.Module> module;
-        @XmlAttribute(name = "id")
+        @XmlAttribute(name = "id", required = true)
         protected String id;
 
         /**
@@ -211,9 +213,10 @@ public class InterfaceList {
          * &lt;complexType&gt;
          *   &lt;complexContent&gt;
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
-         *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
-         *       &lt;attribute name="position" type="{http://www.w3.org/2001/XMLSchema}nonNegativeInteger" /&gt;
-         *       &lt;attribute name="pathToXDC"&gt;
+         *       &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+         *       &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+         *       &lt;attribute name="address" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
+         *       &lt;attribute name="pathToXDC" use="required"&gt;
          *         &lt;simpleType&gt;
          *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyURI"&gt;
          *             &lt;minLength value="1"/&gt;
@@ -232,12 +235,15 @@ public class InterfaceList {
         @XmlType(name = "")
         public static class Module {
 
-            @XmlAttribute(name = "name")
+            @XmlAttribute(name = "name", required = true)
             protected String name;
-            @XmlAttribute(name = "position")
-            @XmlSchemaType(name = "nonNegativeInteger")
+            @XmlAttribute(name = "position", required = true)
+            @XmlSchemaType(name = "positiveInteger")
             protected BigInteger position;
-            @XmlAttribute(name = "pathToXDC")
+            @XmlAttribute(name = "address")
+            @XmlSchemaType(name = "positiveInteger")
+            protected BigInteger address;
+            @XmlAttribute(name = "pathToXDC", required = true)
             protected String pathToXDC;
             @XmlAttribute(name = "enabled")
             protected Boolean enabled;
@@ -288,6 +294,30 @@ public class InterfaceList {
              */
             public void setPosition(BigInteger value) {
                 this.position = value;
+            }
+
+            /**
+             * Gets the value of the address property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link BigInteger }
+             *     
+             */
+            public BigInteger getAddress() {
+                return address;
+            }
+
+            /**
+             * Sets the value of the address property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link BigInteger }
+             *     
+             */
+            public void setAddress(BigInteger value) {
+                this.address = value;
             }
 
             /**
