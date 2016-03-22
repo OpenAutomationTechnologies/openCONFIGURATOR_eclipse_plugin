@@ -248,7 +248,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                     isRpdoMappable = true;
                 }
             }
-        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+        }
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.TPDO))) {
 
@@ -334,7 +335,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                     isRpdoMappable = true;
                 }
             }
-        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+        }
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.TPDO))) {
 

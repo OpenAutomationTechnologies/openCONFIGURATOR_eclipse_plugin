@@ -230,7 +230,8 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                 }
             }
 
-        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+        }
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.TPDO))) {
             if (subObject.getUniqueIDRef() != null) {
@@ -304,7 +305,8 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                     isRpdoMappable = true;
                 }
             }
-        } else if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+        }
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.TPDO))) {
             if (subObject.getUniqueIDRef() != null) {
@@ -491,7 +493,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see org.epsg.openconfigurator.model.IPowerlinkBaseObject#getModel()
      */
     @Override
