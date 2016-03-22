@@ -377,26 +377,34 @@ public class ObjectDictionaryView extends ViewPart {
                                         + " v:" + pgmGrp.isGroupLevelVisible());
 
                         if (pgmGrp.isConditionsMet()) {
-                            if (pgmGrp.isGroupLevelVisible()) {
+                            if ((pgmGrp.isGroupLevelVisible())
+                                    && (pgmGrp.isConfigParameter())) {
                                 visibleObjectsList.add(pgmGrp);
                             } else {
-                                visibleObjectsList
-                                        .addAll(pgmGrp.getVisibleObjects());
-
-                                List<ParameterReference> prmRefList = pgmGrp
-                                        .getParameterRefList();
-                                for (ParameterReference prmRef : prmRefList) {
-                                    if (prmRef.isVisible()) {
-                                        visibleObjectsList.add(prmRef);
-                                    }
-                                }
+                                System.err.println(
+                                        "No parameter groups can be configured ");
                             }
+
+                            // } else {
+                            // visibleObjectsList
+                            // .addAll(pgmGrp.getVisibleObjects());
+                            //
+                            // List<ParameterReference> prmRefList = pgmGrp
+                            // .getParameterRefList();
+                            // for (ParameterReference prmRef : prmRefList) {
+                            // if (prmRef.isVisible()) {
+                            // visibleObjectsList.add(prmRef);
+                            // }
+                            // }
+                            // }
+                        } else {
+                            System.err.println(
+                                    "parameter group cannot be displayed due to false condition set");
                         }
                     }
 
-                    visibleObjectsList.addAll(
-                            nodeObj.getObjectDictionary().getParameterList());
-
+                    // visibleObjectsList.addAll(nodeObj.getObjectDictionary()
+                    // .getParameterofParamGroup());
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj

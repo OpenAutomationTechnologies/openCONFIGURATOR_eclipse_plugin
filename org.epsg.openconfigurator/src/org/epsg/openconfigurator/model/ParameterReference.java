@@ -165,6 +165,10 @@ public class ParameterReference implements IParameter {
         return node;
     }
 
+    public ObjectDictionary getObjectDictionary() {
+        return objectDictionary;
+    }
+
     public ParameterGroup getParameterGroup() {
         return parameterGroup;
     }

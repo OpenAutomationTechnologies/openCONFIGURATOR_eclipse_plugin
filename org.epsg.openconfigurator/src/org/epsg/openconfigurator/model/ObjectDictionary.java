@@ -95,6 +95,8 @@ public class ObjectDictionary {
      */
     private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
 
+    private final List<Parameter> parameterList = new ArrayList<Parameter>();
+
     /**
      * Parameter with uniqueID and parameter model.
      */
@@ -222,6 +224,29 @@ public class ObjectDictionary {
         List<Parameter> valueList = new ArrayList<Parameter>(
                 parameterListMap.values());
         return valueList;
+    }
+
+    public List<Parameter> getParameterofParamGroup() {
+        List<ParameterGroup> paramGrp = getParameterGroupList();
+        for (ParameterGroup pgrp : paramGrp) {
+            List<ParameterGroup> childParamGrp = pgrp.getParameterGroupList();
+            if (childParamGrp != null) {
+                for (ParameterGroup cpgrp : childParamGrp) {
+                    List<ParameterReference> prmRefList = cpgrp
+                            .getParameterRefList();
+                    for (ParameterReference prmRef : prmRefList) {
+                        Parameter param = getParameter(prmRef.getUniqueId());
+                        parameterList.add(param);
+                    }
+                }
+            }
+            List<ParameterReference> prmRefList = pgrp.getParameterRefList();
+            for (ParameterReference prmRef : prmRefList) {
+                Parameter param = getParameter(prmRef.getUniqueId());
+                parameterList.add(param);
+            }
+        }
+        return parameterList;
     }
 
     /**

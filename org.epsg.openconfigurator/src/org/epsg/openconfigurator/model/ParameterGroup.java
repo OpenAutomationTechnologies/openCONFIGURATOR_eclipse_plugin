@@ -52,6 +52,7 @@ public class ParameterGroup {
 
     private LabelDescription label;
     private boolean groupLevelVisible;
+    private boolean configParameter;
 
     private BigInteger bitOffset;
 
@@ -74,6 +75,7 @@ public class ParameterGroup {
         node = nodeInstance;
         xpath = "//plk:parameterGroup[@uniqueID='" + uniqueId + "']";
         label = new LabelDescription(grp.getLabelOrDescriptionOrLabelRef());
+        configParameter = grp.isConfigParameter();
         groupLevelVisible = grp.isGroupLevelVisible();
 
         bitOffset = grp.getBitOffset();
@@ -154,7 +156,8 @@ public class ParameterGroup {
         Collection<ParameterGroup> pgmGrpList = getParameterGroupList();
         for (ParameterGroup pgmGrp : pgmGrpList) {
             if (pgmGrp.isConditionsMet()) {
-                if (pgmGrp.isGroupLevelVisible()) {
+                if ((pgmGrp.isGroupLevelVisible())
+                        && (pgmGrp.isConfigParameter())) {
                     vSet.add(pgmGrp);
                 } else {
 
@@ -221,8 +224,8 @@ public class ParameterGroup {
         // Check all the parameterGroups also
         Collection<ParameterGroup> paramGrp = getParameterGroupList();
         for (ParameterGroup grp : paramGrp) {
-            retVal = retVal
-                    || (grp.isConditionsMet() && grp.isGroupLevelVisible());
+            retVal = retVal || (grp.isConditionsMet()
+                    && grp.isGroupLevelVisible() && grp.isConfigParameter());
         }
 
         return retVal;
@@ -247,6 +250,10 @@ public class ParameterGroup {
             conditionalParameterAllowed = true;
         }
         return conditionalParameterAllowed;
+    }
+
+    public boolean isConfigParameter() {
+        return configParameter;
     }
 
     public boolean isGroupLevelVisible() {
