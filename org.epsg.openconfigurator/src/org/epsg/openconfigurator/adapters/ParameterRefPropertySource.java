@@ -42,6 +42,8 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.DataTypeChoice;
+import org.epsg.openconfigurator.model.Parameter;
+import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.jdom2.JDOMException;
@@ -75,8 +77,17 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         if (paramRef.isLocked()) {
             propertyList.add(actualValueReadOnlyDescriptor);
         } else {
-            // FIXME: Check parameter AccessType also.
-            propertyList.add(actualValueTextDescriptor);
+            Parameter param = paramRef.getObjectDictionary()
+                    .getParameter(paramRef.getUniqueId());
+            ParameterAccess access = param.getAccess();
+            if ((access == ParameterAccess.CONST)
+                    || (access == ParameterAccess.NO_ACCESS)
+                    || (access == ParameterAccess.READ)
+                    || (access == ParameterAccess.UNDEFINED)) {
+                propertyList.add(actualValueReadOnlyDescriptor);
+            } else {
+                propertyList.add(actualValueTextDescriptor);
+            }
         }
 
         if (paramRef.getUnitLabel() != null) {
