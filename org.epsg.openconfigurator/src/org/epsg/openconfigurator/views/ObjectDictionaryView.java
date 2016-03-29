@@ -459,6 +459,9 @@ public class ObjectDictionaryView extends ViewPart
                                     "parameter group cannot be displayed due to false condition set");
                         }
                     }
+
+                    visibleObjectsList.addAll(nodeObj.getObjectDictionary()
+                            .getParameterofParamGroup());
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj
