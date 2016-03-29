@@ -74,4 +74,10 @@ public interface IPluginImages {
     public final static String OBD_HIDE_COMMUNICATION_DEVICE_PROFILE_ICON = "icons/hide_communication_device_profile.gif";
     public final static String OBD_HIDE_STANDARDISED_DEVICE_PROFILE_ICON = "icons/hide_standardized_device_profile.gif";
     public final static String OBD_HIDE_NON_FORCED_ICON = "icons/hide_non_forced.gif";
+
+    // Parameter View icons
+    public final static String OBD_PARAMETER_ICON = "icons/parameter.gif";
+    public final static String OBD_PARAMETER_GROUP_ICON = "icons/parameter_group.gif";
+    public final static String OBD_PARAMETER_REFERENCE_ICON = "icons/parameter_reference.gif";
+    public final static String OBD_PARAMETER_VAR_DECLARATION_ICON = "icons/vardeclaration.gif";
 }

@@ -177,6 +177,10 @@ public class ObjectDictionaryView extends ViewPart {
     private class TreeLabelProvider extends LabelProvider {
         Image objectIcon;
         Image subObjectIcon;
+        Image parameterIcon;
+        Image parameterGroupIcon;
+        Image parameterReferenceIcon;
+        Image varDeclarationIcon;
 
         TreeLabelProvider() {
             objectIcon = org.epsg.openconfigurator.Activator
@@ -185,12 +189,30 @@ public class ObjectDictionaryView extends ViewPart {
             subObjectIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(IPluginImages.OBD_SUB_OBJECT_ICON)
                     .createImage();
+            parameterGroupIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_PARAMETER_GROUP_ICON)
+                    .createImage();
+            parameterReferenceIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(
+                            IPluginImages.OBD_PARAMETER_REFERENCE_ICON)
+                    .createImage();
+            parameterIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_PARAMETER_ICON)
+                    .createImage();
+            varDeclarationIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(
+                            IPluginImages.OBD_PARAMETER_VAR_DECLARATION_ICON)
+                    .createImage();
         }
 
         @Override
         public void dispose() {
             objectIcon.dispose();
             subObjectIcon.dispose();
+            parameterGroupIcon.dispose();
+            parameterReferenceIcon.dispose();
+            parameterIcon.dispose();
+            varDeclarationIcon.dispose();
         }
 
         @Override
@@ -203,6 +225,14 @@ public class ObjectDictionaryView extends ViewPart {
             } else if (element instanceof EmptyObjectDictionary) {
                 // No image is needed for empty contents.
                 return null;
+            } else if (element instanceof ParameterGroup) {
+                return parameterGroupIcon;
+            } else if (element instanceof ParameterReference) {
+                return parameterReferenceIcon;
+            } else if (element instanceof Parameter) {
+                return parameterIcon;
+            } else if (element instanceof VarDecleration) {
+                return varDeclarationIcon;
             }
 
             return PlatformUI.getWorkbench().getSharedImages()
