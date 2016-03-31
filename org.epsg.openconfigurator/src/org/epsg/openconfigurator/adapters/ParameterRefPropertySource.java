@@ -36,15 +36,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.AllowedValues;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.ParameterReference;
+import org.epsg.openconfigurator.model.Range;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.jdom2.JDOMException;
 
@@ -58,8 +62,20 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
     private ParameterReference paramRef;
 
+    private ComboBoxPropertyDescriptor allowedValueDesscriptor;
+
     public ParameterRefPropertySource(final ParameterReference paramRef) {
         setModelData(paramRef);
+
+        actualValueTextDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleParameterReferenceActualValue(value);
+
+            }
+
+        });
     }
 
     private void addPropertyDescriptors(
@@ -175,6 +191,52 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         return retObj;
     }
 
+    private String handleParameterReferenceActualValue(Object value) {
+        String parameterRefUniqueID = paramRef.getUniqueId();
+        Parameter parameter = paramRef.getObjectDictionary()
+                .getParameter(parameterRefUniqueID);
+        if ((paramRef.getActualValue() != null)) {
+
+            List<Range> rangeList = parameter.getRangeList();
+            if (rangeList != null) {
+                for (Range range : rangeList) {
+                    if (value instanceof String) {
+                        String val = (String) value;
+                        try {
+                            int maxValue = Integer
+                                    .parseInt(range.getMaxValue());
+
+                            int minValue = Integer
+                                    .parseInt(range.getMinValue());
+
+                            if (Integer.parseInt(val) < minValue) {
+                                return "Actual value (" + val
+                                        + ") does not fit within the range ("
+                                        + minValue + " to " + maxValue + ")";
+                            }
+                            if (Integer.parseInt(val) > maxValue) {
+                                return "Actual value (" + val
+                                        + ") does not fit within the range ("
+                                        + minValue + " to " + maxValue + ")";
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+            AllowedValues valuesList = parameter.getAllowedValues();
+            List<String> values = valuesList.getValuesList();
+            String[] val = values.toArray(new String[0]);
+            ComboBoxPropertyDescriptor allowedActualValueDescriptor = new ComboBoxPropertyDescriptor(
+                    PARAM_ACTUAL_VALUE_ID, PARAM_ACTUAL_VALUE_LABEL, val);
+            System.out.println("The Allowed values are  : " + values);
+
+        }
+        return null;
+
+    }
+
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
@@ -208,8 +270,9 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
+                        } else {
+                            paramRef.setActualValue((String) value);
                         }
-                        paramRef.setActualValue((String) value);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(e.getCause().getMessage(),
