@@ -89,7 +89,7 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
-				<xsd:attribute name="specificationVersion" type="t_specificationVersion" use="optional" default="1.0.4"/>
+				<xsd:attribute name="specificationVersion" type="t_specificationVersion" use="optional" default="1.1.0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>
@@ -788,7 +788,7 @@
 	</xsd:complexType>
 	<xsd:attributeGroup name="ag_parameter">
 		<xsd:attribute name="uniqueID" type="xsd:ID" use="required"/>
-		<xsd:attribute name="access" default="read">
+		<xsd:attribute name="access" use="optional">
 			<xsd:simpleType>
 				<xsd:restriction base="xsd:NMTOKEN">
 					<xsd:enumeration value="const"/>

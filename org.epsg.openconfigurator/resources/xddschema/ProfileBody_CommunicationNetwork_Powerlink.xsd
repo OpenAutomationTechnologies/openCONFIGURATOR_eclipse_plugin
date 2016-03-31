@@ -155,7 +155,7 @@ C. Ruecker    | 15.12.2015 | + Modular Device Support
 					<xsd:group ref="g_ProfileBody_CommunicationNetwork_Powerlink"/>
 					<xsd:element name="ExternalProfileHandle" type="ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:choice>
-				<xsd:attribute name="specificationVersion" type="t_specificationVersion" use="optional" default="1.0.4"/>
+				<xsd:attribute name="specificationVersion" type="t_specificationVersion" use="optional" default="1.1.0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

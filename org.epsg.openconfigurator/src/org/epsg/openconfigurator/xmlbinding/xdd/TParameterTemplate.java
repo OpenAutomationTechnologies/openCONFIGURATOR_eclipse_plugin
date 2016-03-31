@@ -880,11 +880,7 @@ public class TParameterTemplate {
      *     
      */
     public String getAccess() {
-        if (access == null) {
-            return "read";
-        } else {
-            return access;
-        }
+        return access;
     }
 
     /**

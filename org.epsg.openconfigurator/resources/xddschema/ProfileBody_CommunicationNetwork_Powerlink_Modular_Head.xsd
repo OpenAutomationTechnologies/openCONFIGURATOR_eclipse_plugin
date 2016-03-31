@@ -44,7 +44,7 @@
 					<xsd:group ref="xdd:g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Head"/>
 					<xsd:element name="ExternalProfileHandle" type="xdd:ProfileHandle_DataType" minOccurs="0" maxOccurs="unbounded"/>
 				</xsd:choice>
-				<xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
+				<xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.2.0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

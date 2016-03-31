@@ -1021,11 +1021,7 @@ public class TParameterList {
          *     
          */
         public String getAccess() {
-            if (access == null) {
-                return "read";
-            } else {
-                return access;
-            }
+            return access;
         }
 
         /**

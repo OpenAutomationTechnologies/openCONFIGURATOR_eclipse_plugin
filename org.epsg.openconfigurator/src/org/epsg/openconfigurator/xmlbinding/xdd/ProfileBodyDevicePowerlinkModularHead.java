@@ -37,7 +37,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *           &lt;/restriction&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
- *       &lt;attribute name="specificationVersion" use="required" type="{http://www.ethernet-powerlink.org}t_specificationVersion" fixed="1.0.4" /&gt;
+ *       &lt;attribute name="specificationVersion" use="required" type="{http://www.ethernet-powerlink.org}t_specificationVersion" fixed="1.2.0" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -242,7 +242,7 @@ public class ProfileBodyDevicePowerlinkModularHead
      */
     public String getSpecificationVersion() {
         if (specificationVersion == null) {
-            return "1.0.4";
+            return "1.2.0";
         } else {
             return specificationVersion;
         }

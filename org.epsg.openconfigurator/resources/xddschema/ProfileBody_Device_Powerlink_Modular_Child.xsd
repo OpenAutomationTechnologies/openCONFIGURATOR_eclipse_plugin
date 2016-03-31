@@ -91,7 +91,7 @@
 						</xsd:restriction>
 					</xsd:simpleType>
 				</xsd:attribute>
-				<xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.0.4"/>
+				<xsd:attribute name="specificationVersion" type="xdd:t_specificationVersion" use="required" fixed="1.2.0"/>
 			</xsd:extension>
 		</xsd:complexContent>
 	</xsd:complexType>

@@ -23,7 +23,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;group ref="{http://www.ethernet-powerlink.org}g_ProfileBody_CommunicationNetwork_Powerlink_Modular_Head"/&gt;
  *         &lt;element name="ExternalProfileHandle" type="{http://www.ethernet-powerlink.org}ProfileHandle_DataType" maxOccurs="unbounded" minOccurs="0"/&gt;
  *       &lt;/choice&gt;
- *       &lt;attribute name="specificationVersion" use="required" type="{http://www.ethernet-powerlink.org}t_specificationVersion" fixed="1.0.4" /&gt;
+ *       &lt;attribute name="specificationVersion" use="required" type="{http://www.ethernet-powerlink.org}t_specificationVersion" fixed="1.2.0" /&gt;
  *     &lt;/extension&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -164,7 +164,7 @@ public class ProfileBodyCommunicationNetworkPowerlinkModularHead
      */
     public String getSpecificationVersion() {
         if (specificationVersion == null) {
-            return "1.0.4";
+            return "1.2.0";
         } else {
             return specificationVersion;
         }

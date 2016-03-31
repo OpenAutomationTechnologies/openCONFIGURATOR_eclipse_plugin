@@ -218,14 +218,14 @@
 			</xsd:extension>
 		</xsd:simpleContent>
 	</xsd:complexType>
-	<xsd:simpleType name="t_specificationVersion">
+		<xsd:simpleType name="t_specificationVersion">
 		<xsd:annotation>
 			<xsd:documentation xml:lang="en">Defines the version of the XDD specification which is represented by the profile.
 			</xsd:documentation>
 		</xsd:annotation>
 		<xsd:restriction base="xsd:string">
-			<xsd:enumeration value="1.0.3"/>
-			<xsd:enumeration value="1.0.4"/>
+			<xsd:enumeration value="1.1.0"/>
+			<xsd:enumeration value="1.2.0"/>
 		</xsd:restriction>
 	</xsd:simpleType>
 </xsd:schema>
