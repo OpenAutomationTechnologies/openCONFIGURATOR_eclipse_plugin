@@ -46,7 +46,6 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
-import org.epsg.openconfigurator.model.AllowedValues;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
