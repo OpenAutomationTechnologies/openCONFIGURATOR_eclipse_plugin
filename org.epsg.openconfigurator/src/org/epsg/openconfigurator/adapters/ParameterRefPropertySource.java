@@ -43,7 +43,6 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
-import org.epsg.openconfigurator.model.AllowedValues;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
@@ -165,7 +164,9 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     }
                     break;
                 case PARAM_ACCESS_TYPE_ID:
-                    retObj = paramRef.getAccess().toString();
+                    if (paramRef.getAccess() != null) {
+                        retObj = paramRef.getAccess().toString();
+                    }
                     break;
                 case PARAM_DEFAULT_VALUE_ID:
                     retObj = paramRef.getDefaultValue();
@@ -225,12 +226,6 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     }
                 }
             }
-            AllowedValues valuesList = parameter.getAllowedValues();
-            List<String> values = valuesList.getValuesList();
-            String[] val = values.toArray(new String[0]);
-            ComboBoxPropertyDescriptor allowedActualValueDescriptor = new ComboBoxPropertyDescriptor(
-                    PARAM_ACTUAL_VALUE_ID, PARAM_ACTUAL_VALUE_LABEL, val);
-            System.out.println("The Allowed values are  : " + values);
 
         }
         return null;

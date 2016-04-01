@@ -99,7 +99,7 @@ public class ParameterReference implements IParameter {
             return parameter.getAccess();
         }
 
-        return ParameterAccess.READ; // TODO: Confirm
+        return ParameterAccess.UNDEFINED; // TODO: Confirm
     }
 
     @Override

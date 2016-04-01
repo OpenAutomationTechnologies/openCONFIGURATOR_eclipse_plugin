@@ -179,7 +179,7 @@ public class Parameter implements IParameter {
     /**
      * Instance of parameter access enum.
      */
-    private ParameterAccess access = ParameterAccess.READ;
+    private ParameterAccess access;
 
     /**
      * Instance of DataTypeChoice.
@@ -275,7 +275,16 @@ public class Parameter implements IParameter {
      */
     @Override
     public ParameterAccess getAccess() {
-        // TODO:Check for access of templateIDRef
+        if (access == null) {
+            if (parameterTemplate instanceof TParameterTemplate) {
+                if (parameterTemplate.getAccess() != null) {
+                    return ParameterAccess
+                            .fromValue(parameterTemplate.getAccess());
+                } else {
+                    return ParameterAccess.UNDEFINED;
+                }
+            }
+        }
         return access;
     }
 

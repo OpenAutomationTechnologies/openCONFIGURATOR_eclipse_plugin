@@ -149,7 +149,9 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
                     }
                     break;
                 case PARAM_ACCESS_TYPE_ID:
-                    retObj = param.getAccess().toString();
+                    if (param.getAccess() != null) {
+                        retObj = param.getAccess().toString();
+                    }
                     break;
                 case PARAM_DEFAULT_VALUE_ID:
                     retObj = param.getDefaultValue();
