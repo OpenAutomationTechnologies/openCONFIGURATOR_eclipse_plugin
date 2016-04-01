@@ -33,6 +33,8 @@ package org.epsg.openconfigurator.views;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
+import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
+import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.resources.IPluginImages;
@@ -124,6 +126,19 @@ public class ObjectDictionaryLabelDecorator
                 decoration.addOverlay(
                         org.epsg.openconfigurator.Activator.getImageDescriptor(
                                 IPluginImages.ERROR_OVERLAY_NODE_ICON),
+                        IDecoration.BOTTOM_LEFT);
+            }
+        } else if (element instanceof ParameterReference) {
+            ParameterReference paramRef = (ParameterReference) element;
+            ParameterAccess access = paramRef.getAccess();
+            if ((access == ParameterAccess.CONST)
+                    || (access == ParameterAccess.READ)
+                    || (access == ParameterAccess.UNDEFINED)
+                    || (access == ParameterAccess.NO_ACCESS)
+                    || paramRef.isLocked()) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.OBD_OVERLAY_LOCK_ICON),
                         IDecoration.BOTTOM_LEFT);
             }
         }

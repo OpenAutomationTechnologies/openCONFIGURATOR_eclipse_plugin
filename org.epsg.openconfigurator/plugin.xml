@@ -325,4 +325,18 @@
            <property name="launchbarOverviewIcon" value="icons/window_32.png"/>
      </theme>
   </extension>
+      <extension
+            point="org.eclipse.ui.decorators">
+         <decorator
+               adaptable="true"
+               class="org.epsg.openconfigurator.views.ObjectDictionaryLabelDecorator"
+               icon="icons/lock_overlay.gif"
+               id="org.epsg.openconfigurator.decorator.locked"
+               label="LockedOverlay"
+               lightweight="true"
+               location="BOTTOM_RIGHT"
+               objectClass="org.epsg.openconfigurator.model.ParameterReference"
+               state="true">
+         </decorator>
+      </extension>
 </plugin>
