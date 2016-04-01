@@ -66,8 +66,6 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
     private ParameterReference paramRef;
     private String[] ALLOWED_VALUES;
 
-    private ComboBoxPropertyDescriptor allowedValueDescriptor;
-
     /**
      * Parameter reference constructor to set the model data fro parameter
      * reference.
