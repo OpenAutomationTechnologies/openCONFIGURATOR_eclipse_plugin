@@ -52,6 +52,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.jdom2.JDOMException;
 
 /**
+ * Describes the parameter reference property source.
  *
  * @author Ramakrishnan P
  *
@@ -61,8 +62,12 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
     private ParameterReference paramRef;
 
-    private ComboBoxPropertyDescriptor allowedValueDesscriptor;
-
+    /**
+     * Parameter reference constructor to set the model data fro parameter
+     * reference.
+     *
+     * @param paramRef The Instance of parameter reference
+     */
     public ParameterRefPropertySource(final ParameterReference paramRef) {
         setModelData(paramRef);
 
@@ -77,6 +82,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         });
     }
 
+    // Property descriptor to be displayed in the property page.
     private void addPropertyDescriptors(
             List<IPropertyDescriptor> propertyList) {
         propertyList.add(uniqueIdDescriptor);
@@ -114,11 +120,22 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+     */
     @Override
     public Object getEditableValue() {
         return paramRef;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
@@ -129,6 +146,13 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         return propertyDescriptorArray;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public Object getPropertyValue(Object id) {
         Object retObj = null;
@@ -192,6 +216,13 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         return retObj;
     }
 
+    /**
+     * Handles or validates the actual value of parameter reference on following
+     * conditions.
+     *
+     * @param value The value given to be validated
+     * @return The error statement for invalid actual value.
+     */
     private String handleParameterReferenceActualValue(Object value) {
         String parameterRefUniqueID = paramRef.getUniqueId();
         Parameter parameter = paramRef.getObjectDictionary()
@@ -232,21 +263,47 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.
+     * Object)
+     */
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public void resetPropertyValue(Object id) {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Set the parameter reference model data to the property source.
+     * 
+     * @param paramRef
+     */
     void setModelData(ParameterReference paramRef) {
         this.paramRef = paramRef;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.
+     * lang.Object, java.lang.Object)
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
 

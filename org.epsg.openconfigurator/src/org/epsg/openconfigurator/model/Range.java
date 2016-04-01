@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.model;
 import org.epsg.openconfigurator.xmlbinding.xdd.TRange;
 
 /**
+ * Class that define the range values of parameter or parameter template.
  *
  * @author Ramakrishnan P
  *
@@ -43,19 +44,34 @@ public class Range {
     private String maxValue;
     private String step;
 
+    /**
+     * Constructor of range to define the maximum and minimum value of
+     * parameter.
+     *
+     * @param range The XDD model instance of TRange.
+     */
     public Range(TRange range) {
         maxValue = range.getMaxValue().getValue();
         minValue = range.getMinValue().getValue();
     }
 
+    /**
+     * @return The maximum value of range given in the parameter.
+     */
     public String getMaxValue() {
         return maxValue;
     }
 
+    /**
+     * @return The minimum value of range given in the parameter.
+     */
     public String getMinValue() {
         return minValue;
     }
 
+    /**
+     * @return The step value of parameter.
+     */
     public String getStep() {
         return step;
     }

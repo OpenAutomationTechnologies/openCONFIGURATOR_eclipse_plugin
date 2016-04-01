@@ -36,6 +36,7 @@ import java.math.BigInteger;
 import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
 
 /**
+ * Class to identify and define the variables of var declaration
  *
  * @author Ramakrishnan P
  *
@@ -48,6 +49,11 @@ public class VarDecleration {
     private LabelDescription label;
     private DataTypeChoice dataType;
 
+    /**
+     * Constructor that define the variable values of var declaration
+     *
+     * @param vardecl XDD model instance of TVarDeclaration
+     */
     public VarDecleration(TVarDeclaration vardecl) {
         if (vardecl != null) {
             name = vardecl.getName();
@@ -62,22 +68,37 @@ public class VarDecleration {
         }
     }
 
+    /**
+     * @return The datatype from the data type choice
+     */
     public DataTypeChoice getDataType() {
         return dataType;
     }
 
+    /**
+     * @return The initial value of var declaration variables.
+     */
     public String getInitialValue() {
         return initialValue;
     }
 
+    /**
+     * @return The label description of variables
+     */
     public LabelDescription getLabelDescription() {
         return label;
     }
 
+    /**
+     * @return The name of variables
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return The size of variables listed in the var declaration
+     */
     public long getSize() {
         if (size != null) {
             return size.longValue();
@@ -87,6 +108,9 @@ public class VarDecleration {
         }
     }
 
+    /**
+     * @return The unique ID value of variables in the var declaration
+     */
     public String getUniqueId() {
         return uniqueId;
     }

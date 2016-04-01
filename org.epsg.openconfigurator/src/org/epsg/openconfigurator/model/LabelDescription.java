@@ -38,6 +38,7 @@ import java.util.Locale;
 import org.epsg.openconfigurator.xmlbinding.xdd.Connector;
 
 /**
+ * Class to define the label values of parameter.
  *
  * @author Ramakrishnan P
  *
@@ -48,6 +49,12 @@ public class LabelDescription {
     private HashMap<String, String> labelMap = new HashMap<String, String>();
     private HashMap<String, String> descriptionMap = new HashMap<String, String>();
 
+    /**
+     * . Constructor that define the label values of parameter.
+     *
+     * @param labelDescriptionList list of description availble from the XDD
+     *            model.
+     */
     public LabelDescription(List<Object> labelDescriptionList) {
         if (labelDescriptionList == null) {
             return;
@@ -72,6 +79,9 @@ public class LabelDescription {
         }
     }
 
+    /**
+     * @return The label description of parameter.
+     */
     public String getDescription() {
         if (descriptionMap.containsKey(displayLang)) {
             return descriptionMap.get(displayLang);
@@ -80,6 +90,9 @@ public class LabelDescription {
         }
     }
 
+    /**
+     * @return Label name of parameter.
+     */
     public String getLabel() {
         if (labelMap.containsKey(displayLang)) {
             return labelMap.get(displayLang);
@@ -88,6 +101,9 @@ public class LabelDescription {
         }
     }
 
+    /**
+     * @return The name of parameter from the XDD model.
+     */
     public String getText() {
         String label = getLabel();
         String desc = getDescription();

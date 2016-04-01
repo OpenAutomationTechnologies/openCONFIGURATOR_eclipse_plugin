@@ -37,16 +37,23 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
 
 /**
+ * Class to adapt the data type values from the XDD model.
  *
  * @author Ramakrishnan P
  *
  */
 public class DataTypeChoice {
+
     private DataTypeChoiceType choiceType = DataTypeChoiceType.UNDEFINED;
     private SimpleDataType simpleDataType;
     private StructType structDataType;
     // DataTypeIdRef
 
+    /**
+     * Constructor to define the data type values from Parameter model.
+     *
+     * @param param XDD model instance of Parameter.
+     */
     public DataTypeChoice(TParameterList.Parameter param) {
 
         if (param != null) {
@@ -78,6 +85,11 @@ public class DataTypeChoice {
         }
     }
 
+    /**
+     * Constructor to define the complex data type values from parameter model
+     *
+     * @param varDecl The value of complex data type.
+     */
     public DataTypeChoice(TVarDeclaration varDecl) {
         if (varDecl != null) {
             if (varDecl.getDataTypeIDRef() == null) {
@@ -90,14 +102,23 @@ public class DataTypeChoice {
         }
     }
 
+    /**
+     * @return Choice type of data type from the parameter.
+     */
     public DataTypeChoiceType getChoiceType() {
         return choiceType;
     }
 
+    /**
+     * @return Simple data type of parameter model.
+     */
     public SimpleDataType getSimpleDataType() {
         return simpleDataType;
     }
 
+    /**
+     * @return Complex data type of parameter model.
+     */
     public StructType getStructDataType() {
         return structDataType;
     }

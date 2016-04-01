@@ -40,6 +40,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TRange;
 import org.epsg.openconfigurator.xmlbinding.xdd.TValue;
 
 /**
+ * Lists the allowed values available in the parameter and parameter template.
  *
  * @author Ramakrishnan P
  *
@@ -49,6 +50,11 @@ public class AllowedValues {
     private List<String> valuesList = new ArrayList<>();
     private List<Range> rangeList = new ArrayList<>();
 
+    /**
+     * Constructor that define allowed values from the XDD model
+     *
+     * @param allowedValuesModel XDD model instance of allowed values.
+     */
     public AllowedValues(TAllowedValues allowedValuesModel) {
         if (allowedValuesModel != null) {
             Object templateIdRef = allowedValuesModel.getTemplateIDRef();
@@ -71,6 +77,11 @@ public class AllowedValues {
         }
     }
 
+    /**
+     * Adds the range value from XDD model into range list
+     *
+     * @param rangeElements XDD model instance of TRange.
+     */
     private void addRangeList(List<TRange> rangeElements) {
         for (TRange rangeModel : rangeElements) {
             Range range = new Range(rangeModel);
@@ -78,16 +89,27 @@ public class AllowedValues {
         }
     }
 
+    /**
+     * Adds the value of values into values list.
+     *
+     * @param valueElements XDD model instance of TValue
+     */
     private void addValueList(List<TValue> valueElements) {
         for (TValue valueModel : valueElements) {
             valuesList.add(valueModel.getValue());
         }
     }
 
+    /**
+     * @return The list of range from allowed values of parameter.
+     */
     public List<Range> getRangeList() {
         return rangeList;
     }
 
+    /**
+     * @return The list of values from allowed values of parameter.
+     */
     public List<String> getValuesList() {
         return valuesList;
     }

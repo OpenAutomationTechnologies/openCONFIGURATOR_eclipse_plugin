@@ -36,6 +36,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList.Parameter;
 import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
 
 /**
+ * ENUM class of simple data type availble in the parameter.
  *
  * @author Ramakrishnan P
  *
@@ -50,6 +51,12 @@ public enum SimpleDataType {
                                             "ULINT"), USINT("USINT"), WORD(
                                                     "WORD"), WSTRING("WSTRING");
 
+    /**
+     * Get the data type value from the given parameter.
+     *
+     * @param parameter Instance of Parameter.
+     * @return Data type based on the parameter.
+     */
     public static IEC_Datatype getIEC_DataType(Parameter parameter) {
 
         if (parameter.getBITSTRING() != null) {
@@ -102,6 +109,12 @@ public enum SimpleDataType {
         return IEC_Datatype.UNDEFINED;
     }
 
+    /**
+     * Get data type from the simple data type of parameter
+     *
+     * @param simpleDt Instance of simple data type
+     * @return Data type values based on given data type choice.
+     */
     public static IEC_Datatype getIEC_DataType(SimpleDataType simpleDt) {
         IEC_Datatype iecDt = IEC_Datatype.UNDEFINED;
 
@@ -172,6 +185,12 @@ public enum SimpleDataType {
         return iecDt;
     }
 
+    /**
+     * Get Simple data type of the paameter.
+     *
+     * @param parameter Instance of parameter model
+     * @return data type of given parameter.
+     */
     public static SimpleDataType getSimpleDataType(Parameter parameter) {
 
         if (parameter.getBITSTRING() != null) {
@@ -219,6 +238,13 @@ public enum SimpleDataType {
         return UNDEFINED;
     }
 
+    /**
+     * Get simple data type based on the var declaration element available in
+     * the parameter XDD model
+     *
+     * @param varDecl Instance of TVar declaration
+     * @return The data type based on given vardeclaration.
+     */
     public static SimpleDataType getSimpleDataType(TVarDeclaration varDecl) {
 
         if (varDecl.getBITSTRING() != null) {
@@ -272,6 +298,11 @@ public enum SimpleDataType {
         text = name;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see java.lang.Enum#toString()
+     */
     @Override
     public String toString() {
         return text;

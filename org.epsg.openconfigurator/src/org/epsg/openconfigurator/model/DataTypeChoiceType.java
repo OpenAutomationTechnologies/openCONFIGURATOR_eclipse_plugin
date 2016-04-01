@@ -32,7 +32,8 @@
 package org.epsg.openconfigurator.model;
 
 /**
- *
+ * Enum class to list the various data types available in the parameter.
+ * 
  * @author Ramakrishnan P
  *
  */

@@ -44,6 +44,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
 
 /**
+ * Class to list the parameter references identified under parameter group.
  *
  * @author Ramakrishnan P
  *
@@ -64,6 +65,16 @@ public class ParameterReference implements IParameter {
     private ObjectDictionary objectDictionary;
     private ParameterGroup parameterGroup;
 
+    /**
+     * Parameter reference constructor initializes the attribute values from the
+     * XDD model.
+     *
+     * @param nodeinstance Instance of node.
+     * @param parameterGroup Instance of parameter group to list the parent
+     *            element of parameter reference.
+     * @param objectDictionary Object dictionary instance
+     * @param parameterReferenceModel Parameter reference XDD model instance.
+     */
     public ParameterReference(Node nodeinstance, ParameterGroup parameterGroup,
             ObjectDictionary objectDictionary,
             TParameterGroup.ParameterRef parameterReferenceModel) {
@@ -93,6 +104,11 @@ public class ParameterReference implements IParameter {
 
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getAccess()
+     */
     @Override
     public ParameterAccess getAccess() {
         if (parameter != null) {
@@ -102,6 +118,11 @@ public class ParameterReference implements IParameter {
         return ParameterAccess.UNDEFINED; // TODO: Confirm
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getActualValue()
+     */
     @Override
     public String getActualValue() {
         if (actualValue != null) {
@@ -114,6 +135,11 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getAllowedValues()
+     */
     @Override
     public AllowedValues getAllowedValues() {
         if (parameter != null) {
@@ -122,10 +148,18 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /**
+     * @return Bit offset value of parameter reference.
+     */
     public BigInteger getBitOffset() {
         return bitOffset;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getDataType()
+     */
     @Override
     public DataTypeChoice getDataType() {
         if (parameter != null) {
@@ -134,6 +168,11 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getDataTypeChoice()
+     */
     @Override
     public DataTypeChoiceType getDataTypeChoice() {
         if (parameter != null) {
@@ -142,6 +181,11 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getDefaultValue()
+     */
     @Override
     public String getDefaultValue() {
         if (parameter != null) {
@@ -150,6 +194,11 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getLabelDescription()
+     */
     @Override
     public LabelDescription getLabelDescription() {
         if (parameter != null) {
@@ -165,14 +214,26 @@ public class ParameterReference implements IParameter {
         return node;
     }
 
+    /**
+     * @return Object dictionary instance to receive the parameter based on
+     *         unique ID
+     */
     public ObjectDictionary getObjectDictionary() {
         return objectDictionary;
     }
 
+    /**
+     * @return The parameter group instance to identify the parameter reference
+     */
     public ParameterGroup getParameterGroup() {
         return parameterGroup;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getPropertyList()
+     */
     @Override
     public List<Property> getPropertyList() {
         if (parameter != null) {
@@ -181,6 +242,11 @@ public class ParameterReference implements IParameter {
         return new ArrayList<Parameter.Property>();
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getSimpleDataType()
+     */
     @Override
     public SimpleDataType getSimpleDataType() {
         if (parameter != null) {
@@ -189,6 +255,11 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getStructDataType()
+     */
     @Override
     public StructType getStructDataType() {
         if (parameter != null) {
@@ -197,6 +268,11 @@ public class ParameterReference implements IParameter {
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getUniqueId()
+     */
     @Override
     public String getUniqueId() {
         if (parameter != null) {
@@ -206,6 +282,11 @@ public class ParameterReference implements IParameter {
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.epsg.openconfigurator.model.IParameter#getUnitLabel()
+     */
     @Override
     public LabelDescription getUnitLabel() {
         if (parameter != null) {
@@ -221,10 +302,16 @@ public class ParameterReference implements IParameter {
         return xpath;
     }
 
+    /**
+     * @return The locked attribute value of parameter reference
+     */
     public boolean isLocked() {
         return locked;
     }
 
+    /**
+     * @return The visible attribute value of parameter reference
+     */
     public boolean isVisible() {
         return visible;
     }

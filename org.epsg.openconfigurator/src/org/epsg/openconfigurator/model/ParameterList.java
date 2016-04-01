@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.model;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 
 /**
+ * Class to list the parameter of given XDD of node.
  *
  * @author Ramakrishnan P
  *
@@ -41,6 +42,12 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 public class ParameterList {
     private final Node node;
 
+    /**
+     * Constructor to initialize the instance of node.
+     * 
+     * @param node The instance of Node
+     * @param xddModelArg Instance of XDD model
+     */
     public ParameterList(Node node, ISO15745ProfileContainer xddModelArg) {
         this.node = node;
     }

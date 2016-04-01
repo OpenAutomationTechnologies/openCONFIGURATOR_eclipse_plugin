@@ -39,6 +39,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.model.ParameterGroup;
 
 /**
+ * Describes the property descriptor of parameter group.
  *
  * @author Ramakrishnan P
  *
@@ -48,10 +49,16 @@ public class ParameterGroupPropertySource
 
     private ParameterGroup paramGrp;
 
+    /**
+     * Constructor to set the parameter group model
+     *
+     * @param paramGrp The instance of parameter group
+     */
     public ParameterGroupPropertySource(final ParameterGroup paramGrp) {
         setModelData(paramGrp);
     }
 
+    // The property descriptors to be added into the property page.
     private void addPropertyDescriptors(
             List<IPropertyDescriptor> propertyList) {
         propertyList.add(uniqueIdDescriptor);
@@ -61,11 +68,22 @@ public class ParameterGroupPropertySource
         propertyList.add(nameDescriptor);
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+     */
     @Override
     public Object getEditableValue() {
         return paramGrp;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
@@ -76,6 +94,13 @@ public class ParameterGroupPropertySource
         return propertyDescriptorArray;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public Object getPropertyValue(Object id) {
         Object retObj = null;
@@ -99,22 +124,49 @@ public class ParameterGroupPropertySource
         return retObj;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.
+     * Object)
+     */
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public void resetPropertyValue(Object id) {
         // TODO Auto-generated method stub
 
     }
 
+    /**
+     * Updates the parameter group property source from the parameter group
+     * model.
+     *
+     * @param paramGrp
+     */
     void setModelData(ParameterGroup paramGrp) {
         this.paramGrp = paramGrp;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.
+     * lang.Object, java.lang.Object)
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
         // TODO Auto-generated method stub

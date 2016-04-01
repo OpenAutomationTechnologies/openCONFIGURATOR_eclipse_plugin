@@ -37,33 +37,70 @@ import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.Parameter.Property;
 
 /**
+ * Interface class to define the required elements of parameter.
  *
  * @author Ramakrishnan P
  *
  */
 public interface IParameter {
 
+    /**
+     * @return Access of parameter.
+     */
     public ParameterAccess getAccess();
 
+    /**
+     * @return Actual value of parameter.
+     */
     public String getActualValue();
 
+    /**
+     * @return Allowed values of parameter.
+     */
     public AllowedValues getAllowedValues();
 
+    /**
+     * @return Data type of parameter from the XDD model.
+     */
     public DataTypeChoice getDataType();
 
+    /**
+     * @return The choice of data type from the parameter XDD model.
+     */
     public DataTypeChoiceType getDataTypeChoice();
 
+    /**
+     * @return The default value of parameter.
+     */
     public String getDefaultValue();
 
+    /**
+     * @return Label name of parameter.
+     */
     public LabelDescription getLabelDescription();
 
+    /**
+     * @return List of properties that refer parameter list.
+     */
     public List<Property> getPropertyList();
 
+    /**
+     * @return Simple data type available in the parameter XDD model.
+     */
     public SimpleDataType getSimpleDataType();
 
+    /**
+     * @return The Complex data type of parameter in the XDD model.
+     */
     public StructType getStructDataType();
 
+    /**
+     * @return The parameter unique ID.
+     */
     public String getUniqueId();
 
+    /**
+     * @return The Unit label of parameter.
+     */
     public LabelDescription getUnitLabel();
 }

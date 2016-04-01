@@ -50,6 +50,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.jdom2.JDOMException;
 
 /**
+ * Describes the property source of parameters.
  *
  * @author Ramakrishnan P
  *
@@ -59,6 +60,11 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
 
     private Parameter param;
 
+    /**
+     * Constructor to define the parameter model.
+     *
+     * @param param Instance of Parameter
+     */
     public ParameterPropertySource(final Parameter param) {
         setModelData(param);
         actualValueTextDescriptor.setValidator(new ICellEditorValidator() {
@@ -72,6 +78,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
 
     }
 
+    // Property descriptors to be displayed in the properties page.
     private void addPropertyDescriptors(
             List<IPropertyDescriptor> propertyList) {
         propertyList.add(uniqueIdDescriptor);
@@ -99,11 +106,22 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+     */
     @Override
     public Object getEditableValue() {
         return param;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
@@ -114,6 +132,13 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
         return propertyDescriptorArray;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public Object getPropertyValue(Object id) {
         Object retObj = null;
@@ -212,21 +237,47 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
         return null;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.
+     * Object)
+     */
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
         return false;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public void resetPropertyValue(Object id) {
         // TODO Auto-generated method stub
     }
 
+    /**
+     * Set the parameter model data to the parameter property source
+     *
+     * @param param Instance of parameter.
+     */
     void setModelData(Parameter param) {
         this.param = param;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.
+     * lang.Object, java.lang.Object)
+     */
     @Override
     public void setPropertyValue(Object id, Object value) {
         if (id instanceof String) {
@@ -244,8 +295,9 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
+                        } else {
+                            param.setActualValue(actualValue);
                         }
-                        param.setActualValue(actualValue);
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(e.getCause().getMessage(),

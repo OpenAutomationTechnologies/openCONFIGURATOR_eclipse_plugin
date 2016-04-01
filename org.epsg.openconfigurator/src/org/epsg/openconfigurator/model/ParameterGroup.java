@@ -42,6 +42,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 
 /**
+ * Class that lists the parameter group available in the XDD model
  *
  * @author Ramakrishnan P
  *
@@ -67,6 +68,15 @@ public class ParameterGroup {
 
     private ObjectDictionary objectDictionary;
 
+    /**
+     * Constructor that define the attribute of parameter from the available XDD
+     * model.
+     *
+     * @param nodeInstance Instance of node.
+     * @param objectDictionary Instance of object dictionary that define the
+     *            profle body.
+     * @param grp XDD model instance of parameter group.
+     */
     public ParameterGroup(Node nodeInstance, ObjectDictionary objectDictionary,
             TParameterGroup grp) {
         this.objectDictionary = objectDictionary;
@@ -110,42 +120,70 @@ public class ParameterGroup {
         }
     }
 
+    /**
+     * @return Bitoffset value of parameter group.
+     */
     public BigInteger getBitOffset() {
         return bitOffset;
     }
 
+    /**
+     * @return parameter that is conditionally referenced to the parameter
+     *         group.
+     */
     public Parameter getConditionalParameter() {
         return conditionalParameter;
     }
 
+    /**
+     * @return Conditional value that references the value of parameter.
+     */
     public String getConditionalValue() {
         return conditionalValue;
     }
 
+    /**
+     * @return Parameter group label
+     */
     public LabelDescription getLabel() {
         return label;
     }
 
+    /**
+     * @return Object dictionary instance
+     */
     public ObjectDictionary getObjectDictionary() {
         return objectDictionary;
     }
 
+    /**
+     * @return List of parameter group.
+     */
     public List<ParameterGroup> getParameterGroupList() {
         List<ParameterGroup> valueList = new ArrayList<ParameterGroup>(
                 parameterGroupMap.values());
         return valueList;
     }
 
+    /**
+     * @return List of parameter reference available in the parameter group.
+     */
     public List<ParameterReference> getParameterRefList() {
         List<ParameterReference> valueList = new ArrayList<ParameterReference>(
                 parameterRefMap.values());
         return valueList;
     }
 
+    /**
+     * @return Unique ID of parameter.
+     */
     public String getUniqueId() {
         return uniqueId;
     }
 
+    /**
+     * @return Visible objects of parameter that match the conditional values.
+     */
     public LinkedHashSet<Object> getVisibleObjects() {
 
         LinkedHashSet<Object> vSet = new LinkedHashSet<>();
@@ -208,6 +246,10 @@ public class ParameterGroup {
         return xpath;
     }
 
+    /**
+     * @return <code>True</code> if parameter group could be visible,
+     *         <code>False</code> if parameter group is not visible
+     */
     public boolean hasVisibleObjects() {
         boolean retVal = false;
 
@@ -231,6 +273,13 @@ public class ParameterGroup {
         return retVal;
     }
 
+    /**
+     * @return <code>True</code> if parameter group matches the conditional
+     *         Unique ID and conditional value of parameter references
+     *         <code>False</code> if parameter group does not match the
+     *         conditional Unique ID and conditional value of parameter
+     *         references
+     */
     public boolean isConditionsMet() {
         boolean conditionalParameterAllowed = false;
         if ((conditionalParameter != null) && (conditionalValue != null)) {
@@ -252,10 +301,16 @@ public class ParameterGroup {
         return conditionalParameterAllowed;
     }
 
+    /**
+     * @return The attribute configParameter value of parameter group
+     */
     public boolean isConfigParameter() {
         return configParameter;
     }
 
+    /**
+     * @return The group level visible attribute value of parameter group
+     */
     public boolean isGroupLevelVisible() {
         return groupLevelVisible;
     }

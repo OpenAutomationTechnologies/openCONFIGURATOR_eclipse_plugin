@@ -38,6 +38,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
 
 /**
+ * Class that identifies the struvt data type of parameter.
  *
  * @author Ramakrishnan P
  *
@@ -48,6 +49,11 @@ public class StructType {
     private String uniqueId;
     List<VarDecleration> varDeclList = new ArrayList<>();
 
+    /**
+     * Constructor to define the attribute value of complex data types.
+     *
+     * @param struct Instance of XDD model of struct.
+     */
     public StructType(TDataTypeList.Struct struct) {
         if (struct != null) {
             label = new LabelDescription(
@@ -64,22 +70,38 @@ public class StructType {
         }
     }
 
+    /**
+     * @return The label description of complex data type in parameter.
+     */
     public LabelDescription getLabel() {
         return label;
     }
 
+    /**
+     * @return The name given to the complex data types.
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return Unique ID of struct data type.
+     */
     public String getUniqueId() {
         return uniqueId;
     }
 
+    /**
+     * @return List of vardeclaration available under struct data type.
+     */
     public List<VarDecleration> getVarDeclList() {
         return varDeclList;
     }
 
+    /**
+     * @return The variables of var declaration from the given data type of
+     *         parameter.
+     */
     public List<VarDecleration> getVariables() {
         System.err.println("Variable declerations : " + varDeclList.size());
         return varDeclList;
