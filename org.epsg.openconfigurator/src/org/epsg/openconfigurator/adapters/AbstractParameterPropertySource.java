@@ -36,7 +36,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 
 /**
  * Abstract implementation of property source for POWERLINK Parameter.
- * 
+ *
  * @author Ramakrishnan P
  *
  */
@@ -49,6 +49,7 @@ public abstract class AbstractParameterPropertySource {
     public static final String PARAM_BIT_OFFSET_ID = "Parameter.BitOffset"; //$NON-NLS-1$
     public static final String PARAM_ACTUAL_VALUE_ID = "Parameter.ActualValue"; //$NON-NLS-1$
     public static final String PARAM_ACTUAL_VALUE_READ_ONLY_ID = "Parameter.ActualValue.ReadOnly"; //$NON-NLS-1$
+    public static final String PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID = "Parameter.ActualValue.AllowedValue"; //$NON-NLS-1$
     public static final String PARAM_UNIT_ID = "Parameter.Unit"; //$NON-NLS-1$
     public static final String PARAM_DATATYPE_ID = "Parameter.SimpleDataType"; //$NON-NLS-1$
 

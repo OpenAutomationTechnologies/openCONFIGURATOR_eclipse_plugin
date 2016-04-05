@@ -43,6 +43,7 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.AllowedValues;
 import org.epsg.openconfigurator.model.DataTypeChoice;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
@@ -61,6 +62,9 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         implements IPropertySource {
 
     private ParameterReference paramRef;
+    private String[] ALLOWED_VALUES;
+
+    private ComboBoxPropertyDescriptor allowedValueDescriptor;
 
     /**
      * Parameter reference constructor to set the model data fro parameter
@@ -89,6 +93,12 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         propertyList.add(nameDescriptor);
         propertyList.add(accessTypeDescriptor);
 
+        setAllowedValues();
+
+        allowedValueDescriptor = new ComboBoxPropertyDescriptor(
+                PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID, PARAM_ACTUAL_VALUE_LABEL,
+                ALLOWED_VALUES);
+
         propertyList.add(dataTypeDescriptor);
 
         if (paramRef.getDefaultValue() != null) {
@@ -106,6 +116,9 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     || (access == ParameterAccess.READ)
                     || (access == ParameterAccess.UNDEFINED)) {
                 propertyList.add(actualValueReadOnlyDescriptor);
+            } else if ((paramRef.getAllowedValues().getValuesList() != null)
+                    && !paramRef.getAllowedValues().getValuesList().isEmpty()) {
+                propertyList.add(allowedValueDescriptor);
             } else {
                 propertyList.add(actualValueTextDescriptor);
             }
@@ -195,6 +208,33 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                 case PARAM_DEFAULT_VALUE_ID:
                     retObj = paramRef.getDefaultValue();
                     break;
+                case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID: {
+                    String actualValue = paramRef.getActualValue();
+                    if (actualValue != null) {
+                        System.out.println(
+                                "The actual value in get property value == "
+                                        + actualValue);
+                        for (int i = 0; i < ALLOWED_VALUES.length; i++) {
+                            if (ALLOWED_VALUES[i].equals(actualValue)) {
+                                System.err.println(
+                                        "Get property value : actual value "
+                                                + actualValue);
+                                return retObj = new Integer(i);
+                            }
+                        }
+                    } else {
+
+                        String val = ALLOWED_VALUES[0];
+                        retObj = new Integer(0);
+                        try {
+                            paramRef.setActualValue(val);
+                        } catch (JDOMException | IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                    break;
                 case PARAM_ACTUAL_VALUE_ID:
                 case PARAM_ACTUAL_VALUE_READ_ONLY_ID:
                     if (paramRef.getActualValue() != null) {
@@ -265,7 +305,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.
      * Object)
@@ -278,7 +318,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.
      * lang.Object)
@@ -288,9 +328,18 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         // TODO Auto-generated method stub
     }
 
+    private void setAllowedValues() {
+        AllowedValues allowedValue = paramRef.getAllowedValues();
+        List<String> values = allowedValue.getValuesList();
+        String[] val = values.toArray(new String[0]);
+
+        ALLOWED_VALUES = val;
+
+    }
+
     /**
      * Set the parameter reference model data to the property source.
-     * 
+     *
      * @param paramRef
      */
     void setModelData(ParameterReference paramRef) {
@@ -299,7 +348,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.ui.views.properties.IPropertySource#setPropertyValue(java.
      * lang.Object, java.lang.Object)
@@ -326,6 +375,33 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             paramRef.setActualValue((String) value);
                         }
                     } catch (JDOMException | IOException e) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(e.getCause().getMessage(),
+                                        paramRef.getNode().getNetworkId());
+                        e.printStackTrace();
+                    }
+                    break;
+                case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID:
+                    try {
+                        System.out.println("Value = = " + value);
+                        if (value instanceof Integer) {
+                            String val = ALLOWED_VALUES[(int) value];
+                            System.out.println(
+                                    "The selected allowed value = " + val);
+                            res = OpenConfiguratorCore.GetInstance()
+                                    .SetParameterActualValue(
+                                            paramRef.getNode().getNetworkId(),
+                                            paramRef.getNode().getNodeId(),
+                                            paramRef.getUniqueId(), val);
+                            if (!res.IsSuccessful()) {
+                                System.err.println(OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res));
+                            } else {
+                                paramRef.setActualValue(val);
+                            }
+
+                        }
+                    } catch (Exception e) {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(e.getCause().getMessage(),
                                         paramRef.getNode().getNetworkId());

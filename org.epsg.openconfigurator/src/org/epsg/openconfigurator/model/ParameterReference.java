@@ -64,6 +64,7 @@ public class ParameterReference implements IParameter {
 
     private ObjectDictionary objectDictionary;
     private ParameterGroup parameterGroup;
+    private TParameterGroup.ParameterRef parameterReference;
 
     /**
      * Parameter reference constructor initializes the attribute values from the
@@ -82,6 +83,7 @@ public class ParameterReference implements IParameter {
         this.objectDictionary = objectDictionary;
 
         if (parameterReferenceModel != null) {
+            parameterReference = parameterReferenceModel;
             actualValue = parameterReferenceModel.getActualValue();
             visible = parameterReferenceModel.isVisible();
             locked = parameterReferenceModel.isLocked();
@@ -326,6 +328,7 @@ public class ParameterReference implements IParameter {
     public void setActualValue(final String value)
             throws JDOMException, IOException {
         actualValue = value;
+        parameterReference.setActualValue(value);
         OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
                 this, actualValue);
     }
