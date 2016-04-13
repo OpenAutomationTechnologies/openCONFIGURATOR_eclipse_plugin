@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -45,6 +46,7 @@ import org.eclipse.core.runtime.IPath;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObjects;
@@ -53,6 +55,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
 
@@ -154,6 +157,12 @@ public class Node {
      */
     private final IFile projectXml;
 
+    private List<Interface> interfaceList = new ArrayList<Interface>();
+
+    private List<HeadNodeInterface> interfaceOfNodes = new ArrayList<HeadNodeInterface>();
+
+    private List<InterfaceList> interfaceListOfNodes = new ArrayList<InterfaceList>();
+
     /**
      * Root node instance.
      */
@@ -186,6 +195,10 @@ public class Node {
      */
     private final NetworkManagement networkmanagement;
 
+    private final ModuleManagement moduleManagement;
+
+    private final DeviceModularInterface moduleInterface;
+
     /**
      * Constructor to initialize the node variables.
      */
@@ -200,6 +213,8 @@ public class Node {
         nodeType = NodeType.UNDEFINED;
         objectDictionary = null;
         networkmanagement = null;
+        moduleManagement = null;
+        moduleInterface = null;
         configurationError = "";
     }
 
@@ -261,6 +276,36 @@ public class Node {
         this.xddModel = xddModel;
         objectDictionary = new ObjectDictionary(this, xddModel);
         networkmanagement = new NetworkManagement(this, xddModel);
+        moduleManagement = new ModuleManagement(this, xddModel);
+        List<Interface> interfaceList = moduleManagement.getInterfacelist();
+        for (Interface interfaces : interfaceList) {
+
+            // InterfaceList itfcList = new InterfaceList();
+            // InterfaceList.Interface intf = new InterfaceList.Interface();
+            //
+            // List<InterfaceList.Interface> intfc = new
+            // ArrayList<InterfaceList.Interface>();
+
+            HeadNodeInterface ifList = new HeadNodeInterface(this, interfaces);
+            interfaceOfNodes.add(ifList);
+            // interfaceListOfNodes.add(itfcList);
+        }
+
+        moduleInterface = new DeviceModularInterface(this,
+                moduleManagement.getModuleInterface());
+
+        if (nodeModel instanceof TCN) {
+            TCN cnModel = (TCN) nodeModel;
+            if (isModularheadNode()) {
+                InterfaceList it = cnModel.getInterfaceList();
+                if (it != null) {
+                    List<InterfaceList.Interface> intfc = new ArrayList<InterfaceList.Interface>();
+                    intfc.addAll(it.getInterface());
+
+                    System.out.println("The interface list == ......." + intfc);
+                }
+            }
+        }
     }
 
     /**
@@ -456,6 +501,22 @@ public class Node {
         return objectText;
     }
 
+    public List<HeadNodeInterface> getHeadNodeInterface() {
+        return interfaceOfNodes;
+    }
+
+    public List<Interface> getInterfaceList() {
+        if (getModuleManagement().getModularHeadInterface() != null) {
+            interfaceList.addAll(getModuleManagement().getModularHeadInterface()
+                    .getInterface());
+        }
+        return interfaceList;
+    }
+
+    public List<InterfaceList> getInterfaceListOfNodes() {
+        return interfaceListOfNodes;
+    }
+
     /**
      * @return The XDC model.
      */
@@ -475,6 +536,14 @@ public class Node {
             System.err.println("Invalid node model");
         }
         return null;
+    }
+
+    public DeviceModularInterface getModuleInterface() {
+        return moduleInterface;
+    }
+
+    public ModuleManagement getModuleManagement() {
+        return moduleManagement;
     }
 
     /**
@@ -776,6 +845,13 @@ public class Node {
         }
 
         return true;
+    }
+
+    public boolean isModularheadNode() {
+        if (getModuleManagement().getModularHeadInterface() != null) {
+            return true;
+        }
+        return false;
     }
 
     /**

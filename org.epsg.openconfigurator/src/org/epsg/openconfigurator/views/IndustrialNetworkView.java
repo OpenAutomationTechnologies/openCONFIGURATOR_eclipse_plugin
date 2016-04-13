@@ -86,16 +86,19 @@ import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.event.INodePropertyChangeListener;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.views.mapping.MappingView;
+import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList.Interface;
 import org.jdom2.JDOMException;
 
 /**
@@ -197,26 +200,46 @@ public class IndustrialNetworkView extends ViewPart
 
         @Override
         public Object[] getChildren(Object parent) {
-
-            if (parent instanceof PowerlinkRootNode) {
-                PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
-                Object[] nodeList = powerlinkRoot.getNodeList(parent);
-                if (nodeList.length == 0) {
-                    return new Object[] { new EmptyNetworkView() };
-                } else {
-                    return nodeList;
-                }
-            } else if (parent instanceof Node) {
+            System.out.println(
+                    "Industrial network view parent element = " + parent);
+            if (parent instanceof Node) {
                 Node node = (Node) parent;
-
                 Object nodeObjectModel = node.getNodeModel();
-
+                System.out.println("NodeObject model == " + nodeObjectModel);
                 if (nodeObjectModel instanceof TNetworkConfiguration) {
                     return rootNode.getRmnNodeList().toArray();
                 } else if (nodeObjectModel instanceof TCN) {
                     // TODO implement for Modular CN
+
                 } else if (nodeObjectModel instanceof TRMN) {
                     // TODO implement for Modular RMN
+                }
+                if (node.isModularheadNode()) {
+                    // return rootNode.getInterfacelist(parent);
+                    // return node.getModuleManagement().getInterfacelist()
+                    // .toArray();
+                    return node.getHeadNodeInterface().toArray();
+                    // if (node.getNodeModel() instanceof TCN) {
+                    // TCN cnModel = (TCN) node.getNodeModel();
+                    // InterfaceList intfcList = new InterfaceList();
+                    // List<Interface> intf = intfcList.getInterface();
+                    // cnModel.setInterfaceList();
+                    // // InterfaceList itfcList = new InterfaceList();
+                    // // cnModel.setInterfaceList(itfcList);
+                    // }
+                    // System.out.println("The interface list == ......."
+                    // + cnModel.getInterfaceList());
+                    // // if (it != null) {
+                    // // List<InterfaceList.Interface> intfc =
+                    // // cnModel.getInterfaceList();
+                    // // intfc.addAll(it.getInterface());
+                    // // System.out.println(
+                    // // "The interface list == ......." + intfc);
+                    // // }
+                    // return
+                    // cnModel.getInterfaceList().getInterface().toArray();
+                    // }
+                    // return node.getInterfaceListOfNodes().toArray();
                 }
             }
 
@@ -230,13 +253,26 @@ public class IndustrialNetworkView extends ViewPart
             if (parent == null) {
                 return new Object[] { new EmptyNetworkView() };
             } else {
-                return getChildren(parent);
+                if (parent instanceof PowerlinkRootNode) {
+                    PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
+
+                    Object[] nodeList = powerlinkRoot.getNodeList(parent);
+                    // Object[] interfaceList = powerlinkRoot
+                    // .getInterfacelist(parent);
+                    if (nodeList.length == 0) {
+                        return new Object[] { new EmptyNetworkView() };
+                    } else {
+
+                        return nodeList;
+                    }
+                }
+                return null;
+
             }
         }
 
         @Override
         public Object getParent(Object child) {
-
             if (child instanceof Node) {
                 Node node = (Node) child;
 
@@ -265,8 +301,7 @@ public class IndustrialNetworkView extends ViewPart
                     ArrayList<Node> nodeList = rootNode.getRmnNodeList();
                     return (nodeList.size() > 0 ? true : false);
                 } else if (nodeObjectModel instanceof TCN) {
-                    // TODO implement for Modular CN
-                    return false;
+                    return true;
                 } else if (nodeObjectModel instanceof TRMN) {
                     // TODO implement for Modular RMN
                     return false;
@@ -364,11 +399,34 @@ public class IndustrialNetworkView extends ViewPart
 
         @Override
         public String getText(Object obj) {
-
+            System.out.println("The label provider get text object = " + obj);
             if (obj instanceof Node) {
                 Node node = (Node) obj;
                 return node.getNodeIDWithName();
             }
+            if (obj instanceof HeadNodeInterface) {
+                HeadNodeInterface interfaceList = (HeadNodeInterface) obj;
+                System.out.println("The interface label == "
+                        + interfaceList.getUniqueIDRef().toString());
+                if (interfaceList.getUniqueIDRef() instanceof Interface) {
+                    Interface intfc = (Interface) interfaceList
+                            .getUniqueIDRef();
+                    return intfc.getUniqueID();
+                }
+                return obj.toString();
+            }
+            // if (obj instanceof InterfaceList) {
+            // InterfaceList itfcList = (InterfaceList) obj;
+            //
+            // List<Interface> itfc = new ArrayList<Interface>();
+            // itfc.addAll(itfcList.getInterface());
+            // System.out.println("InterfaceList model = " + itfc);
+            // for (Interface ifc : itfc) {
+            // System.out.println("Interface listed ..........");
+            // return ifc.getId();
+            //
+            // }
+            // }
             return obj.toString();
         }
     }
@@ -380,6 +438,7 @@ public class IndustrialNetworkView extends ViewPart
 
     // Add new node message strings.
     public static final String ADD_NEW_NODE_ACTION_MESSAGE = "Add Node...";
+    public static final String ADD_NEW_MODULE_ACTION_MESSAGE = "Add child Module...";
     public static final String ADD_NEW_NODE_ERROR_MESSAGE = "Internal error occurred. Please try again later";
     public static final String ADD_NEW_NODE_INVALID_SELECTION_MESSAGE = "Invalid selection";
     public static final String ADD_NEW_NODE_TOOL_TIP_TEXT = "Add a node in the network.";
@@ -423,6 +482,8 @@ public class IndustrialNetworkView extends ViewPart
      * Add new node.
      */
     private Action addNewNode;
+
+    private Action addNewModule;
 
     /**
      * Show object dictionary.
@@ -579,7 +640,7 @@ public class IndustrialNetworkView extends ViewPart
             IStructuredSelection selections = (IStructuredSelection) viewer
                     .getSelection();
             Object object = selections.getFirstElement();
-
+            System.out.println("The selected object element = " + object);
             if (object instanceof Node) {
                 Node node = (Node) object;
 
@@ -612,6 +673,9 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                     manager.add(showProperties);
                 }
+            }
+            if (object instanceof HeadNodeInterface) {
+                manager.add(addNewModule);
             }
         }
     }
@@ -960,6 +1024,46 @@ public class IndustrialNetworkView extends ViewPart
         refreshAction.setToolTipText(REFRESH_ACTION_MESSAGE);
         refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.REFRESH_ICON));
+
+        addNewModule = new Action(ADD_NEW_MODULE_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+                ISelection nodeTreeSelection = viewer.getSelection();
+                if ((nodeTreeSelection != null)
+                        && (nodeTreeSelection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
+                    Object selectedObject = strucSelection.getFirstElement();
+                    if ((selectedObject instanceof HeadNodeInterface)) {
+                        HeadNodeInterface selectedNode = (HeadNodeInterface) selectedObject;
+                        NewModuleWizard newModuleWizard = new NewModuleWizard(
+                                rootNode, (HeadNodeInterface) selectedObject);
+
+                        WizardDialog wd = new WizardDialog(
+                                Display.getDefault().getActiveShell(),
+                                newModuleWizard);
+                        wd.setTitle(newModuleWizard.getWindowTitle());
+                        wd.open();
+
+                        // try {
+                        // selectedNode.getProject().refreshLocal(
+                        // IResource.DEPTH_INFINITE,
+                        // new NullProgressMonitor());
+                        // } catch (CoreException e) {
+                        // // TODO Auto-generated catch block
+                        // e.printStackTrace();
+                        // }
+
+                        handleRefresh();
+                    }
+                } else {
+                    showMessage(ADD_NEW_NODE_INVALID_SELECTION_MESSAGE);
+                }
+            }
+        };
+        addNewNode.setToolTipText(ADD_NEW_NODE_TOOL_TIP_TEXT);
+        addNewNode
+                .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
+                        .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
     }
 
     @Override
