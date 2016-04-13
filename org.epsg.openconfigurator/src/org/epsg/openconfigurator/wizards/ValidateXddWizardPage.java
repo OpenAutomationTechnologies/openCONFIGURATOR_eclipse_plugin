@@ -65,6 +65,7 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.ModuleManagement;
 import org.epsg.openconfigurator.model.NetworkManagement;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
@@ -76,7 +77,11 @@ import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularChild;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
 import org.xml.sax.SAXException;
 
@@ -100,6 +105,7 @@ public class ValidateXddWizardPage extends WizardPage {
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
     private static final String ERROR_INVALID_MN_FILE_MESSAGE = "The imported XDD/XDC is not a valid MN XDD/XDC. \nChoose a valid MN XDD/XDC file.";
     private static final String ERROR_INVALID_CN_FILE_MESSAGE = "The imported XDD/XDC is not a valid CN XDD/XDC. \nChoose a valid CN XDD/XDC file.";
+    private static final String ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE = "Modular child CN XDD/XDC cannot be imported as head node. \nChoose a valid CN XDD/XDC file.";
     private static final String ERROR_INVALID_XDD_XDC_FILE_RMN_MESSAGE = "The imported XDD/XDC cannot function as an Redundant Managing Node!";
     private static final String ERROR_INVALID_XDD_XDC_FILE_MN_MESSAGE = "The imported XDD/XDC cannot function as an MN!";
     private static final String INTERNAL_ERROR_MESSAGE = "Internal error!";
@@ -228,6 +234,7 @@ public class ValidateXddWizardPage extends WizardPage {
                 Object node = getNodeModel();
                 Node newNode = new Node(getNodeList(), null, node, xddModel);
                 NetworkManagement netWrkMgmt = newNode.getNetworkManagement();
+                ModuleManagement mduleMgmt = newNode.getModuleManagement();
                 switch (newNode.getNodeType()) {
                     case CONTROLLED_NODE: {
                         if (netWrkMgmt.getGeneralFeatures() != null) {
@@ -235,6 +242,22 @@ public class ValidateXddWizardPage extends WizardPage {
                                     .isDLLFeatureCN()) {
                                 getErrorStyledText(
                                         ERROR_INVALID_CN_FILE_MESSAGE);
+                                return false;
+                            }
+                        }
+                        System.out.println("Modular head node wizard = "
+                                + newNode.getISO15745ProfileContainer()
+                                        .getISO15745Profile());
+                        for (ISO15745Profile profile : newNode
+                                .getISO15745ProfileContainer()
+                                .getISO15745Profile()) {
+                            ProfileBodyDataType profileBodyDatatype = profile
+                                    .getProfileBody();
+                            if ((profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularChild)
+                                    || (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularChild)) {
+
+                                getErrorStyledText(
+                                        ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE);
                                 return false;
                             }
                         }
