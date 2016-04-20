@@ -95,6 +95,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -218,6 +219,7 @@ public class IndustrialNetworkView extends ViewPart
                     // return rootNode.getInterfacelist(parent);
                     // return node.getModuleManagement().getInterfacelist()
                     // .toArray();
+                    InterfaceList obj1 = new InterfaceList();
                     return node.getHeadNodeInterface().toArray();
                     // if (node.getNodeModel() instanceof TCN) {
                     // TCN cnModel = (TCN) node.getNodeModel();
@@ -411,6 +413,7 @@ public class IndustrialNetworkView extends ViewPart
                 if (interfaceList.getUniqueIDRef() instanceof Interface) {
                     Interface intfc = (Interface) interfaceList
                             .getUniqueIDRef();
+                    InterfaceList obj1 = new InterfaceList();
                     return intfc.getUniqueID();
                 }
                 return obj.toString();
@@ -676,6 +679,8 @@ public class IndustrialNetworkView extends ViewPart
             }
             if (object instanceof HeadNodeInterface) {
                 manager.add(addNewModule);
+                manager.add(new Separator());
+                manager.add(showProperties);
             }
         }
     }
@@ -1060,8 +1065,8 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
         };
-        addNewNode.setToolTipText(ADD_NEW_NODE_TOOL_TIP_TEXT);
-        addNewNode
+        addNewModule.setToolTipText(ADD_NEW_NODE_TOOL_TIP_TEXT);
+        addNewModule
                 .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                         .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
     }

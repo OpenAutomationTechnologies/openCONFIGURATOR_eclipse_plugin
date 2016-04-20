@@ -150,7 +150,9 @@ public class PowerlinkRootNode {
 
         // Updates generator attributes in project file.
         OpenConfiguratorProjectUtils.updateGeneratorInfo(node);
-
+        if (node.isModularheadNode()) {
+            node.getInterface().updateInterfaceList();
+        }
         return true;
     }
 
@@ -219,6 +221,19 @@ public class PowerlinkRootNode {
         return returnNodeList;
     }
 
+    public ArrayList<HeadNodeInterface> getInterfaceList() {
+        ArrayList<HeadNodeInterface> returnNodeList = new ArrayList<HeadNodeInterface>();
+
+        Collection<Node> nodeList = nodeCollection.values();
+
+        for (Node node : nodeList) {
+            if (node.isModularheadNode()) {
+                returnNodeList.add(node.getInterface());
+            }
+        }
+        return returnNodeList;
+    }
+
     /**
      * @return The MN node if available in the project, null otherwise.
      */
@@ -243,7 +258,7 @@ public class PowerlinkRootNode {
      * @param inputElement The parent instance.
      * @return The nodes list.
      */
-    public Object[] getNodeList(Object inputElement) {
+    public ArrayList<Node> getNodeLists(Object inputElement) {
         ArrayList<Node> returnNodeList = new ArrayList<Node>();
         if (inputElement instanceof PowerlinkRootNode) {
 
@@ -262,7 +277,7 @@ public class PowerlinkRootNode {
                 // MN/NetworkConfiguration instance is already added.
             }
         }
-        return returnNodeList.toArray();
+        return returnNodeList;
     }
 
     /**
@@ -301,6 +316,7 @@ public class PowerlinkRootNode {
     public Status importNodes(IFile projectFile,
             TNetworkConfiguration networkCfg, IProgressMonitor monitor) {
         Node processingNode = new Node();
+        Module processingModule = new Module();
 
         try {
             // MN section

@@ -64,8 +64,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
+import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
-import org.epsg.openconfigurator.model.ModuleManagement;
 import org.epsg.openconfigurator.model.NetworkManagement;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
@@ -79,9 +79,13 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularChild;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
 import org.xml.sax.SAXException;
 
@@ -149,6 +153,10 @@ public class ValidateXddWizardPage extends WizardPage {
      * This is to restore the custom configuration.
      */
     private String customConfiguration;
+
+    private HeadNodeInterface headNodeInetrfaceObject;
+
+    private ISO15745ProfileContainer xddModel;
 
     /**
      * Checks for the valid XDD path.
@@ -227,16 +235,16 @@ public class ValidateXddWizardPage extends WizardPage {
             // if file exists
             if (fileExists) {
 
-                ISO15745ProfileContainer xddModel = XddMarshaller
-                        .unmarshallXDDFile(xddFile);
+                xddModel = XddMarshaller.unmarshallXDDFile(xddFile);
 
                 // Checks for the valid XDD/XDC file of respective node.
                 Object node = getNodeModel();
                 Node newNode = new Node(getNodeList(), null, node, xddModel);
                 NetworkManagement netWrkMgmt = newNode.getNetworkManagement();
-                ModuleManagement mduleMgmt = newNode.getModuleManagement();
+
                 switch (newNode.getNodeType()) {
                     case CONTROLLED_NODE: {
+
                         if (netWrkMgmt.getGeneralFeatures() != null) {
                             if (!netWrkMgmt.getGeneralFeatures()
                                     .isDLLFeatureCN()) {
@@ -298,6 +306,27 @@ public class ValidateXddWizardPage extends WizardPage {
                             // This RMN is added as a CN
                             // FIXME:
                         }
+                        break;
+                    }
+                    case MODULAR_CHILD_NODE: {
+
+                        for (ISO15745Profile profile : newNode
+                                .getISO15745ProfileContainer()
+                                .getISO15745Profile()) {
+                            ProfileBodyDataType profileBodyDatatype = profile
+                                    .getProfileBody();
+                            if ((profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead)
+                                    || (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead)
+                                    || (profileBodyDatatype instanceof ProfileBodyDevicePowerlink)
+                                    || (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlink)) {
+
+                                getErrorStyledText(
+                                        ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE);
+                                return false;
+                            }
+
+                        }
+
                         break;
                     }
                     case UNDEFINED: /// Fall-Through
@@ -517,6 +546,9 @@ public class ValidateXddWizardPage extends WizardPage {
         } else if (previousPage instanceof AddDefaultMasterNodeWizardPage) {
             AddDefaultMasterNodeWizardPage adMnPage = (AddDefaultMasterNodeWizardPage) previousPage;
             return adMnPage.getNode();
+        } else if (previousPage instanceof AddModuleWizardPage) {
+            AddModuleWizardPage adModulePage = (AddModuleWizardPage) previousPage;
+            return adModulePage.getModulemodel();
         }
         return null;
     }
@@ -542,6 +574,10 @@ public class ValidateXddWizardPage extends WizardPage {
             System.err.println("Invalid node model.");
         }
         return null;
+    }
+
+    public ISO15745ProfileContainer getXddModel() {
+        return xddModel;
     }
 
     private void handleDefaultRadioButtonSelectionChanged(SelectionEvent e) {
@@ -622,6 +658,12 @@ public class ValidateXddWizardPage extends WizardPage {
         }
 
         return pageComplete;
+    }
+
+    public void resetChildModuleWizard() {
+        btnDefault.setVisible(false);
+        btnCustom.setVisible(false);
+
     }
 
     /**

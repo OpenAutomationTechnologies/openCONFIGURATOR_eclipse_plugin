@@ -74,7 +74,7 @@ public class Node {
      *
      */
     public enum NodeType {
-        UNDEFINED, CONTROLLED_NODE, MANAGING_NODE, REDUNDANT_MANAGING_NODE
+        UNDEFINED, CONTROLLED_NODE, MANAGING_NODE, REDUNDANT_MANAGING_NODE, MODULAR_CHILD_NODE
     }
 
     /**
@@ -199,6 +199,8 @@ public class Node {
 
     private final DeviceModularInterface moduleInterface;
 
+    private HeadNodeInterface headNodeInterface;
+
     /**
      * Constructor to initialize the node variables.
      */
@@ -262,6 +264,9 @@ public class Node {
             TMN tempMn = (TMN) nodeModel;
             nodeId = tempMn.getNodeID();
             nodeType = NodeType.MANAGING_NODE;
+        } else if (nodeModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) nodeModel;
+            nodeType = NodeType.MODULAR_CHILD_NODE;
         } else {
             nodeId = 0;
 
@@ -279,8 +284,8 @@ public class Node {
         moduleManagement = new ModuleManagement(this, xddModel);
         List<Interface> interfaceList = moduleManagement.getInterfacelist();
         for (Interface interfaces : interfaceList) {
-            HeadNodeInterface ifList = new HeadNodeInterface(this, interfaces);
-            interfaceOfNodes.add(ifList);
+            headNodeInterface = new HeadNodeInterface(this, interfaces);
+            interfaceOfNodes.add(headNodeInterface);
         }
 
         moduleInterface = new DeviceModularInterface(this,
@@ -293,8 +298,7 @@ public class Node {
                 if (it != null) {
                     List<InterfaceList.Interface> intfc = new ArrayList<InterfaceList.Interface>();
                     intfc.addAll(it.getInterface());
-
-                    System.out.println("The interface list == ......." + intfc);
+                    
                 }
             }
         }
@@ -495,6 +499,10 @@ public class Node {
 
     public List<HeadNodeInterface> getHeadNodeInterface() {
         return interfaceOfNodes;
+    }
+
+    public HeadNodeInterface getInterface() {
+        return headNodeInterface;
     }
 
     public List<Interface> getInterfaceList() {
@@ -816,6 +824,14 @@ public class Node {
             return false;
         }
         return !configurationError.isEmpty();
+    }
+
+    public boolean hasInterface() {
+        List<HeadNodeInterface> interfaces = getHeadNodeInterface();
+        if (interfaces.size() > 0) {
+            return true;
+        }
+        return false;
     }
 
     /**

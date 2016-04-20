@@ -9,6 +9,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
 import org.epsg.openconfigurator.xmlbinding.xdd.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
@@ -21,6 +22,8 @@ public class ModuleManagement {
     private TModuleInterface moduleInterface;
     private InterfaceList modularHeadInterface;
 
+    private TModuleInterface childModuleInterface;
+
     private Node node;
 
     List<Interface> interfacelist = new ArrayList<Interface>();
@@ -28,6 +31,14 @@ public class ModuleManagement {
     public ModuleManagement(Node node, ISO15745ProfileContainer xddModel) {
         this.node = node;
         setXddModel(xddModel);
+    }
+
+    public TModuleInterface getChildModuleInterface() {
+        return childModuleInterface;
+    }
+
+    public TInterfaceList getDevModuleInterfaceList() {
+        return devModuleInterfaceList;
     }
 
     public List<Interface> getInterfacelist() {
@@ -84,10 +95,6 @@ public class ModuleManagement {
                             .getModuleManagement();
                     modularHeadInterface = moduleManagement.getInterfaceList();
                     interfacelist.addAll(modularHeadInterface.getInterface());
-                    System.out.println(
-                            "The interface list available in modular head = "
-                                    + interfacelist);
-
                 }
                 if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
                     ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBodyDatatype;
@@ -95,6 +102,15 @@ public class ModuleManagement {
                             .getModuleManagement();
                     moduleInterface = moduleManagementModel
                             .getModuleInterface();
+
+                } else {
+                    System.out.println("ERROR unhandled Profile body datatype"
+                            + profileBodyDatatype);
+                }
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild childDevProfile = (ProfileBodyDevicePowerlinkModularChild) profileBodyDatatype;
+                    childModuleInterface = childDevProfile.getDeviceManager()
+                            .getModuleManagement().getModuleInterface();
 
                 } else {
                     System.out.println("ERROR unhandled Profile body datatype"

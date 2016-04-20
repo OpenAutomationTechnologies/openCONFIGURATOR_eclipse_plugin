@@ -35,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,11 +50,15 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
@@ -85,6 +90,7 @@ public class NewNodeWizard extends Wizard {
     private Node selectedNodeObj;
     private PowerlinkRootNode nodeList;
     private TNodeCollection nodeCollectionModel;
+    private InterfaceList interfaceListModel;
 
     public NewNodeWizard(PowerlinkRootNode nodeList, Node selectedNodeObj) {
         if (selectedNodeObj == null) {
@@ -128,6 +134,21 @@ public class NewNodeWizard extends Wizard {
 
     }
 
+    public ProfileBodyDataType getProfileBody(
+            ISO15745ProfileContainer xddModel) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBodyDatatype = profile
+                        .getProfileBody();
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    return profileBodyDatatype;
+                }
+            }
+        }
+        return null;
+    }
+
     /**
      * Checks for errors in the wizard pages.
      *
@@ -146,16 +167,6 @@ public class NewNodeWizard extends Wizard {
         validateXddPage.getErrorStyledText("");
         Object nodeObject = addNodePage.getNode();
         Path xdcPath = validateXddPage.getNodeConfigurationPath();
-        if (nodeObject instanceof TCN) {
-            TCN cnModel = (TCN) nodeObject;
-            cnModel.setPathToXDC(xdcPath.toString());
-        } else if (nodeObject instanceof TRMN) {
-            TRMN rmnModel = (TRMN) nodeObject;
-            rmnModel.setPathToXDC(xdcPath.toString());
-        } else {
-            validateXddPage.getErrorStyledText(ERROR_NODE_MODEL);
-            System.err.println(ERROR_NODE_MODEL);
-        }
 
         ISO15745ProfileContainer xddModel = null;
         try {
@@ -179,6 +190,21 @@ public class NewNodeWizard extends Wizard {
             return false;
         }
 
+        if (nodeObject instanceof TCN) {
+            TCN cnModel = (TCN) nodeObject;
+            InterfaceList interfaceList = new InterfaceList();
+            cnModel.setPathToXDC(xdcPath.toString());
+            cnModel.setInterfaceList(interfaceList);
+            System.err.println("The Interface list......... " + interfaceList);
+
+        } else if (nodeObject instanceof TRMN) {
+            TRMN rmnModel = (TRMN) nodeObject;
+            rmnModel.setPathToXDC(xdcPath.toString());
+        } else {
+            validateXddPage.getErrorStyledText(ERROR_NODE_MODEL);
+            System.err.println(ERROR_NODE_MODEL);
+        }
+
         Node newNode = new Node(nodeList, selectedNodeObj.getProjectXml(),
                 nodeObject, xddModel);
 
@@ -196,6 +222,7 @@ public class NewNodeWizard extends Wizard {
 
             try {
                 nodeList.addNode(nodeCollectionModel, newNode);
+
             } catch (IOException | JDOMException e) {
                 if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
                     validateXddPage.getErrorStyledText(e.getMessage());
