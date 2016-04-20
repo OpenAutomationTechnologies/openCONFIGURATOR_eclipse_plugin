@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
+import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
@@ -61,6 +62,8 @@ public class NodeAdapterFactory implements IAdapterFactory {
      * Property source for an Redundant managing node.
      */
     RedundantManagingNodePropertySource rmnPropertySource;
+
+    HeadNodeInterfacePropertySource interfacePropertySource;
 
     @Override
     public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -100,11 +103,46 @@ public class NodeAdapterFactory implements IAdapterFactory {
                     }
                     return rmnPropertySource;
                 }
+            } else if (adaptableObject instanceof HeadNodeInterface) {
+                HeadNodeInterface headinterfaceObj = (HeadNodeInterface) adaptableObject;
+                System.err.println("Head Node Interface == + "
+                        + headinterfaceObj.getUniqueId());
+                if (headinterfaceObj instanceof HeadNodeInterface) {
+
+                    if (interfacePropertySource == null) {
+                        interfacePropertySource = new HeadNodeInterfacePropertySource(
+                                headinterfaceObj);
+                    } else {
+                        interfacePropertySource
+                                .setInterfaceData(headinterfaceObj);
+                    }
+                    return interfacePropertySource;
+                }
+
+                // for (ModularNodeInterfaceList moduleInterface :
+                // interfaceList) {
+                // System.err.println("Interface uniqueID == "
+                // + moduleInterface.getInterfaceUId());
+                // if (moduleInterface instanceof ModularNodeInterfaceList) {
+                //
+                // if (interfacePropertySource == null) {
+                // interfacePropertySource = new
+                // HeadNodeInterfacePropertySource(
+                // moduleInterface);
+                // } else {
+                // interfacePropertySource
+                // .setInterfaceData(moduleInterface);
+                // }
+                // return interfacePropertySource;
+                // }
+                // }
             } else {
                 System.err.println("No property source for " + adaptableObject);
             }
+
         }
         return null;
+
     }
 
     @Override

@@ -48,6 +48,13 @@ public interface IAbstractNodeProperties {
     public static final String NODE_ID_EDITABLE_OBJECT = "node.NodeId.Editable"; //$NON-NLS-1$
     public static final String NODE_ERROR_OBJECT = "node.NodeId.Error"; //$NON-NLS-1$
 
+    public static final String INTERFACE_UNIQUEID_OBJECT = "node.Interface.UniqueID"; //$NON-NLS-1$
+    public static final String INTERFACE_TYPE_OBJECT = "node.Interface.Type"; //$NON-NLS-1$
+    public static final String INTERFACE_MAX_MODULES_OBJECT = "node.Interface.Maxmodules"; //$NON-NLS-1$
+    public static final String INTERFACE_UNUSED_SLOTS_OBJECT = "node.Interface.Unusedslots"; //$NON-NLS-1$
+    public static final String INTERFACE_MODULE_ADDRESSING_OBJECT = "node.Interface.Moduleaddressing"; //$NON-NLS-1$
+    public static final String INTERFACE_MULTIPLE_MODULES_OBJECT = "node.Interface.Multiplemodules"; //$NON-NLS-1$
+
     public static final String NODE_CONIFG_OBJECT = "pathToXDC"; //$NON-NLS-1$
     public static final String NODE_IS_ASYNC_ONLY_OBJECT = "isAsyncOnly"; //$NON-NLS-1$
     public static final String NODE_IS_TYPE1_ROUTER_OBJECT = "isType1Router"; //$NON-NLS-1$

@@ -56,6 +56,13 @@ public abstract class AbstractNodePropertySource {
     private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Is Type2 Router";
     private static final String NODE_FORCED_OBJECTS_LABEL = "Forced Objects";
 
+    public static final String INTERFACE_UNIQUEID_LABEL = "Unique ID"; //$NON-NLS-1$
+    public static final String INTERFACE_TYPE_LABEL = "Type"; //$NON-NLS-1$
+    public static final String INTERFACE_MAX_MODULES_LABEL = "Max Modules"; //$NON-NLS-1$
+    public static final String INTERFACE_UNUSED_SLOTS_LABEL = "Unused Slots"; //$NON-NLS-1$
+    public static final String INTERFACE_MODULE_ADDRESSING_LABEL = "Module Addressing"; //$NON-NLS-1$
+    public static final String INTERFACE_MULTIPLE_MODULES_LABEL = "Multiple Modules"; //$NON-NLS-1$
+
     // ERROR messages
     public static final String NOT_SUPPORTED = "Currently not supported.";
     public static final String ERROR_NODE_NAME_CANNOT_BE_EMPTY = "Node name cannot be empty.";
@@ -74,6 +81,25 @@ public abstract class AbstractNodePropertySource {
             IAbstractNodeProperties.NODE_CONIFG_OBJECT, NODE_CONFIG_LABEL);
     protected PropertyDescriptor nodeErrorDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_ERROR_OBJECT, NODE_ERROR_LABEL);
+
+    protected PropertyDescriptor interfaceUniqueIdDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.INTERFACE_UNIQUEID_OBJECT,
+            INTERFACE_UNIQUEID_LABEL);
+    protected PropertyDescriptor interfaceTypeDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.INTERFACE_TYPE_OBJECT,
+            INTERFACE_TYPE_LABEL);
+    protected PropertyDescriptor interfaceMaxModulesDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.INTERFACE_MAX_MODULES_OBJECT,
+            INTERFACE_MAX_MODULES_LABEL);
+    protected PropertyDescriptor interfaceUnusedSlotsDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.INTERFACE_UNUSED_SLOTS_OBJECT,
+            INTERFACE_UNUSED_SLOTS_LABEL);
+    protected PropertyDescriptor interfaceModuleAddressingDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.INTERFACE_MODULE_ADDRESSING_OBJECT,
+            INTERFACE_MODULE_ADDRESSING_LABEL);
+    protected PropertyDescriptor interfaceMultipleModulesDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.INTERFACE_MULTIPLE_MODULES_OBJECT,
+            INTERFACE_MULTIPLE_MODULES_LABEL);
 
     protected ComboBoxPropertyDescriptor isAsyncOnly = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT,

@@ -279,16 +279,8 @@ public class Node {
         moduleManagement = new ModuleManagement(this, xddModel);
         List<Interface> interfaceList = moduleManagement.getInterfacelist();
         for (Interface interfaces : interfaceList) {
-
-            // InterfaceList itfcList = new InterfaceList();
-            // InterfaceList.Interface intf = new InterfaceList.Interface();
-            //
-            // List<InterfaceList.Interface> intfc = new
-            // ArrayList<InterfaceList.Interface>();
-
             HeadNodeInterface ifList = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(ifList);
-            // interfaceListOfNodes.add(itfcList);
         }
 
         moduleInterface = new DeviceModularInterface(this,
