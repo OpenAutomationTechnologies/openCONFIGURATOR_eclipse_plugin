@@ -1,17 +1,20 @@
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.ConnectedModuleList;
 import org.epsg.openconfigurator.xmlbinding.xdd.FileList;
 import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
 import org.epsg.openconfigurator.xmlbinding.xdd.RangeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingHead;
+import org.jdom2.JDOMException;
 
 public class HeadNodeInterface {
 
@@ -35,10 +38,13 @@ public class HeadNodeInterface {
     private boolean unUsedSlots;
     private boolean multipleModules;
     private Map<Integer, Module> moduleCollection = new HashMap<Integer, Module>();
+   
+private Object interfaceModel;
 
     public HeadNodeInterface(Node node, Interface interfaces) {
         this.node = node;
         if (interfaces != null) {
+            interfaceModel = interfaces.getUniqueIDRef();
             rangeList = interfaces.getRangeList();
             uniqueIDRef = interfaces.getUniqueIDRef();
             intfc = (TInterfaceList.Interface) uniqueIDRef;

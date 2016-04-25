@@ -286,6 +286,7 @@ public class Node {
         for (Interface interfaces : interfaceList) {
             headNodeInterface = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(headNodeInterface);
+
         }
 
         moduleInterface = new DeviceModularInterface(this,
@@ -1508,6 +1509,21 @@ public class Node {
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID,
                 waitNotActive.toString());
+    }
+
+    public void updateInterfaceValue(
+            org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface interfaceObj) {
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            cn.setInterfaceList(new InterfaceList());
+            List<org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface> interfaceList = cn
+                    .getInterfaceList().getInterface();
+            for (org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface intfc : interfaceList) {
+                interfaceObj = intfc;
+            }
+
+        }
+
     }
 
     /**

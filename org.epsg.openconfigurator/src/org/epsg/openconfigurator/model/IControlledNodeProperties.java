@@ -40,6 +40,9 @@ package org.epsg.openconfigurator.model;
 public interface IControlledNodeProperties extends IAbstractNodeProperties {
 
     public static final String CN_TAG = "CN"; //$NON-NLS-1$
+    public static final String INTERFACE_LIST_TAG = "InterfaceList"; //$NON-NLS-1$
+    public static final String INTERFACE_TAG = "Interface"; //$NON-NLS-1$
+    public static final String INTERFACE_ID = "id"; //$NON-NLS-1$
     public static final String MODULE_TAG = "Module"; //$NON-NLS-1$
     public static final String MODULE_NAME = "name"; //$NON-NLS-1$
     public static final String MODULE_POSITION = "position"; //$NON-NLS-1$

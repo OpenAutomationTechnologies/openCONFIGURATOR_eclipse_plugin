@@ -77,6 +77,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
@@ -111,6 +112,29 @@ public class PowerlinkRootNode {
 
     public PowerlinkRootNode(OpenCONFIGURATORProject currentProject) {
         this.currentProject = currentProject;
+    }
+
+    public void addInterface(InterfaceList interfaceListModel, Node node)
+            throws JDOMException, IOException {
+        Object nodeModel = node.getNodeModel();
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            cn.setInterfaceList(new InterfaceList());
+            // interfaceListModel.getInterface()
+            // .addAll(cn.getInterfaceList().getInterface());
+        }
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        ProjectJDomOperation.addNode(document, node);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+        // Updates generator attributes in project file.
+        OpenConfiguratorProjectUtils.updateGeneratorInfo(node);
+
     }
 
     /**

@@ -33,9 +33,11 @@ package org.epsg.openconfigurator.xmloperation;
 
 import java.util.List;
 
+import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
 import org.epsg.openconfigurator.model.IRedundantManagingNodeProperties;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
@@ -62,6 +64,8 @@ public class ProjectJDomOperation {
     static final XPathFactory XPATH_FACTORY_INSTANCE;
     static final Namespace OPENCONFIGURATOR_NAMESPACE;
     static final XPathExpression<Element> MN_XPATH_EXPR;
+
+    static final XPathExpression<Element> CN_XPATH_EXPR;
 
     static final XPathExpression<Element> NODE_ID_COLLECTION_XPATH_EXPR;
 
@@ -91,6 +95,12 @@ public class ProjectJDomOperation {
                 "//oc:NetworkConfiguration", Filters.element());
         netCfgXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
         NETWORKCONFIGURATION_XPATH_EXPR = netCfgXpathelementBuilder
+                .compileWith(XPATH_FACTORY_INSTANCE);
+
+        XPathBuilder<Element> cnXpathelementBuilder = new XPathBuilder<Element>(
+                "//oc:MN", Filters.element());
+        cnXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
+        CN_XPATH_EXPR = cnXpathelementBuilder
                 .compileWith(XPATH_FACTORY_INSTANCE);
 
         XPathBuilder<Element> generatorXpathelementBuilder = new XPathBuilder<Element>(
@@ -172,6 +182,101 @@ public class ProjectJDomOperation {
 
         JDomUtil.addNewElement(document, NODE_ID_COLLECTION_XPATH_EXPR,
                 newElement);
+    }
+
+    public static void addInterfaceList(Document document, final Node node,
+            HeadNodeInterface interfaceOfNode, Module module) {
+
+        String interfaceListTagXpath = node.getXpath() + "/oc:"
+                + IControlledNodeProperties.INTERFACE_LIST_TAG;
+
+        String interfaceXpath = interfaceListTagXpath + "/oc:"
+                + IControlledNodeProperties.INTERFACE_TAG + "[@id='"
+                + interfaceOfNode.getInterfaceUId() + "']";
+
+        if (JDomUtil.isXpathPresent(document, interfaceListTagXpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+
+            System.err.println("Interface List Xpath is present...");
+            Element newObjElement = new Element(
+                    IControlledNodeProperties.INTERFACE_TAG);
+            Attribute intAttr = new Attribute(
+                    IControlledNodeProperties.INTERFACE_ID,
+                    interfaceOfNode.getInterfaceUId());
+            newObjElement.setAttribute(intAttr);
+
+            Element moduleObjElement = new Element(
+                    IControlledNodeProperties.MODULE_TAG);
+            List<Attribute> attribList = moduleObjElement.getAttributes();
+
+            attribList.add(new Attribute(IControlledNodeProperties.MODULE_NAME,
+                    module.getModuleName()));
+
+            attribList.add(
+                    new Attribute(IControlledNodeProperties.MODULE_POSITION,
+                            String.valueOf(module.getPosition())));
+
+            attribList.add(
+                    new Attribute(IControlledNodeProperties.MODULE_PATH_TO_XDC,
+                            module.getPathToXdc()));
+
+            attribList
+                    .add(new Attribute(IControlledNodeProperties.MODULE_ENABLED,
+                            String.valueOf(module.isEnabled())));
+            System.err.println("Interface XPath == " + interfaceXpath);
+            if (JDomUtil.isXpathPresent(document, interfaceXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                System.err.println("Interface with Id Xpath is present...");
+                JDomUtil.addNewElement(document, interfaceXpath,
+                        OPENCONFIGURATOR_NAMESPACE, moduleObjElement);
+
+            } else {
+                JDomUtil.addNewElement(document, interfaceListTagXpath,
+                        OPENCONFIGURATOR_NAMESPACE, newObjElement);
+                JDomUtil.addNewElement(document, interfaceXpath,
+                        OPENCONFIGURATOR_NAMESPACE, moduleObjElement);
+            }
+
+        } else {
+
+            System.err.println("Creating new element.........");
+            Element newElement = new Element(
+                    IControlledNodeProperties.INTERFACE_LIST_TAG);
+            Element newObjElement = new Element(
+                    IControlledNodeProperties.INTERFACE_TAG);
+
+            Attribute intAttr = new Attribute(
+                    IControlledNodeProperties.INTERFACE_ID,
+                    interfaceOfNode.getInterfaceUId());
+            newObjElement.setAttribute(intAttr);
+
+            Element moduleObjElement = new Element(
+                    IControlledNodeProperties.MODULE_TAG);
+            List<Attribute> attribList = moduleObjElement.getAttributes();
+
+            attribList.add(new Attribute(IControlledNodeProperties.MODULE_NAME,
+                    module.getModuleName()));
+
+            attribList.add(
+                    new Attribute(IControlledNodeProperties.MODULE_POSITION,
+                            String.valueOf(module.getPosition())));
+
+            attribList.add(
+                    new Attribute(IControlledNodeProperties.MODULE_PATH_TO_XDC,
+                            module.getPathToXdc()));
+
+            attribList
+                    .add(new Attribute(IControlledNodeProperties.MODULE_ENABLED,
+                            String.valueOf(module.isEnabled())));
+
+            JDomUtil.addNewElement(document, node.getXpath(),
+                    OPENCONFIGURATOR_NAMESPACE, newElement);
+            JDomUtil.addNewElement(document, interfaceListTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE, newObjElement);
+            JDomUtil.addNewElement(document, interfaceXpath,
+                    OPENCONFIGURATOR_NAMESPACE, moduleObjElement);
+            System.err.println("New Element added..........");
+        }
     }
 
     /**

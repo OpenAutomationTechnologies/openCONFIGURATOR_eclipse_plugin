@@ -12,6 +12,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead;
+import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleManagement;
 
@@ -21,10 +22,13 @@ public class ModuleManagement {
     private TModuleManagement moduleManagementModel;
     private TModuleInterface moduleInterface;
     private InterfaceList modularHeadInterface;
+    private TInterfaceList devModuleInterfaceList;
 
     private TModuleInterface childModuleInterface;
 
     private Node node;
+
+    List<TInterfaceList.Interface> interfce = new ArrayList<TInterfaceList.Interface>();
 
     List<Interface> interfacelist = new ArrayList<Interface>();
 
@@ -45,6 +49,10 @@ public class ModuleManagement {
         return interfacelist;
     }
 
+    public List<TInterfaceList.Interface> getInterfce() {
+        return interfce;
+    }
+
     public InterfaceList getModularHeadInterface() {
         return modularHeadInterface;
     }
@@ -59,6 +67,11 @@ public class ModuleManagement {
 
     public TModuleManagement getModuleManagementModel() {
         return moduleManagementModel;
+    }
+
+    public void setDevModuleInterfaceList(
+            TInterfaceList devModuleInterfaceList) {
+        this.devModuleInterfaceList = devModuleInterfaceList;
     }
 
     public void setInterfacelist(List<Interface> interfacelist) {
@@ -102,6 +115,9 @@ public class ModuleManagement {
                             .getModuleManagement();
                     moduleInterface = moduleManagementModel
                             .getModuleInterface();
+                    devModuleInterfaceList = moduleManagementModel
+                            .getInterfaceList();
+                    interfce = devModuleInterfaceList.getInterface();
 
                 } else {
                     System.out.println("ERROR unhandled Profile body datatype"
