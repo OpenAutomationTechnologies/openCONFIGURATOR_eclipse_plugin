@@ -329,7 +329,10 @@ public class ParameterReference implements IParameter {
             throws JDOMException, IOException {
         actualValue = value;
         parameterReference.setActualValue(value);
-        OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
-                this, actualValue);
+        Parameter param = getObjectDictionary().getParameter(getUniqueId());
+        OpenConfiguratorProjectUtils.updateParameterActualValue(node, param,
+                actualValue);
+        // OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
+        // this, actualValue);
     }
 }
