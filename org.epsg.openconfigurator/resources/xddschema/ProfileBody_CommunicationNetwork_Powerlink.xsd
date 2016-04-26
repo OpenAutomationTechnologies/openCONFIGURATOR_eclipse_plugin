@@ -499,6 +499,7 @@ C. Ruecker    | 15.12.2015 | + Modular Device Support
 		<xsd:attribute name="SDOSupportASnd" type="xsd:boolean" use="optional" default="false"/>
 		<xsd:attribute name="SDOSupportPDO" type="xsd:boolean" use="optional" default="false"/>
 		<xsd:attribute name="SDOSupportUdpIp" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="DLLMultiplePReqPRes" type="xsd:boolean" use="optional" default="false"/>
 	</xsd:complexType>
 	<!-- POWERLINK MN features -->
 	<xsd:complexType name="t_MNFeatures">
@@ -523,6 +524,7 @@ C. Ruecker    | 15.12.2015 | + Modular Device Support
 		<xsd:attribute name="PDOTPDOChannels" type="xsd:unsignedShort" use="optional" default="256"/>
 		<xsd:attribute name="NMTMNDNA" type="xsd:boolean" use="optional" default="false"/>
 		<xsd:attribute name="NMTMNRedundancy" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="DLLMNRingRedundancy" type="xsd:boolean" use="optional" default="false"/>
 	</xsd:complexType>
 	<!-- POWERLINK CN features -->
 	<xsd:complexType name="t_CNFeatures">
@@ -532,6 +534,7 @@ C. Ruecker    | 15.12.2015 | + Modular Device Support
 		<xsd:attribute name="NMTCNSoC2PReq" type="xsd:unsignedInt" use="required"/>
 		<xsd:attribute name="NMTCNSetNodeNumberTime" type="xsd:unsignedInt" use="optional" default="0"/>
 		<xsd:attribute name="NMTCNDNA" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="NMTCNMaxAInv" type="xsd:unsignedInt" use="optional" default="0"/>
 	</xsd:complexType>
 	<!-- POWERLINK device commissioning (for XDC files) -->
 	<xsd:complexType name="t_deviceCommissioning">

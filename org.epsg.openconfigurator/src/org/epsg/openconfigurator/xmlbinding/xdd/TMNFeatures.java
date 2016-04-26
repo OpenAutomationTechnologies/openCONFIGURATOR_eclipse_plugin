@@ -38,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="PDOTPDOChannels" type="{http://www.w3.org/2001/XMLSchema}unsignedShort" default="256" /&gt;
  *       &lt;attribute name="NMTMNDNA" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTMNRedundancy" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="DLLMNRingRedundancy" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -100,6 +101,8 @@ public class TMNFeatures {
     protected Boolean nmtmndna;
     @XmlAttribute(name = "NMTMNRedundancy")
     protected Boolean nmtmnRedundancy;
+    @XmlAttribute(name = "DLLMNRingRedundancy")
+    protected Boolean dllmnRingRedundancy;
 
     /**
      * Gets the value of the dllErrMNMultipleMN property.
@@ -591,6 +594,34 @@ public class TMNFeatures {
      */
     public void setNMTMNRedundancy(Boolean value) {
         this.nmtmnRedundancy = value;
+    }
+
+    /**
+     * Gets the value of the dllmnRingRedundancy property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isDLLMNRingRedundancy() {
+        if (dllmnRingRedundancy == null) {
+            return false;
+        } else {
+            return dllmnRingRedundancy;
+        }
+    }
+
+    /**
+     * Sets the value of the dllmnRingRedundancy property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setDLLMNRingRedundancy(Boolean value) {
+        this.dllmnRingRedundancy = value;
     }
 
 }
