@@ -552,8 +552,12 @@ public class ObjectDictionaryView extends ViewPart {
             public void run() {
                 if (toggleParameterView.isChecked()) {
                     parametersVisible = true;
+                    toggleParameterView
+                            .setToolTipText("Switch to Object Dictionary View");
                 } else {
                     parametersVisible = false;
+                    toggleParameterView
+                            .setToolTipText("Switch to Parameter View");
                 }
                 treeViewer.refresh();
             }
