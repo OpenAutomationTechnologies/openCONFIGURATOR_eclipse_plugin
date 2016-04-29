@@ -205,7 +205,7 @@ public class ObjectDictionary {
      * @return Parameter based on given unique ID.
      */
     public Parameter getParameter(String uniqueId) {
-        return parameterListMap.getOrDefault(uniqueId, null);
+        return parameterListMap.get(uniqueId);
     }
 
     /**

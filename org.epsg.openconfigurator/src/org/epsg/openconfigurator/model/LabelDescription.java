@@ -86,7 +86,7 @@ public class LabelDescription {
         if (descriptionMap.containsKey(displayLang)) {
             return descriptionMap.get(displayLang);
         } else {
-            return descriptionMap.getOrDefault("en", "");
+            return descriptionMap.get("en");
         }
     }
 
@@ -97,7 +97,7 @@ public class LabelDescription {
         if (labelMap.containsKey(displayLang)) {
             return labelMap.get(displayLang);
         } else {
-            return labelMap.getOrDefault("en", "");
+            return labelMap.get("en");
         }
     }
 

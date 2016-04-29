@@ -1826,7 +1826,9 @@ public class OpenConfiguratorLibraryUtils {
                             subObject.setError(getErrorMessage(libApiRes));
                             System.err.println(
                                     "Create Parameter sub-object of parameter group WARN: "
-                                            + getErrorMessage(libApiRes));
+                                            + getErrorMessage(libApiRes)
+                                            + libApiRes.GetErrorType()
+                                            + libApiRes.GetErrorMessage());
                         }
                     } else if (subObject
                             .getUniqueIDRef() instanceof TParameterGroup) {
