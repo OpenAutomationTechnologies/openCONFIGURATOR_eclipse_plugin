@@ -84,6 +84,26 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             }
 
         });
+        nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        accessTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+
+        dataTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        defaultValueDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        actualValueReadOnlyDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        actualValueTextDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        unitDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+
+        bitOffsetDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        bitOffsetDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        uniqueIdDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        uniqueIdDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
     }
 
     // Property descriptor to be displayed in the property page.
@@ -98,6 +118,8 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         allowedValueDescriptor = new ComboBoxPropertyDescriptor(
                 PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID, PARAM_ACTUAL_VALUE_LABEL,
                 ALLOWED_VALUES);
+        allowedValueDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
         propertyList.add(dataTypeDescriptor);
 
