@@ -567,8 +567,22 @@ public class OpenConfiguratorLibraryUtils {
                 case DLLCNPResChaining:
                     value = String.valueOf(cnFeatures.isDLLCNPResChaining());
                     break;
+                // case NMTCNPreOp2ToReady2Op:
+                // value = String
+                // .valueOf(cnFeatures.getNMTCNPreOp2ToReady2Op());
+                // break;
                 case NMTCNSoC2PReq:
                     value = String.valueOf(cnFeatures.getNMTCNSoC2PReq());
+                    break;
+                case NMTCNSetNodeNumberTime:
+                    value = String
+                            .valueOf(cnFeatures.getNMTCNSetNodeNumberTime());
+                    break;
+                case NMTCNDNA:
+                    value = String.valueOf(cnFeatures.isNMTCNDNA());
+                    break;
+                case NMTCNMaxAInv:
+                    value = String.valueOf(cnFeatures.getNMTCNMaxAInv());
                     break;
                 default:
                     System.err.println("CNFeature enum unsupported");
@@ -648,10 +662,15 @@ public class OpenConfiguratorLibraryUtils {
                     value = String
                             .valueOf(generalFeatures.getNMTErrorEntries());
                     break;
-
+                case NMTExtNmtCmds:
+                    value = String.valueOf(generalFeatures.isNMTExtNmtCmds());
+                    break;
                 case NMTFlushArpEntry:
                     value = String
                             .valueOf(generalFeatures.isNMTFlushArpEntry());
+                    break;
+                case NMTIsochronous:
+                    value = String.valueOf(generalFeatures.isNMTIsochronous());
                     break;
                 case NMTNetHostNameSet:
                     value = String
@@ -670,6 +689,9 @@ public class OpenConfiguratorLibraryUtils {
                     break;
                 case NMTNodeIDByHW:
                     value = String.valueOf(generalFeatures.isNMTNodeIDByHW());
+                    break;
+                case NMTNodeIDBySW:
+                    value = String.valueOf(generalFeatures.isNMTNodeIDBySW());
                     break;
                 case NMTProductCode:
                     value = String.valueOf(generalFeatures.getNMTProductCode());
@@ -710,6 +732,7 @@ public class OpenConfiguratorLibraryUtils {
                     value = String
                             .valueOf(generalFeatures.isNMTPublishStopped());
                     break;
+
                 case NMTPublishTime:
                     value = String.valueOf(generalFeatures.isNMTPublishTime());
                     break;
@@ -724,6 +747,10 @@ public class OpenConfiguratorLibraryUtils {
                     break;
                 case NWLIPSupport:
                     value = String.valueOf(generalFeatures.isNWLIPSupport());
+                    break;
+                case PDODynamicMapping:
+                    value = String
+                            .valueOf(generalFeatures.isPDODynamicMapping());
                     break;
                 case PDOGranularity:
                     value = String.valueOf(generalFeatures.getPDOGranularity());
@@ -837,6 +864,19 @@ public class OpenConfiguratorLibraryUtils {
                 case SDOServer:
                     value = String.valueOf(generalFeatures.isSDOServer());
                     break;
+                case SDOSupportASnd:
+                    value = String.valueOf(generalFeatures.isSDOSupportASnd());
+                    break;
+                case SDOSupportPDO:
+                    value = String.valueOf(generalFeatures.isSDOSupportPDO());
+                    break;
+                case SDOSupportUdpIp:
+                    value = String.valueOf(generalFeatures.isSDOSupportUdpIp());
+                    break;
+                case DLLMultiplePReqPRes:
+                    value = String
+                            .valueOf(generalFeatures.isDLLMultiplePReqPRes());
+                    break;
                 default:
                     System.err.println(
                             "General feature not handled" + generalFeature);
@@ -920,14 +960,23 @@ public class OpenConfiguratorLibraryUtils {
                 case NMTRelativeTime:
                     value = String.valueOf(mnFeatures.isNMTRelativeTime());
                     break;
+                case NMTServiceUdpIp:
+                    value = String.valueOf(mnFeatures.isNMTServiceUdpIp());
+                    break;
                 case NMTSimpleBoot:
                     value = String.valueOf(mnFeatures.isNMTSimpleBoot());
                     break;
                 case PDOTPDOChannels:
                     value = String.valueOf(mnFeatures.getPDOTPDOChannels());
                     break;
+                case NMTMNDNA:
+                    value = String.valueOf(mnFeatures.isNMTMNDNA());
+                    break;
                 case NMTMNRedundancy:
                     value = String.valueOf(mnFeatures.isNMTMNRedundancy());
+                    break;
+                case DLLMNRingRedundancy:
+                    value = String.valueOf(mnFeatures.isDLLMNRingRedundancy());
                     break;
                 default:
                     System.err.println("MN feature not handled:" + mnFeature);
@@ -1187,10 +1236,6 @@ public class OpenConfiguratorLibraryUtils {
                         System.err.println("CreateDomainObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
-                } else {
-                    // FIXME
-                    System.err.println("ERROR: Invalid object.getUniqueIDRef():"
-                            + object.getUniqueIDRef());
                 }
             } else if ((object.getDataType() != null)
                     && (object.getUniqueIDRef() != null)) {
@@ -1198,6 +1243,19 @@ public class OpenConfiguratorLibraryUtils {
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
 
+                    libApiRes = core.CreateParameterObject(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), objectType,
+                            object.getName(),
+                            getObjectDatatype(object.getDataType()), mapping,
+                            parameter.getUniqueID());
+                    if (!libApiRes.IsSuccessful()) {
+                        object.setError(getErrorMessage(libApiRes));
+                        System.err.println("CreateParameterObject WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                } else if (object.getUniqueIDRef() instanceof TParameterGroup) {
+                    TParameterGroup parameter = (TParameterGroup) object
+                            .getUniqueIDRef();
                     libApiRes = core.CreateParameterObject(node.getNetworkId(),
                             node.getNodeId(), object.getId(), objectType,
                             object.getName(),
@@ -1382,6 +1440,10 @@ public class OpenConfiguratorLibraryUtils {
                                             + getErrorMessage(libApiRes));
                         }
                     }
+                } else {
+                    System.out
+                            .println("Other than parameter template instance");
+
                 }
             } else {
 
@@ -1414,6 +1476,64 @@ public class OpenConfiguratorLibraryUtils {
                                 "Unhandled datatypeObj: " + dataTypeObj);
                     }
                 }
+
+                TAllowedValues allowedValuesModel = parameter
+                        .getAllowedValues();
+                if (allowedValuesModel != null) {
+                    List<TValue> parameterAllowedValuesList = allowedValuesModel
+                            .getValue();
+                    // Create a string collection with allowed values list.
+                    StringCollection allowedValues = new StringCollection();
+                    for (TValue parameterAllowedValue : parameterAllowedValuesList) {
+
+                        allowedValues.add(parameterAllowedValue.getValue());
+                    }
+
+                    libApiRes = core.SetParameterAllowedValues(networkId,
+                            nodeId, parameterUniqueId, allowedValues);
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println(
+                                "SetParameter Allowed Values list WARN: "
+                                        + getErrorMessage(libApiRes));
+                    }
+
+                    List<TRange> rangeList = allowedValuesModel.getRange();
+                    for (TRange range : rangeList) {
+
+                        TRange.MinValue minValueModel = range.getMinValue();
+                        TRange.MaxValue maxValueModel = range.getMaxValue();
+
+                        String minValue = StringUtils.EMPTY;
+                        String maxValue = StringUtils.EMPTY;
+
+                        if (minValueModel != null) {
+                            minValue = minValueModel.getValue();
+                        }
+
+                        if (maxValueModel != null) {
+                            maxValue = maxValueModel.getValue();
+                        }
+
+                        libApiRes = core.SetParameterAllowedRange(networkId,
+                                nodeId, parameterUniqueId, minValue, maxValue);
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err
+                                    .println("SetParameter Allowed Range WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    }
+                }
+
+                TValue defaultValueModel = parameter.getDefaultValue();
+                if (defaultValueModel != null) {
+                    libApiRes = core.SetParameterDefaultValue(networkId, nodeId,
+                            parameterUniqueId, defaultValueModel.getValue());
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("SetParameter Default value WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                }
+
             }
         }
         return libApiRes;
@@ -1655,20 +1775,24 @@ public class OpenConfiguratorLibraryUtils {
                 }
             } else {
                 // Domain objects.
+                if ((subObject.getDataType() == null)
+                        && (subObject.getUniqueIDRef() != null)) {
+                    if (subObject
+                            .getUniqueIDRef() instanceof TParameterList.Parameter) {
+                        Parameter parameter = (Parameter) subObject
+                                .getUniqueIDRef();
 
-                if (subObject
-                        .getUniqueIDRef() instanceof TParameterList.Parameter) {
-                    Parameter parameter = (Parameter) subObject
-                            .getUniqueIDRef();
-                    libApiRes = core.CreateDomainSubObject(node.getNetworkId(),
-                            node.getNodeId(), object.getId(), subObject.getId(),
-                            subObjectType, subObject.getName(), pdoMapping,
-                            parameter.getUniqueID());
-                    if (!libApiRes.IsSuccessful()) {
-                        subObject.setError(getErrorMessage(libApiRes));
-                        System.err.println(
-                                "Create Domain sub-object of parameter WARN: "
-                                        + getErrorMessage(libApiRes));
+                        libApiRes = core.CreateDomainSubObject(
+                                node.getNetworkId(), node.getNodeId(),
+                                object.getId(), subObject.getId(),
+                                subObjectType, subObject.getName(), pdoMapping,
+                                parameter.getUniqueID());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            System.err.println(
+                                    "Create Domain sub-object of parameter WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
                     }
                 } else if ((subObject.getUniqueIDRef() != null)
                         && (subObject.getDataType() != null)) {
@@ -1686,6 +1810,22 @@ public class OpenConfiguratorLibraryUtils {
                             subObject.setError(getErrorMessage(libApiRes));
                             System.err.println(
                                     "Create Parameter sub-Object WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    } else if (subObject
+                            .getUniqueIDRef() instanceof TParameterGroup) {
+                        TParameterGroup parameter = (TParameterGroup) subObject
+                                .getUniqueIDRef();
+                        libApiRes = core.CreateParameterSubObject(
+                                node.getNetworkId(), node.getNodeId(),
+                                object.getId(), subObject.getId(),
+                                subObjectType, subObject.getName(),
+                                getObjectDatatype(subObject.getDataType()),
+                                pdoMapping, parameter.getUniqueID());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            System.err.println(
+                                    "Create Parameter sub-object of parameter group WARN: "
                                             + getErrorMessage(libApiRes));
                         }
                     } else if (subObject
@@ -2650,32 +2790,32 @@ public class OpenConfiguratorLibraryUtils {
             System.loadLibrary("boost_log_setup"); //$NON-NLS-1$
         } else if (SystemUtils.IS_OS_WINDOWS) {
 
-            System.loadLibrary("boost_regex-vc110-mt-1_58");
-            System.loadLibrary("boost_date_time-vc110-mt-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_system-vc110-mt-1_58"); //$NON-NLS-1$
-            System.loadLibrary("boost_chrono-vc110-mt-1_58"); //$NON-NLS-1$
-            System.loadLibrary("boost_filesystem-vc110-mt-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_thread-vc110-mt-1_58"); //$NON-NLS-1$
-            System.loadLibrary("boost_log-vc110-mt-1_58"); //$NON-NLS-1$
-            System.loadLibrary("boost_log_setup-vc110-mt-1_58");
+            // System.loadLibrary("boost_regex-vc110-mt-1_58");
+            // System.loadLibrary("boost_date_time-vc110-mt-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_system-vc110-mt-1_58"); //$NON-NLS-1$
+            // System.loadLibrary("boost_chrono-vc110-mt-1_58"); //$NON-NLS-1$
+            // System.loadLibrary("boost_filesystem-vc110-mt-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_thread-vc110-mt-1_58"); //$NON-NLS-1$
+            // System.loadLibrary("boost_log-vc110-mt-1_58"); //$NON-NLS-1$
+            // System.loadLibrary("boost_log_setup-vc110-mt-1_58");
             // $NON-NLS-1$
             // Temporarily debug versions.
 
-            // System.loadLibrary("boost_regex-vc110-mt-gd-1_58");
-            // System.loadLibrary("boost_date_time-vc110-mt-gd-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_system-vc110-mt-gd-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_chrono-vc110-mt-gd-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_filesystem-vc110-mt-gd-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_thread-vc110-mt-gd-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_log-vc110-mt-gd-1_58"); //$NON-NLS-1$
-            // System.loadLibrary("boost_log_setup-vc110-mt-gd-1_58");
+            System.loadLibrary("boost_regex-vc110-mt-gd-1_58");
+            System.loadLibrary("boost_date_time-vc110-mt-gd-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_system-vc110-mt-gd-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_chrono-vc110-mt-gd-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_filesystem-vc110-mt-gd-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_thread-vc110-mt-gd-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_log-vc110-mt-gd-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_log_setup-vc110-mt-gd-1_58");
             // // // $NON-NLS-1$
         } else {
             System.err.println("Unsupported system");
