@@ -1246,7 +1246,8 @@ public class OpenConfiguratorLibraryUtils {
                     libApiRes = core.CreateParameterObject(node.getNetworkId(),
                             node.getNodeId(), object.getId(), objectType,
                             object.getName(),
-                            getObjectDatatype(object.getDataType()), mapping,
+                            getObjectDatatype(object.getDataType()),
+                            getAccessType(object.getAccessType()), mapping,
                             parameter.getUniqueID());
                     if (!libApiRes.IsSuccessful()) {
                         object.setError(getErrorMessage(libApiRes));
@@ -1259,7 +1260,8 @@ public class OpenConfiguratorLibraryUtils {
                     libApiRes = core.CreateParameterObject(node.getNetworkId(),
                             node.getNodeId(), object.getId(), objectType,
                             object.getName(),
-                            getObjectDatatype(object.getDataType()), mapping,
+                            getObjectDatatype(object.getDataType()),
+                            getAccessType(object.getAccessType()), mapping,
                             parameter.getUniqueID());
                     if (!libApiRes.IsSuccessful()) {
                         object.setError(getErrorMessage(libApiRes));
@@ -1437,7 +1439,8 @@ public class OpenConfiguratorLibraryUtils {
                         if (!libApiRes.IsSuccessful()) {
                             System.err
                                     .println("SetParameter Default value WARN: "
-                                            + getErrorMessage(libApiRes));
+                                            + getErrorMessage(libApiRes)
+                                            + libApiRes.GetErrorType());
                         }
                     }
                 } else {
@@ -1805,6 +1808,7 @@ public class OpenConfiguratorLibraryUtils {
                                 object.getId(), subObject.getId(),
                                 subObjectType, subObject.getName(),
                                 getObjectDatatype(subObject.getDataType()),
+                                getAccessType(subObject.getAccessType()),
                                 pdoMapping, parameter.getUniqueID());
                         if (!libApiRes.IsSuccessful()) {
                             subObject.setError(getErrorMessage(libApiRes));
@@ -1814,21 +1818,26 @@ public class OpenConfiguratorLibraryUtils {
                         }
                     } else if (subObject
                             .getUniqueIDRef() instanceof TParameterGroup) {
-                        TParameterGroup parameter = (TParameterGroup) subObject
+                        TParameterGroup parameterGrp = (TParameterGroup) subObject
                                 .getUniqueIDRef();
                         libApiRes = core.CreateParameterSubObject(
                                 node.getNetworkId(), node.getNodeId(),
                                 object.getId(), subObject.getId(),
                                 subObjectType, subObject.getName(),
                                 getObjectDatatype(subObject.getDataType()),
-                                pdoMapping, parameter.getUniqueID());
+                                getAccessType(subObject.getAccessType()),
+                                pdoMapping, parameterGrp.getUniqueID());
                         if (!libApiRes.IsSuccessful()) {
                             subObject.setError(getErrorMessage(libApiRes));
                             System.err.println(
                                     "Create Parameter sub-object of parameter group WARN: "
                                             + getErrorMessage(libApiRes)
                                             + libApiRes.GetErrorType()
-                                            + libApiRes.GetErrorMessage());
+                                            + libApiRes.GetErrorMessage()
+                                            + " Datatype == "
+                                            + getObjectDatatype(
+                                                    subObject.getDataType())
+                                                            .name());
                         }
                     } else if (subObject
                             .getUniqueIDRef() instanceof TParameterGroup) {
