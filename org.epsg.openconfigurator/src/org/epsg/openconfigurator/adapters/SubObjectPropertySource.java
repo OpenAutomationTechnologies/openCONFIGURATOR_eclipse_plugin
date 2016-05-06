@@ -47,6 +47,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 
 /**
@@ -273,6 +274,9 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     if (uniqueIdRef instanceof TParameterList.Parameter) {
                         TParameterList.Parameter param = (TParameterList.Parameter) uniqueIdRef;
                         retObj = param.getUniqueID();
+                    } else if (uniqueIdRef instanceof TParameterGroup) {
+                        TParameterGroup paramGroup = (TParameterGroup) uniqueIdRef;
+                        retObj = paramGroup.getUniqueID();
                     } else {
                         retObj = StringUtils.EMPTY;
                     }
