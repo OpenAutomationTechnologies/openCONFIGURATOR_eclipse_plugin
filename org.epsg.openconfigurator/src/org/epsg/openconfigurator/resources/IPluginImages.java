@@ -52,6 +52,8 @@ public interface IPluginImages {
     public final static String RMN_ICON = "icons/rmn.gif";
     public final static String MN_ICON = "icons/mn.gif";
     public final static String CN_ICON = "icons/cn.gif";
+    public final static String INTERFACE_ICON = "icons/interface.gif";
+    public final static String MODULE_ICON = "icons/module.gif";
     public final static String CN_DISABLED_ICON = "icons/cn_disabled.gif";
     public final static String DISABLE_NODE_ICON = "icons/disable.gif";
     public final static String OVERLAY_CHAINED_NODE_ICON = "icons/chained.gif";

@@ -203,7 +203,7 @@ public class ObjectDictionaryView extends ViewPart
                             IPluginImages.OBD_PARAMETER_REFERENCE_ICON)
                     .createImage();
             parameterIcon = org.epsg.openconfigurator.Activator
-                    .getImageDescriptor(IPluginImages.OBD_PARAMETER_ICON)
+                    .getImageDescriptor(IPluginImages.MODULE_ICON)
                     .createImage();
             varDeclarationIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(

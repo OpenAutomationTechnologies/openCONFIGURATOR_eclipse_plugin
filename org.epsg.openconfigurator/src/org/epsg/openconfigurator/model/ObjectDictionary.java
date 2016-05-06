@@ -514,7 +514,6 @@ public class ObjectDictionary {
                     List<TObjectExtensionHead> objList = tempObjectLists
                             .getObject();
                     for (TObjectExtensionHead obj : objList) {
-                        System.err.println("Tobject instance == " + obj);
                         PowerlinkObject plkObj = new PowerlinkObject(node, obj);
                         objectsList.add(plkObj);
 

@@ -2,7 +2,9 @@ package org.epsg.openconfigurator.model;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.epsg.openconfigurator.xmlbinding.xdd.ConnectedModuleList;
 import org.epsg.openconfigurator.xmlbinding.xdd.FileList;
@@ -32,6 +34,7 @@ public class HeadNodeInterface {
     private String interfaceUId;
     private boolean unUsedSlots;
     private boolean multipleModules;
+    private Map<Integer, Module> moduleCollection = new HashMap<Integer, Module>();
 
     public HeadNodeInterface(Node node, Interface interfaces) {
         this.node = node;
@@ -90,6 +93,10 @@ public class HeadNodeInterface {
         return moduleAddressing;
     }
 
+    public Map<Integer, Module> getModuleCollection() {
+        return moduleCollection;
+    }
+
     public Node getNode() {
         return node;
     }
@@ -107,6 +114,14 @@ public class HeadNodeInterface {
 
     public Object getUniqueIDRef() {
         return uniqueIDRef;
+    }
+
+    public boolean hasModules() {
+        if (moduleCollection.size() == 0) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     public boolean isMultipleModules() {
@@ -171,5 +186,14 @@ public class HeadNodeInterface {
 
     public void setUnUsedSlots(boolean unUsedSlots) {
         this.unUsedSlots = unUsedSlots;
+    }
+
+    public synchronized void updateInterfaceList()
+            throws JDOMException, IOException {
+
+        org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList interfaceListObj = new org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList();
+        org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface interfaceObj = new org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface();
+        interfaceObj.setId(getInterfaceUId());
+        node.updateInterfaceValue(interfaceObj);
     }
 }

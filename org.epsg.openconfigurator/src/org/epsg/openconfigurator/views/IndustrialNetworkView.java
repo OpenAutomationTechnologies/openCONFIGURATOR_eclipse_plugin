@@ -36,6 +36,7 @@ package org.epsg.openconfigurator.views;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
@@ -87,6 +88,7 @@ import org.epsg.openconfigurator.event.INodePropertyChangeListener;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IPluginImages;
@@ -201,48 +203,28 @@ public class IndustrialNetworkView extends ViewPart
 
         @Override
         public Object[] getChildren(Object parent) {
+
             System.out.println(
                     "Industrial network view parent element = " + parent);
             if (parent instanceof Node) {
                 Node node = (Node) parent;
                 Object nodeObjectModel = node.getNodeModel();
-                System.out.println("NodeObject model == " + nodeObjectModel);
+
                 if (nodeObjectModel instanceof TNetworkConfiguration) {
                     return rootNode.getRmnNodeList().toArray();
                 } else if (nodeObjectModel instanceof TCN) {
-                    // TODO implement for Modular CN
-
+                    if (node.isModularheadNode()) {
+                        return node.getHeadNodeInterface().toArray();
+                    }
                 } else if (nodeObjectModel instanceof TRMN) {
-                    // TODO implement for Modular RMN
+                    // TODO: Implement for modular RMN.
                 }
-                if (node.isModularheadNode()) {
-                    // return rootNode.getInterfacelist(parent);
-                    // return node.getModuleManagement().getInterfacelist()
-                    // .toArray();
-                    InterfaceList obj1 = new InterfaceList();
-                    return node.getHeadNodeInterface().toArray();
-                    // if (node.getNodeModel() instanceof TCN) {
-                    // TCN cnModel = (TCN) node.getNodeModel();
-                    // InterfaceList intfcList = new InterfaceList();
-                    // List<Interface> intf = intfcList.getInterface();
-                    // cnModel.setInterfaceList();
-                    // // InterfaceList itfcList = new InterfaceList();
-                    // // cnModel.setInterfaceList(itfcList);
-                    // }
-                    // System.out.println("The interface list == ......."
-                    // + cnModel.getInterfaceList());
-                    // // if (it != null) {
-                    // // List<InterfaceList.Interface> intfc =
-                    // // cnModel.getInterfaceList();
-                    // // intfc.addAll(it.getInterface());
-                    // // System.out.println(
-                    // // "The interface list == ......." + intfc);
-                    // // }
-                    // return
-                    // cnModel.getInterfaceList().getInterface().toArray();
-                    // }
-                    // return node.getInterfaceListOfNodes().toArray();
-                }
+            }
+
+            if (parent instanceof HeadNodeInterface) {
+                HeadNodeInterface headNodeInterface = (HeadNodeInterface) parent;
+                return headNodeInterface.getModuleCollection().values()
+                        .toArray();
             }
 
             System.err.println("Returning empty object. Parent:" + parent);
@@ -251,26 +233,33 @@ public class IndustrialNetworkView extends ViewPart
 
         @Override
         public Object[] getElements(Object parent) {
-
+            System.err.println(
+                    "Industrial network view content provider get elements : "
+                            + parent);
             if (parent == null) {
                 return new Object[] { new EmptyNetworkView() };
             } else {
                 if (parent instanceof PowerlinkRootNode) {
                     PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
 
-                    Object[] nodeList = powerlinkRoot.getNodeList(parent);
-                    // Object[] interfaceList = powerlinkRoot
-                    // .getInterfacelist(parent);
-                    if (nodeList.length == 0) {
+                    LinkedHashSet<Node> nodeCollection = new LinkedHashSet<Node>();
+
+                    List<Node> nodeList = powerlinkRoot.getNodeLists(parent);
+
+                    nodeCollection.addAll(nodeList);
+
+                    Object[] obj = nodeCollection.toArray();
+
+                    if (nodeCollection.size() == 0) {
                         return new Object[] { new EmptyNetworkView() };
                     } else {
-
-                        return nodeList;
+                        return obj;
                     }
                 }
                 return null;
 
             }
+
         }
 
         @Override
@@ -287,6 +276,12 @@ public class IndustrialNetworkView extends ViewPart
                 } else if (nodeObjectModel instanceof TRMN) {
                     return rootNode.getMN();
                 }
+            } else if (child instanceof Module) {
+                Module module = (Module) child;
+                Object moduleModel = module.getModuleModel();
+                if (moduleModel instanceof InterfaceList.Interface.Module) {
+                    return module.getInterfaceOfModule();
+                }
             }
 
             return null;
@@ -294,11 +289,11 @@ public class IndustrialNetworkView extends ViewPart
 
         @Override
         public boolean hasChildren(Object parent) {
+
             if (parent instanceof Node) {
                 Node node = (Node) parent;
-
                 Object nodeObjectModel = node.getNodeModel();
-
+                Object interfaceModel = node.getInterface();
                 if (nodeObjectModel instanceof TNetworkConfiguration) {
                     ArrayList<Node> nodeList = rootNode.getRmnNodeList();
                     return (nodeList.size() > 0 ? true : false);
@@ -307,7 +302,15 @@ public class IndustrialNetworkView extends ViewPart
                 } else if (nodeObjectModel instanceof TRMN) {
                     // TODO implement for Modular RMN
                     return false;
+                } else if (interfaceModel instanceof HeadNodeInterface) {
+                    ArrayList<HeadNodeInterface> interfaceList = rootNode
+                            .getInterfaceList();
+                    return (interfaceList.size() > 0 ? true : false);
                 }
+            }
+
+            if (parent instanceof HeadNodeInterface) {
+                return true;
             }
 
             return false;
@@ -331,6 +334,8 @@ public class IndustrialNetworkView extends ViewPart
         Image cnEnabledIcon;
         Image cnDisabledIcon;
         Image rmnIcon;
+        Image interfaceIcon;
+        Image moduleIcon;
 
         ViewLabelProvider() {
             mnIcon = org.epsg.openconfigurator.Activator
@@ -342,6 +347,12 @@ public class IndustrialNetworkView extends ViewPart
                     .createImage();
             rmnIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(IPluginImages.RMN_ICON).createImage();
+            interfaceIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.INTERFACE_ICON)
+                    .createImage();
+            moduleIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.MODULE_ICON)
+                    .createImage();
         }
 
         @Override
@@ -350,6 +361,8 @@ public class IndustrialNetworkView extends ViewPart
             cnEnabledIcon.dispose();
             cnDisabledIcon.dispose();
             rmnIcon.dispose();
+            interfaceIcon.dispose();
+            moduleIcon.dispose();
         };
 
         @Override
@@ -391,8 +404,17 @@ public class IndustrialNetworkView extends ViewPart
                 if (nodeObjectModel instanceof TRMN) {
                     return rmnIcon;
                 }
+
             } else if (obj instanceof EmptyNetworkView) {
                 return null;
+            }
+
+            if (obj instanceof HeadNodeInterface) {
+                return interfaceIcon;
+            }
+
+            if (obj instanceof Module) {
+                return moduleIcon;
             }
 
             return PlatformUI.getWorkbench().getSharedImages()
@@ -418,18 +440,11 @@ public class IndustrialNetworkView extends ViewPart
                 }
                 return obj.toString();
             }
-            // if (obj instanceof InterfaceList) {
-            // InterfaceList itfcList = (InterfaceList) obj;
-            //
-            // List<Interface> itfc = new ArrayList<Interface>();
-            // itfc.addAll(itfcList.getInterface());
-            // System.out.println("InterfaceList model = " + itfc);
-            // for (Interface ifc : itfc) {
-            // System.out.println("Interface listed ..........");
-            // return ifc.getId();
-            //
-            // }
-            // }
+            if (obj instanceof Module) {
+                Module module = (Module) obj;
+                return module.getModuleName() + "(" + module.getPosition()
+                        + ")";
+            }
             return obj.toString();
         }
     }
@@ -681,6 +696,19 @@ public class IndustrialNetworkView extends ViewPart
                 manager.add(addNewModule);
                 manager.add(new Separator());
                 manager.add(showProperties);
+            }
+
+            if (object instanceof Module) {
+                manager.add(showProperties);
+                manager.add(new Separator());
+                manager.add(showPdoMapping);
+                manager.add(new Separator());
+                manager.add(showObjectDictionary);
+                manager.add(new Separator());
+                manager.add(enableDisableNode);
+                manager.add(new Separator());
+                manager.add(deleteNode);
+
             }
         }
     }
