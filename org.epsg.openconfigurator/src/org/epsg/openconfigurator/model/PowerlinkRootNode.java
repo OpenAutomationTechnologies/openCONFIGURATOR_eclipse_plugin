@@ -435,6 +435,122 @@ public class PowerlinkRootNode {
                 nodeCollection.put(new Short(processingNode.getNodeId()),
                         processingNode);
                 monitor.worked(1);
+
+                if (cnNode.getInterfaceList() != null) {
+                    System.err.println(
+                            "Interface list availbale in the CN node .. "
+                                    + cnNode.getInterfaceList());
+                    Iterator<InterfaceList.Interface> interfaceIterator = cnNode
+                            .getInterfaceList().getInterface().iterator();
+
+                    while (interfaceIterator.hasNext()) {
+
+                        if (monitor.isCanceled()) {
+                            return new Status(IStatus.OK,
+                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                    "Cancelled", null);
+                        }
+
+                        InterfaceList.Interface intrfce = interfaceIterator
+                                .next();
+
+                        Iterator<InterfaceList.Interface.Module> moduleListIterator = intrfce
+                                .getModule().iterator();
+                        while (moduleListIterator.hasNext()) {
+                            if (monitor.isCanceled()) {
+                                return new Status(IStatus.OK,
+                                        org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                        "Cancelled", null);
+                            }
+
+                            InterfaceList.Interface.Module module = moduleListIterator
+                                    .next();
+
+                            monitor.subTask("Import CN module XDC:"
+                                    + module.getName() + "("
+                                    + module.getPosition().intValue() + ")");
+
+                            String decodedModuleXdcPath = URLDecoder
+                                    .decode(module.getPathToXDC(), "UTF-8");
+
+                            File cnModuleXddFile = new File(
+                                    projectFile.getProject().getLocation()
+                                            + File.separator
+                                            + decodedModuleXdcPath);
+                            System.out.println("CN Module XDD file path:"
+                                    + cnModuleXddFile.getAbsolutePath());
+                            System.out.println("CN Module path to XDC: "
+                                    + module.getPathToXDC());
+                            processingModule = new Module(this, projectFile,
+                                    module, processingNode, null,
+                                    processingNode.getInterface());
+
+                            try {
+
+                                ISO15745ProfileContainer xdd = XddMarshaller
+                                        .unmarshallXDDFile(cnModuleXddFile);
+
+                                Module newModule = new Module(this, projectFile,
+                                        module, processingNode, xdd,
+                                        processingNode.getInterface());
+
+                                processingModule = newModule;
+
+                                processingNode.getInterface()
+                                        .getModuleCollection()
+                                        .put(new Integer(
+                                                processingModule.getPosition()),
+                                                newModule);
+
+                            } catch (JAXBException | SAXException
+                                    | ParserConfigurationException
+                                    | FileNotFoundException
+                                    | UnsupportedEncodingException e) {
+                                if (e instanceof FileNotFoundException) {
+                                    String errorMessage = MessageFormat.format(
+                                            XDC_FILE_NOT_FOUND_ERROR,
+                                            processingNode.getNodeIDWithName(),
+                                            processingNode
+                                                    .getAbsolutePathToXdc());
+                                    processingModule.setError(errorMessage);
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage(errorMessage,
+                                                    processingNode.getProject()
+                                                            .getName());
+                                } else {
+                                    String errorMessage = e.getCause()
+                                            .getMessage()
+                                            + " for the XDD/XDC file of node "
+                                            + processingNode
+                                                    .getNodeIDWithName();
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage(errorMessage,
+                                                    processingNode.getProject()
+                                                            .getName());
+                                    processingModule.setError(errorMessage);
+                                }
+                            }
+                            processingNode.getInterface().getModuleCollection()
+                                    .put(new Integer(
+                                            processingModule.getPosition()),
+                                            processingModule);
+                            monitor.worked(1);
+
+                        }
+                        System.err.println(
+                                "The node ID .... " + processingNode.getNodeId()
+                                        + " The interface id = "
+                                        + processingNode.getInterface()
+                                                .getInterfaceUId()
+                                        + "The module collection Size .... "
+                                        + processingNode.getInterface()
+                                                .getModuleCollection().size());
+
+                    }
+                } else {
+                    System.err.println("Interface List not available");
+                }
+
             }
 
             // Import the RMN nodes
