@@ -50,6 +50,7 @@ public interface IPowerlinkProjectSupport {
             MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
 
     public static final String DEVICE_IMPORT_DIR = "deviceImport";
+    public static final String MODULAR_HEAD_DIR = "ModularHead";
     public static final String DEVICE_CONFIGURATION_DIR = "deviceConfiguration";
     public static final String DEFAULT_OUTPUT_DIR = "output";
 

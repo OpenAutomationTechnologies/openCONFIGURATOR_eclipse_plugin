@@ -62,6 +62,7 @@ import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.ParameterReference;
@@ -122,6 +123,21 @@ public final class OpenConfiguratorProjectUtils {
             OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList
                     .add(support.get(i));
         }
+    }
+
+    public static void addModuleNode(Node node, HeadNodeInterface headinterface,
+            Module module) throws JDOMException, IOException {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        ProjectJDomOperation.addInterfaceList(document, node, headinterface,
+                module);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
     }
 
     /**
@@ -364,6 +380,50 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         return now;
+    }
+
+    public static void importModuleConfigurationFile(Module newModule)
+            throws IOException {
+        java.nio.file.Path moduleImportFile = new File(newModule.getPathToXdc())
+                .toPath();
+        System.out.println("Import path: " + moduleImportFile.toString());
+        java.nio.file.Path projectRootPath = newModule.getProject()
+                .getLocation().toFile().toPath();
+
+        String extensionXdd = FilenameUtils
+                .removeExtension(moduleImportFile.getFileName().toString());
+
+        extensionXdd += "_" + newModule.getPosition()
+                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+        String targetConfigurationPath = new String(projectRootPath.toString()
+                + IPath.SEPARATOR
+                + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                + IPath.SEPARATOR + IPowerlinkProjectSupport.MODULAR_HEAD_DIR
+                + "_" + newModule.getNode().getNodeId() + IPath.SEPARATOR
+                + extensionXdd);
+        String targetDirectoryPath = new String(
+                projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR);
+
+        java.nio.file.Files.createDirectories(Paths.get(targetDirectoryPath
+                + IPath.SEPARATOR + IPowerlinkProjectSupport.MODULAR_HEAD_DIR
+                + "_" + newModule.getNode().getNodeId()));
+
+        java.nio.file.Files.copy(moduleImportFile,
+                new java.io.File(targetConfigurationPath).toPath(),
+                java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+        java.nio.file.Path pathRelative = projectRootPath
+                .relativize(Paths.get(targetConfigurationPath));
+
+        String relativePath = pathRelative.toString();
+        relativePath = relativePath.replace('\\', '/');
+
+        newModule.setPathToXDC(relativePath);
+
     }
 
     /**
