@@ -33,7 +33,7 @@ package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
@@ -100,12 +100,12 @@ public class ObjectDictionary {
     /**
      * Parameter with uniqueID and parameter model.
      */
-    private HashMap<String, Parameter> parameterListMap = new HashMap<String, Parameter>();
+    private LinkedHashMap<String, Parameter> parameterListMap = new LinkedHashMap<String, Parameter>();
 
     /**
      * Parameter group with uniqueID and parameter model.
      */
-    private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<String, ParameterGroup>();
+    private LinkedHashMap<String, ParameterGroup> parameterGroupMap = new LinkedHashMap<String, ParameterGroup>();
 
     /**
      * Constructs object dictionary with following inputs.
@@ -437,6 +437,10 @@ public class ObjectDictionary {
                             for (TParameterGroup grp : paramGroup) {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
+                                System.err.println(
+                                        "The parameter group uniqueID .. "
+                                                + pg.getUniqueId() + "... "
+                                                + pg);
                                 parameterGroupMap.put(pg.getUniqueId(), pg);
                             }
                         }
