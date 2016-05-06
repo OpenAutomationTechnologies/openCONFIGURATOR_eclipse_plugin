@@ -488,6 +488,14 @@ public class ProjectJDomOperation {
                 new Attribute(attributeName, attributeValue));
     }
 
+    public static void updateModuleAttributeValue(Document document,
+            Module module, String attributeName, String attributeValue) {
+        System.err.println(" ....4.....");
+        JDomUtil.updateAttribute(document, module.getXpath(),
+                OPENCONFIGURATOR_NAMESPACE,
+                new Attribute(attributeName, attributeValue));
+    }
+
     /**
      * Update {@link TNetworkConfiguration} values in the project file.
      *

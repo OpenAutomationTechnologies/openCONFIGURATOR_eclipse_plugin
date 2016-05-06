@@ -701,6 +701,27 @@ public final class OpenConfiguratorProjectUtils {
                 .trim());
     }
 
+    public static void updateModuleAttributeValue(final Module module,
+            final String attributeName, final String attributeValue)
+                    throws JDOMException, IOException {
+
+        String projectXmlLocation = module.getNode().getProjectXml()
+                .getLocation().toString();
+        File xmlFile = new File(projectXmlLocation);
+
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        System.err.println(" ....2.....");
+
+        ProjectJDomOperation.updateModuleAttributeValue(document, module,
+                attributeName, attributeValue);
+
+        System.err.println(" ....3.....");
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+    }
+
     /**
      * Update the network configuration attributes in the project XML file.
      *
