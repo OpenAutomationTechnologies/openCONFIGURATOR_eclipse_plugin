@@ -55,6 +55,12 @@ public interface IAbstractNodeProperties {
     public static final String INTERFACE_MODULE_ADDRESSING_OBJECT = "node.Interface.Moduleaddressing"; //$NON-NLS-1$
     public static final String INTERFACE_MULTIPLE_MODULES_OBJECT = "node.Interface.Multiplemodules"; //$NON-NLS-1$
 
+    public static final String MODULE_NAME_OBJECT = "name"; //$NON-NLS-1$
+    public static final String MODULE_POSITION_OBJECT = "node.Module.Position"; //$NON-NLS-1$
+    public static final String MODULE_PATH_TO_XDC_OBJECT = "node.Module.pathToXDC"; //$NON-NLS-1$
+    public static final String MODULE_ADDRESS_OBJECT = "node.Module.Address"; //$NON-NLS-1$
+    public static final String MODULE_ENABLED_OBJECT = "node.Module.Enabled"; //$NON-NLS-1$
+
     public static final String NODE_CONIFG_OBJECT = "pathToXDC"; //$NON-NLS-1$
     public static final String NODE_IS_ASYNC_ONLY_OBJECT = "isAsyncOnly"; //$NON-NLS-1$
     public static final String NODE_IS_TYPE1_ROUTER_OBJECT = "isType1Router"; //$NON-NLS-1$

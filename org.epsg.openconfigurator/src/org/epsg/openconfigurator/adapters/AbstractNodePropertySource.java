@@ -63,6 +63,12 @@ public abstract class AbstractNodePropertySource {
     public static final String INTERFACE_MODULE_ADDRESSING_LABEL = "Module Addressing"; //$NON-NLS-1$
     public static final String INTERFACE_MULTIPLE_MODULES_LABEL = "Multiple Modules"; //$NON-NLS-1$
 
+    public static final String MODULE_NAME_LABEL = "Name"; //$NON-NLS-1$
+    public static final String MODULE_POSITION_LABEL = "Position"; //$NON-NLS-1$
+    public static final String MODULE_ADDRESS_LABEL = "Address"; //$NON-NLS-1$
+    public static final String MODULE_PATH_TO_XDC_LABEL = "Configuration File"; //$NON-NLS-1$
+    public static final String MODULE_ENABLED_LABEL = "Enabled"; //$NON-NLS-1$
+
     // ERROR messages
     public static final String NOT_SUPPORTED = "Currently not supported.";
     public static final String ERROR_NODE_NAME_CANNOT_BE_EMPTY = "Node name cannot be empty.";
@@ -100,6 +106,21 @@ public abstract class AbstractNodePropertySource {
     protected PropertyDescriptor interfaceMultipleModulesDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.INTERFACE_MULTIPLE_MODULES_OBJECT,
             INTERFACE_MULTIPLE_MODULES_LABEL);
+
+    protected TextPropertyDescriptor moduleNameDescriptor = new TextPropertyDescriptor(
+            IAbstractNodeProperties.MODULE_NAME_OBJECT, MODULE_NAME_LABEL);
+    protected PropertyDescriptor modulePositionDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+            MODULE_POSITION_LABEL);
+    protected PropertyDescriptor moduleAddressDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.MODULE_ADDRESS_OBJECT,
+            MODULE_ADDRESS_LABEL);
+    protected PropertyDescriptor modulePathToXDCDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.MODULE_PATH_TO_XDC_OBJECT,
+            MODULE_PATH_TO_XDC_LABEL);
+    protected PropertyDescriptor moduleEnabledDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.MODULE_ENABLED_OBJECT,
+            MODULE_ENABLED_LABEL);
 
     protected ComboBoxPropertyDescriptor isAsyncOnly = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT,

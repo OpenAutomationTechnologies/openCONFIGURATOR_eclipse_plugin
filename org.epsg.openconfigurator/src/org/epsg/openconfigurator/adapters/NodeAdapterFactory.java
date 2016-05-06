@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.adapters;
 import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
@@ -64,6 +65,8 @@ public class NodeAdapterFactory implements IAdapterFactory {
     RedundantManagingNodePropertySource rmnPropertySource;
 
     HeadNodeInterfacePropertySource interfacePropertySource;
+
+    ModulePropertySource modulePropertySource;
 
     @Override
     public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -119,23 +122,17 @@ public class NodeAdapterFactory implements IAdapterFactory {
                     return interfacePropertySource;
                 }
 
-                // for (ModularNodeInterfaceList moduleInterface :
-                // interfaceList) {
-                // System.err.println("Interface uniqueID == "
-                // + moduleInterface.getInterfaceUId());
-                // if (moduleInterface instanceof ModularNodeInterfaceList) {
-                //
-                // if (interfacePropertySource == null) {
-                // interfacePropertySource = new
-                // HeadNodeInterfacePropertySource(
-                // moduleInterface);
-                // } else {
-                // interfacePropertySource
-                // .setInterfaceData(moduleInterface);
-                // }
-                // return interfacePropertySource;
-                // }
-                // }
+            } else if (adaptableObject instanceof Module) {
+                Module moduleObj = (Module) adaptableObject;
+                if (moduleObj instanceof Module) {
+                    if (modulePropertySource == null) {
+                        modulePropertySource = new ModulePropertySource(
+                                moduleObj);
+                    } else {
+                        modulePropertySource.setModuledata(moduleObj);
+                    }
+                    return modulePropertySource;
+                }
             } else {
                 System.err.println("No property source for " + adaptableObject);
             }
