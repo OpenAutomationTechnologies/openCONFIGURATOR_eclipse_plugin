@@ -58,10 +58,12 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPartListener;
+import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
@@ -70,6 +72,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
+import org.epsg.openconfigurator.event.INodePropertyChangeListener;
+import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.model.DataTypeChoiceType;
 import org.epsg.openconfigurator.model.LabelDescription;
 import org.epsg.openconfigurator.model.Node;
@@ -77,6 +81,7 @@ import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.ParameterGroup;
 import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.VarDecleration;
 import org.epsg.openconfigurator.resources.IPluginImages;
@@ -88,7 +93,8 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
  * @author Ramakrishnan P
  *
  */
-public class ObjectDictionaryView extends ViewPart {
+public class ObjectDictionaryView extends ViewPart
+        implements IPropertyListener {
 
     /**
      * Class to bind zero objects with the tree view.
@@ -285,11 +291,13 @@ public class ObjectDictionaryView extends ViewPart {
 
     // Object dictionary filters title
     public static final String HIDE_NON_MAPPABLE_OBJECTS = "Hide Non Mappable Objects";
+
     public static final String HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS = "Hide Communication Profile Area Objects(0x1000-0x1FFF)";
     public static final String HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS = "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)";
     public static final String HIDE_NON_FORCED_OBJECTS = "Hide NonForced Objects";
-
     public static final String OBJECT_PROPERTIES = "Properties";
+
+    private PowerlinkRootNode rootNode;
 
     /**
      * Selection listener to update the objects and sub-objects in the Object
@@ -466,6 +474,10 @@ public class ObjectDictionaryView extends ViewPart {
             return null;
         }
 
+        public TreeViewer getTreeViewer() {
+            return treeViewer;
+        }
+
         @Override
         public boolean hasChildren(Object element) {
             if (element instanceof PowerlinkObject) {
@@ -537,6 +549,19 @@ public class ObjectDictionaryView extends ViewPart {
      */
     private PartListener partListener = new PartListener();
 
+    INodePropertyChangeListener ObjectPropertyChangeListener = new INodePropertyChangeListener() {
+        @Override
+        public void nodePropertyChanged(NodePropertyChangeEvent event) {
+            Display.getDefault().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    treeViewer.setInput(nodeObj);
+                }
+            });
+        }
+    };
+
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
 
@@ -552,6 +577,7 @@ public class ObjectDictionaryView extends ViewPart {
             @Override
             public void run() {
                 treeViewer.refresh();
+                treeViewer.setInput(nodeObj);
             }
         };
         refreshAction.setToolTipText("Refresh");
@@ -803,6 +829,10 @@ public class ObjectDictionaryView extends ViewPart {
         return treeViewer.getControl();
     }
 
+    public void handleRefresh() {
+        treeViewer.setInput(nodeObj);
+    }
+
     /**
      * Double Click action for node on Object dictionary view
      */
@@ -818,6 +848,11 @@ public class ObjectDictionaryView extends ViewPart {
     private void initializeToolBar() {
         IToolBarManager toolbarManager = getViewSite().getActionBars()
                 .getToolBarManager();
+    }
+
+    @Override
+    public void propertyChanged(Object source, int propId) {
+        treeViewer.setInput(nodeObj);
     }
 
     @Override

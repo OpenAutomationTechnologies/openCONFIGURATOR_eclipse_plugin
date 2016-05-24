@@ -36,7 +36,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterTemplate;
 import org.epsg.openconfigurator.xmlbinding.xdd.TProperty;
@@ -478,7 +477,7 @@ public class Parameter implements IParameter {
     public void setActualValue(String value) throws JDOMException, IOException {
         actualValue = value;
         // Update the value in XDC file
-        OpenConfiguratorProjectUtils.updateParameterActualValue(node, this,
-                actualValue);
+        // OpenConfiguratorProjectUtils.updateParameterActualValue(node, this,
+        // actualValue);
     }
 }

@@ -36,9 +36,13 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PlatformUI;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.Parameter.Property;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.views.ObjectDictionaryView;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
@@ -127,11 +131,15 @@ public class ParameterReference implements IParameter {
      */
     @Override
     public String getActualValue() {
-        if (actualValue != null) {
-            return actualValue;
+        if (parameter.getActualValue() != null) {
+            return parameter.getActualValue();
         } else {
-            if (parameter != null) {
-                return parameter.getActualValue();
+            if (parameter.getDefaultValue() != null) {
+                parameter.getDefaultValue();
+            } else {
+                if (actualValue != null) {
+                    return actualValue;
+                }
             }
         }
         return null;
@@ -330,8 +338,21 @@ public class ParameterReference implements IParameter {
         actualValue = value;
         parameterReference.setActualValue(value);
         Parameter param = getObjectDictionary().getParameter(getUniqueId());
+        param.setActualValue(value);
         OpenConfiguratorProjectUtils.updateParameterActualValue(node, param,
                 actualValue);
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                IViewPart viewPart = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage()
+                        .findView(ObjectDictionaryView.ID);
+                if (viewPart instanceof ObjectDictionaryView) {
+                    ObjectDictionaryView obdView = (ObjectDictionaryView) viewPart;
+                    obdView.handleRefresh();
+                }
+            }
+        });
         // OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
         // this, actualValue);
     }
