@@ -36,6 +36,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
@@ -335,7 +338,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     /*
@@ -347,7 +350,38 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
      */
     @Override
     public void resetPropertyValue(Object id) {
-        // TODO Auto-generated method stub
+        if (id instanceof String) {
+            String objectId = (String) id;
+            Result res = new Result();
+            switch (objectId) {
+                case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID:
+                case PARAM_ACTUAL_VALUE_ID:
+                    try {
+                        String defaultValue = paramRef.getDefaultValue();
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetParameterActualValue(
+                                        paramRef.getNode().getNetworkId(),
+                                        paramRef.getNode().getNodeId(),
+                                        paramRef.getUniqueId(), defaultValue);
+                        if (!res.IsSuccessful()) {
+                            System.err.println(OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(res));
+                        } else {
+                            paramRef.setActualValue(defaultValue);
+                        }
+                    } catch (JDOMException | IOException e) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(e.getCause().getMessage(),
+                                        paramRef.getNode().getNetworkId());
+                        e.printStackTrace();
+                    }
+                    break;
+
+                default:
+                    System.err.println(id + " not supported!");
+            }
+        }
+        System.err.println("Reset property value....");
     }
 
     private void setAllowedValues() {
@@ -419,6 +453,8 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                 System.err.println(OpenConfiguratorLibraryUtils
                                         .getErrorMessage(res));
                             } else {
+                                System.out.println(
+                                        "The selected allowed value = " + val);
                                 paramRef.setActualValue(val);
                             }
 
@@ -433,6 +469,14 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                 default:
                     System.err.println(id + " not supported!");
             }
+        }
+
+        try {
+            paramRef.getNode().getProject().refreshLocal(
+                    IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
         }
     }
 

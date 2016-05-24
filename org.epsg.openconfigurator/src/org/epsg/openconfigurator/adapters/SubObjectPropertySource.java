@@ -358,12 +358,41 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
     @Override
     public boolean isPropertySet(Object id) {
         // TODO Auto-generated method stub
-        return false;
+        return true;
     }
 
     @Override
     public void resetPropertyValue(Object id) {
-        // TODO Auto-generated method stub
+        try {
+
+            if (id instanceof String) {
+                String objectId = (String) id;
+                switch (objectId) {
+                    case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
+                        String defaultValue = plkSubObject.getDefaultValue();
+                        Result res = OpenConfiguratorLibraryUtils
+                                .setSubObjectActualValue(plkSubObject,
+                                        defaultValue);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        } else {
+                            // Success - update the OBD
+                            plkSubObject.setActualValue(defaultValue, true);
+                        }
+                        break;
+                    }
+
+                    default:
+                        // others are not editable.
+                }
+            }
+
+        } catch (Exception e) {
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    e.getMessage(),
+                    plkSubObject.getNode().getProject().getName());
+        }
     }
 
     /**
