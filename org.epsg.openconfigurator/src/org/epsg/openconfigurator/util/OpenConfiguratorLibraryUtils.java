@@ -210,16 +210,32 @@ public class OpenConfiguratorLibraryUtils {
                             .getUniqueID();
                     String paramRefActualValue = paramRef.getActualValue();
 
+                    int bitOffset = paramRef.getBitOffset().intValue();
+
                     if (paramRefActualValue == null) {
-                        libApiRes = core.CreateParameterReference(networkId,
-                                nodeId, parentParameterGroupUniqueId,
-                                referencedParamUId);
-                        if (!libApiRes.IsSuccessful()) {
-                            System.err.println(
-                                    "Create parameter Reference without actual value WARN: "
-                                            + getErrorMessage(libApiRes));
+
+                        if ((bitOffset != 0)) {
+                            libApiRes = core.CreateParameterReference(networkId,
+                                    nodeId, parentParameterGroupUniqueId,
+                                    referencedParamUId, "", bitOffset);
+                            if (!libApiRes.IsSuccessful()) {
+                                System.err.println(
+                                        "Create parameter Reference without actual value WARN: "
+                                                + getErrorMessage(libApiRes));
+                            }
+                        } else {
+                            libApiRes = core.CreateParameterReference(networkId,
+                                    nodeId, parentParameterGroupUniqueId,
+                                    referencedParamUId);
+                            if (!libApiRes.IsSuccessful()) {
+                                System.err.println(
+                                        "Create parameter Reference without actual value WARN: "
+                                                + getErrorMessage(libApiRes));
+                            }
                         }
                     } else {
+                        System.err.println("Parameter ref bit offset = "
+                                + paramRef.getBitOffset().intValue());
                         libApiRes = core.CreateParameterReference(networkId,
                                 nodeId, parentParameterGroupUniqueId,
                                 referencedParamUId, paramRefActualValue,
@@ -1219,38 +1235,26 @@ public class OpenConfiguratorLibraryUtils {
                     }
                 } else {
                     object.setError(getErrorMessage(libApiRes));
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printLibraryErrorMessage(libApiRes);
                     System.err.println("WARN: " + getErrorMessage(libApiRes));
-                }
-            } else if ((object.getDataType() == null)
-                    && (object.getUniqueIDRef() != null)) {
-                // Domain objects with uniqueIdRef and without dataType
-                if (object
-                        .getUniqueIDRef() instanceof TParameterList.Parameter) {
-                    Parameter parameter = (Parameter) object.getUniqueIDRef();
-
-                    libApiRes = core.CreateDomainObject(node.getNetworkId(),
-                            node.getNodeId(), object.getId(), objectType,
-                            object.getName(), mapping, parameter.getUniqueID());
-                    if (!libApiRes.IsSuccessful()) {
-                        object.setError(getErrorMessage(libApiRes));
-                        System.err.println("CreateDomainObject WARN: "
-                                + getErrorMessage(libApiRes));
-                    }
                 }
             } else if ((object.getDataType() != null)
                     && (object.getUniqueIDRef() != null)) {
                 if (object
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
-
                     libApiRes = core.CreateParameterObject(node.getNetworkId(),
                             node.getNodeId(), object.getId(), objectType,
                             object.getName(),
                             getObjectDatatype(object.getDataType()),
                             getAccessType(object.getAccessType()), mapping,
-                            parameter.getUniqueID());
+                            parameter.getUniqueID(), object.getDefaultValue(),
+                            object.getActualValue());
                     if (!libApiRes.IsSuccessful()) {
                         object.setError(getErrorMessage(libApiRes));
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printLibraryErrorMessage(libApiRes);
                         System.err.println("CreateParameterObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
@@ -1262,14 +1266,53 @@ public class OpenConfiguratorLibraryUtils {
                             object.getName(),
                             getObjectDatatype(object.getDataType()),
                             getAccessType(object.getAccessType()), mapping,
-                            parameter.getUniqueID());
+                            parameter.getUniqueID(), object.getDefaultValue(),
+                            object.getActualValue());
                     if (!libApiRes.IsSuccessful()) {
                         object.setError(getErrorMessage(libApiRes));
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printLibraryErrorMessage(libApiRes);
                         System.err.println("CreateParameterObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
                 }
 
+            } else if ((object.getDataType() == null)
+                    && (object.getUniqueIDRef() != null)) {
+                PlkDataType datatype = PlkDataType.UNDEFINED;
+                if (object
+                        .getUniqueIDRef() instanceof TParameterList.Parameter) {
+                    Parameter parameter = (Parameter) object.getUniqueIDRef();
+                    libApiRes = core.CreateParameterObject(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), objectType,
+                            object.getName(), datatype,
+                            getAccessType(object.getAccessType()), mapping,
+                            parameter.getUniqueID(), object.getDefaultValue(),
+                            object.getActualValue());
+                    if (!libApiRes.IsSuccessful()) {
+                        object.setError(getErrorMessage(libApiRes));
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printLibraryErrorMessage(libApiRes);
+                        System.err.println("CreateParameterObject WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                } else if (object.getUniqueIDRef() instanceof TParameterGroup) {
+                    TParameterGroup parameter = (TParameterGroup) object
+                            .getUniqueIDRef();
+                    libApiRes = core.CreateParameterObject(node.getNetworkId(),
+                            node.getNodeId(), object.getId(), objectType,
+                            object.getName(), datatype,
+                            getAccessType(object.getAccessType()), mapping,
+                            parameter.getUniqueID(), object.getDefaultValue(),
+                            object.getActualValue());
+                    if (!libApiRes.IsSuccessful()) {
+                        object.setError(getErrorMessage(libApiRes));
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printLibraryErrorMessage(libApiRes);
+                        System.err.println("CreateParameterObject WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                }
             } else {
                 // Cannot happen
                 System.err.println(
@@ -1369,13 +1412,20 @@ public class OpenConfiguratorLibraryUtils {
 
                 if (paramTempladeIDRef instanceof TParameterTemplate) {
                     TParameterTemplate parameteratemplateModel = (TParameterTemplate) paramTempladeIDRef;
+                    ParameterAccess accessparamTemplate = getParameterAccess(
+                            parameter.getAccess());
+                    if (accessparamTemplate == null) {
+                        accessparamTemplate = ParameterAccess.noAccess;
+                    }
                     System.out.println(
                             "Create Parameter template : Parameter UID = "
                                     + parameterUniqueId
                                     + " \nParameter template UID = "
-                                    + parameteratemplateModel.getUniqueID());
+                                    + parameteratemplateModel.getUniqueID()
+                                    + "\nParameter Access "
+                                    + accessparamTemplate);
                     libApiRes = core.CreateParameter(networkId, nodeId,
-                            parameterUniqueId, access,
+                            parameterUniqueId, accessparamTemplate,
                             parameteratemplateModel.getUniqueID());
                     if (!libApiRes.IsSuccessful()) {
                         System.err.println("CreateParameter Template WARN: "
@@ -1443,6 +1493,19 @@ public class OpenConfiguratorLibraryUtils {
                                             + libApiRes.GetErrorType());
                         }
                     }
+                    TValue actualValueModel = parameter.getActualValue();
+                    if (actualValueModel != null) {
+                        libApiRes = core.SetParameterActualValue(networkId,
+                                nodeId, parameterUniqueId,
+                                actualValueModel.getValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err
+                                    .println("SetParameter Actual value WARN: "
+                                            + getErrorMessage(libApiRes)
+                                            + libApiRes.GetErrorType());
+                        }
+                    }
+
                 } else {
                     System.out
                             .println("Other than parameter template instance");
@@ -1537,6 +1600,15 @@ public class OpenConfiguratorLibraryUtils {
                     }
                 }
 
+                TValue actualValueModel = parameter.getActualValue();
+                if (actualValueModel != null) {
+                    libApiRes = core.SetParameterActualValue(networkId, nodeId,
+                            parameterUniqueId, actualValueModel.getValue());
+                    if (!libApiRes.IsSuccessful()) {
+                        System.err.println("SetParameter Actual value WARN: "
+                                + getErrorMessage(libApiRes));
+                    }
+                }
             }
         }
         return libApiRes;
@@ -1659,6 +1731,18 @@ public class OpenConfiguratorLibraryUtils {
                                             + getErrorMessage(libApiRes));
                         }
                     }
+
+                    TValue actualValueModel = parameter.getActualValue();
+                    if (actualValueModel != null) {
+                        libApiRes = core.SetParameterActualValue(networkId,
+                                nodeId, parameterUniqueId,
+                                actualValueModel.getValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            System.err
+                                    .println("SetParameter Actual value WARN: "
+                                            + getErrorMessage(libApiRes));
+                        }
+                    }
                 }
             } else {
                 System.err.println("Parameter template ID  == null");
@@ -1774,30 +1858,13 @@ public class OpenConfiguratorLibraryUtils {
                     }
                 } else {
                     subObject.setError(getErrorMessage(libApiRes));
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printLibraryErrorMessage(libApiRes);
                     System.err.println("WARN: " + getErrorMessage(libApiRes));
                 }
             } else {
                 // Domain objects.
-                if ((subObject.getDataType() == null)
-                        && (subObject.getUniqueIDRef() != null)) {
-                    if (subObject
-                            .getUniqueIDRef() instanceof TParameterList.Parameter) {
-                        Parameter parameter = (Parameter) subObject
-                                .getUniqueIDRef();
-
-                        libApiRes = core.CreateDomainSubObject(
-                                node.getNetworkId(), node.getNodeId(),
-                                object.getId(), subObject.getId(),
-                                subObjectType, subObject.getName(), pdoMapping,
-                                parameter.getUniqueID());
-                        if (!libApiRes.IsSuccessful()) {
-                            subObject.setError(getErrorMessage(libApiRes));
-                            System.err.println(
-                                    "Create Domain sub-object of parameter WARN: "
-                                            + getErrorMessage(libApiRes));
-                        }
-                    }
-                } else if ((subObject.getUniqueIDRef() != null)
+                if ((subObject.getUniqueIDRef() != null)
                         && (subObject.getDataType() != null)) {
                     if (subObject
                             .getUniqueIDRef() instanceof TParameterList.Parameter) {
@@ -1809,9 +1876,13 @@ public class OpenConfiguratorLibraryUtils {
                                 subObjectType, subObject.getName(),
                                 getObjectDatatype(subObject.getDataType()),
                                 getAccessType(subObject.getAccessType()),
-                                pdoMapping, parameter.getUniqueID());
+                                pdoMapping, parameter.getUniqueID(),
+                                subObject.getDefaultValue(),
+                                subObject.getActualValue());
                         if (!libApiRes.IsSuccessful()) {
                             subObject.setError(getErrorMessage(libApiRes));
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(libApiRes);
                             System.err.println(
                                     "Create Parameter sub-Object WARN: "
                                             + getErrorMessage(libApiRes));
@@ -1826,9 +1897,13 @@ public class OpenConfiguratorLibraryUtils {
                                 subObjectType, subObject.getName(),
                                 getObjectDatatype(subObject.getDataType()),
                                 getAccessType(subObject.getAccessType()),
-                                pdoMapping, parameterGrp.getUniqueID());
+                                pdoMapping, parameterGrp.getUniqueID(),
+                                subObject.getDefaultValue(),
+                                subObject.getActualValue());
                         if (!libApiRes.IsSuccessful()) {
                             subObject.setError(getErrorMessage(libApiRes));
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(libApiRes);
                             System.err.println(
                                     "Create Parameter sub-object of parameter group WARN: "
                                             + getErrorMessage(libApiRes)
@@ -1839,20 +1914,58 @@ public class OpenConfiguratorLibraryUtils {
                                                     subObject.getDataType())
                                                             .name());
                         }
-                    } else if (subObject
-                            .getUniqueIDRef() instanceof TParameterGroup) {
-                        TParameterGroup parameter = (TParameterGroup) subObject
+                    } else {
+                        System.err.println(
+                                "ERROR: New instance available as a UniqueIdReference");
+                    }
+                } else if ((subObject.getUniqueIDRef() != null)
+                        && (subObject.getDataType() == null)) {
+                    PlkDataType dataType = PlkDataType.UNDEFINED;
+                    if (subObject
+                            .getUniqueIDRef() instanceof TParameterList.Parameter) {
+                        Parameter parameter = (Parameter) subObject
                                 .getUniqueIDRef();
-                        libApiRes = core.CreateDomainSubObject(
+                        libApiRes = core.CreateParameterSubObject(
                                 node.getNetworkId(), node.getNodeId(),
                                 object.getId(), subObject.getId(),
-                                subObjectType, subObject.getName(), pdoMapping,
-                                parameter.getUniqueID());
+                                subObjectType, subObject.getName(), dataType,
+                                getAccessType(subObject.getAccessType()),
+                                pdoMapping, parameter.getUniqueID(),
+                                subObject.getDefaultValue(),
+                                subObject.getActualValue());
                         if (!libApiRes.IsSuccessful()) {
                             subObject.setError(getErrorMessage(libApiRes));
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(libApiRes);
                             System.err.println(
-                                    "Create Domain sub-object of parameter group WARN: "
+                                    "Create Parameter sub-Object WARN: "
                                             + getErrorMessage(libApiRes));
+                        }
+                    } else if (subObject
+                            .getUniqueIDRef() instanceof TParameterGroup) {
+                        TParameterGroup parameterGrp = (TParameterGroup) subObject
+                                .getUniqueIDRef();
+                        libApiRes = core.CreateParameterSubObject(
+                                node.getNetworkId(), node.getNodeId(),
+                                object.getId(), subObject.getId(),
+                                subObjectType, subObject.getName(), dataType,
+                                getAccessType(subObject.getAccessType()),
+                                pdoMapping, parameterGrp.getUniqueID(),
+                                subObject.getDefaultValue(),
+                                subObject.getActualValue());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(libApiRes);
+                            System.err.println(
+                                    "Create Parameter sub-object of parameter group WARN: "
+                                            + getErrorMessage(libApiRes)
+                                            + libApiRes.GetErrorType()
+                                            + libApiRes.GetErrorMessage()
+                                            + " Datatype == "
+                                            + getObjectDatatype(
+                                                    subObject.getDataType())
+                                                            .name());
                         }
                     } else {
                         System.err.println(
@@ -1861,9 +1974,15 @@ public class OpenConfiguratorLibraryUtils {
                 } else {
                     subObject.setError(
                             "Invalid subObject.getUniqueIDRef() + subObject.getDataType() ");
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "Sub-Object " + subObject.getNameWithId()
+                                            + " has not created in the library",
+                                    subObject.getNode().getNetworkId());
                     System.err.println(
                             "ERROR: Invalid subObject.getUniqueIDRef():"
-                                    + subObject.getUniqueIDRef());
+                                    + subObject.getUniqueIDRef()
+                                    + " SubObject ID " + subObject.getName());
                 }
             }
         }
