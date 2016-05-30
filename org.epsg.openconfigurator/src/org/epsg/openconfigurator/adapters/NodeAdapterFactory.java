@@ -36,9 +36,11 @@ import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingHead;
 
 /**
  * Factory implementation of property sources for different types of Nodes
@@ -108,8 +110,6 @@ public class NodeAdapterFactory implements IAdapterFactory {
                 }
             } else if (adaptableObject instanceof HeadNodeInterface) {
                 HeadNodeInterface headinterfaceObj = (HeadNodeInterface) adaptableObject;
-                System.err.println("Head Node Interface == + "
-                        + headinterfaceObj.getUniqueId());
                 if (headinterfaceObj instanceof HeadNodeInterface) {
 
                     if (interfacePropertySource == null) {
@@ -124,13 +124,24 @@ public class NodeAdapterFactory implements IAdapterFactory {
 
             } else if (adaptableObject instanceof Module) {
                 Module moduleObj = (Module) adaptableObject;
-                if (moduleObj instanceof Module) {
-                    if (modulePropertySource == null) {
-                        modulePropertySource = new ModulePropertySource(
-                                moduleObj);
-                    } else {
-                        modulePropertySource.setModuledata(moduleObj);
-                    }
+                if (!moduleObj.isEnabled()) {
+                    return null;
+                }
+
+                Object moduleObjectModel = moduleObj.getModuleModel();
+                if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
+                    TModuleAddressingHead moduleaddressing = moduleObj
+                            .getInterfaceOfModule().getModuleAddressing();
+
+                    modulePropertySource = new ModulePropertySource(moduleObj,
+                            moduleaddressing);
+                    // if (modulePropertySource == null) {
+                    // modulePropertySource = new ModulePropertySource(
+                    // moduleObj, moduleaddressing);
+                    // } else {
+                    // modulePropertySource.setModuledata(moduleObj,
+                    // moduleaddressing);
+                    // }
                     return modulePropertySource;
                 }
             } else {

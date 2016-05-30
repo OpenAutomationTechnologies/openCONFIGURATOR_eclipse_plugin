@@ -110,7 +110,11 @@ public abstract class AbstractNodePropertySource {
     protected TextPropertyDescriptor moduleNameDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.MODULE_NAME_OBJECT, MODULE_NAME_LABEL);
     protected PropertyDescriptor modulePositionDescriptor = new PropertyDescriptor(
-            IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+            IAbstractNodeProperties.MODULE_POSITION_READONLY_OBJECT,
+            MODULE_POSITION_LABEL);
+
+    protected TextPropertyDescriptor modulePositionTextDescriptor = new TextPropertyDescriptor(
+            IAbstractNodeProperties.MODULE_POSITION_EDITABLE_OBJECT,
             MODULE_POSITION_LABEL);
     protected PropertyDescriptor moduleAddressDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.MODULE_ADDRESS_OBJECT,

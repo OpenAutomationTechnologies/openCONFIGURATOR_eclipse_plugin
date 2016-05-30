@@ -1,6 +1,7 @@
 package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
+import java.math.BigInteger;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -187,4 +188,21 @@ public class Module {
         }
     }
 
+    public void setPosition(String value) throws JDOMException, IOException {
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
+        int oldPosition = getPosition();
+        System.err.println("oldPOsition..... .." + oldPosition);
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            int position = Integer.valueOf(value);
+            module.setPosition(BigInteger.valueOf(position));
+            getInterfaceOfModule().getModuleCollection().remove(oldPosition);
+            getInterfaceOfModule().getModuleCollection().put(position, this);
+        } else {
+            System.err.println("Invalid module model.");
+        }
+
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+    }
 }
