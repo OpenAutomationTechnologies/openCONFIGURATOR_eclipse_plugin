@@ -139,6 +139,8 @@ public class ValidateXddWizardPage extends WizardPage {
      */
     private final String defaultCnXDD;
 
+    private Group grpConfigurationFile;
+
     /**
      * Default managing node XDD path.
      */
@@ -386,7 +388,7 @@ public class ValidateXddWizardPage extends WizardPage {
         Composite headerFrame = new Composite(composite_2, SWT.BORDER);
         headerFrame.setLayout(new GridLayout(1, false));
 
-        Group grpConfigurationFile = new Group(headerFrame, SWT.NONE);
+        grpConfigurationFile = new Group(headerFrame, SWT.NONE);
         GridData gd_grpConfigurationFile = new GridData(SWT.FILL, SWT.FILL,
                 true, false, 1, 1);
         gd_grpConfigurationFile.widthHint = 558;

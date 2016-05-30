@@ -37,7 +37,7 @@ public class NewModuleWizard extends Wizard {
     /**
      * Add validateXddWizardPage
      */
-    private final ValidateXddWizardPage validateXddPage;
+    private final ValidateXddModuleWizardPage validateXddModulePage;
 
     private final AddChildModuleWizardPage addChildmodulePage;
 
@@ -55,7 +55,8 @@ public class NewModuleWizard extends Wizard {
 
         setWindowTitle(WINDOW_TITLE);
         addModulePage = new AddModuleWizardPage(selectedNodeObj);
-        validateXddPage = new ValidateXddWizardPage();
+        validateXddModulePage = new ValidateXddModuleWizardPage(
+                selectedNodeObj);
         addChildmodulePage = new AddChildModuleWizardPage(selectedNodeObj);
     }
 
@@ -63,10 +64,10 @@ public class NewModuleWizard extends Wizard {
     public void addPages() {
         super.addPages();
         addPage(addModulePage);
-        addPage(validateXddPage);
+        addPage(validateXddModulePage);
         addPage(addChildmodulePage);
-        validateXddPage.setPreviousPage(addModulePage);
-        addChildmodulePage.setPreviousPage(validateXddPage);
+        validateXddModulePage.setPreviousPage(addModulePage);
+        addChildmodulePage.setPreviousPage(validateXddModulePage);
 
     }
 
@@ -74,20 +75,27 @@ public class NewModuleWizard extends Wizard {
     public boolean canFinish() {
         if (getContainer().getCurrentPage() == addModulePage) {
             return false;
-        } else if (getContainer().getCurrentPage() == validateXddPage) {
+        } else if (getContainer().getCurrentPage() == validateXddModulePage) {
             return false;
-        } else {
-            return validateXddPage.isPageComplete()
-                    && addChildmodulePage.isPageComplete() && true;
-        }
+        } else if (getContainer().getCurrentPage() == addChildmodulePage) {
+            boolean canFnsh = validateXddModulePage.isPageComplete()
+                    && addModulePage.isPageComplete()
+                    && addChildmodulePage.isPageComplete();
+            System.err.println("Can Finish ... " + canFnsh);
+            return validateXddModulePage.isPageComplete()
+                    && addModulePage.isPageComplete()
+                    && addChildmodulePage.isPageComplete();
 
+        }
+        return true;
     }
 
     @Override
     public boolean performFinish() {
         Object moduleObject = addModulePage.getModulemodel();
-        Path xdcPath = validateXddPage.getNodeConfigurationPath();
+        Path xdcPath = validateXddModulePage.getNodeConfigurationPath();
         int position = addChildmodulePage.getPosition();
+        int address = addChildmodulePage.getAddress();
         boolean enabled = addChildmodulePage.isEnabled();
 
         ISO15745ProfileContainer xddModel = null;
@@ -97,13 +105,14 @@ public class NewModuleWizard extends Wizard {
                 | JAXBException | SAXException
                 | ParserConfigurationException e2) {
             if ((e2.getMessage() != null) && !e2.getMessage().isEmpty()) {
-                validateXddPage.getErrorStyledText(e2.getMessage());
+                validateXddModulePage.getErrorStyledText(e2.getMessage());
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         e2.getMessage(), "");
             } else if ((e2.getCause() != null)
                     && (e2.getCause().getMessage() != null)
                     && !e2.getCause().getMessage().isEmpty()) {
-                validateXddPage.getErrorStyledText(e2.getCause().getMessage());
+                validateXddModulePage
+                        .getErrorStyledText(e2.getCause().getMessage());
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         e2.getCause().getMessage(),
                         selectedNodeObj.getNode().getNetworkId());
@@ -117,6 +126,7 @@ public class NewModuleWizard extends Wizard {
             module.setPathToXDC(xdcPath.toString());
             module.setPosition(BigInteger.valueOf(position));
             module.setEnabled(enabled);
+            module.setAddress(BigInteger.valueOf(address));
         } else {
             System.err.println("Invalid Module model");
         }

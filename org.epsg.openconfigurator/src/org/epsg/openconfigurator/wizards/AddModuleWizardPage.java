@@ -1,9 +1,10 @@
 package org.epsg.openconfigurator.wizards;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -13,6 +14,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
@@ -22,8 +24,8 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 public class AddModuleWizardPage extends WizardPage {
 
     private static final String DIALOG_PAGE_NAME = "AddCNModulewizardPage"; //$NON-NLS-1$
-    public static final String DIALOG_TILE = "POWERLINK node module";
-    public static final String DIALOG_DESCRIPTION = "Add a POWERLINK node module to the network.";
+    public static final String DIALOG_TILE = "POWERLINK module";
+    public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to {0}/{1}.";
     private static final String ERROR_INVALID_MODULE_NAME = "Enter a valid module name.";
 
     private Text text;
@@ -51,7 +53,8 @@ public class AddModuleWizardPage extends WizardPage {
         interfaceObj = selectedNodeObj;
         node = interfaceObj.getNode();
         setTitle(DIALOG_TILE);
-        setDescription(DIALOG_DESCRIPTION);
+        setDescription(MessageFormat.format(DIALOG_DESCRIPTION, node.getName(),
+                interfaceObj.getInterfaceUId()));
     }
 
     @Override
@@ -60,27 +63,27 @@ public class AddModuleWizardPage extends WizardPage {
 
         setControl(container);
         Label lblNodeType = new Label(container, SWT.NONE);
-        lblNodeType.setBounds(48, 37, 73, 23);
-        lblNodeType.setText("Node ID");
+        lblNodeType.setBounds(48, 10, 73, 23);
+        lblNodeType.setText("Node ID:");
 
         nodeIdText = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-        nodeIdText.setBounds(127, 34, 76, 21);
+        nodeIdText.setBounds(126, 7, 76, 21);
         nodeIdText.setText(getNodeId());
 
         Label lblInterfaceId = new Label(container, SWT.NONE);
-        lblInterfaceId.setBounds(48, 117, 73, 15);
-        lblInterfaceId.setText("Interface ID");
+        lblInterfaceId.setBounds(48, 49, 73, 15);
+        lblInterfaceId.setText("Interface ID:");
 
         interfaceIdText = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-        interfaceIdText.setBounds(127, 114, 76, 21);
+        interfaceIdText.setBounds(126, 46, 76, 21);
         interfaceIdText.setText(interfaceObj.getUniqueId());
 
         Label lblName = new Label(container, SWT.NONE);
-        lblName.setBounds(48, 182, 55, 15);
-        lblName.setText("Name");
+        lblName.setBounds(48, 86, 55, 15);
+        lblName.setText("Name:");
 
         moduleName = new Text(container, SWT.BORDER);
-        moduleName.setBounds(127, 179, 160, 21);
+        moduleName.setBounds(126, 83, 160, 21);
         moduleName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -98,10 +101,30 @@ public class AddModuleWizardPage extends WizardPage {
 
     }
 
+    public HeadNodeInterface getheadNodeInterface() {
+        return interfaceObj;
+    }
+
     public Object getModulemodel() {
         return moduleModel;
     }
 
+    private List<String> getModuleNamelist() {
+        List<String> nameList = new ArrayList<String>();
+        if (interfaceObj.getModuleCollection().size() != 0) {
+            Collection<Module> moduleList = interfaceObj.getModuleCollection()
+                    .values();
+            for (Module module : moduleList) {
+                String moduleName = module.getModuleName();
+                nameList.add(moduleName);
+            }
+        } else {
+            nameList = null;
+        }
+        return nameList;
+    }
+
+    @Deprecated
     private List<String> getModuleNameList() {
         Object nodeModel = node.getNodeModel();
         List<InterfaceList.Interface> interfaceList = new ArrayList<InterfaceList.Interface>();
@@ -109,17 +132,21 @@ public class AddModuleWizardPage extends WizardPage {
         if (nodeModel instanceof TCN) {
 
             TCN cn = (TCN) nodeModel;
-            interfaceList.addAll(cn.getInterfaceList().getInterface());
-
-            for (Interface interfaces : interfaceList) {
-                List<InterfaceList.Interface.Module> moduleList = interfaces
-                        .getModule();
-                for (InterfaceList.Interface.Module module : moduleList) {
-                    nameList.add(module.getName());
-                }
+            if (cn.getInterfaceList() != null) {
+                interfaceList.addAll(cn.getInterfaceList().getInterface());
+            } else {
+                return null;
+            }
+        }
+        for (Interface interfaces : interfaceList) {
+            List<InterfaceList.Interface.Module> moduleList = interfaces
+                    .getModule();
+            for (InterfaceList.Interface.Module module : moduleList) {
+                nameList.add(module.getName());
             }
         }
         return nameList;
+
     }
 
     public Node getNode() {
@@ -161,14 +188,16 @@ public class AddModuleWizardPage extends WizardPage {
             setErrorMessage(ERROR_INVALID_MODULE_NAME);
             return false;
         }
-        List<String> nameList = getModuleNameList();
-
-        for (String name : nameList) {
-            if (name.equals(moduleName.getText())) {
-                valid = false;
+        List<String> nameList = getModuleNamelist();
+        if (nameList == null) {
+            valid = true;
+        } else {
+            for (String name : nameList) {
+                if (name.equals(moduleName.getText())) {
+                    valid = false;
+                }
             }
         }
-
         if (!valid) {
             setErrorMessage("Selected Name already available");
             return false;
@@ -183,11 +212,17 @@ public class AddModuleWizardPage extends WizardPage {
                 pageComplete = false;
             }
         }
-        IWizardPage nextPage = getNextPage();
-        if (nextPage instanceof ValidateXddWizardPage) {
-            ValidateXddWizardPage validatePage = (ValidateXddWizardPage) nextPage;
-            validatePage.resetChildModuleWizard();
-        }
+        // IWizardPage nextPage = getNextPage();
+        // if (nextPage instanceof ValidateXddModuleWizardPage) {
+        // ValidateXddModuleWizardPage validatePage =
+        // (ValidateXddModuleWizardPage) nextPage;
+        //
+        // if (String.valueOf(interfaceObj.getModuleAddressing())
+        // .equals("MANUAL")) {
+        // System.err.println("Manual........");
+        // validatePage.resetWizardPage();
+        // }
+        // }
 
         return pageComplete;
 
