@@ -215,6 +215,9 @@ public class ProjectJDomOperation {
             attribList.add(
                     new Attribute(IControlledNodeProperties.MODULE_POSITION,
                             String.valueOf(module.getPosition())));
+            attribList
+                    .add(new Attribute(IControlledNodeProperties.MODULE_ADDRESS,
+                            String.valueOf(module.getAddress())));
 
             attribList.add(
                     new Attribute(IControlledNodeProperties.MODULE_PATH_TO_XDC,
@@ -260,6 +263,10 @@ public class ProjectJDomOperation {
             attribList.add(
                     new Attribute(IControlledNodeProperties.MODULE_POSITION,
                             String.valueOf(module.getPosition())));
+
+            attribList
+                    .add(new Attribute(IControlledNodeProperties.MODULE_ADDRESS,
+                            String.valueOf(module.getAddress())));
 
             attribList.add(
                     new Attribute(IControlledNodeProperties.MODULE_PATH_TO_XDC,
@@ -326,6 +333,11 @@ public class ProjectJDomOperation {
 
         JDomUtil.addNewElement(document, NODE_ID_COLLECTION_XPATH_EXPR,
                 newElement, 2);
+    }
+
+    public static void deleteModule(Document document, Module module) {
+        JDomUtil.removeElement(document, module.getXpath(),
+                OPENCONFIGURATOR_NAMESPACE);
     }
 
     /**
@@ -490,7 +502,6 @@ public class ProjectJDomOperation {
 
     public static void updateModuleAttributeValue(Document document,
             Module module, String attributeName, String attributeValue) {
-        System.err.println(" ....4.....");
         JDomUtil.updateAttribute(document, module.getXpath(),
                 OPENCONFIGURATOR_NAMESPACE,
                 new Attribute(attributeName, attributeValue));

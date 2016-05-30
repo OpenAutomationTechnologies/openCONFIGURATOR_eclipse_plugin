@@ -46,6 +46,7 @@ public interface IControlledNodeProperties extends IAbstractNodeProperties {
     public static final String MODULE_TAG = "Module"; //$NON-NLS-1$
     public static final String MODULE_NAME = "name"; //$NON-NLS-1$
     public static final String MODULE_POSITION = "position"; //$NON-NLS-1$
+    public static final String MODULE_ADDRESS = "address"; //$NON-NLS-1$
     public static final String MODULE_PATH_TO_XDC = "pathToXDC"; //$NON-NLS-1$
     public static final String MODULE_ENABLED = "enabled"; //$NON-NLS-1$
 
