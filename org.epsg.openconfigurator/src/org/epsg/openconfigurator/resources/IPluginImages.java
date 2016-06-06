@@ -80,4 +80,5 @@ public interface IPluginImages {
     public final static String OBD_PARAMETER_GROUP_ICON = "icons/parameter_group.gif";
     public final static String OBD_PARAMETER_REFERENCE_ICON = "icons/parameter_reference.gif";
     public final static String OBD_PARAMETER_VAR_DECLARATION_ICON = "icons/vardeclaration.gif";
+    public final static String OBD_PARAMETER_ACTUAL_VALUE_OVERLAY_ICON = "icons/actual_value.gif";
 }

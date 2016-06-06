@@ -30,6 +30,7 @@
  *******************************************************************************/
 package org.epsg.openconfigurator.views;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -141,6 +142,17 @@ public class ObjectDictionaryLabelDecorator
                                 IPluginImages.OBD_OVERLAY_LOCK_ICON),
                         IDecoration.BOTTOM_LEFT);
             }
+
+            if (!((paramRef.getActualValue() == null)
+                    || (paramRef.getActualValue().isEmpty())
+                    || (paramRef.getActualValue() == StringUtils.EMPTY)
+                    || (paramRef.getActualValue().equals("off")))) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.OBD_PARAMETER_ACTUAL_VALUE_OVERLAY_ICON),
+                        IDecoration.BOTTOM_LEFT);
+            }
+
         }
     }
 
