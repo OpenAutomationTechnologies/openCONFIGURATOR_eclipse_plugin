@@ -87,8 +87,13 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             }
 
         });
-        nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
-        accessTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nameDescriptor.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        nameDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        accessTypeDescriptor
+                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        accessTypeDescriptor
+                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
 
         dataTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         defaultValueDescriptor

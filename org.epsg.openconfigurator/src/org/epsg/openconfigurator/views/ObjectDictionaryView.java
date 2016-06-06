@@ -349,6 +349,9 @@ public class ObjectDictionaryView extends ViewPart
 
             if (sourcePart != null) {
                 sourcePart.getSite().getPage().addPartListener(partListener);
+                if (parametersVisible) {
+                    treeViewer.expandAll();
+                }
             }
         }
     };
@@ -735,6 +738,7 @@ public class ObjectDictionaryView extends ViewPart
                 PlatformUI.getWorkbench().getDecoratorManager()
                         .getLabelDecorator()));
         treeViewer.setInput(new Object());
+        treeViewer.expandAll();
         createContextMenu(treeViewer);
 
         createActions();
@@ -831,6 +835,7 @@ public class ObjectDictionaryView extends ViewPart
 
     public void handleRefresh() {
         treeViewer.setInput(nodeObj);
+        treeViewer.expandAll();
     }
 
     /**
