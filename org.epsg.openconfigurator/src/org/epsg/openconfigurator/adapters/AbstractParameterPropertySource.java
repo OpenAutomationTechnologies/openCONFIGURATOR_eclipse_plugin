@@ -42,6 +42,7 @@ import org.eclipse.ui.views.properties.TextPropertyDescriptor;
  */
 public abstract class AbstractParameterPropertySource {
 
+    // Id of parameter property descriptors
     public static final String UNIQUE_ID = "UniqueId"; //$NON-NLS-1$
     public static final String PARAM_NAME_ID = "Parameter.Name"; //$NON-NLS-1$
     public static final String PARAM_ACCESS_TYPE_ID = "Parameter.AccessType"; //$NON-NLS-1$
@@ -53,6 +54,7 @@ public abstract class AbstractParameterPropertySource {
     public static final String PARAM_UNIT_ID = "Parameter.Unit"; //$NON-NLS-1$
     public static final String PARAM_DATATYPE_ID = "Parameter.SimpleDataType"; //$NON-NLS-1$
 
+    // Parameter labels
     public static final String UNIQUE_ID_LABEL = "Unique ID";
     public static final String PARAM_NAME_LABEL = "Name";
     public static final String PARAM_ACCESS_TYPE_LABEL = "Access Type";

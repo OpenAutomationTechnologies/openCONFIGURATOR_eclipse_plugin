@@ -57,10 +57,11 @@ public interface IAbstractNodeProperties {
 
     public static final String MODULE_NAME_OBJECT = "name"; //$NON-NLS-1$
     public static final String MODULE_POSITION_OBJECT = "position"; //$NON-NLS-1$
+    public static final String MODULE_ADDRESS_OBJECT = "address"; //$NON-NLS-1$
     public static final String MODULE_POSITION_READONLY_OBJECT = "node.Module.Position"; //$NON-NLS-1$
     public static final String MODULE_POSITION_EDITABLE_OBJECT = "node.Module.Editable"; //$NON-NLS-1$
     public static final String MODULE_PATH_TO_XDC_OBJECT = "node.Module.pathToXDC"; //$NON-NLS-1$
-    public static final String MODULE_ADDRESS_OBJECT = "node.Module.Address"; //$NON-NLS-1$
+    public static final String MODULE_ADDRESS_READONLY_OBJECT = "node.Module.Address"; //$NON-NLS-1$
     public static final String MODULE_ENABLED_OBJECT = "node.Module.Enabled"; //$NON-NLS-1$
 
     public static final String NODE_CONIFG_OBJECT = "pathToXDC"; //$NON-NLS-1$

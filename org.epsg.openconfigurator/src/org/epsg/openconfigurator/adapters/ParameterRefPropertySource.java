@@ -241,9 +241,6 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                 case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID: {
                     String actualValue = paramRef.getActualValue();
                     if (actualValue != null) {
-                        System.out.println(
-                                "The actual value in get property value == "
-                                        + actualValue);
                         for (int i = 0; i < ALLOWED_VALUES.length; i++) {
                             if (ALLOWED_VALUES[i].equals(actualValue)) {
                                 System.err.println(
@@ -262,6 +259,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
+
                     }
                 }
                     break;
@@ -331,6 +329,10 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         }
         return null;
 
+    }
+
+    public boolean isModuleParameter() {
+        return paramRef.getObjectDictionary().isModule();
     }
 
     /*
@@ -424,17 +426,38 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                 case PARAM_ACTUAL_VALUE_ID:
                     try {
                         String actualValue = (String) value;
-                        res = OpenConfiguratorCore.GetInstance()
-                                .SetParameterActualValue(
-                                        paramRef.getNode().getNetworkId(),
-                                        paramRef.getNode().getNodeId(),
-                                        paramRef.getUniqueId(), actualValue);
-                        if (!res.IsSuccessful()) {
-                            System.err.println(OpenConfiguratorLibraryUtils
-                                    .getErrorMessage(res));
+                        if (isModuleParameter()) {
+                            String newParameterName = OpenConfiguratorLibraryUtils
+                                    .getModuleParameterUniqueID(
+                                            paramRef.getObjectDictionary()
+                                                    .getModule(),
+                                            paramRef.getUniqueId());
+                            res = OpenConfiguratorCore.GetInstance()
+                                    .SetParameterActualValue(
+                                            paramRef.getNode().getNetworkId(),
+                                            paramRef.getNode().getNodeId(),
+                                            newParameterName, actualValue);
+                            if (!res.IsSuccessful()) {
+                                System.err.println(OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res));
+                            } else {
+                                paramRef.setActualValue((String) value);
+                            }
                         } else {
-                            paramRef.setActualValue((String) value);
+                            res = OpenConfiguratorCore.GetInstance()
+                                    .SetParameterActualValue(
+                                            paramRef.getNode().getNetworkId(),
+                                            paramRef.getNode().getNodeId(),
+                                            paramRef.getUniqueId(),
+                                            actualValue);
+                            if (!res.IsSuccessful()) {
+                                System.err.println(OpenConfiguratorLibraryUtils
+                                        .getErrorMessage(res));
+                            } else {
+                                paramRef.setActualValue((String) value);
+                            }
                         }
+
                     } catch (JDOMException | IOException e) {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(e.getCause().getMessage(),
@@ -449,20 +472,54 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             String val = ALLOWED_VALUES[(int) value];
                             System.out.println(
                                     "The selected allowed value = " + val);
-                            res = OpenConfiguratorCore.GetInstance()
-                                    .SetParameterActualValue(
-                                            paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getNodeId(),
-                                            paramRef.getUniqueId(), val);
-                            if (!res.IsSuccessful()) {
-                                System.err.println(OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res));
-                            } else {
-                                System.out.println(
-                                        "The selected allowed value = " + val);
-                                paramRef.setActualValue(val);
-                            }
+                            if (isModuleParameter()) {
+                                String newParameterName = OpenConfiguratorLibraryUtils
+                                        .getModuleParameterUniqueID(
+                                                paramRef.getObjectDictionary()
+                                                        .getModule(),
+                                                paramRef.getUniqueId());
+                                res = OpenConfiguratorCore.GetInstance()
+                                        .SetParameterActualValue(
+                                                paramRef.getNode()
+                                                        .getNetworkId(),
+                                                paramRef.getNode().getNodeId(),
+                                                newParameterName, val);
+                                if (!res.IsSuccessful()) {
+                                    System.err.println(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                                } else {
+                                    System.out.println(
+                                            "The selected allowed value = "
+                                                    + val);
+                                    paramRef.setActualValue(val);
+                                    System.err.println(
+                                            "The index of given value = "
+                                                    + val.indexOf(val));
+                                }
 
+                            } else {
+                                res = OpenConfiguratorCore.GetInstance()
+                                        .SetParameterActualValue(
+                                                paramRef.getNode()
+                                                        .getNetworkId(),
+                                                paramRef.getNode().getNodeId(),
+                                                paramRef.getUniqueId(), val);
+                                if (!res.IsSuccessful()) {
+                                    System.err.println(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                                } else {
+                                    System.out.println(
+                                            "The selected allowed value = "
+                                                    + val);
+                                    paramRef.setActualValue(val);
+                                    System.err.println(
+                                            "The index of given value = "
+                                                    + val.indexOf(val));
+                                }
+
+                            }
                         }
                     } catch (Exception e) {
                         OpenConfiguratorMessageConsole.getInstance()

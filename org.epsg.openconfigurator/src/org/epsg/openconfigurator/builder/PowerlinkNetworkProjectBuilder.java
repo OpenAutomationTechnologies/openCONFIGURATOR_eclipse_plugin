@@ -75,7 +75,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
     public static final String BUILDER_ID = "org.epsg.openconfigurator.industrialNetworkBuilder";
-    private static final String BUILD_START_MESSAGE = "Build Started for project: {0}";
+    private static final String BUILD_START_MESSAGE = "Build started for project: {0}";
     private static final String BUILD_FAILED_ERROR_MESSAGE = "Build failed for project: {0}";
     private static final String BUILD_COMPLETED_MESSAGE = "Build finished successfully for Project: {0}";
     private static final String UPDATING_NODE_CONFIGURATION_MESSAGE = "Updating node configuration files.";
@@ -152,6 +152,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
         Result res = OpenConfiguratorCore.GetInstance().BuildConfiguration(
                 networkId, configurationOutput, cdcByteCollection);
+
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,

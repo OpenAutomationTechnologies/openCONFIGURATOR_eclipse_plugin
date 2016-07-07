@@ -189,11 +189,22 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         }
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see org.eclipse.ui.views.properties.IPropertySource#getEditableValue()
+     */
     @Override
     public Object getEditableValue() {
         return plkObject;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyDescriptors()
+     */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
         List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
@@ -204,6 +215,13 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         return propertyDescriptorArray;
     }
 
+    /*
+     * (non-Javadoc)
+     *
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#getPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public Object getPropertyValue(Object id) {
         Object retObj = null;
@@ -211,7 +229,15 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case OBJ_INDEX_ID:
-                    retObj = plkObject.getIdHex();
+                    if (plkObject.isModuleObject()) {
+                        long objectIndex = OpenConfiguratorLibraryUtils
+                                .getModuleObjectIndex(plkObject.getModule());
+                        if (objectIndex != 0) {
+                            retObj = plkObject.getModuleObjectID(objectIndex);
+                        }
+                    } else {
+                        retObj = plkObject.getIdHex();
+                    }
                     break;
                 case OBJ_NAME_ID:
                     retObj = plkObject.getName();
@@ -286,10 +312,21 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
      *         being the error message to display to the end user.
      */
     protected String handleActualValue(Object value) {
-        Result res = OpenConfiguratorLibraryUtils
-                .validateObjectActualValue(plkObject, (String) value);
-        if (!res.IsSuccessful()) {
-            return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+        if (isModuleObject()) {
+            long newObjectIndex = OpenConfiguratorLibraryUtils
+                    .getModuleObjectIndex(plkObject.getModule());
+            Result res = OpenConfiguratorLibraryUtils
+                    .validateModuleObjectActualValue(plkObject, (String) value,
+                            newObjectIndex);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
+        } else {
+            Result res = OpenConfiguratorLibraryUtils
+                    .validateObjectActualValue(plkObject, (String) value);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
         }
         return null;
     }
@@ -341,11 +378,35 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         return retVal;
     }
 
+    /**
+     * Verifies the object belonging to module.
+     *
+     * @return <true> if it is a module object, <false> if it is a object of
+     *         node.
+     */
+    public boolean isModuleObject() {
+        return plkObject.isModuleObject();
+    }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.
+     * Object)
+     */
     @Override
     public boolean isPropertySet(Object id) {
         return true;
     }
 
+    /*
+     * (non-Javadoc)
+     * 
+     * @see
+     * org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.
+     * lang.Object)
+     */
     @Override
     public void resetPropertyValue(Object id) {
         try {
@@ -377,6 +438,11 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         }
     }
 
+    /**
+     * Sets the POWERLINK object instance
+     * 
+     * @param adaptableObject Instance of PowerlinkObject
+     */
     public void setObjectData(PowerlinkObject adaptableObject) {
         plkObject = adaptableObject;
     }
@@ -392,15 +458,31 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 String objectId = (String) id;
                 switch (objectId) {
                     case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
-                        Result res = OpenConfiguratorLibraryUtils
-                                .setObjectActualValue(plkObject,
-                                        (String) value);
-                        if (!res.IsSuccessful()) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printLibraryErrorMessage(res);
+                        if (isModuleObject()) {
+                            long newObjectIndex = OpenConfiguratorLibraryUtils
+                                    .getModuleObjectIndex(
+                                            plkObject.getModule());
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .setModuleObjectActualValue(plkObject,
+                                            (String) value, newObjectIndex);
+                            if (!res.IsSuccessful()) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            } else {
+                                // Success - update the OBD
+                                plkObject.setActualValue((String) value, true);
+                            }
                         } else {
-                            // Success - update the OBD
-                            plkObject.setActualValue((String) value, true);
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .setObjectActualValue(plkObject,
+                                            (String) value);
+                            if (!res.IsSuccessful()) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            } else {
+                                // Success - update the OBD
+                                plkObject.setActualValue((String) value, true);
+                            }
                         }
                         break;
                     }

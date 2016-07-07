@@ -58,10 +58,19 @@ public class ObjectAdapterFactory implements IAdapterFactory {
      */
     private SubObjectPropertySource subObjectPropertySource;
 
+    /**
+     * Property source for Parameter reference.
+     */
     private ParameterRefPropertySource parameterRefPropertySource;
 
+    /**
+     * Property source for Parameter.
+     */
     private ParameterPropertySource parameterPropertySource;
 
+    /**
+     * Property source for Parameter group.
+     */
     private ParameterGroupPropertySource parameterGroupPropertySource;
 
     @Override
