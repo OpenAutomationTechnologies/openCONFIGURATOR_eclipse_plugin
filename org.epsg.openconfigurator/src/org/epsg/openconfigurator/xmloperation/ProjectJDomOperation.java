@@ -335,9 +335,18 @@ public class ProjectJDomOperation {
                 newElement, 2);
     }
 
-    public static void deleteModule(Document document, Module module) {
-        JDomUtil.removeElement(document, module.getXpath(),
-                OPENCONFIGURATOR_NAMESPACE);
+    public static void deleteModule(Document document, Module module,
+            boolean finalModuleCheck) {
+        System.err.println("finalModuleCheck....." + finalModuleCheck);
+        if (!finalModuleCheck) {
+            JDomUtil.removeElement(document, module.getInterfaceListTagXPath(),
+                    OPENCONFIGURATOR_NAMESPACE);
+            // JDomUtil.removeElement(document, module.getXpath(),
+            // OPENCONFIGURATOR_NAMESPACE);
+        } else {
+            JDomUtil.removeElement(document, module.getXpath(),
+                    OPENCONFIGURATOR_NAMESPACE);
+        }
     }
 
     /**

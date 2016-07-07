@@ -84,7 +84,10 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmloperation.JDomUtil;
 import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
 import org.jdom2.JDOMException;
@@ -114,6 +117,14 @@ public class PowerlinkRootNode {
         this.currentProject = currentProject;
     }
 
+    /**
+     * Adds the interface available to the project.
+     *
+     * @param interfaceListModel XDD instance of interface list.
+     * @param node Instance of Node.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
     public void addInterface(InterfaceList interfaceListModel, Node node)
             throws JDOMException, IOException {
         Object nodeModel = node.getNodeModel();
@@ -224,6 +235,7 @@ public class PowerlinkRootNode {
                 @Override
                 public void run() {
                     l.nodePropertyChanged(event);
+
                 }
             });
         }
@@ -245,6 +257,9 @@ public class PowerlinkRootNode {
         return returnNodeList;
     }
 
+    /**
+     * @return List of interface available in the modular head node.
+     */
     public ArrayList<HeadNodeInterface> getInterfaceList() {
         ArrayList<HeadNodeInterface> returnNodeList = new ArrayList<HeadNodeInterface>();
 
@@ -309,6 +324,21 @@ public class PowerlinkRootNode {
      */
     public OpenCONFIGURATORProject getOpenConfiguratorProject() {
         return currentProject;
+    }
+
+    public ProfileBodyDataType getProfileBody(
+            ISO15745ProfileContainer xddModel) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBodyDatatype = profile
+                        .getProfileBody();
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    return profileBodyDatatype;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -420,18 +450,37 @@ public class PowerlinkRootNode {
                     Node newNode = new Node(this, projectFile, cnNode, xdd);
 
                     processingNode = newNode;
-
-                    Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
-                    if (!res.IsSuccessful()) {
-                        newNode.setError(OpenConfiguratorLibraryUtils
-                                .getErrorMessage(res));
-                        nodeCollection.put(
-                                new Short(processingNode.getNodeId()), newNode);
-                        return new Status(IStatus.ERROR,
-                                org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                                OpenConfiguratorLibraryUtils
-                                        .getErrorMessage(res),
-                                null);
+                    if (getProfileBody(
+                            xdd) instanceof ProfileBodyDevicePowerlinkModularHead) {
+                        Result res = OpenConfiguratorLibraryUtils
+                                .addModularHeadNode(newNode);
+                        if (!res.IsSuccessful()) {
+                            newNode.setError(OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(res));
+                            nodeCollection.put(
+                                    new Short(processingNode.getNodeId()),
+                                    newNode);
+                            return new Status(IStatus.ERROR,
+                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                    OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res),
+                                    null);
+                        }
+                    } else {
+                        Result res = OpenConfiguratorLibraryUtils
+                                .addNode(newNode);
+                        if (!res.IsSuccessful()) {
+                            newNode.setError(OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(res));
+                            nodeCollection.put(
+                                    new Short(processingNode.getNodeId()),
+                                    newNode);
+                            return new Status(IStatus.ERROR,
+                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                    OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res),
+                                    null);
+                        }
                     }
 
                 } catch (JAXBException | SAXException
@@ -520,12 +569,28 @@ public class PowerlinkRootNode {
 
                                 processingModule = newModule;
 
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .addModule(newModule);
+                                if (!res.IsSuccessful()) {
+                                    newModule.setError(
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res));
+                                    processingNode.getInterface()
+                                            .getModuleCollection().put(
+                                                    new Integer(processingModule
+                                                            .getPosition()),
+                                                    newModule);
+                                    return new Status(IStatus.ERROR,
+                                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                            OpenConfiguratorLibraryUtils
+                                                    .getErrorMessage(res),
+                                            null);
+                                }
                                 processingNode.getInterface()
                                         .getModuleCollection()
                                         .put(new Integer(
                                                 processingModule.getPosition()),
                                                 newModule);
-
                             } catch (JAXBException | SAXException
                                     | ParserConfigurationException
                                     | FileNotFoundException
@@ -561,14 +626,6 @@ public class PowerlinkRootNode {
                             monitor.worked(1);
 
                         }
-                        System.err.println(
-                                "The node ID .... " + processingNode.getNodeId()
-                                        + " The interface id = "
-                                        + processingNode.getInterface()
-                                                .getInterfaceUId()
-                                        + "The module collection Size .... "
-                                        + processingNode.getInterface()
-                                                .getModuleCollection().size());
 
                     }
                 } else {
@@ -773,6 +830,135 @@ public class PowerlinkRootNode {
     }
 
     /**
+     * Removes the module from the project.
+     *
+     * @param module Instance of module to be removed.
+     * @param finalModuleCheck <true> if module is a final module,
+     *            <false> otherwise.
+     * @return <code>true</code> if module is removed. <code>false</code> if
+     *         module is not removed.
+     */
+    public boolean removeModule(final Module module,
+            final boolean finalModuleCheck) {
+        boolean retVal = false;
+        if (module == null) {
+            return retVal;
+        }
+
+        IProject currentProject = module.getProject();
+        if (currentProject == null) {
+            System.err.println("Current project null. returned null");
+            return retVal;
+        }
+
+        System.err.println("Remove module....");
+        final WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
+
+            @Override
+            protected void execute(IProgressMonitor monitor)
+                    throws CoreException, InvocationTargetException,
+                    InterruptedException {
+
+                System.err
+                        .println("Remove module.... entered critical section");
+
+                Node mnNode = getMN();
+
+                Result libResult = OpenConfiguratorLibraryUtils
+                        .removeModule(module);
+                if (!libResult.IsSuccessful()) {
+                    System.err.println(OpenConfiguratorLibraryUtils
+                            .getErrorMessage(libResult));
+                    return;
+                }
+
+                // Remove from the viewer node collection.
+                Object moduleObjectModel = module.getModuleModel();
+                if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
+                    InterfaceList.Interface.Module moduleModel = (InterfaceList.Interface.Module) moduleObjectModel;
+                    int position = module.getPosition();
+                    module.getInterfaceOfModule().getModuleCollection()
+                            .remove(position);
+                    System.err
+                            .println("The module removed form the java model.");
+                    // retVal = true;
+                } else {
+                    System.err
+                            .println("Un-supported module" + moduleObjectModel);
+                    // return false;
+                    // FIXME: Throw an exception
+                }
+
+                // Remove from the openconfigurator project xml.
+                String projectXmlLocation = module.getNode().getProjectXml()
+                        .getLocation().toString();
+                File xmlFile = new File(projectXmlLocation);
+
+                try {
+                    org.jdom2.Document document = JDomUtil
+                            .getXmlDocument(xmlFile);
+                    ProjectJDomOperation.deleteModule(document, module,
+                            finalModuleCheck);
+
+                    JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+                    // Updates generator attributes in project file.
+                    OpenConfiguratorProjectUtils
+                            .updateGeneratorInfo(module.getNode());
+
+                    // OpenConfiguratorProjectUtils.removeConnectedModulesList(
+                    // module.getNode(), module, finalModuleCheck);
+
+                    // Delete the XDC file from the deviceConfiguration
+                    // directory.
+                    Files.delete(Paths.get(module.getAbsolutePathToXdc()));
+
+                } catch (JDOMException | IOException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                    IStatus errorStatus = new Status(IStatus.ERROR,
+                            Activator.PLUGIN_ID, IStatus.OK,
+                            "Error ocurred while delete a node", ex);
+                    throw new CoreException(errorStatus);
+                }
+
+                System.err.println("Remove node.... leaving critical section");
+            }
+        };
+
+        WorkspaceJob job = new WorkspaceJob("Delete a Node") {
+
+            @Override
+            public IStatus runInWorkspace(IProgressMonitor monitor)
+                    throws CoreException {
+                try {
+                    wmo.run(monitor);
+
+                    fireNodePropertyChanged(
+                            new NodePropertyChangeEvent(new Object()));
+
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                    Status errStatus = new Status(IStatus.ERROR,
+                            Activator.PLUGIN_ID, e.getMessage(),
+                            e.getTargetException());
+                    throw new CoreException(errStatus);
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+
+                return Status.OK_STATUS;
+            }
+        };
+
+        job.setUser(true);
+        job.schedule();
+
+        return true;
+
+    }
+
+    /**
      * Removes the node from the project.
      *
      * @param node The node to be removed.
@@ -780,7 +966,7 @@ public class PowerlinkRootNode {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public boolean removeNode(final Node node)
+    public synchronized boolean removeNode(final Node node)
             throws JDOMException, IOException {
         boolean retVal = false;
         if (node == null) {
