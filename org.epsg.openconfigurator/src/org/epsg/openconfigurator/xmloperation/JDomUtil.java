@@ -128,6 +128,28 @@ public class JDomUtil {
         }
     }
 
+    public static void addNewElements(Document doc, String xpath,
+            Namespace namespace, Element newElement) {
+        System.out.println("addNewElement: " + xpath);
+        addNewElements(doc, getXPathExpressionElement(xpath, namespace),
+                newElement);
+    }
+
+    public static void addNewElements(Document doc,
+            XPathExpression<Element> xpath, Element newElement) {
+
+        List<Element> elementsList = xpath.evaluate(doc);
+        for (Element element : elementsList) {
+            newElement.setNamespace(element.getNamespace());
+
+            for (Element newChildElement : newElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
+            newElement.detach();
+            element.addContent(newElement);
+        }
+    }
+
     /**
      * Add new child element into the parameter of XDD/XDC file.
      *
@@ -163,6 +185,7 @@ public class JDomUtil {
                 newChildElement.setNamespace(element.getNamespace());
             }
             element.addContent(index, newElement);
+
         }
     }
 
@@ -269,6 +292,7 @@ public class JDomUtil {
                 + elementsList.size());
         for (Element element : elementsList) {
             element.removeAttribute(attributeName);
+            System.err.println("Attribute removed...@#@#$%");
         }
     }
 
@@ -358,6 +382,9 @@ public class JDomUtil {
         Element emt = xpathExpr.evaluateFirst(document);
         if (emt != null) {
             emt.getAttributes().add(newAttribute);
+            System.err.println("Attribute added into the project file.."
+                    + newAttribute.getName() + " VALUE.."
+                    + newAttribute.getValue());
         } else {
             System.err.println(xpathExpr.getExpression() + "Element null");
         }

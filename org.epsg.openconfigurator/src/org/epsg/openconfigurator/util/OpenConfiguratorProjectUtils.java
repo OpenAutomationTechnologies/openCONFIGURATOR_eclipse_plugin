@@ -126,6 +126,16 @@ public final class OpenConfiguratorProjectUtils {
         }
     }
 
+    /**
+     * Adds the module of head node interface into the project file.
+     *
+     * @param node Instance of Node
+     * @param headinterface Instance of head node interface in which the module
+     *            is to be connected.
+     * @param module Instance of Module.
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications.
+     */
     public static void addModuleNode(Node node, HeadNodeInterface headinterface,
             Module module) throws JDOMException, IOException {
         String projectXmlLocation = node.getProjectXml().getLocation()
@@ -383,6 +393,12 @@ public final class OpenConfiguratorProjectUtils {
         return now;
     }
 
+    /**
+     * Import the configuration file of module into project.
+     *
+     * @param newModule Instance of Module.
+     * @throws IOException Errors with XDC file modifications.
+     */
     public static void importModuleConfigurationFile(Module newModule)
             throws IOException {
         java.nio.file.Path moduleImportFile = new File(newModule.getPathToXdc())
@@ -397,19 +413,22 @@ public final class OpenConfiguratorProjectUtils {
         extensionXdd += "_" + newModule.getPosition()
                 + IPowerlinkProjectSupport.XDC_EXTENSION;
 
+        java.nio.file.Path nodeImportFile = new File(
+                newModule.getNode().getPathToXDC()).toPath();
+
+        String nodeName = FilenameUtils
+                .removeExtension(nodeImportFile.getFileName().toString());
+
         String targetConfigurationPath = new String(projectRootPath.toString()
                 + IPath.SEPARATOR
                 + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
-                + IPath.SEPARATOR + IPowerlinkProjectSupport.MODULAR_HEAD_DIR
-                + "_" + newModule.getNode().getNodeId() + IPath.SEPARATOR
-                + extensionXdd);
+                + IPath.SEPARATOR + nodeName + IPath.SEPARATOR + extensionXdd);
         String targetDirectoryPath = new String(
                 projectRootPath.toString() + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR);
 
-        java.nio.file.Files.createDirectories(Paths.get(targetDirectoryPath
-                + IPath.SEPARATOR + IPowerlinkProjectSupport.MODULAR_HEAD_DIR
-                + "_" + newModule.getNode().getNodeId()));
+        java.nio.file.Files.createDirectories(
+                Paths.get(targetDirectoryPath + IPath.SEPARATOR + nodeName));
 
         java.nio.file.Files.copy(moduleImportFile,
                 new java.io.File(targetConfigurationPath).toPath(),
@@ -486,6 +505,35 @@ public final class OpenConfiguratorProjectUtils {
         newNode.setPathToXDC(relativePath);
     }
 
+    private static void importNodeXDCFile(Node node) throws IOException {
+        java.nio.file.Path nodeImportFile = new File(
+                node.getAbsolutePathToXdc()).toPath();
+        System.out.println("Import path: " + nodeImportFile.toString());
+        java.nio.file.Path projectRootPath = node.getProject().getLocation()
+                .toFile().toPath();
+        String targetImportPath = new String(projectRootPath.toString()
+                + IPath.SEPARATOR + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
+                + IPath.SEPARATOR + nodeImportFile.getFileName().toString());
+
+        // Copy the Node configuration to deviceImport dir
+
+        nodeImportFile = java.nio.file.Files.copy(
+                new java.io.File(nodeImportFile.toString()).toPath(),
+                new java.io.File(targetImportPath).toPath(),
+                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+    }
+
+    /**
+     * Verify the availability of path from the project configuration
+     *
+     * @param pathSettingsModel Instance of XDD model.
+     * @param id Id of project.
+     * @return <code>true</code> if path is present, <code>false</code>
+     *         otherwise.
+     */
     public static boolean isPathIdAlreadyPresent(
             TProjectConfiguration.PathSettings pathSettingsModel,
             final String id) {
@@ -638,6 +686,56 @@ public final class OpenConfiguratorProjectUtils {
     }
 
     /**
+     * Removes the connected modules in the XDD file
+     *
+     * @param node Instance Of Node
+     * @param module Instance of Module
+     * @param finalModuleCheck Boolean value of final module
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void removeConnectedModulesList(Node node, Module module,
+            boolean finalModuleCheck) throws JDOMException, IOException {
+        File xdcFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.deleteConnectedModules(document, module,
+                finalModuleCheck);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+
+    }
+
+    /**
+     * Updated the connected module in the XDD file.
+     *
+     * @param node Instance Of Node
+     * @param module Instance of Module
+     * @param moduleCollection collection of module
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateConnectedModuleList(Node node,
+            HeadNodeInterface headNodeInterface,
+            Map<Integer, Module> moduleCollection)
+                    throws JDOMException, IOException {
+        File xdcFile = new File(node.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.addConnectedModules(document, headNodeInterface,
+                moduleCollection);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+
+    }
+
+    /**
      * Update date, time, tool version and modified by attributes on project
      * file.
      *
@@ -701,6 +799,15 @@ public final class OpenConfiguratorProjectUtils {
                 .trim());
     }
 
+    /**
+     * Updated the attribute of module in the project file.
+     *
+     * @param module Instance of Module
+     * @param attributeName Name of attribute to be updated.
+     * @param attributeValue value to be updated.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
     public static void updateModuleAttributeValue(final Module module,
             final String attributeName, final String attributeValue)
                     throws JDOMException, IOException {
@@ -710,16 +817,93 @@ public final class OpenConfiguratorProjectUtils {
         File xmlFile = new File(projectXmlLocation);
 
         org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
-
-        System.err.println(" ....2.....");
-
+        System.err.println("The position value == " + attributeValue
+                + " module name.." + module.getModuleName());
         ProjectJDomOperation.updateModuleAttributeValue(document, module,
                 attributeName, attributeValue);
 
-        System.err.println(" ....3.....");
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+        System.err.println("Successfully updted in the project file.....");
         // Updates generator attributes in project file.
         updateGeneratorInfo(module.getNode());
+    }
+
+    /**
+     * Updates the index of module object in XDC file
+     *
+     * @param module Instance of Module.
+     * @param moduleObjectIndex Index of object from the library
+     * @param object Instance of POWERLINK object
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateModuleObjectIndex(Module module,
+            long moduleObjectIndex, PowerlinkObject object)
+                    throws JDOMException, IOException {
+        File xdcFile = new File(module.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateModuleObjectIndex(document, module,
+                moduleObjectIndex, object);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+
+    }
+
+    /**
+     * Updates the object of module into the head node.
+     *
+     * @param node Instance of Node.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateModuleObjectInNode(Node node)
+            throws JDOMException, IOException {
+
+        importNodeXDCFile(node);
+        File xdcFile = new File(node.getOutputPathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateModuleObjectInNode(document, node);
+
+        XddJdomOperation.addConnectedModules(document, node.getInterface(),
+                node.getInterface().getModuleCollection());
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+    }
+
+    /**
+     * Updates the sub-object of module into node.
+     *
+     * @param node Instance of Node
+     * @param module Instance of Module.
+     * @param index Index of object
+     * @param subObject Instance of POWERLINK sub-object.
+     * @param subIndex sub-index of sub-object.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateModuleSubObjectInNode(Node node, Module module,
+            long index, PowerlinkSubobject subObject, int subIndex)
+                    throws JDOMException, IOException {
+        File xdcFile = new File(node.getOutputPathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateModuleSubObjectInNode(document, module,
+                subObject, node, index, subIndex);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+
     }
 
     /**

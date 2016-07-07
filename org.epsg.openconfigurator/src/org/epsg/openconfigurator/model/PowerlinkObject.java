@@ -564,6 +564,63 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     }
 
     /**
+     * Get actual value of parameter based on uniqueId Ref
+     *
+     * @param uniqueIDRef2 UniqueID of parameter.
+     * @return Actual value of parameters.
+     */
+    public String getActualValue(Object uniqueIDRef2) {
+        String actualValue = StringUtils.EMPTY;
+        if (uniqueIDRef2 instanceof TParameterList.Parameter) {
+            TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef2;
+            if (parameter.getActualValue() != null) {
+                actualValue = parameter.getActualValue().getValue();
+            } else if (parameter.getDefaultValue() != null) {
+                actualValue = parameter.getDefaultValue().getValue();
+            }
+        } else if (uniqueIDRef2 instanceof TParameterGroup) {
+            TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef2;
+            String uniqueId = parameterGrp.getUniqueID();
+            actualValue = StringUtils.EMPTY;
+        }
+        return actualValue;
+    }
+
+    /**
+     * Get conditional uniqueId of parameter.
+     *
+     * @param conditionalUniqueIDRef uniqueIdRef of conditional parameter.
+     * @return uniqueID of parameter.
+     */
+    public String getConditionalUniqueId(Object conditionalUniqueIDRef) {
+        String uniqueId = StringUtils.EMPTY;
+        if (conditionalUniqueIDRef instanceof TParameterList.Parameter) {
+            TParameterList.Parameter parameter = (TParameterList.Parameter) conditionalUniqueIDRef;
+            uniqueId = parameter.getUniqueID();
+
+        } else if (conditionalUniqueIDRef instanceof TParameterGroup) {
+            TParameterGroup parameterGrp = (TParameterGroup) conditionalUniqueIDRef;
+            uniqueId = parameterGrp.getUniqueID();
+        }
+        return uniqueId;
+    }
+
+    /**
+     * Get config bool value of parameter
+     *
+     * @param configParameter value of configParameter in XDD
+     * @return <code>true</code> if parameter is configurable.
+     *         <code>false</code> if not configurable.
+     */
+    public String getConfigParameter(boolean configParameter) {
+        if (configParameter) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    /**
      * Returns error message string to identify configuration error of POWERLINK
      * object
      */
@@ -612,6 +669,21 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     }
 
     /**
+     * Get the group level visible value of parameter
+     *
+     * @param groupLevelVisible the value from the XDD
+     * @return <code>true</code> if parameter is visible, <code>false</code> if
+     *         not visible.
+     */
+    public String getGroupLevelVisible(boolean groupLevelVisible) {
+        if (groupLevelVisible) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    /**
      * @return High limit value of object.
      */
     @Override
@@ -652,6 +724,20 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     public byte[] getIndex() {
         return idByte;
+    }
+
+    /**
+     * Get the string value of locked attribute for parameter reference.
+     *
+     * @param lockedParameter Boolean value of locked attribute in XDC.
+     * @return true or false based on XDC input.
+     */
+    public String getlockedParameter(boolean lockedParameter) {
+        if (lockedParameter) {
+            return "true";
+        } else {
+            return "false";
+        }
     }
 
     /**
@@ -899,6 +985,20 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     @Override
     public Object getUniqueIDRef() {
         return uniqueIDRef;
+    }
+
+    /**
+     * Get the string value of visible attribute for parameter reference.
+     *
+     * @param visibleParameter Boolean value of visible attribute in XDC
+     * @return true or false based on XDC input.
+     */
+    public String getVisibleParameter(boolean visibleParameter) {
+        if (visibleParameter) {
+            return "true";
+        } else {
+            return "false";
+        }
     }
 
     /**

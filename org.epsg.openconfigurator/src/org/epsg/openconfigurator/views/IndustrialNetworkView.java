@@ -33,6 +33,7 @@
 
 package org.epsg.openconfigurator.views;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
@@ -97,6 +98,7 @@ import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
@@ -494,6 +496,7 @@ public class IndustrialNetworkView extends ViewPart
 
     // Enable/disable action message string.
     public static final String ENABLE_DISABLE_ACTION_MESSAGE = "Enable/Disable";
+    public static final String GENERATE_NODE_XDC_ACTION_MESSAGE = "Export node XDC";
 
     // Object dictionary action message strings.
     public static final String SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE = "Show Object Dictionary";
@@ -553,6 +556,8 @@ public class IndustrialNetworkView extends ViewPart
      * Enable/Disable node action.
      */
     private Action enableDisableNode;
+
+    private Action generateNodeXDC;
 
     /**
      * Refresh the Industrial network view action.
@@ -909,7 +914,7 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(enableDisableNode);
                     if (node.isModularheadNode()) {
                         manager.add(new Separator());
-
+                        manager.add(generateNodeXDC);
                     }
                     // Display list of menu only if the nodes are enabled.
                     if (node.isEnabled()) {
@@ -973,6 +978,37 @@ public class IndustrialNetworkView extends ViewPart
         manager.add(showPdoMapping);
         manager.add(showObjectDictionary);
         manager.add(showProperties);
+    }
+
+    /**
+     * Exports the module XDC into head Node XDC.
+     *
+     * @param selection Instance of Module
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void generateXDC(IStructuredSelection selection)
+            throws JDOMException, IOException {
+        if (selection.isEmpty()) {
+            showMessage("No selection");
+            return;
+        }
+
+        List selectedObjectsList = selection.toList();
+
+        for (Object selectedObject : selectedObjectsList) {
+            if (selectedObject instanceof Node) {
+                Node node = (Node) selectedObject;
+                OpenConfiguratorProjectUtils.updateModuleObjectInNode(node);
+
+                File xdcFile = new File(node.getAbsolutePathToXdc());
+                OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
+                        "Generated modular head node XDC at:"
+                                + node.getProject().getName() + "/output/"
+                                + xdcFile.getName(),
+                        node.getProject().getName());
+            }
+        }
     }
 
     /**
@@ -1384,6 +1420,30 @@ public class IndustrialNetworkView extends ViewPart
 
             }
         };
+        generateNodeXDC = new Action(GENERATE_NODE_XDC_ACTION_MESSAGE) {
+
+            @Override
+            public void run() {
+
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        && (selection instanceof IStructuredSelection)) {
+                    try {
+                        generateXDC((IStructuredSelection) selection);
+                    } catch (JDOMException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    viewer.refresh();
+                }
+            }
+        };
+        generateNodeXDC.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.EXPORT_NODE_ICON));
+
         enableDisableNode.setToolTipText(ENABLE_DISABLE_ACTION_MESSAGE);
         enableDisableNode.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
