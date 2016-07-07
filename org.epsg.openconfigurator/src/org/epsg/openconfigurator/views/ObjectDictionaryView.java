@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file   ObjectDictionaryView.java
+* @file   ObjectDictionaryView.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -76,6 +76,7 @@ import org.epsg.openconfigurator.event.INodePropertyChangeListener;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.model.DataTypeChoiceType;
 import org.epsg.openconfigurator.model.LabelDescription;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.ParameterGroup;
@@ -86,6 +87,7 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.VarDecleration;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 
 /**
  * View to list the objects and subobjects of a node.
@@ -248,8 +250,23 @@ public class ObjectDictionaryView extends ViewPart
         @Override
         public String getText(Object element) {
             if (element instanceof PowerlinkObject) {
+                PowerlinkObject object = (PowerlinkObject) element;
+                if (object.isModuleObject()) {
+                    long objectIndex = OpenConfiguratorLibraryUtils
+                            .getModuleObjectIndex(object.getModule());
+                    if (objectIndex != 0) {
+                        return object.getNameWithId(objectIndex);
+                    }
+                }
                 return ((PowerlinkObject) element).getNameWithId();
             } else if (element instanceof PowerlinkSubobject) {
+                PowerlinkSubobject subObject = (PowerlinkSubobject) element;
+                if (subObject.isModule()) {
+                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                            .getModuleObjectSubIndex(subObject.getModule(),
+                                    subObject);
+                    return subObject.getNameWithId(subObjectIndex);
+                }
                 return ((PowerlinkSubobject) element).getNameWithId();
             } else if (element instanceof Parameter) {
                 Parameter param = (Parameter) element;
@@ -343,6 +360,13 @@ public class ObjectDictionaryView extends ViewPart
                         sourcePart = part;
                         setPartName(nodeObj.getNodeIDWithName());
                         treeViewer.setInput(nodeObj);
+                    }
+                } else if (selectedObj instanceof Module) {
+                    moduleObj = (Module) selectedObj;
+                    if (moduleObj.isEnabled()) {
+                        sourcePart = part;
+                        setPartName(moduleObj.getModuleName());
+                        treeViewer.setInput(moduleObj);
                     }
                 }
             }
@@ -459,14 +483,73 @@ public class ObjectDictionaryView extends ViewPart
                                     "parameter group cannot be displayed due to false condition set");
                         }
                     }
-
-                    visibleObjectsList.addAll(nodeObj.getObjectDictionary()
-                            .getParameterofParamGroup());
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj
                             .getObjectDictionary().getObjectsList();
 
+                    return objectsList.toArray();
+                }
+            } else if (inputElement instanceof Module) {
+                Module moduleObj = (Module) inputElement;
+                if (parametersVisible) {
+
+                    LinkedHashSet<Object> visibleObjectsList = new LinkedHashSet<>();
+                    List<ParameterGroup> paramGrupList = moduleObj
+                            .getObjectDictionary().getParameterGroupList();
+                    for (ParameterGroup pgmGrp : paramGrupList) {
+                        System.err.println("Module --------> "
+                                + pgmGrp.getLabel().getText() + " m:"
+                                + pgmGrp.isConditionsMet() + " v:"
+                                + pgmGrp.isGroupLevelVisible());
+
+                        if (pgmGrp.isConditionsMet()) {
+                            if ((pgmGrp.isGroupLevelVisible())
+                                    && (pgmGrp.isConfigParameter())) {
+                                visibleObjectsList.add(pgmGrp);
+                            } else if (pgmGrp.isConfigParameter()) {
+                                List<ParameterReference> prmRefList = pgmGrp
+                                        .getParameterRefList();
+                                for (ParameterReference prmRef : prmRefList) {
+                                    if (prmRef.isVisible()) {
+                                        visibleObjectsList.add(prmRef);
+                                    }
+                                }
+
+                                List<ParameterGroup> prmGrpList = pgmGrp
+                                        .getParameterGroupList();
+                                for (int count = 1; count < prmGrpList
+                                        .size(); count++) {
+                                    for (ParameterGroup prmGrp : prmGrpList) {
+                                        if (prmGrp.isGroupLevelVisible()
+                                                && prmGrp.isConfigParameter()) {
+                                            visibleObjectsList.add(prmGrp);
+                                        } else if (prmGrp.isConfigParameter()) {
+                                            List<ParameterReference> pgmRefList = prmGrp
+                                                    .getParameterRefList();
+                                            for (ParameterReference prmRef : pgmRefList) {
+                                                if (prmRef.isVisible()) {
+                                                    visibleObjectsList
+                                                            .add(prmRef);
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            } else {
+                                System.err.println(
+                                        "No parameter groups can be configured ");
+                            }
+
+                        } else {
+                            System.err.println(
+                                    "parameter group cannot be displayed due to false condition set");
+                        }
+                    }
+                    return visibleObjectsList.toArray();
+                } else {
+                    List<PowerlinkObject> objectsList = moduleObj
+                            .getObjectDictionary().getObjectsList();
                     return objectsList.toArray();
                 }
             }
@@ -544,6 +627,8 @@ public class ObjectDictionaryView extends ViewPart
      * corresponds to.
      */
     private Node nodeObj;
+
+    private Module moduleObj;
 
     /**
      * Source workbench part.
@@ -837,8 +922,13 @@ public class ObjectDictionaryView extends ViewPart
     }
 
     public void handleRefresh() {
-        treeViewer.setInput(nodeObj);
-        treeViewer.expandAll();
+
+        if (parametersVisible) {
+            treeViewer.setInput(moduleObj);
+            treeViewer.expandAll();
+        } else {
+            treeViewer.setInput(nodeObj);
+        }
     }
 
     /**
@@ -860,7 +950,11 @@ public class ObjectDictionaryView extends ViewPart
 
     @Override
     public void propertyChanged(Object source, int propId) {
-        treeViewer.setInput(nodeObj);
+        if (parametersVisible) {
+            treeViewer.setInput(moduleObj);
+        } else {
+            treeViewer.setInput(nodeObj);
+        }
     }
 
     @Override

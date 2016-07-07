@@ -1,14 +1,54 @@
+/*******************************************************************************
+ * @file   Module.java
+ *
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
@@ -17,9 +57,16 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
+import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
 import org.jdom2.JDOMException;
 
+/**
+ * Describes the functional behavior of module.
+ *
+ * @author SreeHari
+ *
+ */
 public class Module {
 
     private PowerlinkRootNode rootNode;
@@ -32,23 +79,51 @@ public class Module {
 
     private ISO15745ProfileContainer xddModel;
 
+    private final ObjectDictionary objectDictionary;
+
     private String moduleName;
 
     private int maxPosition;
 
+    private int minPosition;
+
+    private int minAddress;
+
+    private int maxAddress;
+
+    private int maxCount;
+
+    private TModuleAddressingChild moduleAddressing;
+
     private String configurationError;
+
+    private String xpath;
 
     private HeadNodeInterface interfaceObj;
 
+    /**
+     * Constructor that defines null values.
+     */
     public Module() {
         rootNode = null;
         projectXml = null;
         moduleModel = null;
         node = null;
         xddModel = null;
+        objectDictionary = null;
         configurationError = "";
     }
 
+    /**
+     * Constructor that constructs the module from the XDD.
+     *
+     * @param rootNode Instance of PowerlinkRootNode.
+     * @param projectXml Project file instance to update the module.
+     * @param nodeModel Instance of java model.
+     * @param node Instance of node in which module is connected.
+     * @param xddModel XDD instance of module.
+     * @param interfaceObj Instance of interface in which module is connected.
+     */
     public Module(PowerlinkRootNode rootNode, IFile projectXml,
             Object nodeModel, Node node, ISO15745ProfileContainer xddModel,
             HeadNodeInterface interfaceObj) {
@@ -68,12 +143,19 @@ public class Module {
             configurationError = "XDD parse not successful";
         }
 
+        xpath = "//plk:ApplicationProcess";
+
+        objectDictionary = new ObjectDictionary(this, node, xddModel);
+
         if (nodeModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) nodeModel;
             moduleName = module.getName();
         }
     }
 
+    /**
+     * @return The XDC path of module.
+     */
     public String getAbsolutePathToXdc() {
         String pathToXdc = getProject().getLocation().toString();
         String xdcPath = getPathToXdc();
@@ -81,6 +163,9 @@ public class Module {
         return pathToXdc;
     }
 
+    /**
+     * @return the address of module.
+     */
     public int getAddress() {
         int address = 0;
 
@@ -96,14 +181,121 @@ public class Module {
         return address;
     }
 
+    /**
+     * @return The Xpath of application process in module XDD.
+     */
+    public String getApplicationProcessXpath() {
+        return xpath;
+    }
+
+    /**
+     * @return The Module ID of module.
+     */
+    public String getChildID() {
+        if (getModuleInterface() != null) {
+            return getModuleInterface().getChildID();
+        }
+        return null;
+    }
+
+    /**
+     * @return The Xpath of interface list in poroject file.
+     */
+    public String getInterfaceListTagXPath() {
+        String interfaceListTagXpath = node.getXpath() + "/oc:"
+                + IControlledNodeProperties.INTERFACE_LIST_TAG;
+        return interfaceListTagXpath;
+    }
+
+    /**
+     * @return The interface instance of module in which it is connected.
+     */
     public HeadNodeInterface getInterfaceOfModule() {
         return interfaceObj;
     }
 
+    /**
+     * @return The Xpath of interface in project file.
+     */
+    public String getInterfaceTagXPath() {
+        String interfaceListTagXpath = node.getXpath() + "/oc:"
+                + IControlledNodeProperties.INTERFACE_LIST_TAG;
+        String interfaceXpath = interfaceListTagXpath + "/oc:"
+                + IControlledNodeProperties.INTERFACE_TAG + "[@id='"
+                + getInterfaceOfModule().getInterfaceUId() + "']" + "/oc:";
+        return interfaceXpath;
+    }
+
+    /**
+     * @return The XDC model.
+     */
+    public ISO15745ProfileContainer getISO15745ProfileContainer() {
+        return xddModel;
+    }
+
+    /**
+     * @return Max address of module.
+     */
+    public int getMaxAddress() {
+
+        if (getModuleInterface().getMaxAddress() != null) {
+            maxAddress = getModuleInterface().getMaxAddress().intValue();
+        }
+        return maxAddress;
+    }
+
+    /**
+     * @return the maximum count of module in the interface list.
+     */
+    public int getMaxCount() {
+        maxCount = getModuleInterface().getMaxCount().intValue();
+        return maxCount;
+    }
+
+    /**
+     * @return The maximum position of module.
+     */
     public int getMaxPosition() {
+        if (getModuleInterface().getMaxPosition() != null) {
+            maxPosition = getModuleInterface().getMaxPosition().intValue();
+        } else {
+            if (getInterfaceOfModule().getMaxModules() != null) {
+                maxPosition = getInterfaceOfModule().getMaxModules().intValue();
+            }
+        }
         return maxPosition;
     }
 
+    /**
+     * @return Minimum address of module.
+     */
+    public int getMinAddress() {
+        minAddress = getModuleInterface().getMinAddress().intValue();
+
+        return minAddress;
+    }
+
+    /**
+     * @return Minimum allowed position of module.
+     */
+    public int getMinPosition() {
+        minPosition = getModuleInterface().getMinPosition().intValue();
+
+        return minPosition;
+    }
+
+    /**
+     * @return Value of module addressing in interface.
+     */
+    public TModuleAddressingChild getModuleAddressing() {
+        moduleAddressing = getModuleInterface().getModuleAddressing();
+
+        return moduleAddressing;
+    }
+
+    /**
+     * @return The module interface in module.
+     */
     public TModuleInterface getModuleInterface() {
         if (xddModel != null) {
             List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
@@ -121,14 +313,23 @@ public class Module {
         return null;
     }
 
+    /**
+     * @return Model of module.
+     */
     public Object getModuleModel() {
         return moduleModel;
     }
 
+    /**
+     * @return Name of Module.
+     */
     public String getModuleName() {
         return moduleName;
     }
 
+    /**
+     * @return Type of module that is connected to interface.
+     */
     public String getModuleType() {
         ModuleTypeList moduletypeList = getModuleInterface()
                 .getModuleTypeList();
@@ -142,10 +343,58 @@ public class Module {
         return moduleTypeName;
     }
 
+    /**
+     * @return The uniqueId of module.
+     */
+    public String getModuleUniqueId() {
+        ModuleTypeList moduletypeList = getModuleInterface()
+                .getModuleTypeList();
+        String moduleTypeName = StringUtils.EMPTY;
+        if (moduletypeList != null) {
+            List<ModuleType> moduleTypelist = moduletypeList.getModuleType();
+            for (ModuleType module : moduleTypelist) {
+                moduleTypeName = module.getUniqueID();
+            }
+        }
+        return moduleTypeName;
+    }
+
+    /**
+     * Receives the next position of given module.
+     *
+     * @param position value of module position
+     * @return next position of module.
+     */
+    public int getNextModulePosition(int position) {
+        Set<Integer> positionCollections = getInterfaceOfModule()
+                .getModuleCollection().keySet();
+        int nextPosition = 0;
+        for (Integer positionAvailable : positionCollections) {
+            if (positionAvailable > position) {
+                nextPosition = positionAvailable;
+                break;
+            }
+        }
+        return nextPosition;
+    }
+
+    /**
+     * @return Instance of Node.
+     */
     public Node getNode() {
         return node;
     }
 
+    /**
+     * @return Instance of Module object dictionary.
+     */
+    public ObjectDictionary getObjectDictionary() {
+        return objectDictionary;
+    }
+
+    /**
+     * @return The path of module XDC.
+     */
     public String getPathToXdc() {
         String pathToXdc = StringUtils.EMPTY;
 
@@ -161,6 +410,9 @@ public class Module {
         return pathToXdc;
     }
 
+    /**
+     * @return Position of module
+     */
     public int getPosition() {
         int position = 0;
 
@@ -177,12 +429,33 @@ public class Module {
     }
 
     /**
+     * Receives the previous position of given module.
+     *
+     * @param position Position of module
+     * @return previous position of module.
+     */
+    public int getPreviousModulePosition(int position) {
+        Set<Integer> positionCollections = getInterfaceOfModule()
+                .getModuleCollection().keySet();
+        int previousPosition = 0;
+        for (Integer positionAvailable : positionCollections) {
+            if (positionAvailable < position) {
+                previousPosition = positionAvailable;
+            }
+        }
+        return previousPosition;
+    }
+
+    /**
      * @return Eclipse project associated with the module.
      */
     public IProject getProject() {
         return node.getProject();
     }
 
+    /**
+     * @return Xpath of project file.
+     */
     public String getXpath() {
 
         String interfaceListTagXpath = node.getXpath() + "/oc:"
@@ -198,6 +471,9 @@ public class Module {
         return interfaceXpath;
     }
 
+    /**
+     * @return <true> if module is enabled, <false> if disabled.
+     */
     public boolean isEnabled() {
         boolean enabled = true;
 
@@ -212,19 +488,131 @@ public class Module {
         return enabled;
     }
 
+    /**
+     * Sets the address value to the module.
+     *
+     * @param value Address to be updated.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void setAddress(String value) throws JDOMException, IOException {
+
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_ADDRESS_OBJECT, value);
+        int oldAddress = getAddress();
+        System.err.println("oldAddress..... .." + oldAddress);
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            int address = Integer.valueOf(value);
+            module.setAddress(BigInteger.valueOf(address));
+            getInterfaceOfModule().getAddressCollection().remove(oldAddress);
+            getInterfaceOfModule().getAddressCollection().put(address, this);
+        } else {
+            System.err.println("Invalid module model.");
+        }
+
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+
+        Result res = new Result();
+
+        res = OpenConfiguratorLibraryUtils.setModuleAddress(this);
+        if (!res.IsSuccessful()) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
+            return;
+        }
+
+    }
+
+    public void setAddresss(String value) throws JDOMException, IOException {
+
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_ADDRESS_OBJECT, value);
+        int oldAddress = getAddress();
+        System.err.println("oldAddress..... .." + oldAddress);
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            int address = Integer.valueOf(value);
+            module.setAddress(BigInteger.valueOf(address));
+            getInterfaceOfModule().getAddressCollection().remove(oldAddress);
+            getInterfaceOfModule().getAddressCollection().put(address, this);
+        } else {
+            System.err.println("Invalid module model.");
+        }
+
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+
+    }
+
+    /**
+     * Updates the enable/disable state of module.
+     *
+     * @param enabled <true> if enabled, <false> if otherwise.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void setEnabled(boolean enabled) throws JDOMException, IOException {
+
+        Result res = new Result();
+
+        res = OpenConfiguratorLibraryUtils.toggleEnableDisable(this);
+        if (!res.IsSuccessful()) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
+            return;
+        }
+
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                    "enabled", String.valueOf(enabled));
+            module.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * Sets the error flag to the module
+     *
+     * @param errorDescription The error message of error flag.
+     */
     public void setError(String errorDescription) {
         configurationError = errorDescription;
     }
 
+    /**
+     * Updates the enabled and disabled state of module.
+     *
+     * @param enabled <true> if module enabled, <false> if disabled.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void setModuleEnabled(boolean enabled)
+            throws JDOMException, IOException {
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                    "enabled", String.valueOf(enabled));
+            module.setEnabled(enabled);
+        }
+    }
+
+    /**
+     * Updates the name to the module.
+     *
+     * @param newName Name to be updated into module.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
     public void setName(final String newName)
             throws JDOMException, IOException {
+
         OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_NAME_OBJECT, newName);
 
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
             module.setName(newName);
-            System.err.println(" ....1.....");
+
         } else {
             System.err.println("setName(newName); Unhandled node model type:"
                     + moduleModel);
@@ -245,24 +633,437 @@ public class Module {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
             module.setPathToXDC(pathToXdc);
 
+        } else {
+            System.err.println("Invalid module model.");
         }
     }
 
+    /**
+     * Updates the position of module.
+     *
+     * @param value The position to be updated.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
     public void setPosition(String value) throws JDOMException, IOException {
+
+        Result res = new Result();
+        boolean validPosition = true;
+        int newPosition = Integer.valueOf(value);
+        int oldPosition = getPosition();
+        int previousPosition = 0;
+        int nextPosition = 0;
+        Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
+                .keySet();
+
+        for (Integer position : positionSet) {
+
+            if (position < newPosition) {
+                if (position != oldPosition) {
+                    previousPosition = position;
+                }
+            }
+
+            if (position > newPosition) {
+                if (position != oldPosition) {
+                    nextPosition = position;
+                    break;
+                }
+            }
+
+        }
+
+        Module currentModule = getInterfaceOfModule().getModuleCollection()
+                .get(oldPosition);
+
+        String currentToPreviousModuleType = currentModule.getModuleInterface()
+                .getType();
+        String currentToNextModuleType = currentModule.getModuleType();
+
+        System.err.println("PreviousPOsition11......" + previousPosition);
+        System.err.println("NextPOsition13......" + nextPosition);
+
+        if (previousPosition != 0) {
+            Module previousModule = getInterfaceOfModule().getModuleCollection()
+                    .get(previousPosition);
+            String previousModuleType = previousModule.getModuleType();
+            System.err.println(
+                    "Previous mOdule type15....." + previousModuleType);
+            System.err.println(
+                    "Next module type16......" + currentToPreviousModuleType);
+            if (previousModuleType.equals(currentToPreviousModuleType)) {
+                validPosition = true;
+                if (nextPosition != 0) {
+                    Module nextModule = getInterfaceOfModule()
+                            .getModuleCollection().get(nextPosition);
+                    String nextModuleType = nextModule.getModuleInterface()
+                            .getType();
+                    System.err.println("Equals123......");
+                    System.err.println("current module type ......"
+                            + currentToNextModuleType);
+                    System.err.println(
+                            "Next module type ......" + nextModuleType);
+                    if ((currentToNextModuleType.equals(nextModuleType))) {
+                        System.err.println("Equals......");
+                        validPosition = true;
+                    } else {
+                        System.err.println("Equals245......");
+                        System.err.println("Not Equals......");
+                        validPosition = false;
+                    }
+                }
+                System.err.println("Eneteref into critical section....");
+            } else {
+                validPosition = false;
+            }
+        } else {
+            if (nextPosition != 0) {
+                Module nextModule = getInterfaceOfModule().getModuleCollection()
+                        .get(nextPosition);
+                String nextModuleType = nextModule.getModuleInterface()
+                        .getType();
+
+                if ((currentToNextModuleType.equals(nextModuleType))) {
+                    System.err.println("Equals......");
+                    validPosition = true;
+                } else {
+                    System.err.println("Equals245......");
+                    System.err.println("Not Equals......");
+                    validPosition = false;
+                }
+            }
+        }
+        System.err.println("Valid position = " + validPosition);
+        if (!validPosition) {
+            MessageDialog dialog = new MessageDialog(null,
+                    "Modify module position", null,
+                    "Modifying the position of module will disable the modules that does not match the module type.'",
+                    MessageDialog.QUESTION, new String[] { "Yes", "No" }, 1);
+            int result = dialog.open();
+            if (result == 0) {
+                OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                        IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
+                System.err.println("oldPOsition..... .." + oldPosition);
+                if (moduleModel instanceof InterfaceList.Interface.Module) {
+                    InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+                    int position = Integer.valueOf(value);
+
+                    res = OpenConfiguratorLibraryUtils.moveModule(this,
+                            oldPosition, position);
+                    if (res.IsSuccessful()) {
+                        module.setPosition(BigInteger.valueOf(position));
+                        getInterfaceOfModule().getModuleCollection()
+                                .remove(oldPosition);
+                        getInterfaceOfModule().getModuleCollection()
+                                .put(position, this);
+                        if (String.valueOf(getInterfaceOfModule()
+                                .getModuleAddressing()) == "POSITION") {
+                            setAddress(value);
+                        }
+                    } else {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printLibraryErrorMessage(res);
+                    }
+                } else {
+                    System.err.println("Invalid module model.");
+                }
+
+                rootNode.fireNodePropertyChanged(
+                        new NodePropertyChangeEvent(this));
+
+                Module moduleTobeDisabled = getInterfaceOfModule()
+                        .getModuleCollection().get(Integer.valueOf(value));
+                moduleTobeDisabled.setEnabled(false);
+                validatePreviousPosition(oldPosition);
+                return;
+            } else {
+                return;
+            }
+        } else {
+            OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                    IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
+            System.err.println("oldPOsition..... .." + oldPosition);
+            if (moduleModel instanceof InterfaceList.Interface.Module) {
+                InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+                int position = Integer.valueOf(value);
+
+                res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
+                        position);
+                if (res.IsSuccessful()) {
+                    module.setPosition(BigInteger.valueOf(position));
+                    getInterfaceOfModule().getModuleCollection()
+                            .remove(oldPosition);
+                    getInterfaceOfModule().getModuleCollection().put(position,
+                            this);
+                    if (String.valueOf(getInterfaceOfModule()
+                            .getModuleAddressing()) == "POSITION") {
+                        setAddress(value);
+                    }
+                } else {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printLibraryErrorMessage(res);
+
+                }
+            } else {
+                System.err.println("Invalid module model.");
+            }
+
+            rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+
+            validatePreviousPosition(oldPosition);
+
+        }
+    }
+
+    /**
+     * Updates the position of module
+     *
+     * @param value new position to be updated.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void setPositions(String value) throws JDOMException, IOException {
+        Result res = new Result();
         OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
         int oldPosition = getPosition();
-        System.err.println("oldPOsition..... .." + oldPosition);
+        int position = Integer.valueOf(value);
+        System.err.println("oldPOsition@#@$..... .." + oldPosition);
+        System.err.println("NewPOsition@$#$..... .." + position);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-            int position = Integer.valueOf(value);
-            module.setPosition(BigInteger.valueOf(position));
-            getInterfaceOfModule().getModuleCollection().remove(oldPosition);
-            getInterfaceOfModule().getModuleCollection().put(position, this);
+
+            res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
+                    position);
+            if (res.IsSuccessful()) {
+                module.setPosition(BigInteger.valueOf(position));
+                getInterfaceOfModule().getModuleCollection()
+                        .remove(oldPosition);
+                getInterfaceOfModule().getModuleCollection().put(position,
+                        this);
+                if (String.valueOf(getInterfaceOfModule()
+                        .getModuleAddressing()) == "POSITION") {
+                    setAddress(value);
+                }
+            } else {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+
+            }
         } else {
             System.err.println("Invalid module model.");
         }
 
         rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+
     }
+
+    public void swapPosition(int oldPosition, int position)
+            throws JDOMException, IOException {
+
+        Object moduleObjModel = getModuleModel();
+        if (moduleObjModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module moduleModelObj = (InterfaceList.Interface.Module) moduleObjModel;
+            moduleModelObj.setPosition(BigInteger.valueOf(position));
+        }
+
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+                String.valueOf(position));
+
+        setAddresss(String.valueOf(position));
+
+        try {
+            getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
+        }
+
+        Module newModule = getInterfaceOfModule().getModuleCollection()
+                .get(position);
+
+        Object newmoduleObjModel = newModule.getModuleModel();
+        if (newmoduleObjModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module newmoduleModelObj = (InterfaceList.Interface.Module) newmoduleObjModel;
+            newmoduleModelObj.setPosition(BigInteger.valueOf(oldPosition));
+        }
+
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(newModule,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+                String.valueOf(oldPosition));
+
+        setAddresss(String.valueOf(oldPosition));
+
+        // getInterfaceOfModule().getModuleCollection().put(oldPosition,
+        // newModule);
+        // getInterfaceOfModule().getModuleCollection().put(position, this);
+
+        try {
+            newModule.getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
+        }
+
+        Result res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
+                position);
+        if (!res.IsSuccessful()) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
+        }
+
+    }
+
+    /**
+     * Validated the module type in the module list based on the modification in
+     * position
+     *
+     * @param newPosition Position to be validatd.
+     *
+     * @return <true> if module type matches in new position, <false> if module
+     *         type does not match.
+     */
+    public boolean validateNewPosition(Integer newPosition) {
+        Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
+                .keySet();
+        boolean validPosition = true;
+        int previousPosition = 0;
+        int nextPosition = 0;
+        for (Integer position : positionSet) {
+            if (newPosition == position) {
+                if (position < newPosition) {
+                    previousPosition = position;
+                }
+
+                if (position > newPosition) {
+                    nextPosition = position;
+                    break;
+                }
+            }
+        }
+
+        Module currentModule = getInterfaceOfModule().getModuleCollection()
+                .get(newPosition);
+
+        String currentToPreviousModuleType = currentModule.getModuleInterface()
+                .getType();
+        String currentToNextModuleType = currentModule.getModuleType();
+
+        if (previousPosition != 0) {
+            Module previousModule = getInterfaceOfModule().getModuleCollection()
+                    .get(previousPosition);
+            String previousModuleType = previousModule.getModuleType();
+            System.err.println(
+                    "Previous mOdule type15....." + previousModuleType);
+            System.err.println(
+                    "Next module type16......" + currentToPreviousModuleType);
+            if (previousModuleType.equals(currentToPreviousModuleType)) {
+                validPosition = true;
+                if (nextPosition != 0) {
+                    Module nextModule = getInterfaceOfModule()
+                            .getModuleCollection().get(nextPosition);
+                    String nextModuleType = nextModule.getModuleInterface()
+                            .getType();
+                    System.err.println("Equals123......");
+                    System.err.println("current module type ......"
+                            + currentToNextModuleType);
+                    System.err.println(
+                            "Next module type ......" + nextModuleType);
+                    if ((currentToNextModuleType.equals(nextModuleType))) {
+                        System.err.println("Equals......");
+                        validPosition = true;
+                    } else {
+                        System.err.println("Equals245......");
+                        System.err.println("Not Equals......");
+                        validPosition = false;
+                    }
+                }
+                System.err.println("Eneteref into critical section....");
+            } else {
+                validPosition = false;
+            }
+        } else {
+            if (nextPosition != 0) {
+                Module nextModule = getInterfaceOfModule().getModuleCollection()
+                        .get(nextPosition);
+                String nextModuleType = nextModule.getModuleInterface()
+                        .getType();
+
+                if ((currentToNextModuleType.equals(nextModuleType))) {
+                    System.err.println("Equals......");
+                    validPosition = true;
+                } else {
+                    System.err.println("Equals245......");
+                    System.err.println("Not Equals......");
+                    validPosition = false;
+                }
+            }
+        }
+        return validPosition;
+
+    }
+
+    /**
+     * Validates the previous position of module based on given position.
+     *
+     * @param oldPosition old position of module.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    private void validatePreviousPosition(Integer oldPosition)
+            throws JDOMException, IOException {
+        int veryOldPosition = 0;
+        int veryNextPosition = 0;
+        Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
+                .keySet();
+        List<Integer> positionToBeChecked = new ArrayList<>();
+        for (Integer position : positionSet) {
+            if (position < oldPosition) {
+                Module mod = getInterfaceOfModule().getModuleCollection()
+                        .get(position);
+                if (mod.isEnabled()) {
+                    veryOldPosition = position;
+                }
+            }
+
+            if (position > oldPosition) {
+                positionToBeChecked.add(position);
+            }
+        }
+
+        if (veryOldPosition != 0) {
+            Module previousModule = getInterfaceOfModule().getModuleCollection()
+                    .get(veryOldPosition);
+            String previousModuleType = previousModule.getModuleType();
+
+            if (positionToBeChecked != null) {
+                for (Integer nextPosition : positionToBeChecked) {
+                    Module nextModule = getInterfaceOfModule()
+                            .getModuleCollection().get(nextPosition);
+                    String nextModuleType = nextModule.getModuleInterface()
+                            .getType();
+                    System.err.println(
+                            "Previous mOdule type..." + previousModuleType);
+                    System.err.println(
+                            "Next module type ......" + nextModuleType);
+                    if (nextModule.isEnabled()) {
+                        if ((previousModuleType.equals(nextModuleType))) {
+                            System.err.println("Equals......");
+                            return;
+                        } else {
+                            System.err.println("Equals245......");
+                            System.err.println("Not Equals......");
+                            nextModule.setEnabled(false);
+                        }
+                    }
+                }
+            }
+
+        }
+
+    }
+
 }

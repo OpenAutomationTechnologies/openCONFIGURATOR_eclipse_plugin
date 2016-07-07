@@ -1,5 +1,5 @@
 /*******************************************************************************
- * @file   ObjectDictionary.java
+* @file   ObjectDictionary.java
  *
  * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
@@ -41,14 +41,18 @@ import javax.xml.bind.DatatypeConverter;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayers;
+import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersExtension;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtension;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtensionHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroupList;
@@ -95,6 +99,9 @@ public class ObjectDictionary {
      */
     private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
 
+    /**
+     * Parameter list.
+     */
     private final List<Parameter> parameterList = new ArrayList<Parameter>();
 
     /**
@@ -106,6 +113,20 @@ public class ObjectDictionary {
      * Parameter group with uniqueID and parameter model.
      */
     private LinkedHashMap<String, ParameterGroup> parameterGroupMap = new LinkedHashMap<String, ParameterGroup>();
+
+    /**
+     * Instance of Module.
+     */
+    private Module module;
+
+    private boolean isModule = false;
+
+    public ObjectDictionary(Module module, Node node,
+            ISO15745ProfileContainer xddModelArg) {
+        this.node = node;
+        this.module = module;
+        setXddModel(xddModelArg);
+    }
 
     /**
      * Constructs object dictionary with following inputs.
@@ -151,6 +172,13 @@ public class ObjectDictionary {
         }
 
         return subObject.getActualValue();
+    }
+
+    /**
+     * @return Instance of module.
+     */
+    public Module getModule() {
+        return module;
     }
 
     /**
@@ -226,6 +254,9 @@ public class ObjectDictionary {
         return valueList;
     }
 
+    /**
+     * @return List of parameters or parameter group.
+     */
     public List<Parameter> getParameterofParamGroup() {
         List<ParameterGroup> paramGrp = getParameterGroupList();
         for (ParameterGroup pgrp : paramGrp) {
@@ -346,6 +377,13 @@ public class ObjectDictionary {
     }
 
     /**
+     * @return <true> if the object belong to module, <false> otherwise.
+     */
+    public boolean isModule() {
+        return isModule;
+    }
+
+    /**
      * Sets the given actual value to subObject of given object and sub object
      * ID.
      *
@@ -437,14 +475,45 @@ public class ObjectDictionary {
                             for (TParameterGroup grp : paramGroup) {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
-                                System.err.println(
-                                        "The parameter group uniqueID .. "
-                                                + pg.getUniqueId() + "... "
-                                                + pg);
+
                                 parameterGroupMap.put(pg.getUniqueId(), pg);
                             }
                         }
                     }
+                }
+
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild modularDevProfile = (ProfileBodyDevicePowerlinkModularChild) profileBodyDatatype;
+                    List<TApplicationProcess> appProcessList = modularDevProfile
+                            .getApplicationProcess();
+                    for (TApplicationProcess appProcess : appProcessList) {
+                        isModule = true;
+                        // Parameter List
+                        TParameterList paramList = appProcess
+                                .getParameterList();
+                        if (paramList != null) {
+                            List<TParameterList.Parameter> parameterModelList = paramList
+                                    .getParameter();
+                            for (TParameterList.Parameter param : parameterModelList) {
+                                Parameter p = new Parameter(node, param);
+                                parameterListMap.put(p.getUniqueId(), p);
+                            }
+                        }
+
+                        // Parameter Groups List
+                        TParameterGroupList paramGroupList = appProcess
+                                .getParameterGroupList();
+                        if (paramGroupList != null) {
+                            List<TParameterGroup> paramGroup = paramGroupList
+                                    .getParameterGroup();
+                            for (TParameterGroup grp : paramGroup) {
+                                ParameterGroup pg = new ParameterGroup(node,
+                                        this, grp);
+                                parameterGroupMap.put(pg.getUniqueId(), pg);
+                            }
+                        }
+                    }
+
                 }
 
                 if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
@@ -534,6 +603,31 @@ public class ObjectDictionary {
                                 || plkObj.isTpdoMappable()) {
                             tpdoMappableObjectList.add(plkObj);
                         }
+                    }
+                }
+
+                if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularChild) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularChild modularCommProfile = (ProfileBodyCommunicationNetworkPowerlinkModularChild) profileBodyDatatype;
+                    TApplicationLayersExtension.ObjectList tempObjectLists = modularCommProfile
+                            .getApplicationLayers().getObjectList();
+                    List<TObjectExtension> objList = tempObjectLists
+                            .getObject();
+                    for (TObjectExtension obj : objList) {
+                        PowerlinkObject plkObj = new PowerlinkObject(module,
+                                node, obj);
+                        objectsList.add(plkObj);
+                        System.out.println(
+                                "Objects list of module...." + objectsList);
+                        if (plkObj.hasRpdoMappableSubObjects()
+                                || plkObj.isRpdoMappable()) {
+                            rpdoMappableObjectList.add(plkObj);
+                        }
+
+                        if (plkObj.hasTpdoMappableSubObjects()
+                                || plkObj.isTpdoMappable()) {
+                            tpdoMappableObjectList.add(plkObj);
+                        }
+
                     }
                 }
 

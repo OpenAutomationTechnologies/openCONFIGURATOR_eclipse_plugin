@@ -43,6 +43,16 @@ public abstract class AbstractPowerlinkObject {
      */
     protected final Node nodeInstance;
 
+    protected Module moduleInstance;
+
+    public AbstractPowerlinkObject(Module moduleInstance) {
+        if (moduleInstance == null) {
+            throw new IllegalArgumentException();
+        }
+        nodeInstance = moduleInstance.getNode();
+        this.moduleInstance = moduleInstance;
+    }
+
     public AbstractPowerlinkObject(Node nodeInstance) {
         if (nodeInstance == null) {
             throw new IllegalArgumentException();

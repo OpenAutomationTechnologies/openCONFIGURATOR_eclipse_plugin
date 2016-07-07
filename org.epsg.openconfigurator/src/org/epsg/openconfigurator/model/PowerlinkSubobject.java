@@ -43,8 +43,11 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
+import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtension.SubObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtensionHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
 
 /**
@@ -128,6 +131,16 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     private String actualValue;
 
     /**
+     * Access type of object in readable format.
+     */
+    private String accessTypeReadable;
+
+    /**
+     * Mapping value of object in readable format.
+     */
+    private String pdoMappingReadable;
+
+    /**
      * Default value of POWERLINK sub-object from the TObject model
      */
     private final String defaultValue;
@@ -163,6 +176,13 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     private final byte[] dataType;
 
     /**
+     * Instance of module.
+     */
+    private Module module;
+
+    private boolean isModule = false;
+
+    /**
      * The denotation variable of POWERLINK sub-object.
      */
     private final String denotation;
@@ -171,6 +191,82 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      * The flag object for POWERLINK sub-object.
      */
     private final byte[] objFlags;
+
+    /**
+     * Constructs a POWERLINK SubObject based on TObjectextension.SubObject
+     * model
+     *
+     * @param nodeInstance Node instance connected to object
+     * @param powerlinkObject object instance of module
+     * @param module instance f module
+     * @param subObject sub-object instance connected to XDD.
+     */
+    public PowerlinkSubobject(Node nodeInstance,
+            PowerlinkObject powerlinkObject, Module module,
+            SubObject subObject) {
+        super(nodeInstance);
+        this.module = module;
+        if (nodeInstance != null) {
+            project = nodeInstance.getProject();
+        } else {
+            project = null;
+        }
+        isModule = true;
+        object = powerlinkObject;
+        idByte = subObject.getSubIndex();
+        idRaw = DatatypeConverter.printHexBinary(idByte);
+        idShort = Short.parseShort(idRaw, 16);
+        idHex = "0x" + idRaw;
+        name = subObject.getName();
+        xpath = object.getXpath() + "/plk:SubObject[@subIndex='" + idRaw + "']";
+
+        denotation = subObject.getDenotation();
+        objFlags = subObject.getObjFlags();
+
+        objectType = subObject.getObjectType();
+        dataType = subObject.getDataType();
+        if (dataType != null) {
+            dataTypeReadable = ObjectDatatype.getDatatypeName(
+                    DatatypeConverter.printHexBinary(dataType));
+        } else {
+            dataTypeReadable = StringUtils.EMPTY;
+        }
+
+        highLimit = subObject.getHighLimit();
+        lowLimit = subObject.getLowLimit();
+
+        actualValue = subObject.getActualValue();
+        defaultValue = subObject.getDefaultValue();
+
+        pdoMapping = subObject.getPDOmapping();
+        accessType = subObject.getAccessType();
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.RPDO))) {
+
+            if (subObject.getUniqueIDRef() != null) {
+                isRpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RW)
+                        || (accessType == TObjectAccessType.WO)) {
+                    isRpdoMappable = true;
+                }
+            }
+        }
+        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                || (pdoMapping == TObjectPDOMapping.TPDO))) {
+            if (subObject.getUniqueIDRef() != null) {
+                isTpdoMappable = true;
+            } else {
+                if ((accessType == TObjectAccessType.RO)
+                        || (accessType == TObjectAccessType.RW)) {
+                    isTpdoMappable = true;
+                }
+            }
+        }
+
+        uniqueIDRef = subObject.getUniqueIDRef();
+    }
 
     /**
      * Constructs a POWERLINK SubObject based on TObject.SubObject model
@@ -218,7 +314,6 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         pdoMapping = subObject.getPDOmapping();
         accessType = subObject.getAccessType();
         if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.RPDO))) {
 
             if (subObject.getUniqueIDRef() != null) {
@@ -294,7 +389,6 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         pdoMapping = subObject.getPDOmapping();
         accessType = subObject.getAccessType();
         if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.RPDO))) {
 
             if (subObject.getUniqueIDRef() != null) {
@@ -363,6 +457,26 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     }
 
     /**
+     * @return Readable format of access type of object.
+     */
+    public String getAccessTypeReadable() {
+        if (accessType != null) {
+            if (accessType == TObjectAccessType.CONST) {
+                accessTypeReadable = "const";
+            } else if (accessType == TObjectAccessType.RO) {
+                accessTypeReadable = "ro";
+            } else if (accessType == TObjectAccessType.RW) {
+                accessTypeReadable = "rw";
+            } else if (accessType == TObjectAccessType.WO) {
+                accessTypeReadable = "wo";
+            }
+        } else {
+            accessTypeReadable = StringUtils.EMPTY;
+        }
+        return accessTypeReadable;
+    }
+
+    /**
      * @return The actual value or default value if actual value is not
      *         available.
      */
@@ -389,6 +503,63 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
             value = StringUtils.EMPTY;
         }
         return value;
+    }
+
+    /**
+     * Get actual value of parameter based on uniqueId Ref
+     *
+     * @param uniqueIDRef2 UniqueID of parameter.
+     * @return Actual value of parameters.
+     */
+    public String getActualValue(Object uniqueIDRef2) {
+        String actualValue = StringUtils.EMPTY;
+        if (uniqueIDRef2 instanceof TParameterList.Parameter) {
+            TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef2;
+            if (parameter.getActualValue() != null) {
+                actualValue = parameter.getActualValue().getValue();
+            } else if (parameter.getDefaultValue() != null) {
+                actualValue = parameter.getDefaultValue().getValue();
+            }
+        } else if (uniqueIDRef2 instanceof TParameterGroup) {
+            TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef2;
+            String uniqueId = parameterGrp.getUniqueID();
+            actualValue = StringUtils.EMPTY;
+        }
+        return actualValue;
+    }
+
+    /**
+     * Get conditional uniqueId of parameter.
+     *
+     * @param conditionalUniqueIDRef uniqueIdRef of conditional parameter.
+     * @return uniqueID of parameter.
+     */
+    public String getConditionalUniqueId(Object conditionalUniqueIDRef) {
+        String uniqueId = StringUtils.EMPTY;
+        if (conditionalUniqueIDRef instanceof TParameterList.Parameter) {
+            TParameterList.Parameter parameter = (TParameterList.Parameter) conditionalUniqueIDRef;
+            uniqueId = parameter.getUniqueID();
+
+        } else if (conditionalUniqueIDRef instanceof TParameterGroup) {
+            TParameterGroup parameterGrp = (TParameterGroup) conditionalUniqueIDRef;
+            uniqueId = parameterGrp.getUniqueID();
+        }
+        return uniqueId;
+    }
+
+    /**
+     * Get config bool value of parameter
+     *
+     * @param configParameter value of configParameter in XDD
+     * @return <code>true</code> if parameter is configurable.
+     *         <code>false</code> if not configurable.
+     */
+    public String getConfigParameter(boolean configParameter) {
+        if (configParameter) {
+            return "true";
+        } else {
+            return "false";
+        }
     }
 
     /**
@@ -440,6 +611,21 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     }
 
     /**
+     * Get the group level visible value of parameter
+     *
+     * @param groupLevelVisible the value from the XDD
+     * @return <code>true</code> if parameter is visible, <code>false</code> if
+     *         not visible.
+     */
+    public String getGroupLevelVisible(boolean groupLevelVisible) {
+        if (groupLevelVisible) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    /**
      * Returns maximum value range of POWERLINK sub-object
      */
     @Override
@@ -477,6 +663,20 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         return idRaw;
     }
 
+    /**
+     * Get the string value of locked attribute for parameter reference.
+     *
+     * @param lockedParameter Boolean value of locked attribute in XDC.
+     * @return true or false based on XDC input.
+     */
+    public String getlockedParameter(boolean lockedParameter) {
+        if (lockedParameter) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -502,6 +702,23 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         return null;
     }
 
+    /**
+     * @return Instance of module.
+     */
+    public Module getModule() {
+        return module;
+    }
+
+    /**
+     * Get the sub-object id of object
+     *
+     * @param subObjectIndex Index of sub-object
+     * @return hexadecimal value of sub-object index.
+     */
+    public Object getModuleSubObjectID(int subObjectIndex) {
+        return "0x" + Long.toHexString(subObjectIndex);
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -524,6 +741,40 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     @Override
     public String getNameWithId() {
         return (getName() + " (" + getIdHex() + ")");
+    }
+
+    /**
+     * Get name and Id of sub-object.
+     *
+     * @param SubObjectIndex
+     * @return Name and ID of sub-object.
+     */
+    public String getNameWithId(int SubObjectIndex) {
+        return (getName() + " (0x"
+                + Long.toHexString(SubObjectIndex).toUpperCase() + ")");
+
+    }
+
+    /**
+     * Get name and Id of bject.
+     *
+     * @param SubObjectIndex
+     * @return Name and ID of object.
+     */
+    public String getNameWithId(long objectIndex) {
+        return (getName() + " (0x" + Long.toHexString(objectIndex) + "/"
+                + getIdHex() + ")");
+    }
+
+    /**
+     * Get name and Id of sub-object and object.
+     *
+     * @param SubObjectIndex
+     * @return Name and ID of sub-object.
+     */
+    public String getNameWithId(long objectIndex, int subobjectIndex) {
+        return (getName() + " (0x" + Long.toHexString(objectIndex) + "/0x"
+                + Long.toHexString(subobjectIndex).toUpperCase() + ")");
     }
 
     /**
@@ -592,6 +843,28 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     }
 
     /**
+     * @return Readable format of PDO mapping.
+     */
+    public String getPDOMappingReadable() {
+        if (pdoMapping != null) {
+            if (pdoMapping == TObjectPDOMapping.DEFAULT) {
+                pdoMappingReadable = "default";
+            } else if (pdoMapping == TObjectPDOMapping.NO) {
+                pdoMappingReadable = "no";
+            } else if (pdoMapping == TObjectPDOMapping.OPTIONAL) {
+                pdoMappingReadable = "optional";
+            } else if (pdoMapping == TObjectPDOMapping.RPDO) {
+                pdoMappingReadable = "RPDO";
+            } else if (pdoMapping == TObjectPDOMapping.TPDO) {
+                pdoMappingReadable = "RPDO";
+            }
+        } else {
+            pdoMappingReadable = StringUtils.EMPTY;
+        }
+        return pdoMappingReadable;
+    }
+
+    /**
      * @return Instance of project.
      */
     @Override
@@ -616,6 +889,29 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         return 0;
     }
 
+    public byte[] getSubIndex() {
+        return idByte;
+    }
+
+    /**
+     * Get uniqueID of parameter based on iniqueIDRef of object.
+     *
+     * @param uniqueIdRef object uniqueId ref value.
+     * @return uniqueId of sub-object.
+     */
+    public String getUniqueId(Object uniqueIdRef) {
+        String uniqueId = StringUtils.EMPTY;
+        if (uniqueIdRef instanceof TParameterList.Parameter) {
+            TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIdRef;
+            uniqueId = parameter.getUniqueID();
+
+        } else if (uniqueIdRef instanceof TParameterGroup) {
+            TParameterGroup parameterGrp = (TParameterGroup) uniqueIdRef;
+            uniqueId = parameterGrp.getUniqueID();
+        }
+        return uniqueId;
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -637,11 +933,33 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     }
 
     /**
+     * Get the string value of visible attribute for parameter reference.
+     *
+     * @param visibleParameter Boolean value of visible attribute in XDC
+     * @return true or false based on XDC input.
+     */
+    public String getVisibleParameter(boolean visibleParameter) {
+        if (visibleParameter) {
+            return "true";
+        } else {
+            return "false";
+        }
+    }
+
+    /**
      * @return Xpath.
      */
     @Override
     public String getXpath() {
         return xpath;
+    }
+
+    /**
+     * @return <code>true</code> if sub-object is module, <code>false</code>
+     *         otherwise.
+     */
+    public boolean isModule() {
+        return isModule;
     }
 
     /**
