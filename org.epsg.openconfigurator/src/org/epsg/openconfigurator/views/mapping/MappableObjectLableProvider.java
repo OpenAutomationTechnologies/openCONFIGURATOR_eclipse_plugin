@@ -35,6 +35,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 
 /**
  * Label provider for PDO mappable objects.
@@ -54,9 +55,21 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 
         if (element instanceof PowerlinkObject) {
             PowerlinkObject obj = (PowerlinkObject) element;
+            if (obj.isModuleObject()) {
+                long objectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectIndex(obj.getModule());
+                return obj.getNameWithId(objectIndex);
+            }
             return obj.getNameWithId();
         } else if (element instanceof PowerlinkSubobject) {
             PowerlinkSubobject obj = (PowerlinkSubobject) element;
+            if (obj.isModule()) {
+                long objectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectIndex(obj.getModule());
+                int subObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectSubIndex(obj.getModule(), obj);
+                return obj.getNameWithId(objectIndex, subObjectIndex);
+            }
             return obj.getUniqueName();
         }
         return element.toString();

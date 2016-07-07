@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -157,10 +158,19 @@ public class Node {
      */
     private final IFile projectXml;
 
+    /**
+     * Interface list of modular controlled node.
+     */
     private List<Interface> interfaceList = new ArrayList<Interface>();
 
+    /**
+     * Interface of modular node.
+     */
     private List<HeadNodeInterface> interfaceOfNodes = new ArrayList<HeadNodeInterface>();
 
+    /**
+     * Interface of node from the XDD instance.
+     */
     private List<InterfaceList> interfaceListOfNodes = new ArrayList<InterfaceList>();
 
     /**
@@ -188,6 +198,9 @@ public class Node {
      */
     private final NodeType nodeType;
 
+    /**
+     * Configuration error value.
+     */
     private String configurationError;
 
     /**
@@ -195,10 +208,19 @@ public class Node {
      */
     private final NetworkManagement networkmanagement;
 
+    /**
+     * Instance of Module management.
+     */
     private final ModuleManagement moduleManagement;
 
+    /**
+     * Instance of DeviceModularinterface.
+     */
     private final DeviceModularInterface moduleInterface;
 
+    /**
+     * Instance of head node interface.
+     */
     private HeadNodeInterface headNodeInterface;
 
     /**
@@ -299,7 +321,7 @@ public class Node {
                 if (it != null) {
                     List<InterfaceList.Interface> intfc = new ArrayList<InterfaceList.Interface>();
                     intfc.addAll(it.getInterface());
-                    
+
                 }
             }
         }
@@ -498,14 +520,23 @@ public class Node {
         return objectText;
     }
 
+    /**
+     * @return The list of interface in the modular controlled node.
+     */
     public List<HeadNodeInterface> getHeadNodeInterface() {
         return interfaceOfNodes;
     }
 
+    /**
+     * @return Interface instance of node.
+     */
     public HeadNodeInterface getInterface() {
         return headNodeInterface;
     }
 
+    /**
+     * @return List of interface from the XDD model.
+     */
     public List<Interface> getInterfaceList() {
         if (getModuleManagement().getModularHeadInterface() != null) {
             interfaceList.addAll(getModuleManagement().getModularHeadInterface()
@@ -514,6 +545,9 @@ public class Node {
         return interfaceList;
     }
 
+    /**
+     * @return Interface list of node.
+     */
     public List<InterfaceList> getInterfaceListOfNodes() {
         return interfaceListOfNodes;
     }
@@ -539,10 +573,16 @@ public class Node {
         return null;
     }
 
+    /**
+     * @return Instance of DeviceModularInterface.
+     */
     public DeviceModularInterface getModuleInterface() {
         return moduleInterface;
     }
 
+    /**
+     * @return Instance of ModuleManagement.
+     */
     public ModuleManagement getModuleManagement() {
         return moduleManagement;
     }
@@ -647,6 +687,20 @@ public class Node {
      */
     public ObjectDictionary getObjectDictionary() {
         return objectDictionary;
+    }
+
+    /**
+     * @return XDC path of output controlled node.
+     */
+    public String getOutputPathToXdc() {
+        java.nio.file.Path nodeImportFile = new File(getAbsolutePathToXdc())
+                .toPath();
+        String pathToXdc = project.getLocation().toString();
+        String xdcPath = pathToXdc + IPath.SEPARATOR
+                + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR + IPath.SEPARATOR
+                + nodeImportFile.getFileName().toString();
+
+        return xdcPath;
     }
 
     /**
@@ -827,6 +881,9 @@ public class Node {
         return !configurationError.isEmpty();
     }
 
+    /**
+     * @return <true> if the node has interface , <false> otherwise.
+     */
     public boolean hasInterface() {
         List<HeadNodeInterface> interfaces = getHeadNodeInterface();
         if (interfaces.size() > 0) {
@@ -856,6 +913,9 @@ public class Node {
         return true;
     }
 
+    /**
+     * @return <true> if the node is modular head node, <false> otherwise.
+     */
     public boolean isModularheadNode() {
         if (getModuleManagement().getModularHeadInterface() != null) {
             return true;
@@ -1075,8 +1135,14 @@ public class Node {
             System.err.println(
                     "Enable disable not supported for nodeType" + nodeModel);
         }
+
     }
 
+    /**
+     * Sets the error flag to the node.
+     *
+     * @param errorDescription The error message corresponding to the flag.
+     */
     public void setError(String errorDescription) {
         configurationError = errorDescription;
     }
@@ -1511,6 +1577,11 @@ public class Node {
                 waitNotActive.toString());
     }
 
+    /**
+     * Updates the interace values into the java model and in the project file.
+     *
+     * @param interfaceObj Project file instrance of interface.
+     */
     public void updateInterfaceValue(
             org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface interfaceObj) {
         if (nodeModel instanceof TCN) {

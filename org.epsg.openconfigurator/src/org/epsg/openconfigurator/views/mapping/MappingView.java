@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.views.mapping;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
@@ -101,6 +102,8 @@ import org.eclipse.ui.part.ViewPart;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.AbstractPowerlinkObject;
+import org.epsg.openconfigurator.model.HeadNodeInterface;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PdoType;
@@ -552,13 +555,38 @@ public class MappingView extends ViewPart {
 
                         if (value instanceof PowerlinkSubobject) {
                             PowerlinkSubobject subObjectTobeMapped = (PowerlinkSubobject) value;
-                            Result res = OpenConfiguratorLibraryUtils
-                                    .mappSubObjectToChannel(pdoChannel,
-                                            mappingSubObject,
-                                            subObjectTobeMapped);
-                            if (!res.IsSuccessful()) {
-                                showMessage(res);
+                            if (subObjectTobeMapped.isModule()) {
+                                long moduleObjectIndex = OpenConfiguratorLibraryUtils
+                                        .getModuleObjectIndex(
+                                                subObjectTobeMapped.getModule(),
+                                                subObjectTobeMapped);
+                                int moduleSubObjectIndex = OpenConfiguratorLibraryUtils
+                                        .getModuleObjectSubIndex(
+                                                subObjectTobeMapped.getModule(),
+                                                subObjectTobeMapped);
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .mappModuleSubObjectToChannel(
+                                                pdoChannel, mappingSubObject,
+                                                subObjectTobeMapped,
+                                                moduleObjectIndex,
+                                                moduleSubObjectIndex);
+                                System.err.println(
+                                        "Mapping sub-objet of module...");
+                                if (!res.IsSuccessful()) {
+                                    showMessage(res);
+                                }
+                            } else {
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .mappSubObjectToChannel(pdoChannel,
+                                                mappingSubObject,
+                                                subObjectTobeMapped);
+                                System.err.println(
+                                        "Mapping sub-objet of node...");
+                                if (!res.IsSuccessful()) {
+                                    showMessage(res);
+                                }
                             }
+
                         } else if (value instanceof PowerlinkObject) {
                             PowerlinkObject objectTobeMapped = (PowerlinkObject) value;
                             Result res = new Result();
@@ -567,10 +595,28 @@ public class MappingView extends ViewPart {
                                         .clearSelectedmappingobject(pdoChannel,
                                                 mappingSubObject);
                             } else {
-                                res = OpenConfiguratorLibraryUtils
-                                        .mappObjectToChannel(pdoChannel,
-                                                mappingSubObject,
-                                                objectTobeMapped);
+                                if (objectTobeMapped.isModuleObject()) {
+                                    long moduleObjectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectIndex(
+                                                    objectTobeMapped
+                                                            .getModule());
+                                    res = OpenConfiguratorLibraryUtils
+                                            .mappModuleObjectToChannel(
+                                                    pdoChannel,
+                                                    mappingSubObject,
+                                                    objectTobeMapped,
+                                                    moduleObjectIndex);
+                                    System.err.println(
+                                            "Mapping objet of module...");
+                                } else {
+                                    res = OpenConfiguratorLibraryUtils
+                                            .mappObjectToChannel(pdoChannel,
+                                                    mappingSubObject,
+                                                    objectTobeMapped);
+                                    System.err.println(
+                                            "Mapping objet of node...");
+                                }
+
                             }
 
                             if (!res.IsSuccessful()) {
@@ -857,6 +903,8 @@ public class MappingView extends ViewPart {
                         PowerlinkSubobject mapParamObj = (PowerlinkSubobject) element;
 
                         String value = mapParamObj.getActualDefaultValue();
+                        System.err.println(
+                                "The mapping value of TPDO/RPDO" + value);
 
                         if (value == null) {
                             value = emptyObject.getActualValue();
@@ -873,6 +921,7 @@ public class MappingView extends ViewPart {
                         }
 
                         String objectId = value.substring(14, 18);
+                        String subObjectId = value.substring(12, 14);
                         long objectIdValue = 0;
                         try {
                             objectIdValue = Long.parseLong(objectId, 16);
@@ -888,11 +937,73 @@ public class MappingView extends ViewPart {
 
                         PowerlinkObject mappableObject = nodeObj
                                 .getObjectDictionary().getObject(objectIdValue);
+                        if (nodeObj.isModularheadNode()) {
+                            List<HeadNodeInterface> interfaceList = nodeObj
+                                    .getHeadNodeInterface();
+                            if (interfaceList != null) {
+                                for (HeadNodeInterface headNodeInterface : interfaceList) {
+                                    Collection<Module> moduleList = headNodeInterface
+                                            .getModuleCollection().values();
+                                    if (moduleList != null) {
+                                        for (Module module : moduleList) {
+                                            List<PowerlinkObject> objectList = module
+                                                    .getObjectDictionary()
+                                                    .getObjectsList();
+                                            for (PowerlinkObject object : objectList) {
+                                                short subObjectIdValue = 0;
+                                                subObjectIdValue = Short
+                                                        .parseShort(subObjectId,
+                                                                16);
+                                                for (PowerlinkSubobject subObject : object
+                                                        .getTpdoMappableObjectList()) {
+                                                    long objectIndex = OpenConfiguratorLibraryUtils
+                                                            .getModuleObjectIndex(
+                                                                    subObject
+                                                                            .getModule());
+                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                            .getModuleObjectSubIndex(
+                                                                    subObject
+                                                                            .getModule(),
+                                                                    subObject);
+                                                    if (objectIdValue == objectIndex) {
+                                                        if (subObjectIndex == subObjectIdValue) {
+                                                            return signedYesImage;
+                                                        }
+                                                    }
+                                                }
+                                                for (PowerlinkSubobject subObject : object
+                                                        .getRpdoMappableObjectList()) {
+                                                    long objectIndex = OpenConfiguratorLibraryUtils
+                                                            .getModuleObjectIndex(
+                                                                    subObject
+                                                                            .getModule());
+                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                            .getModuleObjectSubIndex(
+                                                                    subObject
+                                                                            .getModule(),
+                                                                    subObject);
+                                                    if (objectIdValue == objectIndex) {
+                                                        if (subObjectIndex == subObjectIdValue) {
+                                                            return signedYesImage;
+                                                        }
+                                                    }
+                                                }
+
+                                            }
+                                        }
+                                    } else {
+                                        System.err.println(
+                                                "No modules are available under interface.");
+                                    }
+                                }
+                            }
+                        }
+
                         if (mappableObject == null) {
+
                             return errorImage;
                         }
 
-                        String subObjectId = value.substring(12, 14);
                         short subObjectIdValue = 0;
                         try {
                             subObjectIdValue = Short.parseShort(subObjectId,
@@ -970,7 +1081,9 @@ public class MappingView extends ViewPart {
 
                     if (element instanceof PowerlinkSubobject) {
                         PowerlinkSubobject data = (PowerlinkSubobject) element;
-
+                        System.err.println(
+                                "Mappable Object Name.....@#%&%&%*^(*&))*....................."
+                                        + getMappableObjectName(data));
                         return getMappableObjectName(data);
                     }
                     break;
@@ -1343,6 +1456,95 @@ public class MappingView extends ViewPart {
                 sourcePart = part;
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
+                    setPartName(nodeObj.getNodeIDWithName());
+                    // Set null as input to the view, when the node is disabled.
+                    if (!nodeObj.isEnabled()) {
+                        setPartName("Mapping View");
+
+                        // Summary
+                        tpdoSummaryTableViewer.setInput(null);
+                        rpdoSummaryTableViewer.setInput(null);
+
+                        // TPDO page
+                        tpdoChannelComboViewer.setInput(null);
+                        tpdoTableViewer.setInput(null);
+                        sndtoNodecomboviewer.setInput(null);
+                        setPdoGuiControlsEnabled(PdoType.TPDO, false);
+                        tpdoActionsbuttonGroup.setVisible(false);
+                        tpdoEnabledMappingEntriesText.removeVerifyListener(
+                                enabledEntriesVerifyListener);
+                        tpdoEnabledMappingEntriesText
+                                .setText(StringUtils.EMPTY);
+                        tpdoEnabledMappingEntriesText.addVerifyListener(
+                                enabledEntriesVerifyListener);
+                        tpdoEnabledMappingEntriesText.setEnabled(false);
+                        tpdoChannelSize.setText(StringUtils.EMPTY);
+
+                        // RPDO page
+                        rpdoChannelComboViewer.setInput(null);
+                        rpdoTableViewer.setInput(null);
+                        receiveFromNodecomboviewer.setInput(null);
+                        setPdoGuiControlsEnabled(PdoType.RPDO, false);
+                        rpdoActionsbuttonGroup.setVisible(false);
+                        rpdoEnabledMappingEntriesText.removeVerifyListener(
+                                enabledEntriesVerifyListener);
+                        rpdoEnabledMappingEntriesText
+                                .setText(StringUtils.EMPTY);
+                        rpdoEnabledMappingEntriesText.addVerifyListener(
+                                enabledEntriesVerifyListener);
+                        rpdoEnabledMappingEntriesText.setEnabled(false);
+                        rpdoChannelSize.setText(StringUtils.EMPTY);
+                        return;
+                    }
+
+                    updateTargetNodeIdList();
+
+                    // PDO summary page
+                    tpdoSummaryTableViewer.setInput(nodeObj);
+                    rpdoSummaryTableViewer.setInput(nodeObj);
+
+                    // TPDO page
+                    List<TpdoChannel> tpdoChannels = nodeObj
+                            .getObjectDictionary().getTpdoChannelsList();
+                    tpdoChannelComboViewer.setInput(tpdoChannels);
+                    if (tpdoChannels.size() > 0) {
+                        ISelection channelSelection = new StructuredSelection(
+                                tpdoChannels.get(0));
+                        tpdoChannelComboViewer.setSelection(channelSelection,
+                                true);
+                        tpdoMappingObjClmnEditingSupport.setInput(
+                                getMappableObjectsList(nodeObj, PdoType.TPDO));
+                    } else {
+                        tpdoTableViewer.setInput(null);
+                        sndtoNodecomboviewer.setInput(null);
+                        sndtoNodecomboviewer.setSelection(null, true);
+                    }
+
+                    handlePdoTableResize(PdoType.TPDO,
+                            showAdvancedview.isChecked());
+
+                    // RPDO Page
+                    List<RpdoChannel> rpdoChannels = nodeObj
+                            .getObjectDictionary().getRpdoChannelsList();
+                    rpdoChannelComboViewer.setInput(rpdoChannels);
+                    if (rpdoChannels.size() > 0) {
+                        ISelection channelSelection = new StructuredSelection(
+                                rpdoChannels.get(0));
+                        rpdoChannelComboViewer.setSelection(channelSelection,
+                                true);
+                        rpdoMappingObjClmnEditingSupport.setInput(
+                                getMappableObjectsList(nodeObj, PdoType.RPDO));
+                    } else {
+                        rpdoTableViewer.setInput(null);
+                        receiveFromNodecomboviewer.setInput(null);
+                        receiveFromNodecomboviewer.setSelection(null, true);
+                    }
+
+                    handlePdoTableResize(PdoType.RPDO,
+                            showAdvancedview.isChecked());
+                } else if (selectedObj instanceof Module) {
+                    Module module = (Module) selectedObj;
+                    nodeObj = module.getNode();
                     setPartName(nodeObj.getNodeIDWithName());
                     // Set null as input to the view, when the node is disabled.
                     if (!nodeObj.isEnabled()) {
@@ -2552,8 +2754,77 @@ public class MappingView extends ViewPart {
 
         String subObjectId = value.substring(12, 14);
 
+        if (nodeObj.isModularheadNode()) {
+            List<HeadNodeInterface> interfaceList = nodeObj
+                    .getHeadNodeInterface();
+            if (interfaceList != null) {
+                for (HeadNodeInterface headNodeInterface : interfaceList) {
+                    Collection<Module> moduleList = headNodeInterface
+                            .getModuleCollection().values();
+                    if (moduleList != null) {
+                        for (Module module : moduleList) {
+                            List<PowerlinkObject> objectList = module
+                                    .getObjectDictionary().getObjectsList();
+                            for (PowerlinkObject object : objectList) {
+                                if (object.isTpdoMappable()
+                                        || object.isRpdoMappable()) {
+                                    long objectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectIndex(
+                                                    object.getModule());
+                                    return object.getNameWithId(objectIndex);
+                                }
+
+                                short subObjectIdValue = 0;
+                                subObjectIdValue = Short.parseShort(subObjectId,
+                                        16);
+                                for (PowerlinkSubobject subObject : object
+                                        .getTpdoMappableObjectList()) {
+                                    long objectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectIndex(
+                                                    subObject.getModule());
+                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectSubIndex(
+                                                    subObject.getModule(),
+                                                    subObject);
+                                    if (objectIdValue == objectIndex) {
+                                        if (subObjectIndex == subObjectIdValue) {
+                                            return subObject.getNameWithId(
+                                                    objectIndex,
+                                                    subObjectIndex);
+                                        }
+                                    }
+                                }
+                                for (PowerlinkSubobject subObject : object
+                                        .getRpdoMappableObjectList()) {
+                                    long objectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectIndex(
+                                                    subObject.getModule());
+                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectSubIndex(
+                                                    subObject.getModule(),
+                                                    subObject);
+                                    if (objectIdValue == objectIndex) {
+                                        if (subObjectIndex == subObjectIdValue) {
+                                            return subObject.getNameWithId(
+                                                    objectIndex,
+                                                    subObjectIndex);
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+                    } else {
+                        System.err.println(
+                                "No modules are available under interface.");
+                    }
+                }
+            }
+        }
+
         PowerlinkObject mappableObject = nodeObj.getObjectDictionary()
                 .getObject(objectIdValue);
+
         if (mappableObject != null) {
             short subObjectIdValue = 0;
             try {
@@ -2594,6 +2865,54 @@ public class MappingView extends ViewPart {
             PdoType pdoType) {
         List<AbstractPowerlinkObject> objectList = new ArrayList<AbstractPowerlinkObject>();
         objectList.add(emptyObject);
+
+        if (nodeObj.isModularheadNode()) {
+            List<HeadNodeInterface> interfaceList = nodeObj
+                    .getHeadNodeInterface();
+            if (interfaceList != null) {
+                for (HeadNodeInterface headNodeInterface : interfaceList) {
+                    Collection<Module> moduleList = headNodeInterface
+                            .getModuleCollection().values();
+                    if (moduleList != null) {
+                        for (Module module : moduleList) {
+                            if (pdoType == PdoType.TPDO) {
+                                List<PowerlinkObject> tpdoMappableObjListOfModule = module
+                                        .getObjectDictionary()
+                                        .getTpdoMappableObjectList();
+                                for (PowerlinkObject plkObj : tpdoMappableObjListOfModule) {
+                                    if (plkObj.isTpdoMappable()) {
+                                        objectList.add(plkObj);
+                                    }
+
+                                    for (PowerlinkSubobject plkSubobj : plkObj
+                                            .getTpdoMappableObjectList()) {
+                                        objectList.add(plkSubobj);
+                                    }
+                                }
+                            } else if (pdoType == PdoType.RPDO) {
+                                List<PowerlinkObject> rpdoMappableObjListOfModule = module
+                                        .getObjectDictionary()
+                                        .getRpdoMappableObjectList();
+
+                                for (PowerlinkObject plkObj : rpdoMappableObjListOfModule) {
+                                    if (plkObj.isRpdoMappable()) {
+                                        objectList.add(plkObj);
+                                    }
+
+                                    for (PowerlinkSubobject plkSubobj : plkObj
+                                            .getRpdoMappableObjectList()) {
+                                        objectList.add(plkSubobj);
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        System.err.println(
+                                "No modules are available under interface.");
+                    }
+                }
+            }
+        }
 
         if (pdoType == PdoType.TPDO) {
             List<PowerlinkObject> tpdoMappableObjList = nodeObj
