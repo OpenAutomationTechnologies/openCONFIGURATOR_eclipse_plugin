@@ -1,5 +1,37 @@
+/*******************************************************************************
+ * @file   ModulePropertySource.java
+ *
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.adapters;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -19,15 +51,37 @@ import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingHead;
 
+/**
+ * Describes the property descriptors of module.
+ *
+ * @author SreeHari
+ *
+ */
 public class ModulePropertySource extends AbstractNodePropertySource
         implements IPropertySource {
 
+    private static final String EMPTY_POSITION_ERROR_MESSAGE = "Position cannot be empty.";
+    private static final String INVALID_POSITION_ERROR_MESSAGE = "The module type does not match the interface of node ";
+    private static final String HIGHER_POSITION_ERROR_MESSAGE = "The position of module should not be greater than ";
+    private static final String INVALID_MODULE_TYPE_ERROR_MESSAGE = "The module cannot be placed in position {0} due to invalid module type.";
+    private static final String EMPTY_ADDRESS_ERROR_MESSAGE = "Address cannot be empty.";
+    private static final String AVAILABLE_MODULE_ERROR_MESSAGE = "The position {0} already exists in {1}.";
+    private static final String INVALID_ADDRESS_ERROR_MESSAGE = "Invalid Address.";
+    private static final String HIGHER_ADDRESS_ERROR_MESSAGE = "The address of module should not exceed {0}";
+    private static final String ADDRESS_EXISTS_ERROR_MESSAGE = "Module address already exists.";
+    private static final String INVALID_NAME_ERROR_MESSAGE = "Invalid module name.";
+    private static final String MODULE_EXISTS_ERROR_MESSAGE = "Module name already exists.";
+
     private Module module;
-
     private TModuleAddressingHead moduleAddressing;
-
     private InterfaceList.Interface.Module moduleObjModel;
 
+    /**
+     * Constructor to define the module properties from XDD model.
+     *
+     * @param moduleObj Instance of Module
+     * @param moduleAddressing XDD instance of TModuleAddressingHead
+     */
     public ModulePropertySource(Module moduleObj,
             TModuleAddressingHead moduleAddressing) {
         super();
@@ -53,6 +107,15 @@ public class ModulePropertySource extends AbstractNodePropertySource
 
         });
 
+        moduleAddressTextDescriptor.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleSetModuleAddress(value);
+            }
+
+        });
+
         interfaceModuleAddressingDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
         interfaceModuleAddressingDescriptor
@@ -66,6 +129,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         moduleEnabledDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        moduleAddressDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        moduleAddressTextDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
     }
 
     private void addControlledNodeModulePropertyDescriptors(
@@ -77,12 +144,13 @@ public class ModulePropertySource extends AbstractNodePropertySource
             return;
         }
         propertyList.add(moduleNameDescriptor);
-        if (isPositionEditable()) {
+        if (isPositionOrAddressEditable()) {
+            propertyList.add(moduleAddressTextDescriptor);
             propertyList.add(modulePositionTextDescriptor);
         } else {
+            propertyList.add(moduleAddressDescriptor);
             propertyList.add(modulePositionDescriptor);
         }
-        // propertyList.add(moduleAddressDescriptor);
         propertyList.add(modulePathToXDCDescriptor);
         propertyList.add(moduleEnabledDescriptor);
     }
@@ -119,8 +187,9 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         retObj = String.valueOf(moduleObjModel.getPosition());
                         break;
                     }
+                    case IAbstractNodeProperties.MODULE_ADDRESS_READONLY_OBJECT:
                     case IAbstractNodeProperties.MODULE_ADDRESS_OBJECT: {
-                        retObj = "";
+                        retObj = String.valueOf(moduleObjModel.getAddress());
                         break;
                     }
                     case IAbstractNodeProperties.MODULE_PATH_TO_XDC_OBJECT: {
@@ -152,7 +221,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     .getModuleCollection().keySet();
             if (value instanceof String) {
                 if (((String) value).isEmpty()) {
-                    return "Position cannot be empty.";
+                    return EMPTY_POSITION_ERROR_MESSAGE;
                 }
 
                 String positn = (String) value;
@@ -166,12 +235,14 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     String interfaceType = module.getInterfaceOfModule()
                             .getInterfaceType();
                     if (!(moduleType.equals(interfaceType))) {
-                        return "Only power supply module could be placed at position 1.";
+                        return INVALID_POSITION_ERROR_MESSAGE
+                                + module.getNode().getNodeId();
                     }
                 }
 
                 if ((val == 0) || (val > module.getMaxPosition())) {
-                    return "Invalid Position.";
+                    return HIGHER_POSITION_ERROR_MESSAGE
+                            + module.getMaxPosition();
                 }
 
                 if (val == module.getPosition()) {
@@ -181,7 +252,18 @@ public class ModulePropertySource extends AbstractNodePropertySource
                 for (Integer position : positionSet) {
 
                     if (position == val) {
-                        return "Position already available";
+
+                        return MessageFormat.format(
+                                AVAILABLE_MODULE_ERROR_MESSAGE, val,
+                                module.getInterfaceOfModule()
+                                        .getInterfaceUId());
+                        // if (!module.validateNewPosition(position)) {
+                        //
+                        // return "The module cannot be placed in position "
+                        // + val + " due to invalid module type.";
+                        //
+                        // }
+
                     }
 
                 }
@@ -198,6 +280,47 @@ public class ModulePropertySource extends AbstractNodePropertySource
         return null;
     }
 
+    private String handleSetModuleAddress(Object value) {
+        if (module != null) {
+            Set<Integer> addressSet = module.getInterfaceOfModule()
+                    .getAddressCollection().keySet();
+            if (value instanceof String) {
+                if (((String) value).isEmpty()) {
+                    return EMPTY_ADDRESS_ERROR_MESSAGE;
+                }
+
+                String address = (String) value;
+                int val = Integer.valueOf(address);
+
+                if (module.getInterfaceOfModule().getMaxModules() != null) {
+                    if ((val == 0) || (val > module.getInterfaceOfModule()
+                            .getMaxModules().intValue())) {
+                        return INVALID_ADDRESS_ERROR_MESSAGE;
+                    }
+                }
+
+                if ((val == 0) || (val > module.getMaxPosition())) {
+                    return MessageFormat.format(HIGHER_ADDRESS_ERROR_MESSAGE,
+                            module.getMaxAddress());
+                }
+
+                if (val == module.getAddress()) {
+                    return null;
+                }
+
+                for (Integer addressVal : addressSet) {
+
+                    if (addressVal == val) {
+                        return ADDRESS_EXISTS_ERROR_MESSAGE;
+                    }
+
+                }
+            }
+
+        }
+        return null;
+    }
+
     @Override
     protected String handleSetNodeName(Object name) {
         if (name instanceof String) {
@@ -207,7 +330,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
             }
 
             if (nodeName.charAt(0) == ' ') {
-                return "Invalid name";
+                return INVALID_NAME_ERROR_MESSAGE;
             }
 
             if (nodeName.equals(module.getModuleName())) {
@@ -225,15 +348,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
             if (moduleNameList != null) {
                 for (String modName : moduleNameList) {
                     if (name.equals(modName)) {
-                        return "Module name already available.";
+                        return MODULE_EXISTS_ERROR_MESSAGE;
                     }
                 }
             }
-            // Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-            // cnNode.getNetworkId(), cnNode.getNodeId(), nodeName);
-            // if (!res.IsSuccessful()) {
-            // return OpenConfiguratorLibraryUtils.getErrorMessage(res);
-            // }
 
         } else {
             System.err.println("handleSetNodeName: Invalid value type:" + name);
@@ -241,7 +359,29 @@ public class ModulePropertySource extends AbstractNodePropertySource
         return null;
     }
 
-    private boolean isPositionEditable() {
+    /**
+     * Verifies for the availability of position in the modules of head node.
+     *
+     * @param newPosition Position of module to be verified.
+     * @return <true> if position is available, <false> if not available.
+     */
+    public boolean isPositionAvailable(int newPosition) {
+
+        boolean positionAvailable = false;
+        Set<Integer> positionSet = module.getInterfaceOfModule()
+                .getModuleCollection().keySet();
+
+        for (Integer position : positionSet) {
+
+            if (position == newPosition) {
+                positionAvailable = true;
+            }
+
+        }
+        return positionAvailable;
+    }
+
+    private boolean isPositionOrAddressEditable() {
         boolean editable = false;
 
         if (String.valueOf(moduleAddressing).equals("MANUAL")) {
@@ -265,6 +405,12 @@ public class ModulePropertySource extends AbstractNodePropertySource
 
     }
 
+    /**
+     * Sets the XDD value into java model.
+     *
+     * @param moduleObj Instance of Module.
+     * @param moduleAddressing Instance of TModuleAdrressingHead.
+     */
     public void setModuledata(Module moduleObj,
             TModuleAddressingHead moduleAddressing) {
         Object moduleModel = moduleObj.getModuleModel();
@@ -291,7 +437,22 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.MODULE_POSITION_EDITABLE_OBJECT: {
+
+                        int newPosition = Integer.valueOf((String) value);
+                        int oldPosition = module.getPosition();
+                        // if (isPositionAvailable(newPosition)) {
+                        //
+                        // // module.moveModule(newPosition, oldPosition);
+                        // // module.setPosition((String) value);
+                        // } else {
+                        // module.setPosition((String) value);
+                        // }
                         module.setPosition((String) value);
+                        break;
+                    }
+                    case IAbstractNodeProperties.MODULE_ADDRESS_OBJECT: {
+                        module.setAddress((String) value);
+                        break;
                     }
                     default:
                         System.err.println("Invalid module object");

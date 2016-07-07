@@ -66,8 +66,14 @@ public class NodeAdapterFactory implements IAdapterFactory {
      */
     RedundantManagingNodePropertySource rmnPropertySource;
 
+    /**
+     * Property source for an Interface of Modular controlled node.
+     */
     HeadNodeInterfacePropertySource interfacePropertySource;
 
+    /**
+     * Property source for an Module.
+     */
     ModulePropertySource modulePropertySource;
 
     @Override
@@ -135,13 +141,6 @@ public class NodeAdapterFactory implements IAdapterFactory {
 
                     modulePropertySource = new ModulePropertySource(moduleObj,
                             moduleaddressing);
-                    // if (modulePropertySource == null) {
-                    // modulePropertySource = new ModulePropertySource(
-                    // moduleObj, moduleaddressing);
-                    // } else {
-                    // modulePropertySource.setModuledata(moduleObj,
-                    // moduleaddressing);
-                    // }
                     return modulePropertySource;
                 }
             } else {
