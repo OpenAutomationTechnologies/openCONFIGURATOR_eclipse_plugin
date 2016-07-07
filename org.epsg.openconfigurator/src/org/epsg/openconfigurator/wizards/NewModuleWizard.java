@@ -1,3 +1,34 @@
+/*******************************************************************************
+ * @file   NewModuleWizard.java
+ *
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.wizards;
 
 import java.io.FileNotFoundException;
@@ -14,9 +45,12 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
+import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
@@ -25,6 +59,12 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
+/**
+ * Wizard page to add new module.
+ *
+ * @author SreeHari
+ *
+ */
 public class NewModuleWizard extends Wizard {
 
     private static final String WINDOW_TITLE = "POWERLINK module wizard";
@@ -45,6 +85,13 @@ public class NewModuleWizard extends Wizard {
 
     private PowerlinkRootNode rootNode;
 
+    /**
+     * Constructor to update the wizard page.
+     *
+     * @param nodeList Instance of POWERLINK root node.
+     * @param selectedNodeObj instance of head node interface in which modules
+     *            are to be added.
+     */
     public NewModuleWizard(PowerlinkRootNode nodeList,
             HeadNodeInterface selectedNodeObj) {
         if (selectedNodeObj == null) {
@@ -143,20 +190,42 @@ public class NewModuleWizard extends Wizard {
             e1.printStackTrace();
         }
 
-        // TODO: Update the added module into library.
+        Result res = OpenConfiguratorLibraryUtils.addModule(newModule);
+        if (res.IsSuccessful()) {
+            selectedNodeObj.getModuleCollection()
+                    .put(new Integer(newModule.getPosition()), newModule);
 
-        selectedNodeObj.getModuleCollection()
-                .put(new Integer(newModule.getPosition()), newModule);
+            selectedNodeObj.getAddressCollection()
+                    .put(new Integer(newModule.getAddress()), newModule);
 
-        System.err.println("Module collection values ... "
-                + selectedNodeObj.getModuleCollection().values());
+            System.err.println("Module collection values ... "
+                    + selectedNodeObj.getModuleCollection().values());
 
-        try {
-            OpenConfiguratorProjectUtils.addModuleNode(
-                    selectedNodeObj.getNode(), selectedNodeObj, newModule);
-        } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            try {
+                OpenConfiguratorProjectUtils.addModuleNode(
+                        selectedNodeObj.getNode(), selectedNodeObj, newModule);
+            } catch (JDOMException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        } else {
+            System.err.println("ERROR occured while adding the module. "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR, res);
+
+            // Try removing the node.
+            // FIXME: do we need this?
+            res = OpenConfiguratorLibraryUtils.removeModule(newModule);
+            if (!res.IsSuccessful()) {
+                if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                    // Show or print error message.
+                    System.err
+                            .println("ERROR occured while removin the module. "
+                                    + OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res));
+                }
+            }
         }
 
         try {

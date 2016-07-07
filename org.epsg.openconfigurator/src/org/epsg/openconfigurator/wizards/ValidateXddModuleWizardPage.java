@@ -1,3 +1,34 @@
+/*******************************************************************************
+ * @file   ValidateXddModuleWizardPage.java
+ *
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.wizards;
 
 import java.io.File;
@@ -5,13 +36,16 @@ import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.text.TextViewer;
 import org.eclipse.jface.wizard.IWizardPage;
@@ -58,6 +92,12 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModula
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
 import org.xml.sax.SAXException;
 
+/**
+ * Wizard page to validate the XDD of child module.
+ *
+ * @author SreeHari
+ *
+ */
 public class ValidateXddModuleWizardPage extends WizardPage {
 
     public static final String CONTROLLED_NODE_LABEL = "Controlled Node";
@@ -71,7 +111,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
     private static final String IMPORT_CN_CONFIGURATION_FILE_DIALOG_LABEL = "Import node's XDD/XDC";
     private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
     private static final String ERROR_CHOOSE_VALID_PATH_MESSAGE = "XDD/XDC file does not exist in the path: ";
-    private static final String ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE = "Cannot import CN or modular head node XDD / XDC as module. \nPlease choose a valid modular child XDD / XDC";
+    private static final String ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE = "Cannot import CN or modular head node XDD / XDC as module. \nPlease choose a valid modular child XDD / XDC.";
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
     public static final String DIALOG_TILE = "POWERLINK module";
 
@@ -97,12 +137,24 @@ public class ValidateXddModuleWizardPage extends WizardPage {
      */
     private String customConfiguration;
 
+    /**
+     * Instance of HeadNodeInterface to which the moduleis to be connected.
+     */
     private HeadNodeInterface headNodeInetrfaceObject;
 
+    /**
+     * Instance of XDD model
+     */
     private ISO15745ProfileContainer xddModel;
 
+    /**
+     * Text instance of moduleType.
+     */
     private Text moduleTypeText;
 
+    /**
+     * Label instance of moduleType.
+     */
     private Label moduleTypeLabel;
 
     /**
@@ -155,7 +207,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         try {
             getInfoStyledText("");
             File xddFile = new File(nodeConfigurationPath.getText());
-
+            String moduleTypes = StringUtils.EMPTY;
             boolean fileExists = xddFile.exists();
             // if file exists
             if (fileExists) {
@@ -180,64 +232,72 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 }
 
                 String moduleInterfaceType = getModuleInterface().getType();
+                String moduleTypeVal = StringUtils.EMPTY;
                 List<ModuleType> moduleTypeList = getModuleTypeList()
                         .getModuleType();
                 boolean validModuleType = true;
-                for (ModuleType moduleType : moduleTypeList) {
-                    if ((moduleTypeText.getText()
-                            .equalsIgnoreCase(moduleType.getType()))
-                            || moduleTypeText.getText()
-                                    .contains(moduleInterfaceType)) {
-                        System.out.println("Valid Module type");
-                        validModuleType = true;
-                    } else {
-                        validModuleType = false;
-                    }
-                    if (headNodeInetrfaceObject.getModuleCollection()
-                            .size() != 0) {
-                        if (headNodeInetrfaceObject.isMultipleModules()) {
-                            System.out.println("Multiple Modules = "
-                                    + headNodeInetrfaceObject
-                                            .isMultipleModules());
+                if (moduleTypeList != null) {
+                    for (ModuleType moduleType : moduleTypeList) {
+                        if ((moduleTypeText.getText()
+                                .equalsIgnoreCase(moduleType.getType()))
+                                || moduleTypeText.getText()
+                                        .contains(moduleInterfaceType)) {
+                            System.out.println("Valid Module type");
+                            moduleTypeVal = moduleType.getType();
+                            validModuleType = true;
                         } else {
-                            Collection<Module> moduleCollection = headNodeInetrfaceObject
-                                    .getModuleCollection().values();
-                            for (Module mod : moduleCollection) {
-                                String moduleTypes = mod.getModuleInterface()
-                                        .getType();
-                                System.err.println(
-                                        "Module type = " + moduleTypes);
-                                if (moduleTypes.equals(moduleType.getType())) {
-                                    setErrorMessage(
-                                            "Module Type already available");
-                                    validModuleType = false;
+                            moduleTypeVal = moduleType.getType();
+                            validModuleType = false;
+                        }
+                        if (headNodeInetrfaceObject.getModuleCollection()
+                                .size() != 0) {
+                            if (headNodeInetrfaceObject.isMultipleModules()) {
+                                System.out.println("Multiple Modules = "
+                                        + headNodeInetrfaceObject
+                                                .isMultipleModules());
+
+                            } else {
+                                Collection<Module> moduleCollection = headNodeInetrfaceObject
+                                        .getModuleCollection().values();
+
+                                for (Module mod : moduleCollection) {
+                                    System.err
+                                            .println("Module Collection name..."
+                                                    + mod.getModuleName());
+                                    moduleTypes = mod.getModuleInterface()
+                                            .getType();
+                                    System.err.println(
+                                            "Module type = " + moduleTypes);
+                                    if (moduleTypes
+                                            .equals(moduleType.getType())) {
+                                        moduleTypeVal = moduleType.getType();
+                                        setErrorMessage(
+                                                "Module Type already available");
+                                        validModuleType = false;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-                if (String
-                        .valueOf(headNodeInetrfaceObject.getModuleAddressing())
-                        .equals("POSITION")) {
-                    if (!validModuleType) {
-                        getErrorStyledText(
-                                "The XDD/XDC file does not support the module type.");
-                        return false;
-                    }
-
-                    // if (String
-                    // .valueOf(headNodeInetrfaceObject.getModuleAddressing())
-                    // .equals("POSITION")) {
-                    if (moduleTypeText.getText()
-                            .equalsIgnoreCase(moduleInterfaceType)) {
-
-                    } else {
-                        getErrorStyledText(
-                                "The XDD/XDC file does not support the module type.");
-                        return false;
-                    }
+                if (!validModuleType) {
+                    getErrorStyledText(
+                            "The XDD/XDC file with type " + moduleTypeVal
+                                    + " does not support the module type "
+                                    + moduleTypeText.getText() + ".");
+                    return false;
                 }
-                // }
+
+                if (moduleTypeText.getText()
+                        .equalsIgnoreCase(moduleInterfaceType)) {
+
+                } else {
+                    getErrorStyledText(
+                            "The XDD/XDC file with type " + moduleInterfaceType
+                                    + " does not support the module type "
+                                    + moduleTypeText.getText() + ".");
+                    return false;
+                }
 
                 getInfoStyledText(VALID_FILE_MESSAGE + getModuleName() + ".");
             } else {
@@ -379,6 +439,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         return errorinfo;
     }
 
+    /**
+     * @return The instance of interface from the previous wizard page.
+     */
     public HeadNodeInterface getInterface() {
         IWizardPage previousPage = getPreviousPage();
         if (previousPage instanceof AddModuleWizardPage) {
@@ -397,6 +460,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         return mnXdcPath;
     }
 
+    /**
+     * @return Instance of TModuleInterface
+     */
     public TModuleInterface getModuleInterface() {
         if (xddModel != null) {
             List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
@@ -446,6 +512,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         return null;
     }
 
+    /**
+     * @return Instance of ModuleypeList.
+     */
     public ModuleTypeList getModuleTypeList() {
         if (getModuleInterface() != null) {
             ModuleTypeList moduletypeList = getModuleInterface()
@@ -482,6 +551,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         return null;
     }
 
+    /**
+     * @return Instance of XDD model
+     */
     public ISO15745ProfileContainer getXddModel() {
         return xddModel;
     }
@@ -513,12 +585,25 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         } else {
             Set<Integer> positionSet = headNodeInetrfaceObject
                     .getModuleCollection().keySet();
+            List<Integer> positionList = new ArrayList<Integer>();
             for (Integer position1 : positionSet) {
+                positionList.add(position1);
+            }
+
+            Collections.reverse(positionList);
+            for (Integer position2 : positionList) {
                 Module mod = headNodeInetrfaceObject.getModuleCollection()
-                        .get(position1);
+                        .get(position2);
+                String modType = getInterface().getInterfaceType();
                 System.err.println(
                         "Value Set . . " + mod.getModuleInterface().getType());
-                moduleTypeText.setText(mod.getModuleType());
+                if (mod.isEnabled()) {
+                    modType = mod.getModuleType();
+                    moduleTypeText.setText(modType);
+                    break;
+                } else {
+                    moduleTypeText.setText(modType);
+                }
 
             }
 
@@ -552,10 +637,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         return pageComplete;
     }
 
-    public void resetChildModuleWizard() {
-
-    }
-
+    /**
+     * Updates the wizard page with respect to module addressing scheme.
+     */
     public void resetWizardPage() {
         moduleTypeLabel.setVisible(false);
         moduleTypeText.setVisible(false);

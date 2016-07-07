@@ -1,3 +1,34 @@
+/*******************************************************************************
+ * @file   AddModuleWizardPage.java
+ *
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.wizards;
 
 import java.text.MessageFormat;
@@ -21,8 +52,15 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 
+/**
+ * Wizard page to add child module to the head node.
+ *
+ * @author SreeHari
+ *
+ */
 public class AddModuleWizardPage extends WizardPage {
 
+    // labels to describe the wizard page.
     private static final String DIALOG_PAGE_NAME = "AddCNModulewizardPage"; //$NON-NLS-1$
     public static final String DIALOG_TILE = "POWERLINK module";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to {0}/{1}.";
@@ -89,7 +127,7 @@ public class AddModuleWizardPage extends WizardPage {
             public void modifyText(ModifyEvent e) {
                 setErrorMessage(null);
                 setPageComplete(true);
-                if (!isNodeNameValid(moduleName.getText())) {
+                if (!isModuleNameValid(moduleName.getText())) {
                     setErrorMessage(ERROR_INVALID_MODULE_NAME);
                     setPageComplete(false);
                 }
@@ -101,14 +139,23 @@ public class AddModuleWizardPage extends WizardPage {
 
     }
 
+    /**
+     * @return Instance of HeadNodeInterface
+     */
     public HeadNodeInterface getheadNodeInterface() {
         return interfaceObj;
     }
 
+    /**
+     * @return Instance of Module object model
+     */
     public Object getModulemodel() {
         return moduleModel;
     }
 
+    /**
+     * @return Lists of available module name in the head node.
+     */
     private List<String> getModuleNamelist() {
         List<String> nameList = new ArrayList<String>();
         if (interfaceObj.getModuleCollection().size() != 0) {
@@ -149,15 +196,28 @@ public class AddModuleWizardPage extends WizardPage {
 
     }
 
+    /**
+     * @return Instance of Node
+     */
     public Node getNode() {
         return interfaceObj.getNode();
     }
 
+    /**
+     * @return NodeId in which the module is connected.
+     */
     public String getNodeId() {
         return interfaceObj.getNode().getNodeIdString();
     }
 
-    private boolean isNodeNameValid(final String moduleName) {
+    /**
+     * Verifies the module name to be added.
+     *
+     * @param moduleName The name of module to be verified.
+     * @return <code>true</code> if module is valid, <code>false</code> if not
+     *         valid.
+     */
+    private boolean isModuleNameValid(final String moduleName) {
         boolean retval = false;
 
         if (moduleName == null) {
@@ -182,7 +242,7 @@ public class AddModuleWizardPage extends WizardPage {
 
     @Override
     public boolean isPageComplete() {
-        boolean nameValid = isNodeNameValid(moduleName.getText());
+        boolean nameValid = isModuleNameValid(moduleName.getText());
         boolean valid = true;
         if (!nameValid) {
             setErrorMessage(ERROR_INVALID_MODULE_NAME);
@@ -199,7 +259,7 @@ public class AddModuleWizardPage extends WizardPage {
             }
         }
         if (!valid) {
-            setErrorMessage("Selected Name already available");
+            setErrorMessage("Module Name already exixts.");
             return false;
         }
 
@@ -212,17 +272,6 @@ public class AddModuleWizardPage extends WizardPage {
                 pageComplete = false;
             }
         }
-        // IWizardPage nextPage = getNextPage();
-        // if (nextPage instanceof ValidateXddModuleWizardPage) {
-        // ValidateXddModuleWizardPage validatePage =
-        // (ValidateXddModuleWizardPage) nextPage;
-        //
-        // if (String.valueOf(interfaceObj.getModuleAddressing())
-        // .equals("MANUAL")) {
-        // System.err.println("Manual........");
-        // validatePage.resetWizardPage();
-        // }
-        // }
 
         return pageComplete;
 

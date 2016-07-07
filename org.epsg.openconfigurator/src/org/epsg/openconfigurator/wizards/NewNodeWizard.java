@@ -90,7 +90,6 @@ public class NewNodeWizard extends Wizard {
     private Node selectedNodeObj;
     private PowerlinkRootNode nodeList;
     private TNodeCollection nodeCollectionModel;
-    private InterfaceList interfaceListModel;
 
     public NewNodeWizard(PowerlinkRootNode nodeList, Node selectedNodeObj) {
         if (selectedNodeObj == null) {
@@ -195,7 +194,6 @@ public class NewNodeWizard extends Wizard {
             InterfaceList interfaceList = new InterfaceList();
             cnModel.setPathToXDC(xdcPath.toString());
             cnModel.setInterfaceList(interfaceList);
-            System.err.println("The Interface list......... " + interfaceList);
 
         } else if (nodeObject instanceof TRMN) {
             TRMN rmnModel = (TRMN) nodeObject;
@@ -217,39 +215,87 @@ public class NewNodeWizard extends Wizard {
             e1.printStackTrace();
         }
 
-        Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
-        if (res.IsSuccessful()) {
+        if (getProfileBody(
+                xddModel) instanceof ProfileBodyDevicePowerlinkModularHead) {
+            Result res = OpenConfiguratorLibraryUtils
+                    .addModularHeadNode(newNode);
+            System.err.println("Modular CN...");
+            if (res.IsSuccessful()) {
 
-            try {
-                nodeList.addNode(nodeCollectionModel, newNode);
+                try {
+                    nodeList.addNode(nodeCollectionModel, newNode);
 
-            } catch (IOException | JDOMException e) {
-                if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
-                    validateXddPage.getErrorStyledText(e.getMessage());
-                    PluginErrorDialogUtils.showMessageWindow(
-                            MessageDialog.ERROR, e.getMessage(), "");
-                } else if ((e.getCause() != null)
-                        && (e.getCause().getMessage() != null)
-                        && !e.getCause().getMessage().isEmpty()) {
-                    validateXddPage
-                            .getErrorStyledText(e.getCause().getMessage());
-                    PluginErrorDialogUtils.showMessageWindow(
-                            MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
-                            newNode.getProject().getName());
+                } catch (IOException | JDOMException e) {
+                    if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                        validateXddPage.getErrorStyledText(e.getMessage());
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, e.getMessage(), "");
+                    } else if ((e.getCause() != null)
+                            && (e.getCause().getMessage() != null)
+                            && !e.getCause().getMessage().isEmpty()) {
+                        validateXddPage
+                                .getErrorStyledText(e.getCause().getMessage());
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                                newNode.getProject().getName());
+                    }
+                }
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        res);
+
+                // Try removing the node.
+                // FIXME: do we need this?
+                res = OpenConfiguratorLibraryUtils.removeNode(newNode);
+                if (!res.IsSuccessful()) {
+                    if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                        // Show or print error message.
+                        System.err.println(
+                                "ERROR occured while removin the node. "
+                                        + OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(res));
+                    }
                 }
             }
-        } else {
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR, res);
 
-            // Try removing the node.
-            // FIXME: do we need this?
-            res = OpenConfiguratorLibraryUtils.removeNode(newNode);
-            if (!res.IsSuccessful()) {
-                if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
-                    // Show or print error message.
-                    System.err.println("ERROR occured while removin the node. "
-                            + OpenConfiguratorLibraryUtils
-                                    .getErrorMessage(res));
+        } else {
+            System.err.println("Normal CN...");
+            Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
+            if (res.IsSuccessful()) {
+
+                try {
+                    nodeList.addNode(nodeCollectionModel, newNode);
+
+                } catch (IOException | JDOMException e) {
+                    if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                        validateXddPage.getErrorStyledText(e.getMessage());
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, e.getMessage(), "");
+                    } else if ((e.getCause() != null)
+                            && (e.getCause().getMessage() != null)
+                            && !e.getCause().getMessage().isEmpty()) {
+                        validateXddPage
+                                .getErrorStyledText(e.getCause().getMessage());
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                                newNode.getProject().getName());
+                    }
+                }
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        res);
+
+                // Try removing the node.
+                // FIXME: do we need this?
+                res = OpenConfiguratorLibraryUtils.removeNode(newNode);
+                if (!res.IsSuccessful()) {
+                    if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                        // Show or print error message.
+                        System.err.println(
+                                "ERROR occured while removin the node. "
+                                        + OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(res));
+                    }
                 }
             }
         }

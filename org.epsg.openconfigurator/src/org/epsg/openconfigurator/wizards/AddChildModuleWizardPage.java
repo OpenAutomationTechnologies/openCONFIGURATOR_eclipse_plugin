@@ -1,3 +1,34 @@
+/*******************************************************************************
+ * @file   AddChildModuleWizardPage.java
+ *
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2016, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.wizards;
 
 import java.text.MessageFormat;
@@ -31,8 +62,15 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
 
+/**
+ * Wizard page to add name of the Module
+ *
+ * @author SreeHari
+ *
+ */
 public class AddChildModuleWizardPage extends WizardPage {
 
+    // labels of wizard page.
     private static final String DIALOG_PAGE_NAME = "AddCNModulewizardPage"; //$NON-NLS-1$
     public static final String DIALOG_TILE = "POWERLINK module";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to the network.";
@@ -146,10 +184,16 @@ public class AddChildModuleWizardPage extends WizardPage {
 
     }
 
+    /**
+     * @return The address of module
+     */
     public int getAddress() {
         return Integer.valueOf(addressText.getText());
     }
 
+    /**
+     * @return The instance of TModuleInterface fron the XDD model
+     */
     public TModuleInterface getModuleInterface() {
         if (getXDDModel() != null) {
             List<ISO15745Profile> profiles = getXDDModel().getISO15745Profile();
@@ -191,6 +235,9 @@ public class AddChildModuleWizardPage extends WizardPage {
         return positionList;
     }
 
+    /**
+     * @return Instance of ModuleTypeList.
+     */
     public ModuleTypeList getModuleTypeList() {
         IWizardPage previousPage = getPreviousPage();
         if (previousPage instanceof ValidateXddModuleWizardPage) {
@@ -250,10 +297,16 @@ public class AddChildModuleWizardPage extends WizardPage {
         return IPowerlinkConstants.INVALID_NODE_ID;
     }
 
+    /**
+     * @return The position of Module
+     */
     public int getPosition() {
         return Integer.valueOf(position.getText());
     }
 
+    /**
+     * @return Instance of XDD model
+     */
     public ISO15745ProfileContainer getXDDModel() {
         IWizardPage previousPage = getPreviousPage();
         if (previousPage instanceof ValidateXddModuleWizardPage) {
@@ -281,20 +334,20 @@ public class AddChildModuleWizardPage extends WizardPage {
         int address = Integer.valueOf(addressValue);
         if (getModuleInterface().getMinAddress() != null) {
             if (address < getModuleInterface().getMinAddress().intValue()) {
-                setErrorMessage("Invalid address value");
+                setErrorMessage("Invalid address value.");
                 return retval;
             }
         }
 
         if (getModuleInterface().getMaxAddress() != null) {
             if (address > getModuleInterface().getMaxAddress().intValue()) {
-                setErrorMessage("Invalid address value");
+                setErrorMessage("Invalid address value.");
                 return retval;
             }
         }
 
         if (address > maxModules) {
-            setErrorMessage("Invalid address value");
+            setErrorMessage("Invalid address value.");
             return retval;
         }
 
@@ -323,9 +376,11 @@ public class AddChildModuleWizardPage extends WizardPage {
                         .valueOf(position.getText()) <= getModuleInterface()
                                 .getMaxPosition().intValue();
             } else {
-                isMaxPositionValid = Integer
-                        .valueOf(position.getText()) <= interfaceObj
-                                .getMaxModules().intValue();
+                if (interfaceObj.getMaxModules() != null) {
+                    isMaxPositionValid = Integer
+                            .valueOf(position.getText()) <= interfaceObj
+                                    .getMaxModules().intValue();
+                }
             }
 
             if (getModuleInterface().getMaxPosition() != null) {
@@ -586,7 +641,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         }
 
         if (!valid) {
-            setErrorMessage("Selected position already available.");
+            setErrorMessage("The Module position already exists.");
             return false;
         }
 
@@ -600,7 +655,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         }
 
         if (!validAddress) {
-            setErrorMessage("Selected address already available.");
+            setErrorMessage("The Module address already exists.");
             return false;
         } else {
             pageComplete = true;
@@ -639,7 +694,6 @@ public class AddChildModuleWizardPage extends WizardPage {
     }
 
     public boolean isPositionValid(int positionValue) {
-
         return true;
     }
 
@@ -654,8 +708,4 @@ public class AddChildModuleWizardPage extends WizardPage {
         return false;
     }
 
-    public void resetChildModulePage() {
-        // TODO:
-
-    }
 }
