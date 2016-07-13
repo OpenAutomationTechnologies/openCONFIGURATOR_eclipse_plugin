@@ -97,7 +97,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static final String GENERATOR_VENDOR = "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H."; ////$NON-NLS-1$
     public static final String GENERATOR_TOOL_NAME = "Ethernet POWERLINK openCONFIGURATOR"; ////$NON-NLS-1$
-    public static final String GENERATOR_TOOL_VERSION = "2.1.0"; ////$NON-NLS-1$
+    public static final String GENERATOR_TOOL_VERSION = "2.1.0.beta"; ////$NON-NLS-1$
     public static final String SYSTEM_USER_NAME_ID = "user.name";
     public static final String MODIFIED_ON_ATTRIBUTE = "modifiedOn";
     public static final String TOOL_VERSION_ATTRIBUTE = "toolVersion";
@@ -704,6 +704,38 @@ public final class OpenConfiguratorProjectUtils {
 
         writeToXddXmlDocument(document, xdcFile);
 
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+
+    }
+
+    /**
+     * Update the position and address of module in the project file for move
+     * up/down menu actions.
+     *
+     * @param module Instance of module to which the project file has to be
+     *            updated.
+     * @param attributeName Name of the attribute to be updated.
+     * @param attributeValue Value to be updated.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void swapModuleAttributeValue(Module module,
+            String attributeName, String attributeValue)
+                    throws IOException, JDOMException {
+        String projectXmlLocation = module.getNode().getProjectXml()
+                .getLocation().toString();
+        File xmlFile = new File(projectXmlLocation);
+
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+        System.err.println("The position value == " + attributeValue
+                + " module name.." + module.getModuleName());
+        ProjectJDomOperation.swapModuleAttributeValue(document, module,
+                attributeName, attributeValue);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+        System.err.println("Successfully updted in the project file.....");
         // Updates generator attributes in project file.
         updateGeneratorInfo(module.getNode());
 

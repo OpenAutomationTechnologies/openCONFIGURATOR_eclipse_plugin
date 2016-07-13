@@ -474,9 +474,13 @@ public class IndustrialNetworkView extends ViewPart
             }
             if (obj instanceof Module) {
                 Module module = (Module) obj;
-
-                return module.getModuleName() + " (" + module.getAddress()
-                        + ")";
+                Object moduleObjModel = module.getModuleModel();
+                if (moduleObjModel instanceof InterfaceList.Interface.Module) {
+                    InterfaceList.Interface.Module mod = (InterfaceList.Interface.Module) moduleObjModel;
+                    return mod.getName() + " (" + mod.getAddress() + ")";
+                }
+                // return moduleObjModel.getName() + " (" + module.getAddress()
+                // + ")";
             }
             return obj.toString();
         }
@@ -563,6 +567,16 @@ public class IndustrialNetworkView extends ViewPart
      * Refresh the Industrial network view action.
      */
     private Action refreshAction;
+
+    /**
+     * Action to move the module to previous position
+     */
+    private Action moveModuleUp;
+
+    /**
+     * Action to move the module to next position
+     */
+    private Action moveModuleDown;
 
     /**
      * Show PDO mapping action.
@@ -949,11 +963,16 @@ public class IndustrialNetworkView extends ViewPart
                         manager.add(showProperties);
                         manager.add(new Separator());
                         manager.add(showObjectDictionary);
-                        if (String.valueOf(moduleObj.getInterfaceOfModule()
-                                .getModuleAddressing()) == "POSITION") {
-                            manager.add(new Separator());
-
+                        manager.add(new Separator());
+                        if (moduleObj.getPreviousModulePosition(
+                                moduleObj.getPosition()) != 0) {
+                            manager.add(moveModuleUp);
                         }
+                        if (moduleObj.getNextModulePosition(
+                                moduleObj.getPosition()) != 0) {
+                            manager.add(moveModuleDown);
+                        }
+
                     }
                     manager.add(new Separator());
                     manager.add(enableDisableNode);
@@ -1003,7 +1022,7 @@ public class IndustrialNetworkView extends ViewPart
 
                 File xdcFile = new File(node.getAbsolutePathToXdc());
                 OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
-                        "Generated modular head node XDC at:"
+                        "Generated modular head node XDC at: "
                                 + node.getProject().getName() + "/output/"
                                 + xdcFile.getName(),
                         node.getProject().getName());
@@ -1444,6 +1463,59 @@ public class IndustrialNetworkView extends ViewPart
         generateNodeXDC.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.EXPORT_NODE_ICON));
 
+        moveModuleUp = new Action("Move Up") {
+
+            @Override
+            public void run() {
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        && (selection instanceof IStructuredSelection)) {
+
+                    try {
+                        moveModuleUp((IStructuredSelection) selection);
+                    } catch (JDOMException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    viewer.refresh();
+                }
+            }
+        };
+        moveModuleUp.setToolTipText("Move Up");
+        moveModuleUp.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.ARROW_UP_ICON));
+
+        moveModuleDown = new Action("Move Down") {
+
+            @Override
+            public void run() {
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        && (selection instanceof IStructuredSelection)) {
+
+                    try {
+                        moveModuleDown((IStructuredSelection) selection);
+                    } catch (JDOMException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
+                    handleRefresh();
+                    viewer.refresh();
+
+                }
+            }
+        };
+
+        moveModuleDown.setToolTipText("Move Down");
+        moveModuleDown.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.ARROW_DOWN_ICON));
+
         enableDisableNode.setToolTipText(ENABLE_DISABLE_ACTION_MESSAGE);
         enableDisableNode.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
@@ -1580,15 +1652,6 @@ public class IndustrialNetworkView extends ViewPart
                         wd.setTitle(newModuleWizard.getWindowTitle());
                         wd.open();
 
-                        // try {
-                        // selectedNode.getProject().refreshLocal(
-                        // IResource.DEPTH_INFINITE,
-                        // new NullProgressMonitor());
-                        // } catch (CoreException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-
                         handleRefresh();
                     }
                 } else {
@@ -1600,6 +1663,84 @@ public class IndustrialNetworkView extends ViewPart
         addNewModule
                 .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                         .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
+    }
+
+    private void moveModuleDown(IStructuredSelection selection)
+            throws JDOMException, IOException {
+        if (selection.isEmpty()) {
+            showMessage("No selection");
+            return;
+        }
+
+        List selectedObjectsList = selection.toList();
+
+        for (Object selectedObject : selectedObjectsList) {
+            if (selectedObject instanceof Module) {
+                Module module = (Module) selectedObject;
+
+                int oldPosition = module.getPosition();
+                int position = module.getNextModulePosition(oldPosition);
+                if (position == 0) {
+                    return;
+                }
+                if (module.validateMoveModuleDownPosition(oldPosition,
+                        position)) {
+                    if (String.valueOf(
+                            module.getInterfaceOfModule().getModuleAddressing())
+                            .equals("MANUAL")) {
+                        module.swapManualPosition(oldPosition, position);
+                    } else {
+                        module.swapPosition(oldPosition, position);
+                    }
+                } else {
+                    showErrorMessage(module.errorOfMoveModuleDownPosition(
+                            oldPosition, position));
+                }
+                System.err.println("The down position == " + position);
+
+            }
+        }
+
+    }
+
+    private void moveModuleUp(IStructuredSelection selection)
+            throws JDOMException, IOException {
+        if (selection.isEmpty()) {
+            showMessage("No selection");
+            return;
+        }
+
+        List selectedObjectsList = selection.toList();
+
+        for (Object selectedObject : selectedObjectsList) {
+            if (selectedObject instanceof Module) {
+                Module module = (Module) selectedObject;
+
+                int oldPosition = module.getPosition();
+                int position = module.getPreviousModulePosition(oldPosition);
+                if (position == 0) {
+                    return;
+                }
+                if (module.validateMoveModuleUpPosition(oldPosition,
+                        position)) {
+                    if (String.valueOf(
+                            module.getInterfaceOfModule().getModuleAddressing())
+                            .equals("MANUAL")) {
+
+                        module.swapManualPosition(oldPosition, position);
+
+                    } else {
+                        module.swapPosition(oldPosition, position);
+                    }
+                } else {
+                    showErrorMessage(module.errorOfMoveModuleUpPosition(
+                            oldPosition, position));
+                }
+                System.err.println("The down position == " + position);
+
+            }
+        }
+
     }
 
     @Override

@@ -154,6 +154,120 @@ public class Module {
     }
 
     /**
+     * Get error message on validating the module type while moving the modules.
+     *
+     * @param oldPosition The current position of the module to be moved.
+     * @param newposition The new position to be updated
+     * @return The error message of invalid module type.
+     */
+    public String errorOfMoveModuleDownPosition(int oldPosition,
+            int newposition) {
+
+        String preTypetoBeChecked = StringUtils.EMPTY;
+        String prevModuleTypetoBeChecked = StringUtils.EMPTY;
+        String nextonTypetoBeChecked = StringUtils.EMPTY;
+        String nextTypetoBeChecked = StringUtils.EMPTY;
+
+        Module currentModule = getInterfaceOfModule().getModuleCollection()
+                .get(oldPosition);
+        Module newModule = getInterfaceOfModule().getModuleCollection()
+                .get(newposition);
+
+        int prevModulePosition = currentModule
+                .getPreviousModulePosition(oldPosition);
+        int nextModulePosition = newModule.getNextModulePosition(newposition);
+
+        Module nextModule = getInterfaceOfModule().getModuleCollection()
+                .get(nextModulePosition);
+
+        Module preModule = getInterfaceOfModule().getModuleCollection()
+                .get(prevModulePosition);
+
+        if (prevModulePosition != 0) {
+            preTypetoBeChecked = preModule.getModuleInterface().getType();
+            prevModuleTypetoBeChecked = newModule.getModuleType();
+        }
+
+        if (nextModulePosition != 0) {
+            nextonTypetoBeChecked = currentModule.getModuleInterface()
+                    .getType();
+            nextTypetoBeChecked = nextModule.getModuleType();
+        }
+
+        if (!(nextonTypetoBeChecked.equalsIgnoreCase(nextTypetoBeChecked))) {
+            return "Module cannot be moved. " + currentModule.getModuleName()
+                    + " module does not match with type of module "
+                    + nextModule.getModuleName();
+        }
+
+        if (!(preTypetoBeChecked.equalsIgnoreCase(prevModuleTypetoBeChecked))) {
+            return "Module cannot be moved. " + preModule.getModuleName()
+                    + " module does not match with type of module "
+                    + newModule.getModuleName();
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * Get error message on validating the module type while moving the modules.
+     *
+     * @param oldPosition The current position of the module to be moved.
+     * @param newposition The new position to be updated
+     * @return The error message of invalid module type.
+     */
+    public String errorOfMoveModuleUpPosition(int oldPosition,
+            int newposition) {
+
+        String nextTypetoBeChecked = StringUtils.EMPTY;
+        String newModuleTypetoBeChecked = StringUtils.EMPTY;
+        String previousTypetoBeChecked = StringUtils.EMPTY;
+        String preModuleTypetoBeChecked = StringUtils.EMPTY;
+
+        Module currentModule = getInterfaceOfModule().getModuleCollection()
+                .get(oldPosition);
+        Module newModule = getInterfaceOfModule().getModuleCollection()
+                .get(newposition);
+
+        int nextModulePosition = currentModule
+                .getNextModulePosition(oldPosition);
+        int previousModulePosition = newModule
+                .getPreviousModulePosition(newposition);
+
+        Module prevModule = getInterfaceOfModule().getModuleCollection()
+                .get(previousModulePosition);
+
+        Module nextModule = getInterfaceOfModule().getModuleCollection()
+                .get(nextModulePosition);
+
+        if (nextModulePosition != 0) {
+            nextTypetoBeChecked = nextModule.getModuleInterface().getType();
+            newModuleTypetoBeChecked = newModule.getModuleType();
+        }
+
+        if (previousModulePosition != 0) {
+            previousTypetoBeChecked = currentModule.getModuleInterface()
+                    .getType();
+            preModuleTypetoBeChecked = prevModule.getModuleType();
+        }
+
+        if (!(previousTypetoBeChecked
+                .equalsIgnoreCase(preModuleTypetoBeChecked))) {
+            return "Module cannot be moved. " + currentModule.getModuleName()
+                    + " module does not match with type of module "
+                    + prevModule.getModuleName();
+        }
+
+        if (!(nextTypetoBeChecked.equalsIgnoreCase(newModuleTypetoBeChecked))) {
+            return "Module cannot be moved. " + nextModule.getModuleName()
+                    + " module does not match with type of module "
+                    + newModule.getModuleName();
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return The XDC path of module.
      */
     public String getAbsolutePathToXdc() {
@@ -360,6 +474,24 @@ public class Module {
     }
 
     /**
+     * @return Xpath of project file with respect to name of module.
+     */
+    public String getNameXpath() {
+
+        String interfaceListTagXpath = node.getXpath() + "/oc:"
+                + IControlledNodeProperties.INTERFACE_LIST_TAG;
+
+        String interfaceXpath = interfaceListTagXpath + "/oc:"
+                + IControlledNodeProperties.INTERFACE_TAG + "[@id='"
+                + getInterfaceOfModule().getInterfaceUId() + "']" + "/oc:";
+
+        interfaceXpath += IControlledNodeProperties.MODULE_TAG + "[@" + "name"
+                + "='" + getModuleName() + "']";
+
+        return interfaceXpath;
+    }
+
+    /**
      * Receives the next position of given module.
      *
      * @param position value of module position
@@ -489,6 +621,75 @@ public class Module {
     }
 
     /**
+     * Moves the module based on given position.
+     *
+     * @param newPosition position to be moved
+     * @param oldPosition current position of module.
+     */
+    public void moveModule(int newPosition, int oldPosition) {
+
+        Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
+                .keySet();
+
+        if (newPosition > oldPosition) {
+            List<Integer> positiontoBeMoved = new ArrayList<Integer>();
+            for (Integer position : positionSet) {
+                if (position >= oldPosition) {
+                    if (position <= newPosition) {
+                        positiontoBeMoved.add(position);
+                    }
+                }
+            }
+            System.err.println(
+                    "Position to be moved...for new position greater than older..."
+                            + positiontoBeMoved);
+            for (Integer positionMove : positiontoBeMoved) {
+                if (getPreviousModulePosition(positionMove) != 0) {
+                    int newPositionToBeMoved = getPreviousModulePosition(
+                            positionMove);
+                    System.err.println("The new  previous position.."
+                            + newPositionToBeMoved);
+                    try {
+                        setPosition(String.valueOf(newPositionToBeMoved));
+                    } catch (JDOMException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        } else if (newPosition < oldPosition) {
+            List<Integer> positiontoBeMoved = new ArrayList<Integer>();
+            for (Integer position : positionSet) {
+                if (position <= oldPosition) {
+                    if (position >= newPosition) {
+                        positiontoBeMoved.add(position);
+                    }
+                }
+            }
+            System.err.println(
+                    "Position to be moved..for new position less than older..."
+                            + positiontoBeMoved);
+            for (Integer positionMove : positiontoBeMoved) {
+                if (getNextModulePosition(positionMove) != 0) {
+                    int newPositionToBeMoved = getNextModulePosition(
+                            positionMove);
+                    System.err.println(
+                            "The new  next position.." + newPositionToBeMoved);
+                    try {
+                        setPosition(String.valueOf(newPositionToBeMoved));
+                    } catch (JDOMException | IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+                }
+            }
+
+        }
+
+    }
+
+    /**
      * Sets the address value to the module.
      *
      * @param value Address to be updated.
@@ -526,7 +727,7 @@ public class Module {
 
     public void setAddresss(String value) throws JDOMException, IOException {
 
-        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_ADDRESS_OBJECT, value);
         int oldAddress = getAddress();
         System.err.println("oldAddress..... .." + oldAddress);
@@ -617,6 +818,9 @@ public class Module {
             System.err.println("setName(newName); Unhandled node model type:"
                     + moduleModel);
         }
+
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_NAME_OBJECT, newName);
 
         rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
 
@@ -858,20 +1062,40 @@ public class Module {
 
     }
 
-    public void swapPosition(int oldPosition, int position)
-            throws JDOMException, IOException {
+    /**
+     * Swap the modules based on the given position for addressing scheme manual
+     *
+     * @param oldPosition Current position to be moved
+     * @param position New position to be updated
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void swapManualPosition(int oldPosition, int position)
+            throws IOException, JDOMException {
+        Result res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
+                position);
+        if (!res.IsSuccessful()) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
+        }
+
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+                String.valueOf(position));
+
+        Module newModule = getInterfaceOfModule().getModuleCollection()
+                .get(position);
+
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+                String.valueOf(oldPosition));
 
         Object moduleObjModel = getModuleModel();
         if (moduleObjModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module moduleModelObj = (InterfaceList.Interface.Module) moduleObjModel;
             moduleModelObj.setPosition(BigInteger.valueOf(position));
+            getInterfaceOfModule().getModuleCollection().put(position, this);
         }
-
-        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
-                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
-                String.valueOf(position));
-
-        setAddresss(String.valueOf(position));
 
         try {
             getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -881,24 +1105,64 @@ public class Module {
                     + e.getCause().getMessage());
         }
 
+        Object newmoduleObjModel = newModule.getModuleModel();
+        if (newmoduleObjModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module newmoduleModelObj = (InterfaceList.Interface.Module) newmoduleObjModel;
+            newmoduleModelObj.setPosition(BigInteger.valueOf(oldPosition));
+            getInterfaceOfModule().getModuleCollection().put(oldPosition,
+                    newModule);
+        }
+    }
+
+    /**
+     * Swap the modules based on the given position for addressing scheme
+     * position.
+     *
+     * @param oldPosition Current position to be moved
+     * @param position New position to be updated
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public void swapPosition(int oldPosition, int position)
+            throws JDOMException, IOException {
+
+        Result res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
+                position);
+        if (!res.IsSuccessful()) {
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(res);
+        }
+
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+                String.valueOf(position));
+        setAddresss(String.valueOf(position));
+
         Module newModule = getInterfaceOfModule().getModuleCollection()
                 .get(position);
+
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
+                String.valueOf(oldPosition));
+
+        newModule.setAddresss(String.valueOf(oldPosition));
+
+        Object moduleObjModel = getModuleModel();
+        if (moduleObjModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module moduleModelObj = (InterfaceList.Interface.Module) moduleObjModel;
+            moduleModelObj.setPosition(BigInteger.valueOf(position));
+
+            getInterfaceOfModule().getModuleCollection().put(position, this);
+        }
 
         Object newmoduleObjModel = newModule.getModuleModel();
         if (newmoduleObjModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module newmoduleModelObj = (InterfaceList.Interface.Module) newmoduleObjModel;
             newmoduleModelObj.setPosition(BigInteger.valueOf(oldPosition));
+
+            getInterfaceOfModule().getModuleCollection().put(oldPosition,
+                    newModule);
         }
-
-        OpenConfiguratorProjectUtils.updateModuleAttributeValue(newModule,
-                IAbstractNodeProperties.MODULE_POSITION_OBJECT,
-                String.valueOf(oldPosition));
-
-        setAddresss(String.valueOf(oldPosition));
-
-        // getInterfaceOfModule().getModuleCollection().put(oldPosition,
-        // newModule);
-        // getInterfaceOfModule().getModuleCollection().put(position, this);
 
         try {
             newModule.getProject().refreshLocal(IResource.DEPTH_INFINITE,
@@ -908,13 +1172,115 @@ public class Module {
                     + e.getCause().getMessage());
         }
 
-        Result res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
-                position);
-        if (!res.IsSuccessful()) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printLibraryErrorMessage(res);
+    }
+
+    /**
+     * Validate the type of module on moving the module to its next position
+     *
+     * @param oldPosition The current position to be moved
+     * @param newposition The new position of module to be updated.
+     * @return <code>true</code> if module type is valid, <code>false</code> if
+     *         invalid.
+     */
+    public boolean validateMoveModuleDownPosition(int oldPosition,
+            int newposition) {
+        boolean validModulePosition = true;
+
+        String preTypetoBeChecked = StringUtils.EMPTY;
+        String prevModuleTypetoBeChecked = StringUtils.EMPTY;
+        String nextonTypetoBeChecked = StringUtils.EMPTY;
+        String nextTypetoBeChecked = StringUtils.EMPTY;
+
+        Module currentModule = getInterfaceOfModule().getModuleCollection()
+                .get(oldPosition);
+        Module newModule = getInterfaceOfModule().getModuleCollection()
+                .get(newposition);
+
+        int prevModulePosition = currentModule
+                .getPreviousModulePosition(oldPosition);
+        int nextModulePosition = newModule.getNextModulePosition(newposition);
+
+        Module nextModule = getInterfaceOfModule().getModuleCollection()
+                .get(nextModulePosition);
+
+        Module preModule = getInterfaceOfModule().getModuleCollection()
+                .get(prevModulePosition);
+
+        if (prevModulePosition != 0) {
+            preTypetoBeChecked = preModule.getModuleInterface().getType();
+            prevModuleTypetoBeChecked = newModule.getModuleType();
         }
 
+        if (nextModulePosition != 0) {
+            nextonTypetoBeChecked = currentModule.getModuleInterface()
+                    .getType();
+            nextTypetoBeChecked = nextModule.getModuleType();
+        }
+
+        if (nextonTypetoBeChecked.equalsIgnoreCase(nextTypetoBeChecked)
+                && preTypetoBeChecked
+                        .equalsIgnoreCase(prevModuleTypetoBeChecked)) {
+            validModulePosition = true;
+        } else {
+            validModulePosition = false;
+        }
+        System.err.println("Valid Module position.. " + validModulePosition);
+        return validModulePosition;
+    }
+
+    /**
+     * Validate the type of module on moving the module to its previous position
+     *
+     * @param oldPosition The current position to be moved
+     * @param newposition The new position of module to be updated.
+     * @return <code>true</code> if module type is valid, <code>false</code> if
+     *         invalid.
+     */
+    public boolean validateMoveModuleUpPosition(int oldPosition,
+            int newposition) {
+        boolean validModulePosition = true;
+
+        String nextTypetoBeChecked = StringUtils.EMPTY;
+        String newModuleTypetoBeChecked = StringUtils.EMPTY;
+        String previousTypetoBeChecked = StringUtils.EMPTY;
+        String preModuleTypetoBeChecked = StringUtils.EMPTY;
+
+        Module currentModule = getInterfaceOfModule().getModuleCollection()
+                .get(oldPosition);
+        Module newModule = getInterfaceOfModule().getModuleCollection()
+                .get(newposition);
+
+        int nextModulePosition = currentModule
+                .getNextModulePosition(oldPosition);
+        int previousModulePosition = newModule
+                .getPreviousModulePosition(newposition);
+
+        Module prevModule = getInterfaceOfModule().getModuleCollection()
+                .get(previousModulePosition);
+
+        Module nextModule = getInterfaceOfModule().getModuleCollection()
+                .get(nextModulePosition);
+
+        if (nextModulePosition != 0) {
+            nextTypetoBeChecked = nextModule.getModuleInterface().getType();
+            newModuleTypetoBeChecked = newModule.getModuleType();
+        }
+
+        if (previousModulePosition != 0) {
+            previousTypetoBeChecked = currentModule.getModuleInterface()
+                    .getType();
+            preModuleTypetoBeChecked = prevModule.getModuleType();
+        }
+
+        if (previousTypetoBeChecked.equalsIgnoreCase(preModuleTypetoBeChecked)
+                && nextTypetoBeChecked
+                        .equalsIgnoreCase(newModuleTypetoBeChecked)) {
+            validModulePosition = true;
+        } else {
+            validModulePosition = false;
+        }
+        System.err.println("Valid Module position.. " + validModulePosition);
+        return validModulePosition;
     }
 
     /**

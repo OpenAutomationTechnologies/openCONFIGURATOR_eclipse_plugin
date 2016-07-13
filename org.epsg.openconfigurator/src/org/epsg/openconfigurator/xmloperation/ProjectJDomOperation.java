@@ -496,6 +496,21 @@ public class ProjectJDomOperation {
     }
 
     /**
+     * Update modified values of module in project file.
+     *
+     * @param document Project file instance
+     * @param module Instance of module.
+     * @param attributeName Position/Address attribute name
+     * @param attributeValue value to be set.
+     */
+    public static void swapModuleAttributeValue(Document document,
+            Module module, String attributeName, String attributeValue) {
+        JDomUtil.updateAttribute(document, module.getNameXpath(),
+                OPENCONFIGURATOR_NAMESPACE,
+                new Attribute(attributeName, attributeValue));
+    }
+
+    /**
      * Update modified time values in project file.
      *
      * @param document Project file instance.
