@@ -239,6 +239,18 @@ public class ValidateXddWizardPage extends WizardPage {
 
                 xddModel = XddMarshaller.unmarshallXDDFile(xddFile);
 
+                for (ISO15745Profile profile : xddModel.getISO15745Profile()) {
+                    ProfileBodyDataType profileBodyDatatype = profile
+                            .getProfileBody();
+                    if ((profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularChild)
+                            || (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularChild)) {
+
+                        getErrorStyledText(
+                                ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE);
+                        return false;
+                    }
+                }
+
                 // Checks for the valid XDD/XDC file of respective node.
                 Object node = getNodeModel();
                 Node newNode = new Node(getNodeList(), null, node, xddModel);
