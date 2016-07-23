@@ -32,6 +32,7 @@
 package org.epsg.openconfigurator.xmloperation;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -49,12 +50,14 @@ import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TAllowedValues;
+import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup.ParameterRef;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterTemplate;
 import org.epsg.openconfigurator.xmlbinding.xdd.TRange;
 import org.epsg.openconfigurator.xmlbinding.xdd.TValue;
+import org.epsg.openconfigurator.xmlbinding.xdd.TVarDeclaration;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -82,6 +85,7 @@ public class XddJdomOperation {
     public static final String APPLICATION_PROCESS = "ApplicationProcess";
     public static final String TEMPLATE_LIST = "templateList";
     public static final String PARAMETER_LIST = "parameterList";
+    public static final String DATATYPE_LIST = "dataTypeList";
     public static final String PARAMETER_GROUP_LIST = "parameterGroupList";
     public static final String PARAMETER_GROUP = "parameterGroup";
     public static final String PARAMETER_REFERENCE = "parameterRef";
@@ -405,6 +409,60 @@ public class XddJdomOperation {
         return "UNDEFINED";
     }
 
+    private static String getIEC_DataType(TVarDeclaration parameter) {
+        // TODO: Provide support for datatypeID ref also.
+
+        // parameter.getDataTypeIDRef()
+        if (parameter.getBITSTRING() != null) {
+            return "BITSTRING";
+        } else if (parameter.getBOOL() != null) {
+            return "BOOL";
+        } else if (parameter.getBYTE() != null) {
+            return "BYTE";
+        } else if (parameter.getCHAR() != null) {
+            return "CHAR";
+        } else if (parameter.getDINT() != null) {
+            return "DINT";
+        } else if (parameter.getDWORD() != null) {
+            return "DWORD";
+        } else if (parameter.getINT() != null) {
+            return "INT";
+        } else if (parameter.getLINT() != null) {
+            return "LINT";
+        } else if (parameter.getLREAL() != null) {
+            return "LREAL";
+        } else if (parameter.getLWORD() != null) {
+            return "LWORD";
+        } else if (parameter.getREAL() != null) {
+            return "REAL";
+        } else if (parameter.getSINT() != null) {
+            return "SINT";
+        } else if (parameter.getSTRING() != null) {
+            return "STRING";
+        } else if (parameter.getUDINT() != null) {
+            return "UDINT";
+        } else if (parameter.getUINT() != null) {
+            return "UINT";
+        } else if (parameter.getULINT() != null) {
+            return "ULINT";
+        } else if (parameter.getUSINT() != null) {
+            return "USINT";
+        } else if (parameter.getWORD() != null) {
+            return "WORD";
+        } else if (parameter.getWSTRING() != null) {
+            return "WSTRING";
+        } else {
+            System.err.println("Parameter Un handled IEC_Datatype value");
+            if (parameter.getDataTypeIDRef() != null) {
+                System.err.println(parameter.getDataTypeIDRef());
+            } else {
+                System.err.println("No uniqueIDRef");
+            }
+        }
+
+        return "UNDEFINED";
+    }
+
     private static String getLabel(List<Object> labelOrDescriptionOrLabelRef) {
         for (Object label : labelOrDescriptionOrLabelRef) {
             if (label instanceof String) {
@@ -414,6 +472,41 @@ public class XddJdomOperation {
             }
         }
         return StringUtils.EMPTY;
+    }
+
+    private static void removeNodeApplicationProcess(Document document,
+            Module module) {
+        String paramDataTypeXpath = APPLICATION_PROCESS_XPATH + "/plk:"
+                + DATATYPE_LIST + "/plk:struct";
+        String paramGrpXpath = PARAMETER_GROUP_LIST_XPATH
+                + "/plk:parameterGroup";
+        String paramtempXpath = TEMPLATE_LIST_XPATH + "/plk:parameterTemplate";
+        String paramXpath = PARAMETER_LIST_XPATH + "/plk:parameter";
+
+        if (!JDomUtil.isXpathPresent(document, paramDataTypeXpath,
+                POWERLINK_XDD_NAMESPACE)) {
+            JDomUtil.removeElement(document,
+                    APPLICATION_PROCESS_XPATH + "/plk:" + DATATYPE_LIST,
+                    POWERLINK_XDD_NAMESPACE);
+        }
+
+        if (!JDomUtil.isXpathPresent(document, paramGrpXpath,
+                POWERLINK_XDD_NAMESPACE)) {
+            JDomUtil.removeElement(document, PARAMETER_GROUP_LIST_XPATH,
+                    POWERLINK_XDD_NAMESPACE);
+        }
+
+        if (!JDomUtil.isXpathPresent(document, paramtempXpath,
+                POWERLINK_XDD_NAMESPACE)) {
+            JDomUtil.removeElement(document, TEMPLATE_LIST_XPATH,
+                    POWERLINK_XDD_NAMESPACE);
+        }
+
+        if (!JDomUtil.isXpathPresent(document, paramXpath,
+                POWERLINK_XDD_NAMESPACE)) {
+            JDomUtil.removeElement(document, PARAMETER_LIST_XPATH,
+                    POWERLINK_XDD_NAMESPACE);
+        }
     }
 
     /**
@@ -458,6 +551,10 @@ public class XddJdomOperation {
         if (JDomUtil.isXpathPresent(document, applicationProcessXpath,
                 POWERLINK_XDD_NAMESPACE)) {
             System.err.println("prfileBody Xpath present....");
+            Element newdataTypeElement = new Element(DATATYPE_LIST);
+            JDomUtil.addNewElement(document, APPLICATION_PROCESS_XPATH,
+                    POWERLINK_XDD_NAMESPACE, newdataTypeElement);
+
             Element newTempElement = new Element(TEMPLATE_LIST);
             JDomUtil.addNewElement(document, APPLICATION_PROCESS_XPATH,
                     POWERLINK_XDD_NAMESPACE, newTempElement);
@@ -474,6 +571,10 @@ public class XddJdomOperation {
             Element newObjElement = new Element(APPLICATION_PROCESS);
             JDomUtil.addNewElement(document, xpath, POWERLINK_XDD_NAMESPACE,
                     newObjElement);
+            Element newdataTypeElement = new Element(DATATYPE_LIST);
+            JDomUtil.addNewElement(document, APPLICATION_PROCESS_XPATH,
+                    POWERLINK_XDD_NAMESPACE, newdataTypeElement);
+
             Element newTempElement = new Element(TEMPLATE_LIST);
             JDomUtil.addNewElement(document, APPLICATION_PROCESS_XPATH,
                     POWERLINK_XDD_NAMESPACE, newTempElement);
@@ -602,10 +703,13 @@ public class XddJdomOperation {
 
                     List<PowerlinkObject> plkObjList = module
                             .getObjectDictionary().getObjectsList();
+
                     for (PowerlinkObject plkObj : plkObjList) {
 
                         long moduleObjectIndex = OpenConfiguratorLibraryUtils
-                                .getModuleObjectIndex(plkObj.getModule());
+                                .getModuleObjectsIndex(plkObj.getModule(),
+                                        plkObj.getId());
+
                         String Xpath = "//plk:ObjectList";
                         String objectXpath = "//plk:Object[@index='"
                                 + Long.toHexString(moduleObjectIndex) + "']";
@@ -751,18 +855,87 @@ public class XddJdomOperation {
                         List<PowerlinkSubobject> plkSubObjList = plkObj
                                 .getSubObjects();
                         for (PowerlinkSubobject plkSubObj : plkSubObjList) {
+                            HashMap<Long, Integer> subObjectEntries = new HashMap<Long, Integer>();
                             int moduleSubObjectIndex = OpenConfiguratorLibraryUtils
-                                    .getModuleObjectSubIndex(plkObj.getModule(),
-                                            plkSubObj);
+                                    .getModuleObjectsSubIndex(
+                                            plkObj.getModule(), plkSubObj,
+                                            plkSubObj.getObject().getId());
+
                             String xpath = "//plk:Object[@index='"
                                     + Long.toHexString(moduleObjectIndex)
                                     + "']";
                             String subobjectXpath = xpath
                                     + "/plk:SubObject[@subIndex='"
                                     + Long.toHexString(moduleSubObjectIndex)
+                                            .toUpperCase()
                                     + "']";
+
+                            String numberOfEntriesXpath = xpath
+                                    + "/plk:SubObject[@subIndex='" + "00"
+                                    + "']";
+
                             if (JDomUtil.isXpathPresent(document,
-                                    subobjectXpath, POWERLINK_XDD_NAMESPACE)) {
+                                    numberOfEntriesXpath,
+                                    POWERLINK_XDD_NAMESPACE)) {
+                                System.out
+                                        .println("Number of entries available");
+                            } else {
+                                Element newSubObjElement = new Element(
+                                        "SubObject");
+                                List<Attribute> attribList = newSubObjElement
+                                        .getAttributes();
+
+                                attribList.add(new Attribute("subIndex", "00"));
+
+                                attribList.add(new Attribute("name",
+                                        "NumberOfEntries"));
+
+                                attribList
+                                        .add(new Attribute("objectType", "7"));
+
+                                attribList
+                                        .add(new Attribute("dataType", "0005"));
+
+                                attribList.add(
+                                        new Attribute("accessType", "const"));
+
+                                attribList.add(new Attribute("defaultValue",
+                                        String.valueOf(plkSubObjList.size())));
+
+                                attribList
+                                        .add(new Attribute("PDOmapping", "no"));
+
+                                JDomUtil.addNewElement(document, xpath,
+                                        POWERLINK_XDD_NAMESPACE,
+                                        newSubObjElement);
+                            }
+                            int subIndex = moduleSubObjectIndex;
+                            String subobjectXpathCheck = StringUtils.EMPTY;
+
+                            if (subIndex <= 15) {
+                                subobjectXpathCheck = xpath
+                                        + "/plk:SubObject[@subIndex='0"
+                                        + subIndex + "']";
+                                if (subObjectEntries
+                                        .containsValue(moduleObjectIndex)) {
+                                    subObjectEntries.put(moduleObjectIndex,
+                                            subIndex);
+                                }
+
+                            } else {
+                                subobjectXpathCheck = xpath
+                                        + "/plk:SubObject[@subIndex='"
+                                        + subIndex + "']";
+                                if (subObjectEntries
+                                        .containsValue(moduleObjectIndex)) {
+                                    subObjectEntries.put(moduleObjectIndex,
+                                            subIndex);
+                                }
+                            }
+
+                            if (JDomUtil.isXpathPresent(document,
+                                    subobjectXpathCheck,
+                                    POWERLINK_XDD_NAMESPACE)) {
                                 System.out.println(
                                         "Sub-object index already available.");
                             } else if (JDomUtil.isXpathPresent(document, xpath,
@@ -771,7 +944,7 @@ public class XddJdomOperation {
                                         "SubObject");
                                 List<Attribute> attribList = newSubObjElement
                                         .getAttributes();
-                                int subIndex = moduleSubObjectIndex;
+
                                 if (subIndex <= 15) {
                                     attribList.add(new Attribute("subIndex",
                                             "0" + Integer
@@ -849,7 +1022,6 @@ public class XddJdomOperation {
                                 System.err.println(
                                         "Sub-ObjectList Xpath not found in head node XDC file.");
                             }
-
                             if (plkSubObj.getUniqueIDRef() != null) {
 
                                 String uniqueIdRefXPath = xpath
@@ -889,7 +1061,6 @@ public class XddJdomOperation {
                                                 plkSubObj.getUniqueIDRef());
                                     } else {
 
-                                        int subIndex = moduleSubObjectIndex;
                                         String subIndexVal = Long
                                                 .toHexString(
                                                         moduleSubObjectIndex)
@@ -914,11 +1085,22 @@ public class XddJdomOperation {
                                         String actualValue = plkSubObj
                                                 .getActualValue(plkSubObj
                                                         .getUniqueIDRef());
+
                                         if ((actualValue == null)
                                                 || (actualValue == StringUtils.EMPTY)) {
-                                            System.err.println(
-                                                    "Actual Value Empty...");
-                                        } else {
+                                            actualValue = plkSubObj
+                                                    .getActualValueFromLibrary(
+                                                            subIndex,
+                                                            moduleObjectIndex);
+                                        }
+                                        System.err.println("Actual value....."
+                                                + actualValue + " Object .."
+                                                + Long.toHexString(
+                                                        moduleObjectIndex)
+                                                + " subObject.." + Integer
+                                                        .toHexString(subIndex));
+                                        if ((actualValue != null)
+                                                || (actualValue != StringUtils.EMPTY)) {
                                             Attribute newAttribute = new Attribute(
                                                     OBJECT_ACTUAL_VALUE,
                                                     actualValue);
@@ -927,14 +1109,31 @@ public class XddJdomOperation {
                                                     POWERLINK_XDD_NAMESPACE,
                                                     newAttribute);
                                         }
+                                        String removeactualValueXpath = "//plk:ObjectList"
+                                                + "/plk:Object[@index='"
+                                                + Long.toHexString(
+                                                        moduleObjectIndex)
+                                                + "']"
+                                                + "/plk:SubObject[@actualValue='']";
+                                        if (JDomUtil.isXpathPresent(document,
+                                                removeactualValueXpath,
+                                                POWERLINK_XDD_NAMESPACE)) {
+                                            JDomUtil.removeAttributes(document,
+                                                    removeactualValueXpath,
+                                                    POWERLINK_XDD_NAMESPACE,
+                                                    "actualValue");
+                                        }
                                     }
                                 }
 
                             }
 
                         }
+
                     }
+
                 }
+
             }
         }
 
@@ -1056,7 +1255,7 @@ public class XddJdomOperation {
             }
 
         }
-
+        removeNodeApplicationProcess(document, module);
     }
 
     /**
@@ -1100,6 +1299,7 @@ public class XddJdomOperation {
                         updateParameterGroupsInXDC(document, module, plkObj,
                                 paramGrp, childPrmXpath, PARAMETER_GROUP,
                                 newUniqueId);
+
                     } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
                         TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                         updateParameterReferenceInXDC(document, module, plkObj,
@@ -1113,6 +1313,67 @@ public class XddJdomOperation {
 
         }
 
+    }
+
+    public static void updateNumberOfEntries(Document document, Node node) {
+        if (node.isModularheadNode()) {
+            List<HeadNodeInterface> interfaceList = node.getHeadNodeInterface();
+            for (HeadNodeInterface interfaces : interfaceList) {
+                Collection<Module> moduleList = interfaces.getModuleCollection()
+                        .values();
+                for (Module module : moduleList) {
+                    List<PowerlinkObject> plkObjList = module
+                            .getObjectDictionary().getObjectsList();
+
+                    for (PowerlinkObject plkObj : plkObjList) {
+
+                        long moduleObjectIndex = OpenConfiguratorLibraryUtils
+                                .getModuleObjectsIndex(plkObj.getModule(),
+                                        plkObj.getId());
+
+                        String Xpath = "//plk:ObjectList";
+                        String objectXpath = "//plk:Object[@index='"
+                                + Long.toHexString(moduleObjectIndex) + "']";
+
+                        if (JDomUtil.isXpathPresent(document, objectXpath,
+                                POWERLINK_XDD_NAMESPACE)) {
+
+                            for (int count = 0; count < 255; count++) {
+
+                                String defaultValue = Long.toHexString(count)
+                                        .toUpperCase();
+                                if (count <= 15) {
+                                    defaultValue = "0" + Long.toHexString(count)
+                                            .toUpperCase();
+                                }
+
+                                String xpath = "//plk:Object[@index='"
+                                        + Long.toHexString(moduleObjectIndex)
+                                        + "']";
+                                String subobjectXpath = xpath
+                                        + "/plk:SubObject[@subIndex='"
+                                        + defaultValue + "']";
+                                String numberOfEntriesXpath = xpath
+                                        + "/plk:SubObject[@subIndex='" + "00"
+                                        + "']";
+                                Attribute newAttribute = new Attribute(
+                                        "defaultValue", String.valueOf(count));
+                                if (JDomUtil.isXpathPresent(document,
+                                        subobjectXpath,
+                                        POWERLINK_XDD_NAMESPACE)) {
+                                    JDomUtil.updateAttribute(document,
+                                            numberOfEntriesXpath,
+                                            POWERLINK_XDD_NAMESPACE,
+                                            newAttribute);
+                                }
+                            }
+
+                        }
+                    }
+
+                }
+            }
+        }
     }
 
     private static void updateObjectUniqueIdRef(Document document,
@@ -1299,9 +1560,8 @@ public class XddJdomOperation {
     }
 
     private static void updateParameterGroupsInXDC(Document document,
-            Module module, PowerlinkObject plkSubObj,
-            TParameterGroup parameterGrp, String xpath, String parentChild,
-            String newUniqueID) {
+            Module module, PowerlinkObject plkObj, TParameterGroup parameterGrp,
+            String xpath, String parentChild, String newUniqueID) {
         String olduniqueId = parameterGrp.getUniqueID();
         String uniqueId = OpenConfiguratorLibraryUtils
                 .getModuleParameterUniqueID(module, olduniqueId);
@@ -1314,7 +1574,7 @@ public class XddJdomOperation {
                     parameterGrp.getKindOfAccess()));
         }
         if (parameterGrp.getConditionalUniqueIDRef() != null) {
-            String oldparamUniqueId = plkSubObj.getConditionalUniqueId(
+            String oldparamUniqueId = plkObj.getConditionalUniqueId(
                     parameterGrp.getConditionalUniqueIDRef());
             String paramUniqueId = OpenConfiguratorLibraryUtils
                     .getModuleParameterUniqueID(module, oldparamUniqueId);
@@ -1331,9 +1591,9 @@ public class XddJdomOperation {
                     String.valueOf(parameterGrp.getBitOffset())));
         }
 
-        attribList.add(new Attribute("configParameter", plkSubObj
-                .getConfigParameter(parameterGrp.isConfigParameter())));
-        attribList.add(new Attribute("groupLevelVisible", plkSubObj
+        attribList.add(new Attribute("configParameter",
+                plkObj.getConfigParameter(parameterGrp.isConfigParameter())));
+        attribList.add(new Attribute("groupLevelVisible", plkObj
                 .getGroupLevelVisible(parameterGrp.isGroupLevelVisible())));
         JDomUtil.addNewElement(document, xpath, POWERLINK_XDD_NAMESPACE,
                 newParamGroup);
@@ -1363,6 +1623,30 @@ public class XddJdomOperation {
                     module.getNode().getNetworkId(),
                     module.getNode().getNodeId(), param, module);
         }
+
+        List<Object> parameterGroupReferenceList = parameterGrp
+                .getParameterGroupOrParameterRef();
+        String paramGrpXpath = xpath + "/plk:parameterGroup[@uniqueID='"
+                + uniqueId + "']";
+        if (parameterGroupReferenceList != null) {
+            System.err.println("Parameter child group......." + paramGrpXpath);
+            for (Object parameterGroupReference : parameterGroupReferenceList) {
+                if (parameterGroupReference instanceof TParameterGroup) {
+                    TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
+                    updateParameterGroupsInXDC(document, module, plkObj,
+                            paramGrp, paramGrpXpath, PARAMETER_GROUP, uniqueId);
+
+                } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
+                    TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
+                    updateParameterReferenceInXDC(document, module, plkObj,
+                            parameterReferenceModel, paramGrpXpath);
+                    String oldParamRefUniqueId = plkObj.getUniqueId(
+                            parameterReferenceModel.getUniqueIDRef());
+
+                }
+            }
+        }
+
     }
 
     private static void updateParameterGroupsInXDC(Document document,
@@ -1405,9 +1689,9 @@ public class XddJdomOperation {
         JDomUtil.addNewElement(document, xpath, POWERLINK_XDD_NAMESPACE,
                 newParamGroup);
 
-        String parameterTemplateXpath = PARAMETER_GROUP_LIST_XPATH
-                + "/plk:parameterGroup[@uniqueID='" + newUniqueID + "']"
+        String parameterTemplateXpath = xpath
                 + "/plk:parameterGroup[@uniqueID='" + uniqueId + "']";
+
         System.err.println(
                 "Xpath of parameter child group..." + parameterTemplateXpath);
 
@@ -1419,7 +1703,7 @@ public class XddJdomOperation {
 
         System.err.println("The child param label...." + new LabelDescription(
                 parameterGrp.getLabelOrDescriptionOrLabelRef()).getText());
-        JDomUtil.addNewElement(document, parameterTemplateXpath,
+        JDomUtil.addNewElements(document, parameterTemplateXpath,
                 POWERLINK_XDD_NAMESPACE, newLabelelement);
 
         if (parameterGrp
@@ -1430,6 +1714,30 @@ public class XddJdomOperation {
                     module.getNode().getNetworkId(),
                     module.getNode().getNodeId(), param, module);
         }
+
+        List<Object> parameterGroupReferenceList = parameterGrp
+                .getParameterGroupOrParameterRef();
+        String paramGrpXpath = xpath + "/plk:parameterGroup[@uniqueID='"
+                + uniqueId + "']";
+        if (parameterGroupReferenceList != null) {
+            System.err.println("Parameter child group......." + paramGrpXpath);
+            for (Object parameterGroupReference : parameterGroupReferenceList) {
+                if (parameterGroupReference instanceof TParameterGroup) {
+                    TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
+                    updateParameterGroupsInXDC(document, module, plkSubObj,
+                            paramGrp, paramGrpXpath, PARAMETER_GROUP, uniqueId);
+
+                } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
+                    TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
+                    updateParameterReferenceInXDC(document, module, plkSubObj,
+                            parameterReferenceModel, paramGrpXpath);
+                    String oldParamRefUniqueId = plkSubObj.getUniqueId(
+                            parameterReferenceModel.getUniqueIDRef());
+
+                }
+            }
+        }
+
     }
 
     private static void updateParameterListsToHeadXDC(Document document,
@@ -1750,10 +2058,26 @@ public class XddJdomOperation {
                 JDomUtil.addNewElement(document, parameterTemplateXpath,
                         POWERLINK_XDD_NAMESPACE, newParamTempLabelElement);
 
-                Element dataTypeElement = new Element(
-                        getIEC_DataType(parameterModel));
-                JDomUtil.addNewElement(document, parameterTemplateXpath,
-                        POWERLINK_XDD_NAMESPACE, dataTypeElement);
+                if (parameterModel.getDataTypeIDRef() != null) {
+                    Element dataTypeIdRefElement = new Element("dataTypeIDRef");
+                    List<Attribute> attribListdataType = dataTypeIdRefElement
+                            .getAttributes();
+
+                    attribListdataType.add(new Attribute("uniqueIDRef",
+                            module.getParamUniqueID(parameterModel
+                                    .getDataTypeIDRef().getUniqueIDRef())));
+                    JDomUtil.addNewElement(document, parameterTemplateXpath,
+                            POWERLINK_XDD_NAMESPACE, dataTypeIdRefElement);
+                    updateStructDataType(document, networkId, nodeId, parameter,
+                            module,
+                            parameterModel.getDataTypeIDRef().getUniqueIDRef());
+                } else {
+
+                    Element dataTypeElement = new Element(
+                            getIEC_DataType(parameterModel));
+                    JDomUtil.addNewElement(document, parameterTemplateXpath,
+                            POWERLINK_XDD_NAMESPACE, dataTypeElement);
+                }
 
                 Element defaultValueElement = new Element("defaultValue");
                 List<Attribute> attribListdefault = defaultValueElement
@@ -2083,7 +2407,7 @@ public class XddJdomOperation {
                 .getUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterReferenceModel
                     .getUniqueIDRef();
-            updateParameterListToHeadXDC(document,
+            updateParameterListsToHeadXDC(document,
                     module.getNode().getNetworkId(),
                     module.getNode().getNodeId(), param, module);
 
@@ -2224,4 +2548,115 @@ public class XddJdomOperation {
 
     }
 
+    private static void updateStructDataType(Document document,
+            String networkId, short nodeId,
+            org.epsg.openconfigurator.xmlbinding.xdd.TParameterList.Parameter parameter,
+            Module module, Object object) {
+        String dataTypeListXpath = APPLICATION_PROCESS_XPATH + "/plk:"
+                + DATATYPE_LIST;
+
+        if (JDomUtil.isXpathPresent(document, dataTypeListXpath,
+                POWERLINK_XDD_NAMESPACE)) {
+
+            if (object instanceof TDataTypeList.Struct) {
+                TDataTypeList.Struct structDt = (TDataTypeList.Struct) object;
+                Element newStructElement = new Element("struct");
+                List<Attribute> attribList = newStructElement.getAttributes();
+                attribList.add(new Attribute("name", structDt.getName()));
+                attribList
+                        .add(new Attribute("uniqueID", structDt.getUniqueID()));
+                JDomUtil.addNewElements(document, dataTypeListXpath,
+                        POWERLINK_XDD_NAMESPACE, newStructElement);
+
+                String parameterStructXpath = dataTypeListXpath
+                        + "/plk:struct[@uniqueID='" + structDt.getUniqueID()
+                        + "']";
+                Element newStructTempLabelElement = new Element("label");
+                List<Attribute> attribListlbl = newStructTempLabelElement
+                        .getAttributes();
+                attribListlbl.add(new Attribute("lang", "en-us"));
+                newStructTempLabelElement.setText(new LabelDescription(
+                        structDt.getLabelOrDescriptionOrLabelRef()).getText());
+                JDomUtil.addNewElements(document, parameterStructXpath,
+                        POWERLINK_XDD_NAMESPACE, newStructTempLabelElement);
+
+                List<TVarDeclaration> varDeclist = structDt.getVarDeclaration();
+
+                for (TVarDeclaration varDecl : varDeclist) {
+                    Element newStructVarDeclarationElement = new Element(
+                            "varDeclaration");
+                    List<Attribute> attribListvar = newStructVarDeclarationElement
+                            .getAttributes();
+                    attribListvar.add(new Attribute("name", varDecl.getName()));
+                    attribListvar.add(
+                            new Attribute("uniqueID", varDecl.getUniqueID()));
+                    JDomUtil.addNewElements(document, parameterStructXpath,
+                            POWERLINK_XDD_NAMESPACE,
+                            newStructVarDeclarationElement);
+
+                    String varDeclXpath = parameterStructXpath
+                            + "/plk:varDeclaration[@uniqueID='"
+                            + varDecl.getUniqueID() + "']";
+                    Element dataTypeElement = new Element(
+                            getIEC_DataType(varDecl));
+                    JDomUtil.addNewElements(document, varDeclXpath,
+                            POWERLINK_XDD_NAMESPACE, dataTypeElement);
+
+                }
+
+            }
+        } else {
+            Element newParamElement = new Element(DATATYPE_LIST);
+            JDomUtil.addNewElement(document, APPLICATION_PROCESS_XPATH,
+                    POWERLINK_XDD_NAMESPACE, newParamElement);
+
+            if (object instanceof TDataTypeList.Struct) {
+                TDataTypeList.Struct structDt = (TDataTypeList.Struct) object;
+                Element newStructElement = new Element("struct");
+                List<Attribute> attribList = newStructElement.getAttributes();
+                attribList.add(new Attribute("name", structDt.getName()));
+                attribList
+                        .add(new Attribute("uniqueID", structDt.getUniqueID()));
+                JDomUtil.addNewElements(document, dataTypeListXpath,
+                        POWERLINK_XDD_NAMESPACE, newStructElement);
+
+                String parameterStructXpath = dataTypeListXpath
+                        + "/plk:struct[@uniqueID='" + structDt.getUniqueID()
+                        + "']";
+                Element newStructTempLabelElement = new Element("label");
+                List<Attribute> attribListlbl = newStructTempLabelElement
+                        .getAttributes();
+                attribListlbl.add(new Attribute("lang", "en-us"));
+                newStructTempLabelElement.setText(new LabelDescription(
+                        structDt.getLabelOrDescriptionOrLabelRef()).getText());
+                JDomUtil.addNewElements(document, parameterStructXpath,
+                        POWERLINK_XDD_NAMESPACE, newStructTempLabelElement);
+
+                List<TVarDeclaration> varDeclist = structDt.getVarDeclaration();
+
+                for (TVarDeclaration varDecl : varDeclist) {
+                    Element newStructVarDeclarationElement = new Element(
+                            "varDeclaration");
+                    List<Attribute> attribListvar = newStructVarDeclarationElement
+                            .getAttributes();
+                    attribListvar.add(new Attribute("name", varDecl.getName()));
+                    attribListvar.add(
+                            new Attribute("uniqueID", varDecl.getUniqueID()));
+                    JDomUtil.addNewElements(document, parameterStructXpath,
+                            POWERLINK_XDD_NAMESPACE,
+                            newStructVarDeclarationElement);
+
+                    String varDeclXpath = parameterStructXpath
+                            + "/plk:varDeclaration[@uniqueID='"
+                            + varDecl.getUniqueID() + "']";
+                    Element dataTypeElement = new Element(
+                            getIEC_DataType(varDecl));
+                    JDomUtil.addNewElements(document, varDeclXpath,
+                            POWERLINK_XDD_NAMESPACE, dataTypeElement);
+
+                }
+
+            }
+        }
+    }
 }
