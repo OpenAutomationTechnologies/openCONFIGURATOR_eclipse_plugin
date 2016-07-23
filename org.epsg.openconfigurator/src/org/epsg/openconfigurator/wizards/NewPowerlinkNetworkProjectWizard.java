@@ -46,6 +46,7 @@ import java.nio.file.StandardCopyOption;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -342,8 +343,15 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow());
         } catch (CoreException ex) {
             ex.printStackTrace();
-            PluginErrorDialogUtils.displayErrorMessageDialog(
-                    ERROR_WHILE_CREATING_PROJECT, ex);
+            if (ex instanceof ResourceException) {
+                PluginErrorDialogUtils.displayErrorMessageDialog(
+                        ERROR_WHILE_CREATING_PROJECT
+                                + "\nCreate a project with different name.",
+                        ex);
+            } else {
+                PluginErrorDialogUtils.displayErrorMessageDialog(
+                        ERROR_WHILE_CREATING_PROJECT, ex);
+            }
             getContainer().showPage(newProjectCreationPage);
             return false;
         }
