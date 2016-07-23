@@ -295,38 +295,68 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         String parameterRefUniqueID = paramRef.getUniqueId();
         Parameter parameter = paramRef.getObjectDictionary()
                 .getParameter(parameterRefUniqueID);
-        if ((paramRef.getActualValue() != null)) {
+        String actualvalue = (String) value;
+        if (isModuleParameter()) {
+            String newParameterName = OpenConfiguratorLibraryUtils
+                    .getModuleParameterUniqueID(
+                            paramRef.getObjectDictionary().getModule(),
+                            paramRef.getUniqueId());
+            Result res = OpenConfiguratorCore.GetInstance()
+                    .SetParameterActualValue(paramRef.getNode().getNetworkId(),
+                            paramRef.getNode().getNodeId(), newParameterName,
+                            actualvalue);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
+        } else {
+            Result res = OpenConfiguratorCore.GetInstance()
+                    .SetParameterActualValue(paramRef.getNode().getNetworkId(),
+                            paramRef.getNode().getNodeId(),
+                            parameter.getUniqueId(), actualvalue);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
+        }
+        try {
+            if ((paramRef.getActualValue() != null)) {
 
-            List<Range> rangeList = parameter.getRangeList();
-            if (rangeList != null) {
-                for (Range range : rangeList) {
-                    if (value instanceof String) {
-                        String val = (String) value;
-                        try {
-                            int maxValue = Integer
-                                    .parseInt(range.getMaxValue());
+                List<Range> rangeList = parameter.getRangeList();
+                if (rangeList != null) {
+                    for (Range range : rangeList) {
+                        if (value instanceof String) {
+                            String val = (String) value;
+                            try {
+                                int maxValue = Integer
+                                        .parseInt(range.getMaxValue());
 
-                            int minValue = Integer
-                                    .parseInt(range.getMinValue());
+                                int minValue = Integer
+                                        .parseInt(range.getMinValue());
 
-                            if (Integer.parseInt(val) < minValue) {
-                                return "Actual value (" + val
-                                        + ") does not fit within the range ("
-                                        + minValue + " to " + maxValue + ")";
+                                if (Integer.parseInt(val) < minValue) {
+                                    return "Actual value (" + val
+                                            + ") does not fit within the range ("
+                                            + minValue + " to " + maxValue
+                                            + ")";
+                                }
+                                if (Integer.parseInt(val) > maxValue) {
+                                    return "Actual value (" + val
+                                            + ") does not fit within the range ("
+                                            + minValue + " to " + maxValue
+                                            + ")";
+                                }
+                            } catch (NumberFormatException e) {
+                                e.printStackTrace();
+                                return "Invalid actual value.";
                             }
-                            if (Integer.parseInt(val) > maxValue) {
-                                return "Actual value (" + val
-                                        + ") does not fit within the range ("
-                                        + minValue + " to " + maxValue + ")";
-                            }
-                        } catch (Exception e) {
-                            e.printStackTrace();
                         }
                     }
                 }
-            }
 
+            }
+        } catch (NumberFormatException e) {
+            return "Invalid actual value.";
         }
+
         return null;
 
     }
