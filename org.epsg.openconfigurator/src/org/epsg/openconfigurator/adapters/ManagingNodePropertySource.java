@@ -416,7 +416,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         if (cycleTime.isEmpty()) {
                             return "";
                         }
-                        retObj = String.valueOf(Integer.decode(cycleTime));
+                        retObj = String.valueOf(cycleTime);
                         break;
                     case INetworkProperties.NET_ASYNC_MTU_OBJECT:
                         String asyncMtu = mnNode.getAsyncMtu();
