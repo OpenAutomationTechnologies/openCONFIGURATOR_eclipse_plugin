@@ -88,6 +88,12 @@ import org.epsg.openconfigurator.xmloperation.ProjectJDomOperation;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
 
+/**
+ * Updates the values of node and module into XDC or project file.
+ *
+ * @author SreeHari
+ *
+ */
 public final class OpenConfiguratorProjectUtils {
 
     public static final String PATH_SETTINGS_DEFAULT_PATH_ID = "defaultOutputPath"; ////$NON-NLS-1$

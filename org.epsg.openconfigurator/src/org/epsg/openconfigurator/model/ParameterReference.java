@@ -36,13 +36,9 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.PlatformUI;
 import org.epsg.openconfigurator.model.Parameter.ParameterAccess;
 import org.epsg.openconfigurator.model.Parameter.Property;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
-import org.epsg.openconfigurator.views.ObjectDictionaryView;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
@@ -337,22 +333,18 @@ public class ParameterReference implements IParameter {
             throws JDOMException, IOException {
         actualValue = value;
         parameterReference.setActualValue(value);
-        Parameter param = getObjectDictionary().getParameter(getUniqueId());
-        param.setActualValue(value);
-        OpenConfiguratorProjectUtils.updateParameterActualValue(node, param,
-                actualValue);
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                IViewPart viewPart = PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getActivePage()
-                        .findView(ObjectDictionaryView.ID);
-                if (viewPart instanceof ObjectDictionaryView) {
-                    ObjectDictionaryView obdView = (ObjectDictionaryView) viewPart;
-                    obdView.handleRefresh();
-                }
-            }
-        });
+        if (getObjectDictionary().isModule()) {
+            Parameter param = getObjectDictionary().getParameter(getUniqueId());
+            param.setActualValue(value);
+            OpenConfiguratorProjectUtils.updateParameterActualValue(
+                    getObjectDictionary().getModule(), param, actualValue);
+        } else {
+            Parameter param = getObjectDictionary().getParameter(getUniqueId());
+            param.setActualValue(value);
+            OpenConfiguratorProjectUtils.updateParameterActualValue(node, param,
+                    actualValue);
+        }
+
         // OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
         // this, actualValue);
     }
