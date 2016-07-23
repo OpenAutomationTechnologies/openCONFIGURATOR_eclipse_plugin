@@ -65,6 +65,7 @@ public abstract class AbstractNodePropertySource {
 
     public static final String MODULE_NAME_LABEL = "Name"; //$NON-NLS-1$
     public static final String MODULE_POSITION_LABEL = "Position"; //$NON-NLS-1$
+    public static final String MODULE_TYPE_LABEL = "Type"; //$NON-NLS-1$
     public static final String MODULE_ADDRESS_LABEL = "Address"; //$NON-NLS-1$
     public static final String MODULE_PATH_TO_XDC_LABEL = "Configuration File"; //$NON-NLS-1$
     public static final String MODULE_ENABLED_LABEL = "Enabled"; //$NON-NLS-1$
@@ -112,6 +113,9 @@ public abstract class AbstractNodePropertySource {
     protected PropertyDescriptor modulePositionDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.MODULE_POSITION_READONLY_OBJECT,
             MODULE_POSITION_LABEL);
+    protected PropertyDescriptor moduleTypeDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.MODULE_TYPE_READONLY_OBJECT,
+            MODULE_TYPE_LABEL);
 
     protected TextPropertyDescriptor modulePositionTextDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.MODULE_POSITION_EDITABLE_OBJECT,

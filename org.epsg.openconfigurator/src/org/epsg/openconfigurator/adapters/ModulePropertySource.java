@@ -65,10 +65,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
     private static final String HIGHER_POSITION_ERROR_MESSAGE = "The position of module should not be greater than ";
     private static final String INVALID_MODULE_TYPE_ERROR_MESSAGE = "The module cannot be placed in position {0} due to invalid module type.";
     private static final String EMPTY_ADDRESS_ERROR_MESSAGE = "Address cannot be empty.";
-    private static final String AVAILABLE_MODULE_ERROR_MESSAGE = "The position {0} already exists in {1}.";
+    private static final String AVAILABLE_MODULE_ERROR_MESSAGE = "Position {0} on interface {1} is already occupied.";
     private static final String INVALID_ADDRESS_ERROR_MESSAGE = "Invalid Address.";
     private static final String HIGHER_ADDRESS_ERROR_MESSAGE = "The address of module should not exceed {0}";
-    private static final String ADDRESS_EXISTS_ERROR_MESSAGE = "Module address already exists.";
+    private static final String ADDRESS_EXISTS_ERROR_MESSAGE = "Address {0} on interface {1} is already occupied.";
     private static final String INVALID_NAME_ERROR_MESSAGE = "Invalid module name.";
     private static final String MODULE_EXISTS_ERROR_MESSAGE = "Module name already exists.";
 
@@ -133,6 +133,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         moduleAddressTextDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        moduleTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
     }
 
     private void addControlledNodeModulePropertyDescriptors(
@@ -146,13 +147,13 @@ public class ModulePropertySource extends AbstractNodePropertySource
         propertyList.add(moduleNameDescriptor);
         if (isPositionOrAddressEditable()) {
             propertyList.add(moduleAddressTextDescriptor);
-            propertyList.add(modulePositionTextDescriptor);
         } else {
             propertyList.add(moduleAddressDescriptor);
-            propertyList.add(modulePositionDescriptor);
         }
+        propertyList.add(modulePositionDescriptor);
         propertyList.add(modulePathToXDCDescriptor);
-        propertyList.add(moduleEnabledDescriptor);
+        propertyList.add(moduleTypeDescriptor);
+        // propertyList.add(moduleEnabledDescriptor);
     }
 
     @Override
@@ -196,6 +197,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         retObj = moduleObjModel.getPathToXDC();
                         break;
 
+                    }
+                    case IAbstractNodeProperties.MODULE_TYPE_READONLY_OBJECT: {
+                        retObj = module.getModuleInterface().getType();
+                        break;
                     }
                     case IAbstractNodeProperties.MODULE_ENABLED_OBJECT: {
                         int value = (moduleObjModel.isEnabled() == true) ? 1
@@ -281,6 +286,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
     }
 
     private String handleSetModuleAddress(Object value) {
+        System.err.println("Handle address value..");
         if (module != null) {
             Set<Integer> addressSet = module.getInterfaceOfModule()
                     .getAddressCollection().keySet();
@@ -308,10 +314,20 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     return null;
                 }
 
-                for (Integer addressVal : addressSet) {
+                List<Integer> addresslist = new ArrayList<Integer>();
+                Collection<Module> moduleList = module.getInterfaceOfModule()
+                        .getModuleCollection().values();
+                for (Module mod : moduleList) {
+                    addresslist.add(mod.getAddress());
+                }
 
+                for (Integer addressVal : addresslist) {
+                    System.out.println("The address set .." + addressVal);
                     if (addressVal == val) {
-                        return ADDRESS_EXISTS_ERROR_MESSAGE;
+                        return MessageFormat.format(
+                                ADDRESS_EXISTS_ERROR_MESSAGE, val,
+                                module.getInterfaceOfModule()
+                                        .getInterfaceUId());
                     }
 
                 }
@@ -442,7 +458,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         int oldPosition = module.getPosition();
                         // if (isPositionAvailable(newPosition)) {
                         //
-                        // // module.moveModule(newPosition, oldPosition);
+                        // module.swapPosition(oldPosition, newPosition);
                         // // module.setPosition((String) value);
                         // } else {
                         // module.setPosition((String) value);
