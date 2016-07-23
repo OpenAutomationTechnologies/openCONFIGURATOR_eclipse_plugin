@@ -252,6 +252,13 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                 }
             }
         }
+
+        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
+                && (accessType == TObjectAccessType.RW)) {
+            isRpdoMappable = true;
+
+        }
+
         if (((pdoMapping == TObjectPDOMapping.DEFAULT)
                 || (pdoMapping == TObjectPDOMapping.OPTIONAL)
                 || (pdoMapping == TObjectPDOMapping.TPDO))) {
@@ -339,6 +346,13 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
             }
         }
 
+        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
+                && (accessType == TObjectAccessType.RW)) {
+            isTpdoMappable = true;
+            isRpdoMappable = true;
+
+        }
+
         uniqueIDRef = subObject.getUniqueIDRef();
     }
 
@@ -411,6 +425,13 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                     isTpdoMappable = true;
                 }
             }
+        }
+
+        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
+                && (accessType == TObjectAccessType.RW)) {
+            isTpdoMappable = true;
+            isRpdoMappable = true;
+
         }
 
         uniqueIDRef = subObject.getUniqueIDRef();
@@ -509,6 +530,8 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      * Get actual value of parameter based on uniqueId Ref
      *
      * @param uniqueIDRef2 UniqueID of parameter.
+     * @param moduleObjectIndex
+     * @param subIndex
      * @return Actual value of parameters.
      */
     public String getActualValue(Object uniqueIDRef2) {
@@ -526,6 +549,19 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
             actualValue = StringUtils.EMPTY;
         }
         return actualValue;
+    }
+
+    public String getActualValueFromLibrary(int subIndex,
+            long moduleObjectIndex) {
+        String actualValue = StringUtils.EMPTY;
+        Node node = getNode();
+        actualValue = OpenConfiguratorLibraryUtils.getActualValueOfObject(node,
+                this, subIndex, moduleObjectIndex);
+        if ((actualValue != null) || (actualValue != StringUtils.EMPTY)) {
+            return actualValue;
+        } else {
+            return actualValue;
+        }
     }
 
     /**
@@ -856,7 +892,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
             } else if (pdoMapping == TObjectPDOMapping.RPDO) {
                 pdoMappingReadable = "RPDO";
             } else if (pdoMapping == TObjectPDOMapping.TPDO) {
-                pdoMappingReadable = "RPDO";
+                pdoMappingReadable = "TPDO";
             }
         } else {
             pdoMappingReadable = StringUtils.EMPTY;

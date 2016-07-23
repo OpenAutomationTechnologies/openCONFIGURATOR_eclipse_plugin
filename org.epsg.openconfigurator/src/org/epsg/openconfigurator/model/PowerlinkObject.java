@@ -259,7 +259,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
 
             if (obj.isRpdoMappable()) {
                 rpdoMappableObjectList.add(obj);
-            } else if (obj.isTpdoMappable()) {
+            }
+            if (obj.isTpdoMappable()) {
                 tpdoMappableObjectList.add(obj);
             }
         }
@@ -298,6 +299,12 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                     isTpdoMappable = true;
                 }
             }
+        }
+
+        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
+                && (accessType == TObjectAccessType.RW)) {
+            isRpdoMappable = true;
+            isTpdoMappable = true;
         }
 
         uniqueIDRef = object.getUniqueIDRef();
@@ -350,7 +357,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
 
             if (obj.isRpdoMappable()) {
                 rpdoMappableObjectList.add(obj);
-            } else if (obj.isTpdoMappable()) {
+            }
+            if (obj.isTpdoMappable()) {
                 tpdoMappableObjectList.add(obj);
             }
         }
@@ -388,6 +396,12 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                     isTpdoMappable = true;
                 }
             }
+        }
+
+        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
+                && (accessType == TObjectAccessType.RW)) {
+            isRpdoMappable = true;
+            isTpdoMappable = true;
         }
 
         uniqueIDRef = object.getUniqueIDRef();
@@ -436,7 +450,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
 
             if (obj.isRpdoMappable()) {
                 rpdoMappableObjectList.add(obj);
-            } else if (obj.isTpdoMappable()) {
+            }
+            if (obj.isTpdoMappable()) {
                 tpdoMappableObjectList.add(obj);
             }
         }
@@ -474,6 +489,12 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                     isTpdoMappable = true;
                 }
             }
+        }
+
+        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
+                && (accessType == TObjectAccessType.RW)) {
+            isRpdoMappable = true;
+            isTpdoMappable = true;
         }
 
         uniqueIDRef = object.getUniqueIDRef();
@@ -807,7 +828,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      * @return Index and name of the module object.
      */
     public String getNameWithId(long objectIndex) {
-        return (getName() + " (0x" + Long.toHexString(objectIndex) + ")");
+        return (getName() + " (0x" + Long.toHexString(objectIndex).toUpperCase()
+                + ")");
     }
 
     /**
@@ -879,7 +901,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             } else if (pdoMapping == TObjectPDOMapping.RPDO) {
                 pdoMappingReadable = "RPDO";
             } else if (pdoMapping == TObjectPDOMapping.TPDO) {
-                pdoMappingReadable = "RPDO";
+                pdoMappingReadable = "TPDO";
             }
         } else {
             pdoMappingReadable = StringUtils.EMPTY;
