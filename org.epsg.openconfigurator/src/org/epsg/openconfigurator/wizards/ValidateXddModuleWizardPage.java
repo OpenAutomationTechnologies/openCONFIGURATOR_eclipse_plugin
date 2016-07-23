@@ -277,13 +277,15 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                                     }
                                 }
                             }
+                        } else {
+                            moduleTypes = moduleType.getType();
                         }
                     }
                 }
                 if (!validModuleType) {
                     getErrorStyledText(
-                            "The XDD/XDC file with type " + moduleTypeVal
-                                    + " does not support the module type "
+                            "The XDD/XDC has module type " + moduleTypes
+                                    + " but the interface only supports module type "
                                     + moduleTypeText.getText() + ".");
                     return false;
                 }
@@ -293,8 +295,8 @@ public class ValidateXddModuleWizardPage extends WizardPage {
 
                 } else {
                     getErrorStyledText(
-                            "The XDD/XDC file with type " + moduleInterfaceType
-                                    + " does not support the module type "
+                            "The XDD/XDC has module type " + moduleTypes
+                                    + " but the interface only supports module type "
                                     + moduleTypeText.getText() + ".");
                     return false;
                 }

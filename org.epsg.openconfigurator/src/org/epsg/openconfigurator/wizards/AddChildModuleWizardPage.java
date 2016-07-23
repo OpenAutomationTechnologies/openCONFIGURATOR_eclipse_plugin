@@ -92,6 +92,7 @@ public class AddChildModuleWizardPage extends WizardPage {
 
         @Override
         public void modifyText(ModifyEvent e) {
+            getWizard().getContainer().updateButtons();
             setErrorMessage(null);
             setPageComplete(true);
 
@@ -101,31 +102,30 @@ public class AddChildModuleWizardPage extends WizardPage {
                 setErrorMessage("Invalid address.");
                 setPageComplete(false);
             }
-            getWizard().getContainer().updateButtons();
 
         }
 
     };
 
-    ModifyListener positionModifyListener = new ModifyListener() {
-
-        @Override
-        public void modifyText(ModifyEvent e) {
-            getWizard().getContainer().updateButtons();
-            setErrorMessage(null);
-            setPageComplete(true);
-            if ((position.getSelection() > position.getMaximum())
-                    || (position.getSelection() < position.getMinimum())) {
-                setErrorMessage("Enter a valid position");
-                setPageComplete(false);
-            }
-            if (position.getText() == null) {
-                setErrorMessage("Enter a valid position");
-                setPageComplete(false);
-            }
-        }
-
-    };
+    // ModifyListener positionModifyListener = new ModifyListener() {
+    //
+    // @Override
+    // public void modifyText(ModifyEvent e) {
+    // getWizard().getContainer().updateButtons();
+    // setErrorMessage(null);
+    // setPageComplete(true);
+    // if ((position.getSelection() > position.getMaximum())
+    // || (position.getSelection() < position.getMinimum())) {
+    // setErrorMessage("Enter a valid position");
+    // setPageComplete(false);
+    // }
+    // if (position.getText() == null) {
+    // setErrorMessage("Enter a valid position");
+    // setPageComplete(false);
+    // }
+    // }
+    //
+    // };
 
     protected AddChildModuleWizardPage(HeadNodeInterface selectedNodeObj) {
 
@@ -148,8 +148,8 @@ public class AddChildModuleWizardPage extends WizardPage {
         position = new Spinner(container, SWT.BORDER);
         position.setBounds(169, 7, 47, 22);
         position.setMaximum(interfaceObj.getMaxModules().intValue());
-        position.addModifyListener(positionModifyListener);
-
+        // position.addModifyListener(positionModifyListener);
+        position.setEnabled(false);
         // position.setSelection(getNewPosition());
 
         if (!interfaceObj.isUnUsedSlots()) {
@@ -179,7 +179,7 @@ public class AddChildModuleWizardPage extends WizardPage {
 
         addressText = new Spinner(container, SWT.BORDER);
         addressText.setBounds(169, 130, 76, 21);
-
+        addressText.setMaximum(interfaceObj.getMaxModules().intValue());
         addressText.addModifyListener(addressModifyListener);
 
     }
@@ -349,6 +349,9 @@ public class AddChildModuleWizardPage extends WizardPage {
         if (address > maxModules) {
             setErrorMessage("Invalid address value.");
             return retval;
+        } else {
+            System.err.println("Valid value...." + address + " maxModules...."
+                    + maxModules);
         }
 
         return true;
@@ -411,10 +414,10 @@ public class AddChildModuleWizardPage extends WizardPage {
 
         if (String.valueOf(interfaceObj.getModuleAddressing())
                 .equalsIgnoreCase("POSITION")) {
-            position.removeModifyListener(positionModifyListener);
+            // position.removeModifyListener(positionModifyListener);
             addressText.removeModifyListener(addressModifyListener);
             // addressText.removeVerifyListener(addressVerifyListener);
-            position.setEnabled(false);
+            // position.setEnabled(false);
             addressText.setEnabled(false);
             if (moduleSize != 0) {
                 System.err.println("Key set of module position"
@@ -436,9 +439,7 @@ public class AddChildModuleWizardPage extends WizardPage {
                         .keySet();
                 System.err.println("POsitionSet = " + positionSet);
                 for (Integer position1 : positionSet) {
-                    if (position1 == minimumValue) {
-                        minimumValue = position1 + 1;
-                    }
+                    minimumValue = position1 + 1;
                 }
                 Collection<Module> moduleCollection = interfaceObj
                         .getModuleCollection().values();
@@ -448,12 +449,6 @@ public class AddChildModuleWizardPage extends WizardPage {
                             "Module name == " + module.getModuleName());
                     int address = module.getAddress();
                     addressList.add(address);
-                    // System.err.println("Address value == " + address);
-                    // if (address == minimumAddress) {
-                    // minimumAddress = address + 1;
-                    // }
-                    //
-                    // System.err.println("Address == " + minimumAddress);
                 }
                 System.err.println("Address List = " + addressList);
                 for (Integer addres : addressList) {
@@ -479,6 +474,12 @@ public class AddChildModuleWizardPage extends WizardPage {
                             validModuleType = true;
                         } else {
                             validModuleType = false;
+                            setErrorMessage("The module type "
+                                    + moduleType.getType()
+                                    + " does not match the interface module type "
+                                    + interfaceObj.getInterfaceType()
+                                    + " on interface "
+                                    + interfaceObj.getInterfaceUId() + ".");
                         }
                     }
                 }
@@ -524,8 +525,14 @@ public class AddChildModuleWizardPage extends WizardPage {
                                             validModuleType = true;
                                             break;
                                         } else {
-                                            setErrorMessage(
-                                                    "Module type mismatch.");
+                                            setErrorMessage("The module type "
+                                                    + addedModuleType
+                                                    + " does not match the interface module type "
+                                                    + nextPositionModuleType
+                                                    + " on module "
+                                                    + nextPositionModule
+                                                            .getModuleName()
+                                                    + ".");
                                             return false;
                                         }
                                     }
@@ -534,7 +541,13 @@ public class AddChildModuleWizardPage extends WizardPage {
                             validModuleType = true;
                         } else {
                             validModuleType = false;
-
+                            setErrorMessage("The module type "
+                                    + moduleType.getType()
+                                    + " does not match the interface module type "
+                                    + previousPositionModule.getModuleType()
+                                    + " on module "
+                                    + previousPositionModule.getModuleName()
+                                    + ".");
                         }
 
                     }
@@ -557,6 +570,12 @@ public class AddChildModuleWizardPage extends WizardPage {
                             validModuleType = true;
                         } else {
                             validModuleType = false;
+                            setErrorMessage("The module type "
+                                    + moduleType.getType()
+                                    + " does not match the interface module type "
+                                    + interfaceObj.getInterfaceType()
+                                    + " on interface "
+                                    + interfaceObj.getInterfaceUId() + ".");
                         }
                     }
                 }
@@ -675,6 +694,26 @@ public class AddChildModuleWizardPage extends WizardPage {
                     + position.getText() + ".");
             // getContainer().showPage(getPreviousPage());
             pageComplete = false;
+        }
+
+        if (!(interfaceObj.hasModules())) {
+            System.err.println("POsition...." + position.getText());
+            if ((position.getText()) != "1") {
+                if (!(position.getMinimum() == 1)) {
+                    setErrorMessage("Module cannot be placed at position "
+                            + position.getText() + ". The interface ('"
+                            + interfaceObj.getInterfaceUId()
+                            + "') does not contain module at position 1.");
+
+                    pageComplete = false;
+                } else {
+                    setErrorMessage(null);
+                    pageComplete = true;
+                }
+            } else {
+                setErrorMessage(null);
+                pageComplete = true;
+            }
         }
 
         System.err.println("PageComplete == " + pageComplete);

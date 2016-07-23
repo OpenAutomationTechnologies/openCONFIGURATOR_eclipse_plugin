@@ -35,6 +35,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
@@ -248,18 +249,22 @@ public class AddModuleWizardPage extends WizardPage {
             setErrorMessage(ERROR_INVALID_MODULE_NAME);
             return false;
         }
-        List<String> nameList = getModuleNamelist();
-        if (nameList == null) {
+
+        Set<String> moduleNameList = interfaceObj.getModuleNameCollection()
+                .keySet();
+
+        if (moduleNameList == null) {
             valid = true;
         } else {
-            for (String name : nameList) {
+            for (String name : moduleNameList) {
                 if (name.equals(moduleName.getText())) {
                     valid = false;
                 }
             }
         }
+
         if (!valid) {
-            setErrorMessage("Module Name already exixts.");
+            setErrorMessage("Module Name already exists.");
             return false;
         }
 

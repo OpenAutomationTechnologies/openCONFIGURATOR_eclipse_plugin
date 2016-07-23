@@ -198,6 +198,9 @@ public class NewModuleWizard extends Wizard {
             selectedNodeObj.getAddressCollection()
                     .put(new Integer(newModule.getAddress()), newModule);
 
+            selectedNodeObj.getModuleNameCollection()
+                    .put(new String(newModule.getModuleName()), newModule);
+
             System.err.println("Module collection values ... "
                     + selectedNodeObj.getModuleCollection().values());
 

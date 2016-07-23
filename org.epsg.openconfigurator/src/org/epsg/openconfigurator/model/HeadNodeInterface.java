@@ -76,6 +76,8 @@ public class HeadNodeInterface {
 
     private Map<Integer, Module> moduleCollection = new HashMap<Integer, Module>();
 
+    private Map<String, Module> moduleNameCollection = new HashMap<String, Module>();
+
     private Map<Integer, Module> addressCollection = new HashMap<Integer, Module>();
 
     private List<org.epsg.openconfigurator.xmlbinding.xdd.Range> listOfRange = new ArrayList<>();
@@ -208,6 +210,13 @@ public class HeadNodeInterface {
      */
     public Map<Integer, Module> getModuleCollection() {
         return moduleCollection;
+    }
+
+    /**
+     * @return The collection of module names connected to head node interface.
+     */
+    public Map<String, Module> getModuleNameCollection() {
+        return moduleNameCollection;
     }
 
     /**
