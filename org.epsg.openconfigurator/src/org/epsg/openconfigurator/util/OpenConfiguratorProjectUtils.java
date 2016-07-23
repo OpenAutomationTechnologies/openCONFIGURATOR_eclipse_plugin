@@ -55,7 +55,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.Status;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
@@ -861,6 +863,71 @@ public final class OpenConfiguratorProjectUtils {
         updateGeneratorInfo(module.getNode());
     }
 
+    public static void updateModuleConfigurationPath(Module module,
+            int position) throws JDOMException, IOException {
+
+        java.nio.file.Path nodeImportFile = new File(
+                module.getNode().getPathToXDC()).toPath();
+
+        java.nio.file.Path moduleImportFile = new File(module.getPathToXdc())
+                .toPath();
+
+        java.nio.file.Path projectRootPath = module.getProject().getLocation()
+                .toFile().toPath();
+
+        String xddNameWithExtension = moduleImportFile.getFileName().toString();
+        String oldNodeSuffix = "_" + module.getPosition()
+                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+        String xddFileNameWithNoSuffix = xddNameWithExtension.substring(0,
+                xddNameWithExtension.length() - oldNodeSuffix.length());
+
+        System.err.println(
+                "XDD file name with no suffix....." + xddFileNameWithNoSuffix);
+
+        // Append node ID and the 'XDC' extension to the configuration file.
+        String xddFileNameWithSuffix = xddFileNameWithNoSuffix + "_" + position
+                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+        String nodeName = FilenameUtils
+                .removeExtension(nodeImportFile.getFileName().toString());
+
+        String targetConfigurationPath = new String(
+                projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                        + IPath.SEPARATOR + nodeName + IPath.SEPARATOR
+                        + xddFileNameWithSuffix);
+
+        System.out.println(
+                "Target configuration path ..." + targetConfigurationPath);
+
+        java.nio.file.Path pathRelative = projectRootPath
+                .relativize(Paths.get(targetConfigurationPath));
+        File unModifiedfile = new File(
+                projectRootPath + "/" + moduleImportFile);
+        System.err.println(
+                "Unmodified file path ===" + unModifiedfile.getAbsolutePath());
+
+        File updatedfile = new File(projectRootPath + "/" + pathRelative);
+        System.err.println(
+                "updatedfile file path ===" + updatedfile.getAbsolutePath());
+
+        Files.move(unModifiedfile.toPath(), updatedfile.toPath(),
+                StandardCopyOption.REPLACE_EXISTING);
+
+        String relativePath = pathRelative.toString();
+        relativePath = relativePath.replace('\\', '/');
+        System.out.println("The relatiove path = " + relativePath);
+
+        // Set the relative path to the CN object
+        module.setPathToXDC(relativePath);
+        System.err.println(
+                "The module get Path to XDC.." + module.getPathToXdc());
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+    }
+
     /**
      * Updates the index of module object in XDC file
      *
@@ -893,14 +960,16 @@ public final class OpenConfiguratorProjectUtils {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public static void updateModuleObjectInNode(Node node)
-            throws JDOMException, IOException {
-
+    public static Status updateModuleObjectInNode(Node node,
+            IProgressMonitor monitor) throws JDOMException, IOException {
+        monitor.subTask("Export module node XDC:");
         importNodeXDCFile(node);
         File xdcFile = new File(node.getOutputPathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
         XddJdomOperation.updateModuleObjectInNode(document, node);
+
+        XddJdomOperation.updateNumberOfEntries(document, node);
 
         XddJdomOperation.addConnectedModules(document, node.getInterface(),
                 node.getInterface().getModuleCollection());
@@ -909,6 +978,15 @@ public final class OpenConfiguratorProjectUtils {
 
         // Updates generator attributes in project file.
         updateGeneratorInfo(node);
+        monitor.done();
+        if (monitor.isCanceled()) {
+            return new Status(IStatus.OK,
+                    org.epsg.openconfigurator.Activator.PLUGIN_ID, "Cancelled",
+                    null);
+        }
+
+        return new Status(IStatus.OK,
+                org.epsg.openconfigurator.Activator.PLUGIN_ID, "OK", null);
     }
 
     /**
@@ -1139,6 +1217,30 @@ public final class OpenConfiguratorProjectUtils {
 
         // Updates generator attributes in project file.
         updateGeneratorInfo(node);
+    }
+
+    /**
+     * Update actual value of parameter into the device configuration file.
+     *
+     * @param module Instance of Module.
+     * @param parameter Parameter instance
+     * @param actualValue The value to be updated into the parameter.
+     * @throws IOException Errors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateParameterActualValue(Module module,
+            Parameter parameter, String actualValue)
+                    throws JDOMException, IOException {
+        File xdcFile = new File(module.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateParameterActualValue(document, parameter,
+                actualValue);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
     }
 
     /**

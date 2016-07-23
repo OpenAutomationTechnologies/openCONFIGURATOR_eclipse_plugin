@@ -57,6 +57,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
+import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
 import org.jdom2.JDOMException;
@@ -186,6 +187,10 @@ public class Module {
         if (prevModulePosition != 0) {
             preTypetoBeChecked = preModule.getModuleInterface().getType();
             prevModuleTypetoBeChecked = newModule.getModuleType();
+        } else {
+            prevModuleTypetoBeChecked = newModule.getModuleType();
+            preTypetoBeChecked = newModule.getInterfaceOfModule()
+                    .getInterfaceType();
         }
 
         if (nextModulePosition != 0) {
@@ -195,15 +200,41 @@ public class Module {
         }
 
         if (!(nextonTypetoBeChecked.equalsIgnoreCase(nextTypetoBeChecked))) {
-            return "Module cannot be moved. " + currentModule.getModuleName()
-                    + " module does not match with type of module "
-                    + nextModule.getModuleName();
+
+            return "Module cannot be moved because "
+                    + currentModule.getModuleName() + " with module type "
+                    + nextTypetoBeChecked + " does not match "
+                    + nextModule.getModuleName() + " module type "
+                    + nextModule.getModuleInterface().getType() + ".";
         }
 
         if (!(preTypetoBeChecked.equalsIgnoreCase(prevModuleTypetoBeChecked))) {
-            return "Module cannot be moved. " + preModule.getModuleName()
-                    + " module does not match with type of module "
-                    + newModule.getModuleName();
+
+            if (preModule != null) {
+                return "Module cannot be moved because "
+                        + preModule.getModuleName() + " with module type "
+                        + preTypetoBeChecked + " does not match "
+                        + newModule.getModuleName() + " module type "
+                        + prevModuleTypetoBeChecked + ".";
+            } else {
+                return "Module cannot be moved because "
+                        + newModule.getInterfaceOfModule().getInterfaceUId()
+                        + " with module type "
+                        + newModule.getInterfaceOfModule().getInterfaceType()
+                        + " does not match " + newModule.getModuleName()
+                        + " module type "
+                        + newModule.getModuleInterface().getType() + ".";
+
+            }
+        }
+
+        if (!(currentModule.getModuleInterface().getType()
+                .equalsIgnoreCase(newModule.getModuleType()))) {
+            return "Module cannot be moved because "
+                    + currentModule.getModuleName() + " with module type "
+                    + currentModule.getModuleInterface().getType()
+                    + " does not match " + newModule.getModuleName()
+                    + " module type " + newModule.getModuleType() + ".";
         }
 
         return StringUtils.EMPTY;
@@ -249,19 +280,50 @@ public class Module {
             previousTypetoBeChecked = currentModule.getModuleInterface()
                     .getType();
             preModuleTypetoBeChecked = prevModule.getModuleType();
+        } else {
+            previousTypetoBeChecked = currentModule.getModuleInterface()
+                    .getType();
+            preModuleTypetoBeChecked = currentModule.getInterfaceOfModule()
+                    .getInterfaceType();
         }
 
         if (!(previousTypetoBeChecked
                 .equalsIgnoreCase(preModuleTypetoBeChecked))) {
-            return "Module cannot be moved. " + currentModule.getModuleName()
-                    + " module does not match with type of module "
-                    + prevModule.getModuleName();
+
+            if (prevModule != null) {
+                return "Module cannot be moved because "
+                        + currentModule.getModuleName() + " with module type "
+                        + previousTypetoBeChecked + " does not match "
+                        + prevModule.getModuleName() + " module type "
+                        + preModuleTypetoBeChecked + ".";
+            } else {
+                return "Module cannot be moved because "
+                        + currentModule.getModuleName() + " with module type "
+                        + previousTypetoBeChecked + " does not match "
+                        + currentModule.getInterfaceOfModule().getInterfaceUId()
+                        + " interface type " + currentModule
+                                .getInterfaceOfModule().getInterfaceType()
+                        + ".";
+
+            }
         }
 
         if (!(nextTypetoBeChecked.equalsIgnoreCase(newModuleTypetoBeChecked))) {
-            return "Module cannot be moved. " + nextModule.getModuleName()
-                    + " module does not match with type of module "
-                    + newModule.getModuleName();
+            return "Module cannot be moved because "
+                    + nextModule.getModuleName() + " with module type "
+                    + nextTypetoBeChecked + " does not match "
+                    + newModule.getModuleName() + " module type "
+                    + newModuleTypetoBeChecked + ".";
+
+        }
+
+        if (!(currentModule.getModuleType()
+                .equalsIgnoreCase(newModule.getModuleInterface().getType()))) {
+            return "Module cannot be moved because "
+                    + currentModule.getModuleName() + " with module type "
+                    + currentModule.getModuleType() + " does not match "
+                    + newModule.getModuleName() + " module type "
+                    + newModule.getModuleInterface().getType() + ".";
         }
 
         return StringUtils.EMPTY;
@@ -310,6 +372,13 @@ public class Module {
             return getModuleInterface().getChildID();
         }
         return null;
+    }
+
+    /**
+     * @return Error in configuration file.
+     */
+    public String getError() {
+        return configurationError;
     }
 
     /**
@@ -524,6 +593,16 @@ public class Module {
         return objectDictionary;
     }
 
+    public String getParamUniqueID(Object uniqueIDRef) {
+        String uniqueId = StringUtils.EMPTY;
+        if (uniqueIDRef instanceof TDataTypeList.Struct) {
+            TDataTypeList.Struct structDt = (TDataTypeList.Struct) uniqueIDRef;
+            uniqueId = structDt.getUniqueID();
+
+        }
+        return uniqueId;
+    }
+
     /**
      * @return The path of module XDC.
      */
@@ -601,6 +680,19 @@ public class Module {
                 + "position" + "='" + String.valueOf(getPosition()) + "']";
 
         return interfaceXpath;
+    }
+
+    /**
+     * Checks for valid XDD model.
+     *
+     * @return <code>True</code> if node has no XDD/XDC file. <code>False</code>
+     *         if module has XDD/XDC file
+     */
+    public boolean hasError() {
+        if (configurationError == null) {
+            return false;
+        }
+        return !configurationError.isEmpty();
     }
 
     /**
@@ -812,15 +904,15 @@ public class Module {
 
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            getInterfaceOfModule().getModuleNameCollection()
+                    .remove(module.getName());
+            getInterfaceOfModule().getModuleNameCollection().put(newName, this);
             module.setName(newName);
 
         } else {
             System.err.println("setName(newName); Unhandled node model type:"
                     + moduleModel);
         }
-
-        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
-                IAbstractNodeProperties.MODULE_NAME_OBJECT, newName);
 
         rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
 
@@ -942,7 +1034,7 @@ public class Module {
             MessageDialog dialog = new MessageDialog(null,
                     "Modify module position", null,
                     "Modifying the position of module will disable the modules that does not match the module type.'",
-                    MessageDialog.QUESTION, new String[] { "Yes", "No" }, 1);
+                    MessageDialog.WARNING, new String[] { "Yes", "No" }, 1);
             int result = dialog.open();
             if (result == 0) {
                 OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
@@ -1082,6 +1174,10 @@ public class Module {
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT,
                 String.valueOf(position));
+        OpenConfiguratorProjectUtils.updateModuleConfigurationPath(this,
+                position);
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXdc());
 
         Module newModule = getInterfaceOfModule().getModuleCollection()
                 .get(position);
@@ -1089,6 +1185,11 @@ public class Module {
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT,
                 String.valueOf(oldPosition));
+        OpenConfiguratorProjectUtils.updateModuleConfigurationPath(newModule,
+                oldPosition);
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT,
+                newModule.getPathToXdc());
 
         Object moduleObjModel = getModuleModel();
         if (moduleObjModel instanceof InterfaceList.Interface.Module) {
@@ -1137,6 +1238,10 @@ public class Module {
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT,
                 String.valueOf(position));
         setAddresss(String.valueOf(position));
+        OpenConfiguratorProjectUtils.updateModuleConfigurationPath(this,
+                position);
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXdc());
 
         Module newModule = getInterfaceOfModule().getModuleCollection()
                 .get(position);
@@ -1146,6 +1251,11 @@ public class Module {
                 String.valueOf(oldPosition));
 
         newModule.setAddresss(String.valueOf(oldPosition));
+        OpenConfiguratorProjectUtils.updateModuleConfigurationPath(newModule,
+                oldPosition);
+        OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT,
+                newModule.getPathToXdc());
 
         Object moduleObjModel = getModuleModel();
         if (moduleObjModel instanceof InterfaceList.Interface.Module) {
@@ -1207,19 +1317,24 @@ public class Module {
                 .get(prevModulePosition);
 
         if (prevModulePosition != 0) {
-            preTypetoBeChecked = preModule.getModuleInterface().getType();
+            preTypetoBeChecked = newModule.getModuleInterface().getType();
+            prevModuleTypetoBeChecked = preModule.getModuleType();
+        } else {
             prevModuleTypetoBeChecked = newModule.getModuleType();
+            preTypetoBeChecked = newModule.getInterfaceOfModule()
+                    .getInterfaceType();
         }
 
         if (nextModulePosition != 0) {
-            nextonTypetoBeChecked = currentModule.getModuleInterface()
-                    .getType();
-            nextTypetoBeChecked = nextModule.getModuleType();
+            nextonTypetoBeChecked = nextModule.getModuleInterface().getType();
+            nextTypetoBeChecked = currentModule.getModuleType();
         }
 
         if (nextonTypetoBeChecked.equalsIgnoreCase(nextTypetoBeChecked)
                 && preTypetoBeChecked
-                        .equalsIgnoreCase(prevModuleTypetoBeChecked)) {
+                        .equalsIgnoreCase(prevModuleTypetoBeChecked)
+                && (currentModule.getModuleInterface().getType()
+                        .equalsIgnoreCase(newModule.getModuleType()))) {
             validModulePosition = true;
         } else {
             validModulePosition = false;
@@ -1270,11 +1385,18 @@ public class Module {
             previousTypetoBeChecked = currentModule.getModuleInterface()
                     .getType();
             preModuleTypetoBeChecked = prevModule.getModuleType();
+        } else {
+            previousTypetoBeChecked = currentModule.getModuleInterface()
+                    .getType();
+            preModuleTypetoBeChecked = currentModule.getInterfaceOfModule()
+                    .getInterfaceType();
         }
 
         if (previousTypetoBeChecked.equalsIgnoreCase(preModuleTypetoBeChecked)
                 && nextTypetoBeChecked
-                        .equalsIgnoreCase(newModuleTypetoBeChecked)) {
+                        .equalsIgnoreCase(newModuleTypetoBeChecked)
+                && (currentModule.getModuleType().equalsIgnoreCase(
+                        newModule.getModuleInterface().getType()))) {
             validModulePosition = true;
         } else {
             validModulePosition = false;
