@@ -35,6 +35,7 @@ package org.epsg.openconfigurator.views;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -43,9 +44,13 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
@@ -92,8 +97,10 @@ import org.epsg.openconfigurator.event.INodePropertyChangeListener;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
+import org.epsg.openconfigurator.model.Path;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
@@ -105,6 +112,8 @@ import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration.PathSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList.Interface;
@@ -160,6 +169,10 @@ public class IndustrialNetworkView extends ViewPart
                     return nodeFirst.getNodeId() - nodeSecond.getNodeId();
                 }
 
+            } else if ((e1 instanceof Module) && (e2 instanceof Module)) {
+                Module moduleFirst = (Module) e1;
+                Module moduleSecond = (Module) e2;
+                return moduleFirst.getPosition() - moduleSecond.getPosition();
             } else {
                 compare = e1.toString().compareTo(e2.toString());
             }
@@ -499,7 +512,10 @@ public class IndustrialNetworkView extends ViewPart
     public static final String ADD_NEW_NODE_TOOL_TIP_TEXT = "Add a node in the network.";
 
     // Enable/disable action message string.
-    public static final String ENABLE_DISABLE_ACTION_MESSAGE = "Enable/Disable";
+    // public static final String ENABLE_DISABLE_ACTION_MESSAGE =
+    // "Enable/Disable";
+    public static final String ENABLE_ACTION_MESSAGE = "Enable";
+    public static final String DISABLE_ACTION_MESSAGE = "Disable";
     public static final String GENERATE_NODE_XDC_ACTION_MESSAGE = "Export node XDC";
 
     // Object dictionary action message strings.
@@ -539,6 +555,8 @@ public class IndustrialNetworkView extends ViewPart
      */
     private Action addNewNode;
 
+    private Job exportNodeXDC;
+
     private Action addNewModule;
 
     /**
@@ -559,7 +577,9 @@ public class IndustrialNetworkView extends ViewPart
     /**
      * Enable/Disable node action.
      */
-    private Action enableDisableNode;
+    // private Action enableDisableNode;
+    private Action enable;
+    private Action disable;
 
     private Action generateNodeXDC;
 
@@ -730,8 +750,13 @@ public class IndustrialNetworkView extends ViewPart
                             .getModuleType();
                     for (ModuleType moduletype : enabledModuleTypeList) {
                         String enabledModuleType = moduletype.getType();
+                        System.err.println(
+                                "Enabled module type.." + enabledModuleType);
+                        System.err.println("Next position module type.."
+                                + nextPositionModuleType);
                         if (enabledModuleType.equals(nextPositionModuleType)) {
                             enable = true;
+
                         } else {
                             enable = false;
                         }
@@ -894,6 +919,129 @@ public class IndustrialNetworkView extends ViewPart
     }
 
     /**
+     * Verifies the enabling of module based on the module type of connected
+     * modules.
+     *
+     * @param module Instance of Module.
+     * @return <code>true</code> module is enabled, <code>false</code> module is
+     *         disabled.
+     */
+    private String errorModuleEnabled(Module module) {
+        boolean enable = false;
+        int enabledModulePosition = module.getPosition();
+        int previousModulePosition = 0;
+        HeadNodeInterface interfaceObj = module.getInterfaceOfModule();
+        List<Integer> positionToBeChecked = new ArrayList<>();
+        List<Integer> previousPositionList = new ArrayList<>();
+        Set<Integer> positionset = interfaceObj.getModuleCollection().keySet();
+        for (Integer pos : positionset) {
+            if (pos < enabledModulePosition) {
+                previousModulePosition = pos;
+                previousPositionList.add(previousModulePosition);
+            }
+
+            if (pos > enabledModulePosition) {
+                positionToBeChecked.add(pos);
+            }
+        }
+        Module enabledPositionModule = interfaceObj.getModuleCollection()
+                .get(enabledModulePosition);
+        Collections.sort(previousPositionList, Collections.reverseOrder());
+        if (previousModulePosition != 0) {
+            for (Integer previousPosition : previousPositionList) {
+                System.err.println(
+                        "Previous position!@#$ . ..." + previousPosition);
+                Module previousPositionModule = interfaceObj
+                        .getModuleCollection().get(previousPosition);
+                List<ModuleType> previousModuleTypeList = previousPositionModule
+                        .getModuleInterface().getModuleTypeList()
+                        .getModuleType();
+                if (previousPositionModule.isEnabled()) {
+                    for (ModuleType moduleType : previousModuleTypeList) {
+                        String previousModuleType = moduleType.getType();
+                        String enabledPositionModuleType = enabledPositionModule
+                                .getModuleInterface().getType();
+                        System.err.println("Previous Module Position type ...."
+                                + previousModuleType);
+                        System.err.println("Enabled Module Position type ...."
+                                + enabledPositionModuleType);
+                        if (previousModuleType
+                                .equals(enabledPositionModuleType)) {
+                            System.err.println(
+                                    "Previous module equals enabled module.....");
+                            enable = true;
+                        } else {
+                            return "The Module '"
+                                    + previousPositionModule.getModuleName()
+                                    + "' with module type " + previousModuleType
+                                    + " does not match the module '"
+                                    + enabledPositionModule.getModuleName()
+                                    + "' with module type "
+                                    + enabledPositionModuleType + ".";
+                        }
+                    }
+                }
+                if (enable) {
+                    break;
+                }
+            }
+        } else {
+            String previousModuleType = interfaceObj.getInterfaceType();
+            String enabledPositionModuleType = enabledPositionModule
+                    .getModuleInterface().getType();
+            if (previousModuleType.equals(enabledPositionModuleType)) {
+                System.err
+                        .println("Previous module equals enabled module.....");
+                enable = true;
+            } else {
+                return "The Interface '" + interfaceObj.getInterfaceUId()
+                        + "' with type " + previousModuleType
+                        + " does not match the module '"
+                        + enabledPositionModule.getModuleName()
+                        + "' with module type " + enabledPositionModuleType
+                        + ".";
+            }
+        }
+        if (positionToBeChecked != null) {
+            for (Integer nextPosition : positionToBeChecked) {
+                System.err.println("Next position @#$#%......." + nextPosition);
+                Module nextPositionModule = interfaceObj.getModuleCollection()
+                        .get(nextPosition);
+                if (nextPositionModule.isEnabled()) {
+                    String nextPositionModuleType = nextPositionModule
+                            .getModuleInterface().getType();
+                    List<ModuleType> enabledModuleTypeList = enabledPositionModule
+                            .getModuleInterface().getModuleTypeList()
+                            .getModuleType();
+                    for (ModuleType moduletype : enabledModuleTypeList) {
+                        String enabledModuleType = moduletype.getType();
+                        System.err.println(
+                                "Enabled module type.." + enabledModuleType);
+                        System.err.println("Next position module type.."
+                                + nextPositionModuleType);
+                        if (enabledModuleType.equals(nextPositionModuleType)) {
+                            enable = true;
+
+                        } else {
+                            return "The Module '"
+                                    + enabledPositionModule.getModuleName()
+                                    + "' with module type " + enabledModuleType
+                                    + " does not match the module '"
+                                    + nextPositionModule.getModuleName()
+                                    + "' with module type "
+                                    + nextPositionModuleType + ".";
+                        }
+                    }
+                    break;
+                }
+
+            }
+        }
+        System.err.println("Enable..............................." + enable);
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * Prepares the context menu in the given menu manager based on the node
      * selected in the tree viewer.
      *
@@ -925,7 +1073,11 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(showObjectDictionary);
                     manager.add(new Separator());
                 } else if (nodeObjectModel instanceof TCN) {
-                    manager.add(enableDisableNode);
+                    if (node.isEnabled()) {
+                        manager.add(disable);
+                    } else {
+                        manager.add(enable);
+                    }
                     if (node.isModularheadNode()) {
                         manager.add(new Separator());
                         manager.add(generateNodeXDC);
@@ -960,9 +1112,12 @@ public class IndustrialNetworkView extends ViewPart
                 Node node = moduleObj.getNode();
                 if (node.isEnabled()) {
                     if (moduleObj.isEnabled()) {
-                        manager.add(showProperties);
-                        manager.add(new Separator());
-                        manager.add(showObjectDictionary);
+                        manager.add(disable);
+                    } else {
+                        manager.add(enable);
+                    }
+                    if (moduleObj.isEnabled()) {
+
                         manager.add(new Separator());
                         if (moduleObj.getPreviousModulePosition(
                                 moduleObj.getPosition()) != 0) {
@@ -972,14 +1127,19 @@ public class IndustrialNetworkView extends ViewPart
                                 moduleObj.getPosition()) != 0) {
                             manager.add(moveModuleDown);
                         }
+                        manager.add(new Separator());
+                        manager.add(showObjectDictionary);
 
                     }
                     manager.add(new Separator());
-                    manager.add(enableDisableNode);
+
                 }
                 manager.add(new Separator());
                 manager.add(deleteNode);
-
+                if (moduleObj.isEnabled()) {
+                    manager.add(new Separator());
+                    manager.add(showProperties);
+                }
             }
         }
     }
@@ -1017,15 +1177,49 @@ public class IndustrialNetworkView extends ViewPart
 
         for (Object selectedObject : selectedObjectsList) {
             if (selectedObject instanceof Node) {
-                Node node = (Node) selectedObject;
-                OpenConfiguratorProjectUtils.updateModuleObjectInNode(node);
+                final Node node = (Node) selectedObject;
+                exportNodeXDC = new Job("Export module into node XDC.") {
 
-                File xdcFile = new File(node.getAbsolutePathToXdc());
-                OpenConfiguratorMessageConsole.getInstance().printInfoMessage(
-                        "Generated modular head node XDC at: "
-                                + node.getProject().getName() + "/output/"
-                                + xdcFile.getName(),
-                        node.getProject().getName());
+                    @Override
+                    protected IStatus run(IProgressMonitor monitor) {
+                        IStatus result;
+                        try {
+                            result = OpenConfiguratorProjectUtils
+                                    .updateModuleObjectInNode(node, monitor);
+                            File xdcFile = new File(
+                                    node.getAbsolutePathToXdc());
+
+                            Path outputpath = getProjectOutputPath(node);
+
+                            final java.nio.file.Path targetPath;
+
+                            if (outputpath.isLocal()) {
+                                targetPath = FileSystems.getDefault().getPath(
+                                        node.getProject().getLocation()
+                                                .toString(),
+                                        outputpath.getPath());
+                            } else {
+                                targetPath = FileSystems.getDefault()
+                                        .getPath(outputpath.getPath());
+                            }
+
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printInfoMessage(
+                                            "Generated modular head node XDC at: "
+                                                    + targetPath.toString()
+                                                    + "\\" + xdcFile.getName(),
+                                            node.getProject().getName());
+                            return result;
+                        } catch (JDOMException | IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        return null;
+                    }
+
+                };
+                exportNodeXDC.schedule();
+
             }
         }
     }
@@ -1035,6 +1229,43 @@ public class IndustrialNetworkView extends ViewPart
      */
     public PowerlinkRootNode getNodeList() {
         return rootNode;
+    }
+
+    /**
+     * @return Returns the output path settings from the project XML.
+     */
+    public Path getProjectOutputPath(Node node) {
+        PathSettings pathSett = node.getCurrentProject()
+                .getProjectConfiguration().getPathSettings();
+        String activeOutputPathID = pathSett.getActivePath();
+        if (activeOutputPathID == null) {
+            if (!pathSett.getPath().isEmpty()) {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, "defaultOutputPath");
+                if (defaultPath != null) {
+                    return new Path(node.getProject(), defaultPath.getPath(),
+                            true);
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. defaultPath not found");
+                }
+            }
+        } else {
+            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
+                    activeOutputPathID);
+            if (defaultPath != null) {
+                if (!defaultPath.getId()
+                        .equalsIgnoreCase("defaultOutputPath")) {
+                    return new Path(node.getProject(), defaultPath.getPath(),
+                            false);
+                }
+            } else {
+                System.err.println(
+                        "Unhandled error occurred. activeOutputPath not found");
+            }
+        }
+        return new Path(node.getProject(),
+                IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
     }
 
     private void handleEnableDisable(IStructuredSelection selection) {
@@ -1121,8 +1352,10 @@ public class IndustrialNetworkView extends ViewPart
                         if (isNextModulePositionAvailable(module)) {
                             MessageDialog dialog = new MessageDialog(null,
                                     "Disable module", null,
-                                    "Disabling the module will disable the modules that does not match the module type.",
-                                    MessageDialog.QUESTION,
+                                    "Disabling the module "
+                                            + module.getModuleName()
+                                            + " will disable subsequent modules if their module type do not match.",
+                                    MessageDialog.WARNING,
                                     new String[] { "Yes", "No" }, 1);
                             int result = dialog.open();
                             if (result == 0) {
@@ -1137,10 +1370,7 @@ public class IndustrialNetworkView extends ViewPart
 
                         module.setEnabled(!module.isEnabled());
                     } else {
-                        showErrorMessage(
-                                "The module type does not match.\n Module "
-                                        + module.getPosition()
-                                        + " cannot be enabled.");
+                        showErrorMessage(errorModuleEnabled(module));
                     }
                 } catch (JDOMException | IOException e) {
                     OpenConfiguratorMessageConsole.getInstance()
@@ -1252,7 +1482,8 @@ public class IndustrialNetworkView extends ViewPart
                         }
                     }
                 } else {
-                    showMessage("Delete this node not supported!");
+                    showWarningMessage("Node '" + node.getName()
+                            + "' cannot be removed from the network.");
                 }
             } else if (selectedObject instanceof Module) {
                 Module module = (Module) selectedObject;
@@ -1291,6 +1522,7 @@ public class IndustrialNetworkView extends ViewPart
                         }
 
                         validateModule(module);
+                        // moveUpModule(module);
 
                         handleRefresh();
                         viewer.refresh();
@@ -1426,7 +1658,20 @@ public class IndustrialNetworkView extends ViewPart
                 .setImageDescriptor(PlatformUI.getWorkbench().getSharedImages()
                         .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
 
-        enableDisableNode = new Action(ENABLE_DISABLE_ACTION_MESSAGE) {
+        enable = new Action(ENABLE_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+                ISelection selection = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getSelectionService()
+                        .getSelection();
+                if ((selection != null)
+                        & (selection instanceof IStructuredSelection)) {
+                    handleEnableDisable((IStructuredSelection) selection);
+                }
+
+            }
+        };
+        disable = new Action(DISABLE_ACTION_MESSAGE) {
             @Override
             public void run() {
                 ISelection selection = PlatformUI.getWorkbench()
@@ -1450,6 +1695,7 @@ public class IndustrialNetworkView extends ViewPart
                 if ((selection != null)
                         && (selection instanceof IStructuredSelection)) {
                     try {
+
                         generateXDC((IStructuredSelection) selection);
                     } catch (JDOMException | IOException e) {
                         // TODO Auto-generated catch block
@@ -1516,8 +1762,11 @@ public class IndustrialNetworkView extends ViewPart
         moveModuleDown.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.ARROW_DOWN_ICON));
 
-        enableDisableNode.setToolTipText(ENABLE_DISABLE_ACTION_MESSAGE);
-        enableDisableNode.setImageDescriptor(org.epsg.openconfigurator.Activator
+        enable.setToolTipText(ENABLE_ACTION_MESSAGE);
+        enable.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
+        disable.setToolTipText(ENABLE_ACTION_MESSAGE);
+        disable.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
 
         showObjectDictionary = new Action(
@@ -1743,6 +1992,26 @@ public class IndustrialNetworkView extends ViewPart
 
     }
 
+    private void moveUpModule(Module module) {
+        int currentPosition = module.getPosition();
+        if (String.valueOf(module.getInterfaceOfModule().getModuleAddressing())
+                .equalsIgnoreCase("MANUAL")) {
+            System.err.println("Module availability check.."
+                    + module.getModuleName() + currentPosition);
+
+            Set<Integer> positionSet = module.getInterfaceOfModule()
+                    .getModuleCollection().keySet();
+            List<Integer> positionToBeMoved = new ArrayList<Integer>();
+            for (Integer position : positionSet) {
+                if (position > currentPosition) {
+                    positionToBeMoved.add(position);
+                }
+            }
+
+        }
+
+    }
+
     @Override
     public void propertyChanged(Object source, int propId) {
         handleRefresh();
@@ -1763,6 +2032,11 @@ public class IndustrialNetworkView extends ViewPart
 
     private void showMessage(String message) {
         MessageDialog.openInformation(viewer.getControl().getShell(),
+                "POWERLINK Network", message);
+    }
+
+    private void showWarningMessage(String message) {
+        MessageDialog.openWarning(viewer.getControl().getShell(),
                 "POWERLINK Network", message);
     }
 
@@ -1822,8 +2096,21 @@ public class IndustrialNetworkView extends ViewPart
                                             .equalsIgnoreCase("MANUAL")) {
                                         if (previousModuleType.equalsIgnoreCase(
                                                 nextPositionModuleType)) {
-                                            return;
+                                            Module moduleValue = interfaceObj
+                                                    .getModuleCollection()
+                                                    .get(posit);
+                                            int newPosition = posit - 1;
+
+                                            moduleValue.setPositions(String
+                                                    .valueOf(newPosition));
+                                            // return;
                                         } else {
+                                            Module moduleValue = interfaceObj
+                                                    .getModuleCollection()
+                                                    .get(posit);
+                                            int newPosition = posit - 1;
+                                            moduleValue.setPositions(String
+                                                    .valueOf(newPosition));
                                             mod.setEnabled(false);
                                         }
                                     } else {
@@ -1888,9 +2175,36 @@ public class IndustrialNetworkView extends ViewPart
                             .equalsIgnoreCase("MANUAL")) {
                         if (previousModuleType
                                 .equalsIgnoreCase(nextModuletype)) {
+                            Module moduleValue = interfaceObj
+                                    .getModuleCollection().get(position);
+                            int newPosition = position - 1;
+                            System.err.println(
+                                    "The module entered critical position....."
+                                            + newPosition + "Name..."
+                                            + moduleValue.getModuleName());
+
+                            System.err.println(
+                                    "The module address entered critical position....."
+                                            + newPosition + "Name..."
+                                            + moduleValue.getModuleName()
+                                            + "Address..."
+                                            + moduleValue.getAddress());
+
+                            moduleValue
+                                    .setPositions(String.valueOf(newPosition));
+                            // moduleValue.setAddress(
+                            // String.valueOf(newPosition));
                             return;
                         } else {
-                            moduleObj.setEnabled(false);
+                            Module moduleValue = interfaceObj
+                                    .getModuleCollection().get(position);
+                            int newPosition = position - 1;
+                            System.err.println("new posit..... " + newPosition);
+
+                            moduleValue
+                                    .setPositions(String.valueOf(newPosition));
+                            moduleValue.setEnabled(false);
+
                         }
                     } else {
                         if (nextModuletype != null) {

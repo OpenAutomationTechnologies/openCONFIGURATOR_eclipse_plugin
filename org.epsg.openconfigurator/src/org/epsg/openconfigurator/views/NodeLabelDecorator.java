@@ -36,6 +36,7 @@ package org.epsg.openconfigurator.views;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
+import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.resources.IPluginImages;
 
@@ -77,6 +78,15 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
             }
             // Error overlay image to node with invalid XDC file.
             if (nodeObj.hasError()) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.ERROR_OVERLAY_NODE_ICON),
+                        IDecoration.BOTTOM_LEFT);
+
+            }
+        } else if (element instanceof Module) {
+            Module moduleObj = (Module) element;
+            if (moduleObj.hasError()) {
                 decoration.addOverlay(
                         org.epsg.openconfigurator.Activator.getImageDescriptor(
                                 IPluginImages.ERROR_OVERLAY_NODE_ICON),
