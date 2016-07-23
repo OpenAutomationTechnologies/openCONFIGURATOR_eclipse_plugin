@@ -107,6 +107,9 @@ public class ObjectDictionaryView extends ViewPart
     private class EmptyObjectDictionary {
         @Override
         public String toString() {
+            if (parametersVisible) {
+                return "Parameters not available.";
+            }
             return "Object dictionary not available.";
         }
     }
@@ -241,6 +244,9 @@ public class ObjectDictionaryView extends ViewPart
                 return parameterIcon;
             } else if (element instanceof VarDecleration) {
                 return varDeclarationIcon;
+            } else if (element instanceof String) {
+                // No image is needed for empty contents.
+                return null;
             }
 
             return PlatformUI.getWorkbench().getSharedImages()
@@ -253,7 +259,8 @@ public class ObjectDictionaryView extends ViewPart
                 PowerlinkObject object = (PowerlinkObject) element;
                 if (object.isModuleObject()) {
                     long objectIndex = OpenConfiguratorLibraryUtils
-                            .getModuleObjectIndex(object.getModule());
+                            .getModuleObjectsIndex(object.getModule(),
+                                    object.getId());
                     if (objectIndex != 0) {
                         return object.getNameWithId(objectIndex);
                     }
@@ -263,8 +270,8 @@ public class ObjectDictionaryView extends ViewPart
                 PowerlinkSubobject subObject = (PowerlinkSubobject) element;
                 if (subObject.isModule()) {
                     int subObjectIndex = OpenConfiguratorLibraryUtils
-                            .getModuleObjectSubIndex(subObject.getModule(),
-                                    subObject);
+                            .getModuleObjectsSubIndex(subObject.getModule(),
+                                    subObject, subObject.getObject().getId());
                     return subObject.getNameWithId(subObjectIndex);
                 }
                 return ((PowerlinkSubobject) element).getNameWithId();
@@ -297,6 +304,8 @@ public class ObjectDictionaryView extends ViewPart
                     return labelDesc.getText();
                 }
                 return pgmGrp.getUniqueId();
+            } else if (element instanceof String) {
+                return "Parameters not available.";
             }
             return element == null ? "" : element.toString();//$NON-NLS-1$
         }
@@ -483,6 +492,7 @@ public class ObjectDictionaryView extends ViewPart
                                     "parameter group cannot be displayed due to false condition set");
                         }
                     }
+                    visibleObjectsList.add(new String());
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj
@@ -546,6 +556,7 @@ public class ObjectDictionaryView extends ViewPart
                                     "parameter group cannot be displayed due to false condition set");
                         }
                     }
+                    visibleObjectsList.add(new String());
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = moduleObj
@@ -692,9 +703,9 @@ public class ObjectDictionaryView extends ViewPart
             }
         };
         toggleParameterView.setToolTipText("Switch to Parameter View");
-        toggleParameterView
-                .setImageDescriptor(org.epsg.openconfigurator.Activator
-                        .getImageDescriptor(IPluginImages.RMN_ICON));
+        toggleParameterView.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_PARAMETER_GROUP_ICON));
 
         hideNonMappableObjects = new Action(HIDE_NON_MAPPABLE_OBJECTS,
                 IAction.AS_CHECK_BOX) {
