@@ -576,10 +576,23 @@ public class AddControlledNodeWizardPage extends WizardPage {
     }
 
     private boolean isValidNodeId(short nodeId) {
-        if ((nodeId > IPowerlinkConstants.INVALID_NODE_ID)
-                && (nodeId <= IPowerlinkConstants.BROADCAST_NODE_ID)) {
-            return true;
+        switch (nodeTypeCombo.getText()) {
+            case CONTROLLED_NODE_LABEL:
+                if ((nodeId > IPowerlinkConstants.INVALID_NODE_ID)
+                        && (nodeId <= IPowerlinkConstants.CN_MAX_NODE_ID)) {
+                    return true;
+                }
+                break;
+            case REDUNDANT_MANAGING_NODE_LABEL:
+                if ((nodeId >= IPowerlinkConstants.RMN_MIN_NODE_ID)
+                        && (nodeId <= IPowerlinkConstants.RMN_MAX_NODE_ID)) {
+                    return true;
+                }
+                break;
+            default:
+                break;
         }
+
         return false;
     }
 
