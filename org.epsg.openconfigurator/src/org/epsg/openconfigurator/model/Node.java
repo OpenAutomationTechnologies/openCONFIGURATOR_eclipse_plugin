@@ -429,6 +429,15 @@ public class Node {
         return pathToXdc;
     }
 
+    public String getAbsolutePathToXdc(String nodeName) {
+        String pathToXdc = project.getLocation().toString();
+        String modulePath = nodeName;
+        pathToXdc = pathToXdc + IPath.SEPARATOR
+                + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                + IPath.SEPARATOR + modulePath;
+        return pathToXdc;
+    }
+
     /**
      * @return The value of AsndMaxNumber from object dictionary
      */

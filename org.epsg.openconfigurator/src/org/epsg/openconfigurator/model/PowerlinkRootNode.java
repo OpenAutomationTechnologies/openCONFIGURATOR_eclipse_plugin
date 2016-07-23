@@ -53,6 +53,8 @@ import java.util.Set;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -485,7 +487,8 @@ public class PowerlinkRootNode {
 
                 } catch (JAXBException | SAXException
                         | ParserConfigurationException | FileNotFoundException
-                        | UnsupportedEncodingException e) {
+                        | UnsupportedEncodingException
+                        | NullPointerException e) {
                     if (e instanceof FileNotFoundException) {
                         String errorMessage = MessageFormat.format(
                                 XDC_FILE_NOT_FOUND_ERROR,
@@ -591,10 +594,21 @@ public class PowerlinkRootNode {
                                         .put(new Integer(
                                                 processingModule.getPosition()),
                                                 newModule);
+                                processingNode.getInterface()
+                                        .getAddressCollection()
+                                        .put(new Integer(
+                                                processingModule.getAddress()),
+                                                newModule);
+                                processingNode.getInterface()
+                                        .getModuleNameCollection().put(
+                                                new String(processingModule
+                                                        .getModuleName()),
+                                                newModule);
                             } catch (JAXBException | SAXException
                                     | ParserConfigurationException
                                     | FileNotFoundException
-                                    | UnsupportedEncodingException e) {
+                                    | UnsupportedEncodingException
+                                    | NullPointerException e) {
                                 if (e instanceof FileNotFoundException) {
                                     String errorMessage = MessageFormat.format(
                                             XDC_FILE_NOT_FOUND_ERROR,
@@ -619,10 +633,13 @@ public class PowerlinkRootNode {
                                     processingModule.setError(errorMessage);
                                 }
                             }
-                            processingNode.getInterface().getModuleCollection()
-                                    .put(new Integer(
-                                            processingModule.getPosition()),
-                                            processingModule);
+                            if (processingNode.getInterface() != null) {
+                                processingNode.getInterface()
+                                        .getModuleCollection()
+                                        .put(new Integer(
+                                                processingModule.getPosition()),
+                                                processingModule);
+                            }
                             monitor.worked(1);
 
                         }
@@ -877,8 +894,13 @@ public class PowerlinkRootNode {
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
                     InterfaceList.Interface.Module moduleModel = (InterfaceList.Interface.Module) moduleObjectModel;
                     int position = module.getPosition();
+                    module.getInterfaceOfModule().getModuleNameCollection()
+                            .remove(module.getModuleName());
                     module.getInterfaceOfModule().getModuleCollection()
                             .remove(position);
+                    module.getInterfaceOfModule().getAddressCollection()
+                            .remove(module.getAddress());
+
                     System.err
                             .println("The module removed form the java model.");
                     // retVal = true;
@@ -1058,6 +1080,28 @@ public class PowerlinkRootNode {
 
                     // Delete the XDC file from the deviceConfiguration
                     // directory.
+                    if (node.isModularheadNode()) {
+
+                        Collection<Module> moduleList = node.getInterface()
+                                .getModuleCollection().values();
+                        if (moduleList != null) {
+                            for (Module module : moduleList) {
+                                Files.delete(Paths
+                                        .get(module.getAbsolutePathToXdc()));
+                            }
+                            java.nio.file.Path nodeImportFile = new File(
+                                    node.getPathToXDC()).toPath();
+                            String nodeName = FilenameUtils.removeExtension(
+                                    nodeImportFile.getFileName().toString());
+                            System.out.println("The path to be deleted.."
+                                    + node.getAbsolutePathToXdc(nodeName));
+                            FileUtils.deleteDirectory(new File(
+                                    node.getAbsolutePathToXdc(nodeName)));
+                            // Files.delete(Paths
+                            // .get(node.getAbsolutePathToXdc(nodeName)));
+                        }
+                    }
+
                     Files.delete(Paths.get(node.getAbsolutePathToXdc()));
 
                 } catch (JDOMException | IOException ex) {
