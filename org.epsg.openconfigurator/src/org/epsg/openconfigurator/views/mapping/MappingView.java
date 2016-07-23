@@ -272,7 +272,7 @@ public class MappingView extends ViewPart {
                                     "Enabled mapping entries ("
                                             + enabledEntriesActValue
                                             + ") exceeds the available subobjects("
-                                            + availableSubObjects + ")");
+                                            + availableSubObjects + ").");
                             return;
                         }
 
@@ -559,11 +559,15 @@ public class MappingView extends ViewPart {
                                 long moduleObjectIndex = OpenConfiguratorLibraryUtils
                                         .getModuleObjectIndex(
                                                 subObjectTobeMapped.getModule(),
-                                                subObjectTobeMapped);
+                                                subObjectTobeMapped,
+                                                subObjectTobeMapped.getObject()
+                                                        .getId());
                                 int moduleSubObjectIndex = OpenConfiguratorLibraryUtils
-                                        .getModuleObjectSubIndex(
+                                        .getModuleObjectsSubIndex(
                                                 subObjectTobeMapped.getModule(),
-                                                subObjectTobeMapped);
+                                                subObjectTobeMapped,
+                                                subObjectTobeMapped.getObject()
+                                                        .getId());
                                 Result res = OpenConfiguratorLibraryUtils
                                         .mappModuleSubObjectToChannel(
                                                 pdoChannel, mappingSubObject,
@@ -597,9 +601,10 @@ public class MappingView extends ViewPart {
                             } else {
                                 if (objectTobeMapped.isModuleObject()) {
                                     long moduleObjectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectIndex(
+                                            .getModuleObjectsIndex(
                                                     objectTobeMapped
-                                                            .getModule());
+                                                            .getModule(),
+                                                    objectTobeMapped.getId());
                                     res = OpenConfiguratorLibraryUtils
                                             .mappModuleObjectToChannel(
                                                     pdoChannel,
@@ -957,14 +962,20 @@ public class MappingView extends ViewPart {
                                                 for (PowerlinkSubobject subObject : object
                                                         .getTpdoMappableObjectList()) {
                                                     long objectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectIndex(
-                                                                    subObject
-                                                                            .getModule());
-                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectSubIndex(
+                                                            .getModuleObjectsIndex(
                                                                     subObject
                                                                             .getModule(),
-                                                                    subObject);
+                                                                    subObject
+                                                                            .getObject()
+                                                                            .getId());
+                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                            .getModuleObjectsSubIndex(
+                                                                    subObject
+                                                                            .getModule(),
+                                                                    subObject,
+                                                                    subObject
+                                                                            .getObject()
+                                                                            .getId());
                                                     if (objectIdValue == objectIndex) {
                                                         if (subObjectIndex == subObjectIdValue) {
                                                             return signedYesImage;
@@ -974,14 +985,20 @@ public class MappingView extends ViewPart {
                                                 for (PowerlinkSubobject subObject : object
                                                         .getRpdoMappableObjectList()) {
                                                     long objectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectIndex(
-                                                                    subObject
-                                                                            .getModule());
-                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectSubIndex(
+                                                            .getModuleObjectsIndex(
                                                                     subObject
                                                                             .getModule(),
-                                                                    subObject);
+                                                                    subObject
+                                                                            .getObject()
+                                                                            .getId());
+                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                            .getModuleObjectsSubIndex(
+                                                                    subObject
+                                                                            .getModule(),
+                                                                    subObject,
+                                                                    subObject
+                                                                            .getObject()
+                                                                            .getId());
                                                     if (objectIdValue == objectIndex) {
                                                         if (subObjectIndex == subObjectIdValue) {
                                                             return signedYesImage;
@@ -1457,180 +1474,15 @@ public class MappingView extends ViewPart {
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
                     setPartName(nodeObj.getNodeIDWithName());
+
                     // Set null as input to the view, when the node is disabled.
-                    if (!nodeObj.isEnabled()) {
-                        setPartName("Mapping View");
-
-                        // Summary
-                        tpdoSummaryTableViewer.setInput(null);
-                        rpdoSummaryTableViewer.setInput(null);
-
-                        // TPDO page
-                        tpdoChannelComboViewer.setInput(null);
-                        tpdoTableViewer.setInput(null);
-                        sndtoNodecomboviewer.setInput(null);
-                        setPdoGuiControlsEnabled(PdoType.TPDO, false);
-                        tpdoActionsbuttonGroup.setVisible(false);
-                        tpdoEnabledMappingEntriesText.removeVerifyListener(
-                                enabledEntriesVerifyListener);
-                        tpdoEnabledMappingEntriesText
-                                .setText(StringUtils.EMPTY);
-                        tpdoEnabledMappingEntriesText.addVerifyListener(
-                                enabledEntriesVerifyListener);
-                        tpdoEnabledMappingEntriesText.setEnabled(false);
-                        tpdoChannelSize.setText(StringUtils.EMPTY);
-
-                        // RPDO page
-                        rpdoChannelComboViewer.setInput(null);
-                        rpdoTableViewer.setInput(null);
-                        receiveFromNodecomboviewer.setInput(null);
-                        setPdoGuiControlsEnabled(PdoType.RPDO, false);
-                        rpdoActionsbuttonGroup.setVisible(false);
-                        rpdoEnabledMappingEntriesText.removeVerifyListener(
-                                enabledEntriesVerifyListener);
-                        rpdoEnabledMappingEntriesText
-                                .setText(StringUtils.EMPTY);
-                        rpdoEnabledMappingEntriesText.addVerifyListener(
-                                enabledEntriesVerifyListener);
-                        rpdoEnabledMappingEntriesText.setEnabled(false);
-                        rpdoChannelSize.setText(StringUtils.EMPTY);
-                        return;
-                    }
-
-                    updateTargetNodeIdList();
-
-                    // PDO summary page
-                    tpdoSummaryTableViewer.setInput(nodeObj);
-                    rpdoSummaryTableViewer.setInput(nodeObj);
-
-                    // TPDO page
-                    List<TpdoChannel> tpdoChannels = nodeObj
-                            .getObjectDictionary().getTpdoChannelsList();
-                    tpdoChannelComboViewer.setInput(tpdoChannels);
-                    if (tpdoChannels.size() > 0) {
-                        ISelection channelSelection = new StructuredSelection(
-                                tpdoChannels.get(0));
-                        tpdoChannelComboViewer.setSelection(channelSelection,
-                                true);
-                        tpdoMappingObjClmnEditingSupport.setInput(
-                                getMappableObjectsList(nodeObj, PdoType.TPDO));
-                    } else {
-                        tpdoTableViewer.setInput(null);
-                        sndtoNodecomboviewer.setInput(null);
-                        sndtoNodecomboviewer.setSelection(null, true);
-                    }
-
-                    handlePdoTableResize(PdoType.TPDO,
-                            showAdvancedview.isChecked());
-
-                    // RPDO Page
-                    List<RpdoChannel> rpdoChannels = nodeObj
-                            .getObjectDictionary().getRpdoChannelsList();
-                    rpdoChannelComboViewer.setInput(rpdoChannels);
-                    if (rpdoChannels.size() > 0) {
-                        ISelection channelSelection = new StructuredSelection(
-                                rpdoChannels.get(0));
-                        rpdoChannelComboViewer.setSelection(channelSelection,
-                                true);
-                        rpdoMappingObjClmnEditingSupport.setInput(
-                                getMappableObjectsList(nodeObj, PdoType.RPDO));
-                    } else {
-                        rpdoTableViewer.setInput(null);
-                        receiveFromNodecomboviewer.setInput(null);
-                        receiveFromNodecomboviewer.setSelection(null, true);
-                    }
-
-                    handlePdoTableResize(PdoType.RPDO,
-                            showAdvancedview.isChecked());
+                    displayMappingView(nodeObj);
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
                     nodeObj = module.getNode();
                     setPartName(nodeObj.getNodeIDWithName());
                     // Set null as input to the view, when the node is disabled.
-                    if (!nodeObj.isEnabled()) {
-                        setPartName("Mapping View");
-
-                        // Summary
-                        tpdoSummaryTableViewer.setInput(null);
-                        rpdoSummaryTableViewer.setInput(null);
-
-                        // TPDO page
-                        tpdoChannelComboViewer.setInput(null);
-                        tpdoTableViewer.setInput(null);
-                        sndtoNodecomboviewer.setInput(null);
-                        setPdoGuiControlsEnabled(PdoType.TPDO, false);
-                        tpdoActionsbuttonGroup.setVisible(false);
-                        tpdoEnabledMappingEntriesText.removeVerifyListener(
-                                enabledEntriesVerifyListener);
-                        tpdoEnabledMappingEntriesText
-                                .setText(StringUtils.EMPTY);
-                        tpdoEnabledMappingEntriesText.addVerifyListener(
-                                enabledEntriesVerifyListener);
-                        tpdoEnabledMappingEntriesText.setEnabled(false);
-                        tpdoChannelSize.setText(StringUtils.EMPTY);
-
-                        // RPDO page
-                        rpdoChannelComboViewer.setInput(null);
-                        rpdoTableViewer.setInput(null);
-                        receiveFromNodecomboviewer.setInput(null);
-                        setPdoGuiControlsEnabled(PdoType.RPDO, false);
-                        rpdoActionsbuttonGroup.setVisible(false);
-                        rpdoEnabledMappingEntriesText.removeVerifyListener(
-                                enabledEntriesVerifyListener);
-                        rpdoEnabledMappingEntriesText
-                                .setText(StringUtils.EMPTY);
-                        rpdoEnabledMappingEntriesText.addVerifyListener(
-                                enabledEntriesVerifyListener);
-                        rpdoEnabledMappingEntriesText.setEnabled(false);
-                        rpdoChannelSize.setText(StringUtils.EMPTY);
-                        return;
-                    }
-
-                    updateTargetNodeIdList();
-
-                    // PDO summary page
-                    tpdoSummaryTableViewer.setInput(nodeObj);
-                    rpdoSummaryTableViewer.setInput(nodeObj);
-
-                    // TPDO page
-                    List<TpdoChannel> tpdoChannels = nodeObj
-                            .getObjectDictionary().getTpdoChannelsList();
-                    tpdoChannelComboViewer.setInput(tpdoChannels);
-                    if (tpdoChannels.size() > 0) {
-                        ISelection channelSelection = new StructuredSelection(
-                                tpdoChannels.get(0));
-                        tpdoChannelComboViewer.setSelection(channelSelection,
-                                true);
-                        tpdoMappingObjClmnEditingSupport.setInput(
-                                getMappableObjectsList(nodeObj, PdoType.TPDO));
-                    } else {
-                        tpdoTableViewer.setInput(null);
-                        sndtoNodecomboviewer.setInput(null);
-                        sndtoNodecomboviewer.setSelection(null, true);
-                    }
-
-                    handlePdoTableResize(PdoType.TPDO,
-                            showAdvancedview.isChecked());
-
-                    // RPDO Page
-                    List<RpdoChannel> rpdoChannels = nodeObj
-                            .getObjectDictionary().getRpdoChannelsList();
-                    rpdoChannelComboViewer.setInput(rpdoChannels);
-                    if (rpdoChannels.size() > 0) {
-                        ISelection channelSelection = new StructuredSelection(
-                                rpdoChannels.get(0));
-                        rpdoChannelComboViewer.setSelection(channelSelection,
-                                true);
-                        rpdoMappingObjClmnEditingSupport.setInput(
-                                getMappableObjectsList(nodeObj, PdoType.RPDO));
-                    } else {
-                        rpdoTableViewer.setInput(null);
-                        receiveFromNodecomboviewer.setInput(null);
-                        receiveFromNodecomboviewer.setSelection(null, true);
-                    }
-
-                    handlePdoTableResize(PdoType.RPDO,
-                            showAdvancedview.isChecked());
+                    displayMappingView(nodeObj);
                 } else {
                     System.err.println(
                             "Other than node is selected!" + selectedObj);
@@ -1647,21 +1499,22 @@ public class MappingView extends ViewPart {
      * Source workbench part.
      */
     private IWorkbenchPart sourcePart;
+
     /**
      * Listener instance to listen to the changes in the source part.
      */
     private final PartListener partListener = new PartListener();
-
     /**
      * TPDO page controls
      */
     private TabItem tbtmTpdo;
+
     private ComboViewer tpdoChannelComboViewer;
     private ComboViewer sndtoNodecomboviewer;
     private TableViewer tpdoTableViewer;
     private TableViewerColumn tpdoMappingObjectColumn;
-
     private TableViewerColumn tpdoActionsColumn;
+
     private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
     private Composite tpdoPageFooter;
     private Button btnTpdoChannelMapAvailableObjects;
@@ -1675,40 +1528,39 @@ public class MappingView extends ViewPart {
     private TableColumn tpdoTblclmnActualValue;
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
-
     private ModifyListener tpdoEnabledMappingEntriesTextModifyListener;
+
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
-
     private SelectionListener tpdoActionsClearBtnSelectionListener;
+
     private SelectionListener tpdoActionsDownBtnSelectionListener;
     private SelectionListener tpdoActionsUpBtnSelectionListener;
-
     /**
      * RPDO page controls
      */
     private TabItem tbtmRpdo;
-    private ComboViewer rpdoChannelComboViewer;
 
+    private ComboViewer rpdoChannelComboViewer;
     private ComboViewer receiveFromNodecomboviewer;
+
     private TableViewer rpdoTableViewer;
     private TableViewerColumn rpdoMappingObjectColumn;
-
     private TableViewerColumn rpdoActionsColumn;
 
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
+
     private Composite rpdoPageFooter;
     private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
     private Text rpdoEnabledMappingEntriesText;
     private Text rpdoChannelSize;
     private TableEditor rpdoTableActionsEditor;
-
     private Composite rpdoActionsbuttonGroup;
 
     private Button rpdoActionsUpButton;
-    private Button rpdoActionsDownButton;
 
+    private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
 
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
@@ -1718,10 +1570,10 @@ public class MappingView extends ViewPart {
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
 
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
+
     private SelectionListener rpdoClearAllMappingBtnSelectionListener;
     private SelectionListener rpdoActionsClearBtnSelectionListener;
     private SelectionListener rpdoActionsDownBtnSelectionListener;
-
     private SelectionListener rpdoActionsUpBtnSelectionListener;
 
     /**
@@ -1730,36 +1582,36 @@ public class MappingView extends ViewPart {
     private Action showAdvancedview;
 
     private final Image clearImage;
+
     private final Image upArrowImage;
     private final Image downArrowImage;
-
     private final Image warningImage;
-    private final Image errorImage;
 
+    private final Image errorImage;
     private final Image signedYesImage;
+
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
-
     /**
      * Summary Page
      */
     private TabItem tbtmPdoConfiguration;
+
     private TableViewer tpdoSummaryTableViewer;
     private TableColumn tpdoSummaryClmnMappingVersion;
     private boolean tpdoSummaryOnlyShowChannelsWithData = false;
-
     private TableViewer rpdoSummaryTableViewer;
+
     private TableColumn rpdoSummaryClmnMappingVersion;
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
-
     /**
      * Common application model data
      */
     private final Node emptyNode;
+
     private final Node selfReceiptNode;
     private final PowerlinkObject emptyObject;
     private final ArrayList<Node> targetNodeIdList = new ArrayList<Node>();
-
     /**
      * VerifyListener to update the number of available Mapping object entries
      */
@@ -2632,6 +2484,87 @@ public class MappingView extends ViewPart {
                 networkViewPartSelectionListener);
     }
 
+    public void displayMappingView(Node nodeObj) {
+        if (!nodeObj.isEnabled()) {
+            setPartName("Mapping View");
+
+            // Summary
+            tpdoSummaryTableViewer.setInput(null);
+            rpdoSummaryTableViewer.setInput(null);
+
+            // TPDO page
+            tpdoChannelComboViewer.setInput(null);
+            tpdoTableViewer.setInput(null);
+            sndtoNodecomboviewer.setInput(null);
+            setPdoGuiControlsEnabled(PdoType.TPDO, false);
+            tpdoActionsbuttonGroup.setVisible(false);
+            tpdoEnabledMappingEntriesText
+                    .removeVerifyListener(enabledEntriesVerifyListener);
+            tpdoEnabledMappingEntriesText.setText(StringUtils.EMPTY);
+            tpdoEnabledMappingEntriesText
+                    .addVerifyListener(enabledEntriesVerifyListener);
+            tpdoEnabledMappingEntriesText.setEnabled(false);
+            tpdoChannelSize.setText(StringUtils.EMPTY);
+
+            // RPDO page
+            rpdoChannelComboViewer.setInput(null);
+            rpdoTableViewer.setInput(null);
+            receiveFromNodecomboviewer.setInput(null);
+            setPdoGuiControlsEnabled(PdoType.RPDO, false);
+            rpdoActionsbuttonGroup.setVisible(false);
+            rpdoEnabledMappingEntriesText
+                    .removeVerifyListener(enabledEntriesVerifyListener);
+            rpdoEnabledMappingEntriesText.setText(StringUtils.EMPTY);
+            rpdoEnabledMappingEntriesText
+                    .addVerifyListener(enabledEntriesVerifyListener);
+            rpdoEnabledMappingEntriesText.setEnabled(false);
+            rpdoChannelSize.setText(StringUtils.EMPTY);
+            return;
+        }
+
+        updateTargetNodeIdList();
+
+        // PDO summary page
+        tpdoSummaryTableViewer.setInput(nodeObj);
+        rpdoSummaryTableViewer.setInput(nodeObj);
+
+        // TPDO page
+        List<TpdoChannel> tpdoChannels = nodeObj.getObjectDictionary()
+                .getTpdoChannelsList();
+        tpdoChannelComboViewer.setInput(tpdoChannels);
+        if (tpdoChannels.size() > 0) {
+            ISelection channelSelection = new StructuredSelection(
+                    tpdoChannels.get(0));
+            tpdoChannelComboViewer.setSelection(channelSelection, true);
+            tpdoMappingObjClmnEditingSupport
+                    .setInput(getMappableObjectsList(nodeObj, PdoType.TPDO));
+        } else {
+            tpdoTableViewer.setInput(null);
+            sndtoNodecomboviewer.setInput(null);
+            sndtoNodecomboviewer.setSelection(null, true);
+        }
+
+        handlePdoTableResize(PdoType.TPDO, showAdvancedview.isChecked());
+
+        // RPDO Page
+        List<RpdoChannel> rpdoChannels = nodeObj.getObjectDictionary()
+                .getRpdoChannelsList();
+        rpdoChannelComboViewer.setInput(rpdoChannels);
+        if (rpdoChannels.size() > 0) {
+            ISelection channelSelection = new StructuredSelection(
+                    rpdoChannels.get(0));
+            rpdoChannelComboViewer.setSelection(channelSelection, true);
+            rpdoMappingObjClmnEditingSupport
+                    .setInput(getMappableObjectsList(nodeObj, PdoType.RPDO));
+        } else {
+            rpdoTableViewer.setInput(null);
+            receiveFromNodecomboviewer.setInput(null);
+            receiveFromNodecomboviewer.setSelection(null, true);
+        }
+
+        handlePdoTableResize(PdoType.RPDO, showAdvancedview.isChecked());
+    }
+
     @Override
     public void dispose() {
         super.dispose();
@@ -2769,8 +2702,9 @@ public class MappingView extends ViewPart {
                                 if (object.isTpdoMappable()
                                         || object.isRpdoMappable()) {
                                     long objectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectIndex(
-                                                    object.getModule());
+                                            .getModuleObjectsIndex(
+                                                    object.getModule(),
+                                                    object.getId());
                                     return object.getNameWithId(objectIndex);
                                 }
 
@@ -2780,12 +2714,16 @@ public class MappingView extends ViewPart {
                                 for (PowerlinkSubobject subObject : object
                                         .getTpdoMappableObjectList()) {
                                     long objectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectIndex(
-                                                    subObject.getModule());
-                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectSubIndex(
+                                            .getModuleObjectsIndex(
                                                     subObject.getModule(),
-                                                    subObject);
+                                                    subObject.getObject()
+                                                            .getId());
+                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectsSubIndex(
+                                                    subObject.getModule(),
+                                                    subObject,
+                                                    subObject.getObject()
+                                                            .getId());
                                     if (objectIdValue == objectIndex) {
                                         if (subObjectIndex == subObjectIdValue) {
                                             return subObject.getNameWithId(
@@ -2797,12 +2735,16 @@ public class MappingView extends ViewPart {
                                 for (PowerlinkSubobject subObject : object
                                         .getRpdoMappableObjectList()) {
                                     long objectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectIndex(
-                                                    subObject.getModule());
-                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectSubIndex(
+                                            .getModuleObjectsIndex(
                                                     subObject.getModule(),
-                                                    subObject);
+                                                    subObject.getObject()
+                                                            .getId());
+                                    int subObjectIndex = OpenConfiguratorLibraryUtils
+                                            .getModuleObjectsSubIndex(
+                                                    subObject.getModule(),
+                                                    subObject,
+                                                    subObject.getObject()
+                                                            .getId());
                                     if (objectIdValue == objectIndex) {
                                         if (subObjectIndex == subObjectIdValue) {
                                             return subObject.getNameWithId(

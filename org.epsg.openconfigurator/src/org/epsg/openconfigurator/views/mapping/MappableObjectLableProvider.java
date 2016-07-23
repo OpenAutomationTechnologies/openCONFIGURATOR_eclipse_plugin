@@ -56,19 +56,26 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
         if (element instanceof PowerlinkObject) {
             PowerlinkObject obj = (PowerlinkObject) element;
             if (obj.isModuleObject()) {
+
                 long objectIndex = OpenConfiguratorLibraryUtils
-                        .getModuleObjectIndex(obj.getModule());
+                        .getModuleObjectsIndex(obj.getModule(), obj.getId());
                 return obj.getNameWithId(objectIndex);
             }
             return obj.getNameWithId();
         } else if (element instanceof PowerlinkSubobject) {
             PowerlinkSubobject obj = (PowerlinkSubobject) element;
             if (obj.isModule()) {
+
                 long objectIndex = OpenConfiguratorLibraryUtils
-                        .getModuleObjectIndex(obj.getModule());
+                        .getModuleObjectsIndex(obj.getModule(),
+                                obj.getObject().getId());
                 int subObjectIndex = OpenConfiguratorLibraryUtils
-                        .getModuleObjectSubIndex(obj.getModule(), obj);
+                        .getModuleObjectsSubIndex(obj.getModule(), obj,
+                                obj.getObject().getId());
+                System.err.println("The module object index ...." + objectIndex
+                        + "Object ID.." + obj.getId());
                 return obj.getNameWithId(objectIndex, subObjectIndex);
+
             }
             return obj.getUniqueName();
         }

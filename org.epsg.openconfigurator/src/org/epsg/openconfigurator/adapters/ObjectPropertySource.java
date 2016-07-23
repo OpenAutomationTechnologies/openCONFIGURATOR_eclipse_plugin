@@ -231,7 +231,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_INDEX_ID:
                     if (plkObject.isModuleObject()) {
                         long objectIndex = OpenConfiguratorLibraryUtils
-                                .getModuleObjectIndex(plkObject.getModule());
+                                .getModuleObjectsIndex(plkObject.getModule(),
+                                        plkObject.getId());
                         if (objectIndex != 0) {
                             retObj = plkObject.getModuleObjectID(objectIndex);
                         }
@@ -314,7 +315,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
     protected String handleActualValue(Object value) {
         if (isModuleObject()) {
             long newObjectIndex = OpenConfiguratorLibraryUtils
-                    .getModuleObjectIndex(plkObject.getModule());
+                    .getModuleObjectsIndex(plkObject.getModule(),
+                            plkObject.getId());
             Result res = OpenConfiguratorLibraryUtils
                     .validateModuleObjectActualValue(plkObject, (String) value,
                             newObjectIndex);
@@ -390,7 +392,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.ui.views.properties.IPropertySource#isPropertySet(java.lang.
      * Object)
@@ -402,7 +404,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.ui.views.properties.IPropertySource#resetPropertyValue(java.
      * lang.Object)
@@ -440,7 +442,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
 
     /**
      * Sets the POWERLINK object instance
-     * 
+     *
      * @param adaptableObject Instance of PowerlinkObject
      */
     public void setObjectData(PowerlinkObject adaptableObject) {
@@ -460,8 +462,9 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
                         if (isModuleObject()) {
                             long newObjectIndex = OpenConfiguratorLibraryUtils
-                                    .getModuleObjectIndex(
-                                            plkObject.getModule());
+                                    .getModuleObjectsIndex(
+                                            plkObject.getModule(),
+                                            plkObject.getId());
                             Result res = OpenConfiguratorLibraryUtils
                                     .setModuleObjectActualValue(plkObject,
                                             (String) value, newObjectIndex);

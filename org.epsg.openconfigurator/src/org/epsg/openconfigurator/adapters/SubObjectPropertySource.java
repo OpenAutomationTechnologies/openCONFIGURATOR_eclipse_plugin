@@ -249,8 +249,9 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_INDEX_ID:
                     if (plkSubObject.getObject().isModuleObject()) {
                         long objectIndex = OpenConfiguratorLibraryUtils
-                                .getModuleObjectIndex(
-                                        plkSubObject.getObject().getModule());
+                                .getModuleObjectsIndex(
+                                        plkSubObject.getObject().getModule(),
+                                        plkSubObject.getObject().getId());
                         if (objectIndex != 0) {
                             retObj = plkSubObject.getObject()
                                     .getModuleObjectID(objectIndex);
@@ -262,8 +263,9 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_SUB_INDEX_ID:
                     if (plkSubObject.isModule()) {
                         int subObjectIndex = OpenConfiguratorLibraryUtils
-                                .getModuleObjectSubIndex(
-                                        plkSubObject.getModule(), plkSubObject);
+                                .getModuleObjectsSubIndex(
+                                        plkSubObject.getModule(), plkSubObject,
+                                        plkSubObject.getObject().getId());
 
                         retObj = plkSubObject
                                 .getModuleSubObjectID(subObjectIndex);
@@ -346,7 +348,8 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
     protected String handleActualValue(Object value) {
         if (isModuleSubObject()) {
             long newObjectIndex = OpenConfiguratorLibraryUtils
-                    .getModuleObjectIndex(plkSubObject.getModule());
+                    .getModuleObjectsIndex(plkSubObject.getModule(),
+                            plkSubObject.getObject().getId());
             Result res = OpenConfiguratorLibraryUtils
                     .validateModuleSubobjectActualValue(plkSubObject,
                             (String) value, newObjectIndex);
@@ -515,8 +518,9 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
                         if (isModuleSubObject()) {
                             long newObjectIndex = OpenConfiguratorLibraryUtils
-                                    .getModuleObjectIndex(
-                                            plkSubObject.getModule());
+                                    .getModuleObjectsIndex(
+                                            plkSubObject.getModule(),
+                                            plkSubObject.getObject().getId());
                             Result res = OpenConfiguratorLibraryUtils
                                     .setModuleSubObjectActualValue(plkSubObject,
                                             (String) value, newObjectIndex);

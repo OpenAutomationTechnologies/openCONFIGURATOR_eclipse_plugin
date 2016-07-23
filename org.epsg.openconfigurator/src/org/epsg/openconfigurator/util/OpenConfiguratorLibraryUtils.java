@@ -954,11 +954,12 @@ public class OpenConfiguratorLibraryUtils {
                         actualValue, object.getRangeSelector());
 
                 System.err.println("Module Object Index.... "
-                        + getModuleObjectIndex(module));
+                        + getModuleObjectsIndex(module, object.getId()));
 
                 if (libApiRes.IsSuccessful()) {
                     libApiRes = core.SetObjectLimits(node.getNetworkId(),
-                            node.getNodeId(), getModuleObjectIndex(module),
+                            node.getNodeId(),
+                            getModuleObjectsIndex(module, object.getId()),
                             object.getLowLimit(), object.getHighLimit());
                     if (!libApiRes.IsSuccessful()) {
                         object.setError(getErrorMessage(libApiRes));
@@ -1179,7 +1180,7 @@ public class OpenConfiguratorLibraryUtils {
                                 + object.getIdHex());
             }
 
-            long objectIndex = getModuleObjectIndex(module);
+            long objectIndex = getModuleObjectsIndex(module, object.getId());
             System.err.println("Object Index...." + objectIndex);
             libApiRes = addSubObjects(module, object, objectIndex);
 
@@ -2950,7 +2951,9 @@ public class OpenConfiguratorLibraryUtils {
                 if (libApiRes.IsSuccessful()) {
                     System.err.println("Index#####......" + index);
                     libApiRes = core.SetSubObjectLimits(node.getNetworkId(),
-                            node.getNodeId(), index, subObject.getId(),
+                            node.getNodeId(), index,
+                            (short) getModuleObjectsSubIndex(module, subObject,
+                                    subObject.getObject().getId()),
                             subObject.getLowLimit(), subObject.getHighLimit());
                     if (!libApiRes.IsSuccessful()) {
                         subObject.setError(getErrorMessage(libApiRes));
@@ -3444,7 +3447,8 @@ public class OpenConfiguratorLibraryUtils {
 
     private static Result createModule(Module module) {
         Node node = module.getNode();
-        Result libApiRes = OpenConfiguratorCore.GetInstance().CreateModule(
+        Result libApiRes = new Result();
+        libApiRes = OpenConfiguratorCore.GetInstance().CreateModule(
                 node.getNetworkId(), node.getNodeId(),
                 node.getInterface().getInterfaceUId(), module.getChildID(),
                 module.getPosition(), module.getAddress(),
@@ -3562,6 +3566,24 @@ public class OpenConfiguratorLibraryUtils {
             }
         }
         return accessType;
+    }
+
+    public static String getActualValueOfObject(Node node,
+            PowerlinkSubobject powerlinkSubobject, int subIndex,
+            long moduleObjectIndex) {
+        String[] actualValue = new String[1];
+        short subObjectIndex = (short) subIndex;
+        Result res = OpenConfiguratorCore.GetInstance().GetSubObjectActualValue(
+                node.getNetworkId(), node.getNodeId(), moduleObjectIndex,
+                subObjectIndex, actualValue);
+        if (!res.IsSuccessful()) {
+            System.err.println(res);
+        }
+        System.err.println("The actual value of sub-Object.."
+                + powerlinkSubobject.getNameWithId(subObjectIndex)
+                + " actualValue.." + actualValue[0]);
+        return actualValue[0];
+
     }
 
     /**
@@ -4089,10 +4111,6 @@ public class OpenConfiguratorLibraryUtils {
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), 0000, -1,
                         index, subIndex);
-        System.out.println("Current Index....." + index[0]);
-        System.out.println("Current sub Index....." + subIndex[0]);
-        System.out.println("Child ID....." + module.getChildID());
-        System.out.println("Child position....." + module.getPosition());
         if (!libApiRes.IsSuccessful()) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printLibraryErrorMessage(libApiRes);
@@ -4108,7 +4126,7 @@ public class OpenConfiguratorLibraryUtils {
      * @return Library result instance.
      */
     public static long getModuleObjectIndex(Module module,
-            PowerlinkSubobject subObject) {
+            PowerlinkSubobject subObject, long id) {
         Result libApiRes = new Result();
         Node node = module.getNode();
 
@@ -4118,17 +4136,71 @@ public class OpenConfiguratorLibraryUtils {
         libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
-                        module.getChildID(), module.getPosition(), 0000,
+                        module.getChildID(), module.getPosition(), id,
                         subObject.getId(), index, subIndex);
         System.out.println("Current Index....." + index[0]);
         System.out.println("Current sub Index....." + subIndex[0]);
         System.out.println("Child ID....." + module.getChildID());
         System.out.println("Child position....." + module.getPosition());
         if (!libApiRes.IsSuccessful()) {
+            System.err.println("getModuleObjectIndex.." + libApiRes);
             OpenConfiguratorMessageConsole.getInstance()
                     .printLibraryErrorMessage(libApiRes);
         }
         return index[0];
+    }
+
+    public static long getModuleObjectsIndex(Module module, long id) {
+        Result libApiRes = new Result();
+        Node node = module.getNode();
+
+        long[] index = new long[1];
+        int[] subIndex = new int[1];
+
+        libApiRes = OpenConfiguratorCore.GetInstance()
+                .GetModuleObjectCurrentIndex(node.getNetworkId(),
+                        node.getNodeId(), node.getInterface().getInterfaceUId(),
+                        module.getChildID(), module.getPosition(), id, -1,
+                        index, subIndex);
+        if (!libApiRes.IsSuccessful()) {
+            System.err.println(
+                    "getModuleObjectsIndex.." + id + ".... " + libApiRes);
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(libApiRes);
+        }
+        return index[0];
+    }
+
+    /**
+     * Get the sub object sub index of module from the library
+     *
+     * @param module Instance of module
+     * @param subObject Instance of PowerlinkSubObject.
+     * @return
+     */
+    public static int getModuleObjectsSubIndex(Module module,
+            PowerlinkSubobject subObject, long id) {
+        Result libApiRes = new Result();
+        Node node = module.getNode();
+
+        long[] index = new long[1];
+        int[] subIndex = new int[1];
+
+        libApiRes = OpenConfiguratorCore.GetInstance()
+                .GetModuleObjectCurrentIndex(node.getNetworkId(),
+                        node.getNodeId(), node.getInterface().getInterfaceUId(),
+                        module.getChildID(), module.getPosition(), id,
+                        subObject.getId(), index, subIndex);
+        System.out.println("Current Index....." + index[0]);
+        System.out.println("Current sub Index....." + subIndex[0]);
+        System.out.println("Child ID....." + module.getChildID());
+        System.out.println("Child position....." + module.getPosition());
+        if (!libApiRes.IsSuccessful()) {
+            System.err.println("getModuleObjectsSubIndex.." + libApiRes);
+            OpenConfiguratorMessageConsole.getInstance()
+                    .printLibraryErrorMessage(libApiRes);
+        }
+        return subIndex[0];
     }
 
     /**
@@ -4156,6 +4228,7 @@ public class OpenConfiguratorLibraryUtils {
         System.out.println("Child ID....." + module.getChildID());
         System.out.println("Child position....." + module.getPosition());
         if (!libApiRes.IsSuccessful()) {
+            System.err.println("getModuleObjectSubIndex.." + libApiRes);
             OpenConfiguratorMessageConsole.getInstance()
                     .printLibraryErrorMessage(libApiRes);
         }
@@ -4397,12 +4470,6 @@ public class OpenConfiguratorLibraryUtils {
             }
         }
         return sortNumber;
-    }
-
-    private static int[] getSubObjectIndex(short value) {
-        int subIndex = value;
-        int[] subIndexArray = new int[] { subIndex };
-        return subIndexArray;
     }
 
     private static Result importProfileBodyCommunicationNetworkPowerlink(
@@ -4803,7 +4870,7 @@ public class OpenConfiguratorLibraryUtils {
                 + pdoChannel.getNode().getNetworkId() + "NodeId"
                 + pdoChannel.getNode().getNodeId() + " "
                 + mappingSubObject.getObject().getIdHex() + "/"
-                + moduleObjectIndex + " --- " + subObjectTobeMapped.getId());
+                + moduleObjectIndex + " --- " + moduleSubObjectIndex);
 
         return OpenConfiguratorCore.GetInstance().MapSubObjectToChannel(
                 pdoChannel.getNode().getNetworkId(),
@@ -5185,7 +5252,7 @@ public class OpenConfiguratorLibraryUtils {
 
     /**
      * Validate value of module sub-Object
-     * 
+     *
      * @param plkSubObject Instance of POWERLINK object
      * @param value The actual value to be validated
      * @param newObjectIndex The index of sub-object from the library
