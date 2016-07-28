@@ -134,6 +134,9 @@ public class ParameterReference implements IParameter {
                 parameter.getDefaultValue();
             } else {
                 if (actualValue != null) {
+                    if (actualValue.contains("Â")) {
+                        actualValue = actualValue.replace("Â", "");
+                    }
                     return actualValue;
                 }
             }
@@ -329,8 +332,10 @@ public class ParameterReference implements IParameter {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public void setActualValue(final String value)
-            throws JDOMException, IOException {
+    public void setActualValue(String value) throws JDOMException, IOException {
+        if (value.contains("Â")) {
+            value = value.replace("Â", "");
+        }
         actualValue = value;
         parameterReference.setActualValue(value);
         if (getObjectDictionary().isModule()) {

@@ -302,6 +302,8 @@ public class Parameter implements IParameter {
                     return StringUtils.EMPTY;
                 }
             }
+        } else if (actualValue.contains("Â")) {
+            actualValue = actualValue.replace("Â", "");
         }
         return actualValue;
     }
@@ -361,6 +363,8 @@ public class Parameter implements IParameter {
                     return StringUtils.EMPTY;
                 }
             }
+        } else if (defaultValue.contains("Â")) {
+            defaultValue = defaultValue.replace("Â", "");
         }
         return defaultValue;
     }
