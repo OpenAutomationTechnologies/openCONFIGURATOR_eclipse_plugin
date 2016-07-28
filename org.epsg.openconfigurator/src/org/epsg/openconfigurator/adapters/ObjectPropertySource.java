@@ -345,10 +345,22 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         if (plkObject.getActualValue() == null) {
             return "Set some value in the actual value field.";
         } else if (plkObject.getActualValue() != null) {
-            Result res = OpenConfiguratorLibraryUtils
-                    .validateForceObjectActualValue(plkObject);
-            if (!res.IsSuccessful()) {
-                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            if (isModuleObject()) {
+                long newObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectsIndex(plkObject.getModule(),
+                                plkObject.getId());
+                Result res = OpenConfiguratorLibraryUtils
+                        .validateForceObjectActualValue(plkObject,
+                                newObjectIndex);
+                if (!res.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                }
+            } else {
+                Result res = OpenConfiguratorLibraryUtils
+                        .validateForceObjectActualValue(plkObject);
+                if (!res.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                }
             }
         }
 
@@ -417,15 +429,34 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 switch (objectId) {
                     case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
                         String defaultValue = plkObject.getDefaultValue();
-                        Result res = OpenConfiguratorLibraryUtils
-                                .setObjectActualValue(plkObject, defaultValue);
-                        if (!res.IsSuccessful()) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printLibraryErrorMessage(res);
+                        if (isModuleObject()) {
+                            long newObjectIndex = OpenConfiguratorLibraryUtils
+                                    .getModuleObjectsIndex(
+                                            plkObject.getModule(),
+                                            plkObject.getId());
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .setModuleObjectActualValue(plkObject,
+                                            defaultValue, newObjectIndex);
+                            if (!res.IsSuccessful()) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            } else {
+                                // Success - update the OBD
+                                plkObject.setActualValue(defaultValue, true);
+                            }
                         } else {
-                            // Success - update the OBD
-                            plkObject.setActualValue(defaultValue, true);
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .setObjectActualValue(plkObject,
+                                            defaultValue);
+                            if (!res.IsSuccessful()) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            } else {
+                                // Success - update the OBD
+                                plkObject.setActualValue(defaultValue, true);
+                            }
                         }
+
                         break;
                     }
 
@@ -494,17 +525,32 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                         if (value instanceof Integer) {
                             int val = ((Integer) value).intValue();
                             boolean result = (val == 0) ? true : false;
-
-                            Result res = OpenConfiguratorLibraryUtils
-                                    .forceObject(plkObject, result);
-                            if (!res.IsSuccessful()) {
-                                OpenConfiguratorMessageConsole.getInstance()
-                                        .printLibraryErrorMessage(res);
+                            if (isModuleObject()) {
+                                long newObjectIndex = OpenConfiguratorLibraryUtils
+                                        .getModuleObjectsIndex(
+                                                plkObject.getModule(),
+                                                plkObject.getId());
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .forceObject(plkObject, result,
+                                                newObjectIndex);
+                                if (!res.IsSuccessful()) {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                } else {
+                                    // Success - update the OBD
+                                    plkObject.forceActualValue(result, true);
+                                }
                             } else {
-                                // Success - update the OBD
-                                plkObject.forceActualValue(result, true);
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .forceObject(plkObject, result);
+                                if (!res.IsSuccessful()) {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                } else {
+                                    // Success - update the OBD
+                                    // plkObject.forceActualValue(result, true);
+                                }
                             }
-
                         } else {
                             System.err.println("Invalid value type" + value);
                         }

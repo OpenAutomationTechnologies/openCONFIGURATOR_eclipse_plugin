@@ -378,10 +378,27 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
         if (plkSubObject.getActualValue() == null) {
             return "Set some value in the actual value field.";
         } else {
-            Result res = OpenConfiguratorLibraryUtils
-                    .validateForceSubObjectActualValue(plkSubObject);
-            if (!res.IsSuccessful()) {
-                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            if (isModuleSubObject()) {
+                long newObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectsIndex(plkSubObject.getModule(),
+                                plkSubObject.getObject().getId());
+                int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectSubIndex(plkSubObject.getModule(),
+                                plkSubObject);
+                System.err
+                        .println("The module sub-object.." + newSubObjectIndex);
+                Result res = OpenConfiguratorLibraryUtils
+                        .validateForceSubObjectActualValue(plkSubObject,
+                                newObjectIndex, newSubObjectIndex);
+                if (!res.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                }
+            } else {
+                Result res = OpenConfiguratorLibraryUtils
+                        .validateForceSubObjectActualValue(plkSubObject);
+                if (!res.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+                }
             }
         }
         return null;
@@ -480,15 +497,37 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 switch (objectId) {
                     case OBJ_ACTUAL_VALUE_EDITABLE_ID: {
                         String defaultValue = plkSubObject.getDefaultValue();
-                        Result res = OpenConfiguratorLibraryUtils
-                                .setSubObjectActualValue(plkSubObject,
-                                        defaultValue);
-                        if (!res.IsSuccessful()) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printLibraryErrorMessage(res);
+                        if (isModuleSubObject()) {
+                            long newObjectIndex = OpenConfiguratorLibraryUtils
+                                    .getModuleObjectsIndex(
+                                            plkSubObject.getModule(),
+                                            plkSubObject.getObject().getId());
+                            int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                                    .getModuleObjectSubIndex(
+                                            plkSubObject.getModule(),
+                                            plkSubObject);
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .setModuleSubObjectActualValue(plkSubObject,
+                                            defaultValue, newObjectIndex,
+                                            newSubObjectIndex);
+                            if (!res.IsSuccessful()) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            } else {
+                                // Success - update the OBD
+                                plkSubObject.setActualValue(defaultValue, true);
+                            }
                         } else {
-                            // Success - update the OBD
-                            plkSubObject.setActualValue(defaultValue, true);
+                            Result res = OpenConfiguratorLibraryUtils
+                                    .setSubObjectActualValue(plkSubObject,
+                                            defaultValue);
+                            if (!res.IsSuccessful()) {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            } else {
+                                // Success - update the OBD
+                                plkSubObject.setActualValue(defaultValue, true);
+                            }
                         }
                         break;
                     }
@@ -521,9 +560,15 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                                     .getModuleObjectsIndex(
                                             plkSubObject.getModule(),
                                             plkSubObject.getObject().getId());
+                            int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                                    .getModuleObjectsSubIndex(
+                                            plkSubObject.getModule(),
+                                            plkSubObject,
+                                            plkSubObject.getObject().getId());
                             Result res = OpenConfiguratorLibraryUtils
                                     .setModuleSubObjectActualValue(plkSubObject,
-                                            (String) value, newObjectIndex);
+                                            (String) value, newObjectIndex,
+                                            newSubObjectIndex);
                             if (!res.IsSuccessful()) {
                                 OpenConfiguratorMessageConsole.getInstance()
                                         .printLibraryErrorMessage(res);
@@ -553,14 +598,38 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                             int val = ((Integer) value).intValue();
                             boolean result = (val == 0) ? true : false;
 
-                            Result res = OpenConfiguratorLibraryUtils
-                                    .forceSubObject(plkSubObject, result);
-                            if (!res.IsSuccessful()) {
-                                OpenConfiguratorMessageConsole.getInstance()
-                                        .printLibraryErrorMessage(res);
+                            if (isModuleSubObject()) {
+                                long newObjectIndex = OpenConfiguratorLibraryUtils
+                                        .getModuleObjectsIndex(
+                                                plkSubObject.getModule(),
+                                                plkSubObject.getObject()
+                                                        .getId());
+                                int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                                        .getModuleObjectSubIndex(
+                                                plkSubObject.getModule(),
+                                                plkSubObject);
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .forceSubObject(plkSubObject, result,
+                                                newObjectIndex,
+                                                newSubObjectIndex);
+                                if (!res.IsSuccessful()) {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                } else {
+                                    // Success - update the OBD
+                                    // plkSubObject.forceActualValue(result,
+                                    // true);
+                                }
                             } else {
-                                // Success - update the OBD
-                                plkSubObject.forceActualValue(result, true);
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .forceSubObject(plkSubObject, result);
+                                if (!res.IsSuccessful()) {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printLibraryErrorMessage(res);
+                                } else {
+                                    // Success - update the OBD
+                                    plkSubObject.forceActualValue(result, true);
+                                }
                             }
                         } else {
                             System.err.println("Invalid value type");
