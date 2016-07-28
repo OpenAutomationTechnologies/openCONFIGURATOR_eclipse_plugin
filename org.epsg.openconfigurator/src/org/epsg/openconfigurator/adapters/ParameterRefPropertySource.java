@@ -395,11 +395,16 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                 case PARAM_ACTUAL_VALUE_ID:
                     try {
                         String defaultValue = paramRef.getDefaultValue();
+                        String newParameterName = OpenConfiguratorLibraryUtils
+                                .getModuleParameterUniqueID(
+                                        paramRef.getObjectDictionary()
+                                                .getModule(),
+                                        paramRef.getUniqueId());
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         paramRef.getNode().getNetworkId(),
                                         paramRef.getNode().getNodeId(),
-                                        paramRef.getUniqueId(), defaultValue);
+                                        newParameterName, defaultValue);
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
@@ -424,7 +429,14 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
     private void setAllowedValues() {
         AllowedValues allowedValue = paramRef.getAllowedValues();
         List<String> values = allowedValue.getValuesList();
-        String[] val = values.toArray(new String[0]);
+        List<String> valu = new ArrayList<String>();
+        for (String value : values) {
+            if (value.contains("Â")) {
+                value = value.replace("Â", "");
+            }
+            valu.add(value);
+        }
+        String[] val = valu.toArray(new String[0]);
 
         ALLOWED_VALUES = val;
 
