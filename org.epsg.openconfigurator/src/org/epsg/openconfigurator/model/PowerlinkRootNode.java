@@ -1097,8 +1097,8 @@ public class PowerlinkRootNode {
                                     + node.getAbsolutePathToXdc(nodeName));
                             FileUtils.deleteDirectory(new File(
                                     node.getAbsolutePathToXdc(nodeName)));
-                            // Files.delete(Paths
-                            // .get(node.getAbsolutePathToXdc(nodeName)));
+                            Files.delete(Paths
+                                    .get(node.getAbsolutePathToXdc(nodeName)));
                         }
                     }
 
