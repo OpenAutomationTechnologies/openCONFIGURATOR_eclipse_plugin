@@ -540,8 +540,6 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
             TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef2;
             if (parameter.getActualValue() != null) {
                 actualValue = parameter.getActualValue().getValue();
-            } else if (parameter.getDefaultValue() != null) {
-                actualValue = parameter.getDefaultValue().getValue();
             }
         } else if (uniqueIDRef2 instanceof TParameterGroup) {
             TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef2;
@@ -624,6 +622,25 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     @Override
     public String getDataTypeReadable() {
         return dataTypeReadable;
+    }
+
+    /**
+     * Get default value of parameter based on uniqueId Ref
+     *
+     * @param uniqueIDRef2 UniqueID of parameter.
+     * @param moduleObjectIndex
+     * @param subIndex
+     * @return Actual value of parameters.
+     */
+    public String getdefaultValue(Object uniqueIDRef2) {
+        String defaultValue = StringUtils.EMPTY;
+        if (uniqueIDRef2 instanceof TParameterList.Parameter) {
+            TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef2;
+            if (parameter.getDefaultValue() != null) {
+                defaultValue = parameter.getDefaultValue().getValue();
+            }
+        }
+        return defaultValue;
     }
 
     /**

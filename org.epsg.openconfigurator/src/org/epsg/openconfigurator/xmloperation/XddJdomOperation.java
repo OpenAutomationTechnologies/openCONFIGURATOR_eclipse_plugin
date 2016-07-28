@@ -1109,6 +1109,20 @@ public class XddJdomOperation {
                                                     POWERLINK_XDD_NAMESPACE,
                                                     newAttribute);
                                         }
+                                        String defaultValue = plkSubObj
+                                                .getdefaultValue(plkSubObj
+                                                        .getUniqueIDRef());
+
+                                        if ((defaultValue != null)
+                                                || (defaultValue != StringUtils.EMPTY)) {
+                                            Attribute newAttribute = new Attribute(
+                                                    "defaultValue",
+                                                    defaultValue);
+                                            JDomUtil.setAttribute(document,
+                                                    subobjectXpath,
+                                                    POWERLINK_XDD_NAMESPACE,
+                                                    newAttribute);
+                                        }
                                         String removeactualValueXpath = "//plk:ObjectList"
                                                 + "/plk:Object[@index='"
                                                 + Long.toHexString(
@@ -1334,7 +1348,7 @@ public class XddJdomOperation {
                         String Xpath = "//plk:ObjectList";
                         String objectXpath = "//plk:Object[@index='"
                                 + Long.toHexString(moduleObjectIndex) + "']";
-
+                        int entriesDefaultValue = 0;
                         if (JDomUtil.isXpathPresent(document, objectXpath,
                                 POWERLINK_XDD_NAMESPACE)) {
 
@@ -1356,11 +1370,15 @@ public class XddJdomOperation {
                                 String numberOfEntriesXpath = xpath
                                         + "/plk:SubObject[@subIndex='" + "00"
                                         + "']";
-                                Attribute newAttribute = new Attribute(
-                                        "defaultValue", String.valueOf(count));
+
                                 if (JDomUtil.isXpathPresent(document,
                                         subobjectXpath,
                                         POWERLINK_XDD_NAMESPACE)) {
+                                    entriesDefaultValue = entriesDefaultValue
+                                            + 1;
+                                    Attribute newAttribute = new Attribute(
+                                            "defaultValue", String.valueOf(
+                                                    entriesDefaultValue - 1));
                                     JDomUtil.updateAttribute(document,
                                             numberOfEntriesXpath,
                                             POWERLINK_XDD_NAMESPACE,
@@ -1790,16 +1808,6 @@ public class XddJdomOperation {
                 JDomUtil.addNewElements(document, parameterTemplateXpath,
                         POWERLINK_XDD_NAMESPACE, dataTypeElement);
 
-                Element defaultValueElement = new Element("defaultValue");
-                List<Attribute> attribListdefault = defaultValueElement
-                        .getAttributes();
-                if (parameterModel.getDefaultValue() != null) {
-                    attribListdefault.add(new Attribute("value",
-                            parameterModel.getDefaultValue().getValue()));
-                    JDomUtil.addNewElements(document, parameterTemplateXpath,
-                            POWERLINK_XDD_NAMESPACE, defaultValueElement);
-                }
-
                 Element actualValueElement = new Element("actualValue");
                 List<Attribute> attribListactual = actualValueElement
                         .getAttributes();
@@ -1808,6 +1816,16 @@ public class XddJdomOperation {
                             parameterModel.getActualValue().getValue()));
                     JDomUtil.addNewElements(document, parameterTemplateXpath,
                             POWERLINK_XDD_NAMESPACE, actualValueElement);
+                }
+
+                Element defaultValueElement = new Element("defaultValue");
+                List<Attribute> attribListdefault = defaultValueElement
+                        .getAttributes();
+                if (parameterModel.getDefaultValue() != null) {
+                    attribListdefault.add(new Attribute("value",
+                            parameterModel.getDefaultValue().getValue()));
+                    JDomUtil.addNewElements(document, parameterTemplateXpath,
+                            POWERLINK_XDD_NAMESPACE, defaultValueElement);
                 }
 
                 TAllowedValues allowedValuesModel = parameter
@@ -1833,6 +1851,9 @@ public class XddJdomOperation {
                                 POWERLINK_XDD_NAMESPACE, valueElement);
 
                         Element labelElement = new Element("label");
+                        String allowedModuleslabelXPath = allowedModulesXPath
+                                + "/plk:value[@value='"
+                                + parameterAllowedValue.getValue() + "']";
                         List<Attribute> attriblbl = labelElement
                                 .getAttributes();
                         attriblbl.add(new Attribute("lang", "en"));
@@ -1840,6 +1861,9 @@ public class XddJdomOperation {
                                 new LabelDescription(parameterAllowedValue
                                         .getLabelOrDescriptionOrLabelRef())
                                                 .getText());
+                        JDomUtil.addNewElements(document,
+                                allowedModuleslabelXPath,
+                                POWERLINK_XDD_NAMESPACE, labelElement);
 
                     }
 
@@ -2079,16 +2103,6 @@ public class XddJdomOperation {
                             POWERLINK_XDD_NAMESPACE, dataTypeElement);
                 }
 
-                Element defaultValueElement = new Element("defaultValue");
-                List<Attribute> attribListdefault = defaultValueElement
-                        .getAttributes();
-                if (parameterModel.getDefaultValue() != null) {
-                    attribListdefault.add(new Attribute("value",
-                            parameterModel.getDefaultValue().getValue()));
-                    JDomUtil.addNewElement(document, parameterTemplateXpath,
-                            POWERLINK_XDD_NAMESPACE, defaultValueElement);
-                }
-
                 Element actualValueElement = new Element("actualValue");
                 List<Attribute> attribListactual = actualValueElement
                         .getAttributes();
@@ -2097,6 +2111,16 @@ public class XddJdomOperation {
                             parameterModel.getActualValue().getValue()));
                     JDomUtil.addNewElement(document, parameterTemplateXpath,
                             POWERLINK_XDD_NAMESPACE, actualValueElement);
+                }
+
+                Element defaultValueElement = new Element("defaultValue");
+                List<Attribute> attribListdefault = defaultValueElement
+                        .getAttributes();
+                if (parameterModel.getDefaultValue() != null) {
+                    attribListdefault.add(new Attribute("value",
+                            parameterModel.getDefaultValue().getValue()));
+                    JDomUtil.addNewElement(document, parameterTemplateXpath,
+                            POWERLINK_XDD_NAMESPACE, defaultValueElement);
                 }
 
                 TAllowedValues allowedValuesModel = parameter
@@ -2122,6 +2146,9 @@ public class XddJdomOperation {
                                 POWERLINK_XDD_NAMESPACE, valueElement);
 
                         Element labelElement = new Element("label");
+                        String allowedModuleslabelXPath = allowedModulesXPath
+                                + "/plk:value[@value='"
+                                + parameterAllowedValue.getValue() + "']";
                         List<Attribute> attriblbl = labelElement
                                 .getAttributes();
                         attriblbl.add(new Attribute("lang", "en"));
@@ -2129,6 +2156,9 @@ public class XddJdomOperation {
                                 new LabelDescription(parameterAllowedValue
                                         .getLabelOrDescriptionOrLabelRef())
                                                 .getText());
+                        JDomUtil.addNewElement(document,
+                                allowedModuleslabelXPath,
+                                POWERLINK_XDD_NAMESPACE, labelElement);
 
                     }
 
@@ -2466,15 +2496,6 @@ public class XddJdomOperation {
         JDomUtil.addNewElement(document, parameterTemplateXpath,
                 POWERLINK_XDD_NAMESPACE, dataTypeElement);
 
-        Element defaultValueElement = new Element("defaultValue");
-        List<Attribute> attribListdefault = defaultValueElement.getAttributes();
-        if (parameteratemplateModel.getDefaultValue() != null) {
-            attribListdefault.add(new Attribute("value",
-                    parameteratemplateModel.getDefaultValue().getValue()));
-            JDomUtil.addNewElement(document, parameterTemplateXpath,
-                    POWERLINK_XDD_NAMESPACE, defaultValueElement);
-        }
-
         Element actualValueElement = new Element("actualValue");
         List<Attribute> attribListactual = actualValueElement.getAttributes();
 
@@ -2483,6 +2504,15 @@ public class XddJdomOperation {
                     parameteratemplateModel.getActualValue().getValue()));
             JDomUtil.addNewElement(document, parameterTemplateXpath,
                     POWERLINK_XDD_NAMESPACE, actualValueElement);
+        }
+
+        Element defaultValueElement = new Element("defaultValue");
+        List<Attribute> attribListdefault = defaultValueElement.getAttributes();
+        if (parameteratemplateModel.getDefaultValue() != null) {
+            attribListdefault.add(new Attribute("value",
+                    parameteratemplateModel.getDefaultValue().getValue()));
+            JDomUtil.addNewElement(document, parameterTemplateXpath,
+                    POWERLINK_XDD_NAMESPACE, defaultValueElement);
         }
 
         TAllowedValues allowedValuesModel = parameteratemplateModel
