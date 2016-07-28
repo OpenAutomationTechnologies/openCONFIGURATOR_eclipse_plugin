@@ -426,9 +426,14 @@ public class AddChildModuleWizardPage extends WizardPage {
                         .keySet();
                 for (Integer position1 : positionSet) {
                     position.setMinimum(position1 + 1);
-                    addressText.setMinimum(position1 + 1);
                 }
 
+                Set<Integer> addressSet = interfaceObj.getAddressCollection()
+                        .keySet();
+                for (Integer address1 : addressSet) {
+                    int nextAddress = address1 + 1;
+                    addressText.setMinimum(nextAddress);
+                }
             } else {
                 position.setMinimum(minimumValue);
                 addressText.setMinimum(minimumValue);
@@ -452,9 +457,14 @@ public class AddChildModuleWizardPage extends WizardPage {
                 }
                 System.err.println("Address List = " + addressList);
                 for (Integer addres : addressList) {
-                    if (addressList.contains(minimumAddress)) {
+                    if (minimumAddress == addres) {
                         minimumAddress = addres + 1;
+
                     }
+                    if (addressList.contains(minimumAddress)) {
+                        minimumAddress = minimumAddress + 1;
+                    }
+
                 }
                 System.err.println("Minimum address = " + minimumAddress);
                 position.setMinimum(minimumValue);

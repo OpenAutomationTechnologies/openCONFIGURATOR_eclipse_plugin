@@ -687,7 +687,22 @@ public class ValidateXddWizardPage extends WizardPage {
         if (!btnCustom.isEnabled()) {
             btnCustom.setEnabled(true);
         }
+        btnDefault.setSelection(false);
         handleDefaultRadioButtonSelectionChanged(null);
+        btnDefault.setEnabled(false);
+        btnCustom.setSelection(true);
+        setErrorMessage(null);
+        getInfoStyledText("");
+        if (btnCustom.getSelection()) {
+            nodeConfigurationPath
+                    .removeModifyListener(nodeConfigurationPathModifyListener);
+            nodeConfigurationPath.setEnabled(true);
+            nodeConfigurationPath.setText(customConfiguration);
+            btnBrowse.setEnabled(true);
+            nodeConfigurationPath
+                    .addModifyListener(nodeConfigurationPathModifyListener);
+        }
+
     }
 
     /**
