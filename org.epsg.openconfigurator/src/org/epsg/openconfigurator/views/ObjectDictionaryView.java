@@ -492,8 +492,11 @@ public class ObjectDictionaryView extends ViewPart
                                     "parameter group cannot be displayed due to false condition set");
                         }
                     }
-                    visibleObjectsList.add(new String());
+                    if (visibleObjectsList.size() == 0) {
+                        visibleObjectsList.add(new String());
+                    }
                     return visibleObjectsList.toArray();
+
                 } else {
                     List<PowerlinkObject> objectsList = nodeObj
                             .getObjectDictionary().getObjectsList();
@@ -556,7 +559,9 @@ public class ObjectDictionaryView extends ViewPart
                                     "parameter group cannot be displayed due to false condition set");
                         }
                     }
-                    visibleObjectsList.add(new String());
+                    if (visibleObjectsList.size() == 0) {
+                        visibleObjectsList.add(new String());
+                    }
                     return visibleObjectsList.toArray();
                 } else {
                     List<PowerlinkObject> objectsList = moduleObj

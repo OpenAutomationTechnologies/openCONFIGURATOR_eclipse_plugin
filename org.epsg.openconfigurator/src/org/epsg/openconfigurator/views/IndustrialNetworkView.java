@@ -2148,7 +2148,9 @@ public class IndustrialNetworkView extends ViewPart
                                                         .valueOf(newPosition));
                                                 // moduleValue.setAddress(String
                                                 // .valueOf(newPosition));
-                                                mod.setEnabled(false);
+                                                if (mod.isEnabled()) {
+                                                    mod.setEnabled(false);
+                                                }
 
                                             }
                                         }
@@ -2159,6 +2161,7 @@ public class IndustrialNetworkView extends ViewPart
                     } else {
                         System.err.println("Next position unavailable.");
                     }
+                    return;
                 } else {
                     System.err.println("Previous position is disabled.");
                 }
@@ -2243,7 +2246,9 @@ public class IndustrialNetworkView extends ViewPart
                                         "new posit..... " + newPosition);
                                 moduleValue.setPositions(
                                         String.valueOf(newPosition));
-                                moduleObj.setEnabled(false);
+                                if (moduleObj.isEnabled()) {
+                                    moduleObj.setEnabled(false);
+                                }
 
                             }
                         }
