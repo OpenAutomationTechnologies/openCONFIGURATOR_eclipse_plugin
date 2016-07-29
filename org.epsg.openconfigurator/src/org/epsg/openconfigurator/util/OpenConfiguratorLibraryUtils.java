@@ -4745,32 +4745,32 @@ public class OpenConfiguratorLibraryUtils {
             System.loadLibrary("boost_log_setup"); //$NON-NLS-1$
         } else if (SystemUtils.IS_OS_WINDOWS) {
 
-            // System.loadLibrary("boost_regex-vc110-mt-1_58");
-            // System.loadLibrary("boost_date_time-vc110-mt-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_system-vc110-mt-1_58"); //$NON-NLS-1$
-            // System.loadLibrary("boost_chrono-vc110-mt-1_58"); //$NON-NLS-1$
-            // System.loadLibrary("boost_filesystem-vc110-mt-1_58");
-            // // $NON-NLS-1$
-            // System.loadLibrary("boost_thread-vc110-mt-1_58"); //$NON-NLS-1$
-            // System.loadLibrary("boost_log-vc110-mt-1_58"); //$NON-NLS-1$
-            // System.loadLibrary("boost_log_setup-vc110-mt-1_58");
+            System.loadLibrary("boost_regex-vc110-mt-1_58");
+            System.loadLibrary("boost_date_time-vc110-mt-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_system-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_chrono-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_filesystem-vc110-mt-1_58");
+            // $NON-NLS-1$
+            System.loadLibrary("boost_thread-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_log-vc110-mt-1_58"); //$NON-NLS-1$
+            System.loadLibrary("boost_log_setup-vc110-mt-1_58");
             // $NON-NLS-1$
             // Temporarily debug versions.
 
-            System.loadLibrary("boost_regex-vc110-mt-gd-1_58");
-            System.loadLibrary("boost_date_time-vc110-mt-gd-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_system-vc110-mt-gd-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_chrono-vc110-mt-gd-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_filesystem-vc110-mt-gd-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_thread-vc110-mt-gd-1_58");
-            // $NON-NLS-1$
-            System.loadLibrary("boost_log-vc110-mt-gd-1_58"); //$NON-NLS-1$
-            System.loadLibrary("boost_log_setup-vc110-mt-gd-1_58");
+            // System.loadLibrary("boost_regex-vc110-mt-gd-1_58");
+            // System.loadLibrary("boost_date_time-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_system-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_chrono-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_filesystem-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_thread-vc110-mt-gd-1_58");
+            // // $NON-NLS-1$
+            // System.loadLibrary("boost_log-vc110-mt-gd-1_58"); //$NON-NLS-1$
+            // System.loadLibrary("boost_log_setup-vc110-mt-gd-1_58");
             // // // $NON-NLS-1$
         } else {
             System.err.println("Unsupported system");

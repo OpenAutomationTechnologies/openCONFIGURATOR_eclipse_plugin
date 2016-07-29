@@ -212,32 +212,4 @@ public class TCNFeatures {
         nmtcnSoC2PReq = value;
     }
 
-    /**
-     * Gets the value of the nmtcnMaxAInv property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Long }
-     *     
-     */
-    public long getNMTCNMaxAInv() {
-        if (nmtcnMaxAInv == null) {
-            return  0L;
-        } else {
-            return nmtcnMaxAInv;
-        }
-    }
-
-    /**
-     * Sets the value of the nmtcnMaxAInv property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Long }
-     *     
-     */
-    public void setNMTCNMaxAInv(Long value) {
-        this.nmtcnMaxAInv = value;
-    }
-
 }

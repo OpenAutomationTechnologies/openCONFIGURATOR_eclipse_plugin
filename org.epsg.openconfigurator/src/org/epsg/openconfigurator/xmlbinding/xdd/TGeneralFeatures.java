@@ -1962,32 +1962,4 @@ public class TGeneralFeatures {
         sdoSupportUdpIp = value;
     }
 
-    /**
-     * Gets the value of the dllMultiplePReqPRes property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Boolean }
-     *     
-     */
-    public boolean isDLLMultiplePReqPRes() {
-        if (dllMultiplePReqPRes == null) {
-            return false;
-        } else {
-            return dllMultiplePReqPRes;
-        }
-    }
-
-    /**
-     * Sets the value of the dllMultiplePReqPRes property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Boolean }
-     *     
-     */
-    public void setDLLMultiplePReqPRes(Boolean value) {
-        this.dllMultiplePReqPRes = value;
-    }
-
 }
