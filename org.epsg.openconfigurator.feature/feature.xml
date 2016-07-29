@@ -2,7 +2,7 @@
 <feature
       id="org.epsg.openconfigurator.feature"
       label="Ethernet POWERLINK openCONFIGURATOR"
-      version="2.1.0.vbetaqualifier"
+      version="2.1.0.qualifier"
       provider-name="Kalycito Infotech Pvt Ltd. and Bernecker + Rainer Industrie-Elektronik Ges.m.b.H."
       plugin="org.epsg.openconfigurator">
 
