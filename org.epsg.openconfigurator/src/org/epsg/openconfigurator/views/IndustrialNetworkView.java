@@ -262,7 +262,7 @@ public class IndustrialNetworkView extends ViewPart
                 if (parent instanceof PowerlinkRootNode) {
                     PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
 
-                    LinkedHashSet<Node> nodeCollection = new LinkedHashSet<Node>();
+                    LinkedHashSet<Node> nodeCollection = new LinkedHashSet<>();
 
                     List<Node> nodeList = powerlinkRoot.getNodeLists(parent);
 
@@ -480,7 +480,6 @@ public class IndustrialNetworkView extends ViewPart
                 if (interfaceList.getUniqueIDRef() instanceof Interface) {
                     Interface intfc = (Interface) interfaceList
                             .getUniqueIDRef();
-                    InterfaceList obj1 = new InterfaceList();
                     return intfc.getUniqueID();
                 }
                 return obj.toString();
@@ -1665,7 +1664,7 @@ public class IndustrialNetworkView extends ViewPart
                         .getActiveWorkbenchWindow().getSelectionService()
                         .getSelection();
                 if ((selection != null)
-                        & (selection instanceof IStructuredSelection)) {
+                        && (selection instanceof IStructuredSelection)) {
                     handleEnableDisable((IStructuredSelection) selection);
                 }
 
@@ -1678,7 +1677,7 @@ public class IndustrialNetworkView extends ViewPart
                         .getActiveWorkbenchWindow().getSelectionService()
                         .getSelection();
                 if ((selection != null)
-                        & (selection instanceof IStructuredSelection)) {
+                        && (selection instanceof IStructuredSelection)) {
                     handleEnableDisable((IStructuredSelection) selection);
                 }
 
@@ -2001,7 +2000,7 @@ public class IndustrialNetworkView extends ViewPart
 
             Set<Integer> positionSet = module.getInterfaceOfModule()
                     .getModuleCollection().keySet();
-            List<Integer> positionToBeMoved = new ArrayList<Integer>();
+            List<Integer> positionToBeMoved = new ArrayList<>();
             for (Integer position : positionSet) {
                 if (position > currentPosition) {
                     positionToBeMoved.add(position);

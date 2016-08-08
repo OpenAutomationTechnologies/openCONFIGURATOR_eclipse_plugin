@@ -45,7 +45,6 @@ import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
-import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
@@ -164,7 +163,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addControlledNodeModulePropertyDescriptors(propertyList);
 
         IPropertyDescriptor[] propertyDescriptorArray = {};
@@ -314,7 +313,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     return null;
                 }
 
-                List<Integer> addresslist = new ArrayList<Integer>();
+                List<Integer> addresslist = new ArrayList<>();
                 Collection<Module> moduleList = module.getInterfaceOfModule()
                         .getModuleCollection().values();
                 for (Module mod : moduleList) {
@@ -440,7 +439,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
 
     @Override
     public void setPropertyValue(Object id, Object value) {
-        Result res = new Result();
+
         try {
             if (id instanceof String) {
                 String objectId = (String) id;
@@ -454,8 +453,6 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     }
                     case IAbstractNodeProperties.MODULE_POSITION_EDITABLE_OBJECT: {
 
-                        int newPosition = Integer.valueOf((String) value);
-                        int oldPosition = module.getPosition();
                         // if (isPositionAvailable(newPosition)) {
                         //
                         // module.swapPosition(oldPosition, newPosition);
@@ -472,6 +469,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     }
                     default:
                         System.err.println("Invalid module object");
+                        break;
                 }
             }
         } catch (Exception e) {

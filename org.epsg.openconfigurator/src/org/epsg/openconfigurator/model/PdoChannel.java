@@ -126,7 +126,7 @@ public class PdoChannel {
             return 0;
         }
 
-        if (value == "") {
+        if (value.equals("")) {
             return 0;
         }
 

@@ -67,18 +67,18 @@ public class HeadNodeInterface {
     private FileList fileList;
     private byte[] firmwareList;
     private byte[] identList;
-    private List<Object> labelDescription = new ArrayList<Object>();
+    private List<Object> labelDescription = new ArrayList<>();
     private TModuleAddressingHead moduleAddressing;
     private String interfaceType;
     private String interfaceUId;
     private boolean unUsedSlots;
     private boolean multipleModules;
 
-    private Map<Integer, Module> moduleCollection = new HashMap<Integer, Module>();
+    private Map<Integer, Module> moduleCollection = new HashMap<>();
 
-    private Map<String, Module> moduleNameCollection = new HashMap<String, Module>();
+    private Map<String, Module> moduleNameCollection = new HashMap<>();
 
-    private Map<Integer, Module> addressCollection = new HashMap<Integer, Module>();
+    private Map<Integer, Module> addressCollection = new HashMap<>();
 
     private List<org.epsg.openconfigurator.xmlbinding.xdd.Range> listOfRange = new ArrayList<>();
 
@@ -360,8 +360,8 @@ public class HeadNodeInterface {
     /**
      * Sets the multiple modules connected to interface.
      *
-     * @param multipleModules <true> if multiple modules allowed,
-     *            <false> otherwise.
+     * @param multipleModules <true> if multiple modules allowed, <false>
+     *            otherwise.
      */
     public void setMultipleModules(boolean multipleModules) {
         this.multipleModules = multipleModules;
@@ -423,7 +423,6 @@ public class HeadNodeInterface {
     public synchronized void updateInterfaceList()
             throws JDOMException, IOException {
 
-        org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList interfaceListObj = new org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList();
         org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface interfaceObj = new org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface();
         interfaceObj.setId(getInterfaceUId());
         node.updateInterfaceValue(interfaceObj);

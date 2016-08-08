@@ -46,6 +46,7 @@ import java.nio.file.StandardCopyOption;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.internal.resources.ResourceException;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -169,11 +170,15 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
             Path sourcePath = Paths.get(mnXdd.toString());
 
             System.out.println("MN XDD path" + sourcePath);
-
-            String targetImportPath = projectPath + IPath.SEPARATOR
-                    + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
-                    + IPath.SEPARATOR + mnXdd.getFileName().toString();
-
+            String targetImportPath = StringUtils.EMPTY;
+            if (mnXdd.getFileName() != null) {
+                if ((mnXdd.getFileName() != null)) {
+                    targetImportPath = projectPath + IPath.SEPARATOR
+                            + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICEIMPORT
+                            + IPath.SEPARATOR
+                            + String.valueOf(mnXdd.getFileName());
+                }
+            }
             Path targetPath = Paths.get(targetImportPath);
 
             System.err.println("Target path == " + targetPath);
@@ -185,7 +190,12 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
 
             // Rename the XDD to XDC and copy the deviceImport MN XDD to
             // deviceConfiguration dir
-            String extensionXdd = mnXdd.getFileName().toString();
+            String extensionXdd = StringUtils.EMPTY;
+            if (mnXdd.getFileName() != null) {
+                if ((mnXdd.getFileName() != null)) {
+                    extensionXdd = String.valueOf(mnXdd.getFileName());
+                }
+            }
             int pos = extensionXdd.lastIndexOf(".");
             if (pos > 0) {
                 extensionXdd = extensionXdd.substring(0, pos);

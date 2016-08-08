@@ -555,7 +555,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         Node node = getNode();
         actualValue = OpenConfiguratorLibraryUtils.getActualValueOfObject(node,
                 this, subIndex, moduleObjectIndex);
-        if ((actualValue != null) || (actualValue != StringUtils.EMPTY)) {
+        if ((actualValue != null)) {
             return actualValue;
         } else {
             return actualValue;

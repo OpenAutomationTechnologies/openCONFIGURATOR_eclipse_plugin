@@ -55,6 +55,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -106,7 +107,7 @@ public class PowerlinkRootNode {
     private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid.\n XDC Path: {1}";
     private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
 
-    private Map<Short, Node> nodeCollection = new HashMap<Short, Node>();
+    private Map<Short, Node> nodeCollection = new HashMap<>();
     private OpenCONFIGURATORProject currentProject;
 
     private ListenerList nodePropertyChangeListeners = new ListenerList(
@@ -247,7 +248,7 @@ public class PowerlinkRootNode {
      * @return The list of CN nodes available in the project.
      */
     public ArrayList<Node> getCnNodeList() {
-        ArrayList<Node> returnNodeList = new ArrayList<Node>();
+        ArrayList<Node> returnNodeList = new ArrayList<>();
         Collection<Node> nodeList = nodeCollection.values();
 
         for (Node node : nodeList) {
@@ -263,7 +264,7 @@ public class PowerlinkRootNode {
      * @return List of interface available in the modular head node.
      */
     public ArrayList<HeadNodeInterface> getInterfaceList() {
-        ArrayList<HeadNodeInterface> returnNodeList = new ArrayList<HeadNodeInterface>();
+        ArrayList<HeadNodeInterface> returnNodeList = new ArrayList<>();
 
         Collection<Node> nodeList = nodeCollection.values();
 
@@ -300,7 +301,7 @@ public class PowerlinkRootNode {
      * @return The nodes list.
      */
     public ArrayList<Node> getNodeLists(Object inputElement) {
-        ArrayList<Node> returnNodeList = new ArrayList<Node>();
+        ArrayList<Node> returnNodeList = new ArrayList<>();
         if (inputElement instanceof PowerlinkRootNode) {
 
             Collection<Node> nodeList = nodeCollection.values();
@@ -347,7 +348,7 @@ public class PowerlinkRootNode {
      * @return Returns the list of RMNs available in the project.
      */
     public ArrayList<Node> getRmnNodeList() {
-        ArrayList<Node> returnNodeList = new ArrayList<Node>();
+        ArrayList<Node> returnNodeList = new ArrayList<>();
 
         Collection<Node> nodeList = nodeCollection.values();
 
@@ -850,8 +851,8 @@ public class PowerlinkRootNode {
      * Removes the module from the project.
      *
      * @param module Instance of module to be removed.
-     * @param finalModuleCheck <true> if module is a final module,
-     *            <false> otherwise.
+     * @param finalModuleCheck <true> if module is a final module, <false>
+     *            otherwise.
      * @return <code>true</code> if module is removed. <code>false</code> if
      *         module is not removed.
      */
@@ -1089,10 +1090,16 @@ public class PowerlinkRootNode {
                                 Files.delete(Paths
                                         .get(module.getAbsolutePathToXdc()));
                             }
+                            String nodeName = StringUtils.EMPTY;
                             java.nio.file.Path nodeImportFile = new File(
                                     node.getPathToXDC()).toPath();
-                            String nodeName = FilenameUtils.removeExtension(
-                                    nodeImportFile.getFileName().toString());
+                            if (nodeImportFile != null) {
+                                if ((nodeImportFile.getFileName() != null)) {
+                                    nodeName = FilenameUtils.removeExtension(
+                                            String.valueOf(nodeImportFile
+                                                    .getFileName()));
+                                }
+                            }
                             System.out.println("The path to be deleted.."
                                     + node.getAbsolutePathToXdc(nodeName));
                             FileUtils.deleteDirectory(new File(

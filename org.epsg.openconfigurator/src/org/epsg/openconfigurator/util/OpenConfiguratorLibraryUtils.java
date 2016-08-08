@@ -3634,7 +3634,7 @@ public class OpenConfiguratorLibraryUtils {
                 .hasNext();) {
             String actualValue = iterator.GetValue();
 
-            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<>(
                     iterator.GetKey().getFirst(),
                     iterator.GetKey().getSecond());
             objectJCollection.put(entryVal, actualValue);
@@ -4289,7 +4289,7 @@ public class OpenConfiguratorLibraryUtils {
                 .hasNext();) {
             String actualValue = iterator.GetValue();
 
-            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<Long, Integer>(
+            Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<>(
                     iterator.GetKey().getFirst(),
                     iterator.GetKey().getSecond());
             objectJCollection.put(entryVal, actualValue);

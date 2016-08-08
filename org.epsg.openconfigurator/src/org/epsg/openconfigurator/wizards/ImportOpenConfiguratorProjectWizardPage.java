@@ -423,7 +423,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     /**
      * List of project records.
      */
-    private List<ProjectRecord> selectedProjects = new ArrayList<ProjectRecord>();
+    private List<ProjectRecord> selectedProjects = new ArrayList<>();
 
     /**
      * List projects from directory radio button.
@@ -493,12 +493,13 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                     return new File(current, name).isDirectory();
                 }
             });
-
-            for (String subDir : subDirNameList) {
-                File subDirProjetfile = getProjectFile(new File(
-                        directory.getPath() + File.separator + subDir));
-                if (subDirProjetfile != null) {
-                    files.add(subDirProjetfile);
+            if (subDirNameList != null) {
+                for (String subDir : subDirNameList) {
+                    File subDirProjetfile = getProjectFile(new File(
+                            directory.getPath() + File.separator + subDir));
+                    if (subDirProjetfile != null) {
+                        files.add(subDirProjetfile);
+                    }
                 }
             }
         }
@@ -636,7 +637,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      */
     private void createProjectDescription(ProjectRecord selectedProjectRecord,
             IProgressMonitor monitor) throws InvocationTargetException,
-                    InterruptedException, IOException {
+            InterruptedException, IOException {
 
         String projectName = FilenameUtils
                 .removeExtension(selectedProjectRecord.getProjectName());
@@ -1028,7 +1029,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * @return The list of selected projects.
      */
     private ArrayList<ProjectRecord> getProjectRecords() {
-        ArrayList<ProjectRecord> projectRecords = new ArrayList<ProjectRecord>();
+        ArrayList<ProjectRecord> projectRecords = new ArrayList<>();
         for (ProjectRecord selectedProject : selectedProjects) {
             String projectName = selectedProject.getProjectName();
             selectedProject.hasConflicts = (isProjectFolderInWorkspacePath(
@@ -1135,7 +1136,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private void updateProjectsList(final String path) {
 
         if ((path == null) || (path.length() == 0)) {
-            selectedProjects = new ArrayList<ProjectRecord>();
+            selectedProjects = new ArrayList<>();
             projectsListCheckBoxTreeViewer.refresh(true);
             projectsListCheckBoxTreeViewer
                     .setCheckedElements(selectedProjects.toArray());
@@ -1170,8 +1171,8 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                     monitor.beginTask(
                             ImportOpenConfiguratorProjectWizardPage.SEARCH_PROJECTS_TASK_LABEL,
                             100);
-                    selectedProjects = new ArrayList<ProjectRecord>();
-                    Collection<File> files = new ArrayList<File>();
+                    selectedProjects = new ArrayList<>();
+                    Collection<File> files = new ArrayList<>();
                     monitor.worked(10);
 
                     if (dirSelected && directory.isDirectory()) {

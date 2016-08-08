@@ -39,7 +39,6 @@ import java.util.Map;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang.StringUtils;
-import org.epsg.openconfigurator.lib.wrapper.StringCollection;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.LabelDescription;
 import org.epsg.openconfigurator.model.Module;
@@ -732,46 +731,49 @@ public class XddJdomOperation {
                                         String.valueOf(
                                                 plkObj.getObjectType())));
                             }
-                            if (plkObj
-                                    .getDataTypeReadable() != StringUtils.EMPTY) {
+                            if (!(plkObj.getDataTypeReadable()
+                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                                 attribList.add(new Attribute("dataType",
                                         plkObj.getDataTypeReadable()));
                             }
-                            if (plkObj
-                                    .getAccessTypeReadable() != StringUtils.EMPTY) {
+                            if (!(plkObj.getAccessTypeReadable()
+                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                                 attribList.add(new Attribute("accessType",
                                         plkObj.getAccessTypeReadable()));
                             }
-                            if (plkObj.getDefaultValue() != StringUtils.EMPTY) {
+                            if (!(plkObj.getDefaultValue()
+                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                                 attribList.add(new Attribute("defaultValue",
                                         plkObj.getDefaultValue()));
                             }
 
                             if (plkObj.getActualValue() != null) {
-                                if (plkObj
-                                        .getActualValue() != StringUtils.EMPTY) {
+                                if (!(plkObj.getActualValue()
+                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
                                     attribList.add(new Attribute("actualValue",
                                             plkObj.getActualValue()));
                                 }
                             }
 
-                            if (plkObj.getHighLimit() != StringUtils.EMPTY) {
+                            if (!(plkObj.getHighLimit()
+                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                                 attribList.add(new Attribute("highLimit",
                                         plkObj.getHighLimit()));
                             }
-                            if (plkObj.getLowLimit() != StringUtils.EMPTY) {
+                            if (!(plkObj.getLowLimit()
+                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                                 attribList.add(new Attribute("lowLimit",
                                         plkObj.getLowLimit()));
                             }
-                            if (plkObj
-                                    .getPDOMappingReadable() != StringUtils.EMPTY) {
+                            if (!(plkObj.getPDOMappingReadable()
+                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                                 attribList.add(new Attribute("PDOmapping",
                                         plkObj.getPDOMappingReadable()));
                             }
 
                             if (plkObj.getUniqueIDRef() != null) {
-                                if (plkObj
-                                        .getUniqueIDRef() != StringUtils.EMPTY) {
+                                if (!(plkObj.getUniqueIDRef()
+                                        .equals(StringUtils.EMPTY))) {
 
                                     attribList.add(new Attribute("uniqueIDRef",
                                             plkObj.getUniqueId(
@@ -833,7 +835,9 @@ public class XddJdomOperation {
                                                 .getActualValue(plkObj
                                                         .getUniqueIDRef());
                                         if ((actualValue == null)
-                                                || (actualValue == StringUtils.EMPTY)) {
+                                                || (actualValue
+                                                        .equalsIgnoreCase(
+                                                                StringUtils.EMPTY))) {
                                             System.err.println(
                                                     "Actual Value Empty...");
                                         } else {
@@ -855,7 +859,7 @@ public class XddJdomOperation {
                         List<PowerlinkSubobject> plkSubObjList = plkObj
                                 .getSubObjects();
                         for (PowerlinkSubobject plkSubObj : plkSubObjList) {
-                            HashMap<Long, Integer> subObjectEntries = new HashMap<Long, Integer>();
+                            HashMap<Long, Integer> subObjectEntries = new HashMap<>();
                             int moduleSubObjectIndex = OpenConfiguratorLibraryUtils
                                     .getModuleObjectsSubIndex(
                                             plkObj.getModule(), plkSubObj,
@@ -916,8 +920,8 @@ public class XddJdomOperation {
                                 subobjectXpathCheck = xpath
                                         + "/plk:SubObject[@subIndex='0"
                                         + subIndex + "']";
-                                if (subObjectEntries
-                                        .containsValue(moduleObjectIndex)) {
+                                if (subObjectEntries.containsValue(
+                                        (int) moduleObjectIndex)) {
                                     subObjectEntries.put(moduleObjectIndex,
                                             subIndex);
                                 }
@@ -926,8 +930,8 @@ public class XddJdomOperation {
                                 subobjectXpathCheck = xpath
                                         + "/plk:SubObject[@subIndex='"
                                         + subIndex + "']";
-                                if (subObjectEntries
-                                        .containsValue(moduleObjectIndex)) {
+                                if (subObjectEntries.containsValue(
+                                        (int) moduleObjectIndex)) {
                                     subObjectEntries.put(moduleObjectIndex,
                                             subIndex);
                                 }
@@ -969,50 +973,48 @@ public class XddJdomOperation {
                                             DatatypeConverter.printHexBinary(
                                                     plkSubObj.getDataType())));
                                 }
-                                if (plkSubObj
-                                        .getAccessTypeReadable() != StringUtils.EMPTY) {
+                                if (!(plkSubObj.getAccessTypeReadable()
+                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
                                     attribList.add(new Attribute("accessType",
                                             plkSubObj.getAccessTypeReadable()));
                                 }
-                                if (plkSubObj
-                                        .getDefaultValue() != StringUtils.EMPTY) {
+                                if (!(plkSubObj.getDefaultValue()
+                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
                                     attribList.add(new Attribute("defaultValue",
                                             plkSubObj.getDefaultValue()));
                                 }
 
                                 if (plkSubObj.getActualValue() != null) {
-                                    if (plkSubObj
-                                            .getActualValue() != StringUtils.EMPTY) {
+                                    if (!(plkSubObj.getActualValue()
+                                            .equalsIgnoreCase(
+                                                    StringUtils.EMPTY))) {
                                         attribList.add(new Attribute(
                                                 "actualValue",
                                                 plkSubObj.getActualValue()));
                                     }
                                 }
 
-                                if (plkSubObj
-                                        .getHighLimit() != StringUtils.EMPTY) {
+                                if (!(plkSubObj.getHighLimit()
+                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
                                     attribList.add(new Attribute("highLimit",
                                             plkSubObj.getHighLimit()));
                                 }
-                                if (plkSubObj
-                                        .getLowLimit() != StringUtils.EMPTY) {
+                                if (!(plkSubObj.getLowLimit()
+                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
                                     attribList.add(new Attribute("lowLimit",
                                             plkSubObj.getLowLimit()));
                                 }
 
-                                if (plkSubObj
-                                        .getPDOMappingReadable() != StringUtils.EMPTY) {
+                                if (!(plkSubObj.getPDOMappingReadable()
+                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
                                     attribList.add(new Attribute("PDOmapping",
                                             plkSubObj.getPDOMappingReadable()));
                                 }
 
                                 if (plkSubObj.getUniqueIDRef() != null) {
-                                    if (plkSubObj.getUniqueIDRef() != null) {
-                                        attribList.add(new Attribute(
-                                                "uniqueIDRef",
-                                                plkSubObj.getUniqueId(plkSubObj
-                                                        .getUniqueIDRef())));
-                                    }
+                                    attribList.add(new Attribute("uniqueIDRef",
+                                            plkSubObj.getUniqueId(plkSubObj
+                                                    .getUniqueIDRef())));
                                 }
 
                                 JDomUtil.addNewElement(document, xpath,
@@ -1087,7 +1089,9 @@ public class XddJdomOperation {
                                                         .getUniqueIDRef());
 
                                         if ((actualValue == null)
-                                                || (actualValue == StringUtils.EMPTY)) {
+                                                || (actualValue
+                                                        .equalsIgnoreCase(
+                                                                StringUtils.EMPTY))) {
                                             actualValue = plkSubObj
                                                     .getActualValueFromLibrary(
                                                             subIndex,
@@ -1099,8 +1103,7 @@ public class XddJdomOperation {
                                                         moduleObjectIndex)
                                                 + " subObject.." + Integer
                                                         .toHexString(subIndex));
-                                        if ((actualValue != null)
-                                                || (actualValue != StringUtils.EMPTY)) {
+                                        if ((actualValue != null)) {
                                             Attribute newAttribute = new Attribute(
                                                     OBJECT_ACTUAL_VALUE,
                                                     actualValue);
@@ -1113,8 +1116,7 @@ public class XddJdomOperation {
                                                 .getdefaultValue(plkSubObj
                                                         .getUniqueIDRef());
 
-                                        if ((defaultValue != null)
-                                                || (defaultValue != StringUtils.EMPTY)) {
+                                        if ((defaultValue != null)) {
                                             Attribute newAttribute = new Attribute(
                                                     "defaultValue",
                                                     defaultValue);
@@ -1187,23 +1189,28 @@ public class XddJdomOperation {
                 attribList.add(new Attribute("dataType", DatatypeConverter
                         .printHexBinary(subObject.getDataType())));
             }
-            if (subObject.getAccessTypeReadable() != StringUtils.EMPTY) {
+            if (!(subObject.getAccessTypeReadable()
+                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                 attribList.add(new Attribute("accessType",
                         subObject.getAccessTypeReadable()));
             }
-            if (subObject.getDefaultValue() != StringUtils.EMPTY) {
+            if (!(subObject.getDefaultValue()
+                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                 attribList.add(new Attribute("defaultValue",
                         subObject.getDefaultValue()));
             }
-            if (subObject.getActualValue() != StringUtils.EMPTY) {
+            if (!(subObject.getActualValue()
+                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                 attribList.add(new Attribute("actualValue",
                         subObject.getActualValue()));
             }
-            if (subObject.getHighLimit() != StringUtils.EMPTY) {
+            if (!(subObject.getHighLimit()
+                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                 attribList.add(
                         new Attribute("highLimit", subObject.getHighLimit()));
             }
-            if (subObject.getLowLimit() != StringUtils.EMPTY) {
+            if (!(subObject.getLowLimit()
+                    .equalsIgnoreCase(StringUtils.EMPTY))) {
                 attribList.add(
                         new Attribute("lowLimit", subObject.getLowLimit()));
             }
@@ -1840,7 +1847,6 @@ public class XddJdomOperation {
                     List<TValue> parameterAllowedValuesList = allowedValuesModel
                             .getValue();
                     // Create a string collection with allowed values list.
-                    StringCollection allowedValues = new StringCollection();
                     for (TValue parameterAllowedValue : parameterAllowedValuesList) {
                         Element valueElement = new Element("value");
                         List<Attribute> attribValue = valueElement
@@ -1962,7 +1968,7 @@ public class XddJdomOperation {
                 List<TValue> parameterAllowedValuesList = allowedValuesModel
                         .getValue();
                 // Create a string collection with allowed values list.
-                StringCollection allowedValues = new StringCollection();
+
                 for (TValue parameterAllowedValue : parameterAllowedValuesList) {
                     Element valueElement = new Element("value");
                     List<Attribute> attribValue = valueElement.getAttributes();
@@ -2135,7 +2141,6 @@ public class XddJdomOperation {
                     List<TValue> parameterAllowedValuesList = allowedValuesModel
                             .getValue();
                     // Create a string collection with allowed values list.
-                    StringCollection allowedValues = new StringCollection();
                     for (TValue parameterAllowedValue : parameterAllowedValuesList) {
                         Element valueElement = new Element("value");
                         List<Attribute> attribValue = valueElement
@@ -2257,7 +2262,6 @@ public class XddJdomOperation {
                 List<TValue> parameterAllowedValuesList = allowedValuesModel
                         .getValue();
                 // Create a string collection with allowed values list.
-                StringCollection allowedValues = new StringCollection();
                 for (TValue parameterAllowedValue : parameterAllowedValuesList) {
                     Element valueElement = new Element("value");
                     List<Attribute> attribValue = valueElement.getAttributes();
@@ -2526,7 +2530,6 @@ public class XddJdomOperation {
             List<TValue> parameterAllowedValuesList = allowedValuesModel
                     .getValue();
             // Create a string collection with allowed values list.
-            StringCollection allowedValues = new StringCollection();
             for (TValue parameterAllowedValue : parameterAllowedValuesList) {
                 Element valueElement = new Element("value");
                 List<Attribute> attribValue = valueElement.getAttributes();

@@ -736,7 +736,7 @@ public class MappingView extends ViewPart {
                     if (!tpdoSummaryOnlyShowChannelsWithData) {
                         return tpdoChannels.toArray();
                     } else {
-                        List<TpdoChannel> pdoChannels = new ArrayList<TpdoChannel>();
+                        List<TpdoChannel> pdoChannels = new ArrayList<>();
                         for (TpdoChannel tpdo : tpdoChannels) {
                             long size = OpenConfiguratorLibraryUtils
                                     .getChannelSize(tpdo);
@@ -753,7 +753,7 @@ public class MappingView extends ViewPart {
                     if (!rpdoSummaryOnlyShowChannelsWithData) {
                         return rpdoChannels.toArray();
                     } else {
-                        List<RpdoChannel> pdoChannels = new ArrayList<RpdoChannel>();
+                        List<RpdoChannel> pdoChannels = new ArrayList<>();
                         for (RpdoChannel rpdo : rpdoChannels) {
                             long size = OpenConfiguratorLibraryUtils
                                     .getChannelSize(rpdo);
@@ -1645,7 +1645,7 @@ public class MappingView extends ViewPart {
 
     private final Node selfReceiptNode;
     private final PowerlinkObject emptyObject;
-    private final ArrayList<Node> targetNodeIdList = new ArrayList<Node>();
+    private final ArrayList<Node> targetNodeIdList = new ArrayList<>();
     /**
      * VerifyListener to update the number of available Mapping object entries
      */
@@ -2381,9 +2381,6 @@ public class MappingView extends ViewPart {
                 tblclmnActions.setWidth(100);
                 tblclmnActions.setText(PDO_TABLE_COLUMN_ACTIONS_LABEL);
 
-                TableViewerColumn empty = new TableViewerColumn(rpdoTableViewer,
-                        SWT.NONE);
-
                 rpdoPageFooter = new Composite(composite_3, SWT.NONE);
                 RowLayout rl_rpdoPageFooter = new RowLayout(SWT.HORIZONTAL);
                 rl_rpdoPageFooter.justify = true;
@@ -2839,7 +2836,7 @@ public class MappingView extends ViewPart {
      */
     private List<AbstractPowerlinkObject> getMappableObjectsList(Node nodeObj,
             PdoType pdoType) {
-        List<AbstractPowerlinkObject> objectList = new ArrayList<AbstractPowerlinkObject>();
+        List<AbstractPowerlinkObject> objectList = new ArrayList<>();
         objectList.add(emptyObject);
 
         if (nodeObj.isModularheadNode()) {

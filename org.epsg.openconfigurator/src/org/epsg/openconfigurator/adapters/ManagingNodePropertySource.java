@@ -316,7 +316,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addNetworkPropertyDescriptors(propertyList);
         addManagingNodePropertyDescriptors(propertyList);
 
@@ -521,7 +521,10 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 int asyncMtuValue = Integer.decode((String) value);
-                if ((asyncMtuValue < 300) && (asyncMtuValue > 1500)) {
+                if ((asyncMtuValue < 300)) {
+                    return INVALID_RANGE_ASYNC_MTU;
+                }
+                if ((asyncMtuValue > 1500)) {
                     return INVALID_RANGE_ASYNC_MTU;
                 }
                 // validate the value with openCONFIGURATOR library.
@@ -760,7 +763,10 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             try {
                 int preScalarVal = Integer.decode((String) value);
 
-                if ((preScalarVal < 0) && (preScalarVal > 1000)) {
+                if ((preScalarVal < 0)) {
+                    return INVALID_RANGE_PRE_SCALER;
+                }
+                if ((preScalarVal > 1000)) {
                     return INVALID_RANGE_PRE_SCALER;
                 }
                 // validate the value with openCONFIGURATOR library.

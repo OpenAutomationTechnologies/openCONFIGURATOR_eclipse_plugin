@@ -72,14 +72,14 @@ public class NewModuleWizard extends Wizard {
     /**
      * Add new module wizard page.
      */
-    private final AddModuleWizardPage addModulePage;
+    private AddModuleWizardPage addModulePage;
 
     /**
      * Add validateXddWizardPage
      */
-    private final ValidateXddModuleWizardPage validateXddModulePage;
+    private ValidateXddModuleWizardPage validateXddModulePage;
 
-    private final AddChildModuleWizardPage addChildmodulePage;
+    private AddChildModuleWizardPage addChildmodulePage;
 
     private HeadNodeInterface selectedNodeObj;
 
@@ -96,15 +96,15 @@ public class NewModuleWizard extends Wizard {
             HeadNodeInterface selectedNodeObj) {
         if (selectedNodeObj == null) {
             System.err.println("Invalid Interface selection");
+        } else {
+            this.selectedNodeObj = selectedNodeObj;
+            setWindowTitle(WINDOW_TITLE);
+            addModulePage = new AddModuleWizardPage(selectedNodeObj);
+            validateXddModulePage = new ValidateXddModuleWizardPage(
+                    selectedNodeObj);
+            addChildmodulePage = new AddChildModuleWizardPage(selectedNodeObj);
         }
         rootNode = nodeList;
-        this.selectedNodeObj = selectedNodeObj;
-
-        setWindowTitle(WINDOW_TITLE);
-        addModulePage = new AddModuleWizardPage(selectedNodeObj);
-        validateXddModulePage = new ValidateXddModuleWizardPage(
-                selectedNodeObj);
-        addChildmodulePage = new AddChildModuleWizardPage(selectedNodeObj);
     }
 
     @Override

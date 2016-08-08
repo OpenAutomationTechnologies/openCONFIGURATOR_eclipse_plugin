@@ -103,15 +103,6 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
         }
 
         /**
-         * Returns the description corresponding to the builder configuration.
-         *
-         * @return The description.
-         */
-        public String getDescription() {
-            return description;
-        }
-
-        /**
          * Returns the name corresponding to the builder configuration.
          *
          * @return The name.
@@ -181,7 +172,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     /**
      * List of build configurations.
      */
-    private List<BuilderConfiguration> builderConfig = new ArrayList<BuilderConfiguration>();
+    private List<BuilderConfiguration> builderConfig = new ArrayList<>();
 
     /**
      * The Setting data model from the openCONFIGURATOR project.
@@ -417,7 +408,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
      * @return String[] List of builder configuration names.
      */
     private String[] getSettingListFromBuilderConfiguraion() {
-        ArrayList<String> stringList = new ArrayList<String>();
+        ArrayList<String> stringList = new ArrayList<>();
         for (BuilderConfiguration builderConfiguration : builderConfig) {
             if (!builderConfiguration.isAlreadyAvailable()) {
                 stringList.add(builderConfiguration.getName());

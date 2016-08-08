@@ -107,18 +107,22 @@ import org.jdom2.JDOMException;
                             MappingView.showMessageWindow(MessageDialog.ERROR,
                                     "Object " + commParam.getIdHex()
                                             + "/0x1 does not exists!");
+                        } else {
+                            if (node.getNodeIdString() != null) {
+                                Result res = OpenConfiguratorLibraryUtils
+                                        .setSubObjectActualValue(subObj,
+                                                node.getNodeIdString());
+                                if (!res.IsSuccessful()) {
+                                    MappingView.showMessage(res);
+                                    return;
+                                }
+                            }
                         }
-
-                        Result res = OpenConfiguratorLibraryUtils
-                                .setSubObjectActualValue(subObj,
-                                        node.getNodeIdString());
-                        if (!res.IsSuccessful()) {
-                            MappingView.showMessage(res);
-                            return;
-                        }
-
                         try {
-                            subObj.setActualValue(node.getNodeIdString(), true);
+                            if (node.getNodeIdString() != null) {
+                                subObj.setActualValue(node.getNodeIdString(),
+                                        true);
+                            }
                         } catch (JDOMException | IOException e) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(e.getMessage(),

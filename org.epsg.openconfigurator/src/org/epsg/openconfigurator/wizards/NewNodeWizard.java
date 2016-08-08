@@ -98,12 +98,18 @@ public class NewNodeWizard extends Wizard {
 
         this.selectedNodeObj = selectedNodeObj;
         this.nodeList = nodeList;
-        Object nodeModel = this.selectedNodeObj.getNodeModel();
-        if (nodeModel instanceof TNetworkConfiguration) {
-            TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
-            nodeCollectionModel = net.getNodeCollection();
+        Object nodeModel = null;
+        if (this.selectedNodeObj != null) {
+            nodeModel = this.selectedNodeObj.getNodeModel();
         }
-
+        if (nodeModel == null) {
+            System.err.println("The NodeModel is empty!");
+        } else {
+            if (nodeModel instanceof TNetworkConfiguration) {
+                TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
+                nodeCollectionModel = net.getNodeCollection();
+            }
+        }
         setWindowTitle(WINDOW_TITLE);
         addNodePage = new AddControlledNodeWizardPage(nodeCollectionModel);
         validateXddPage = new ValidateXddWizardPage();

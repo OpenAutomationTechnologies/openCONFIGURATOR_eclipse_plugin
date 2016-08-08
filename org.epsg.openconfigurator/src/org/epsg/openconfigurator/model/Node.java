@@ -161,17 +161,17 @@ public class Node {
     /**
      * Interface list of modular controlled node.
      */
-    private List<Interface> interfaceList = new ArrayList<Interface>();
+    private List<Interface> interfaceList = new ArrayList<>();
 
     /**
      * Interface of modular node.
      */
-    private List<HeadNodeInterface> interfaceOfNodes = new ArrayList<HeadNodeInterface>();
+    private List<HeadNodeInterface> interfaceOfNodes = new ArrayList<>();
 
     /**
      * Interface of node from the XDD instance.
      */
-    private List<InterfaceList> interfaceListOfNodes = new ArrayList<InterfaceList>();
+    private List<InterfaceList> interfaceListOfNodes = new ArrayList<>();
 
     /**
      * Root node instance.
@@ -319,7 +319,7 @@ public class Node {
             if (isModularheadNode()) {
                 InterfaceList it = cnModel.getInterfaceList();
                 if (it != null) {
-                    List<InterfaceList.Interface> intfc = new ArrayList<InterfaceList.Interface>();
+                    List<InterfaceList.Interface> intfc = new ArrayList<>();
                     intfc.addAll(it.getInterface());
 
                 }
@@ -347,8 +347,9 @@ public class Node {
                     forcedObjTag = mn.getForcedObjects();
                 }
             } else {
-                removeForcedObject(forcedObjTag, forceObj);
-
+                if (forcedObjTag != null) {
+                    removeForcedObject(forcedObjTag, forceObj);
+                }
                 if (forcedObjTag != null) {
                     if (forcedObjTag.getObject().isEmpty()) {
                         mn.setForcedObjects(null);
@@ -364,8 +365,9 @@ public class Node {
                     forcedObjTag = cn.getForcedObjects();
                 }
             } else {
-                removeForcedObject(forcedObjTag, forceObj);
-
+                if (forcedObjTag != null) {
+                    removeForcedObject(forcedObjTag, forceObj);
+                }
                 if (forcedObjTag != null) {
                     if (forcedObjTag.getObject().isEmpty()) {
                         cn.setForcedObjects(null);
@@ -381,7 +383,9 @@ public class Node {
                     forcedObjTag = rmn.getForcedObjects();
                 }
             } else {
-                removeForcedObject(forcedObjTag, forceObj);
+                if (forcedObjTag != null) {
+                    removeForcedObject(forcedObjTag, forceObj);
+                }
                 if (forcedObjTag != null) {
                     if (forcedObjTag.getObject().isEmpty()) {
                         rmn.setForcedObjects(null);
@@ -702,12 +706,19 @@ public class Node {
      * @return XDC path of output controlled node.
      */
     public String getOutputPathToXdc() {
+        String xdcPath = StringUtils.EMPTY;
+
         java.nio.file.Path nodeImportFile = new File(getAbsolutePathToXdc())
                 .toPath();
         String pathToXdc = project.getLocation().toString();
-        String xdcPath = pathToXdc + IPath.SEPARATOR
-                + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR + IPath.SEPARATOR
-                + nodeImportFile.getFileName().toString();
+        if (nodeImportFile != null) {
+            if (nodeImportFile.getFileName() != null) {
+                xdcPath = pathToXdc + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
+                        + IPath.SEPARATOR
+                        + String.valueOf(nodeImportFile.getFileName());
+            }
+        }
 
         return xdcPath;
     }
@@ -1599,7 +1610,9 @@ public class Node {
             List<org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface> interfaceList = cn
                     .getInterfaceList().getInterface();
             for (org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface intfc : interfaceList) {
-                interfaceObj = intfc;
+                if (interfaceObj != null) {
+                    interfaceObj = intfc;
+                }
             }
 
         }

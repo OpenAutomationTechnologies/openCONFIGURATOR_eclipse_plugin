@@ -239,8 +239,8 @@ public class JDomUtil {
      */
     public static XPathExpression<Element> getXPathExpressionElement(
             String xpathValue, Namespace namespace) {
-        XPathBuilder<Element> elementBuilder = new XPathBuilder<Element>(
-                xpathValue, Filters.element());
+        XPathBuilder<Element> elementBuilder = new XPathBuilder<>(xpathValue,
+                Filters.element());
         elementBuilder.setNamespace(namespace);
         return elementBuilder.compileWith(XPathFactory.instance());
     }
@@ -405,5 +405,6 @@ public class JDomUtil {
         FileWriter fileWriter = new FileWriter(xmlFile);
         xmlOutput.output(document, fileWriter);
         fileWriter.close();
+
     }
 }

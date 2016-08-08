@@ -724,7 +724,7 @@ public class Module {
                 .keySet();
 
         if (newPosition > oldPosition) {
-            List<Integer> positiontoBeMoved = new ArrayList<Integer>();
+            List<Integer> positiontoBeMoved = new ArrayList<>();
             for (Integer position : positionSet) {
                 if (position >= oldPosition) {
                     if (position <= newPosition) {
@@ -751,7 +751,7 @@ public class Module {
             }
 
         } else if (newPosition < oldPosition) {
-            List<Integer> positiontoBeMoved = new ArrayList<Integer>();
+            List<Integer> positiontoBeMoved = new ArrayList<>();
             for (Integer position : positionSet) {
                 if (position <= oldPosition) {
                     if (position >= newPosition) {
@@ -1052,8 +1052,10 @@ public class Module {
                                 .remove(oldPosition);
                         getInterfaceOfModule().getModuleCollection()
                                 .put(position, this);
-                        if (String.valueOf(getInterfaceOfModule()
-                                .getModuleAddressing()) == "POSITION") {
+                        if (String
+                                .valueOf(getInterfaceOfModule()
+                                        .getModuleAddressing())
+                                .equalsIgnoreCase("POSITION")) {
                             setAddress(value);
                         }
                     } else {
@@ -1091,8 +1093,10 @@ public class Module {
                             .remove(oldPosition);
                     getInterfaceOfModule().getModuleCollection().put(position,
                             this);
-                    if (String.valueOf(getInterfaceOfModule()
-                            .getModuleAddressing()) == "POSITION") {
+                    if (String
+                            .valueOf(getInterfaceOfModule()
+                                    .getModuleAddressing())
+                            .equalsIgnoreCase("POSITION")) {
                         setAddress(value);
                     }
                 } else {
@@ -1137,8 +1141,8 @@ public class Module {
                         .remove(oldPosition);
                 getInterfaceOfModule().getModuleCollection().put(position,
                         this);
-                if (String.valueOf(getInterfaceOfModule()
-                        .getModuleAddressing()) == "POSITION") {
+                if (String.valueOf(getInterfaceOfModule().getModuleAddressing())
+                        .equalsIgnoreCase("POSITION")) {
                     setAddress(value);
                 }
             } else {
@@ -1414,13 +1418,14 @@ public class Module {
      * @return <true> if module type matches in new position, <false> if module
      *         type does not match.
      */
-    public boolean validateNewPosition(Integer newPosition) {
+    public boolean validateNewPosition(int newPosition) {
         Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
                 .keySet();
         boolean validPosition = true;
         int previousPosition = 0;
         int nextPosition = 0;
-        for (Integer position : positionSet) {
+        for (int position : positionSet) {
+
             if (newPosition == position) {
                 if (position < newPosition) {
                     previousPosition = position;
@@ -1431,6 +1436,7 @@ public class Module {
                     break;
                 }
             }
+
         }
 
         Module currentModule = getInterfaceOfModule().getModuleCollection()

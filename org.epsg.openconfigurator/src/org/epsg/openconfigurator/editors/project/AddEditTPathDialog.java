@@ -167,109 +167,116 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
      */
     @Override
     protected Control createDialogArea(Composite parent) {
-        if (path.getId() == null) {
-            setTitle(AddEditTPathDialog.DIALOG_ADD_TITLE);
-        } else {
-            setTitle(AddEditTPathDialog.DIALOG_EDIT_TITLE);
-        }
-
-        setMessage(AddEditTPathDialog.DIALOG_DEFAULT_MESSAGE);
-
-        Composite container = new Composite(parent, SWT.NONE);
-        container.setLayoutData(new GridData(GridData.FILL_BOTH));
-        container.setLayout(new GridLayout(3, false));
-
-        Label lblSettingsName = new Label(container, SWT.CENTER);
-        lblSettingsName.setText(AddEditTPathDialog.NAME_LABEL);
-        lblSettingsName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false,
-                false, 1, 1));
-
-        txtName = new Text(container, SWT.NONE);
-        txtName.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false,
-                2, 1));
-        if ((path != null) && (path.getId() != null)) {
-            txtName.setText(path.getId());
-        }
-        txtName.addModifyListener(new ModifyListener() {
-
-            @Override
-            public void modifyText(ModifyEvent e) {
-
-                setErrorMessage(null);
-                if (txtName.getText().isEmpty()) {
-                    setErrorMessage(AddEditTPathDialog.NAME_FIELD_MESSAGE_EMPTY_NAME);
-                }
-
-                // Check if is ID already present in the model
-                if ((path.getId() != null)
-                        && !path.getId().equalsIgnoreCase(txtName.getText())
-                        && OpenConfiguratorProjectUtils.isPathIdAlreadyPresent(
-                                pathSettingsModel, txtName.getText())) {
-                    setErrorMessage(AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);
-                }
-
-                dirty = true;
+        if (path != null) {
+            if (path.getId() == null) {
+                setTitle(AddEditTPathDialog.DIALOG_ADD_TITLE);
+            } else {
+                setTitle(AddEditTPathDialog.DIALOG_EDIT_TITLE);
             }
-        });
 
-        Label lblValue = new Label(container, SWT.CENTER);
-        lblValue.setText(AddEditTPathDialog.LOCATION_LABEL);
-        lblValue.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false,
-                1, 1));
+            setMessage(AddEditTPathDialog.DIALOG_DEFAULT_MESSAGE);
 
-        txtLocation = new Text(container, SWT.NONE);
-        txtLocation.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true,
-                false, 1, 1));
-        txtLocation.setText("");
-        if ((path != null) && (path.getPath() != null)) {
-            txtLocation.setText(path.getPath());
-        }
-        txtLocation.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                setErrorMessage(null);
+            Composite container = new Composite(parent, SWT.NONE);
+            container.setLayoutData(new GridData(GridData.FILL_BOTH));
+            container.setLayout(new GridLayout(3, false));
 
-                if (txtLocation.getText().isEmpty()) {
-                    setErrorMessage(AddEditTPathDialog.LOCATION_FIELD_MESSAGE_MUST_SPEFIFY_PATH);
-                    return;
-                }
+            Label lblSettingsName = new Label(container, SWT.CENTER);
+            lblSettingsName.setText(AddEditTPathDialog.NAME_LABEL);
+            lblSettingsName.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 
-                File file = new File(txtLocation.getText().trim());
-                if (!file.exists() || !file.isDirectory()) {
-                    setErrorMessage("Invalid path specified.");
-                    return;
-                }
-
-                dirty = true;
+            txtName = new Text(container, SWT.NONE);
+            txtName.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+            if ((path != null) && (path.getId() != null)) {
+                txtName.setText(path.getId());
             }
-        });
+            txtName.addModifyListener(new ModifyListener() {
 
-        Button btnBrowse = new Button(container, SWT.PUSH);
-        btnBrowse.setText(AddEditTPathDialog.BROWSE_LABEL);
-        GridData gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
-        btnBrowse.setLayoutData(gd);
-        btnBrowse.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
+                @Override
+                public void modifyText(ModifyEvent e) {
 
-                DirectoryDialog dirDialog = new DirectoryDialog(getShell(),
-                        SWT.OPEN);
-                dirDialog.setText(AddEditTPathDialog.BROWSE_LOCATION_TITLE);
-                if (!txtLocation.getText().isEmpty()) {
-                    dirDialog.setFilterPath(txtLocation.getText());
-                }
+                    setErrorMessage(null);
+                    if (txtName.getText().isEmpty()) {
+                        setErrorMessage(
+                                AddEditTPathDialog.NAME_FIELD_MESSAGE_EMPTY_NAME);
+                    }
 
-                // Open Dialog and save result of selection
-                String selectedOutputPath = dirDialog.open();
-                if ((selectedOutputPath != null)
-                        && !selectedOutputPath.isEmpty()) {
-                    txtLocation.setText(selectedOutputPath);
+                    // Check if is ID already present in the model
+                    if ((path.getId() != null)
+                            && !path.getId().equalsIgnoreCase(txtName.getText())
+                            && OpenConfiguratorProjectUtils
+                                    .isPathIdAlreadyPresent(pathSettingsModel,
+                                            txtName.getText())) {
+                        setErrorMessage(
+                                AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);
+                    }
+
                     dirty = true;
                 }
-            }
-        });
+            });
 
-        return container;
+            Label lblValue = new Label(container, SWT.CENTER);
+            lblValue.setText(AddEditTPathDialog.LOCATION_LABEL);
+            lblValue.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+
+            txtLocation = new Text(container, SWT.NONE);
+            txtLocation.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            txtLocation.setText("");
+            if ((path != null) && (path.getPath() != null)) {
+                txtLocation.setText(path.getPath());
+            }
+            txtLocation.addModifyListener(new ModifyListener() {
+                @Override
+                public void modifyText(ModifyEvent e) {
+                    setErrorMessage(null);
+
+                    if (txtLocation.getText().isEmpty()) {
+                        setErrorMessage(
+                                AddEditTPathDialog.LOCATION_FIELD_MESSAGE_MUST_SPEFIFY_PATH);
+                        return;
+                    }
+
+                    File file = new File(txtLocation.getText().trim());
+                    if (!file.exists() || !file.isDirectory()) {
+                        setErrorMessage("Invalid path specified.");
+                        return;
+                    }
+
+                    dirty = true;
+                }
+            });
+
+            Button btnBrowse = new Button(container, SWT.PUSH);
+            btnBrowse.setText(AddEditTPathDialog.BROWSE_LABEL);
+            GridData gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
+            btnBrowse.setLayoutData(gd);
+            btnBrowse.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+
+                    DirectoryDialog dirDialog = new DirectoryDialog(getShell(),
+                            SWT.OPEN);
+                    dirDialog.setText(AddEditTPathDialog.BROWSE_LOCATION_TITLE);
+                    if (!txtLocation.getText().isEmpty()) {
+                        dirDialog.setFilterPath(txtLocation.getText());
+                    }
+
+                    // Open Dialog and save result of selection
+                    String selectedOutputPath = dirDialog.open();
+                    if ((selectedOutputPath != null)
+                            && !selectedOutputPath.isEmpty()) {
+                        txtLocation.setText(selectedOutputPath);
+                        dirty = true;
+                    }
+                }
+            });
+
+            return container;
+        }
+        return null;
     }
 
     /**
@@ -305,24 +312,26 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
                     nameValid = true;
                     setErrorMessage(null);
                 } else {
-                    setErrorMessage(AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);
+                    setErrorMessage(
+                            AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);
                 }
             } else {
                 if (path.getId().equalsIgnoreCase(txtName.getText())
-                        || !OpenConfiguratorProjectUtils
-                        .isPathIdAlreadyPresent(pathSettingsModel,
-                                txtName.getText())) {
+                        || !OpenConfiguratorProjectUtils.isPathIdAlreadyPresent(
+                                pathSettingsModel, txtName.getText())) {
                     nameValid = true;
                     setErrorMessage(null);
                 } else {
-                    setErrorMessage(AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);
+                    setErrorMessage(
+                            AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_ALREADY_EXISTS);
                 }
             }
         } else {
             setErrorMessage(AddEditTPathDialog.NAME_FIELD_MESSAGE_NAME_INVALID);
         }
 
-        if ((txtLocation.getText() != null) && !txtLocation.getText().isEmpty()) {
+        if ((txtLocation.getText() != null)
+                && !txtLocation.getText().isEmpty()) {
             File file = new File(txtLocation.getText().trim());
             if (!file.exists() || !file.isDirectory()) {
                 setErrorMessage("Invalid path specified.");
@@ -330,7 +339,8 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
                 locationValid = true;
             }
         } else {
-            setErrorMessage(AddEditTPathDialog.LOCATION_FIELD_MESSAGE_INVALID_PATH);
+            setErrorMessage(
+                    AddEditTPathDialog.LOCATION_FIELD_MESSAGE_INVALID_PATH);
         }
 
         return (nameValid && locationValid);

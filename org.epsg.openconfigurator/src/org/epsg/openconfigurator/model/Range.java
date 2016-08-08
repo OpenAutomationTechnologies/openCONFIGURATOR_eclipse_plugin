@@ -43,6 +43,7 @@ public class Range {
     private String minValue;
     private String maxValue;
     private String step;
+    private TRange range;
 
     /**
      * Constructor of range to define the maximum and minimum value of
@@ -51,6 +52,7 @@ public class Range {
      * @param range The XDD model instance of TRange.
      */
     public Range(TRange range) {
+        this.range = range;
         maxValue = range.getMaxValue().getValue();
         minValue = range.getMinValue().getValue();
     }
@@ -73,6 +75,7 @@ public class Range {
      * @return The step value of parameter.
      */
     public String getStep() {
+        step = range.getStep().getValue();
         return step;
     }
 }

@@ -163,7 +163,7 @@ public class ObjectDictionaryView extends ViewPart
         @Override
         public Object[] filter(Viewer viewer, Object parent,
                 Object[] elements) {
-            ArrayList<Object> objList = new ArrayList<Object>();
+            ArrayList<Object> objList = new ArrayList<>();
 
             // Display sub-object after filtering of objects.
             if (parent instanceof PowerlinkObject) {
@@ -577,10 +577,6 @@ public class ObjectDictionaryView extends ViewPart
         public Object getParent(Object element) {
             System.err.println("getParent " + element);
             return null;
-        }
-
-        public TreeViewer getTreeViewer() {
-            return treeViewer;
         }
 
         @Override

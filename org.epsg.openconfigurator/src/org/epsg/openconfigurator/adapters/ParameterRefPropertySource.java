@@ -181,7 +181,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addPropertyDescriptors(propertyList);
 
         IPropertyDescriptor[] propertyDescriptorArray = {};
@@ -246,7 +246,8 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                 System.err.println(
                                         "Get property value : actual value "
                                                 + actualValue);
-                                return retObj = new Integer(i);
+                                retObj = new Integer(i);
+                                return retObj;
                             }
                         }
                     } else {
@@ -429,10 +430,10 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
     private void setAllowedValues() {
         AllowedValues allowedValue = paramRef.getAllowedValues();
         List<String> values = allowedValue.getValuesList();
-        List<String> valu = new ArrayList<String>();
+        List<String> valu = new ArrayList<>();
         for (String value : values) {
-            if (value.contains("Â")) {
-                value = value.replace("Â", "");
+            if (value.contains("ï¿½")) {
+                value = value.replace("ï¿½", "");
             }
             valu.add(value);
         }
