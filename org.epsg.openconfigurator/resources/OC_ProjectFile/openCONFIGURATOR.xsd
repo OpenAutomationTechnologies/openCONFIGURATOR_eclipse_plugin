@@ -262,7 +262,6 @@
 				</xs:complexType>
 			</xs:element>
 		</xs:sequence>
-		<xs:attribute name="name" type="ppc:tNonEmptyString"/>
 		<xs:attribute name="isAsyncOnly" type="xs:boolean" default="false">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">"True" -> AsyncOnly node. "False" -> Isochonrously accessed node. See EPSG DS 301, 0x1F81, Bit 8.</xs:documentation>
@@ -280,6 +279,7 @@
 				<xs:sequence>
 					<xs:element ref="oc:InterfaceList" minOccurs="0"/>
 				</xs:sequence>
+				<xs:attribute name="name" type="ppc:tNonEmptyString" use="optional" default="POWERLINK CN"/>
 				<xs:attribute name="nodeID" use="required">
 					<xs:simpleType>
 						<xs:union memberTypes="oc:tRegularCNNodeID"/>
@@ -343,6 +343,7 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="oc:tAbstractNode">
+				<xs:attribute name="name" type="ppc:tNonEmptyString" use="optional" default="POWERLINK MN"/>
 				<xs:attribute name="nodeID" type="xs:unsignedByte" use="required" fixed="240"/>
 				<xs:attribute name="pathToXDC">
 					<xs:annotation>
@@ -389,6 +390,7 @@
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="oc:tAbstractNode">
+				<xs:attribute name="name" type="ppc:tNonEmptyString" use="optional" default="POWERLINK RMN"/>
 				<xs:attribute name="nodeID" use="required">
 					<xs:simpleType>
 						<xs:union memberTypes="oc:tRegularCNNodeID oc:tDefaultRedundantMNNodeID"/>
@@ -424,6 +426,19 @@
 						<xs:sequence>
 							<xs:element name="Module" minOccurs="1" maxOccurs="unbounded">
 								<xs:complexType>
+									<xs:sequence>
+										<xs:element ref="oc:InterfaceList" minOccurs="0"/>
+										<xs:element name="ForcedObjects" minOccurs="0">
+											<xs:annotation>
+												<xs:documentation xml:lang="en">Persists the configuration objects which are forced to the POWERLINK configuration.</xs:documentation>
+											</xs:annotation>
+											<xs:complexType>
+												<xs:sequence minOccurs="1" maxOccurs="unbounded">
+													<xs:element ref="oc:Object"/>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
 									<xs:attribute name="name" type="ppc:tNonEmptyString" use="required"/>
 									<xs:attribute name="position" type="xs:positiveInteger" use="required"/>
 									<xs:attribute name="address" type="xs:positiveInteger" use="optional"/>

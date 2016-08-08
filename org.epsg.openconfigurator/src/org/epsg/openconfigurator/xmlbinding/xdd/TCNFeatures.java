@@ -7,14 +7,12 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
+
 /**
- * <p>
- * Java class for t_CNFeatures complex type.
- *
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
- *
+ * <p>Java class for t_CNFeatures complex type.
+ * 
+ * <p>The following schema fragment specifies the expected content contained within this class.
+ * 
  * <pre>
  * &lt;complexType name="t_CNFeatures"&gt;
  *   &lt;complexContent&gt;
@@ -30,8 +28,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "t_CNFeatures")
@@ -57,56 +55,12 @@ public class TCNFeatures {
     protected Long nmtcnMaxAInv;
 
     /**
-     * Gets the value of the nmtcnMaxAInv property.
-     *
-     * @return possible object is {@link Long }
-     *
-     */
-    public long getNMTCNMaxAInv() {
-        if (nmtcnMaxAInv == null) {
-            return 0L;
-        } else {
-            return nmtcnMaxAInv;
-        }
-    }
-
-    /**
-     * Gets the value of the nmtcnPreOp2ToReady2Op property.
-     *
-     * @return possible object is {@link Long }
-     *
-     */
-    public Long getNMTCNPreOp2ToReady2Op() {
-        return nmtcnPreOp2ToReady2Op;
-    }
-
-    /**
-     * Gets the value of the nmtcnSetNodeNumberTime property.
-     *
-     * @return possible object is {@link Long }
-     *
-     */
-    public long getNMTCNSetNodeNumberTime() {
-        if (nmtcnSetNodeNumberTime == null) {
-            return 0L;
-        } else {
-            return nmtcnSetNodeNumberTime;
-        }
-    }
-
-    /**
-     * Gets the value of the nmtcnSoC2PReq property.
-     *
-     */
-    public long getNMTCNSoC2PReq() {
-        return nmtcnSoC2PReq;
-    }
-
-    /**
      * Gets the value of the dllcnFeatureMultiplex property.
-     *
-     * @return possible object is {@link Boolean }
-     *
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
      */
     public boolean isDLLCNFeatureMultiplex() {
         if (dllcnFeatureMultiplex == null) {
@@ -117,10 +71,24 @@ public class TCNFeatures {
     }
 
     /**
+     * Sets the value of the dllcnFeatureMultiplex property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setDLLCNFeatureMultiplex(Boolean value) {
+        this.dllcnFeatureMultiplex = value;
+    }
+
+    /**
      * Gets the value of the dllcnpResChaining property.
-     *
-     * @return possible object is {@link Boolean }
-     *
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
      */
     public boolean isDLLCNPResChaining() {
         if (dllcnpResChaining == null) {
@@ -131,10 +99,92 @@ public class TCNFeatures {
     }
 
     /**
+     * Sets the value of the dllcnpResChaining property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setDLLCNPResChaining(Boolean value) {
+        this.dllcnpResChaining = value;
+    }
+
+    /**
+     * Gets the value of the nmtcnPreOp2ToReady2Op property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public Long getNMTCNPreOp2ToReady2Op() {
+        return nmtcnPreOp2ToReady2Op;
+    }
+
+    /**
+     * Sets the value of the nmtcnPreOp2ToReady2Op property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setNMTCNPreOp2ToReady2Op(Long value) {
+        this.nmtcnPreOp2ToReady2Op = value;
+    }
+
+    /**
+     * Gets the value of the nmtcnSoC2PReq property.
+     * 
+     */
+    public long getNMTCNSoC2PReq() {
+        return nmtcnSoC2PReq;
+    }
+
+    /**
+     * Sets the value of the nmtcnSoC2PReq property.
+     * 
+     */
+    public void setNMTCNSoC2PReq(long value) {
+        this.nmtcnSoC2PReq = value;
+    }
+
+    /**
+     * Gets the value of the nmtcnSetNodeNumberTime property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public long getNMTCNSetNodeNumberTime() {
+        if (nmtcnSetNodeNumberTime == null) {
+            return  0L;
+        } else {
+            return nmtcnSetNodeNumberTime;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtcnSetNodeNumberTime property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
+     */
+    public void setNMTCNSetNodeNumberTime(Long value) {
+        this.nmtcnSetNodeNumberTime = value;
+    }
+
+    /**
      * Gets the value of the nmtcndna property.
-     *
-     * @return possible object is {@link Boolean }
-     *
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
      */
     public boolean isNMTCNDNA() {
         if (nmtcndna == null) {
@@ -145,71 +195,43 @@ public class TCNFeatures {
     }
 
     /**
-     * Sets the value of the dllcnFeatureMultiplex property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setDLLCNFeatureMultiplex(Boolean value) {
-        dllcnFeatureMultiplex = value;
-    }
-
-    /**
-     * Sets the value of the dllcnpResChaining property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setDLLCNPResChaining(Boolean value) {
-        dllcnpResChaining = value;
-    }
-
-    /**
      * Sets the value of the nmtcndna property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
      */
     public void setNMTCNDNA(Boolean value) {
-        nmtcndna = value;
+        this.nmtcndna = value;
+    }
+
+    /**
+     * Gets the value of the nmtcnMaxAInv property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *     
+     */
+    public long getNMTCNMaxAInv() {
+        if (nmtcnMaxAInv == null) {
+            return  0L;
+        } else {
+            return nmtcnMaxAInv;
+        }
     }
 
     /**
      * Sets the value of the nmtcnMaxAInv property.
-     *
-     * @param value allowed object is {@link Long }
-     *
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *     
      */
     public void setNMTCNMaxAInv(Long value) {
-        nmtcnMaxAInv = value;
-    }
-
-    /**
-     * Sets the value of the nmtcnPreOp2ToReady2Op property.
-     *
-     * @param value allowed object is {@link Long }
-     *
-     */
-    public void setNMTCNPreOp2ToReady2Op(Long value) {
-        nmtcnPreOp2ToReady2Op = value;
-    }
-
-    /**
-     * Sets the value of the nmtcnSetNodeNumberTime property.
-     *
-     * @param value allowed object is {@link Long }
-     *
-     */
-    public void setNMTCNSetNodeNumberTime(Long value) {
-        nmtcnSetNodeNumberTime = value;
-    }
-
-    /**
-     * Sets the value of the nmtcnSoC2PReq property.
-     *
-     */
-    public void setNMTCNSoC2PReq(long value) {
-        nmtcnSoC2PReq = value;
+        this.nmtcnMaxAInv = value;
     }
 
 }

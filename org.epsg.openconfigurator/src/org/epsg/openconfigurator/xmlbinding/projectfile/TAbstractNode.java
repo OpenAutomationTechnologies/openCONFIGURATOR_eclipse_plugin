@@ -35,7 +35,6 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
  *       &lt;/sequence&gt;
- *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *       &lt;attribute name="isAsyncOnly" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="isType1Router" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="isType2Router" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
@@ -59,8 +58,6 @@ public abstract class TAbstractNode {
 
     @XmlElement(name = "ForcedObjects")
     protected TAbstractNode.ForcedObjects forcedObjects;
-    @XmlAttribute(name = "name")
-    protected String name;
     @XmlAttribute(name = "isAsyncOnly")
     protected Boolean isAsyncOnly;
     @XmlAttribute(name = "isType1Router")
@@ -90,30 +87,6 @@ public abstract class TAbstractNode {
      */
     public void setForcedObjects(TAbstractNode.ForcedObjects value) {
         this.forcedObjects = value;
-    }
-
-    /**
-     * Gets the value of the name property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Sets the value of the name property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setName(String value) {
-        this.name = value;
     }
 
     /**

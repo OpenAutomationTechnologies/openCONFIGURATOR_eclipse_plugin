@@ -18,6 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="tRMN"&gt;
  *   &lt;complexContent&gt;
  *     &lt;extension base="{http://sourceforge.net/projects/openconf/configuration}tAbstractNode"&gt;
+ *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" default="POWERLINK RMN" /&gt;
  *       &lt;attribute name="nodeID" use="required"&gt;
  *         &lt;simpleType&gt;
  *           &lt;union memberTypes=" {http://sourceforge.net/projects/openconf/configuration}tRegularCNNodeID {http://sourceforge.net/projects/openconf/configuration}tDefaultRedundantMNNodeID"&gt;
@@ -44,10 +45,40 @@ public class TRMN
     extends TAbstractNode
 {
 
+    @XmlAttribute(name = "name")
+    protected String name;
     @XmlAttribute(name = "nodeID", required = true)
     protected String nodeID;
     @XmlAttribute(name = "pathToXDC")
     protected String pathToXDC;
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        if (name == null) {
+            return "POWERLINK RMN";
+        } else {
+            return name;
+        }
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
+    }
 
     /**
      * Gets the value of the nodeID property.

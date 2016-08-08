@@ -32,6 +32,20 @@ import javax.xml.bind.annotation.XmlType;
  *                     &lt;complexType&gt;
  *                       &lt;complexContent&gt;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                           &lt;sequence&gt;
+ *                             &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
+ *                             &lt;element name="ForcedObjects" minOccurs="0"&gt;
+ *                               &lt;complexType&gt;
+ *                                 &lt;complexContent&gt;
+ *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                                     &lt;sequence maxOccurs="unbounded"&gt;
+ *                                       &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}Object"/&gt;
+ *                                     &lt;/sequence&gt;
+ *                                   &lt;/restriction&gt;
+ *                                 &lt;/complexContent&gt;
+ *                               &lt;/complexType&gt;
+ *                             &lt;/element&gt;
+ *                           &lt;/sequence&gt;
  *                           &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *                           &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
  *                           &lt;attribute name="address" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
@@ -115,6 +129,20 @@ public class InterfaceList {
      *           &lt;complexType&gt;
      *             &lt;complexContent&gt;
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+     *                 &lt;sequence&gt;
+     *                   &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
+     *                   &lt;element name="ForcedObjects" minOccurs="0"&gt;
+     *                     &lt;complexType&gt;
+     *                       &lt;complexContent&gt;
+     *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+     *                           &lt;sequence maxOccurs="unbounded"&gt;
+     *                             &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}Object"/&gt;
+     *                           &lt;/sequence&gt;
+     *                         &lt;/restriction&gt;
+     *                       &lt;/complexContent&gt;
+     *                     &lt;/complexType&gt;
+     *                   &lt;/element&gt;
+     *                 &lt;/sequence&gt;
      *                 &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *                 &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
      *                 &lt;attribute name="address" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
@@ -213,6 +241,20 @@ public class InterfaceList {
          * &lt;complexType&gt;
          *   &lt;complexContent&gt;
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+         *       &lt;sequence&gt;
+         *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
+         *         &lt;element name="ForcedObjects" minOccurs="0"&gt;
+         *           &lt;complexType&gt;
+         *             &lt;complexContent&gt;
+         *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+         *                 &lt;sequence maxOccurs="unbounded"&gt;
+         *                   &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}Object"/&gt;
+         *                 &lt;/sequence&gt;
+         *               &lt;/restriction&gt;
+         *             &lt;/complexContent&gt;
+         *           &lt;/complexType&gt;
+         *         &lt;/element&gt;
+         *       &lt;/sequence&gt;
          *       &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
          *       &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
          *       &lt;attribute name="address" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
@@ -232,9 +274,16 @@ public class InterfaceList {
          * 
          */
         @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "")
+        @XmlType(name = "", propOrder = {
+            "interfaceList",
+            "forcedObjects"
+        })
         public static class Module {
 
+            @XmlElement(name = "InterfaceList")
+            protected InterfaceList interfaceList;
+            @XmlElement(name = "ForcedObjects")
+            protected InterfaceList.Interface.Module.ForcedObjects forcedObjects;
             @XmlAttribute(name = "name", required = true)
             protected String name;
             @XmlAttribute(name = "position", required = true)
@@ -247,6 +296,54 @@ public class InterfaceList {
             protected String pathToXDC;
             @XmlAttribute(name = "enabled")
             protected Boolean enabled;
+
+            /**
+             * Gets the value of the interfaceList property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link InterfaceList }
+             *     
+             */
+            public InterfaceList getInterfaceList() {
+                return interfaceList;
+            }
+
+            /**
+             * Sets the value of the interfaceList property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link InterfaceList }
+             *     
+             */
+            public void setInterfaceList(InterfaceList value) {
+                this.interfaceList = value;
+            }
+
+            /**
+             * Gets the value of the forcedObjects property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link InterfaceList.Interface.Module.ForcedObjects }
+             *     
+             */
+            public InterfaceList.Interface.Module.ForcedObjects getForcedObjects() {
+                return forcedObjects;
+            }
+
+            /**
+             * Sets the value of the forcedObjects property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link InterfaceList.Interface.Module.ForcedObjects }
+             *     
+             */
+            public void setForcedObjects(InterfaceList.Interface.Module.ForcedObjects value) {
+                this.forcedObjects = value;
+            }
 
             /**
              * Gets the value of the name property.
@@ -370,6 +467,66 @@ public class InterfaceList {
              */
             public void setEnabled(Boolean value) {
                 this.enabled = value;
+            }
+
+
+            /**
+             * <p>Java class for anonymous complex type.
+             * 
+             * <p>The following schema fragment specifies the expected content contained within this class.
+             * 
+             * <pre>
+             * &lt;complexType&gt;
+             *   &lt;complexContent&gt;
+             *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+             *       &lt;sequence maxOccurs="unbounded"&gt;
+             *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}Object"/&gt;
+             *       &lt;/sequence&gt;
+             *     &lt;/restriction&gt;
+             *   &lt;/complexContent&gt;
+             * &lt;/complexType&gt;
+             * </pre>
+             * 
+             * 
+             */
+            @XmlAccessorType(XmlAccessType.FIELD)
+            @XmlType(name = "", propOrder = {
+                "object"
+            })
+            public static class ForcedObjects {
+
+                @XmlElement(name = "Object", required = true)
+                protected List<Object> object;
+
+                /**
+                 * Gets the value of the object property.
+                 * 
+                 * <p>
+                 * This accessor method returns a reference to the live list,
+                 * not a snapshot. Therefore any modification you make to the
+                 * returned list will be present inside the JAXB object.
+                 * This is why there is not a <CODE>set</CODE> method for the object property.
+                 * 
+                 * <p>
+                 * For example, to add a new item, do as follows:
+                 * <pre>
+                 *    getObject().add(newItem);
+                 * </pre>
+                 * 
+                 * 
+                 * <p>
+                 * Objects of the following type(s) are allowed in the list
+                 * {@link Object }
+                 * 
+                 * 
+                 */
+                public List<Object> getObject() {
+                    if (object == null) {
+                        object = new ArrayList<Object>();
+                    }
+                    return this.object;
+                }
+
             }
 
         }

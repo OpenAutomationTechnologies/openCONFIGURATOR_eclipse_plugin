@@ -46,6 +46,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link InterfaceList.Interface.Module }
+     * 
+     */
+    public InterfaceList.Interface.Module createInterfaceListInterfaceModule() {
+        return new InterfaceList.Interface.Module();
+    }
+
+    /**
      * Create an instance of {@link TProjectConfiguration }
      * 
      */
@@ -198,11 +206,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link InterfaceList.Interface.Module }
+     * Create an instance of {@link InterfaceList.Interface.Module.ForcedObjects }
      * 
      */
-    public InterfaceList.Interface.Module createInterfaceListInterfaceModule() {
-        return new InterfaceList.Interface.Module();
+    public InterfaceList.Interface.Module.ForcedObjects createInterfaceListInterfaceModuleForcedObjects() {
+        return new InterfaceList.Interface.Module.ForcedObjects();
     }
 
     /**

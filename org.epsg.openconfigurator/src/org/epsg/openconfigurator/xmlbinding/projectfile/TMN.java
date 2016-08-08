@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="tMN"&gt;
  *   &lt;complexContent&gt;
  *     &lt;extension base="{http://sourceforge.net/projects/openconf/configuration}tAbstractNode"&gt;
+ *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" default="POWERLINK MN" /&gt;
  *       &lt;attribute name="nodeID" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" fixed="240" /&gt;
  *       &lt;attribute name="pathToXDC"&gt;
  *         &lt;simpleType&gt;
@@ -61,6 +62,8 @@ public class TMN
     extends TAbstractNode
 {
 
+    @XmlAttribute(name = "name")
+    protected String name;
     @XmlAttribute(name = "nodeID", required = true)
     @XmlSchemaType(name = "unsignedByte")
     protected short nodeID;
@@ -72,6 +75,34 @@ public class TMN
     protected Long asyncSlotTimeout;
     @XmlAttribute(name = "aSndMaxNumber")
     protected Short aSndMaxNumber;
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        if (name == null) {
+            return "POWERLINK MN";
+        } else {
+            return name;
+        }
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
+    }
 
     /**
      * Gets the value of the nodeID property.

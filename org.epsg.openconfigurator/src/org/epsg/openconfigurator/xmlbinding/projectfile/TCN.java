@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;sequence&gt;
  *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
+ *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" default="POWERLINK CN" /&gt;
  *       &lt;attribute name="nodeID" use="required"&gt;
  *         &lt;simpleType&gt;
  *           &lt;union memberTypes=" {http://sourceforge.net/projects/openconf/configuration}tRegularCNNodeID"&gt;
@@ -66,6 +67,8 @@ public class TCN
 
     @XmlElement(name = "InterfaceList")
     protected InterfaceList interfaceList;
+    @XmlAttribute(name = "name")
+    protected String name;
     @XmlAttribute(name = "nodeID", required = true)
     protected String nodeID;
     @XmlAttribute(name = "pathToXDC", required = true)
@@ -121,6 +124,34 @@ public class TCN
      */
     public void setInterfaceList(InterfaceList value) {
         this.interfaceList = value;
+    }
+
+    /**
+     * Gets the value of the name property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getName() {
+        if (name == null) {
+            return "POWERLINK CN";
+        } else {
+            return name;
+        }
+    }
+
+    /**
+     * Sets the value of the name property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setName(String value) {
+        this.name = value;
     }
 
     /**
