@@ -50,7 +50,6 @@ import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
-import org.epsg.openconfigurator.validation.ModuleAddressVerifyListener;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -85,8 +84,6 @@ public class AddChildModuleWizardPage extends WizardPage {
     private Label addressLabel;
 
     private Spinner addressText;
-
-    private ModuleAddressVerifyListener addressVerifyListener = new ModuleAddressVerifyListener();
 
     ModifyListener addressModifyListener = new ModifyListener() {
 
@@ -187,7 +184,7 @@ public class AddChildModuleWizardPage extends WizardPage {
     /**
      * @return The address of module
      */
-    public int getAddress() {
+    public Integer getAddress() {
         return Integer.valueOf(addressText.getText());
     }
 
@@ -214,8 +211,8 @@ public class AddChildModuleWizardPage extends WizardPage {
     @Deprecated
     private List<Integer> getModulePositionList() {
         Object nodeModel = node.getNodeModel();
-        List<InterfaceList.Interface> interfaceList = new ArrayList<InterfaceList.Interface>();
-        List<Integer> positionList = new ArrayList<Integer>();
+        List<InterfaceList.Interface> interfaceList = new ArrayList<>();
+        List<Integer> positionList = new ArrayList<>();
         if (nodeModel instanceof TCN) {
 
             TCN cn = (TCN) nodeModel;
@@ -249,7 +246,7 @@ public class AddChildModuleWizardPage extends WizardPage {
 
     private int getNewPosition() {
         setErrorMessage(null);
-        List<InterfaceList.Interface> interfaceList = new ArrayList<InterfaceList.Interface>();
+        List<InterfaceList.Interface> interfaceList = new ArrayList<>();
         if (interfaceObj.getModuleCollection().size() == 0) {
             // errorField = true;
             System.err.println("Module Collection size .. "
@@ -274,7 +271,7 @@ public class AddChildModuleWizardPage extends WizardPage {
             List<InterfaceList.Interface> interfacelist) {
         setErrorMessage(null);
 
-        List<Integer> positionList = new ArrayList<Integer>();
+        List<Integer> positionList = new ArrayList<>();
 
         for (Interface interfaces : interfacelist) {
             List<InterfaceList.Interface.Module> moduleList = interfaces
@@ -300,7 +297,7 @@ public class AddChildModuleWizardPage extends WizardPage {
     /**
      * @return The position of Module
      */
-    public int getPosition() {
+    public Integer getPosition() {
         return Integer.valueOf(position.getText());
     }
 
@@ -329,9 +326,9 @@ public class AddChildModuleWizardPage extends WizardPage {
             return retval;
         }
 
-        int maxModules = Integer.valueOf(positionRangevalue.getText());
+        Integer maxModules = Integer.valueOf(positionRangevalue.getText());
 
-        int address = Integer.valueOf(addressValue);
+        Integer address = Integer.valueOf(addressValue);
         if (getModuleInterface().getMinAddress() != null) {
             if (address < getModuleInterface().getMinAddress().intValue()) {
                 setErrorMessage("Invalid address value.");
@@ -448,7 +445,7 @@ public class AddChildModuleWizardPage extends WizardPage {
                 }
                 Collection<Module> moduleCollection = interfaceObj
                         .getModuleCollection().values();
-                List<Integer> addressList = new ArrayList<Integer>();
+                List<Integer> addressList = new ArrayList<>();
                 for (Module module : moduleCollection) {
                     System.err.println(
                             "Module name == " + module.getModuleName());

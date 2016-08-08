@@ -38,6 +38,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
@@ -78,6 +79,8 @@ public class RedundantManagingNodePropertySource
             IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
     private static final TextPropertyDescriptor nodeIdEditableDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT, NODE_ID_LABEL);
+    private static final String[] EXPERT_FILTER_FLAG = {
+            IPropertySheetEntry.FILTER_ID_EXPERT };
 
     private static final String ERROR_WAIT_NOT_ACTIVE_CANNOT_BE_EMPTY = "Wait Not Active value cannot be empty.";
     private static final String INVALID_RANGE_WAIT_NOT_ACTIVE = "Invalid range for Wait Not Active.";
@@ -92,15 +95,13 @@ public class RedundantManagingNodePropertySource
     static {
         waitNotActiveDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        waitNotActiveDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        waitNotActiveDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         waitNotActiveDescriptor.setDescription(
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_DESCRIPTION);
 
         priorityDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        priorityDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        priorityDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         priorityDescriptor.setDescription(
                 IRedundantManagingNodeProperties.RMN_PRIORITY_DESCRIPTION);
     }
@@ -146,13 +147,13 @@ public class RedundantManagingNodePropertySource
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
         isAsyncOnly.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        isAsyncOnly.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isAsyncOnly.setFilterFlags(EXPERT_FILTER_FLAG);
 
         isType1Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        isType1Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isType1Router.setFilterFlags(EXPERT_FILTER_FLAG);
         isType2Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        isType2Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
-        forcedObjects.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isType2Router.setFilterFlags(EXPERT_FILTER_FLAG);
+        forcedObjects.setFilterFlags(EXPERT_FILTER_FLAG);
     }
 
     /**
@@ -206,7 +207,7 @@ public class RedundantManagingNodePropertySource
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addRedundantNodePropertyDescriptors(propertyList);
 
         IPropertyDescriptor[] propertyDescriptorArray = {};
@@ -228,7 +229,7 @@ public class RedundantManagingNodePropertySource
                         if (rmn.getName() != null) {
                             retObj = rmn.getName();
                         } else {
-                            retObj = new String();
+                            retObj = "";
                         }
                         break;
                     case IAbstractNodeProperties.NODE_ID_READONLY_OBJECT:
@@ -259,17 +260,17 @@ public class RedundantManagingNodePropertySource
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
                         int value = (rmn.isIsAsyncOnly() == true) ? 0 : 1;
-                        retObj = new Integer(value);
+                        retObj = Integer.valueOf(value);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
                         int value = (rmn.isIsType1Router() == true) ? 0 : 1;
-                        retObj = new Integer(value);
+                        retObj = Integer.valueOf(value);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
                         int value = (rmn.isIsType2Router() == true) ? 0 : 1;
-                        retObj = new Integer(value);
+                        retObj = Integer.valueOf(value);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:

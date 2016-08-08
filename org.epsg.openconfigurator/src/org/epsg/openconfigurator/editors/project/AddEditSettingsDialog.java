@@ -78,27 +78,22 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
      */
     private class BuilderConfiguration {
         /**
+         * The name of the configuration.
+         */
+        private final String name;
+
+        /**
          * Determines the availability of the configuration in the builder vs
          * the library.
          */
         private boolean alreadyAvailable;
 
         /**
-         * The name of the configuration.
-         */
-        private String name;
-
-        /**
-         * The description of the configuration.
-         */
-        private String description;
-
-        /**
          * Constructor
          *
          * @param name The name of the configuration.
          */
-        BuilderConfiguration(final String name) {
+        public BuilderConfiguration(String name) {
             this.name = name;
         }
 
@@ -133,16 +128,16 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
     /**
      * Dialog strings and messages.
      */
-    private final String DIALOG_TITLE = "Configure Setting - ";
-    private final String DIALOG_MESSAGE = "Add a setting to build configuration.";
-    private final String VALUE_ERROR_MESSAGE = "Enter a valid value.\nFormat: NodeID;NodeID; eg:1;32;110;";
-    private final String VALUE_TOOL_TIP = "Empty: all nodes.\nCustom format: NodeID;NodeID; eg:1;32;110;";
-    private final String NAME_LABEL = "Name:";
-    private final String VALUE_LABEL = "Value:";
-    private final String ACTIVE_LABEL = "Active:";
-    private final String INVALID_SETTINGS_TYPE = "Select a valid Settings type.";
-    private final String EMPTY_SETTINGS_TYPE_ERROR = "No new settings are available. Try editing from the settings table.";
-    private final String ERROR_INVALID_NODE_ID = "{0} is not a valid node ID.";
+    private static final String DIALOG_TITLE = "Configure Setting - ";
+    private static final String DIALOG_MESSAGE = "Add a setting to build configuration.";
+    private static final String VALUE_ERROR_MESSAGE = "Enter a valid value.\nFormat: NodeID;NodeID; eg:1;32;110;";
+    private static final String VALUE_TOOL_TIP = "Empty: all nodes.\nCustom format: NodeID;NodeID; eg:1;32;110;";
+    private static final String NAME_LABEL = "Name:";
+    private static final String VALUE_LABEL = "Value:";
+    private static final String ACTIVE_LABEL = "Active:";
+    private static final String INVALID_SETTINGS_TYPE = "Select a valid Settings type.";
+    private static final String EMPTY_SETTINGS_TYPE_ERROR = "No new settings are available. Try editing from the settings table.";
+    private static final String ERROR_INVALID_NODE_ID = "{0} is not a valid node ID.";
 
     /**
      * Builder settings value.
@@ -279,8 +274,9 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
                 }
 
                 // Allow arrow keys and backspace and delete keys
-                if ((inputChar == SWT.BS) || (inputChar == SWT.ARROW_LEFT)
-                        || (inputChar == SWT.ARROW_RIGHT)
+                if ((inputChar == SWT.BS)
+                        || (Integer.valueOf(inputChar) == SWT.ARROW_LEFT)
+                        || (Integer.valueOf(inputChar) == SWT.ARROW_RIGHT)
                         || (inputChar == SWT.DEL)) {
                     event.doit = true;
                 }

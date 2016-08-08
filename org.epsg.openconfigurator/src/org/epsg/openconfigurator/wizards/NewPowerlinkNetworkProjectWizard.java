@@ -201,8 +201,8 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                 extensionXdd = extensionXdd.substring(0, pos);
             }
 
-            String targetConfigurationPath = new String(
-                    projectPath + IPath.SEPARATOR
+            String targetConfigurationPath = String
+                    .valueOf(projectPath + IPath.SEPARATOR
                             + AddDefaultMasterNodeWizardPage.PROJECT_DIRECTORY_DEVICECONFIGURATION
                             + IPath.SEPARATOR + extensionXdd
                             + IPowerlinkProjectSupport.XDC_EXTENSION);

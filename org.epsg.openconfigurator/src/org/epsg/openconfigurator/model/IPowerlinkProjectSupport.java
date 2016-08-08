@@ -39,16 +39,6 @@ package org.epsg.openconfigurator.model;
  */
 public interface IPowerlinkProjectSupport {
 
-    public static final String MN_OBD_TXT = "mnobd.txt"; //$NON-NLS-1$
-    public static final String MN_OBD_CDC = "mnobd.cdc"; //$NON-NLS-1$
-    public static final String MN_OBD_CHAR_TXT = "mnobd_char.txt"; //$NON-NLS-1$
-    public static final String XAP_H = "xap.h"; //$NON-NLS-1$
-    public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
-    public static final String PROCESSIMAGE_CS = "ProcessImage.cs"; //$NON-NLS-1$
-
-    public static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
-            MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
-
     public static final String DEVICE_IMPORT_DIR = "deviceImport";
     public static final String MODULAR_HEAD_DIR = "ModularHead";
     public static final String DEVICE_CONFIGURATION_DIR = "deviceConfiguration";
@@ -63,9 +53,4 @@ public interface IPowerlinkProjectSupport {
     public static final String DEFAULT_XDD_FILTER_NAME_EXTENSION = "XML Device Description(*.xdd)"; ////$NON-NLS-1$
     public static final String DEFAULT_XDC_FILTER_NAME_EXTENSION = "XML Device Configuration(*.xdc)"; ////$NON-NLS-1$
 
-    public static final String[] CONFIGURATION_FILTER_EXTENSIONS = {
-            "*.xdc;*.xdd", "*" };
-
-    public static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
-            "XDD/XDC files", "All files" };
 }

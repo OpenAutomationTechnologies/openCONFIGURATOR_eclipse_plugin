@@ -117,16 +117,16 @@ public class PdoChannel {
         }
 
         String value = nrEntriesSubObj.getActualValue();
-        if (value == null) {
+        if (value.isEmpty()) {
             value = nrEntriesSubObj.getDefaultValue();
+            if (value == null) {
+                System.err.println("No default/actual value");
+                return 0;
+            }
+
         }
 
-        if (value == null) {
-            System.err.println("No default/actual value");
-            return 0;
-        }
-
-        if (value.equals("")) {
+        if (value.isEmpty()) {
             return 0;
         }
 
@@ -152,7 +152,7 @@ public class PdoChannel {
         }
 
         String mappingVersion = mappingVersionSubObj.getActualValue();
-        if (mappingVersion == null) {
+        if (mappingVersion.isEmpty()) {
             mappingVersion = mappingVersionSubObj.getDefaultValue();
         }
 

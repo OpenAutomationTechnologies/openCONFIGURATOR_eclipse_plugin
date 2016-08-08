@@ -72,7 +72,7 @@ public class Module {
 
     private PowerlinkRootNode rootNode;
 
-    private IFile projectXml;
+    // private IFile projectXml;
 
     private Object moduleModel;
 
@@ -107,7 +107,6 @@ public class Module {
      */
     public Module() {
         rootNode = null;
-        projectXml = null;
         moduleModel = null;
         node = null;
         xddModel = null;
@@ -130,7 +129,8 @@ public class Module {
             HeadNodeInterface interfaceObj) {
         if (nodeModel instanceof InterfaceList.Interface.Module) {
             this.rootNode = rootNode;
-            this.projectXml = projectXml;
+            // Implemented for future enhancement.
+            // this.projectXml = projectXml;
             moduleModel = nodeModel;
             this.node = node;
             this.xddModel = xddModel;
@@ -796,7 +796,7 @@ public class Module {
         System.err.println("oldAddress..... .." + oldAddress);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-            int address = Integer.valueOf(value);
+            Integer address = Integer.valueOf(value);
             module.setAddress(BigInteger.valueOf(address));
             getInterfaceOfModule().getAddressCollection().remove(oldAddress);
             getInterfaceOfModule().getAddressCollection().put(address, this);
@@ -806,9 +806,7 @@ public class Module {
 
         rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
 
-        Result res = new Result();
-
-        res = OpenConfiguratorLibraryUtils.setModuleAddress(this);
+        Result res = OpenConfiguratorLibraryUtils.setModuleAddress(this);
         if (!res.IsSuccessful()) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printLibraryErrorMessage(res);
@@ -825,7 +823,7 @@ public class Module {
         System.err.println("oldAddress..... .." + oldAddress);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-            int address = Integer.valueOf(value);
+            Integer address = Integer.valueOf(value);
             module.setAddress(BigInteger.valueOf(address));
             getInterfaceOfModule().getAddressCollection().remove(oldAddress);
             getInterfaceOfModule().getAddressCollection().put(address, this);
@@ -846,9 +844,7 @@ public class Module {
      */
     public void setEnabled(boolean enabled) throws JDOMException, IOException {
 
-        Result res = new Result();
-
-        res = OpenConfiguratorLibraryUtils.toggleEnableDisable(this);
+        Result res = OpenConfiguratorLibraryUtils.toggleEnableDisable(this);
         if (!res.IsSuccessful()) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printLibraryErrorMessage(res);
@@ -943,16 +939,15 @@ public class Module {
      */
     public void setPosition(String value) throws JDOMException, IOException {
 
-        Result res = new Result();
         boolean validPosition = true;
-        int newPosition = Integer.valueOf(value);
+        Integer newPosition = Integer.valueOf(value);
         int oldPosition = getPosition();
         int previousPosition = 0;
         int nextPosition = 0;
         Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
                 .keySet();
 
-        for (Integer position : positionSet) {
+        for (int position : positionSet) {
 
             if (position < newPosition) {
                 if (position != oldPosition) {
@@ -1042,9 +1037,9 @@ public class Module {
                 System.err.println("oldPOsition..... .." + oldPosition);
                 if (moduleModel instanceof InterfaceList.Interface.Module) {
                     InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-                    int position = Integer.valueOf(value);
+                    Integer position = Integer.valueOf(value);
 
-                    res = OpenConfiguratorLibraryUtils.moveModule(this,
+                    Result res = OpenConfiguratorLibraryUtils.moveModule(this,
                             oldPosition, position);
                     if (res.IsSuccessful()) {
                         module.setPosition(BigInteger.valueOf(position));
@@ -1083,10 +1078,10 @@ public class Module {
             System.err.println("oldPOsition..... .." + oldPosition);
             if (moduleModel instanceof InterfaceList.Interface.Module) {
                 InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-                int position = Integer.valueOf(value);
+                Integer position = Integer.valueOf(value);
 
-                res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
-                        position);
+                Result res = OpenConfiguratorLibraryUtils.moveModule(this,
+                        oldPosition, position);
                 if (res.IsSuccessful()) {
                     module.setPosition(BigInteger.valueOf(position));
                     getInterfaceOfModule().getModuleCollection()
@@ -1123,18 +1118,18 @@ public class Module {
      * @throws JDOMException Errors with time modifications.
      */
     public void setPositions(String value) throws JDOMException, IOException {
-        Result res = new Result();
+
         OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
         int oldPosition = getPosition();
-        int position = Integer.valueOf(value);
+        Integer position = Integer.valueOf(value);
         System.err.println("oldPOsition@#@$..... .." + oldPosition);
         System.err.println("NewPOsition@$#$..... .." + position);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
 
-            res = OpenConfiguratorLibraryUtils.moveModule(this, oldPosition,
-                    position);
+            Result res = OpenConfiguratorLibraryUtils.moveModule(this,
+                    oldPosition, position);
             if (res.IsSuccessful()) {
                 module.setPosition(BigInteger.valueOf(position));
                 getInterfaceOfModule().getModuleCollection()

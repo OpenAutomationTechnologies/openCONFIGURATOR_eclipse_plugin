@@ -64,8 +64,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.epsg.openconfigurator.model.HeadNodeInterface;
-import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.NetworkManagement;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
@@ -113,6 +111,12 @@ public class ValidateXddWizardPage extends WizardPage {
     private static final String ERROR_INVALID_XDD_XDC_FILE_MN_MESSAGE = "The imported XDD/XDC cannot function as an MN!";
     private static final String INTERNAL_ERROR_MESSAGE = "Internal error!";
 
+    private static final String[] CONFIGURATION_FILTER_EXTENSIONS = {
+            "*.xdc;*.xdd", "*" };
+
+    private static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
+            "XDD/XDC files", "All files" };
+
     /**
      * Control to display the node configuration path.
      */
@@ -154,8 +158,6 @@ public class ValidateXddWizardPage extends WizardPage {
      * This is to restore the custom configuration.
      */
     private String customConfiguration;
-
-    private HeadNodeInterface headNodeInetrfaceObject;
 
     private ISO15745ProfileContainer xddModel;
 
@@ -458,11 +460,10 @@ public class ValidateXddWizardPage extends WizardPage {
 
                 fileDialog.setText(IMPORT_CN_CONFIGURATION_FILE_DIALOG_LABEL);
                 // Set filter on .XDD and .XDC files
-                fileDialog.setFilterExtensions(
-                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_EXTENSIONS);
+                fileDialog.setFilterExtensions(CONFIGURATION_FILTER_EXTENSIONS);
                 // Put in a readable name for the filter
-                fileDialog.setFilterNames(
-                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_NAMES_EXTENSIONS);
+                fileDialog
+                        .setFilterNames(CONFIGURATION_FILTER_NAMES_EXTENSIONS);
                 // Open Dialog and save result of selection
                 String selectedFile = fileDialog.open();
 

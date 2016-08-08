@@ -124,7 +124,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addPropertyDescriptors(propertyList);
 
         IPropertyDescriptor[] propertyDescriptorArray = {};
@@ -282,12 +282,12 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
     public void setPropertyValue(Object id, Object value) {
         if (id instanceof String) {
             String objectId = (String) id;
-            Result res = new Result();
+
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ID:
                     try {
                         String actualValue = (String) value;
-                        res = OpenConfiguratorCore.GetInstance()
+                        Result res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         param.getNode().getNetworkId(),
                                         param.getNode().getNodeId(),

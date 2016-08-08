@@ -39,8 +39,6 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkP
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
-import org.epsg.openconfigurator.xmlbinding.xdd.TDeviceCommissioning;
-import org.epsg.openconfigurator.xmlbinding.xdd.TDiagnostic;
 import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TNetworkManagement;
@@ -57,10 +55,6 @@ public class NetworkManagement {
     private TGeneralFeatures generalFeatures;
     private TMNFeatures mnFeatures;
     private TCNFeatures cnFeatures;
-
-    // unused right now.
-    private TDiagnostic diagnositc;
-    private TDeviceCommissioning deviceComissioning;
 
     private Node node;
 
@@ -118,8 +112,10 @@ public class NetworkManagement {
                         generalFeatures = nmtMgmt.getGeneralFeatures();
                         mnFeatures = nmtMgmt.getMNFeatures();
                         cnFeatures = nmtMgmt.getCNFeatures();
-                        diagnositc = nmtMgmt.getDiagnostic();
-                        deviceComissioning = nmtMgmt.getDeviceCommissioning();
+                        // unused right now.
+                        // diagnositc = nmtMgmt.getDiagnostic();
+                        // deviceComissioning =
+                        // nmtMgmt.getDeviceCommissioning();
                     }
                     // XDD model for modular head node
                 } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
@@ -131,8 +127,10 @@ public class NetworkManagement {
                         generalFeatures = nmtMgmt.getGeneralFeatures();
                         mnFeatures = nmtMgmt.getMNFeatures();
                         cnFeatures = nmtMgmt.getCNFeatures();
-                        diagnositc = nmtMgmt.getDiagnostic();
-                        deviceComissioning = nmtMgmt.getDeviceCommissioning();
+                        // unused right now.
+                        // diagnositc = nmtMgmt.getDiagnostic();
+                        // deviceComissioning =
+                        // nmtMgmt.getDeviceCommissioning();
                     }
                 } else {
                     System.out.println("ERROR unhandled Profile body datatype"

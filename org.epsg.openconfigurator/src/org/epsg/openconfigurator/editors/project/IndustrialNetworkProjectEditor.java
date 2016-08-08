@@ -358,7 +358,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * @return the openCONFIGURATOR project model contents as string
      */
     private String getModelData() {
-        String retVal = new String("");
+        String retVal = "";
         try {
             if (currentProject != null) {
                 OpenConfiguratorProjectUtils

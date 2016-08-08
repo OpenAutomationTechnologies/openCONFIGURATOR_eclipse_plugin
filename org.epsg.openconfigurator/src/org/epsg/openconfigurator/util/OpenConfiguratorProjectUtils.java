@@ -432,14 +432,14 @@ public final class OpenConfiguratorProjectUtils {
                             nodeName = FilenameUtils.removeExtension(String
                                     .valueOf(nodeImportFile.getFileName()));
 
-                            String targetConfigurationPath = new String(
-                                    projectRootPath.toString() + IPath.SEPARATOR
-                                            + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
-                                            + IPath.SEPARATOR + nodeName
-                                            + IPath.SEPARATOR + extensionXdd);
-                            String targetDirectoryPath = new String(
-                                    projectRootPath.toString() + IPath.SEPARATOR
-                                            + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR);
+                            String targetConfigurationPath = projectRootPath
+                                    .toString() + IPath.SEPARATOR
+                                    + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                                    + IPath.SEPARATOR + nodeName
+                                    + IPath.SEPARATOR + extensionXdd;
+                            String targetDirectoryPath = projectRootPath
+                                    .toString() + IPath.SEPARATOR
+                                    + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR;
 
                             java.nio.file.Files.createDirectories(
                                     Paths.get(targetDirectoryPath
@@ -485,8 +485,8 @@ public final class OpenConfiguratorProjectUtils {
         String targetImportPath = StringUtils.EMPTY;
         if (nodeImportFile != null) {
             if ((nodeImportFile.getFileName() != null)) {
-                targetImportPath = new String(
-                        projectRootPath.toString() + IPath.SEPARATOR
+                targetImportPath = String
+                        .valueOf(projectRootPath.toString() + IPath.SEPARATOR
                                 + IPowerlinkProjectSupport.DEVICE_IMPORT_DIR
                                 + IPath.SEPARATOR
                                 + String.valueOf(nodeImportFile.getFileName()));
@@ -514,10 +514,10 @@ public final class OpenConfiguratorProjectUtils {
                         extensionXdd += "_" + newNode.getNodeId()
                                 + IPowerlinkProjectSupport.XDC_EXTENSION;
 
-                        String targetConfigurationPath = new String(
-                                projectRootPath.toString() + IPath.SEPARATOR
-                                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
-                                        + IPath.SEPARATOR + extensionXdd);
+                        String targetConfigurationPath = projectRootPath
+                                .toString() + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                                + IPath.SEPARATOR + extensionXdd;
 
                         java.nio.file.Files.copy(nodeImportFile,
                                 new java.io.File(targetConfigurationPath)
@@ -548,8 +548,8 @@ public final class OpenConfiguratorProjectUtils {
         String targetImportPath = StringUtils.EMPTY;
         if (nodeImportFile != null) {
             if ((nodeImportFile.getFileName() != null)) {
-                targetImportPath = new String(
-                        projectRootPath.toString() + IPath.SEPARATOR
+                targetImportPath = String
+                        .valueOf(projectRootPath.toString() + IPath.SEPARATOR
                                 + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
                                 + IPath.SEPARATOR
                                 + String.valueOf(nodeImportFile.getFileName()));
@@ -938,12 +938,11 @@ public final class OpenConfiguratorProjectUtils {
                             nodeName = FilenameUtils.removeExtension(String
                                     .valueOf(nodeImportFile.getFileName()));
 
-                            String targetConfigurationPath = new String(
-                                    projectRootPath.toString() + IPath.SEPARATOR
-                                            + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
-                                            + IPath.SEPARATOR + nodeName
-                                            + IPath.SEPARATOR
-                                            + xddFileNameWithSuffix);
+                            String targetConfigurationPath = projectRootPath
+                                    .toString() + IPath.SEPARATOR
+                                    + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                                    + IPath.SEPARATOR + nodeName
+                                    + IPath.SEPARATOR + xddFileNameWithSuffix;
 
                             System.out.println("Target configuration path ..."
                                     + targetConfigurationPath);
@@ -1211,8 +1210,8 @@ public final class OpenConfiguratorProjectUtils {
                 String xddFileNameWithSuffix = xddFileNameWithNoSuffix + "_"
                         + newNodeId + IPowerlinkProjectSupport.XDC_EXTENSION;
 
-                String targetConfigurationPath = new String(
-                        projectRootPath.toString() + IPath.SEPARATOR
+                String targetConfigurationPath = String
+                        .valueOf(projectRootPath.toString() + IPath.SEPARATOR
                                 + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
                                 + IPath.SEPARATOR + xddFileNameWithSuffix);
 

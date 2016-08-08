@@ -40,6 +40,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
@@ -65,6 +66,8 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
     public static final String OBJ_SUB_INDEX_LABEL = "Sub-Object ID"; //$NON-NLS-1$
     private static final PropertyDescriptor subObjectIdDescriptor = new PropertyDescriptor(
             OBJ_SUB_INDEX_ID, OBJ_SUB_INDEX_LABEL);
+    private static final String[] EXPERT_FILTER_FLAG = {
+            IPropertySheetEntry.FILTER_ID_EXPERT };
 
     static {
         subObjectIdDescriptor
@@ -86,20 +89,17 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
         nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         objectTypeDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        objectTypeDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        objectTypeDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         dataTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
         lowLimitDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        lowLimitDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        lowLimitDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         highLimitDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        highLimitDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        highLimitDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         accessTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
 
@@ -117,8 +117,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
             }
         });
         forceActualValue.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        forceActualValue
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        forceActualValue.setFilterFlags(EXPERT_FILTER_FLAG);
         forceActualValue.setValidator(new ICellEditorValidator() {
 
             @Override
@@ -129,24 +128,20 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
 
         denotationDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        denotationDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        denotationDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         pdoMappingDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         objFlagsDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        objFlagsDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        objFlagsDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         uniqueIDRefDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        uniqueIDRefDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        uniqueIDRefDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         objectErrorDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        objectErrorDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        objectErrorDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
     }
 
     private void addSubObjectPropertyDescriptors(
@@ -225,7 +220,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
      */
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addSubObjectPropertyDescriptors(propertyList);
 
         IPropertyDescriptor[] propertyDescriptorArray = {};
@@ -302,7 +297,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_FORCE_ACTUAL_VALUE_ID:
 
                     int val = (plkSubObject.isObjectForced() == true) ? 0 : 1;
-                    retObj = new Integer(val);
+                    retObj = Integer.valueOf(val);
                     break;
                 case OBJ_DENOTATION_ID:
                     retObj = plkSubObject.getDenotation();
@@ -375,7 +370,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
      *         being the error message to display to the end user.
      */
     protected String handleForceActualValue(Object value) {
-        if (plkSubObject.getActualValue() == null) {
+        if (plkSubObject.getActualValue().equalsIgnoreCase(StringUtils.EMPTY)) {
             return "Set some value in the actual value field.";
         } else {
             if (isModuleSubObject()) {

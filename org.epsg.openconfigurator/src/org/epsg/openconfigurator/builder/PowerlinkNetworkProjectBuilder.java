@@ -82,6 +82,16 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private static final String UPDATING_NODE_CONFIGURATION__ERROR_MESSAGE = "Failed to update the node configuration files.\n\tError message: ";
     private static final String UPDATING_NODE_CONFIGURATION__COMPLETED_MESSAGE = "Completed updating node configuration files.";
 
+    public static final String MN_OBD_TXT = "mnobd.txt"; //$NON-NLS-1$
+    public static final String MN_OBD_CDC = "mnobd.cdc"; //$NON-NLS-1$
+    public static final String MN_OBD_CHAR_TXT = "mnobd_char.txt"; //$NON-NLS-1$
+    public static final String XAP_H = "xap.h"; //$NON-NLS-1$
+    public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
+    public static final String PROCESSIMAGE_CS = "ProcessImage.cs"; //$NON-NLS-1$
+
+    private static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
+            MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
+
     /**
      * The list of Industrial network project editors wherein the library has
      * only knowledge about the projects which are open via
@@ -90,7 +100,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      * @return The list of Industrial network project editors.
      */
     private static List<IndustrialNetworkProjectEditor> getOpenProjectEditors() {
-        List<IndustrialNetworkProjectEditor> projectEditors = new ArrayList<IndustrialNetworkProjectEditor>();
+        List<IndustrialNetworkProjectEditor> projectEditors = new ArrayList<>();
         IWorkbenchWindow workbenchWindows[] = PlatformUI.getWorkbench()
                 .getWorkbenchWindows();
         for (IWorkbenchWindow window : workbenchWindows) {
@@ -146,7 +156,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     private boolean buildConciseDeviceConfiguration(final String networkId,
             java.nio.file.Path outputpath, final IProgressMonitor monitor)
-                    throws CoreException {
+            throws CoreException {
         String configurationOutput[] = new String[1];
         ByteCollection cdcByteCollection = new ByteCollection();
 
@@ -231,8 +241,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
         } else {
-            java.nio.file.Path targetFilePath = targetPath
-                    .resolve(IPowerlinkProjectSupport.XAP_H);
+            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_H);
 
             try {
                 if (!Files.exists(targetPath)) {
@@ -279,7 +288,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             throw new CoreException(errorStatus);
         } else {
             java.nio.file.Path targetFilePath = targetPath
-                    .resolve(IPowerlinkProjectSupport.PROCESSIMAGE_CS);
+                    .resolve(PROCESSIMAGE_CS);
 
             try {
                 if (!Files.exists(targetPath)) {
@@ -310,7 +319,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     private boolean buildProcessImageDescriptions(String networkId,
             java.nio.file.Path targetPath, IProgressMonitor monitor)
-                    throws CoreException {
+            throws CoreException {
 
         ByteCollection nodeIdCollection = new ByteCollection();
         Result res = OpenConfiguratorCore.GetInstance()
@@ -369,8 +378,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
         } else {
-            java.nio.file.Path targetFilePath = targetPath
-                    .resolve(IPowerlinkProjectSupport.XAP_XML);
+            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_XML);
 
             try {
                 if (!Files.exists(targetPath)) {
@@ -422,7 +430,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         .getPath(outputpath.getPath());
             }
 
-            for (String outputFile : IPowerlinkProjectSupport.OUTPUT_FILES) {
+            for (String outputFile : OUTPUT_FILES) {
                 java.nio.file.Path targetFilePath = targetPath
                         .resolve(outputFile);
                 if (Files.exists(targetFilePath, LinkOption.NOFOLLOW_LINKS)) {
@@ -456,8 +464,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private boolean createMnobdCdc(java.nio.file.Path outputFolder,
             ByteBuffer buffer) throws CoreException {
 
-        java.nio.file.Path targetFilePath = outputFolder
-                .resolve(IPowerlinkProjectSupport.MN_OBD_CDC);
+        java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_CDC);
 
         try {
             Files.write(targetFilePath, buffer.array());
@@ -505,7 +512,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         }
 
         java.nio.file.Path targetFilePath = outputFolder
-                .resolve(IPowerlinkProjectSupport.MN_OBD_CHAR_TXT);
+                .resolve(MN_OBD_CHAR_TXT);
 
         try {
             Files.write(targetFilePath, sb.toString().getBytes());
@@ -531,8 +538,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private boolean createMnobdTxt(java.nio.file.Path outputFolder,
             final String configuration) throws CoreException {
 
-        java.nio.file.Path targetFilePath = outputFolder
-                .resolve(IPowerlinkProjectSupport.MN_OBD_TXT);
+        java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_TXT);
 
         try {
             Files.write(targetFilePath, configuration.getBytes());

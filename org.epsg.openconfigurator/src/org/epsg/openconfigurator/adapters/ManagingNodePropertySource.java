@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
@@ -81,12 +82,13 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             "Multiplexed Cycle Count", "Pre-Scaler",
             CN_LOSS_OF_SOC_TOLERANCE_LABEL };
 
+    private static final String[] YES_NO = { "Yes", "No" };
     private static final String MN_CATEGORY = "Managing Node";
     private static final String NETWORK_CATEGORY = "Network";
 
     private static final ComboBoxPropertyDescriptor transmitPres = new ComboBoxPropertyDescriptor(
             IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT,
-            MN_PROPERTY_LABEL_LIST[0], IPropertySourceSupport.YES_NO);
+            MN_PROPERTY_LABEL_LIST[0], YES_NO);
     private static final TextPropertyDescriptor asyncSlotTimeout = new TextPropertyDescriptor(
             IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT,
             MN_PROPERTY_LABEL_LIST[1]);
@@ -109,6 +111,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     private static final TextPropertyDescriptor lossSocToleranceDescriptor = new TextPropertyDescriptor(
             INetworkProperties.NET_LOSS_OF_SOC_TOLERANCE_OBJECT,
             CN_LOSS_OF_SOC_TOLERANCE_LABEL);
+    private static final String[] EXPERT_FILTER_FLAG = {
+            IPropertySheetEntry.FILTER_ID_EXPERT };
 
     // Error messages
     private static final String ERROR_ASYNC_SLOT_TIMEOUT_CANNOT_BE_EMPTY = "Async. slot timeout cannot be empty.";
@@ -144,13 +148,12 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 IManagingNodeProperties.MN_TRANSMIT_PRES_DESCRIPTION);
 
         asyncSlotTimeout.setCategory(MN_CATEGORY);
-        asyncSlotTimeout
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        asyncSlotTimeout.setFilterFlags(EXPERT_FILTER_FLAG);
         asyncSlotTimeout.setDescription(
                 IManagingNodeProperties.MN_ASYNC_SLOT_TIMEOUT_DESCRIPTION);
 
         asndMaxNumber.setCategory(MN_CATEGORY);
-        asndMaxNumber.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        asndMaxNumber.setFilterFlags(EXPERT_FILTER_FLAG);
         asndMaxNumber.setDescription(
                 IManagingNodeProperties.MN_ASND_MAX_NR_DESCRIPTION);
 
@@ -159,25 +162,23 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 INetworkProperties.NETWORK_CYCLE_TIME_DESCRIPTION);
 
         asyncMtu.setCategory(NETWORK_CATEGORY);
-        asyncMtu.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        asyncMtu.setFilterFlags(EXPERT_FILTER_FLAG);
         asyncMtu.setDescription(
                 INetworkProperties.NETWORK_ASYNC_MTU_DESCRIPTION);
 
         multiplexedCycleCnt.setCategory(NETWORK_CATEGORY);
-        multiplexedCycleCnt
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        multiplexedCycleCnt.setFilterFlags(EXPERT_FILTER_FLAG);
         multiplexedCycleCnt.setDescription(
                 INetworkProperties.NETWORK_MULTIPLEXED_CYCLE_CNT_DESCRIPTION);
 
         preScaler.setCategory(NETWORK_CATEGORY);
-        preScaler.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        preScaler.setFilterFlags(EXPERT_FILTER_FLAG);
         preScaler.setDescription(
                 INetworkProperties.NETWORK_PRE_SCALER_DESCRIPTION);
 
         lossSocToleranceDescriptor.setDescription(
                 INetworkProperties.LOSS_SOC_TOLERANCE_DESCRIPTION);
-        lossSocToleranceDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        lossSocToleranceDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         lossSocToleranceDescriptor.setCategory(NETWORK_CATEGORY);
     }
 
@@ -219,15 +220,15 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         });
 
         isAsyncOnly.setCategory(MN_CATEGORY);
-        isAsyncOnly.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isAsyncOnly.setFilterFlags(EXPERT_FILTER_FLAG);
 
         isType1Router.setCategory(MN_CATEGORY);
-        isType1Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isType1Router.setFilterFlags(EXPERT_FILTER_FLAG);
 
         isType2Router.setCategory(MN_CATEGORY);
-        isType2Router.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        isType2Router.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        forcedObjects.setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        forcedObjects.setFilterFlags(EXPERT_FILTER_FLAG);
 
         cycleTime.setValidator(new ICellEditorValidator() {
 
@@ -358,7 +359,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             val = 1;
                         }
 
-                        retObj = new Integer(val);
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
@@ -382,7 +383,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             val = 1;
                         }
 
-                        retObj = new Integer(val);
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
@@ -391,7 +392,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             val = 1;
                         }
 
-                        retObj = new Integer(val);
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
@@ -400,7 +401,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             val = 1;
                         }
 
-                        retObj = new Integer(val);
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:

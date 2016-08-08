@@ -542,8 +542,6 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                 actualValue = parameter.getActualValue().getValue();
             }
         } else if (uniqueIDRef2 instanceof TParameterGroup) {
-            TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef2;
-            String uniqueId = parameterGrp.getUniqueID();
             actualValue = StringUtils.EMPTY;
         }
         return actualValue;

@@ -319,9 +319,8 @@ public class Node {
             if (isModularheadNode()) {
                 InterfaceList it = cnModel.getInterfaceList();
                 if (it != null) {
-                    List<InterfaceList.Interface> intfc = new ArrayList<>();
-                    intfc.addAll(it.getInterface());
-
+                    List<InterfaceList.Interface> intfc = it.getInterface();
+                    System.out.println("The interface list.." + intfc);
                 }
             }
         }

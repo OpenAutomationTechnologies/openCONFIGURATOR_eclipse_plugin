@@ -781,7 +781,8 @@ public class OpenConfiguratorLibraryUtils {
                     accessType, startIndex, endIndex,
                     dynamicChannel.getMaxNumber(), addressOffset, bitAlignment);
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println("Create Dynamic channels WARN: "
+                        + getErrorMessage(libApiRes));
             }
         }
         return libApiRes;
@@ -843,7 +844,8 @@ public class OpenConfiguratorLibraryUtils {
                     accessType, startIndex, endIndex,
                     dynamicChannel.getMaxNumber(), addressOffset, bitAlignment);
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println("Create dynamic channels WARN: "
+                        + getErrorMessage(libApiRes));
             }
         }
         return libApiRes;
@@ -906,9 +908,8 @@ public class OpenConfiguratorLibraryUtils {
      * @return Result instance from library.
      */
     public static Result addModule(final Module module) {
-        Result libApiRes = new Result();
 
-        libApiRes = createModule(module);
+        Result libApiRes = createModule(module);
         if (!libApiRes.IsSuccessful()) {
             return libApiRes;
         }
@@ -993,7 +994,8 @@ public class OpenConfiguratorLibraryUtils {
                     object.setError(getErrorMessage(libApiRes));
                     OpenConfiguratorMessageConsole.getInstance()
                             .printLibraryErrorMessage(libApiRes);
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                    System.err.println("Create Module Object WARN: "
+                            + getErrorMessage(libApiRes));
                 }
             } else if ((object.getDataType() != null)
                     && (object.getUniqueIDRef() != null)) {
@@ -1060,28 +1062,7 @@ public class OpenConfiguratorLibraryUtils {
                         System.err.println("CreateParameterObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectIndex(module,
-                    // getModuleObjectIndex(module),
-                    // object);
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectInNode(node, object,
-                    // module,
-                    // getModuleObjectIndex(module));
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
+
                 }
 
             } else if ((object.getDataType() == null)
@@ -1107,28 +1088,7 @@ public class OpenConfiguratorLibraryUtils {
                         System.err.println("CreateParameterObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectIndex(module,
-                    // getModuleObjectIndex(module),
-                    // object);
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectInNode(node, object,
-                    // module,
-                    // getModuleObjectIndex(module));
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
+
                 } else if (object.getUniqueIDRef() instanceof TParameterGroup) {
                     TParameterGroup parameter = (TParameterGroup) object
                             .getUniqueIDRef();
@@ -1149,28 +1109,7 @@ public class OpenConfiguratorLibraryUtils {
                         System.err.println("CreateParameterObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectIndex(module,
-                    // getModuleObjectIndex(module),
-                    // object);
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectInNode(node, object,
-                    // module,
-                    // getModuleObjectIndex(module));
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
+
                 }
 
             } else {
@@ -1185,7 +1124,8 @@ public class OpenConfiguratorLibraryUtils {
             libApiRes = addSubObjects(module, object, objectIndex);
 
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println("Module Sub-Object WARN: "
+                        + getErrorMessage(libApiRes));
             }
         }
 
@@ -1948,7 +1888,8 @@ public class OpenConfiguratorLibraryUtils {
                     object.setError(getErrorMessage(libApiRes));
                     OpenConfiguratorMessageConsole.getInstance()
                             .printLibraryErrorMessage(libApiRes);
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                    System.err.println("Create Object WARN: "
+                            + getErrorMessage(libApiRes));
                 }
             } else if ((object.getDataType() != null)
                     && (object.getUniqueIDRef() != null)) {
@@ -2033,7 +1974,8 @@ public class OpenConfiguratorLibraryUtils {
 
             libApiRes = addSubObjects(node, object);
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println(
+                        "Node Sub-Object WARN: " + getErrorMessage(libApiRes));
             }
         }
 
@@ -3006,16 +2948,7 @@ public class OpenConfiguratorLibraryUtils {
                                     "Create Parameter sub-Object WARN: "
                                             + getErrorMessage(libApiRes));
                         }
-                        // else {
-                        // try {
-                        // OpenConfiguratorProjectUtils
-                        // .updateModuleSubObjectInNode(node,
-                        // module, index, subObject);
-                        // } catch (JDOMException | IOException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-                        // }
+
                     } else if (subObject
                             .getUniqueIDRef() instanceof TParameterGroup) {
                         TParameterGroup parameterGrp = (TParameterGroup) subObject
@@ -3049,16 +2982,7 @@ public class OpenConfiguratorLibraryUtils {
                             System.err.println(
                                     "Sub-object created successfully..");
                         }
-                        // else {
-                        // try {
-                        // OpenConfiguratorProjectUtils
-                        // .updateModuleSubObjectInNode(node,
-                        // module, index, subObject);
-                        // } catch (JDOMException | IOException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-                        // }
+
                     } else {
                         System.err.println(
                                 "ERROR: New instance available as a UniqueIdReference");
@@ -3089,16 +3013,7 @@ public class OpenConfiguratorLibraryUtils {
                                     "Create Parameter sub-Object WARN: "
                                             + getErrorMessage(libApiRes));
                         }
-                        // else {
-                        // try {
-                        // OpenConfiguratorProjectUtils
-                        // .updateModuleSubObjectInNode(node,
-                        // module, index, subObject);
-                        // } catch (JDOMException | IOException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-                        // }
+
                     } else if (subObject
                             .getUniqueIDRef() instanceof TParameterGroup) {
                         TParameterGroup parameterGrp = (TParameterGroup) subObject
@@ -3128,16 +3043,7 @@ public class OpenConfiguratorLibraryUtils {
                                                     subObject.getDataType())
                                                             .name());
                         }
-                        // else {
-                        // try {
-                        // OpenConfiguratorProjectUtils
-                        // .updateModuleSubObjectInNode(node,
-                        // module, index, subObject);
-                        // } catch (JDOMException | IOException e) {
-                        // // TODO Auto-generated catch block
-                        // e.printStackTrace();
-                        // }
-                        // }
+
                     } else {
                         System.err.println(
                                 "ERROR: New instance available as a UniqueIdReference");
@@ -3214,7 +3120,8 @@ public class OpenConfiguratorLibraryUtils {
                     subObject.setError(getErrorMessage(libApiRes));
                     OpenConfiguratorMessageConsole.getInstance()
                             .printLibraryErrorMessage(libApiRes);
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                    System.err.println("Add Sub-Object WARN: "
+                            + getErrorMessage(libApiRes));
                 }
             } else {
                 // Domain objects.
@@ -3447,8 +3354,8 @@ public class OpenConfiguratorLibraryUtils {
 
     private static Result createModule(Module module) {
         Node node = module.getNode();
-        Result libApiRes = new Result();
-        libApiRes = OpenConfiguratorCore.GetInstance().CreateModule(
+
+        Result libApiRes = OpenConfiguratorCore.GetInstance().CreateModule(
                 node.getNetworkId(), node.getNodeId(),
                 node.getInterface().getInterfaceUId(), module.getChildID(),
                 module.getPosition(), module.getAddress(),
@@ -3535,9 +3442,6 @@ public class OpenConfiguratorLibraryUtils {
     public static Result forceSubObject(PowerlinkSubobject plkSubObject,
             boolean force) {
         String actualValue = plkSubObject.getActualValue();
-        if (actualValue == null) {
-            actualValue = "";
-        }
 
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
@@ -3549,9 +3453,6 @@ public class OpenConfiguratorLibraryUtils {
     public static Result forceSubObject(PowerlinkSubobject plkSubObject,
             boolean result, long newObjectIndex, int newSubObjectIndex) {
         String actualValue = plkSubObject.getActualValue();
-        if (actualValue == null) {
-            actualValue = "";
-        }
 
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
@@ -3652,7 +3553,7 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static long getChannelSize(PdoChannel channel) {
         long[] tempSize = new long[1];
-        Result res = OpenConfiguratorCore.GetInstance().GetChannelSize(
+        OpenConfiguratorCore.GetInstance().GetChannelSize(
                 channel.getNode().getNetworkId(), channel.getNode().getNodeId(),
                 getDirection(channel.getPdoType()), channel.getChannelNumber(),
                 tempSize);
@@ -4061,13 +3962,13 @@ public class OpenConfiguratorLibraryUtils {
      * @return Library result instance.
      */
     public static long getModuleObjectIndex(Module module) {
-        Result libApiRes = new Result();
+
         Node node = module.getNode();
 
         long[] index = new long[1];
         int[] subIndex = new int[1];
 
-        libApiRes = OpenConfiguratorCore.GetInstance()
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), 0000, -1,
@@ -4088,13 +3989,13 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static long getModuleObjectIndex(Module module,
             PowerlinkSubobject subObject, long id) {
-        Result libApiRes = new Result();
+
         Node node = module.getNode();
 
         long[] index = new long[1];
         int[] subIndex = new int[1];
 
-        libApiRes = OpenConfiguratorCore.GetInstance()
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id,
@@ -4112,13 +4013,13 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     public static long getModuleObjectsIndex(Module module, long id) {
-        Result libApiRes = new Result();
+
         Node node = module.getNode();
 
         long[] index = new long[1];
         int[] subIndex = new int[1];
 
-        libApiRes = OpenConfiguratorCore.GetInstance()
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id, -1,
@@ -4141,13 +4042,13 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static int getModuleObjectsSubIndex(Module module,
             PowerlinkSubobject subObject, long id) {
-        Result libApiRes = new Result();
+
         Node node = module.getNode();
 
         long[] index = new long[1];
         int[] subIndex = new int[1];
 
-        libApiRes = OpenConfiguratorCore.GetInstance()
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id,
@@ -4173,13 +4074,13 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static int getModuleObjectSubIndex(Module module,
             PowerlinkSubobject subObject) {
-        Result libApiRes = new Result();
+
         Node node = module.getNode();
 
         long[] index = new long[1];
         int[] subIndex = new int[1];
 
-        libApiRes = OpenConfiguratorCore.GetInstance()
+        Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), 0000,
@@ -4325,6 +4226,8 @@ public class OpenConfiguratorLibraryUtils {
                 objectType = ObjectType.RECORD;
                 break;
             default:
+                System.err.println("Invalid Object type");
+                break;
         }
         return objectType;
     }
@@ -4440,7 +4343,8 @@ public class OpenConfiguratorLibraryUtils {
 
         libApiRes = addObjectDictionary(node, node.getObjectDictionary());
         if (!libApiRes.IsSuccessful()) {
-            System.err.println("WARN: " + getErrorMessage(libApiRes));
+            System.err.println("Add Object dictionary WARN: "
+                    + getErrorMessage(libApiRes));
         }
 
         if (node.getNodeId() > 239) {
@@ -4448,7 +4352,8 @@ public class OpenConfiguratorLibraryUtils {
                     node.getNodeId(),
                     commProfile.getApplicationLayers().getDynamicChannels());
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println("Add dynamic channel WARN: "
+                        + getErrorMessage(libApiRes));
             }
         }
 
@@ -4461,9 +4366,7 @@ public class OpenConfiguratorLibraryUtils {
             Module module,
             ProfileBodyCommunicationNetworkPowerlinkModularChild profileBodyDatatype) {
 
-        Result libApiRes = new Result();
-
-        libApiRes = addModuleObjectDictionary(module,
+        Result libApiRes = addModuleObjectDictionary(module,
                 module.getObjectDictionary());
         if (!libApiRes.IsSuccessful()) {
             System.err.println("Add module object dictionary WARN: "
@@ -4480,7 +4383,8 @@ public class OpenConfiguratorLibraryUtils {
 
         libApiRes = addObjectDictionary(node, node.getObjectDictionary());
         if (!libApiRes.IsSuccessful()) {
-            System.err.println("WARN: " + getErrorMessage(libApiRes));
+            System.err.println("Add object dictionary WARN: "
+                    + getErrorMessage(libApiRes));
         }
 
         if (node.getNodeId() > 239) {
@@ -4488,7 +4392,8 @@ public class OpenConfiguratorLibraryUtils {
                     node.getNodeId(), modularCommProfile.getApplicationLayers()
                             .getDynamicChannels());
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println(
+                        "Dynamic channels WARN: " + getErrorMessage(libApiRes));
             }
         }
 
@@ -4603,7 +4508,8 @@ public class OpenConfiguratorLibraryUtils {
             libApiRes = addDataTypeList(node.getNetworkId(), node.getNodeId(),
                     appProcess.getDataTypeList());
             if (!libApiRes.IsSuccessful()) {
-                System.err.println("WARN: " + getErrorMessage(libApiRes));
+                System.err.println(
+                        " Data type list WARN: " + getErrorMessage(libApiRes));
             }
 
             TTemplateList templateList = appProcess.getTemplateList();
@@ -4611,7 +4517,8 @@ public class OpenConfiguratorLibraryUtils {
                 libApiRes = addParameterTemplateList(node.getNetworkId(),
                         node.getNodeId(), templateList.getParameterTemplate());
                 if (!libApiRes.IsSuccessful()) {
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                    System.err.println("Template list WARN: "
+                            + getErrorMessage(libApiRes));
                 }
             }
 
@@ -4620,7 +4527,8 @@ public class OpenConfiguratorLibraryUtils {
                 libApiRes = addParameterList(node.getNetworkId(),
                         node.getNodeId(), parameterList.getParameter());
                 if (!libApiRes.IsSuccessful()) {
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                    System.err.println("parameter list WARN: "
+                            + getErrorMessage(libApiRes));
                 }
             }
 
@@ -4630,7 +4538,8 @@ public class OpenConfiguratorLibraryUtils {
                 libApiRes = addParameterGroup(node.getNetworkId(),
                         node.getNodeId(), parameterGroupList);
                 if (!libApiRes.IsSuccessful()) {
-                    System.err.println("WARN: " + getErrorMessage(libApiRes));
+                    System.err.println("Parameter group list WARN: "
+                            + getErrorMessage(libApiRes));
                 }
             }
         }

@@ -100,7 +100,7 @@ public class Parameter implements IParameter {
      * @author Ramakrishnan P
      *
      */
-    public class Property {
+    public static class Property {
         private String name;
         private String value;
 
@@ -275,12 +275,15 @@ public class Parameter implements IParameter {
     @Override
     public ParameterAccess getAccess() {
         if (access == null) {
-            if (parameterTemplate instanceof TParameterTemplate) {
-                if (parameterTemplate.getAccess() != null) {
-                    return ParameterAccess
-                            .fromValue(parameterTemplate.getAccess());
-                } else {
-                    return ParameterAccess.UNDEFINED;
+            if (parameterTemplate != null) {
+
+                if (parameterTemplate instanceof TParameterTemplate) {
+                    if (parameterTemplate.getAccess() != null) {
+                        return ParameterAccess
+                                .fromValue(parameterTemplate.getAccess());
+                    } else {
+                        return ParameterAccess.UNDEFINED;
+                    }
                 }
             }
         }
@@ -295,11 +298,13 @@ public class Parameter implements IParameter {
     @Override
     public String getActualValue() {
         if ((actualValue == null) || (actualValue.isEmpty())) {
-            if (parameterTemplate instanceof TParameterTemplate) {
-                if (parameterTemplate.getActualValue() != null) {
-                    return parameterTemplate.getActualValue().getValue();
-                } else {
-                    return StringUtils.EMPTY;
+            if (parameterTemplate != null) {
+                if (parameterTemplate instanceof TParameterTemplate) {
+                    if (parameterTemplate.getActualValue() != null) {
+                        return parameterTemplate.getActualValue().getValue();
+                    } else {
+                        return StringUtils.EMPTY;
+                    }
                 }
             }
         } else if (actualValue.contains("Â")) {
@@ -316,12 +321,14 @@ public class Parameter implements IParameter {
     @Override
     public AllowedValues getAllowedValues() {
         if ((allowedValues == null)) {
-            if (parameterTemplate instanceof TParameterTemplate) {
-                if (parameterTemplate.getAllowedValues() != null) {
-                    return new AllowedValues(
-                            parameterTemplate.getAllowedValues());
-                } else {
-                    return null;
+            if (parameterTemplate != null) {
+                if (parameterTemplate instanceof TParameterTemplate) {
+                    if (parameterTemplate.getAllowedValues() != null) {
+                        return new AllowedValues(
+                                parameterTemplate.getAllowedValues());
+                    } else {
+                        return null;
+                    }
                 }
             }
         }
@@ -356,11 +363,13 @@ public class Parameter implements IParameter {
     @Override
     public String getDefaultValue() {
         if ((defaultValue == null) || (defaultValue.isEmpty())) {
-            if (parameterTemplate instanceof TParameterTemplate) {
-                if (parameterTemplate.getDefaultValue() != null) {
-                    return parameterTemplate.getDefaultValue().getValue();
-                } else {
-                    return StringUtils.EMPTY;
+            if (parameterTemplate != null) {
+                if (parameterTemplate instanceof TParameterTemplate) {
+                    if (parameterTemplate.getDefaultValue() != null) {
+                        return parameterTemplate.getDefaultValue().getValue();
+                    } else {
+                        return StringUtils.EMPTY;
+                    }
                 }
             }
         } else if (defaultValue.contains("Â")) {

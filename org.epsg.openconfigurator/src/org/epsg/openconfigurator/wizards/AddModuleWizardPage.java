@@ -43,7 +43,6 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
@@ -67,12 +66,9 @@ public class AddModuleWizardPage extends WizardPage {
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to {0}/{1}.";
     private static final String ERROR_INVALID_MODULE_NAME = "Enter a valid module name.";
 
-    private Text text;
     private Text nodeIdText;
     private Text interfaceIdText;
     private Text moduleName;
-    private Spinner position;
-    private Label positionRange;
 
     private Object nodeModel = null;
 
@@ -81,8 +77,6 @@ public class AddModuleWizardPage extends WizardPage {
     private NodeNameVerifyListener moduleNameVerifyListener = new NodeNameVerifyListener();
 
     private HeadNodeInterface interfaceObj;
-
-    private String nodeId;
 
     private Node node;
 
@@ -158,7 +152,7 @@ public class AddModuleWizardPage extends WizardPage {
      * @return Lists of available module name in the head node.
      */
     private List<String> getModuleNamelist() {
-        List<String> nameList = new ArrayList<String>();
+        List<String> nameList = new ArrayList<>();
         if (interfaceObj.getModuleCollection().size() != 0) {
             Collection<Module> moduleList = interfaceObj.getModuleCollection()
                     .values();
@@ -175,8 +169,8 @@ public class AddModuleWizardPage extends WizardPage {
     @Deprecated
     private List<String> getModuleNameList() {
         Object nodeModel = node.getNodeModel();
-        List<InterfaceList.Interface> interfaceList = new ArrayList<InterfaceList.Interface>();
-        List<String> nameList = new ArrayList<String>();
+        List<InterfaceList.Interface> interfaceList = new ArrayList<>();
+        List<String> nameList = new ArrayList<>();
         if (nodeModel instanceof TCN) {
 
             TCN cn = (TCN) nodeModel;
@@ -285,7 +279,6 @@ public class AddModuleWizardPage extends WizardPage {
     private void updateCnModel() {
         nodeModel = getNode().getNodeModel();
         if (nodeModel instanceof TCN) {
-            TCN cnModel = (TCN) nodeModel;
             InterfaceList.Interface.Module cnModule = new InterfaceList.Interface.Module();
             cnModule.setName(moduleName.getText());
             // cnModule.setPosition(BigInteger.valueOf(position.getSelection()));

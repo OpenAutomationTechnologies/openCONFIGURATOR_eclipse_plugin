@@ -46,7 +46,7 @@ public class ModuleAddressVerifyListener implements VerifyListener {
 
     /*
      * (non-Javadoc)
-     * 
+     *
      * @see
      * org.eclipse.swt.events.VerifyListener#verifyText(org.eclipse.swt.events.
      * VerifyEvent)
@@ -85,8 +85,10 @@ public class ModuleAddressVerifyListener implements VerifyListener {
         }
 
         // Allow arrow keys and backspace and delete keys
-        if ((inputChar == SWT.BS) || (inputChar == SWT.ARROW_LEFT)
-                || (inputChar == SWT.ARROW_RIGHT) || (inputChar == SWT.DEL)) {
+        if ((inputChar == SWT.BS)
+                || (Integer.valueOf(inputChar) == SWT.ARROW_LEFT)
+                || (Integer.valueOf(inputChar) == SWT.ARROW_RIGHT)
+                || (inputChar == SWT.DEL)) {
             event.doit = true;
             return;
         }

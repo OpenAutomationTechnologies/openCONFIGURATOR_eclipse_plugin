@@ -43,6 +43,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
@@ -70,6 +71,8 @@ public class ModulePropertySource extends AbstractNodePropertySource
     private static final String ADDRESS_EXISTS_ERROR_MESSAGE = "Address {0} on interface {1} is already occupied.";
     private static final String INVALID_NAME_ERROR_MESSAGE = "Invalid module name.";
     private static final String MODULE_EXISTS_ERROR_MESSAGE = "Module name already exists.";
+    private static final String[] EXPERT_FILTER_FLAG = {
+            IPropertySheetEntry.FILTER_ID_EXPERT };
 
     private Module module;
     private TModuleAddressingHead moduleAddressing;
@@ -117,8 +120,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
 
         interfaceModuleAddressingDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        interfaceModuleAddressingDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        interfaceModuleAddressingDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         moduleNameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         modulePositionDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
@@ -204,7 +206,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.MODULE_ENABLED_OBJECT: {
                         int value = (moduleObjModel.isEnabled() == true) ? 1
                                 : 0;
-                        boolean isvalue = new Integer(value) == 0 ? false
+                        boolean isvalue = Integer.valueOf(value) == 0 ? false
                                 : true;
                         retObj = String.valueOf(isvalue);
                         break;
@@ -229,7 +231,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                 }
 
                 String positn = (String) value;
-                int val = Integer.valueOf(positn);
+                Integer val = Integer.valueOf(positn);
 
                 if (val == 1) {
                     Module mod = module.getInterfaceOfModule()
@@ -253,7 +255,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     return null;
                 }
 
-                for (Integer position : positionSet) {
+                for (int position : positionSet) {
 
                     if (position == val) {
 
@@ -261,12 +263,6 @@ public class ModulePropertySource extends AbstractNodePropertySource
                                 AVAILABLE_MODULE_ERROR_MESSAGE, val,
                                 module.getInterfaceOfModule()
                                         .getInterfaceUId());
-                        // if (!module.validateNewPosition(position)) {
-                        //
-                        // return "The module cannot be placed in position "
-                        // + val + " due to invalid module type.";
-                        //
-                        // }
 
                     }
 
@@ -287,15 +283,13 @@ public class ModulePropertySource extends AbstractNodePropertySource
     private String handleSetModuleAddress(Object value) {
         System.err.println("Handle address value..");
         if (module != null) {
-            Set<Integer> addressSet = module.getInterfaceOfModule()
-                    .getAddressCollection().keySet();
             if (value instanceof String) {
                 if (((String) value).isEmpty()) {
                     return EMPTY_ADDRESS_ERROR_MESSAGE;
                 }
 
                 String address = (String) value;
-                int val = Integer.valueOf(address);
+                Integer val = Integer.valueOf(address);
 
                 if (module.getInterfaceOfModule().getMaxModules() != null) {
                     if ((val == 0) || (val > module.getInterfaceOfModule()
@@ -320,7 +314,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     addresslist.add(mod.getAddress());
                 }
 
-                for (Integer addressVal : addresslist) {
+                for (int addressVal : addresslist) {
                     System.out.println("The address set .." + addressVal);
                     if (addressVal == val) {
                         return MessageFormat.format(

@@ -31,8 +31,6 @@
 
 package org.epsg.openconfigurator.adapters;
 
-import org.eclipse.ui.views.properties.IPropertySheetEntry;
-
 /**
  * Property source constants.
  *
@@ -42,11 +40,8 @@ import org.eclipse.ui.views.properties.IPropertySheetEntry;
 public interface IPropertySourceSupport {
 
     // Property source constant labels.
-    public static final String[] YES_NO = { "Yes", "No" };
 
     public static final String BASIC_CATEGORY = "Basic";
     public static final String ADVANCED_CATEGORY = "Advanced";
 
-    public static final String[] EXPERT_FILTER_FLAG = {
-            IPropertySheetEntry.FILTER_ID_EXPERT };
 }

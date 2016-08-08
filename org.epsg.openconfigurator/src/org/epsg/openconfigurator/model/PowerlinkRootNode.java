@@ -175,7 +175,7 @@ public class PowerlinkRootNode {
             return false;
         }
 
-        nodeCollection.put(new Short(node.getNodeId()), node);
+        nodeCollection.put(Short.valueOf(node.getNodeId()), node);
 
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
@@ -461,7 +461,7 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    new Short(processingNode.getNodeId()),
+                                    Short.valueOf(processingNode.getNodeId()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -476,7 +476,7 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    new Short(processingNode.getNodeId()),
+                                    Short.valueOf(processingNode.getNodeId()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -509,7 +509,7 @@ public class PowerlinkRootNode {
                         processingNode.setError(errorMessage);
                     }
                 }
-                nodeCollection.put(new Short(processingNode.getNodeId()),
+                nodeCollection.put(Short.valueOf(processingNode.getNodeId()),
                         processingNode);
                 monitor.worked(1);
 
@@ -581,8 +581,9 @@ public class PowerlinkRootNode {
                                                     .getErrorMessage(res));
                                     processingNode.getInterface()
                                             .getModuleCollection().put(
-                                                    new Integer(processingModule
-                                                            .getPosition()),
+                                                    Integer.valueOf(
+                                                            processingModule
+                                                                    .getPosition()),
                                                     newModule);
                                     return new Status(IStatus.ERROR,
                                             org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -592,17 +593,17 @@ public class PowerlinkRootNode {
                                 }
                                 processingNode.getInterface()
                                         .getModuleCollection()
-                                        .put(new Integer(
+                                        .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 newModule);
                                 processingNode.getInterface()
                                         .getAddressCollection()
-                                        .put(new Integer(
+                                        .put(Integer.valueOf(
                                                 processingModule.getAddress()),
                                                 newModule);
                                 processingNode.getInterface()
                                         .getModuleNameCollection().put(
-                                                new String(processingModule
+                                                String.valueOf(processingModule
                                                         .getModuleName()),
                                                 newModule);
                             } catch (JAXBException | SAXException
@@ -637,7 +638,7 @@ public class PowerlinkRootNode {
                             if (processingNode.getInterface() != null) {
                                 processingNode.getInterface()
                                         .getModuleCollection()
-                                        .put(new Integer(
+                                        .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 processingModule);
                             }
@@ -684,7 +685,7 @@ public class PowerlinkRootNode {
                     if (!res.IsSuccessful()) {
                         newNode.setError(OpenConfiguratorLibraryUtils
                                 .getErrorMessage(res));
-                        nodeCollection.put(new Short(newNode.getNodeId()),
+                        nodeCollection.put(Short.valueOf(newNode.getNodeId()),
                                 newNode);
                         return new Status(IStatus.ERROR,
                                 org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -704,7 +705,7 @@ public class PowerlinkRootNode {
                                     processingNode.getProject().getName());
                     processingNode.setError(errorMessage);
                 }
-                nodeCollection.put(new Short(processingNode.getNodeId()),
+                nodeCollection.put(Short.valueOf(processingNode.getNodeId()),
                         processingNode);
                 monitor.worked(1);
             }
@@ -851,8 +852,8 @@ public class PowerlinkRootNode {
      * Removes the module from the project.
      *
      * @param module Instance of module to be removed.
-     * @param finalModuleCheck <true> if module is a final module,
-     *            <false> otherwise.
+     * @param finalModuleCheck <true> if module is a final module, <false>
+     *            otherwise.
      * @return <code>true</code> if module is removed. <code>false</code> if
      *         module is not removed.
      */
@@ -876,8 +877,6 @@ public class PowerlinkRootNode {
                     throws CoreException, InvocationTargetException,
                     InterruptedException {
 
-
-                Node mnNode = getMN();
 
                 Result libResult = OpenConfiguratorLibraryUtils
                         .removeModule(module);
@@ -1193,9 +1192,9 @@ public class PowerlinkRootNode {
                         }
 
                         // Remove the old node ID from node collection.
-                        nodeCollection.remove(new Short(oldNodeId));
+                        nodeCollection.remove(Short.valueOf(oldNodeId));
                         // Add the modified node ID into node collection.
-                        nodeCollection.put(new Short(newNodeId), oldNode);
+                        nodeCollection.put(Short.valueOf(newNodeId), oldNode);
 
                         fireNodePropertyChanged(
                                 new NodePropertyChangeEvent(oldNode));

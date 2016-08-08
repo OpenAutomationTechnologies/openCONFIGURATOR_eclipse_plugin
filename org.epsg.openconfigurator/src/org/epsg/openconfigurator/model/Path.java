@@ -50,13 +50,7 @@ public class Path {
      */
     private String path;
 
-    /**
-     * The eclipse project reference.
-     */
-    private IProject project;
-
     public Path(IProject project, String path, boolean local) {
-        this.project = project;
         this.path = path;
         this.local = local;
     }

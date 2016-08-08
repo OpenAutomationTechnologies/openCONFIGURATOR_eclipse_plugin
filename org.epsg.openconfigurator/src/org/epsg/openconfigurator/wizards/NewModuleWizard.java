@@ -193,13 +193,13 @@ public class NewModuleWizard extends Wizard {
         Result res = OpenConfiguratorLibraryUtils.addModule(newModule);
         if (res.IsSuccessful()) {
             selectedNodeObj.getModuleCollection()
-                    .put(new Integer(newModule.getPosition()), newModule);
+                    .put(Integer.valueOf(newModule.getPosition()), newModule);
 
             selectedNodeObj.getAddressCollection()
-                    .put(new Integer(newModule.getAddress()), newModule);
+                    .put(Integer.valueOf(newModule.getAddress()), newModule);
 
             selectedNodeObj.getModuleNameCollection()
-                    .put(new String(newModule.getModuleName()), newModule);
+                    .put(newModule.getModuleName(), newModule);
 
             System.err.println("Module collection values ... "
                     + selectedNodeObj.getModuleCollection().values());

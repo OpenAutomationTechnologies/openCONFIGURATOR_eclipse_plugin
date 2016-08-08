@@ -40,7 +40,6 @@ import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
 import org.epsg.openconfigurator.xmlbinding.xdd.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
-import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TApplicationLayersModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList;
@@ -61,13 +60,9 @@ public class ModuleManagement {
     private InterfaceList modularHeadInterface;
     private TInterfaceList devModuleInterfaceList;
 
-    private TModuleInterface childModuleInterface;
+    List<TInterfaceList.Interface> interfce = new ArrayList<>();
 
-    private Node node;
-
-    List<TInterfaceList.Interface> interfce = new ArrayList<TInterfaceList.Interface>();
-
-    List<Interface> interfacelist = new ArrayList<Interface>();
+    List<Interface> interfacelist = new ArrayList<>();
 
     /**
      * Constructor that defines the module management from the XDD model.
@@ -76,7 +71,6 @@ public class ModuleManagement {
      * @param xddModel Instance of module XDD.
      */
     public ModuleManagement(Node node, ISO15745ProfileContainer xddModel) {
-        this.node = node;
         setXddModel(xddModel);
     }
 
@@ -151,12 +145,7 @@ public class ModuleManagement {
                     interfce = devModuleInterfaceList.getInterface();
 
                 }
-                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularChild) {
-                    ProfileBodyDevicePowerlinkModularChild childDevProfile = (ProfileBodyDevicePowerlinkModularChild) profileBodyDatatype;
-                    childModuleInterface = childDevProfile.getDeviceManager()
-                            .getModuleManagement().getModuleInterface();
 
-                }
             }
         }
 

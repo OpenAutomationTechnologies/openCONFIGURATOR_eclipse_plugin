@@ -37,7 +37,6 @@ import java.util.List;
 
 import org.epsg.openconfigurator.xmlbinding.xdd.FileList;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleTypeList;
-import org.epsg.openconfigurator.xmlbinding.xdd.RangeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
 
@@ -51,7 +50,7 @@ public class DeviceModularInterface {
 
     private Node node;
 
-    private List<Object> labellist = new ArrayList<Object>();
+    private List<Object> labellist = new ArrayList<>();
 
     private FileList fileList;
 
@@ -72,10 +71,6 @@ public class DeviceModularInterface {
     private BigInteger maxPosition;
 
     private BigInteger maxCount;
-
-    private RangeList rangeList;
-
-    private Object uniqueIDRef;
 
     /**
      * Constructor that describes the module interface of modules from the XDD.

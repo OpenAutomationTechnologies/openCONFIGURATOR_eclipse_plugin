@@ -44,7 +44,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IAction;
-import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -911,7 +910,7 @@ public class MappingView extends ViewPart {
                         System.err.println(
                                 "The mapping value of TPDO/RPDO" + value);
 
-                        if (value == null) {
+                        if (value.isEmpty()) {
                             value = emptyObject.getActualValue();
                         }
 
@@ -1113,7 +1112,7 @@ public class MappingView extends ViewPart {
 
                         String value = mapParamObj.getActualDefaultValue();
 
-                        if (value == null) {
+                        if (value.equalsIgnoreCase(StringUtils.EMPTY)) {
                             return "0";
                         }
 
@@ -1660,8 +1659,9 @@ public class MappingView extends ViewPart {
 
             // Allow arrow keys and backspace and delete
             // keys
-            if ((inputChar == SWT.BS) || (inputChar == SWT.ARROW_LEFT)
-                    || (inputChar == SWT.ARROW_RIGHT)
+            if ((inputChar == SWT.BS)
+                    || (Integer.valueOf(inputChar) == SWT.ARROW_LEFT)
+                    || (Integer.valueOf(inputChar) == SWT.ARROW_RIGHT)
                     || (inputChar == SWT.DEL)) {
                 e.doit = true;
                 return;
@@ -2140,9 +2140,6 @@ public class MappingView extends ViewPart {
                 TableColumn tblclmnActions = tpdoActionsColumn.getColumn();
                 tblclmnActions.setWidth(100);
                 tblclmnActions.setText(PDO_TABLE_COLUMN_ACTIONS_LABEL);
-
-                TableViewerColumn empty = new TableViewerColumn(tpdoTableViewer,
-                        SWT.NONE);
 
                 tpdoPageFooter = new Composite(composite_3, SWT.NONE);
                 RowLayout rl_tpdoPageFooter = new RowLayout(SWT.HORIZONTAL);
@@ -2635,7 +2632,7 @@ public class MappingView extends ViewPart {
             PowerlinkSubobject mappingSubObj) {
         String value = mappingSubObj.getActualDefaultValue();
 
-        if (value == null) {
+        if (value.equalsIgnoreCase(StringUtils.EMPTY)) {
             return emptyObject;
         }
 
@@ -2690,7 +2687,7 @@ public class MappingView extends ViewPart {
 
         String value = mappingSubObj.getActualDefaultValue();
 
-        if (value == null) {
+        if (value.equalsIgnoreCase(StringUtils.EMPTY)) {
             return emptyObject.getNameWithId();
         }
 
@@ -3014,16 +3011,14 @@ public class MappingView extends ViewPart {
      * Initialize the menu.
      */
     private void initializeMenu() {
-        IMenuManager menuManager = getViewSite().getActionBars()
-                .getMenuManager();
+        // Initialize menu for mapping view.
     }
 
     /**
      * Initialize the toolbar.
      */
     private void initializeToolBar() {
-        IToolBarManager toolbarManager = getViewSite().getActionBars()
-                .getToolBarManager();
+        // Initialize toolbar for mapping view.
     }
 
     @Override
@@ -3061,7 +3056,7 @@ public class MappingView extends ViewPart {
         PowerlinkSubobject nodeIdSubObject = pdoChannel.getCommunicationParam()
                 .getSubObject((short) 01);
         String actualValue = nodeIdSubObject.getActualDefaultValue();
-        if (actualValue == null) {
+        if (actualValue.equalsIgnoreCase(StringUtils.EMPTY)) {
             actualValue = "0";
         }
 

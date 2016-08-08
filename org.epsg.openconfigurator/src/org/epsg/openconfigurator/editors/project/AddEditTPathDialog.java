@@ -188,7 +188,7 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
             txtName = new Text(container, SWT.NONE);
             txtName.setLayoutData(
                     new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-            if ((path != null) && (path.getId() != null)) {
+            if ((path.getId() != null)) {
                 txtName.setText(path.getId());
             }
             txtName.addModifyListener(new ModifyListener() {
@@ -225,7 +225,7 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
             txtLocation.setLayoutData(
                     new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
             txtLocation.setText("");
-            if ((path != null) && (path.getPath() != null)) {
+            if ((path.getPath() != null)) {
                 txtLocation.setText(path.getPath());
             }
             txtLocation.addModifyListener(new ModifyListener() {

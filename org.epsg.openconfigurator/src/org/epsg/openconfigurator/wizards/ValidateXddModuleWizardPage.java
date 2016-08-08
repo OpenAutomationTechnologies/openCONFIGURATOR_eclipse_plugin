@@ -71,7 +71,6 @@ import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
-import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
@@ -114,6 +113,12 @@ public class ValidateXddModuleWizardPage extends WizardPage {
     private static final String ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE = "Cannot import CN or modular head node XDD / XDC as module. \nPlease choose a valid modular child XDD / XDC.";
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
     public static final String DIALOG_TILE = "POWERLINK module";
+
+    private static final String[] CONFIGURATION_FILTER_EXTENSIONS = {
+            "*.xdc;*.xdd", "*" };
+
+    private static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
+            "XDD/XDC files", "All files" };
 
     /**
      * Control to display the node configuration path.
@@ -399,11 +404,10 @@ public class ValidateXddModuleWizardPage extends WizardPage {
 
                 fileDialog.setText(IMPORT_CN_CONFIGURATION_FILE_DIALOG_LABEL);
                 // Set filter on .XDD and .XDC files
-                fileDialog.setFilterExtensions(
-                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_EXTENSIONS);
+                fileDialog.setFilterExtensions(CONFIGURATION_FILTER_EXTENSIONS);
                 // Put in a readable name for the filter
-                fileDialog.setFilterNames(
-                        IPowerlinkProjectSupport.CONFIGURATION_FILTER_NAMES_EXTENSIONS);
+                fileDialog
+                        .setFilterNames(CONFIGURATION_FILTER_NAMES_EXTENSIONS);
                 // Open Dialog and save result of selection
                 String selectedFile = fileDialog.open();
 
@@ -587,7 +591,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         } else {
             Set<Integer> positionSet = headNodeInetrfaceObject
                     .getModuleCollection().keySet();
-            List<Integer> positionList = new ArrayList<Integer>();
+            List<Integer> positionList = new ArrayList<>();
             for (Integer position1 : positionSet) {
                 positionList.add(position1);
             }

@@ -66,17 +66,17 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     /**
      * List of sub-objects available in the node.
      */
-    private final List<PowerlinkSubobject> subObjectsList = new ArrayList<PowerlinkSubobject>();
+    private final List<PowerlinkSubobject> subObjectsList = new ArrayList<>();
 
     /**
      * TPDO mappable subobjects list.
      */
-    private final List<PowerlinkSubobject> tpdoMappableObjectList = new ArrayList<PowerlinkSubobject>();
+    private final List<PowerlinkSubobject> tpdoMappableObjectList = new ArrayList<>();
 
     /**
      * RPDO mappable subobjects list.
      */
-    private final List<PowerlinkSubobject> rpdoMappableObjectList = new ArrayList<PowerlinkSubobject>();
+    private final List<PowerlinkSubobject> rpdoMappableObjectList = new ArrayList<>();
 
     /**
      * Object ID in hex without 0x.
@@ -600,8 +600,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                 actualValue = parameter.getDefaultValue().getValue();
             }
         } else if (uniqueIDRef2 instanceof TParameterGroup) {
-            TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef2;
-            String uniqueId = parameterGrp.getUniqueID();
             actualValue = StringUtils.EMPTY;
         }
         return actualValue;

@@ -91,17 +91,17 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
     /**
      * Default managing node name.
      */
-    private Text txtNodeName;
-
-    /**
-     * Default managing node name.
-     */
-    private final String defaultMasterName = "openPOWERLINK_MN";
+    private final static String defaultMasterName = "openPOWERLINK_MN";
 
     /**
      * Default managing node ID.
      */
-    private final short defaultMnNodeId = IPowerlinkConstants.MN_DEFAULT_NODE_ID;
+    private final static short defaultMnNodeId = IPowerlinkConstants.MN_DEFAULT_NODE_ID;
+
+    /**
+     * Default managing node name.
+     */
+    private Text txtNodeName;
 
     /**
      * MN object model.

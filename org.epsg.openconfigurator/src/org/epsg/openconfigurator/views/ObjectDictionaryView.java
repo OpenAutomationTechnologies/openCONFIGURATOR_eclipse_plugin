@@ -58,7 +58,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPageLayout;
@@ -72,8 +71,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
-import org.epsg.openconfigurator.event.INodePropertyChangeListener;
-import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.model.DataTypeChoiceType;
 import org.epsg.openconfigurator.model.LabelDescription;
 import org.epsg.openconfigurator.model.Module;
@@ -82,7 +79,6 @@ import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.ParameterGroup;
 import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
-import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.VarDecleration;
 import org.epsg.openconfigurator.resources.IPluginImages;
@@ -323,8 +319,6 @@ public class ObjectDictionaryView extends ViewPart
     public static final String HIDE_NON_FORCED_OBJECTS = "Hide NonForced Objects";
     public static final String OBJECT_PROPERTIES = "Properties";
 
-    private PowerlinkRootNode rootNode;
-
     /**
      * Selection listener to update the objects and sub-objects in the Object
      * dictionary view.
@@ -493,7 +487,7 @@ public class ObjectDictionaryView extends ViewPart
                         }
                     }
                     if (visibleObjectsList.size() == 0) {
-                        visibleObjectsList.add(new String());
+                        visibleObjectsList.add("");
                     }
                     return visibleObjectsList.toArray();
 
@@ -560,7 +554,7 @@ public class ObjectDictionaryView extends ViewPart
                         }
                     }
                     if (visibleObjectsList.size() == 0) {
-                        visibleObjectsList.add(new String());
+                        visibleObjectsList.add("");
                     }
                     return visibleObjectsList.toArray();
                 } else {
@@ -651,19 +645,6 @@ public class ObjectDictionaryView extends ViewPart
      * Listener instance to listen to the changes in the source part.
      */
     private PartListener partListener = new PartListener();
-
-    INodePropertyChangeListener ObjectPropertyChangeListener = new INodePropertyChangeListener() {
-        @Override
-        public void nodePropertyChanged(NodePropertyChangeEvent event) {
-            Display.getDefault().asyncExec(new Runnable() {
-
-                @Override
-                public void run() {
-                    treeViewer.setInput(nodeObj);
-                }
-            });
-        }
-    };
 
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
@@ -845,7 +826,6 @@ public class ObjectDictionaryView extends ViewPart
 
         contributeToActionBars();
         hookDoubleClickAction();
-        initializeToolBar();
 
         getViewSite().getPage().addSelectionListener(IndustrialNetworkView.ID,
                 listener);
@@ -953,11 +933,6 @@ public class ObjectDictionaryView extends ViewPart
                 propertiesAction.run();
             }
         });
-    }
-
-    private void initializeToolBar() {
-        IToolBarManager toolbarManager = getViewSite().getActionBars()
-                .getToolBarManager();
     }
 
     @Override

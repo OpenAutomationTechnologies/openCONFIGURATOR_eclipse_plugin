@@ -77,6 +77,7 @@ public class AbstractObjectPropertySource {
     private static final String OBJ_OBJFLAGS_LABEL = "Object Flags";
     private static final String OBJ_UNIQUEIDREF_LABEL = "UniqueIDRef";
 
+    private static final String[] YES_NO = { "Yes", "No" };
     protected PropertyDescriptor objectIdDescriptor = new PropertyDescriptor(
             OBJ_INDEX_ID, OBJ_INDEX_LABEL);
     protected PropertyDescriptor nameDescriptor = new PropertyDescriptor(
@@ -100,8 +101,7 @@ public class AbstractObjectPropertySource {
             OBJ_ACTUAL_VALUE_EDITABLE_ID, OBJ_ACTUAL_VALUE_LABEL);
 
     protected ComboBoxPropertyDescriptor forceActualValue = new ComboBoxPropertyDescriptor(
-            OBJ_FORCE_ACTUAL_VALUE_ID, OBJ_FORCE_ACTUAL_VALUE_LABEL,
-            IPropertySourceSupport.YES_NO);
+            OBJ_FORCE_ACTUAL_VALUE_ID, OBJ_FORCE_ACTUAL_VALUE_LABEL, YES_NO);
     protected PropertyDescriptor denotationDescriptor = new PropertyDescriptor(
             OBJ_DENOTATION_ID, OBJ_DENOTATION_LABEL);
     protected PropertyDescriptor pdoMappingDescriptor = new PropertyDescriptor(

@@ -69,7 +69,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
     public static final String CONTROLLED_NODE_LABEL = "Controlled Node";
     public static final String REDUNDANT_MANAGING_NODE_LABEL = "Redundant Managing Node";
-    public static final String NODE_TYPES[] = { CONTROLLED_NODE_LABEL,
+    private static final String NODE_TYPES[] = { CONTROLLED_NODE_LABEL,
             REDUNDANT_MANAGING_NODE_LABEL };
 
     private static final String DIALOG_PAGE_NAME = "AddCnwizardPage"; //$NON-NLS-1$
@@ -266,10 +266,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private short getNextValidCnNodeId(List<TCN> cnNodeList) {
         setErrorMessage(null);
 
-        List<Short> nodeIdList = new ArrayList<Short>();
+        List<Short> nodeIdList = new ArrayList<>();
 
         for (TCN cn : cnNodeList) {
-            Short cnNodeId = new Short(cn.getNodeID());
+            Short cnNodeId = Short.valueOf(cn.getNodeID());
             nodeIdList.add(cnNodeId);
         }
 
@@ -298,7 +298,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
      * @return the new RMN node ID.
      */
     private short getNextValidRmnNodeId(List<TRMN> rmnNodeList) {
-        List<Short> rmnNodeIdList = new ArrayList<Short>();
+        List<Short> rmnNodeIdList = new ArrayList<>();
         for (TRMN rmn : rmnNodeList) {
             rmnNodeIdList.add(Short.parseShort(rmn.getNodeID()));
         }
@@ -339,17 +339,17 @@ public class AddControlledNodeWizardPage extends WizardPage {
      * @return the list of node IDs.
      */
     private List<Short> getNodeIDs() {
-        List<Short> nodeIdList = new ArrayList<Short>();
+        List<Short> nodeIdList = new ArrayList<>();
 
         nodeIdList.add(nodeCollection.getMN().getNodeID());
 
         for (TCN cn : nodeCollection.getCN()) {
-            Short cnNodeId = new Short(cn.getNodeID());
+            Short cnNodeId = Short.valueOf(cn.getNodeID());
             nodeIdList.add(cnNodeId);
         }
 
         for (TRMN rmn : nodeCollection.getRMN()) {
-            Short rmnNodeId = new Short(rmn.getNodeID());
+            Short rmnNodeId = Short.valueOf(rmn.getNodeID());
             nodeIdList.add(rmnNodeId);
         }
         return nodeIdList;

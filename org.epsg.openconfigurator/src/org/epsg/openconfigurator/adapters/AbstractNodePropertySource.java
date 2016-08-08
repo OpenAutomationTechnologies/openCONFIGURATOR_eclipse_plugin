@@ -78,6 +78,7 @@ public abstract class AbstractNodePropertySource {
     public static final String ERROR_NODE_ID_DECEEDS_RANGE = "Node ID deceeds the range.";
     public static final String ERROR_OBJECT_NOT_FOUND = "Object not found!";
 
+    private static final String[] YES_NO = { "Yes", "No" };
     protected TextPropertyDescriptor nameDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.NODE_NAME_OBJECT, NODE_NAME_LABEL);
     protected PropertyDescriptor readOnlynameDescriptor = new PropertyDescriptor(
@@ -136,15 +137,15 @@ public abstract class AbstractNodePropertySource {
 
     protected ComboBoxPropertyDescriptor isAsyncOnly = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT,
-            NODE_IS_ASYNC_ONLY_LABEL, IPropertySourceSupport.YES_NO);
+            NODE_IS_ASYNC_ONLY_LABEL, YES_NO);
 
     protected ComboBoxPropertyDescriptor isType1Router = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT,
-            NODE_IS_TYPE1_ROUTER_LABEL, IPropertySourceSupport.YES_NO);
+            NODE_IS_TYPE1_ROUTER_LABEL, YES_NO);
 
     protected ComboBoxPropertyDescriptor isType2Router = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT,
-            NODE_IS_TYPE2_ROUTER_LABEL, IPropertySourceSupport.YES_NO);
+            NODE_IS_TYPE2_ROUTER_LABEL, YES_NO);
 
     protected PropertyDescriptor forcedObjects = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT,

@@ -731,42 +731,35 @@ public class XddJdomOperation {
                                         String.valueOf(
                                                 plkObj.getObjectType())));
                             }
-                            if (!(plkObj.getDataTypeReadable()
-                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+                            if (!(plkObj.getDataTypeReadable().isEmpty())) {
                                 attribList.add(new Attribute("dataType",
                                         plkObj.getDataTypeReadable()));
                             }
-                            if (!(plkObj.getAccessTypeReadable()
-                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+                            if (!(plkObj.getAccessTypeReadable().isEmpty())) {
                                 attribList.add(new Attribute("accessType",
                                         plkObj.getAccessTypeReadable()));
                             }
-                            if (!(plkObj.getDefaultValue()
-                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+                            if (!(plkObj.getDefaultValue().isEmpty())) {
                                 attribList.add(new Attribute("defaultValue",
                                         plkObj.getDefaultValue()));
                             }
 
                             if (plkObj.getActualValue() != null) {
-                                if (!(plkObj.getActualValue()
-                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
+                                if (!(plkObj.getActualValue().isEmpty())) {
                                     attribList.add(new Attribute("actualValue",
                                             plkObj.getActualValue()));
                                 }
                             }
 
-                            if (!(plkObj.getHighLimit()
-                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+                            if (!(plkObj.getHighLimit().isEmpty())) {
                                 attribList.add(new Attribute("highLimit",
                                         plkObj.getHighLimit()));
                             }
-                            if (!(plkObj.getLowLimit()
-                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+                            if (!(plkObj.getLowLimit().isEmpty())) {
                                 attribList.add(new Attribute("lowLimit",
                                         plkObj.getLowLimit()));
                             }
-                            if (!(plkObj.getPDOMappingReadable()
-                                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+                            if (!(plkObj.getPDOMappingReadable().isEmpty())) {
                                 attribList.add(new Attribute("PDOmapping",
                                         plkObj.getPDOMappingReadable()));
                             }
@@ -974,39 +967,35 @@ public class XddJdomOperation {
                                                     plkSubObj.getDataType())));
                                 }
                                 if (!(plkSubObj.getAccessTypeReadable()
-                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
+                                        .isEmpty())) {
                                     attribList.add(new Attribute("accessType",
                                             plkSubObj.getAccessTypeReadable()));
                                 }
-                                if (!(plkSubObj.getDefaultValue()
-                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
+                                if (!(plkSubObj.getDefaultValue().isEmpty())) {
                                     attribList.add(new Attribute("defaultValue",
                                             plkSubObj.getDefaultValue()));
                                 }
 
                                 if (plkSubObj.getActualValue() != null) {
                                     if (!(plkSubObj.getActualValue()
-                                            .equalsIgnoreCase(
-                                                    StringUtils.EMPTY))) {
+                                            .isEmpty())) {
                                         attribList.add(new Attribute(
                                                 "actualValue",
                                                 plkSubObj.getActualValue()));
                                     }
                                 }
 
-                                if (!(plkSubObj.getHighLimit()
-                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
+                                if (!(plkSubObj.getHighLimit().isEmpty())) {
                                     attribList.add(new Attribute("highLimit",
                                             plkSubObj.getHighLimit()));
                                 }
-                                if (!(plkSubObj.getLowLimit()
-                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
+                                if (!(plkSubObj.getLowLimit().isEmpty())) {
                                     attribList.add(new Attribute("lowLimit",
                                             plkSubObj.getLowLimit()));
                                 }
 
                                 if (!(plkSubObj.getPDOMappingReadable()
-                                        .equalsIgnoreCase(StringUtils.EMPTY))) {
+                                        .isEmpty())) {
                                     attribList.add(new Attribute("PDOmapping",
                                             plkSubObj.getPDOMappingReadable()));
                                 }
@@ -1189,28 +1178,23 @@ public class XddJdomOperation {
                 attribList.add(new Attribute("dataType", DatatypeConverter
                         .printHexBinary(subObject.getDataType())));
             }
-            if (!(subObject.getAccessTypeReadable()
-                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+            if (!(subObject.getAccessTypeReadable().isEmpty())) {
                 attribList.add(new Attribute("accessType",
                         subObject.getAccessTypeReadable()));
             }
-            if (!(subObject.getDefaultValue()
-                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+            if (!(subObject.getDefaultValue().isEmpty())) {
                 attribList.add(new Attribute("defaultValue",
                         subObject.getDefaultValue()));
             }
-            if (!(subObject.getActualValue()
-                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+            if (!(subObject.getActualValue().isEmpty())) {
                 attribList.add(new Attribute("actualValue",
                         subObject.getActualValue()));
             }
-            if (!(subObject.getHighLimit()
-                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+            if (!(subObject.getHighLimit().isEmpty())) {
                 attribList.add(
                         new Attribute("highLimit", subObject.getHighLimit()));
             }
-            if (!(subObject.getLowLimit()
-                    .equalsIgnoreCase(StringUtils.EMPTY))) {
+            if (!(subObject.getLowLimit().isEmpty())) {
                 attribList.add(
                         new Attribute("lowLimit", subObject.getLowLimit()));
             }
@@ -2052,8 +2036,6 @@ public class XddJdomOperation {
                 .getModuleParameterUniqueID(module, oldparamUniqueId);
 
         System.err.println("New param UniqueID..." + paramUniqueId);
-
-        String access = parameter.getAccess();
 
         TParameterList.Parameter parameterModel = parameter;
 

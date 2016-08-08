@@ -42,6 +42,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
+import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
@@ -64,9 +65,11 @@ import org.jdom2.JDOMException;
 public class ParameterRefPropertySource extends AbstractParameterPropertySource
         implements IPropertySource {
 
+    private static final String[] EXPERT_FILTER_FLAG = {
+            IPropertySheetEntry.FILTER_ID_EXPERT };
     private ParameterReference paramRef;
-    private String[] ALLOWED_VALUES;
 
+    private String[] ALLOWED_VALUES;
     private ComboBoxPropertyDescriptor allowedValueDescriptor;
 
     /**
@@ -88,12 +91,10 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
         });
         nameDescriptor.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        nameDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        nameDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         accessTypeDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        accessTypeDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        accessTypeDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         dataTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         defaultValueDescriptor
@@ -106,12 +107,10 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
         bitOffsetDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        bitOffsetDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        bitOffsetDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         uniqueIdDescriptor
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
-        uniqueIdDescriptor
-                .setFilterFlags(IPropertySourceSupport.EXPERT_FILTER_FLAG);
+        uniqueIdDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
     }
 
     // Property descriptor to be displayed in the property page.
@@ -246,14 +245,14 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                 System.err.println(
                                         "Get property value : actual value "
                                                 + actualValue);
-                                retObj = new Integer(i);
+                                retObj = Integer.valueOf(i);
                                 return retObj;
                             }
                         }
                     } else {
 
                         String val = ALLOWED_VALUES[0];
-                        retObj = new Integer(0);
+                        retObj = Integer.valueOf(0);
                         try {
                             paramRef.setActualValue(val);
                         } catch (JDOMException | IOException e) {
@@ -390,7 +389,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
     public void resetPropertyValue(Object id) {
         if (id instanceof String) {
             String objectId = (String) id;
-            Result res = new Result();
+
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID:
                 case PARAM_ACTUAL_VALUE_ID:
@@ -401,7 +400,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                         paramRef.getObjectDictionary()
                                                 .getModule(),
                                         paramRef.getUniqueId());
-                        res = OpenConfiguratorCore.GetInstance()
+                        Result res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         paramRef.getNode().getNetworkId(),
                                         paramRef.getNode().getNodeId(),

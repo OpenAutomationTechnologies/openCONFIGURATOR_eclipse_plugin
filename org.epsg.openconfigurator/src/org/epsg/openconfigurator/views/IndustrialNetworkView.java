@@ -322,10 +322,12 @@ public class IndustrialNetworkView extends ViewPart
                 } else if (nodeObjectModel instanceof TRMN) {
                     // TODO implement for Modular RMN
                     return false;
-                } else if (interfaceModel instanceof HeadNodeInterface) {
-                    ArrayList<HeadNodeInterface> interfaceList = rootNode
-                            .getInterfaceList();
-                    return (interfaceList.size() > 0 ? true : false);
+                } else if (interfaceModel != null) {
+                    if (interfaceModel instanceof HeadNodeInterface) {
+                        ArrayList<HeadNodeInterface> interfaceList = rootNode
+                                .getInterfaceList();
+                        return (interfaceList.size() > 0 ? true : false);
+                    }
                 }
             }
 
@@ -654,8 +656,6 @@ public class IndustrialNetworkView extends ViewPart
             });
         }
     };
-
-    private boolean isNextModuleAvailable = false;
 
     /**
      * The constructor.
@@ -1890,7 +1890,6 @@ public class IndustrialNetworkView extends ViewPart
                     IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
                     Object selectedObject = strucSelection.getFirstElement();
                     if ((selectedObject instanceof HeadNodeInterface)) {
-                        HeadNodeInterface selectedNode = (HeadNodeInterface) selectedObject;
                         NewModuleWizard newModuleWizard = new NewModuleWizard(
                                 rootNode, (HeadNodeInterface) selectedObject);
 
@@ -1987,26 +1986,6 @@ public class IndustrialNetworkView extends ViewPart
                 System.err.println("The down position == " + position);
 
             }
-        }
-
-    }
-
-    private void moveUpModule(Module module) {
-        int currentPosition = module.getPosition();
-        if (String.valueOf(module.getInterfaceOfModule().getModuleAddressing())
-                .equalsIgnoreCase("MANUAL")) {
-            System.err.println("Module availability check.."
-                    + module.getModuleName() + currentPosition);
-
-            Set<Integer> positionSet = module.getInterfaceOfModule()
-                    .getModuleCollection().keySet();
-            List<Integer> positionToBeMoved = new ArrayList<>();
-            for (Integer position : positionSet) {
-                if (position > currentPosition) {
-                    positionToBeMoved.add(position);
-                }
-            }
-
         }
 
     }

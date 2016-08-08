@@ -116,17 +116,14 @@ public class NodeAdapterFactory implements IAdapterFactory {
                 }
             } else if (adaptableObject instanceof HeadNodeInterface) {
                 HeadNodeInterface headinterfaceObj = (HeadNodeInterface) adaptableObject;
-                if (headinterfaceObj instanceof HeadNodeInterface) {
 
-                    if (interfacePropertySource == null) {
-                        interfacePropertySource = new HeadNodeInterfacePropertySource(
-                                headinterfaceObj);
-                    } else {
-                        interfacePropertySource
-                                .setInterfaceData(headinterfaceObj);
-                    }
-                    return interfacePropertySource;
+                if (interfacePropertySource == null) {
+                    interfacePropertySource = new HeadNodeInterfacePropertySource(
+                            headinterfaceObj);
+                } else {
+                    interfacePropertySource.setInterfaceData(headinterfaceObj);
                 }
+                return interfacePropertySource;
 
             } else if (adaptableObject instanceof Module) {
                 Module moduleObj = (Module) adaptableObject;
