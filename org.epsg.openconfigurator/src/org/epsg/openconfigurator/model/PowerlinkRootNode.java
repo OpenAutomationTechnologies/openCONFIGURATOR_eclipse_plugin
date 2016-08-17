@@ -851,8 +851,8 @@ public class PowerlinkRootNode {
      * Removes the module from the project.
      *
      * @param module Instance of module to be removed.
-     * @param finalModuleCheck <true> if module is a final module, <false>
-     *            otherwise.
+     * @param finalModuleCheck <true> if module is a final module,
+     *            <false> otherwise.
      * @return <code>true</code> if module is removed. <code>false</code> if
      *         module is not removed.
      */
@@ -869,7 +869,6 @@ public class PowerlinkRootNode {
             return retVal;
         }
 
-        System.err.println("Remove module....");
         final WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
 
             @Override
@@ -877,8 +876,6 @@ public class PowerlinkRootNode {
                     throws CoreException, InvocationTargetException,
                     InterruptedException {
 
-                System.err
-                        .println("Remove module.... entered critical section");
 
                 Node mnNode = getMN();
 
@@ -902,13 +899,9 @@ public class PowerlinkRootNode {
                     module.getInterfaceOfModule().getAddressCollection()
                             .remove(module.getAddress());
 
-                    System.err
-                            .println("The module removed form the java model.");
-                    // retVal = true;
                 } else {
                     System.err
                             .println("Un-supported module" + moduleObjectModel);
-                    // return false;
                     // FIXME: Throw an exception
                 }
 
@@ -928,9 +921,6 @@ public class PowerlinkRootNode {
                     // Updates generator attributes in project file.
                     OpenConfiguratorProjectUtils
                             .updateGeneratorInfo(module.getNode());
-
-                    // OpenConfiguratorProjectUtils.removeConnectedModulesList(
-                    // module.getNode(), module, finalModuleCheck);
 
                     // Delete the XDC file from the deviceConfiguration
                     // directory.
@@ -1030,15 +1020,12 @@ public class PowerlinkRootNode {
                     TRMN rMN = (TRMN) nodeObjectModel;
                     short nodeId = Short.parseShort(rMN.getNodeID());
                     nodeCollection.remove(nodeId);
-                    // retVal = true;
                 } else if (nodeObjectModel instanceof TCN) {
                     TCN cnNode = (TCN) nodeObjectModel;
                     short nodeId = Short.parseShort(cnNode.getNodeID());
                     nodeCollection.remove(nodeId);
-                    // retVal = true;
                 } else {
                     System.err.println("Un-supported node" + nodeObjectModel);
-                    // return false;
                     // FIXME: Throw an exception
                 }
 
@@ -1057,7 +1044,6 @@ public class PowerlinkRootNode {
                                 "Remove from openCONF model failed. Node ID:"
                                         + node.getNodeId() + " modelType:"
                                         + nodeObjectModel);
-                        // return false;
                         // FIXME: Throw an exception
                     }
                 } else {
@@ -1102,22 +1088,26 @@ public class PowerlinkRootNode {
                             }
                             System.out.println("The path to be deleted.."
                                     + node.getAbsolutePathToXdc(nodeName));
+
                             FileUtils.deleteDirectory(new File(
                                     node.getAbsolutePathToXdc(nodeName)));
-                            Files.delete(Paths
-                                    .get(node.getAbsolutePathToXdc(nodeName)));
+                            Files.delete(
+                                    Paths.get(node.getAbsolutePathToXdc()));
                         }
-                    }
+                    } else {
 
-                    Files.delete(Paths.get(node.getAbsolutePathToXdc()));
+                        Files.delete(Paths.get(node.getAbsolutePathToXdc()));
+                    }
 
                 } catch (JDOMException | IOException ex) {
                     // TODO Auto-generated catch block
+
                     ex.printStackTrace();
                     IStatus errorStatus = new Status(IStatus.ERROR,
                             Activator.PLUGIN_ID, IStatus.OK,
                             "Error ocurred while delete a node", ex);
                     throw new CoreException(errorStatus);
+
                 }
 
                 System.err.println("Remove node.... leaving critical section");
