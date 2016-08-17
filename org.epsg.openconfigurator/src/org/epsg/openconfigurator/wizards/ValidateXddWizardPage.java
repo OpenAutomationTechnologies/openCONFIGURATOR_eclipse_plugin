@@ -95,8 +95,7 @@ public class ValidateXddWizardPage extends WizardPage {
     public static final String REDUNDANT_MANAGING_NODE_LABEL = "Redundant Managing Node";
     public static final String DIALOG_DESCRIPTION = "Add XDD file to the node.";
     private static final String CONFIGURATION_FILE_LABEL = "Configuration File";
-    private static final String NODE_CONFIGURATION_LABEL = "XDD/XDC file:";
-    private static final String DEFAULT_CONFIGURATION_LABEL = "Default";
+    private static final String DEFAULT_CONFIGURATION_LABEL = "Choose a XDD/XDC file";
     private static final String CUSTOM_CONFIGURATION_LABEL = "Custom";
 
     private static final String DIALOG_PAGE_NAME = "ValidateXddwizardPage";
@@ -177,7 +176,6 @@ public class ValidateXddWizardPage extends WizardPage {
             setPageComplete(true);
             if (!isNodeConfigurationValid(nodeConfigurationPath.getText())) {
                 setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
-                getErrorStyledText(ERROR_CHOOSE_VALID_FILE_MESSAGE);
                 setPageComplete(false);
             }
 
@@ -408,30 +406,40 @@ public class ValidateXddWizardPage extends WizardPage {
         grpConfigurationFile.setText(CONFIGURATION_FILE_LABEL);
         grpConfigurationFile.setLayout(new GridLayout(4, false));
 
-        btnDefault = new Button(grpConfigurationFile, SWT.RADIO);
+        btnDefault = new Button(grpConfigurationFile, SWT.CHECK);
         btnDefault.setText(DEFAULT_CONFIGURATION_LABEL);
 
         btnCustom = new Button(grpConfigurationFile, SWT.RADIO);
         btnCustom.setLayoutData(
                 new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
         btnCustom.setText(CUSTOM_CONFIGURATION_LABEL);
-        btnCustom.setSelection(true);
+        btnCustom.setSelection(false);
+        btnCustom.setVisible(false);
         new Label(grpConfigurationFile, SWT.NONE);
 
         if (btnDefault.getSelection()) {
-            nodeConfigurationPath.setEnabled(false);
-            nodeConfigurationPath.setText(defaultCnXDD);
-            btnBrowse.setEnabled(false);
+            btnCustom.setVisible(false);
+            btnCustom.setEnabled(false);
+            btnDefault.setSelection(true);
+            if (!btnDefault.isEnabled()) {
+                btnDefault.setEnabled(true);
+            }
+            nodeConfigurationPath
+                    .removeModifyListener(nodeConfigurationPathModifyListener);
+            nodeConfigurationPath.setEnabled(true);
+            nodeConfigurationPath.setText(customConfiguration);
+            btnBrowse.setEnabled(true);
+            nodeConfigurationPath
+                    .addModifyListener(nodeConfigurationPathModifyListener);
         }
-
-        Label lblXddxdc = new Label(grpConfigurationFile, SWT.NONE);
-        lblXddxdc.setText(NODE_CONFIGURATION_LABEL);
 
         nodeConfigurationPath = new Text(grpConfigurationFile, SWT.BORDER);
         nodeConfigurationPath.setLayoutData(
-                new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
-
+                new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
+        btnDefault.setSelection(true);
         nodeConfigurationPath.setToolTipText(nodeConfigurationPath.getText());
+        nodeConfigurationPath
+                .addModifyListener(nodeConfigurationPathModifyListener);
         nodeConfigurationPath
                 .addModifyListener(nodeConfigurationPathModifyListener);
 
@@ -479,11 +487,12 @@ public class ValidateXddWizardPage extends WizardPage {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                handleDefaultRadioButtonSelectionChanged(e);
+                btnDefault.setSelection(true);
+                btnDefault.setEnabled(true);
+
+                // handleDefaultRadioButtonSelectionChanged(e);
             }
         });
-        nodeConfigurationPath
-                .addModifyListener(nodeConfigurationPathModifyListener);
         TextViewer textViewer = new TextViewer(headerFrame,
                 SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
         errorinfo = textViewer.getTextWidget();
@@ -677,6 +686,7 @@ public class ValidateXddWizardPage extends WizardPage {
     public void resetChildModuleWizard() {
         btnDefault.setVisible(false);
         btnCustom.setVisible(false);
+        btnDefault.setSelection(true);
 
     }
 
@@ -684,16 +694,14 @@ public class ValidateXddWizardPage extends WizardPage {
      * Update validate wizard page buttons for CN node type.
      */
     public void resetCnWizard() {
-        if (!btnCustom.isEnabled()) {
-            btnCustom.setEnabled(true);
+        btnCustom.setVisible(false);
+        btnCustom.setEnabled(false);
+        if (!btnDefault.isEnabled()) {
+            btnDefault.setEnabled(true);
         }
-        btnDefault.setSelection(false);
-        handleDefaultRadioButtonSelectionChanged(null);
-        btnDefault.setEnabled(false);
-        btnCustom.setSelection(true);
-        setErrorMessage(null);
-        getInfoStyledText("");
-        if (btnCustom.getSelection()) {
+        btnDefault.setSelection(true);
+
+        if (btnDefault.getSelection()) {
             nodeConfigurationPath
                     .removeModifyListener(nodeConfigurationPathModifyListener);
             nodeConfigurationPath.setEnabled(true);
