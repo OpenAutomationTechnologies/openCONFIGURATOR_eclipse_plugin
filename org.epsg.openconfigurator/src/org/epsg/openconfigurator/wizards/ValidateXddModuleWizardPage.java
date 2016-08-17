@@ -284,7 +284,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 }
                 if (!validModuleType) {
                     getErrorStyledText(
-                            "The XDD/XDC has module type " + moduleTypes
+                            "The XDD/XDC has module type " + moduleInterfaceType
                                     + " but the interface only supports module type "
                                     + moduleTypeText.getText() + ".");
                     return false;
@@ -295,7 +295,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
 
                 } else {
                     getErrorStyledText(
-                            "The XDD/XDC has module type " + moduleTypes
+                            "The XDD/XDC has module type " + moduleInterfaceType
                                     + " but the interface only supports module type "
                                     + moduleTypeText.getText() + ".");
                     return false;
