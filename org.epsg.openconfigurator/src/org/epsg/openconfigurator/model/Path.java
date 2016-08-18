@@ -31,8 +31,6 @@
 
 package org.epsg.openconfigurator.model;
 
-import org.eclipse.core.resources.IProject;
-
 /**
  * Utility class to wrap the location
  *
@@ -50,7 +48,7 @@ public class Path {
      */
     private String path;
 
-    public Path(IProject project, String path, boolean local) {
+    public Path(String path, boolean local) {
         this.path = path;
         this.local = local;
     }

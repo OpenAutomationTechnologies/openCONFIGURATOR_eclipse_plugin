@@ -513,6 +513,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
                                 .format(ERROR_INVALID_NODE_ID, element));
                     }
                 } catch (NumberFormatException exception) {
+                    exception.printStackTrace();
                     setErrorMessage(MessageFormat.format(ERROR_INVALID_NODE_ID,
                             element));
                 }

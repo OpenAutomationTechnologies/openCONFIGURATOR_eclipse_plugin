@@ -1002,10 +1002,9 @@ public class OpenConfiguratorLibraryUtils {
                 if (object
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
-                    libApiRes = core
-                            .CreateModuleParameterObject(node.getNetworkId(),
-                                    node.getNodeId(), node.getInterface()
-                                            .getInterfaceUId(),
+                    libApiRes = core.CreateModuleParameterObject(
+                            node.getNetworkId(), node.getNodeId(),
+                            node.getInterface().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -1045,10 +1044,9 @@ public class OpenConfiguratorLibraryUtils {
                 } else if (object.getUniqueIDRef() instanceof TParameterGroup) {
                     TParameterGroup parameter = (TParameterGroup) object
                             .getUniqueIDRef();
-                    libApiRes = core
-                            .CreateModuleParameterObject(node.getNetworkId(),
-                                    node.getNodeId(), node.getInterface()
-                                            .getInterfaceUId(),
+                    libApiRes = core.CreateModuleParameterObject(
+                            node.getNetworkId(), node.getNodeId(),
+                            node.getInterface().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -1067,14 +1065,12 @@ public class OpenConfiguratorLibraryUtils {
 
             } else if ((object.getDataType() == null)
                     && (object.getUniqueIDRef() != null)) {
-                PlkDataType datatype = PlkDataType.UNDEFINED;
                 if (object
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
-                    libApiRes = core
-                            .CreateModuleParameterObject(node.getNetworkId(),
-                                    node.getNodeId(), node.getInterface()
-                                            .getInterfaceUId(),
+                    libApiRes = core.CreateModuleParameterObject(
+                            node.getNetworkId(), node.getNodeId(),
+                            node.getInterface().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -1092,10 +1088,9 @@ public class OpenConfiguratorLibraryUtils {
                 } else if (object.getUniqueIDRef() instanceof TParameterGroup) {
                     TParameterGroup parameter = (TParameterGroup) object
                             .getUniqueIDRef();
-                    libApiRes = core
-                            .CreateModuleParameterObject(node.getNetworkId(),
-                                    node.getNodeId(), node.getInterface()
-                                            .getInterfaceUId(),
+                    libApiRes = core.CreateModuleParameterObject(
+                            node.getNetworkId(), node.getNodeId(),
+                            node.getInterface().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -2989,7 +2984,6 @@ public class OpenConfiguratorLibraryUtils {
                     }
                 } else if ((subObject.getUniqueIDRef() != null)
                         && (subObject.getDataType() == null)) {
-                    PlkDataType dataType = PlkDataType.UNDEFINED;
                     if (subObject
                             .getUniqueIDRef() instanceof TParameterList.Parameter) {
                         Parameter parameter = (Parameter) subObject
@@ -3310,12 +3304,11 @@ public class OpenConfiguratorLibraryUtils {
         }
 
         HeadNodeInterface headNodeInterface = node.getInterface();
-        libApiRes = OpenConfiguratorCore.GetInstance()
-                .CreateInterface(node.getNetworkId(), node.getNodeId(),
-                        headNodeInterface.getInterfaceUId(),
-                        headNodeInterface.getInterfaceType(),
-                        getModuleAddressing(
-                                headNodeInterface.getModuleAddressing()),
+        libApiRes = OpenConfiguratorCore.GetInstance().CreateInterface(
+                node.getNetworkId(), node.getNodeId(),
+                headNodeInterface.getInterfaceUId(),
+                headNodeInterface.getInterfaceType(),
+                getModuleAddressing(headNodeInterface.getModuleAddressing()),
                 headNodeInterface.getMaxModules().longValue(),
                 headNodeInterface.isUnUsedSlots(),
                 headNodeInterface.isMultipleModules());
@@ -3930,6 +3923,7 @@ public class OpenConfiguratorLibraryUtils {
                     break;
                 case "next":
                     moduleAddressing = ModuleAddressing.NEXT;
+                    break;
                 default:
                     break;
             }
@@ -4363,8 +4357,7 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     private static Result importProfileBodyCommunicationNetworkPowerlinkModularChild(
-            Module module,
-            ProfileBodyCommunicationNetworkPowerlinkModularChild profileBodyDatatype) {
+            Module module) {
 
         Result libApiRes = addModuleObjectDictionary(module,
                 module.getObjectDictionary());
@@ -4557,8 +4550,7 @@ public class OpenConfiguratorLibraryUtils {
                         (ProfileBodyDevicePowerlinkModularChild) profileBodyDatatype);
             } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularChild) {
                 libApiRes = importProfileBodyCommunicationNetworkPowerlinkModularChild(
-                        module,
-                        (ProfileBodyCommunicationNetworkPowerlinkModularChild) profileBodyDatatype);
+                        module);
             } else {
                 System.err.println(
                         "Unknown profile body datatype:" + profileBodyDatatype);
@@ -4732,8 +4724,7 @@ public class OpenConfiguratorLibraryUtils {
      * @return Result from the library.
      */
     public static Result mappModuleSubObjectToChannel(PdoChannel pdoChannel,
-            PowerlinkSubobject mappingSubObject,
-            PowerlinkSubobject subObjectTobeMapped, long moduleObjectIndex,
+            PowerlinkSubobject mappingSubObject, long moduleObjectIndex,
             int moduleSubObjectIndex) {
 
         System.err.println("mappModuleSubObjectToChannel ->Network ID:"
@@ -5041,7 +5032,7 @@ public class OpenConfiguratorLibraryUtils {
                                     "Object ID 0x"
                                             + DatatypeConverter.printHexBinary(
                                                     forcedObjectId)
-                                    + " is forced and is not available in the XDD/XDC file.",
+                                            + " is forced and is not available in the XDD/XDC file.",
                                     node.getProject().getName());
                     continue;
                 }
@@ -5061,10 +5052,10 @@ public class OpenConfiguratorLibraryUtils {
                                     "Object ID 0x"
                                             + DatatypeConverter.printHexBinary(
                                                     forcedObjectId)
-                                    + "/0x"
-                                    + DatatypeConverter
-                                            .printHexBinary(forcedSubObjectId)
-                                    + " is forced and is not available in the XDD/XDC file.",
+                                            + "/0x"
+                                            + DatatypeConverter.printHexBinary(
+                                                    forcedSubObjectId)
+                                            + " is forced and is not available in the XDD/XDC file.",
                                     node.getNetworkId());
                     continue;
                 }

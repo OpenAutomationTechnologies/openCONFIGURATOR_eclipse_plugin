@@ -93,6 +93,118 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
 
     /**
+     * Create the mnobd.cdc in the specified output folder.
+     *
+     * @param outputFolder Location to save the file.
+     * @param buffer The file contents.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean createMnobdCdc(java.nio.file.Path outputFolder,
+            ByteBuffer buffer) throws CoreException {
+
+        java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_CDC);
+
+        try {
+            Files.write(targetFilePath, buffer.array());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
+        }
+
+        return true;
+    }
+
+    /**
+     * Create the mnobd_char.txt in the specified output folder.
+     *
+     * @param outputFolder Location to save the file.
+     * @param buffer The file contents.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean createMnobdHexTxt(java.nio.file.Path outputFolder,
+            ByteBuffer buffer) throws CoreException {
+
+        StringBuilder sb = new StringBuilder();
+        byte[] txtArray = buffer.array();
+        short lineBreakCount = 0;
+
+        for (int cnt = 0; cnt < txtArray.length; ++cnt) {
+            sb.append("0x"); //$NON-NLS-1$
+            sb.append(String.format("%02X", txtArray[cnt])); //$NON-NLS-1$
+            if (cnt != (txtArray.length - 1)) {
+                sb.append(","); //$NON-NLS-1$
+            }
+            lineBreakCount++;
+
+            if (lineBreakCount == 16) {
+                sb.append(System.lineSeparator());
+                lineBreakCount = 0;
+            } else {
+                sb.append(" "); //$NON-NLS-1$
+            }
+        }
+
+        java.nio.file.Path targetFilePath = outputFolder
+                .resolve(MN_OBD_CHAR_TXT);
+
+        try {
+            Files.write(targetFilePath, sb.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
+        }
+        return true;
+    }
+
+    /**
+     * Create the mnobd.txt in the specified output folder.
+     *
+     * @param outputFolder Location to save the file.
+     * @param configuration The file contents.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean createMnobdTxt(java.nio.file.Path outputFolder,
+            final String configuration) throws CoreException {
+
+        java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_TXT);
+
+        try {
+            Files.write(targetFilePath, configuration.getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
+        }
+
+        return true;
+    }
+
+    private static void displayLibraryErrorMessage(final Result res) {
+        Display.getDefault().syncExec(new Runnable() {
+
+            @Override
+            public void run() {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+            }
+        });
+    }
+
+    /**
      * The list of Industrial network project editors wherein the library has
      * only knowledge about the projects which are open via
      * IndustrialNetworkProjectEditor.
@@ -440,8 +552,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         System.err.format(
                                 "%s: no such" + " file or directory%n",
                                 targetPath);
+                        x.printStackTrace();
                     } catch (DirectoryNotEmptyException x) {
                         System.err.format("%s not empty%n", targetPath);
+                        x.printStackTrace();
                     } catch (IOException x) {
                         System.err.println(x);
                     }
@@ -451,107 +565,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         }
         System.out.println(
                 "Project:" + getProject().getName() + " Clean successful");
-    }
-
-    /**
-     * Create the mnobd.cdc in the specified output folder.
-     *
-     * @param outputFolder Location to save the file.
-     * @param buffer The file contents.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean createMnobdCdc(java.nio.file.Path outputFolder,
-            ByteBuffer buffer) throws CoreException {
-
-        java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_CDC);
-
-        try {
-            Files.write(targetFilePath, buffer.array());
-        } catch (IOException e) {
-            e.printStackTrace();
-            IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
-                            + targetFilePath.toString() + " is not accessible.",
-                    e);
-            throw new CoreException(errorStatus);
-        }
-
-        return true;
-    }
-
-    /**
-     * Create the mnobd_char.txt in the specified output folder.
-     *
-     * @param outputFolder Location to save the file.
-     * @param buffer The file contents.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean createMnobdHexTxt(java.nio.file.Path outputFolder,
-            ByteBuffer buffer) throws CoreException {
-
-        StringBuilder sb = new StringBuilder();
-        byte[] txtArray = buffer.array();
-        short lineBreakCount = 0;
-
-        for (int cnt = 0; cnt < txtArray.length; ++cnt) {
-            sb.append("0x"); //$NON-NLS-1$
-            sb.append(String.format("%02X", txtArray[cnt])); //$NON-NLS-1$
-            if (cnt != (txtArray.length - 1)) {
-                sb.append(","); //$NON-NLS-1$
-            }
-            lineBreakCount++;
-
-            if (lineBreakCount == 16) {
-                sb.append(System.lineSeparator());
-                lineBreakCount = 0;
-            } else {
-                sb.append(" "); //$NON-NLS-1$
-            }
-        }
-
-        java.nio.file.Path targetFilePath = outputFolder
-                .resolve(MN_OBD_CHAR_TXT);
-
-        try {
-            Files.write(targetFilePath, sb.toString().getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-            IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
-                            + targetFilePath.toString() + " is not accessible.",
-                    e);
-            throw new CoreException(errorStatus);
-        }
-        return true;
-    }
-
-    /**
-     * Create the mnobd.txt in the specified output folder.
-     *
-     * @param outputFolder Location to save the file.
-     * @param configuration The file contents.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean createMnobdTxt(java.nio.file.Path outputFolder,
-            final String configuration) throws CoreException {
-
-        java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_TXT);
-
-        try {
-            Files.write(targetFilePath, configuration.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-            IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
-                            + targetFilePath.toString() + " is not accessible.",
-                    e);
-            throw new CoreException(errorStatus);
-        }
-
-        return true;
     }
 
     private void displayErrorMessage(final String message) {
@@ -572,17 +585,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             public void run() {
                 OpenConfiguratorMessageConsole.getInstance()
                         .printInfoMessage(message, getProject().getName());
-            }
-        });
-    }
-
-    private void displayLibraryErrorMessage(final Result res) {
-        Display.getDefault().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-                OpenConfiguratorMessageConsole.getInstance()
-                        .printLibraryErrorMessage(res);
             }
         });
     }

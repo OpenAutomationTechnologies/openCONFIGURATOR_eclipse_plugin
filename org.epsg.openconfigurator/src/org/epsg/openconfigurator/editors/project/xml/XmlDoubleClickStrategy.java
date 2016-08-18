@@ -121,6 +121,7 @@ public class XmlDoubleClickStrategy implements ITextDoubleClickStrategy {
             fText.setSelectedRange(offset, len);
             return true;
         } catch (BadLocationException x) {
+            x.printStackTrace();
         }
 
         return false;
@@ -181,6 +182,7 @@ public class XmlDoubleClickStrategy implements ITextDoubleClickStrategy {
             return true;
 
         } catch (BadLocationException x) {
+            x.printStackTrace();
         }
 
         return false;

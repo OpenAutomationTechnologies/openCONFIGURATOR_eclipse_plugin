@@ -365,6 +365,7 @@ public class RedundantManagingNodePropertySource
                             nodeIDvalue);
                 }
             } catch (NumberFormatException ex) {
+                ex.printStackTrace();
                 return ERROR_INVALID_RMN_NODE_ID;
             }
         }
@@ -410,6 +411,7 @@ public class RedundantManagingNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_RMN_PRIORITY;
             }
         } else {
@@ -494,6 +496,7 @@ public class RedundantManagingNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_WAIT_NOT_ACTIVE;
             }
         } else {

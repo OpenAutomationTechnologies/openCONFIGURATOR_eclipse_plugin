@@ -120,8 +120,10 @@ import org.jdom2.JDOMException;
                         }
                         try {
                             if (node.getNodeIdString() != null) {
-                                subObj.setActualValue(node.getNodeIdString(),
-                                        true);
+                                if (subObj != null) {
+                                    subObj.setActualValue(
+                                            node.getNodeIdString(), true);
+                                }
                             }
                         } catch (JDOMException | IOException e) {
                             OpenConfiguratorMessageConsole.getInstance()

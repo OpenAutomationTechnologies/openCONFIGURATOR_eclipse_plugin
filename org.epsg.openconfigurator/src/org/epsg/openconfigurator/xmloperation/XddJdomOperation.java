@@ -227,17 +227,6 @@ public class XddJdomOperation {
 
     }
 
-    public static void deleteIndex(Document document, Module module) {
-        String Xpath = "//plk:Object[@" + "index" + "]";
-        if (JDomUtil.isXpathPresent(document, Xpath, POWERLINK_XDD_NAMESPACE)) {
-            JDomUtil.removeAttributes(document, Xpath, POWERLINK_XDD_NAMESPACE,
-                    "index");
-        } else {
-            System.err.println("Object index Xpath not found......@#$&*");
-        }
-
-    }
-
     /**
      * Removes the actual value of sub-objects from the XDD/XDC file.
      *
@@ -462,19 +451,7 @@ public class XddJdomOperation {
         return "UNDEFINED";
     }
 
-    private static String getLabel(List<Object> labelOrDescriptionOrLabelRef) {
-        for (Object label : labelOrDescriptionOrLabelRef) {
-            if (label instanceof String) {
-                String lab = (String) label;
-                System.err.println("The label of parameter..." + lab);
-                return lab;
-            }
-        }
-        return StringUtils.EMPTY;
-    }
-
-    private static void removeNodeApplicationProcess(Document document,
-            Module module) {
+    private static void removeNodeApplicationProcess(Document document) {
         String paramDataTypeXpath = APPLICATION_PROCESS_XPATH + "/plk:"
                 + DATATYPE_LIST + "/plk:struct";
         String paramGrpXpath = PARAMETER_GROUP_LIST_XPATH
@@ -540,8 +517,7 @@ public class XddJdomOperation {
                 POWERLINK_XDD_NAMESPACE, newAttribute);
     }
 
-    private static void updateApplicationProcess(Document document,
-            Module module) {
+    private static void updateApplicationProcess(Document document) {
 
         // String xpath = "//plk:ProfileBody[@fileCreator='kalycito']";
         String xpath = "//plk:ProfileBody[@*[local-name()='type']='ProfileBody_Device_Powerlink_Modular_Head']";
@@ -799,8 +775,7 @@ public class XddJdomOperation {
                                             System.err.println(
                                                     "The Xpath Already available.....");
                                         } else {
-                                            updateApplicationProcess(document,
-                                                    module);
+                                            updateApplicationProcess(document);
                                             System.err.println(
                                                     "The Xpath Already  not available.....");
 
@@ -1038,8 +1013,7 @@ public class XddJdomOperation {
                                             System.err.println(
                                                     "The Xpath Already available.....");
                                         } else {
-                                            updateApplicationProcess(document,
-                                                    module);
+                                            updateApplicationProcess(document);
                                             System.err.println(
                                                     "The Xpath Already  not available.....");
 
@@ -1220,9 +1194,7 @@ public class XddJdomOperation {
         if (uniqueIdRef instanceof TParameterList.Parameter) {
             TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIdRef;
 
-            updateParameterListToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), parameter, module);
+            updateParameterListToHeadXDC(document, parameter, module);
 
         } else if (uniqueIdRef instanceof TParameterGroup) {
             TParameterGroup parameterGrp = (TParameterGroup) uniqueIdRef;
@@ -1245,22 +1217,19 @@ public class XddJdomOperation {
                     if (parameterGroupReference instanceof TParameterGroup) {
                         TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
                         updateParameterGroupsInXDC(document, module, plkSubObj,
-                                paramGrp, childPrmXpath, PARAMETER_GROUP,
-                                newUniqueId);
+                                paramGrp, childPrmXpath, PARAMETER_GROUP);
                     } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
                         TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                         updateParameterReferenceInXDC(document, module,
                                 plkSubObj, parameterReferenceModel,
                                 childPrmXpath);
-                        String oldParamRefUniqueId = plkSubObj.getUniqueId(
-                                parameterReferenceModel.getUniqueIDRef());
 
                     }
                 }
             }
 
         }
-        removeNodeApplicationProcess(document, module);
+        removeNodeApplicationProcess(document);
     }
 
     /**
@@ -1277,9 +1246,7 @@ public class XddJdomOperation {
         if (uniqueIdRef instanceof TParameterList.Parameter) {
             TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIdRef;
 
-            updateParameterListToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), parameter, module);
+            updateParameterListToHeadXDC(document, parameter, module);
 
         } else if (uniqueIdRef instanceof TParameterGroup) {
             TParameterGroup parameterGrp = (TParameterGroup) uniqueIdRef;
@@ -1309,8 +1276,6 @@ public class XddJdomOperation {
                         TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                         updateParameterReferenceInXDC(document, module, plkObj,
                                 parameterReferenceModel, childPrmXpath);
-                        String oldParamRefUniqueId = plkObj.getUniqueId(
-                                parameterReferenceModel.getUniqueIDRef());
 
                     }
                 }
@@ -1336,7 +1301,6 @@ public class XddJdomOperation {
                                 .getModuleObjectsIndex(plkObj.getModule(),
                                         plkObj.getId());
 
-                        String Xpath = "//plk:ObjectList";
                         String objectXpath = "//plk:Object[@index='"
                                 + Long.toHexString(moduleObjectIndex) + "']";
                         int entriesDefaultValue = 0;
@@ -1498,9 +1462,7 @@ public class XddJdomOperation {
                 .getConditionalUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterGrp
                     .getConditionalUniqueIDRef();
-            updateParameterListsToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), param, module);
+            updateParameterListsToHeadXDC(document, param, module);
             System.err.println("The Parameter updated in the head node...");
         }
     }
@@ -1561,9 +1523,7 @@ public class XddJdomOperation {
                 .getConditionalUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterGrp
                     .getConditionalUniqueIDRef();
-            updateParameterListsToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), param, module);
+            updateParameterListsToHeadXDC(document, param, module);
             System.err.println("The Parameter updated in the head node...");
         }
     }
@@ -1628,9 +1588,7 @@ public class XddJdomOperation {
                 .getConditionalUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterGrp
                     .getConditionalUniqueIDRef();
-            updateParameterListsToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), param, module);
+            updateParameterListsToHeadXDC(document, param, module);
         }
 
         List<Object> parameterGroupReferenceList = parameterGrp
@@ -1649,8 +1607,6 @@ public class XddJdomOperation {
                     TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                     updateParameterReferenceInXDC(document, module, plkObj,
                             parameterReferenceModel, paramGrpXpath);
-                    String oldParamRefUniqueId = plkObj.getUniqueId(
-                            parameterReferenceModel.getUniqueIDRef());
 
                 }
             }
@@ -1660,8 +1616,7 @@ public class XddJdomOperation {
 
     private static void updateParameterGroupsInXDC(Document document,
             Module module, PowerlinkSubobject plkSubObj,
-            TParameterGroup parameterGrp, String xpath, String parentChild,
-            String newUniqueID) {
+            TParameterGroup parameterGrp, String xpath, String parentChild) {
         String olduniqueId = parameterGrp.getUniqueID();
         String uniqueId = OpenConfiguratorLibraryUtils
                 .getModuleParameterUniqueID(module, olduniqueId);
@@ -1719,9 +1674,7 @@ public class XddJdomOperation {
                 .getConditionalUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterGrp
                     .getConditionalUniqueIDRef();
-            updateParameterListsToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), param, module);
+            updateParameterListsToHeadXDC(document, param, module);
         }
 
         List<Object> parameterGroupReferenceList = parameterGrp
@@ -1734,15 +1687,12 @@ public class XddJdomOperation {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
                     updateParameterGroupsInXDC(document, module, plkSubObj,
-                            paramGrp, paramGrpXpath, PARAMETER_GROUP, uniqueId);
+                            paramGrp, paramGrpXpath, PARAMETER_GROUP);
 
                 } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
                     TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                     updateParameterReferenceInXDC(document, module, plkSubObj,
                             parameterReferenceModel, paramGrpXpath);
-                    String oldParamRefUniqueId = plkSubObj.getUniqueId(
-                            parameterReferenceModel.getUniqueIDRef());
-
                 }
             }
         }
@@ -1750,8 +1700,7 @@ public class XddJdomOperation {
     }
 
     private static void updateParameterListsToHeadXDC(Document document,
-            String networkId, short nodeId, TParameterList.Parameter parameter,
-            Module module) {
+            TParameterList.Parameter parameter, Module module) {
 
         String oldparamUniqueId = parameter.getUniqueID();
         String paramUniqueId = OpenConfiguratorLibraryUtils
@@ -2013,14 +1962,14 @@ public class XddJdomOperation {
                 if (JDomUtil.isXpathPresent(document, TEMPLATE_LIST_XPATH,
                         POWERLINK_XDD_NAMESPACE)) {
                     updatePrameterTemplateListInHeadNode(document,
-                            parameteratemplateModel, module);
+                            parameteratemplateModel);
                 } else {
                     Element newTempElement = new Element(TEMPLATE_LIST);
                     JDomUtil.addNewElements(document, APPLICATION_PROCESS_XPATH,
                             POWERLINK_XDD_NAMESPACE, newTempElement);
 
                     updatePrameterTemplateListInHeadNode(document,
-                            parameteratemplateModel, module);
+                            parameteratemplateModel);
                 }
             }
 
@@ -2028,8 +1977,7 @@ public class XddJdomOperation {
     }
 
     private static void updateParameterListToHeadXDC(Document document,
-            String networkId, short nodeId, TParameterList.Parameter parameter,
-            Module module) {
+            TParameterList.Parameter parameter, Module module) {
 
         String oldparamUniqueId = parameter.getUniqueID();
         String paramUniqueId = OpenConfiguratorLibraryUtils
@@ -2080,8 +2028,7 @@ public class XddJdomOperation {
                                     .getDataTypeIDRef().getUniqueIDRef())));
                     JDomUtil.addNewElement(document, parameterTemplateXpath,
                             POWERLINK_XDD_NAMESPACE, dataTypeIdRefElement);
-                    updateStructDataType(document, networkId, nodeId, parameter,
-                            module,
+                    updateStructDataType(document,
                             parameterModel.getDataTypeIDRef().getUniqueIDRef());
                 } else {
 
@@ -2304,14 +2251,14 @@ public class XddJdomOperation {
                 if (JDomUtil.isXpathPresent(document, TEMPLATE_LIST_XPATH,
                         POWERLINK_XDD_NAMESPACE)) {
                     updatePrameterTemplateListInHeadNode(document,
-                            parameteratemplateModel, module);
+                            parameteratemplateModel);
                 } else {
                     Element newTempElement = new Element(TEMPLATE_LIST);
                     JDomUtil.addNewElement(document, APPLICATION_PROCESS_XPATH,
                             POWERLINK_XDD_NAMESPACE, newTempElement);
 
                     updatePrameterTemplateListInHeadNode(document,
-                            parameteratemplateModel, module);
+                            parameteratemplateModel);
                 }
             }
 
@@ -2379,9 +2326,7 @@ public class XddJdomOperation {
                 .getUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterReferenceModel
                     .getUniqueIDRef();
-            updateParameterListToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), param, module);
+            updateParameterListToHeadXDC(document, param, module);
 
         }
 
@@ -2423,34 +2368,14 @@ public class XddJdomOperation {
                 .getUniqueIDRef() instanceof TParameterList.Parameter) {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterReferenceModel
                     .getUniqueIDRef();
-            updateParameterListsToHeadXDC(document,
-                    module.getNode().getNetworkId(),
-                    module.getNode().getNodeId(), param, module);
+            updateParameterListsToHeadXDC(document, param, module);
 
         }
-
-    }
-
-    private static void updateParameterRefUniqueIdRef(Document document,
-            Module module, PowerlinkSubobject plkSubObj, String childPrmXpath,
-            Object uniqueIdRef) {
-        String uniqueId = StringUtils.EMPTY;
-        if (uniqueIdRef instanceof TParameterList.Parameter) {
-            TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIdRef;
-            String parameterUniqueId = parameter.getUniqueID();
-            uniqueId = OpenConfiguratorLibraryUtils
-                    .getModuleParameterUniqueID(module, parameterUniqueId);
-
-        }
-
-        Attribute uniqueIDAttribute = new Attribute("uniqueIDRef", uniqueId);
-        JDomUtil.updateAttribute(document, childPrmXpath,
-                POWERLINK_XDD_NAMESPACE, uniqueIDAttribute);
 
     }
 
     private static void updatePrameterTemplateListInHeadNode(Document document,
-            TParameterTemplate parameteratemplateModel, Module module) {
+            TParameterTemplate parameteratemplateModel) {
 
         String parameterTemplateUniqueID = parameteratemplateModel
                 .getUniqueID();
@@ -2563,10 +2488,7 @@ public class XddJdomOperation {
 
     }
 
-    private static void updateStructDataType(Document document,
-            String networkId, short nodeId,
-            org.epsg.openconfigurator.xmlbinding.xdd.TParameterList.Parameter parameter,
-            Module module, Object object) {
+    private static void updateStructDataType(Document document, Object object) {
         String dataTypeListXpath = APPLICATION_PROCESS_XPATH + "/plk:"
                 + DATATYPE_LIST;
 

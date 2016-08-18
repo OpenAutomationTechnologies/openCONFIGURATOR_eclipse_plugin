@@ -735,6 +735,9 @@ public class PowerlinkRootNode {
             return new Status(IStatus.ERROR,
                     org.epsg.openconfigurator.Activator.PLUGIN_ID, errorMessage,
                     e1);
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         monitor.done();
         return new Status(IStatus.OK,
@@ -889,7 +892,6 @@ public class PowerlinkRootNode {
                 // Remove from the viewer node collection.
                 Object moduleObjectModel = module.getModuleModel();
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
-                    InterfaceList.Interface.Module moduleModel = (InterfaceList.Interface.Module) moduleObjectModel;
                     int position = module.getPosition();
                     module.getInterfaceOfModule().getModuleNameCollection()
                             .remove(module.getModuleName());
@@ -1025,7 +1027,6 @@ public class PowerlinkRootNode {
                     nodeCollection.remove(nodeId);
                 } else {
                     System.err.println("Un-supported node" + nodeObjectModel);
-                    // FIXME: Throw an exception
                 }
 
                 // Remove from the openconfigurator model.
@@ -1043,7 +1044,6 @@ public class PowerlinkRootNode {
                                 "Remove from openCONF model failed. Node ID:"
                                         + node.getNodeId() + " modelType:"
                                         + nodeObjectModel);
-                        // FIXME: Throw an exception
                     }
                 } else {
                     System.err.println("Node model has been changed");

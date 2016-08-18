@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 
 import javax.xml.XMLConstants;
 import javax.xml.bind.JAXBContext;
@@ -102,8 +101,8 @@ public final class XddMarshaller {
     }
 
     private static ISO15745ProfileContainer unmarshallXDD(
-            final InputSource inputSource) throws JAXBException, SAXException,
-                    ParserConfigurationException {
+            final InputSource inputSource)
+            throws JAXBException, SAXException, ParserConfigurationException {
         final JAXBContext jc = JAXBContext
                 .newInstance(ISO15745ProfileContainer.class);
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -151,19 +150,35 @@ public final class XddMarshaller {
      * @throws JAXBException
      * @throws SAXException
      * @throws ParserConfigurationException
-     * @throws FileNotFoundException
-     * @throws UnsupportedEncodingException
+     * @throws IOException
      */
     public static ISO15745ProfileContainer unmarshallXDDFile(final File file)
             throws JAXBException, SAXException, ParserConfigurationException,
-            FileNotFoundException, UnsupportedEncodingException {
+            IOException {
 
-        BOMInputStream bomIn = new BOMInputStream(new FileInputStream(file),
-                false);
-        Reader reader = new InputStreamReader(bomIn);
-        final InputSource input = new InputSource(reader);
-        input.setSystemId(file.toURI().toString());
+        BOMInputStream bomIn = null;
+        Reader reader = null;
+        InputSource input = null;
+
+        try {
+            bomIn = new BOMInputStream(new FileInputStream(file), false);
+            reader = new InputStreamReader(bomIn);
+            input = new InputSource(reader);
+            input.setSystemId(file.toURI().toString());
+            return unmarshallXDD(input);
+        } catch (Exception e) {
+            if (bomIn != null) {
+                bomIn.close();
+            }
+            e.printStackTrace();
+        } finally {
+            if (bomIn != null) {
+                bomIn.close();
+            }
+        }
+
         return unmarshallXDD(input);
+
     }
 
     /**

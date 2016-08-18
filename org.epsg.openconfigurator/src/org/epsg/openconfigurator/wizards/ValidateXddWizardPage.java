@@ -59,7 +59,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PlatformUI;
@@ -373,6 +372,9 @@ public class ValidateXddWizardPage extends WizardPage {
             }
             e.printStackTrace();
             return false;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return true;
     }
@@ -417,7 +419,6 @@ public class ValidateXddWizardPage extends WizardPage {
         btnCustom.setText(CUSTOM_CONFIGURATION_LABEL);
         btnCustom.setSelection(false);
         btnCustom.setVisible(false);
-        new Label(grpConfigurationFile, SWT.NONE);
 
         if (btnDefault.getSelection()) {
             btnCustom.setVisible(false);

@@ -166,6 +166,9 @@ public class NewModuleWizard extends Wizard {
             }
             e2.printStackTrace();
             return false;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         if (moduleObject instanceof InterfaceList.Interface.Module) {

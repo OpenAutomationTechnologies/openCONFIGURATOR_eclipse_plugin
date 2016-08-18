@@ -106,15 +106,12 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                 }
 
                 TAutoGenerationSettings ag = (TAutoGenerationSettings) element;
-                if (ag.getId()
-                        .equalsIgnoreCase(
-                                OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-                        || ag.getId()
-                                .equalsIgnoreCase(
-                                        OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
+                if (ag.getId().equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
                         || ag.getId().equalsIgnoreCase(
-                                projectConfiguration
-                                        .getActiveAutoGenerationSetting())) {
+                                OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
+                        || ag.getId().equalsIgnoreCase(projectConfiguration
+                                .getActiveAutoGenerationSetting())) {
                     return false;
                 }
             }
@@ -190,8 +187,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
      *
      * @author Ramakrishnan P
      */
-    class AutoGenerationSettingsContentProvider implements
-            IStructuredContentProvider {
+    class AutoGenerationSettingsContentProvider
+            implements IStructuredContentProvider {
         /**
          * Disposes any created resources
          */
@@ -212,7 +209,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
          * Called when the input changes
          */
         @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        public void inputChanged(Viewer viewer, Object oldInput,
+                Object newInput) {
             // Ignore
         }
     }
@@ -269,7 +267,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
      *            instance.
      */
     public ModifyAutoGenerationSettingsDialog(Shell parentShell,
-            final String networkID, TProjectConfiguration projectConfiguration) {
+            final String networkID,
+            TProjectConfiguration projectConfiguration) {
         super(parentShell);
         this.networkID = networkID;
         this.projectConfiguration = projectConfiguration;
@@ -301,11 +300,11 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         container.setLayout(new GridLayout(2, false));
 
         // Add the TableViewer
-        tableViewer = new TableViewer(container, SWT.SINGLE | SWT.H_SCROLL
-                | SWT.V_SCROLL | SWT.BORDER);
+        tableViewer = new TableViewer(container,
+                SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER);
 
-        tableViewer
-        .setContentProvider(new AutoGenerationSettingsContentProvider());
+        tableViewer.setContentProvider(
+                new AutoGenerationSettingsContentProvider());
         tableViewer.setInput(projectConfiguration.getAutoGenerationSettings());
 
         table = tableViewer.getTable();
@@ -327,41 +326,38 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         });
 
         tableViewer
-        .addSelectionChangedListener(new ISelectionChangedListener() {
+                .addSelectionChangedListener(new ISelectionChangedListener() {
 
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                ISelection s = event.getSelection();
+                    @Override
+                    public void selectionChanged(SelectionChangedEvent event) {
+                        ISelection s = event.getSelection();
 
-                if ((s instanceof IStructuredSelection)
-                        && (((IStructuredSelection) s).size() == 1)) {
-                    Object object = ((IStructuredSelection) s)
-                            .getFirstElement();
+                        if ((s instanceof IStructuredSelection)
+                                && (((IStructuredSelection) s).size() == 1)) {
+                            Object object = ((IStructuredSelection) s)
+                                    .getFirstElement();
 
-                    TAutoGenerationSettings ag = (TAutoGenerationSettings) object;
+                            TAutoGenerationSettings ag = (TAutoGenerationSettings) object;
 
-                    // If the current selection ID = defaultOutputPath
-                    // then disable edit/delete button
-                    if (ag.getId()
-                            .equalsIgnoreCase(
+                            // If the current selection ID = defaultOutputPath
+                            // then disable edit/delete button
+                            if (ag.getId().equalsIgnoreCase(
                                     OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
-                                    || ag.getId()
-                                    .equalsIgnoreCase(
+                                    || ag.getId().equalsIgnoreCase(
                                             OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_NONE_ID)
-                                            || ag.getId()
-                                            .equalsIgnoreCase(
-                                                    projectConfiguration
+                                    || ag.getId().equalsIgnoreCase(
+                                            projectConfiguration
                                                     .getActiveAutoGenerationSetting())) {
                                 deleteSettingsButton.setEnabled(false);
-                    } else {
-                        deleteSettingsButton.setEnabled(true);
+                            } else {
+                                deleteSettingsButton.setEnabled(true);
+                            }
+                        } else {
+                            System.err.println(
+                                    "Selection should be an event of structured selection.");
+                        }
                     }
-                } else {
-                    System.err
-                    .println("Selection should be an event of structured selection.");
-                }
-            }
-        });
+                });
 
         for (int i = 0, n = table.getColumnCount(); i < n; i++) {
             table.getColumn(i).pack();
@@ -372,7 +368,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         // Add a button to create the new person
         Button btnNewAutoGeneration = new Button(container, SWT.PUSH);
         btnNewAutoGeneration
-        .setText(ModifyAutoGenerationSettingsDialog.ADD_BUTTON_LABEL);
+                .setText(ModifyAutoGenerationSettingsDialog.ADD_BUTTON_LABEL);
         gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
         btnNewAutoGeneration.setLayoutData(gd);
 
@@ -388,9 +384,9 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                     // Report to the user about the error from the library
                     final String errorMessage = OpenConfiguratorLibraryUtils
                             .getErrorMessage(libApiRes);
-                    System.err.println("AddConfiguration '"
-                            + newAutoGenerationSettingsID + "' fails. "
-                            + errorMessage);
+                    System.err.println(
+                            "AddConfiguration '" + newAutoGenerationSettingsID
+                                    + "' fails. " + errorMessage);
                     PluginErrorDialogUtils
                             .showMessageWindow(MessageDialog.ERROR, libApiRes);
                     return;
@@ -406,8 +402,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         });
 
         deleteSettingsButton = new Button(container, SWT.PUSH);
-        deleteSettingsButton
-        .setText(ModifyAutoGenerationSettingsDialog.DELETE_BUTTON_LABEL);
+        deleteSettingsButton.setText(
+                ModifyAutoGenerationSettingsDialog.DELETE_BUTTON_LABEL);
         gd = new GridData(SWT.FILL, SWT.TOP, false, false, 1, 1);
         deleteSettingsButton.setLayoutData(gd);
         deleteSettingsButton.addSelectionListener(new SelectionAdapter() {
@@ -424,10 +420,10 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         TextCellEditor idCellEditor = createIDColumnCellEditor(table);
 
         // Set the editors, cell modifier, and column properties
-        tableViewer
-        .setColumnProperties(new String[] { ModifyAutoGenerationSettingsDialog.NAME });
-        tableViewer.setCellModifier(new AutoGenerationSettingsCellModifier(
-                tableViewer));
+        tableViewer.setColumnProperties(
+                new String[] { ModifyAutoGenerationSettingsDialog.NAME });
+        tableViewer.setCellModifier(
+                new AutoGenerationSettingsCellModifier(tableViewer));
         tableViewer.setCellEditors(new CellEditor[] { idCellEditor });
         tableViewer.refresh();
 
@@ -471,9 +467,9 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
             public String isValid(Object value) {
                 final String groupId = (String) value;
                 if (isAutoGenerationIdAlreadyPresent(groupId)) {
-                    return MessageFormat
-                            .format(ModifyAutoGenerationSettingsDialog.GROUP_NAME_ALREADY_PRESENT_ERROR,
-                                    groupId);
+                    return MessageFormat.format(
+                            ModifyAutoGenerationSettingsDialog.GROUP_NAME_ALREADY_PRESENT_ERROR,
+                            groupId);
                 }
 
                 if (groupId.isEmpty()) {
@@ -566,19 +562,17 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
             TAutoGenerationSettings settingTobeRemoved = agList.get(index);
             settingToBeRemoved = settingTobeRemoved.getId();
         } catch (IndexOutOfBoundsException e) {
-
-            System.err
-                    .println(MessageFormat
-                    .format(ModifyAutoGenerationSettingsDialog.REMOVE_GROUP_NAME_FAILED,
-                            index));
+            e.printStackTrace();
+            System.err.println(MessageFormat.format(
+                    ModifyAutoGenerationSettingsDialog.REMOVE_GROUP_NAME_FAILED,
+                    index));
             return false;
         }
 
         if ((settingToBeRemoved == null) || (settingToBeRemoved.isEmpty())) {
-            System.err
-                    .println(MessageFormat
-                            .format(ModifyAutoGenerationSettingsDialog.REMOVE_GROUP_NAME_FAILED,
-                                    index));
+            System.err.println(MessageFormat.format(
+                    ModifyAutoGenerationSettingsDialog.REMOVE_GROUP_NAME_FAILED,
+                    index));
             return false;
         }
 
@@ -596,8 +590,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         }
 
         agList.remove(index); // No need to return the removed element.
-        if (settingToBeRemoved.equalsIgnoreCase(projectConfiguration
-                .getActiveAutoGenerationSetting())) {
+        if (settingToBeRemoved.equalsIgnoreCase(
+                projectConfiguration.getActiveAutoGenerationSetting())) {
             // The item about to be removed is same as the active auto
             // generation setting.
             // Update the active auto-generation setting to 0, then remove it.
@@ -608,8 +602,8 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
                 final String errorMessage = OpenConfiguratorLibraryUtils
                         .getErrorMessage(libApiRes);
 
-                System.err.println("SetActiveConfiguration failed. "
-                        + errorMessage);
+                System.err.println(
+                        "SetActiveConfiguration failed. " + errorMessage);
 
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         libApiRes);

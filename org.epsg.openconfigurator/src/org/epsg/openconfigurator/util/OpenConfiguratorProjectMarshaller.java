@@ -113,7 +113,7 @@ public final class OpenConfiguratorProjectMarshaller {
         marshaller.marshal(base, writer);
         if (OpenConfiguratorProjectMarshaller.projectSchema != null) {
             marshaller
-            .setSchema(OpenConfiguratorProjectMarshaller.projectSchema);
+                    .setSchema(OpenConfiguratorProjectMarshaller.projectSchema);
         }
 
         return writer.toString();
@@ -139,7 +139,7 @@ public final class OpenConfiguratorProjectMarshaller {
         marshaller.marshal(base, file);
         if (OpenConfiguratorProjectMarshaller.projectSchema != null) {
             marshaller
-            .setSchema(OpenConfiguratorProjectMarshaller.projectSchema);
+                    .setSchema(OpenConfiguratorProjectMarshaller.projectSchema);
         }
     }
 
@@ -156,9 +156,9 @@ public final class OpenConfiguratorProjectMarshaller {
      * @throws MalformedURLException
      */
     public static OpenCONFIGURATORProject unmarshallOpenConfiguratorProject(
-            final File file) throws JAXBException, SAXException,
-            ParserConfigurationException, FileNotFoundException,
-            MalformedURLException {
+            final File file)
+            throws JAXBException, SAXException, ParserConfigurationException,
+            FileNotFoundException, MalformedURLException {
         final JAXBContext jc = JAXBContext
                 .newInstance(OpenCONFIGURATORProject.class);
         final SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -182,9 +182,8 @@ public final class OpenConfiguratorProjectMarshaller {
     }
 
     public static OpenCONFIGURATORProject unmarshallOpenConfiguratorProject(
-            final InputStream file) throws JAXBException, SAXException,
-            ParserConfigurationException, FileNotFoundException,
-            MalformedURLException {
+            final InputStream file)
+            throws JAXBException, SAXException, ParserConfigurationException {
         final JAXBContext jc = JAXBContext
                 .newInstance(OpenCONFIGURATORProject.class);
         final SAXParserFactory spf = SAXParserFactory.newInstance();

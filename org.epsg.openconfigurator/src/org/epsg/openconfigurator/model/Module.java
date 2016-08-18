@@ -1505,7 +1505,6 @@ public class Module {
     private void validatePreviousPosition(Integer oldPosition)
             throws JDOMException, IOException {
         int veryOldPosition = 0;
-        int veryNextPosition = 0;
         Set<Integer> positionSet = getInterfaceOfModule().getModuleCollection()
                 .keySet();
         List<Integer> positionToBeChecked = new ArrayList<>();
@@ -1528,25 +1527,22 @@ public class Module {
                     .get(veryOldPosition);
             String previousModuleType = previousModule.getModuleType();
 
-            if (positionToBeChecked != null) {
-                for (Integer nextPosition : positionToBeChecked) {
-                    Module nextModule = getInterfaceOfModule()
-                            .getModuleCollection().get(nextPosition);
-                    String nextModuleType = nextModule.getModuleInterface()
-                            .getType();
-                    System.err.println(
-                            "Previous mOdule type..." + previousModuleType);
-                    System.err.println(
-                            "Next module type ......" + nextModuleType);
-                    if (nextModule.isEnabled()) {
-                        if ((previousModuleType.equals(nextModuleType))) {
-                            System.err.println("Equals......");
-                            return;
-                        } else {
-                            System.err.println("Equals245......");
-                            System.err.println("Not Equals......");
-                            nextModule.setEnabled(false);
-                        }
+            for (Integer nextPosition : positionToBeChecked) {
+                Module nextModule = getInterfaceOfModule().getModuleCollection()
+                        .get(nextPosition);
+                String nextModuleType = nextModule.getModuleInterface()
+                        .getType();
+                System.err.println(
+                        "Previous mOdule type..." + previousModuleType);
+                System.err.println("Next module type ......" + nextModuleType);
+                if (nextModule.isEnabled()) {
+                    if ((previousModuleType.equals(nextModuleType))) {
+                        System.err.println("Equals......");
+                        return;
+                    } else {
+                        System.err.println("Equals245......");
+                        System.err.println("Not Equals......");
+                        nextModule.setEnabled(false);
                     }
                 }
             }

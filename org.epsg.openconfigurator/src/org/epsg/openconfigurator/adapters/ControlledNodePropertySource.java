@@ -684,6 +684,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     return "Node with id " + nodeIDvalue + " already exists.";
                 }
             } catch (NumberFormatException ex) {
+                ex.printStackTrace();
                 return INVALID_CN_NODE_ID;
             }
         }

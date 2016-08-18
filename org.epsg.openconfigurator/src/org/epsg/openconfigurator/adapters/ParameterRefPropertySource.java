@@ -279,6 +279,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     break;
                 default:
                     System.err.println("Not supported!");
+                    break;
             }
         }
         return retObj;
@@ -354,6 +355,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
             }
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             return "Invalid actual value.";
         }
 
@@ -421,6 +423,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
                 default:
                     System.err.println(id + " not supported!");
+                    break;
             }
         }
         System.err.println("Reset property value....");

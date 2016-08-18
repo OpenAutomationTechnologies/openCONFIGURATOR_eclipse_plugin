@@ -193,6 +193,9 @@ public class NewNodeWizard extends Wizard {
             }
             e2.printStackTrace();
             return false;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
 
         if (nodeObject instanceof TCN) {

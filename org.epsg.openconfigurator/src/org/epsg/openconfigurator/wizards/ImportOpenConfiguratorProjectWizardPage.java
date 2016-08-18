@@ -326,6 +326,40 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private static final String NO_PROJECTS_FOUND_MESSAGE = "No projects are found to import.";
 
     /**
+     * Check if the project folder is already in workspace or not.
+     *
+     * @param projectName Project name
+     * @return True if present, false otherwise.
+     */
+    private static boolean isProjectFolderInWorkspacePath(
+            final String projectName) {
+        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
+        IPath wsPath = workspace.getRoot().getLocation();
+        IPath localProjectPath = wsPath.append(projectName);
+        return localProjectPath.toFile().exists();
+    }
+
+    /**
+     * Check if the project is already in workspace or not.
+     *
+     * @param projectName Project name
+     * @return True if present, false otherwise.
+     */
+    private static boolean isProjectInWorkspace(final String projectName) {
+        if (projectName == null) {
+            return false;
+        }
+        IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot()
+                .getProjects();
+        for (IProject workspaceProject : workspaceProjects) {
+            if (projectName.equals(workspaceProject.getName())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Overwrite query to get the input from the user whether to overwrite or
      * not.
      */
@@ -378,7 +412,6 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         }
 
     };
-
     /**
      * Check state listener to handle the check events of the project list
      * viewer.
@@ -407,6 +440,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * Flag to allow/dis-allow copy the files into workspace.
      */
     private boolean copyFiles = true;
+
     private boolean lastCopyFiles = false;
 
     /**
@@ -434,7 +468,6 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * Directory text box.
      */
     private Text directoryPathField;
-
     /**
      * Checkbox based tree viewer to list all the available projects.
      */
@@ -444,6 +477,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * Search nested projects.
      */
     private boolean nestedProjects = false;
+
     private boolean lastNestedProjects = false;
 
     /**
@@ -834,6 +868,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         try {
             getContainer().run(true, true, op);
         } catch (InterruptedException e) {
+            e.printStackTrace();
             return false;
         } catch (InvocationTargetException e) {
             // one of the steps resulted in a core exception
@@ -1042,39 +1077,6 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     }
 
     /**
-     * Check if the project folder is already in workspace or not.
-     *
-     * @param projectName Project name
-     * @return True if present, false otherwise.
-     */
-    private boolean isProjectFolderInWorkspacePath(final String projectName) {
-        final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-        IPath wsPath = workspace.getRoot().getLocation();
-        IPath localProjectPath = wsPath.append(projectName);
-        return localProjectPath.toFile().exists();
-    }
-
-    /**
-     * Check if the project is already in workspace or not.
-     *
-     * @param projectName Project name
-     * @return True if present, false otherwise.
-     */
-    private boolean isProjectInWorkspace(final String projectName) {
-        if (projectName == null) {
-            return false;
-        }
-        IProject[] workspaceProjects = ResourcesPlugin.getWorkspace().getRoot()
-                .getProjects();
-        for (IProject workspaceProject : workspaceProjects) {
-            if (projectName.equals(workspaceProject.getName())) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Prompts the path from the user to search for the projects.
      */
     private void promptSearchProjectLocation() {
@@ -1206,6 +1208,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
+            e.printStackTrace();
             // Nothing to do if the user interrupts.
         }
 

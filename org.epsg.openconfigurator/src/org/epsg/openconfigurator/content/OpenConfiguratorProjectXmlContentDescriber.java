@@ -55,8 +55,37 @@ import org.xml.sax.SAXException;
  * @see org.eclipse.core.runtime.content.IContentDescriber
  * @see org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject
  */
-public class OpenConfiguratorProjectXmlContentDescriber extends
-        XMLContentDescriber {
+public class OpenConfiguratorProjectXmlContentDescriber
+        extends XMLContentDescriber {
+
+    /**
+     *
+     * @param contents The contents of the openCONIGURATOR project XML file.
+     *
+     * @return Code. IContentDescriber.VALID if the file is valid XML schema
+     *         otherwise IContentDescriber.INVALID
+     *
+     * @throws IOException
+     */
+    private static int validateSchema(final InputSource contents)
+            throws IOException {
+
+        if ((contents == null) || (contents.getByteStream() == null)) {
+            return IContentDescriber.INVALID;
+        }
+
+        try {
+            OpenConfiguratorProjectMarshaller.unmarshallOpenConfiguratorProject(
+                    contents.getByteStream());
+        } catch (JAXBException | SAXException
+                | ParserConfigurationException e) {
+            // TODO: print in the Console of the Target eclipse application.
+            e.printStackTrace();
+            return IContentDescriber.INVALID;
+        }
+
+        return IContentDescriber.VALID;
+    }
 
     /**
      * {@inheritDoc}
@@ -65,7 +94,8 @@ public class OpenConfiguratorProjectXmlContentDescriber extends
     public int describe(InputStream contents, IContentDescription description)
             throws IOException {
         // Validate for basic XML describer.
-        if (super.describe(contents, description) == IContentDescriber.INVALID) {
+        if (super.describe(contents,
+                description) == IContentDescriber.INVALID) {
             return IContentDescriber.INVALID;
         }
 
@@ -83,7 +113,8 @@ public class OpenConfiguratorProjectXmlContentDescriber extends
     public int describe(Reader contents, IContentDescription description)
             throws IOException {
         // Validate for basic XML describer.
-        if (super.describe(contents, description) == IContentDescriber.INVALID) {
+        if (super.describe(contents,
+                description) == IContentDescriber.INVALID) {
             return IContentDescriber.INVALID;
         }
 
@@ -92,32 +123,5 @@ public class OpenConfiguratorProjectXmlContentDescriber extends
 
         // Validate the openCONFIGURATOR project with the schema.
         return validateSchema(new InputSource(contents));
-    }
-
-    /**
-     *
-     * @param contents The contents of the openCONIGURATOR project XML file.
-     *
-     * @return Code. IContentDescriber.VALID if the file is valid XML schema
-     *         otherwise IContentDescriber.INVALID
-     *
-     * @throws IOException
-     */
-    private int validateSchema(final InputSource contents) throws IOException {
-
-        if ((contents == null) || (contents.getByteStream() == null)) {
-            return IContentDescriber.INVALID;
-        }
-
-        try {
-            OpenConfiguratorProjectMarshaller
-                    .unmarshallOpenConfiguratorProject(contents.getByteStream());
-        } catch (JAXBException | SAXException | ParserConfigurationException e) {
-            // TODO: print in the Console of the Target eclipse application.
-            e.printStackTrace();
-            return IContentDescriber.INVALID;
-        }
-
-        return IContentDescriber.VALID;
     }
 }

@@ -80,6 +80,7 @@ import org.xml.sax.SAXException;
  * @author Ramakrishnan P
  *
  */
+@SuppressWarnings("restriction")
 public class NewPowerlinkNetworkProjectWizard extends Wizard
         implements INewWizard, IExecutableExtension {
 
@@ -334,6 +335,9 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
                     e2.getCause().getMessage(), name);
             e2.printStackTrace();
             return false;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         // get a project handle
         try {

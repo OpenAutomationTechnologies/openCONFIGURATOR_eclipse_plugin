@@ -227,6 +227,7 @@ public class PdoChannel {
             try {
                 nodeIdValue = Integer.decode(targetNodeId).shortValue();
             } catch (NumberFormatException ex) {
+                ex.printStackTrace();
                 OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                         "Invalid Target node Id for channel" + getText(),
                         getNode().getProject().getName());

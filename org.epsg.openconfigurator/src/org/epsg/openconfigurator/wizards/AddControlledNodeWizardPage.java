@@ -89,6 +89,22 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String ERROR_RMN_NOT_SUPPORTED = "{0} does not support RMN.";
     private static final String ERROR_RMN_WITH_CHAINED_STATION = "POWERLINK network with chained station cannot have RMN.";
 
+    private static boolean isValidCnNodeId(short cnNodeId) {
+        if ((cnNodeId >= IPowerlinkConstants.CN_MIN_NODE_ID)
+                && (cnNodeId <= IPowerlinkConstants.CN_MAX_NODE_ID)) {
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean isValidRmnNodeId(short rmnNodeId) {
+        if ((rmnNodeId >= IPowerlinkConstants.RMN_MIN_NODE_ID)
+                && (rmnNodeId <= IPowerlinkConstants.RMN_MAX_NODE_ID)) {
+            return true;
+        }
+        return false;
+    }
+
     /**
      * Control to display the Node name.
      */
@@ -229,10 +245,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
             setErrorMessage(ERROR_MODEL_NOT_AVAILABLE);
             setPageComplete(false);
             return 1;
-        } else {
-            List<TCN> cnList = nodeCollection.getCN();
-            return getNextValidCnNodeId(cnList);
         }
+        List<TCN> cnList = nodeCollection.getCN();
+        return getNextValidCnNodeId(cnList);
+
     }
 
     /**
@@ -246,15 +262,15 @@ public class AddControlledNodeWizardPage extends WizardPage {
             setErrorMessage(ERROR_MODEL_NOT_AVAILABLE);
             setPageComplete(false);
             return IPowerlinkConstants.RMN_MIN_NODE_ID;
-        } else {
-            // Return min nodeid if there is no RMN available in the model.
-            if (nodeCollection.getRMN().isEmpty()) {
-                return IPowerlinkConstants.RMN_MIN_NODE_ID;
-            }
-
-            List<TRMN> rmnList = nodeCollection.getRMN();
-            return getNextValidRmnNodeId(rmnList);
         }
+        // Return min nodeid if there is no RMN available in the model.
+        if (nodeCollection.getRMN().isEmpty()) {
+            return IPowerlinkConstants.RMN_MIN_NODE_ID;
+        }
+
+        List<TRMN> rmnList = nodeCollection.getRMN();
+        return getNextValidRmnNodeId(rmnList);
+
     }
 
     /**
@@ -461,6 +477,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
             short parsedNodeId = Short.parseShort(nodeId);
             retVal = isNodeIdAvailable(nodeIdList, parsedNodeId);
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             System.err.println("Number format exception");
         }
 
@@ -567,14 +584,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         return pageComplete;
     }
 
-    private boolean isValidCnNodeId(short cnNodeId) {
-        if ((cnNodeId >= IPowerlinkConstants.CN_MIN_NODE_ID)
-                && (cnNodeId <= IPowerlinkConstants.CN_MAX_NODE_ID)) {
-            return true;
-        }
-        return false;
-    }
-
     private boolean isValidNodeId(short nodeId) {
         switch (nodeTypeCombo.getText()) {
             case CONTROLLED_NODE_LABEL:
@@ -602,17 +611,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
             short parsedNodeId = Short.parseShort(nodeId);
             retVal = isValidNodeId(parsedNodeId);
         } catch (NumberFormatException e) {
+            e.printStackTrace();
             System.err.println("Number format exception");
         }
         return retVal;
-    }
-
-    private boolean isValidRmnNodeId(short rmnNodeId) {
-        if ((rmnNodeId >= IPowerlinkConstants.RMN_MIN_NODE_ID)
-                && (rmnNodeId <= IPowerlinkConstants.RMN_MAX_NODE_ID)) {
-            return true;
-        }
-        return false;
     }
 
     private void updateCnModel() {

@@ -63,7 +63,6 @@ public class ModulePropertySource extends AbstractNodePropertySource
     private static final String EMPTY_POSITION_ERROR_MESSAGE = "Position cannot be empty.";
     private static final String INVALID_POSITION_ERROR_MESSAGE = "The module type does not match the interface of node ";
     private static final String HIGHER_POSITION_ERROR_MESSAGE = "The position of module should not be greater than ";
-    private static final String INVALID_MODULE_TYPE_ERROR_MESSAGE = "The module cannot be placed in position {0} due to invalid module type.";
     private static final String EMPTY_ADDRESS_ERROR_MESSAGE = "Address cannot be empty.";
     private static final String AVAILABLE_MODULE_ERROR_MESSAGE = "Position {0} on interface {1} is already occupied.";
     private static final String INVALID_ADDRESS_ERROR_MESSAGE = "Invalid Address.";
@@ -211,6 +210,8 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         retObj = String.valueOf(isvalue);
                         break;
                     }
+                    default:
+                        break;
                 }
             }
         } catch (Exception e) {
@@ -354,11 +355,9 @@ public class ModulePropertySource extends AbstractNodePropertySource
                 moduleNameList.add(moduleName);
             }
 
-            if (moduleNameList != null) {
-                for (String modName : moduleNameList) {
-                    if (name.equals(modName)) {
-                        return MODULE_EXISTS_ERROR_MESSAGE;
-                    }
+            for (String modName : moduleNameList) {
+                if (name.equals(modName)) {
+                    return MODULE_EXISTS_ERROR_MESSAGE;
                 }
             }
 

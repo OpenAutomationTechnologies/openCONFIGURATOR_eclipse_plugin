@@ -248,7 +248,7 @@ public class ParameterReference implements IParameter {
         if (parameter != null) {
             return parameter.getPropertyList();
         }
-        return new ArrayList<Parameter.Property>();
+        return new ArrayList<>();
     }
 
     /*
@@ -286,9 +286,9 @@ public class ParameterReference implements IParameter {
     public String getUniqueId() {
         if (parameter != null) {
             return parameter.getUniqueId();
-        } else {
-            return null;
         }
+        return null;
+
     }
 
     /*
@@ -350,7 +350,5 @@ public class ParameterReference implements IParameter {
                     actualValue);
         }
 
-        // OpenConfiguratorProjectUtils.updateParameterReferenceActualValue(node,
-        // this, actualValue);
     }
 }

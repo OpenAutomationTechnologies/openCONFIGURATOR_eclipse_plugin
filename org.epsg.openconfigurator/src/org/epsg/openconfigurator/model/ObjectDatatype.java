@@ -133,7 +133,8 @@ public class ObjectDatatype {
             case "0403":
                 retValue = "NETTIME";
                 break;
-
+            default:
+                break;
         }
         return retValue;
     }

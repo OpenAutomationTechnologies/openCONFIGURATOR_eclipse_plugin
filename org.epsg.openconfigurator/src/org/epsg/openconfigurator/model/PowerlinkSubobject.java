@@ -555,9 +555,9 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
                 this, subIndex, moduleObjectIndex);
         if ((actualValue != null)) {
             return actualValue;
-        } else {
-            return actualValue;
         }
+        return actualValue;
+
     }
 
     /**
@@ -589,9 +589,9 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public String getConfigParameter(boolean configParameter) {
         if (configParameter) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
+
     }
 
     /**
@@ -671,9 +671,9 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public String getGroupLevelVisible(boolean groupLevelVisible) {
         if (groupLevelVisible) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
+
     }
 
     /**
@@ -723,9 +723,9 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public String getlockedParameter(boolean lockedParameter) {
         if (lockedParameter) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
+
     }
 
     /*
@@ -992,9 +992,9 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public String getVisibleParameter(boolean visibleParameter) {
         if (visibleParameter) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
+
     }
 
     /**

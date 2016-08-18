@@ -99,6 +99,30 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
     private final static short defaultMnNodeId = IPowerlinkConstants.MN_DEFAULT_NODE_ID;
 
     /**
+     * Checks for the valid name for the master node.
+     *
+     * @param mnName Name
+     * @return true if valid, false otherwise.
+     */
+    private static boolean isMnNameValid(final String mnName) {
+        boolean retval = false;
+        if (mnName.length() == 0) {
+            return retval;
+        }
+
+        // Space as first character is not allowed. ppc:tNonEmptyString
+        if (mnName.charAt(0) == ' ') {
+            return retval;
+        }
+
+        if (mnName.length() > 0) {
+            retval = true;
+        }
+
+        return retval;
+    }
+
+    /**
      * Default managing node name.
      */
     private Text txtNodeName;
@@ -235,30 +259,6 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
         }
 
         return "";
-    }
-
-    /**
-     * Checks for the valid name for the master node.
-     *
-     * @param mnName Name
-     * @return true if valid, false otherwise.
-     */
-    private boolean isMnNameValid(final String mnName) {
-        boolean retval = false;
-        if (mnName.length() == 0) {
-            return retval;
-        }
-
-        // Space as first character is not allowed. ppc:tNonEmptyString
-        if (mnName.charAt(0) == ' ') {
-            return retval;
-        }
-
-        if (mnName.length() > 0) {
-            retval = true;
-        }
-
-        return retval;
     }
 
     /**

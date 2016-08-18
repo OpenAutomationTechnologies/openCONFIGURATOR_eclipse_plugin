@@ -32,11 +32,9 @@
 package org.epsg.openconfigurator.editors.project;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
-import java.net.MalformedURLException;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -416,10 +414,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 TPath defaultPath = OpenConfiguratorProjectUtils
                         .getTPath(pathSett, "defaultOutputPath");
                 if (defaultPath != null) {
-                    return new Path(activeProject, defaultPath.getPath(), true);
-                } else {
-                    System.err.println(
-                            "Unhandled error occurred. defaultPath not found");
+                    return new Path(defaultPath.getPath(), true);
                 }
             }
         } else {
@@ -428,16 +423,14 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             if (defaultPath != null) {
                 if (!defaultPath.getId()
                         .equalsIgnoreCase("defaultOutputPath")) {
-                    return new Path(activeProject, defaultPath.getPath(),
-                            false);
+                    return new Path(defaultPath.getPath(), false);
                 }
             } else {
                 System.err.println(
                         "Unhandled error occurred. activeOutputPath not found");
             }
         }
-        return new Path(activeProject,
-                IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
     }
 
     /**
@@ -494,8 +487,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             currentProject = OpenConfiguratorProjectMarshaller
                     .unmarshallOpenConfiguratorProject(
                             projectFile.getContents());
-        } catch (FileNotFoundException | MalformedURLException | JAXBException
-                | SAXException | ParserConfigurationException
+        } catch (JAXBException | SAXException | ParserConfigurationException
                 | CoreException e) {
             e.printStackTrace();
             throw new PartInitException(
@@ -655,8 +647,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             currentProject = OpenConfiguratorProjectMarshaller
                     .unmarshallOpenConfiguratorProject(is);
 
-        } catch (FileNotFoundException | MalformedURLException | JAXBException
-                | SAXException | ParserConfigurationException e) {
+        } catch (JAXBException | SAXException
+                | ParserConfigurationException e) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     1, e.getMessage(), e);
             ErrorDialog.openError(getSite().getShell(), null,

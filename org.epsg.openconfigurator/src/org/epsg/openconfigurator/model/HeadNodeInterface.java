@@ -190,9 +190,8 @@ public class HeadNodeInterface {
     public BigInteger getMaxModules() {
         if (maxModules != null) {
             return maxModules;
-        } else {
-            return null;
         }
+        return null;
     }
 
     /**
@@ -253,9 +252,9 @@ public class HeadNodeInterface {
     public boolean hasModules() {
         if (moduleCollection.size() == 0) {
             return false;
-        } else {
-            return true;
         }
+        return true;
+
     }
 
     /**

@@ -53,42 +53,12 @@ import org.eclipse.ui.handlers.HandlerUtil;
 public class AddRemovePowerlinkNetworkProjectNatureHandler
         extends AbstractHandler {
 
-    @Override
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-        ISelection selection = HandlerUtil.getCurrentSelection(event);
-        //
-        if (selection instanceof IStructuredSelection) {
-            for (Iterator<?> it = ((IStructuredSelection) selection)
-                    .iterator(); it.hasNext();) {
-                Object element = it.next();
-                IProject project = null;
-                if (element instanceof IProject) {
-                    project = (IProject) element;
-                } else if (element instanceof IAdaptable) {
-                    project = (IProject) ((IAdaptable) element)
-                            .getAdapter(IProject.class);
-                }
-                if (project != null) {
-                    try {
-                        toggleNature(project);
-                    } catch (CoreException e) {
-                        // TODO log something
-                        throw new ExecutionException("Failed to toggle nature",
-                                e);
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
     /**
      * Toggles sample nature on a project
      *
      * @param project to have sample nature added or removed
      */
-    private void toggleNature(IProject project) throws CoreException {
+    private static void toggleNature(IProject project) throws CoreException {
         IProjectDescription description = project.getDescription();
         String[] natures = description.getNatureIds();
 
@@ -111,6 +81,35 @@ public class AddRemovePowerlinkNetworkProjectNatureHandler
         newNatures[natures.length] = PowerlinkNetworkProjectNature.NATURE_ID;
         description.setNatureIds(newNatures);
         project.setDescription(description, null);
+    }
+
+    @Override
+    public Object execute(ExecutionEvent event) throws ExecutionException {
+        ISelection selection = HandlerUtil.getCurrentSelection(event);
+        //
+        if (selection instanceof IStructuredSelection) {
+            for (Iterator<?> it = ((IStructuredSelection) selection)
+                    .iterator(); it.hasNext();) {
+                Object element = it.next();
+                IProject project = null;
+                if (element instanceof IProject) {
+                    project = (IProject) element;
+                } else if (element instanceof IAdaptable) {
+                    project = ((IAdaptable) element).getAdapter(IProject.class);
+                }
+                if (project != null) {
+                    try {
+                        toggleNature(project);
+                    } catch (CoreException e) {
+                        // TODO log something
+                        throw new ExecutionException("Failed to toggle nature",
+                                e);
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
 }

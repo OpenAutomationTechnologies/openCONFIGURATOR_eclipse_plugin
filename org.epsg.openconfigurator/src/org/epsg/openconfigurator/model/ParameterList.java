@@ -40,11 +40,12 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
  *
  */
 public class ParameterList {
+
     private final Node node;
 
     /**
      * Constructor to initialize the instance of node.
-     * 
+     *
      * @param node The instance of Node
      * @param xddModelArg Instance of XDD model
      */

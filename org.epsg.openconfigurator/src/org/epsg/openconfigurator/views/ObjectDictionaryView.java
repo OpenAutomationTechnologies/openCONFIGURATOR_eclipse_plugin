@@ -400,8 +400,8 @@ public class ObjectDictionaryView extends ViewPart
                 PowerlinkObject objItem = (PowerlinkObject) parentElement;
                 return objItem.getSubObjects().toArray();
             } else if (parentElement instanceof ParameterReference) {
-                ParameterReference paramRef = (ParameterReference) parentElement;
                 // Do nothing.
+                // TODO: Implement for future enhancement.
             } else if (parentElement instanceof Parameter) {
                 Parameter param = (Parameter) parentElement;
                 if (param.getDataTypeChoice() == DataTypeChoiceType.STRUCT) {
@@ -414,6 +414,7 @@ public class ObjectDictionaryView extends ViewPart
                 } else if (param
                         .getDataTypeChoice() == DataTypeChoiceType.SIMPLE) {
                     // Ignore; This does not have any child variables.
+                    // TODO: Implement for future enhancement.
                 } else {
                     System.err
                             .println("Unhandled " + param.getDataTypeChoice());

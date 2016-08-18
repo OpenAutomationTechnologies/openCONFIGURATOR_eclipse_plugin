@@ -137,6 +137,32 @@ public class Node {
         return attributeName;
     }
 
+    private static void removeForcedObject(ForcedObjects forcedObjTag,
+            org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObjToBeRemoved) {
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+
+            if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                    forcedObjToBeRemoved.getIndex())) {
+                if (forcedObjToBeRemoved.getSubindex() == null) {
+                    tempForcedObjToBeRemoved = tempForceObj;
+                    break;
+                } else {
+                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                            forcedObjToBeRemoved.getSubindex())) {
+                        tempForcedObjToBeRemoved = tempForceObj;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (tempForcedObjToBeRemoved != null) {
+            forcedObjTag.getObject().remove(tempForcedObjToBeRemoved);
+        }
+    }
+
     /**
      * Node instance from the openCONFIGURATOR project. Example: The Object is
      * one of TNetworkConfiguration(only for MN), TCN, TRMN.
@@ -287,7 +313,6 @@ public class Node {
             nodeId = tempMn.getNodeID();
             nodeType = NodeType.MANAGING_NODE;
         } else if (nodeModel instanceof InterfaceList.Interface.Module) {
-            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) nodeModel;
             nodeType = NodeType.MODULAR_CHILD_NODE;
         } else {
             nodeId = 0;
@@ -397,26 +422,29 @@ public class Node {
 
         if (force) {
             boolean alreadyForced = false;
-            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
-                    .getObject()) {
+            if (forcedObjTag != null) {
+                for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                        .getObject()) {
 
-                if (java.util.Arrays.equals(tempForceObj.getIndex(),
-                        forceObj.getIndex())) {
-                    if (forceObj.getSubindex() == null) {
-                        alreadyForced = true;
-                        break;
-                    } else {
-                        if (java.util.Arrays.equals(tempForceObj.getSubindex(),
-                                forceObj.getSubindex())) {
+                    if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                            forceObj.getIndex())) {
+                        if (forceObj.getSubindex() == null) {
                             alreadyForced = true;
                             break;
+                        } else {
+                            if (java.util.Arrays.equals(
+                                    tempForceObj.getSubindex(),
+                                    forceObj.getSubindex())) {
+                                alreadyForced = true;
+                                break;
+                            }
                         }
                     }
                 }
-            }
 
-            if (!alreadyForced) {
-                forcedObjTag.getObject().add(forceObj);
+                if (!alreadyForced) {
+                    forcedObjTag.getObject().add(forceObj);
+                }
             }
         }
     }
@@ -579,8 +607,6 @@ public class Node {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeModel;
             BigInteger lossSocToleranceValue = net.getLossOfSocTolerance();
             return String.valueOf(lossSocToleranceValue);
-        } else {
-            System.err.println("Invalid node model");
         }
         return null;
     }
@@ -999,32 +1025,6 @@ public class Node {
         return networkmanagement.getGeneralFeatures().isPDOSelfReceipt();
     }
 
-    private void removeForcedObject(ForcedObjects forcedObjTag,
-            org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObjToBeRemoved) {
-        org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
-        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
-                .getObject()) {
-
-            if (java.util.Arrays.equals(tempForceObj.getIndex(),
-                    forcedObjToBeRemoved.getIndex())) {
-                if (forcedObjToBeRemoved.getSubindex() == null) {
-                    tempForcedObjToBeRemoved = tempForceObj;
-                    break;
-                } else {
-                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
-                            forcedObjToBeRemoved.getSubindex())) {
-                        tempForcedObjToBeRemoved = tempForceObj;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (tempForcedObjToBeRemoved != null) {
-            forcedObjTag.getObject().remove(tempForcedObjToBeRemoved);
-        }
-    }
-
     /**
      * Set ASnd max number
      *
@@ -1127,7 +1127,6 @@ public class Node {
      */
     public void setCycleTime(Long value) throws JDOMException, IOException {
         if (value == null) {
-            // FIXME: throw invalid argument.
             return;
         }
 
@@ -1202,7 +1201,6 @@ public class Node {
     public void setMultiplexedCycleLength(Integer value)
             throws JDOMException, IOException {
         if (value == null) {
-            // FIXME: throw invalid argument.
             return;
         }
 

@@ -85,8 +85,8 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
      * @author Ramakrishnan P
      *
      */
-    private class PathSettingsContentProvider implements
-            IStructuredContentProvider {
+    private class PathSettingsContentProvider
+            implements IStructuredContentProvider {
         /**
          * Disposes any created resources
          */
@@ -104,7 +104,8 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
         }
 
         @Override
-        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        public void inputChanged(Viewer viewer, Object oldInput,
+                Object newInput) {
             // ignore.
         }
     }
@@ -132,9 +133,8 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
                 }
 
                 TPath path = (TPath) element;
-                if (path.getId()
-                        .equalsIgnoreCase(
-                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                if (path.getId().equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
                     return false;
                 }
 
@@ -327,10 +327,9 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
                             TPath path = (TPath) object;
 
                             // If the current selection ID = defaultOutputPath
-                    // then disable edit/delete button
-                            if (path.getId()
-                                    .equalsIgnoreCase(
-                                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                            // then disable edit/delete button
+                            if (path.getId().equalsIgnoreCase(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
                                 btnEditPath.setEnabled(false);
                                 deleteSettingsButton.setEnabled(false);
                             } else {
@@ -339,8 +338,8 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
                             }
 
                         } else {
-                            System.err
-                                    .println("Selection should be an event of structured selection.");
+                            System.err.println(
+                                    "Selection should be an event of structured selection.");
                         }
                     }
                 });
@@ -390,13 +389,11 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
         btnEditPath.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                TPath path = pathSettingsModel.getPath().get(
-                        table.getSelectionIndex());
+                TPath path = pathSettingsModel.getPath()
+                        .get(table.getSelectionIndex());
 
-                if (!path
-                        .getId()
-                        .equalsIgnoreCase(
-                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                if (!path.getId().equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
                     AddEditTPathDialog pathDialog = new AddEditTPathDialog(
                             getShell(), pathSettingsModel, path);
 
@@ -428,8 +425,8 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
         // create the editors for the column
         TextCellEditor idCellEditor = createIDColumnCellEditor(table);
         // Set the editors, cell modifier, and column properties
-        tableViewer
-                .setColumnProperties(new String[] { ModifyPathSettingsDialog.NAME });
+        tableViewer.setColumnProperties(
+                new String[] { ModifyPathSettingsDialog.NAME });
         tableViewer
                 .setCellModifier(new PathSettingsIdCellModifier(tableViewer));
         tableViewer.setCellEditors(new CellEditor[] { idCellEditor });
@@ -527,22 +524,22 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
             TPath pathTobeRemoved = pathList.get(index);
             pathIdToBeRemoved = pathTobeRemoved.getId();
         } catch (IndexOutOfBoundsException e) {
-
-            System.err.println(MessageFormat.format(
-                    ModifyPathSettingsDialog.REMOVE_PATH_ERROR, index));
+            e.printStackTrace();
+            System.err.println(MessageFormat
+                    .format(ModifyPathSettingsDialog.REMOVE_PATH_ERROR, index));
             return false;
         }
 
         if ((pathIdToBeRemoved == null) || (pathIdToBeRemoved.isEmpty())) {
-            System.err.println(MessageFormat.format(
-                    ModifyPathSettingsDialog.REMOVE_PATH_ERROR, index));
+            System.err.println(MessageFormat
+                    .format(ModifyPathSettingsDialog.REMOVE_PATH_ERROR, index));
             return false;
         }
 
         pathList.remove(index); // No need to return the removed element.
 
-        if (pathIdToBeRemoved.equalsIgnoreCase(pathSettingsModel
-                .getActivePath())) {
+        if (pathIdToBeRemoved
+                .equalsIgnoreCase(pathSettingsModel.getActivePath())) {
             // The item about to be removed is same as the activePathSetting.
             // Update the activePathSetting setting to 0, then remove it.
             pathSettingsModel.setActivePath((pathList.get(0).getId()).trim());

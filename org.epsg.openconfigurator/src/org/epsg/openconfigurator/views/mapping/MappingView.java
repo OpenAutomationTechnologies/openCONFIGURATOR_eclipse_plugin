@@ -508,8 +508,6 @@ public class MappingView extends ViewPart {
                 PowerlinkSubobject mappingSubObj = (PowerlinkSubobject) element;
 
                 return getMappableObject(mappingSubObj);
-            } else {
-                System.err.println("Get value fails");
             }
             return element.toString();
         }
@@ -570,7 +568,6 @@ public class MappingView extends ViewPart {
                                 Result res = OpenConfiguratorLibraryUtils
                                         .mappModuleSubObjectToChannel(
                                                 pdoChannel, mappingSubObject,
-                                                subObjectTobeMapped,
                                                 moduleObjectIndex,
                                                 moduleSubObjectIndex);
                                 System.err.println(
@@ -1112,7 +1109,7 @@ public class MappingView extends ViewPart {
 
                         String value = mapParamObj.getActualDefaultValue();
 
-                        if (value.equalsIgnoreCase(StringUtils.EMPTY)) {
+                        if (value.isEmpty()) {
                             return "0";
                         }
 
@@ -1169,6 +1166,8 @@ public class MappingView extends ViewPart {
                     if (element instanceof PowerlinkSubobject) {
                         return StringUtils.EMPTY;
                     }
+                    break;
+                default:
                     break;
             }
             return element.toString();
@@ -2632,7 +2631,7 @@ public class MappingView extends ViewPart {
             PowerlinkSubobject mappingSubObj) {
         String value = mappingSubObj.getActualDefaultValue();
 
-        if (value.equalsIgnoreCase(StringUtils.EMPTY)) {
+        if (value.isEmpty()) {
             return emptyObject;
         }
 
@@ -2660,9 +2659,6 @@ public class MappingView extends ViewPart {
             if (mappableObject.getObjectType() == 7) {
                 if (subObjectIdValue == 0) {
                     return mappableObject;
-                } else {
-                    System.err.println(
-                            "Error in XDD/XDC. Var type objects has subobjects!");
                 }
             }
 
@@ -2687,7 +2683,7 @@ public class MappingView extends ViewPart {
 
         String value = mappingSubObj.getActualDefaultValue();
 
-        if (value.equalsIgnoreCase(StringUtils.EMPTY)) {
+        if (value.isEmpty()) {
             return emptyObject.getNameWithId();
         }
 
@@ -2807,9 +2803,6 @@ public class MappingView extends ViewPart {
             if (mappableObject.getObjectType() == 7) {
                 if (subObjectIdValue == 0) {
                     return mappableObject.getNameWithId();
-                } else {
-                    System.err.println(
-                            "Error in XDD/XDC. Var type objects has subobjects!");
                 }
             }
 
@@ -2928,9 +2921,6 @@ public class MappingView extends ViewPart {
             IndustrialNetworkView netView = (IndustrialNetworkView) sourcePart;
 
             return netView.getNodeList();
-        } else {
-            System.err.println(
-                    "Node list: Industrial network view not available.");
         }
         return null;
     }
@@ -3056,7 +3046,7 @@ public class MappingView extends ViewPart {
         PowerlinkSubobject nodeIdSubObject = pdoChannel.getCommunicationParam()
                 .getSubObject((short) 01);
         String actualValue = nodeIdSubObject.getActualDefaultValue();
-        if (actualValue.equalsIgnoreCase(StringUtils.EMPTY)) {
+        if (actualValue.isEmpty()) {
             actualValue = "0";
         }
 

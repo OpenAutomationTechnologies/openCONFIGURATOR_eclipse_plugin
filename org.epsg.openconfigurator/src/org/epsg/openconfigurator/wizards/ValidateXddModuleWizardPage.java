@@ -33,6 +33,7 @@ package org.epsg.openconfigurator.wizards;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -73,7 +74,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
-import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
@@ -200,7 +200,6 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         headNodeInetrfaceObject = interfaceObj;
         setTitle(DIALOG_TILE);
         setDescription(DIALOG_DESCRIPTION);
-        String cnXddPath = IOpenConfiguratorResource.DEFAULT_CN_XDD;
 
         customConfiguration = "";
     }
@@ -329,6 +328,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
             }
             e.printStackTrace();
             return false;
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
         return true;
     }
@@ -372,8 +374,6 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 SWT.BORDER | SWT.READ_ONLY);
         moduleTypeText.setLayoutData(
                 new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
-        new Label(grpConfigurationFile, SWT.NONE);
-        new Label(grpConfigurationFile, SWT.NONE);
 
         Label lblXddxdc = new Label(grpConfigurationFile, SWT.NONE);
         lblXddxdc.setText(NODE_CONFIGURATION_LABEL);

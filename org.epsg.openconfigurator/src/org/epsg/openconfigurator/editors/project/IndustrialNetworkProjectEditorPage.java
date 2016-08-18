@@ -1106,6 +1106,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         .getPathSettings().getPath().get(0);
                 pathDropDown.setText(path.getId() + " : " + path.getPath());
             } catch (IndexOutOfBoundsException e) {
+                e.printStackTrace();
                 System.err.println(
                         IndustrialNetworkProjectEditorPage.ERROR_NO_PATH_AVAILABLE);
             }
@@ -1222,7 +1223,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      * Reloads the Auto Generation settings from the model into the combo.
      */
     private void reloadAutoGenerationSettingsCombo() {
-        List<String> items = new ArrayList<String>();
+        List<String> items = new ArrayList<>();
         List<TAutoGenerationSettings> agList = currentProject
                 .getProjectConfiguration().getAutoGenerationSettings();
         for (TAutoGenerationSettings ag : agList) {

@@ -634,9 +634,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     public String getConfigParameter(boolean configParameter) {
         if (configParameter) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
     }
 
     /**
@@ -697,9 +696,8 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     public String getGroupLevelVisible(boolean groupLevelVisible) {
         if (groupLevelVisible) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
     }
 
     /**
@@ -754,9 +752,9 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     public String getlockedParameter(boolean lockedParameter) {
         if (lockedParameter) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
+
     }
 
     /**
@@ -943,6 +941,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
         try {
             subobjectIdShort = Short.parseShort(subobjectIdRaw, 16);
         } catch (NumberFormatException ex) {
+            ex.printStackTrace();
             return null;
         }
 
@@ -1016,9 +1015,9 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     public String getVisibleParameter(boolean visibleParameter) {
         if (visibleParameter) {
             return "true";
-        } else {
-            return "false";
         }
+        return "false";
+
     }
 
     /**

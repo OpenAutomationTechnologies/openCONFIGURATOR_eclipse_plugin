@@ -32,9 +32,6 @@
 package org.epsg.openconfigurator.wizards;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 import org.eclipse.jface.wizard.WizardPage;
@@ -45,11 +42,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
-import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
-import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 
 /**
@@ -66,8 +61,39 @@ public class AddModuleWizardPage extends WizardPage {
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to {0}/{1}.";
     private static final String ERROR_INVALID_MODULE_NAME = "Enter a valid module name.";
 
+    /**
+     * Verifies the module name to be added.
+     *
+     * @param moduleName The name of module to be verified.
+     * @return <code>true</code> if module is valid, <code>false</code> if not
+     *         valid.
+     */
+    private static boolean isModuleNameValid(final String moduleName) {
+        boolean retval = false;
+
+        if (moduleName == null) {
+            return retval;
+        }
+
+        if (moduleName.length() == 0) {
+            return retval;
+        }
+
+        // Space as first character is not allowed. ppc:tNonEmptyString
+        if (moduleName.charAt(0) == ' ') {
+            return retval;
+        }
+
+        if (moduleName.length() > 0) {
+            retval = true;
+        }
+
+        return retval;
+    }
+
     private Text nodeIdText;
     private Text interfaceIdText;
+
     private Text moduleName;
 
     private Object nodeModel = null;
@@ -149,49 +175,6 @@ public class AddModuleWizardPage extends WizardPage {
     }
 
     /**
-     * @return Lists of available module name in the head node.
-     */
-    private List<String> getModuleNamelist() {
-        List<String> nameList = new ArrayList<>();
-        if (interfaceObj.getModuleCollection().size() != 0) {
-            Collection<Module> moduleList = interfaceObj.getModuleCollection()
-                    .values();
-            for (Module module : moduleList) {
-                String moduleName = module.getModuleName();
-                nameList.add(moduleName);
-            }
-        } else {
-            nameList = null;
-        }
-        return nameList;
-    }
-
-    @Deprecated
-    private List<String> getModuleNameList() {
-        Object nodeModel = node.getNodeModel();
-        List<InterfaceList.Interface> interfaceList = new ArrayList<>();
-        List<String> nameList = new ArrayList<>();
-        if (nodeModel instanceof TCN) {
-
-            TCN cn = (TCN) nodeModel;
-            if (cn.getInterfaceList() != null) {
-                interfaceList.addAll(cn.getInterfaceList().getInterface());
-            } else {
-                return null;
-            }
-        }
-        for (Interface interfaces : interfaceList) {
-            List<InterfaceList.Interface.Module> moduleList = interfaces
-                    .getModule();
-            for (InterfaceList.Interface.Module module : moduleList) {
-                nameList.add(module.getName());
-            }
-        }
-        return nameList;
-
-    }
-
-    /**
      * @return Instance of Node
      */
     public Node getNode() {
@@ -203,36 +186,6 @@ public class AddModuleWizardPage extends WizardPage {
      */
     public String getNodeId() {
         return interfaceObj.getNode().getNodeIdString();
-    }
-
-    /**
-     * Verifies the module name to be added.
-     *
-     * @param moduleName The name of module to be verified.
-     * @return <code>true</code> if module is valid, <code>false</code> if not
-     *         valid.
-     */
-    private boolean isModuleNameValid(final String moduleName) {
-        boolean retval = false;
-
-        if (moduleName == null) {
-            return retval;
-        }
-
-        if (moduleName.length() == 0) {
-            return retval;
-        }
-
-        // Space as first character is not allowed. ppc:tNonEmptyString
-        if (moduleName.charAt(0) == ' ') {
-            return retval;
-        }
-
-        if (moduleName.length() > 0) {
-            retval = true;
-        }
-
-        return retval;
     }
 
     @Override

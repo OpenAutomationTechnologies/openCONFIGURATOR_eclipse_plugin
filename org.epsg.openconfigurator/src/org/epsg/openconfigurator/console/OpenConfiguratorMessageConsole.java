@@ -33,6 +33,7 @@
  *******************************************************************************/
 package org.epsg.openconfigurator.console;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -64,27 +65,13 @@ public class OpenConfiguratorMessageConsole {
         console = new OpenConfiguratorMessageConsole();
     }
 
-    public static OpenConfiguratorMessageConsole getInstance() {
-        return console;
-    }
-
-    /**
-     * List of available console streams
-     */
-    private MessageConsoleStream infoMessageConsole;
-    private MessageConsoleStream errorMessageConsole;
-    private MessageConsoleStream libraryMessageConsole;
-
-    private OpenConfiguratorMessageConsole() {
-    }
-
     /**
      * Gets the console instance from the target eclipse application.
      *
      * @param name The name of the console.
      * @return The MessageConsole instance.
      */
-    private synchronized MessageConsole findConsole(String name) {
+    private static synchronized MessageConsole findConsole(String name) {
 
         // Returns instance of ConsolePlugin
         ConsolePlugin plugin = ConsolePlugin.getDefault();
@@ -109,10 +96,26 @@ public class OpenConfiguratorMessageConsole {
         return myConsole;
     }
 
-    private synchronized String getCurrentTime() {
+    private static synchronized String getCurrentTime() {
         Date now = new Date();
         String strDate = sdfDate.format(now);
         return strDate;
+    }
+
+    public static OpenConfiguratorMessageConsole getInstance() {
+        return console;
+    }
+
+    /**
+     * List of available console streams
+     */
+    private MessageConsoleStream infoMessageConsole;
+
+    private MessageConsoleStream errorMessageConsole;
+
+    private MessageConsoleStream libraryMessageConsole;
+
+    private OpenConfiguratorMessageConsole() {
     }
 
     private MessageConsoleStream getErrorMessageStream() {
@@ -160,6 +163,7 @@ public class OpenConfiguratorMessageConsole {
      *
      * @param message The message to be updated.
      * @param projectName The name of the project to be updated.
+     *
      */
     public void printErrorMessage(final String message,
             final String projectName) {
@@ -167,6 +171,12 @@ public class OpenConfiguratorMessageConsole {
                 + projectName + "] " + message;
         MessageConsoleStream out = getErrorMessageStream();
         out.println(fullMessage);
+        try {
+            out.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -174,6 +184,7 @@ public class OpenConfiguratorMessageConsole {
      *
      * @param message The message to be updated.
      * @param projectName The name of the project to be updated.
+     *
      */
     public void printInfoMessage(final String message,
             final String projectName) {
@@ -181,6 +192,12 @@ public class OpenConfiguratorMessageConsole {
                 + projectName + "] " + message;
         MessageConsoleStream out = getInfoMessageStream();
         out.println(fullMessage);
+        try {
+            out.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -200,6 +217,12 @@ public class OpenConfiguratorMessageConsole {
                         + message;
                 MessageConsoleStream out = getErrorMessageStream();
                 out.println(fullMessage);
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         });
     }
@@ -217,6 +240,12 @@ public class OpenConfiguratorMessageConsole {
 
                 MessageConsoleStream out = getLibraryMessageStream();
                 out.println(message);
+                try {
+                    out.close();
+                } catch (IOException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         });
     }

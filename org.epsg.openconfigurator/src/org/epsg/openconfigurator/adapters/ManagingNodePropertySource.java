@@ -500,6 +500,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_ASND_MAX_NR;
             }
         }
@@ -547,6 +548,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_ASYNC_MTU;
             }
         } else {
@@ -594,6 +596,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_ASYNCT_SLOT_TIMEOUT;
             }
         }
@@ -615,7 +618,6 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 return ERROR_CYCLE_TIME_CANNOT_BE_EMPTY;
             }
             try {
-                long cycleTime = Long.decode((String) value);
                 // validate the value with openCONFIGURATOR library.
                 PowerlinkObject cycleTimeObj = mnNode.getObjectDictionary()
                         .getObject(INetworkProperties.CYCLE_TIME_OBJECT_ID);
@@ -633,6 +635,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_CYCLE_TIME;
             }
         } else {
@@ -663,6 +666,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE;
             }
         } else {
@@ -711,6 +715,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_MULTIPLEXED_CYCLE_CNT;
             }
         } else {
@@ -790,6 +795,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
 
             } catch (NumberFormatException e) {
+                e.printStackTrace();
                 return ERROR_INVALID_VALUE_PRE_SCALER;
             }
         }

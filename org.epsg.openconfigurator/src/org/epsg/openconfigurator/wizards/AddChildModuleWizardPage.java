@@ -31,7 +31,6 @@
 
 package org.epsg.openconfigurator.wizards;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -49,10 +48,6 @@ import org.eclipse.swt.widgets.Spinner;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
-import org.epsg.openconfigurator.util.IPowerlinkConstants;
-import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
-import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
@@ -74,13 +69,15 @@ public class AddChildModuleWizardPage extends WizardPage {
     public static final String DIALOG_TILE = "POWERLINK module";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to the network.";
 
+    private static Node node;
+
     private HeadNodeInterface interfaceObj;
     private Spinner position;
     private Label positionlabel;
     private Button enabled;
     private Label positionRange;
     private Label positionRangevalue;
-    private Node node;
+
     private Label addressLabel;
 
     private Spinner addressText;
@@ -103,26 +100,6 @@ public class AddChildModuleWizardPage extends WizardPage {
         }
 
     };
-
-    // ModifyListener positionModifyListener = new ModifyListener() {
-    //
-    // @Override
-    // public void modifyText(ModifyEvent e) {
-    // getWizard().getContainer().updateButtons();
-    // setErrorMessage(null);
-    // setPageComplete(true);
-    // if ((position.getSelection() > position.getMaximum())
-    // || (position.getSelection() < position.getMinimum())) {
-    // setErrorMessage("Enter a valid position");
-    // setPageComplete(false);
-    // }
-    // if (position.getText() == null) {
-    // setErrorMessage("Enter a valid position");
-    // setPageComplete(false);
-    // }
-    // }
-    //
-    // };
 
     protected AddChildModuleWizardPage(HeadNodeInterface selectedNodeObj) {
 
@@ -208,30 +185,6 @@ public class AddChildModuleWizardPage extends WizardPage {
         return null;
     }
 
-    @Deprecated
-    private List<Integer> getModulePositionList() {
-        Object nodeModel = node.getNodeModel();
-        List<InterfaceList.Interface> interfaceList = new ArrayList<>();
-        List<Integer> positionList = new ArrayList<>();
-        if (nodeModel instanceof TCN) {
-
-            TCN cn = (TCN) nodeModel;
-            if (cn.getInterfaceList() != null) {
-                interfaceList.addAll(cn.getInterfaceList().getInterface());
-            } else {
-                return null;
-            }
-            for (Interface interfaces : interfaceList) {
-                List<InterfaceList.Interface.Module> moduleList = interfaces
-                        .getModule();
-                for (InterfaceList.Interface.Module module : moduleList) {
-                    positionList.add(module.getPosition().intValue());
-                }
-            }
-        }
-        return positionList;
-    }
-
     /**
      * @return Instance of ModuleTypeList.
      */
@@ -242,56 +195,6 @@ public class AddChildModuleWizardPage extends WizardPage {
             return adModuleXddPage.getModuleTypeList();
         }
         return null;
-    }
-
-    private int getNewPosition() {
-        setErrorMessage(null);
-        List<InterfaceList.Interface> interfaceList = new ArrayList<>();
-        if (interfaceObj.getModuleCollection().size() == 0) {
-            // errorField = true;
-            System.err.println("Module Collection size .. "
-                    + interfaceObj.getModuleCollection().size());
-            setErrorMessage("ERROR_MODEL_NOT_AVAILABLE");
-            // setPageComplete(false);
-            return getModuleInterface().getMinPosition().intValue();
-        } else {
-            Object nodeModel = node.getNodeModel();
-            if (nodeModel instanceof TCN) {
-                System.err.println("Module Collection size .. "
-                        + interfaceObj.getModuleCollection().size());
-                TCN cn = (TCN) nodeModel;
-                interfaceList.addAll(cn.getInterfaceList().getInterface());
-            }
-
-            return getNextValidModulePosition(interfaceList);
-        }
-    }
-
-    private int getNextValidModulePosition(
-            List<InterfaceList.Interface> interfacelist) {
-        setErrorMessage(null);
-
-        List<Integer> positionList = new ArrayList<>();
-
-        for (Interface interfaces : interfacelist) {
-            List<InterfaceList.Interface.Module> moduleList = interfaces
-                    .getModule();
-            for (InterfaceList.Interface.Module module : moduleList) {
-                positionList.add(module.getPosition().intValue());
-            }
-        }
-
-        if (!isPositionAvailable(positionList, position.getSelection())) {
-            return position.getSelection();
-        }
-
-        // errorField = true;
-        String errorMessage = MessageFormat.format(
-                "ERROR_MAXIMUM_NODE_ID_LIMIT_REACHED",
-                IPowerlinkConstants.CN_MAX_NODE_ID);
-        setErrorMessage(errorMessage);
-        setPageComplete(false);
-        return IPowerlinkConstants.INVALID_NODE_ID;
     }
 
     /**
@@ -346,9 +249,6 @@ public class AddChildModuleWizardPage extends WizardPage {
         if (address > maxModules) {
             setErrorMessage("Invalid address value.");
             return retval;
-        } else {
-            System.err.println("Valid value...." + address + " maxModules...."
-                    + maxModules);
         }
 
         return true;
@@ -517,34 +417,22 @@ public class AddChildModuleWizardPage extends WizardPage {
                         if (previousPositionModule.getModuleType()
                                 .equals(getModuleInterface().getType())) {
                             System.err.println("Min position = " + minPosition);
-                            if (positionToBeChecked != null) {
-                                for (Integer positionVal : positionToBeChecked) {
-                                    Module nextPositionModule = interfaceObj
-                                            .getModuleCollection()
-                                            .get(positionVal);
-                                    String nextPositionModuleType = nextPositionModule
-                                            .getModuleInterface().getType();
-                                    String addedModuleType = moduleType
-                                            .getType();
-                                    if (nextPositionModule.isEnabled()) {
-                                        if (addedModuleType.equals(
-                                                nextPositionModuleType)) {
-                                            validModuleType = true;
-                                            break;
-                                        } else {
-                                            setErrorMessage("The module type "
-                                                    + addedModuleType
-                                                    + " does not match the interface module type "
-                                                    + nextPositionModuleType
-                                                    + " on module "
-                                                    + nextPositionModule
-                                                            .getModuleName()
-                                                    + ".");
-                                            return false;
-                                        }
+
+                            for (Integer positionVal : positionToBeChecked) {
+                                Module nextPositionModule = interfaceObj
+                                        .getModuleCollection().get(positionVal);
+                                String nextPositionModuleType = nextPositionModule
+                                        .getModuleInterface().getType();
+                                String addedModuleType = moduleType.getType();
+                                if (nextPositionModule.isEnabled()) {
+                                    if (addedModuleType
+                                            .equals(nextPositionModuleType)) {
+                                        validModuleType = true;
+                                        break;
                                     }
                                 }
                             }
+
                             validModuleType = true;
                         } else {
                             validModuleType = false;
@@ -672,12 +560,11 @@ public class AddChildModuleWizardPage extends WizardPage {
         }
 
         if (moduleList != null) {
-            if (addressList != null) {
-                if (addressList
-                        .contains(Integer.valueOf(addressText.getText()))) {
-                    validAddress = false;
-                }
+
+            if (addressList.contains(Integer.valueOf(addressText.getText()))) {
+                validAddress = false;
             }
+
         }
 
         if (!validAddress) {
@@ -726,32 +613,6 @@ public class AddChildModuleWizardPage extends WizardPage {
         System.err.println("PageComplete == " + pageComplete);
         return pageComplete;
 
-    }
-
-    private boolean isPositionAvailable(List<Integer> positionList,
-            int positionTobeChecked) {
-        boolean positionAvailable = false;
-        for (int position : positionList) {
-            if (position == positionTobeChecked) {
-                positionAvailable = true;
-            }
-        }
-        return positionAvailable;
-    }
-
-    public boolean isPositionValid(int positionValue) {
-        return true;
-    }
-
-    private boolean isValidPosition(int position) {
-        System.err.println("valid position..." + position);
-        if ((position >= getModuleInterface().getMinPosition().intValue())
-                && (position <= getModuleInterface().getMaxPosition()
-                        .intValue())) {
-            System.err.println("valid position... inside loop...");
-            return true;
-        }
-        return false;
     }
 
 }

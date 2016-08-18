@@ -50,8 +50,8 @@ import org.eclipse.swt.custom.StyleRange;
  * @author Ramakrishnan P
  *
  */
-public class NonRuleBasedDamagerRepairer implements IPresentationDamager,
-        IPresentationRepairer {
+public class NonRuleBasedDamagerRepairer
+        implements IPresentationDamager, IPresentationRepairer {
 
     /** The document this object works on */
     protected IDocument fDocument;
@@ -82,8 +82,9 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager,
     protected void addRange(TextPresentation presentation, int offset,
             int length, TextAttribute attr) {
         if (attr != null) {
-            presentation.addStyleRange(new StyleRange(offset, length, attr
-                    .getForeground(), attr.getBackground(), attr.getStyle()));
+            presentation.addStyleRange(
+                    new StyleRange(offset, length, attr.getForeground(),
+                            attr.getBackground(), attr.getStyle()));
         }
     }
 
@@ -119,6 +120,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager,
             info = fDocument.getLineInformation(line + 1);
             return info.getOffset() + info.getLength();
         } catch (BadLocationException x) {
+            x.printStackTrace();
             return fDocument.getLength();
         }
     }
@@ -132,13 +134,12 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager,
         if (!documentPartitioningChanged) {
             try {
 
-                IRegion info = fDocument.getLineInformationOfOffset(event
-                        .getOffset());
+                IRegion info = fDocument
+                        .getLineInformationOfOffset(event.getOffset());
                 int start = Math.max(partition.getOffset(), info.getOffset());
 
-                int end = event.getOffset()
-                        + (event.getText() == null ? event.getLength() : event
-                                .getText().length());
+                int end = event.getOffset() + (event.getText() == null
+                        ? event.getLength() : event.getText().length());
 
                 if ((info.getOffset() <= end)
                         && (end <= (info.getOffset() + info.getLength()))) {
@@ -153,6 +154,7 @@ public class NonRuleBasedDamagerRepairer implements IPresentationDamager,
                 return new Region(start, end - start);
 
             } catch (BadLocationException x) {
+                x.printStackTrace();
             }
         }
 

@@ -277,14 +277,13 @@ public class Parameter implements IParameter {
         if (access == null) {
             if (parameterTemplate != null) {
 
-                if (parameterTemplate instanceof TParameterTemplate) {
-                    if (parameterTemplate.getAccess() != null) {
-                        return ParameterAccess
-                                .fromValue(parameterTemplate.getAccess());
-                    } else {
-                        return ParameterAccess.UNDEFINED;
-                    }
+                if (parameterTemplate.getAccess() != null) {
+                    return ParameterAccess
+                            .fromValue(parameterTemplate.getAccess());
+                } else {
+                    return ParameterAccess.UNDEFINED;
                 }
+
             }
         }
         return access;
@@ -299,14 +298,14 @@ public class Parameter implements IParameter {
     public String getActualValue() {
         if ((actualValue == null) || (actualValue.isEmpty())) {
             if (parameterTemplate != null) {
-                if (parameterTemplate instanceof TParameterTemplate) {
-                    if (parameterTemplate.getActualValue() != null) {
-                        return parameterTemplate.getActualValue().getValue();
-                    } else {
-                        return StringUtils.EMPTY;
-                    }
+
+                if (parameterTemplate.getActualValue() != null) {
+                    return parameterTemplate.getActualValue().getValue();
+                } else {
+                    return StringUtils.EMPTY;
                 }
             }
+
         } else if (actualValue.contains("Â")) {
             actualValue = actualValue.replace("Â", "");
         }
@@ -322,14 +321,12 @@ public class Parameter implements IParameter {
     public AllowedValues getAllowedValues() {
         if ((allowedValues == null)) {
             if (parameterTemplate != null) {
-                if (parameterTemplate instanceof TParameterTemplate) {
-                    if (parameterTemplate.getAllowedValues() != null) {
-                        return new AllowedValues(
-                                parameterTemplate.getAllowedValues());
-                    } else {
-                        return null;
-                    }
+
+                if (parameterTemplate.getAllowedValues() != null) {
+                    return new AllowedValues(
+                            parameterTemplate.getAllowedValues());
                 }
+
             }
         }
         return allowedValues;
@@ -364,13 +361,13 @@ public class Parameter implements IParameter {
     public String getDefaultValue() {
         if ((defaultValue == null) || (defaultValue.isEmpty())) {
             if (parameterTemplate != null) {
-                if (parameterTemplate instanceof TParameterTemplate) {
-                    if (parameterTemplate.getDefaultValue() != null) {
-                        return parameterTemplate.getDefaultValue().getValue();
-                    } else {
-                        return StringUtils.EMPTY;
-                    }
+
+                if (parameterTemplate.getDefaultValue() != null) {
+                    return parameterTemplate.getDefaultValue().getValue();
+                } else {
+                    return StringUtils.EMPTY;
                 }
+
             }
         } else if (defaultValue.contains("Â")) {
             defaultValue = defaultValue.replace("Â", "");
@@ -489,8 +486,5 @@ public class Parameter implements IParameter {
      */
     public void setActualValue(String value) throws JDOMException, IOException {
         actualValue = value;
-        // Update the value in XDC file
-        // OpenConfiguratorProjectUtils.updateParameterActualValue(node, this,
-        // actualValue);
     }
 }

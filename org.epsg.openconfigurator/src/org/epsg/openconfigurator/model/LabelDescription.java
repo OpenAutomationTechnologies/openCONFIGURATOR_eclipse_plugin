@@ -46,8 +46,8 @@ import org.epsg.openconfigurator.xmlbinding.xdd.Connector;
 public class LabelDescription {
     static String displayLang = Locale.getDefault().getDisplayLanguage();
 
-    private HashMap<String, String> labelMap = new HashMap<String, String>();
-    private HashMap<String, String> descriptionMap = new HashMap<String, String>();
+    private HashMap<String, String> labelMap = new HashMap<>();
+    private HashMap<String, String> descriptionMap = new HashMap<>();
 
     /**
      * . Constructor that define the label values of parameter.
@@ -72,9 +72,9 @@ public class LabelDescription {
                     descriptionMap.put(desc.getLang(), desc.getValue());
                 }
             } else if (obj instanceof Connector.LabelRef) {
-                // FIXME;
+                // FIXME; To be implemented for future enhancements.
             } else if (obj instanceof Connector.DescriptionRef) {
-                // FIXME;
+                // FIXME; To be implemented for future enhancements.
             }
         }
     }
@@ -85,9 +85,9 @@ public class LabelDescription {
     public String getDescription() {
         if (descriptionMap.containsKey(displayLang)) {
             return descriptionMap.get(displayLang);
-        } else {
-            return descriptionMap.get("en");
         }
+        return descriptionMap.get("en");
+
     }
 
     /**
@@ -96,9 +96,9 @@ public class LabelDescription {
     public String getLabel() {
         if (labelMap.containsKey(displayLang)) {
             return labelMap.get(displayLang);
-        } else {
-            return labelMap.get("en");
         }
+        return labelMap.get("en");
+
     }
 
     /**

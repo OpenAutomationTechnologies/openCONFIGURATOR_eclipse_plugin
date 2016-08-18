@@ -370,7 +370,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
      *         being the error message to display to the end user.
      */
     protected String handleForceActualValue(Object value) {
-        if (plkSubObject.getActualValue().equalsIgnoreCase(StringUtils.EMPTY)) {
+        if (plkSubObject.getActualValue().isEmpty()) {
             return "Set some value in the actual value field.";
         } else {
             if (isModuleSubObject()) {

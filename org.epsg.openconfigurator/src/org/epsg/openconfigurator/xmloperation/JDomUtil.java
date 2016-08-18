@@ -215,18 +215,31 @@ public class JDomUtil {
      */
     public static org.jdom2.Document getXmlDocument(final File xmlFile)
             throws JDOMException, IOException {
+        BOMInputStream bomIn = null;
+        org.jdom2.Document document = null;
 
-        BOMInputStream bomIn = new BOMInputStream(new FileInputStream(xmlFile),
-                false);
-        Reader reader = new InputStreamReader(bomIn);
-        InputSource input = new InputSource(reader);
-        input.setSystemId(xmlFile.toURI().toString());
+        try {
+            bomIn = new BOMInputStream(new FileInputStream(xmlFile), false);
+            Reader reader = new InputStreamReader(bomIn);
+            InputSource input = new InputSource(reader);
+            input.setSystemId(xmlFile.toURI().toString());
 
-        SAXBuilder builder = new SAXBuilder();
-        org.jdom2.Document document = builder.build(input);
+            SAXBuilder builder = new SAXBuilder();
+            document = builder.build(input);
 
-        reader.close();
+            reader.close();
 
+            return document;
+        } catch (Exception e) {
+            if (bomIn != null) {
+                bomIn.close();
+            }
+            e.printStackTrace();
+        } finally {
+            if (bomIn != null) {
+                bomIn.close();
+            }
+        }
         return document;
     }
 
