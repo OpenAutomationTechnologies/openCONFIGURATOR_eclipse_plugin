@@ -72,6 +72,9 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String NODE_TYPES[] = { CONTROLLED_NODE_LABEL,
             REDUNDANT_MANAGING_NODE_LABEL };
 
+    private static final String STATION_TYPES[] = { "Normal", "Chained",
+            "Multiplexed" };
+
     private static final String DIALOG_PAGE_NAME = "AddCnwizardPage"; //$NON-NLS-1$
     public static final String DIALOG_TILE = "POWERLINK node";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK node to the network.";
@@ -178,6 +181,11 @@ public class AddControlledNodeWizardPage extends WizardPage {
      * Control to list the type of supported node.
      */
     private Combo nodeTypeCombo;
+
+    /**
+     * Control to list the station type to node.
+     */
+    private Combo stationTypeCombo;
 
     /**
      * Control to display the node ID.
@@ -295,6 +303,15 @@ public class AddControlledNodeWizardPage extends WizardPage {
         Label lblRange = new Label(container, SWT.NONE);
         lblRange.setBounds(244, 48, 51, 19);
         lblRange.setText(RANGE_LABEL);
+
+        Label lblNewLabel = new Label(container, SWT.NONE);
+        lblNewLabel.setBounds(21, 137, 73, 23);
+        lblNewLabel.setText("Station Type:");
+
+        stationTypeCombo = new Combo(container, SWT.READ_ONLY);
+        stationTypeCombo.setBounds(121, 137, 117, 23);
+        stationTypeCombo.setItems(STATION_TYPES);
+        stationTypeCombo.select(0);
 
     }
 
@@ -449,6 +466,11 @@ public class AddControlledNodeWizardPage extends WizardPage {
         return nodeTypeCombo.getText();
     }
 
+    public int getStationTypeChanged() {
+        int selectionIndex = stationTypeCombo.getSelectionIndex();
+        return selectionIndex;
+    }
+
     /**
      * Handles the node type change events.
      *
@@ -466,6 +488,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
                 short newCnNodeId = getNewCnNodeId();
                 nodeIdSpinner.setSelection(newCnNodeId);
+                stationTypeCombo.setEnabled(true);
                 break;
 
             case REDUNDANT_MANAGING_NODE_LABEL:
@@ -475,6 +498,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
                         + nodeIdSpinner.getMaximum());
                 short newRmnNodeId = getNewRmnNodeId();
                 nodeIdSpinner.setSelection(newRmnNodeId);
+                stationTypeCombo.setEnabled(false);
+                stationTypeCombo.select(0);
                 break;
 
             default:
@@ -490,6 +515,15 @@ public class AddControlledNodeWizardPage extends WizardPage {
         }
 
         nodeName.addVerifyListener(nameVerifyListener);
+    }
+
+    private void handleStationTypeChanged(int selectionIndex) {
+        if (selectionIndex == 2) {
+            setErrorMessage("Multiplexed operation currently not supported.");
+        } else {
+            setErrorMessage(null);
+        }
+
     }
 
     /**
@@ -581,6 +615,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
         } else {
             System.err.println("Invalid wizard page.");
         }
+
         return pageComplete;
     }
 

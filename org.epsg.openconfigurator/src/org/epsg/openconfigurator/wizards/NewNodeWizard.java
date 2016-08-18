@@ -74,6 +74,11 @@ public class NewNodeWizard extends Wizard {
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
     public static final String ERROR_NODE_MODEL = "Invalid node model.";
 
+    private static final String CNPRES_CHAINING_ERROR_MESSAGE = "The node {0} does not support PRes Chaining operation.";
+    private static final String MNPRES_CHAINING_ERROR_MESSAGE = "The MN {0} does not support PRes Chaining operation.";
+    private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
+    private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported.";
+
     /**
      * Add new node wizard page.
      */
@@ -154,6 +159,55 @@ public class NewNodeWizard extends Wizard {
         return null;
     }
 
+    private boolean handleStationTypeChanged(int selectionIndex, Node cnNode) {
+
+        int val = ((Integer) selectionIndex).intValue();
+        if (val == 1) {
+            // Checks the value of PresChaining from the XDD
+            // model of MN and CN.
+            Node mnNode = cnNode.getPowerlinkRootNode().getMN();
+            boolean mnPresChaining = mnNode.getNetworkManagement()
+                    .getMnFeatures().isDLLMNPResChaining();
+            if (!mnPresChaining) {
+
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        MNPRES_CHAINING_ERROR_MESSAGE,
+                        cnNode.getProject().getName());
+                getContainer().showPage(addNodePage);
+                return false;
+            }
+
+            boolean cnPresChaining = cnNode.getNetworkManagement()
+                    .getCnFeatures().isDLLCNPResChaining();
+            if (!cnPresChaining) {
+                // do not allow
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        CNPRES_CHAINING_ERROR_MESSAGE,
+                        cnNode.getProject().getName());
+                getContainer().showPage(addNodePage);
+                return false;
+            }
+
+            List<Node> rmnNodes = cnNode.getPowerlinkRootNode()
+                    .getRmnNodeList();
+            if (rmnNodes.size() > 0) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        CHAINED_STATION_ERROR_MESSAGE,
+                        cnNode.getProject().getName());
+                getContainer().showPage(addNodePage);
+                return false;
+            }
+        } else if (val == 2) {
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR,
+                    cnNode.getProject().getName());
+            getContainer().showPage(addNodePage);
+            return false;
+        }
+        return true;
+
+    }
+
     /**
      * Checks for errors in the wizard pages.
      *
@@ -214,6 +268,15 @@ public class NewNodeWizard extends Wizard {
 
         Node newNode = new Node(nodeList, selectedNodeObj.getProjectXml(),
                 nodeObject, xddModel);
+
+        if (!(handleStationTypeChanged(addNodePage.getStationTypeChanged(),
+                newNode))) {
+            getContainer().showPage(addNodePage);
+            // addNodePage.setErrorMessage(CHAINED_STATION_ERROR_MESSAGE);
+            return false;
+        } else {
+            addNodePage.setErrorMessage("");
+        }
 
         try {
             OpenConfiguratorProjectUtils.importNodeConfigurationFile(newNode);
@@ -308,6 +371,16 @@ public class NewNodeWizard extends Wizard {
                 }
             }
         }
+
+        try {
+
+            newNode.addStationTypeofNode(addNodePage.getStationTypeChanged());
+
+        } catch (JDOMException | IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
         return true;
     }
 }

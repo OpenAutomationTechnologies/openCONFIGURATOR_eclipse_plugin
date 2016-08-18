@@ -44,8 +44,11 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
@@ -168,6 +171,11 @@ public class Node {
      * one of TNetworkConfiguration(only for MN), TCN, TRMN.
      */
     private final Object nodeModel;
+
+    /**
+     * Instance of Xdd model.
+     */
+    private TCN tcn;
 
     /**
      * The memory of the XDC linked to this Node.
@@ -349,6 +357,66 @@ public class Node {
                 }
             }
         }
+    }
+
+    public void addStationTypeofNode(int stationTypeChanged)
+            throws JDOMException, IOException {
+        Result res = new Result();
+        Object nodeObject = getNodeModel();
+        if (nodeObject instanceof TCN) {
+            TCN tcn = (TCN) nodeObject;
+            switch (stationTypeChanged) {
+                case 0:
+                    break;
+                case 1:
+                    tcn.setIsChained(true);
+                    break;
+                case 2:
+                    tcn.setIsMultiplexed(true);
+                    break;
+                default:
+                    System.err.println("Invalid Selection.");
+                    break;
+            }
+        }
+
+        PlkOperationMode plkMode = null;
+        int val = ((Integer) stationTypeChanged).intValue();
+        if (val == 0) { // Normal Station.
+            res = OpenConfiguratorCore.GetInstance()
+                    .ResetOperationMode(getNetworkId(), getNodeId());
+            plkMode = PlkOperationMode.NORMAL;
+        } else if (val == 1) {
+            res = OpenConfiguratorCore.GetInstance()
+                    .SetOperationModeChained(getNetworkId(), getNodeId());
+            plkMode = PlkOperationMode.CHAINED;
+        } else if (val == 2) {
+            res = OpenConfiguratorCore.GetInstance()
+                    .SetOperationModeMultiplexed(getNetworkId(), getNodeId(),
+                            (short) tcn.getForcedMultiplexedCycle());
+            plkMode = PlkOperationMode.MULTIPLEXED;
+        }
+        if (plkMode != null) {
+            if (res.IsSuccessful()) {
+                setPlkOperationMode(plkMode);
+            } else {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+            }
+        } else {
+            System.err.println("Invalid POWERLINK operation mode");
+        }
+        // Node Assignment values will be modified by the
+        // library. So refresh the project file data.
+        OpenConfiguratorProjectUtils.updateNodeAssignmentValues(this);
+
+        // RPDO nodeID will be changed by the library. So
+        // refresh the node XDD data
+        OpenConfiguratorProjectUtils.persistNodeData(this);
+
+        // Updates the generator attributes in project file.
+        OpenConfiguratorProjectUtils.updateGeneratorInfo(this);
+
     }
 
     /**
@@ -1422,6 +1490,15 @@ public class Node {
         }
 
         return updatedInTheModel;
+    }
+
+    public void setNodeData() {
+
+        if (getNodeModel() instanceof TCN) {
+            tcn = (TCN) getNodeModel();
+        } else {
+            tcn = null;
+        }
     }
 
     /**
