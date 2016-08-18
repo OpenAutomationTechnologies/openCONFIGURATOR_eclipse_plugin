@@ -61,6 +61,8 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.IManagedForm;
 import org.eclipse.ui.forms.editor.FormPage;
@@ -77,6 +79,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TGenerator;
@@ -120,6 +123,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String PATH_SECTION_MODIFY_PATH_LIST_HYPERLINK_LABEL = "Modify the available list of paths";
     private static final String PATH_SECTION_ADD_LABEL = "Add...";
     private static final String PATH_SECTION_OUTPUT_PATH_LABEL = "Output path:";
+
+    private static final String NETWORK_VIEW_SECTION_HEADING = "POWERLINK Network View";
+    private static final String NETWORK_VIEW_SECTION_HEADING_DESCRIPTION = "Links the POWERLINK network view of the project.";
+    private static final String NETWORK_VIEW_SECTION_HYPERLINK_LABEL = "POWERLINK network view";
 
     private static final String NO_ROWS_SELECTED_ERROR = "No rows selected.";
     private static final String MULTIPSE_SELECTION_NOT_ALLOWED_ERROR = "Multiple rows selection is not supported.";
@@ -364,7 +371,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     IndustrialNetworkProjectEditorPage.this
                             .reloadAutoGenerationSettingsTable();
                 } else {
-                    // If cancelled.
+                    // Add edit dialog setting cancelled.
+                    System.err.println("Add Edit setting dialog is canceled.");
                 }
 
             } else if (e.widget == addSettingsButton) {
@@ -728,6 +736,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         createAutoGenerationSettingsSection(managedForm);
         createGeneratorWidgets(managedForm);
         createProjectPathSettingsSection(managedForm);
+        createShortcutToNetworkViewWidgets(managedForm);
         addListenersToContorls();
     }
 
@@ -991,6 +1000,54 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 pathComboViewer.refresh();
                 if (pathDropDown.getText().isEmpty()) {
                     pathDropDown.select(0);
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Creates the widgets and controls for the {@link TGenerator} model.
+     *
+     * @param managedForm The parent form.
+     */
+    private void createShortcutToNetworkViewWidgets(
+            final IManagedForm managedForm) {
+        Section sctnGenerator = toolkit.createSection(
+                managedForm.getForm().getBody(),
+                ExpandableComposite.EXPANDED | Section.DESCRIPTION
+                        | ExpandableComposite.TWISTIE
+                        | ExpandableComposite.TITLE_BAR);
+        managedForm.getToolkit().paintBordersFor(sctnGenerator);
+        sctnGenerator.setText(
+                IndustrialNetworkProjectEditorPage.NETWORK_VIEW_SECTION_HEADING);
+        sctnGenerator.setDescription(
+                IndustrialNetworkProjectEditorPage.NETWORK_VIEW_SECTION_HEADING_DESCRIPTION);
+
+        Composite client = toolkit.createComposite(sctnGenerator, SWT.WRAP);
+        GridLayout layout = new GridLayout(4, false);
+        layout.marginWidth = 2;
+        layout.marginHeight = 2;
+        client.setLayout(layout);
+        toolkit.paintBordersFor(client);
+        sctnGenerator.setClient(client);
+
+        Hyperlink link = toolkit.createHyperlink(client,
+                IndustrialNetworkProjectEditorPage.NETWORK_VIEW_SECTION_HYPERLINK_LABEL,
+                SWT.RIGHT);
+        link.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        toolkit.adapt(link, true, true);
+        link.setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
+        link.addHyperlinkListener(new HyperlinkAdapter() {
+            @Override
+            public void linkActivated(HyperlinkEvent e) {
+                try {
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(IndustrialNetworkView.ID);
+                } catch (PartInitException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
                 }
             }
         });
@@ -1366,6 +1423,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
             } else {
                 // TODO: No autoGeneration settings are available in the list.
+                System.err.println("Auto Generation combo box is Empty.");
             }
         }
         IndustrialNetworkProjectEditorPage.this
