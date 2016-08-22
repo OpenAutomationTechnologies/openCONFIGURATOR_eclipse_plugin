@@ -55,6 +55,7 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
 
     @Override
     public void decorate(Object element, IDecoration decoration) {
+
         if (element instanceof Node) {
             Node nodeObj = (Node) element;
             switch (nodeObj.getPlkOperationMode()) {
@@ -85,6 +86,7 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
 
             }
         } else if (element instanceof Module) {
+
             Module moduleObj = (Module) element;
             if (moduleObj.hasError()) {
                 decoration.addOverlay(

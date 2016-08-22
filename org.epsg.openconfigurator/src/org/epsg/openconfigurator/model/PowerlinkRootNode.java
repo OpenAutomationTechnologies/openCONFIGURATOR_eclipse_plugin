@@ -134,8 +134,6 @@ public class PowerlinkRootNode {
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
             cn.setInterfaceList(new InterfaceList());
-            // interfaceListModel.getInterface()
-            // .addAll(cn.getInterfaceList().getInterface());
         }
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
@@ -880,15 +878,15 @@ public class PowerlinkRootNode {
                     throws CoreException, InvocationTargetException,
                     InterruptedException {
 
-
-                Result libResult = OpenConfiguratorLibraryUtils
-                        .removeModule(module);
-                if (!libResult.IsSuccessful()) {
-                    System.err.println(OpenConfiguratorLibraryUtils
-                            .getErrorMessage(libResult));
-                    return;
+                if (!module.hasError()) {
+                    Result libResult = OpenConfiguratorLibraryUtils
+                            .removeModule(module);
+                    if (!libResult.IsSuccessful()) {
+                        System.err.println(OpenConfiguratorLibraryUtils
+                                .getErrorMessage(libResult));
+                        return;
+                    }
                 }
-
                 // Remove from the viewer node collection.
                 Object moduleObjectModel = module.getModuleModel();
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {

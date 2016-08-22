@@ -134,6 +134,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
         moduleAddressTextDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         moduleTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        moduleErrorDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        readOnlymoduleNameDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
     }
 
     private void addControlledNodeModulePropertyDescriptors(
@@ -144,6 +148,19 @@ public class ModulePropertySource extends AbstractNodePropertySource
         if (moduleObjModel == null) {
             return;
         }
+        if (module.hasError()) {
+
+            propertyList.add(readOnlymoduleNameDescriptor);
+            propertyList.add(moduleAddressDescriptor);
+            propertyList.add(modulePositionDescriptor);
+            if (moduleObjModel.getPathToXDC() != null) {
+
+                propertyList.add(modulePathToXDCDescriptor);
+            }
+            propertyList.add(moduleErrorDescriptor);
+            return;
+        }
+
         propertyList.add(moduleNameDescriptor);
         if (isPositionOrAddressEditable()) {
             propertyList.add(moduleAddressTextDescriptor);
@@ -154,6 +171,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
         propertyList.add(modulePathToXDCDescriptor);
         propertyList.add(moduleTypeDescriptor);
         // propertyList.add(moduleEnabledDescriptor);
+
     }
 
     @Override
@@ -183,6 +201,11 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         retObj = moduleObjModel.getName();
                         break;
                     }
+                    case IAbstractNodeProperties.READ_ONLY_MODULE_NAME_OBJECT: {
+                        retObj = moduleObjModel.getName();
+                        break;
+                    }
+
                     case IAbstractNodeProperties.MODULE_POSITION_EDITABLE_OBJECT:
                     case IAbstractNodeProperties.MODULE_POSITION_READONLY_OBJECT: {
                         retObj = String.valueOf(moduleObjModel.getPosition());
@@ -208,6 +231,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         boolean isvalue = Integer.valueOf(value) == 0 ? false
                                 : true;
                         retObj = String.valueOf(isvalue);
+                        break;
+                    }
+                    case IAbstractNodeProperties.MODULE_ERROR_OBJECT: {
+                        retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
                         break;
                     }
                     default:
@@ -445,14 +472,6 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.MODULE_POSITION_EDITABLE_OBJECT: {
-
-                        // if (isPositionAvailable(newPosition)) {
-                        //
-                        // module.swapPosition(oldPosition, newPosition);
-                        // // module.setPosition((String) value);
-                        // } else {
-                        // module.setPosition((String) value);
-                        // }
                         module.setPosition((String) value);
                         break;
                     }

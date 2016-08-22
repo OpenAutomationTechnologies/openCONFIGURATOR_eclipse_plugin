@@ -56,6 +56,7 @@ public interface IAbstractNodeProperties {
     public static final String INTERFACE_MULTIPLE_MODULES_OBJECT = "node.Interface.Multiplemodules"; //$NON-NLS-1$
 
     public static final String MODULE_NAME_OBJECT = "name"; //$NON-NLS-1$
+    public static final String READ_ONLY_MODULE_NAME_OBJECT = "name.ReadOnly"; //$NON-NLS-1$
     public static final String MODULE_POSITION_OBJECT = "position"; //$NON-NLS-1$
     public static final String MODULE_ADDRESS_OBJECT = "address"; //$NON-NLS-1$
     public static final String MODULE_POSITION_READONLY_OBJECT = "node.Module.Position"; //$NON-NLS-1$
@@ -64,6 +65,7 @@ public interface IAbstractNodeProperties {
     public static final String MODULE_PATH_TO_XDC_OBJECT = "node.Module.pathToXDC"; //$NON-NLS-1$
     public static final String MODULE_ADDRESS_READONLY_OBJECT = "node.Module.Address"; //$NON-NLS-1$
     public static final String MODULE_ENABLED_OBJECT = "node.Module.Enabled"; //$NON-NLS-1$
+    public static final String MODULE_ERROR_OBJECT = "module.Error"; //$NON-NLS-1$
 
     public static final String NODE_CONIFG_OBJECT = "pathToXDC"; //$NON-NLS-1$
     public static final String NODE_IS_ASYNC_ONLY_OBJECT = "isAsyncOnly"; //$NON-NLS-1$

@@ -353,4 +353,16 @@
                state="true">
          </decorator>
       </extension>
+      <extension
+            point="org.eclipse.ui.decorators">
+         <decorator
+               class="org.epsg.openconfigurator.views.NodeLabelDecorator"
+               icon="icons/error_overlay.gif"
+               id="org.epsg.openconfigurator.decorator.erroroverlay"
+               label="erroroverlay"
+               lightweight="true"
+               location="BOTTOM_RIGHT"
+               state="true">
+         </decorator>
+      </extension>
 </plugin>

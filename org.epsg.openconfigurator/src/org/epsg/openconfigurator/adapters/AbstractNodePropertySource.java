@@ -111,6 +111,9 @@ public abstract class AbstractNodePropertySource {
 
     protected TextPropertyDescriptor moduleNameDescriptor = new TextPropertyDescriptor(
             IAbstractNodeProperties.MODULE_NAME_OBJECT, MODULE_NAME_LABEL);
+    protected PropertyDescriptor readOnlymoduleNameDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.READ_ONLY_MODULE_NAME_OBJECT,
+            MODULE_NAME_LABEL);
     protected PropertyDescriptor modulePositionDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.MODULE_POSITION_READONLY_OBJECT,
             MODULE_POSITION_LABEL);
@@ -134,6 +137,8 @@ public abstract class AbstractNodePropertySource {
     protected PropertyDescriptor moduleEnabledDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.MODULE_ENABLED_OBJECT,
             MODULE_ENABLED_LABEL);
+    protected PropertyDescriptor moduleErrorDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.MODULE_ERROR_OBJECT, NODE_ERROR_LABEL);
 
     protected ComboBoxPropertyDescriptor isAsyncOnly = new ComboBoxPropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT,
