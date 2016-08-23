@@ -32,6 +32,7 @@
 package org.epsg.openconfigurator.model;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -500,6 +501,13 @@ public class PowerlinkObject extends AbstractPowerlinkObject
         uniqueIDRef = object.getUniqueIDRef();
     }
 
+    public long bytesToLong(byte[] bytes) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
+        buffer.put(bytes);
+        buffer.flip();// need flip
+        return buffer.getLong();
+    }
+
     /**
      * Note: This does not delete from the XML file.
      */
@@ -526,6 +534,20 @@ public class PowerlinkObject extends AbstractPowerlinkObject
         org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
         forcedObj.setIndex(getIndex());
         nodeInstance.forceObjectActualValue(forcedObj, force);
+    }
+
+    public synchronized void forceActualValue(Module module, boolean force,
+            boolean writeToProjectFile, long newObjectIndex)
+            throws JDOMException, IOException {
+        if (writeToProjectFile) {
+            OpenConfiguratorProjectUtils.forceActualValue(module, getNode(),
+                    this, null, force, newObjectIndex);
+        }
+
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
+        forcedObj.setIndex(longToBytes(newObjectIndex));
+        module.forceObjectActualValue(forcedObj, force);
+
     }
 
     /**
@@ -1056,6 +1078,12 @@ public class PowerlinkObject extends AbstractPowerlinkObject
         return isModule;
     }
 
+    public boolean isModuleObjectForced(long newObjectIndex) {
+
+        return module.isObjectIdForced(newObjectIndex);
+
+    }
+
     /**
      * Checks for forced objects.
      *
@@ -1083,6 +1111,12 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     @Override
     public boolean isTpdoMappable() {
         return isTpdoMappable;
+    }
+
+    public byte[] longToBytes(long x) {
+        ByteBuffer buffer = ByteBuffer.allocate(Long.SIZE);
+        buffer.putLong(x);
+        return buffer.array();
     }
 
     /**
@@ -1114,6 +1148,28 @@ public class PowerlinkObject extends AbstractPowerlinkObject
         }
     }
 
+    public void setActualValue(final String actualValue, boolean writeToXdc,
+            boolean moduleObject) throws IOException, JDOMException {
+        TObjectAccessType accessType = getAccessType();
+        if (accessType != null) {
+            if ((accessType == TObjectAccessType.RO)
+                    || (accessType == TObjectAccessType.CONST)) {
+                throw new RuntimeException("Restricted access to object " + "'"
+                        + getName() + "'" + " to set the actual value.");
+            }
+        }
+
+        this.actualValue = actualValue;
+
+        if (writeToXdc) {
+            if (moduleObject) {
+                OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(
+                        getModule(), this, actualValue);
+            }
+        }
+
+    }
+
     /**
      * Updates the given message string as a POWERLINK object configuration
      * error.
@@ -1122,9 +1178,5 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     public void setError(final String errorMessage) {
         configurationError = errorMessage;
     }
-
-    // public void setIndex(long moduleObjectIndex) {
-    // idByte = longToBytes(moduleObjectIndex);
-    // }
 
 }

@@ -78,6 +78,7 @@ import org.epsg.openconfigurator.model.PdoType;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObjects;
@@ -517,7 +518,6 @@ public class OpenConfiguratorLibraryUtils {
                 List<TSubrange> subRangeList = arrayDt.getSubrange();
                 TSubrange subRange = subRangeList.get(0);
 
-                // arrayDt.getDataTypeIDRef().getUniqueIDRef().toString();
                 IEC_Datatype iecDataType = getIEC_DataType(arrayDt);
 
                 libApiRes = core.CreateArrayDatatype(networkId, nodeId,
@@ -1148,13 +1148,7 @@ public class OpenConfiguratorLibraryUtils {
                     System.err.println("ERRR......");
                     continue;
                 }
-                System.err.println("Node Id.." + nodeId);
-                System.err.println("Network Id.." + networkId);
-                System.err.println("Module Id..." + moduleId);
-                System.err.println("Interface Id..." + interfaceId);
-                System.err.println("Module position..." + modulePosition);
-                System.err.println(
-                        "Parameter group Id..." + parameterGroupUniqueId);
+
                 libApiRes = core.CreateParameterGroup(networkId, nodeId,
                         parameterGroupUniqueId, interfaceId, moduleId,
                         modulePosition);
@@ -3367,7 +3361,6 @@ public class OpenConfiguratorLibraryUtils {
 
         libApiRes = importXddModel(module);
         if (!libApiRes.IsSuccessful()) {
-            System.err.println("Import XDD Module..... lib error");
             return libApiRes;
         }
 
@@ -3417,6 +3410,13 @@ public class OpenConfiguratorLibraryUtils {
         return res;
     }
 
+    /**
+     * Force the object's actual value to the library.
+     *
+     * @param plkObject The module object for which the value has to be forced.
+     * @param force True to force.
+     * @return The result from the library.
+     */
     public static Result forceObject(PowerlinkObject plkObject, boolean result,
             long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
@@ -3443,6 +3443,14 @@ public class OpenConfiguratorLibraryUtils {
         return res;
     }
 
+    /**
+     * Force the module sub-object's actual value to the library.
+     *
+     * @param plkSubObject The sub-object of module for which the value has to
+     *            be forced.
+     * @param force True to force.
+     * @return The result from the library.
+     */
     public static Result forceSubObject(PowerlinkSubobject plkSubObject,
             boolean result, long newObjectIndex, int newSubObjectIndex) {
         String actualValue = plkSubObject.getActualValue();
@@ -3484,6 +3492,15 @@ public class OpenConfiguratorLibraryUtils {
         return accessType;
     }
 
+    /**
+     * Receives the actual value of module object.
+     *
+     * @param node Instance of Node
+     * @param powerlinkSubobject Instance of PowerlinkSubObject
+     * @param subIndex The sub-Index of module sub-object
+     * @param moduleObjectIndex The index value of module object.
+     * @return The actual value of module object.
+     */
     public static String getActualValueOfObject(Node node,
             PowerlinkSubobject powerlinkSubobject, int subIndex,
             long moduleObjectIndex) {
@@ -3994,10 +4011,6 @@ public class OpenConfiguratorLibraryUtils {
                         node.getNodeId(), node.getInterface().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id,
                         subObject.getId(), index, subIndex);
-        System.out.println("Current Index....." + index[0]);
-        System.out.println("Current sub Index....." + subIndex[0]);
-        System.out.println("Child ID....." + module.getChildID());
-        System.out.println("Child position....." + module.getPosition());
         if (!libApiRes.IsSuccessful()) {
             System.err.println("getModuleObjectIndex.." + libApiRes);
             OpenConfiguratorMessageConsole.getInstance()
@@ -4190,7 +4203,7 @@ public class OpenConfiguratorLibraryUtils {
             objectJCollection.put(entryVal, actualValue);
             iterator.next();
         }
-
+        // Persist actual value of objects into XDC.
         return res;
     }
 
@@ -4291,6 +4304,7 @@ public class OpenConfiguratorLibraryUtils {
                     pdoMapping = PDOMapping.RPDO;
                     break;
                 default:
+                    break;
             }
         }
 
@@ -4308,6 +4322,7 @@ public class OpenConfiguratorLibraryUtils {
                     sortMode = SortMode.SUBINDEX;
                     break;
                 default:
+                    break;
             }
         }
         return sortMode;
@@ -4325,6 +4340,7 @@ public class OpenConfiguratorLibraryUtils {
                     sortNumber = SortNumber.ADDRESS;
                     break;
                 default:
+                    break;
             }
         }
         return sortNumber;
@@ -4993,6 +5009,100 @@ public class OpenConfiguratorLibraryUtils {
      *
      * @return Result from the library.
      */
+    private static Result updateForcedObjectsIntoLibary(Module module) {
+        Result libApiRes = new Result();
+        InterfaceList.Interface.Module moduleObj = null;
+        if (module.getModuleModel() instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module mod = (InterfaceList.Interface.Module) module
+                    .getModuleModel();
+            moduleObj = mod;
+        }
+        if (moduleObj == null) {
+            return libApiRes;
+        }
+        org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects forcedObjects = moduleObj
+                .getForcedObjects();
+
+        if (forcedObjects == null) {
+            // Ignore if no objects are forced and return success.
+            return libApiRes;
+        }
+
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj : forcedObjects
+                .getObject()) {
+            byte[] forcedObjectId = forcedObj.getIndex();
+            byte[] forcedSubObjectId = forcedObj.getSubindex();
+
+            if (forcedSubObjectId == null) {
+                PowerlinkObject plkObj = module
+                        .updateModuleObjectsFromLibrary(forcedObjectId);
+                if (plkObj == null) {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "Module Object ID 0x"
+                                            + DatatypeConverter.printHexBinary(
+                                                    forcedObjectId)
+                                            + " is forced and is not available in the XDD/XDC file.",
+                                    module.getProject().getName());
+                    continue;
+                }
+                System.err.println(
+                        "Forced Object from module.." + plkObj.getNameWithId());
+                String objectIndex = DatatypeConverter
+                        .printHexBinary(forcedObjectId);
+                long moduleObjectIndex = Long.parseLong(objectIndex, 16);
+                libApiRes = OpenConfiguratorLibraryUtils.forceObject(plkObj,
+                        true, moduleObjectIndex);
+            } else {
+                PowerlinkSubobject plkSubObj = module
+                        .updateModuleSubObjectsFromLibrary(forcedObjectId,
+                                forcedSubObjectId);
+
+                if (plkSubObj == null) {
+                    System.err.println(
+                            "Object is forced which is not available in the XDD/XDC file");
+
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "Module Object ID 0x"
+                                            + DatatypeConverter.printHexBinary(
+                                                    forcedObjectId)
+                                            + "/0x"
+                                            + DatatypeConverter.printHexBinary(
+                                                    forcedSubObjectId)
+                                            + " is forced and is not available in the XDD/XDC file.",
+                                    module.getNode().getNetworkId());
+                    continue;
+                }
+                System.err.println("Forced SubObject from module.."
+                        + plkSubObj.getNameWithId());
+                String objectIndex = DatatypeConverter
+                        .printHexBinary(forcedObjectId);
+                long moduleObjectIndex = Long.parseLong(objectIndex, 16);
+                String subobjectIndex = DatatypeConverter
+                        .printHexBinary(forcedSubObjectId);
+                int moduleSubObjectindex = Integer.parseInt(subobjectIndex, 16);
+                libApiRes = OpenConfiguratorLibraryUtils.forceSubObject(
+                        plkSubObj, true, moduleObjectIndex,
+                        moduleSubObjectindex);
+            }
+
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("The libAPIRES == = =" + libApiRes);
+                return libApiRes;
+            }
+        }
+
+        return libApiRes;
+    }
+
+    /**
+     * Update force configurations into the library.
+     *
+     * @param node Node instance.
+     *
+     * @return Result from the library.
+     */
     private static Result updateForcedObjectsIntoLibary(Node node) {
         Result libApiRes = new Result();
         TAbstractNode abstractNode = null;
@@ -5135,7 +5245,7 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static Result validateModuleSubobjectActualValue(
             PowerlinkSubobject plkSubObject, String value,
-            long newObjectIndex) {
+            long newObjectIndex,int newSubObjectindex) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
                 newObjectIndex, plkSubObject.getId(), value,

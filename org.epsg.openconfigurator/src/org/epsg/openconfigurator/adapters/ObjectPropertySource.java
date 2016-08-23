@@ -258,12 +258,26 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     break;
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
-                    retObj = plkObject.getActualValue();
+                    if (isModuleObject()) {
+                        retObj = plkObject.getActualValue();
+                    } else {
+                        retObj = plkObject.getActualValue();
+                    }
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:
+                    if (isModuleObject()) {
+                        long newObjectIndex = OpenConfiguratorLibraryUtils
+                                .getModuleObjectsIndex(plkObject.getModule(),
+                                        plkObject.getId());
 
-                    int val = (plkObject.isObjectForced() == true) ? 0 : 1;
-                    retObj = Integer.valueOf(val);
+                        int val = (plkObject
+                                .isModuleObjectForced(newObjectIndex) == true)
+                                        ? 0 : 1;
+                        retObj = Integer.valueOf(val);
+                    } else {
+                        int val = (plkObject.isObjectForced() == true) ? 0 : 1;
+                        retObj = Integer.valueOf(val);
+                    }
 
                     break;
                 case OBJ_DENOTATION_ID:
@@ -457,6 +471,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
 
                     default:
                         // others are not editable.
+                        break;
                 }
             }
 
@@ -499,7 +514,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                         .printLibraryErrorMessage(res);
                             } else {
                                 // Success - update the OBD
-                                plkObject.setActualValue((String) value, true);
+                                plkObject.setActualValue((String) value, true,
+                                        isModuleObject());
                             }
                         } else {
                             Result res = OpenConfiguratorLibraryUtils
@@ -533,7 +549,9 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                             .printLibraryErrorMessage(res);
                                 } else {
                                     // Success - update the OBD
-                                    plkObject.forceActualValue(result, true);
+                                    plkObject.forceActualValue(
+                                            plkObject.getModule(), result, true,
+                                            newObjectIndex);
                                 }
                             } else {
                                 Result res = OpenConfiguratorLibraryUtils
@@ -543,7 +561,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                             .printLibraryErrorMessage(res);
                                 } else {
                                     // Success - update the OBD
-                                    // plkObject.forceActualValue(result, true);
+                                    plkObject.forceActualValue(result, true);
                                 }
                             }
                         } else {
@@ -554,6 +572,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     }
                     default:
                         // others are not editable.
+                        break;
                 }
             }
 

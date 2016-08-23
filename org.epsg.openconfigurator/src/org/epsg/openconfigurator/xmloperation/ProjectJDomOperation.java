@@ -78,32 +78,32 @@ public class ProjectJDomOperation {
 
         OPENCONFIGURATOR_NAMESPACE = Namespace.getNamespace("oc",
                 "http://sourceforge.net/projects/openconf/configuration");
-        XPathBuilder<Element> mnXpathelementBuilder = new XPathBuilder<Element>(
+        XPathBuilder<Element> mnXpathelementBuilder = new XPathBuilder<>(
                 "//oc:MN", Filters.element());
         mnXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
         MN_XPATH_EXPR = mnXpathelementBuilder
                 .compileWith(XPATH_FACTORY_INSTANCE);
 
-        XPathBuilder<Element> nodeCollectionXpathelementBuilder = new XPathBuilder<Element>(
+        XPathBuilder<Element> nodeCollectionXpathelementBuilder = new XPathBuilder<>(
                 "//oc:NodeCollection", Filters.element());
         nodeCollectionXpathelementBuilder
                 .setNamespace(OPENCONFIGURATOR_NAMESPACE);
         NODE_ID_COLLECTION_XPATH_EXPR = nodeCollectionXpathelementBuilder
                 .compileWith(XPATH_FACTORY_INSTANCE);
 
-        XPathBuilder<Element> netCfgXpathelementBuilder = new XPathBuilder<Element>(
+        XPathBuilder<Element> netCfgXpathelementBuilder = new XPathBuilder<>(
                 "//oc:NetworkConfiguration", Filters.element());
         netCfgXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
         NETWORKCONFIGURATION_XPATH_EXPR = netCfgXpathelementBuilder
                 .compileWith(XPATH_FACTORY_INSTANCE);
 
-        XPathBuilder<Element> cnXpathelementBuilder = new XPathBuilder<Element>(
+        XPathBuilder<Element> cnXpathelementBuilder = new XPathBuilder<>(
                 "//oc:MN", Filters.element());
         cnXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
         CN_XPATH_EXPR = cnXpathelementBuilder
                 .compileWith(XPATH_FACTORY_INSTANCE);
 
-        XPathBuilder<Element> generatorXpathelementBuilder = new XPathBuilder<Element>(
+        XPathBuilder<Element> generatorXpathelementBuilder = new XPathBuilder<>(
                 "//oc:Generator", Filters.element());
         generatorXpathelementBuilder.setNamespace(OPENCONFIGURATOR_NAMESPACE);
         GENERATOR_XPATH_EXPR = generatorXpathelementBuilder
@@ -360,6 +360,80 @@ public class ProjectJDomOperation {
                 OPENCONFIGURATOR_NAMESPACE);
     }
 
+    public static void forceActualValue(Document document, Module module,
+            PowerlinkObject object, PowerlinkSubobject powerlinkSubobject,
+            long newObjectIndex, int newSubObjectIndex) {
+        if (powerlinkSubobject != null) {
+            System.out.println("Force object actual value:" + object.getIdRaw()
+                    + newSubObjectIndex);
+        } else {
+            System.out
+                    .println("Force object actual value:" + object.getIdRaw());
+        }
+        System.err.println("Is object already forced..."
+                + isObjectAlreadyForced(document, module, object,
+                        powerlinkSubobject, newObjectIndex, newSubObjectIndex));
+        if (isObjectAlreadyForced(document, module, object, powerlinkSubobject,
+                newObjectIndex, newSubObjectIndex)) {
+            return;
+        }
+
+        String forcedTagXpath = module.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT;
+        if (JDomUtil.isXpathPresent(document, forcedTagXpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            Element newObjElement = new Element(
+                    IAbstractNodeProperties.NODE_OBJECTS_OBJECT);
+            Attribute objAttr = new Attribute(
+                    IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT,
+                    Long.toHexString(newObjectIndex));
+            newObjElement.setAttribute(objAttr);
+
+            if (powerlinkSubobject != null) {
+                String subObjectIndex = Integer.toHexString(newSubObjectIndex);
+                if (Integer.valueOf(subObjectIndex) < 10) {
+                    subObjectIndex = "0" + subObjectIndex;
+                }
+                Attribute subObjAttr = new Attribute(
+                        IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT,
+                        subObjectIndex);
+                newObjElement.setAttribute(subObjAttr);
+            }
+
+            JDomUtil.addModuleForceObjectElement(document, forcedTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE, newObjElement);
+
+        } else {
+
+            Element newObjElement = new Element(
+                    IAbstractNodeProperties.NODE_OBJECTS_OBJECT);
+            Attribute objAttr = new Attribute(
+                    IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT,
+                    Long.toHexString(newObjectIndex));
+            newObjElement.setAttribute(objAttr);
+
+            if (powerlinkSubobject != null) {
+                String subObjectIndex = Integer.toHexString(newSubObjectIndex);
+                if (Integer.valueOf(subObjectIndex) < 10) {
+                    subObjectIndex = "0" + subObjectIndex;
+                }
+                Attribute subObjAttr = new Attribute(
+                        IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT,
+                        subObjectIndex);
+                newObjElement.setAttribute(subObjAttr);
+            }
+
+            Element newElement = new Element(
+                    IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT);
+            newElement.setContent(newObjElement);
+
+            JDomUtil.addModuleForceObjectElement(document, module.getXpath(),
+                    OPENCONFIGURATOR_NAMESPACE, newElement);
+
+        }
+
+    }
+
     /**
      * Add the force configuration for the object/sub-object for the given node.
      *
@@ -428,6 +502,61 @@ public class ProjectJDomOperation {
         }
     }
 
+    public static int getChildIndexbelowNode(Document document, Node node) {
+        XPathExpression<Element> xpath = JDomUtil.getXPathExpressionElement(
+                node.getXpath(), OPENCONFIGURATOR_NAMESPACE);
+        List<Element> elementsList = xpath.evaluate(document);
+        Element parentElement = elementsList.get(0);
+        List<Element> childElement = parentElement.getChildren();
+        if (!childElement.isEmpty()) {
+            for (int childCount = 1; childCount <= childElement
+                    .size(); childCount++) {
+                for (Element child : childElement) {
+                    int index = parentElement.indexOf(child);
+                    if (child.getQualifiedName() == "InterfaceList") {
+                        return index;
+                    }
+                }
+            }
+        } else {
+            System.err.println(
+                    "No child elements are available for the given Node with ID = "
+                            + node.getNodeId());
+        }
+        return 0;
+    }
+
+    /**
+     * Check if object is already forced in the project XML file.
+     *
+     * @param document The project file instance.
+     * @param node The node instance.
+     * @param object The object to be checked.
+     * @param subObject The sub-object to be checked.
+     * @return True if available False otherwise.
+     */
+    private static boolean isObjectAlreadyForced(Document document,
+            final Module module, PowerlinkObject object,
+            PowerlinkSubobject subObject, long newObjectIndex,
+            int newSubObjectIndex) {
+        String xpath = module.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT + "/oc:"
+                + IAbstractNodeProperties.NODE_OBJECTS_OBJECT + "[@"
+                + IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT + "='"
+                + Long.toHexString(newObjectIndex) + "']";
+        if (subObject != null) {
+            String subObjectIndex = Integer.toHexString(newSubObjectIndex);
+            if (Integer.valueOf(subObjectIndex) < 10) {
+                subObjectIndex = "0" + subObjectIndex;
+            }
+            xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT
+                    + "='" + subObjectIndex + "']";
+        }
+
+        return JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE);
+    }
+
     /**
      * Check if object is already forced in the project XML file.
      *
@@ -452,6 +581,40 @@ public class ProjectJDomOperation {
 
         return JDomUtil.isXpathPresent(document, xpath,
                 OPENCONFIGURATOR_NAMESPACE);
+    }
+
+    public static void removeForcedObject(Document document, Module module,
+            PowerlinkObject object, PowerlinkSubobject powerlinkSubobject,
+            long newObjectIndex, int newSubObjectIndex) {
+        if (powerlinkSubobject != null) {
+            System.out.println("removeForcedObject actual value:"
+                    + object.getIdRaw() + newSubObjectIndex);
+        } else {
+            System.out.println(
+                    "removeForcedObject actual value:" + object.getIdRaw());
+        }
+
+        String xpath = module.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT + "/oc:"
+                + IAbstractNodeProperties.NODE_OBJECTS_OBJECT + "[@"
+                + IAbstractNodeProperties.NODE_OBJECTS_INDEX_OBJECT + "='"
+                + Long.toHexString(newObjectIndex) + "']";
+        if (powerlinkSubobject != null) {
+            xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT
+                    + "='" + Integer.toHexString(newSubObjectIndex) + "']";
+        }
+
+        JDomUtil.removeElement(document, xpath, OPENCONFIGURATOR_NAMESPACE);
+
+        String forcedTagXpath = module.getXpath() + "/oc:"
+                + IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT;
+
+        if (JDomUtil.getChildrenCount(document, forcedTagXpath,
+                OPENCONFIGURATOR_NAMESPACE) == 0) {
+            JDomUtil.removeElement(document, forcedTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE);
+        }
+
     }
 
     /**

@@ -292,12 +292,30 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     break;
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
-                    retObj = plkSubObject.getActualValue();
+                    if (isModuleSubObject()) {
+                        retObj = plkSubObject.getActualValue();
+                    } else {
+                        retObj = plkSubObject.getActualValue();
+                    }
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:
-
-                    int val = (plkSubObject.isObjectForced() == true) ? 0 : 1;
-                    retObj = Integer.valueOf(val);
+                    if (isModuleSubObject()) {
+                        long newObjectIndex = OpenConfiguratorLibraryUtils
+                                .getModuleObjectsIndex(plkSubObject.getModule(),
+                                        plkSubObject.getObject().getId());
+                        int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                                .getModuleObjectsSubIndex(
+                                        plkSubObject.getModule(), plkSubObject,
+                                        plkSubObject.getObject().getId());
+                        int val = (plkSubObject.isModuleObjectForced(
+                                newObjectIndex, newSubObjectIndex) == true) ? 0
+                                        : 1;
+                        retObj = Integer.valueOf(val);
+                    } else {
+                        int val = (plkSubObject.isObjectForced() == true) ? 0
+                                : 1;
+                        retObj = Integer.valueOf(val);
+                    }
                     break;
                 case OBJ_DENOTATION_ID:
                     retObj = plkSubObject.getDenotation();
@@ -345,9 +363,12 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
             long newObjectIndex = OpenConfiguratorLibraryUtils
                     .getModuleObjectsIndex(plkSubObject.getModule(),
                             plkSubObject.getObject().getId());
+            int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                    .getModuleObjectsSubIndex(plkSubObject.getModule(),
+                            plkSubObject, plkSubObject.getObject().getId());
             Result res = OpenConfiguratorLibraryUtils
                     .validateModuleSubobjectActualValue(plkSubObject,
-                            (String) value, newObjectIndex);
+                            (String) value, newObjectIndex,newSubObjectIndex);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -465,6 +486,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
 
                     default:
                         // others are not editable.
+                        break;
                 }
             }
 
@@ -529,6 +551,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
 
                     default:
                         // others are not editable.
+                        break;
                 }
             }
 
@@ -570,7 +593,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                             } else {
                                 // Success - update the OBD
                                 plkSubObject.setActualValue((String) value,
-                                        true);
+                                        true, isModuleSubObject());
                             }
                         } else {
                             Result res = OpenConfiguratorLibraryUtils
@@ -582,7 +605,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                             } else {
                                 // Success - update the OBD
                                 plkSubObject.setActualValue((String) value,
-                                        true);
+                                        true, isModuleSubObject());
                             }
                         }
 
@@ -603,6 +626,9 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                                         .getModuleObjectSubIndex(
                                                 plkSubObject.getModule(),
                                                 plkSubObject);
+                                System.err.println(
+                                        "The Module object Index in properties..."
+                                                + newObjectIndex);
                                 Result res = OpenConfiguratorLibraryUtils
                                         .forceSubObject(plkSubObject, result,
                                                 newObjectIndex,
@@ -612,8 +638,10 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                                             .printLibraryErrorMessage(res);
                                 } else {
                                     // Success - update the OBD
-                                    // plkSubObject.forceActualValue(result,
-                                    // true);
+                                    plkSubObject.forceActualValue(
+                                            plkSubObject.getModule(), result,
+                                            true, newObjectIndex,
+                                            newSubObjectIndex);
                                 }
                             } else {
                                 Result res = OpenConfiguratorLibraryUtils
@@ -633,10 +661,12 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     }
                     default:
                         // others are not editable.
+                        break;
                 }
             }
 
         } catch (Exception e) {
+            System.err.println("The proerty of sub object.." + e.getMessage());
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     e.getMessage(),
                     plkSubObject.getNode().getProject().getName());

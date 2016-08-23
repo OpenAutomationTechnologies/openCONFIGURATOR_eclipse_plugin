@@ -252,6 +252,50 @@ public final class OpenConfiguratorProjectUtils {
         return retVal;
     }
 
+    public static void forceActualValue(Module module, Node node,
+            PowerlinkObject powerlinkObject, PowerlinkSubobject subObject,
+            boolean force, long newObjectIndex)
+            throws JDOMException, IOException {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        if (force) {
+            ProjectJDomOperation.forceActualValue(document, module,
+                    powerlinkObject, subObject, newObjectIndex, 0);
+        } else {
+            ProjectJDomOperation.removeForcedObject(document, module,
+                    powerlinkObject, subObject, newObjectIndex, 0);
+        }
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+
+    }
+
+    public static void forceActualValue(Module module, Node node,
+            PowerlinkObject object, PowerlinkSubobject powerlinkSubobject,
+            boolean force, long newObjectIndex, int newSubObjectIndex)
+            throws JDOMException, IOException {
+        String projectXmlLocation = node.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        if (force) {
+            ProjectJDomOperation.forceActualValue(document, module, object,
+                    powerlinkSubobject, newObjectIndex, newSubObjectIndex);
+        } else {
+            ProjectJDomOperation.removeForcedObject(document, module, object,
+                    powerlinkSubobject, newObjectIndex, newSubObjectIndex);
+        }
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(node);
+
+    }
+
     /**
      * Force actual value of the Object and writes in the project file
      *
@@ -485,6 +529,30 @@ public final class OpenConfiguratorProjectUtils {
         String targetImportPath = StringUtils.EMPTY;
         if (nodeImportFile != null) {
             if ((nodeImportFile.getFileName() != null)) {
+                File importDirectory = new File(String
+                        .valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.DEVICE_IMPORT_DIR));
+                if (!importDirectory.exists()) {
+                    System.err.println("The directory does not exists....");
+                    importDirectory.mkdir();
+                }
+
+                File configDirectory = new File(String.valueOf(projectRootPath
+                        .toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR));
+                if (!configDirectory.exists()) {
+                    System.err.println("The directory does not exists....");
+                    configDirectory.mkdir();
+                }
+
+                File outputDirectory = new File(String
+                        .valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR));
+                if (!outputDirectory.exists()) {
+                    System.err.println("The directory does not exists....");
+                    outputDirectory.mkdir();
+                }
+
                 targetImportPath = String
                         .valueOf(projectRootPath.toString() + IPath.SEPARATOR
                                 + IPowerlinkProjectSupport.DEVICE_IMPORT_DIR
@@ -1234,6 +1302,37 @@ public final class OpenConfiguratorProjectUtils {
         }
         // Updates generator attributes in project file.
         updateGeneratorInfo(node);
+    }
+
+    public static void updateObjectAttributeActualValue(Module module,
+            PowerlinkObject powerlinkObject, String actualValue)
+            throws IOException, JDOMException {
+        File xdcFile = new File(module.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateActualValue(document, powerlinkObject,
+                actualValue);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+
+    }
+
+    public static void updateObjectAttributeActualValue(Module module,
+            PowerlinkSubobject object, String actualValue)
+            throws IOException, JDOMException {
+        File xdcFile = new File(module.getAbsolutePathToXdc());
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
+
+        XddJdomOperation.updateActualValue(document, object, actualValue);
+
+        writeToXddXmlDocument(document, xdcFile);
+
+        // Updates generator attributes in project file.
+        updateGeneratorInfo(module.getNode());
+
     }
 
     /**

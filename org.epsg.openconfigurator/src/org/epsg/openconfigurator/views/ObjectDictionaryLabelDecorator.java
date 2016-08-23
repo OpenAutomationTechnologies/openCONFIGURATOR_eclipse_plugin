@@ -39,6 +39,7 @@ import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.resources.IPluginImages;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 
 /**
@@ -68,6 +69,19 @@ public class ObjectDictionaryLabelDecorator
                         org.epsg.openconfigurator.Activator.getImageDescriptor(
                                 IPluginImages.OBD_OVERLAY_FORCED_OBJECTS_ICON),
                         IDecoration.BOTTOM_RIGHT);
+            }
+
+            // Set warning icon for forced module Objects
+            if (obj.isModuleObject()) {
+                long newObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectsIndex(obj.getModule(), obj.getId());
+                if (obj.isModuleObjectForced(newObjectIndex)) {
+                    decoration.addOverlay(
+                            org.epsg.openconfigurator.Activator
+                                    .getImageDescriptor(
+                                            IPluginImages.OBD_OVERLAY_FORCED_OBJECTS_ICON),
+                            IDecoration.BOTTOM_RIGHT);
+                }
             }
 
             // Only VAR type is allowed to be edited.
@@ -103,6 +117,24 @@ public class ObjectDictionaryLabelDecorator
                         org.epsg.openconfigurator.Activator.getImageDescriptor(
                                 IPluginImages.OBD_OVERLAY_FORCED_OBJECTS_ICON),
                         IDecoration.BOTTOM_RIGHT);
+            }
+
+            // Set warning icon for forced module sub-Objects
+            if (subObj.isModule()) {
+                long newObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectsIndex(subObj.getModule(),
+                                subObj.getObject().getId());
+                int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                        .getModuleObjectsSubIndex(subObj.getModule(), subObj,
+                                subObj.getObject().getId());
+                if (subObj.isModuleObjectForced(newObjectIndex,
+                        newSubObjectIndex)) {
+                    decoration.addOverlay(
+                            org.epsg.openconfigurator.Activator
+                                    .getImageDescriptor(
+                                            IPluginImages.OBD_OVERLAY_FORCED_OBJECTS_ICON),
+                            IDecoration.BOTTOM_RIGHT);
+                }
             }
 
             // Only VAR type is allowed to be edited.

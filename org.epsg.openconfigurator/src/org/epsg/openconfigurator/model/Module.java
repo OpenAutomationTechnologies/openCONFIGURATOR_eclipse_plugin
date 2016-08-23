@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -51,6 +53,7 @@ import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
@@ -71,8 +74,6 @@ import org.jdom2.JDOMException;
 public class Module {
 
     private PowerlinkRootNode rootNode;
-
-    // private IFile projectXml;
 
     private Object moduleModel;
 
@@ -327,6 +328,66 @@ public class Module {
         }
 
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * Add/remove force object model in the project model.
+     *
+     * @param forceObj The forced object model.
+     * @param force true to add and false to remove.
+     */
+    public void forceObjectActualValue(
+            org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj,
+            boolean force) {
+        org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects forcedObjTag = null;
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module mod = (InterfaceList.Interface.Module) moduleModel;
+            forcedObjTag = mod.getForcedObjects();
+            System.err.println("Force Module Object.." + force);
+            System.err.println("Force Module Object Tag.." + forcedObjTag);
+            if (force) {
+                if (forcedObjTag == null) {
+                    mod.setForcedObjects(
+                            new org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects());
+                    forcedObjTag = mod.getForcedObjects();
+                }
+            } else {
+                if (forcedObjTag != null) {
+                    removeForcedObject(forcedObjTag, forceObj);
+                }
+                if (forcedObjTag != null) {
+                    if (forcedObjTag.getObject().isEmpty()) {
+                        mod.setForcedObjects(null);
+                    }
+                }
+            }
+        }
+
+        if (force) {
+            boolean alreadyForced = false;
+            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                    .getObject()) {
+                System.err.println("The forced Object.." + DatatypeConverter
+                        .printHexBinary(tempForceObj.getIndex()));
+                if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                        forceObj.getIndex())) {
+                    if (forceObj.getSubindex() == null) {
+                        alreadyForced = true;
+                        break;
+                    } else {
+                        if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                                forceObj.getSubindex())) {
+                            alreadyForced = true;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (!alreadyForced) {
+                forcedObjTag.getObject().add(forceObj);
+            }
+        }
     }
 
     /**
@@ -712,6 +773,67 @@ public class Module {
         return enabled;
     }
 
+    public boolean isObjectIdForced(long newObjectIndex) {
+        ForcedObjects forcedObjTag = null;
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module net = (InterfaceList.Interface.Module) moduleModel;
+            forcedObjTag = net.getForcedObjects();
+        }
+
+        if (forcedObjTag == null) {
+            return false;
+        }
+
+        boolean alreadyForced = false;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+            String objectIndex = Long.toHexString(newObjectIndex);
+            byte[] objectId = DatatypeConverter.parseHexBinary(objectIndex);
+
+            if (java.util.Arrays.equals(tempForceObj.getIndex(), objectId)) {
+                alreadyForced = true;
+            }
+        }
+
+        return alreadyForced;
+    }
+
+    public boolean isObjectIdForced(long moduleObjectIndex,
+            int moduleSubobjectindex) {
+        ForcedObjects forcedObjTag = null;
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module net = (InterfaceList.Interface.Module) moduleModel;
+            forcedObjTag = net.getForcedObjects();
+        }
+
+        if (forcedObjTag == null) {
+            return false;
+        }
+
+        boolean alreadyForced = false;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+            String objectIndex = Long.toHexString(moduleObjectIndex);
+            byte[] objectId = DatatypeConverter.parseHexBinary(objectIndex);
+            String subobjectindex = Integer.toHexString(moduleSubobjectindex);
+            if (Integer.valueOf(subobjectindex) < 10) {
+                subobjectindex = "0" + subobjectindex;
+            }
+            byte[] subObjectId = DatatypeConverter
+                    .parseHexBinary(subobjectindex);
+            if (java.util.Arrays.equals(tempForceObj.getIndex(), objectId)) {
+                if (subObjectId == null) {
+                    alreadyForced = true;
+                } else if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                        subObjectId)) {
+                    alreadyForced = true;
+                }
+            }
+        }
+
+        return alreadyForced;
+    }
+
     /**
      * Moves the module based on given position.
      *
@@ -781,6 +903,33 @@ public class Module {
 
     }
 
+    private void removeForcedObject(ForcedObjects forcedObjTag,
+            org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+
+            if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                    forceObj.getIndex())) {
+                if (forceObj.getSubindex() == null) {
+                    tempForcedObjToBeRemoved = tempForceObj;
+                    break;
+                } else {
+                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                            forceObj.getSubindex())) {
+                        tempForcedObjToBeRemoved = tempForceObj;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (tempForcedObjToBeRemoved != null) {
+            forcedObjTag.getObject().remove(tempForcedObjToBeRemoved);
+        }
+
+    }
+
     /**
      * Sets the address value to the module.
      *
@@ -843,14 +992,14 @@ public class Module {
      * @throws JDOMException Errors with time modifications.
      */
     public void setEnabled(boolean enabled) throws JDOMException, IOException {
-
-        Result res = OpenConfiguratorLibraryUtils.toggleEnableDisable(this);
-        if (!res.IsSuccessful()) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printLibraryErrorMessage(res);
-            return;
+        if (!hasError()) {
+            Result res = OpenConfiguratorLibraryUtils.toggleEnableDisable(this);
+            if (!res.IsSuccessful()) {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+                return;
+            }
         }
-
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
             OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
@@ -1281,6 +1430,56 @@ public class Module {
                     + e.getCause().getMessage());
         }
 
+    }
+
+    public PowerlinkObject updateModuleObjectsFromLibrary(byte[] forcedObject) {
+
+        for (PowerlinkObject obj : getObjectDictionary().getObjectsList()) {
+            long newObjectIndex = OpenConfiguratorLibraryUtils
+                    .getModuleObjectsIndex(obj.getModule(), obj.getId());
+            String objectId = Long.toHexString(newObjectIndex);
+            String objectIndex = DatatypeConverter.printHexBinary(forcedObject);
+            if (objectId.equalsIgnoreCase(objectIndex)) {
+                return obj;
+            }
+        }
+        return null;
+
+    }
+
+    public PowerlinkSubobject updateModuleSubObjectsFromLibrary(byte[] obj,
+            byte[] subObj) {
+        for (PowerlinkObject object : getObjectDictionary().getObjectsList()) {
+            long newObjectIndex = OpenConfiguratorLibraryUtils
+                    .getModuleObjectsIndex(object.getModule(), object.getId());
+            String objectId = Long.toHexString(newObjectIndex);
+            String objectIndex = DatatypeConverter.printHexBinary(obj);
+            System.err.println("ObjectId..." + objectId + " Object Index..."
+                    + objectIndex);
+            if (objectId.equalsIgnoreCase(objectIndex)) {
+
+                for (PowerlinkSubobject subObject : object.getSubObjects()) {
+                    int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                            .getModuleObjectsSubIndex(subObject.getModule(),
+                                    subObject, subObject.getObject().getId());
+                    String subobjectId = Long.toHexString(newSubObjectIndex);
+
+                    if (newSubObjectIndex < 10) {
+                        subobjectId = "0" + subobjectId;
+                    }
+
+                    String subobjectIndex = DatatypeConverter
+                            .printHexBinary(subObj);
+                    System.err.println("Sub ObjectId..." + subobjectId
+                            + "sub Object Index..." + subobjectIndex);
+                    if (subobjectId.equalsIgnoreCase(subobjectIndex)) {
+                        return subObject;
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     /**

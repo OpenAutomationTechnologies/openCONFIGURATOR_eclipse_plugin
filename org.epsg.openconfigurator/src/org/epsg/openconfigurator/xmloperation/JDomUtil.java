@@ -62,6 +62,32 @@ import org.xml.sax.InputSource;
  */
 public class JDomUtil {
 
+    public static void addModuleForceObjectElement(Document document,
+            String forcedTagXpath, Namespace openconfiguratorNamespace,
+            Element newObjElement) {
+        System.out.println("addNewElement: " + forcedTagXpath);
+        addModuleForceObjectElements(document, getXPathExpressionElement(
+                forcedTagXpath, openconfiguratorNamespace), newObjElement);
+
+    }
+
+    private static void addModuleForceObjectElements(Document document,
+            XPathExpression<Element> xPathExpressionElement,
+            Element newObjElement) {
+        List<Element> elementsList = xPathExpressionElement.evaluate(document);
+        System.err.println("Elements list.." + elementsList);
+        for (Element element : elementsList) {
+            newObjElement.setNamespace(element.getNamespace());
+            for (Element newChildElement : newObjElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
+
+            element.addContent(newObjElement);
+
+        }
+
+    }
+
     /**
      * Adds the new element under the xpath specified available in the document.
      *

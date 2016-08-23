@@ -469,6 +469,28 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         nodeInstance.forceObjectActualValue(forcedObj, force);
     }
 
+    public synchronized void forceActualValue(Module moduleObj, boolean force,
+            boolean writeToXdc, long newObjectIndex, int newSubObjectIndex)
+            throws JDOMException, IOException {
+        if (writeToXdc) {
+            OpenConfiguratorProjectUtils.forceActualValue(moduleObj, getNode(),
+                    object, this, force, newObjectIndex, newSubObjectIndex);
+        }
+        String objectId = Long.toHexString(newObjectIndex);
+        byte[] objectIndex = DatatypeConverter.parseHexBinary(objectId);
+        String subObjectId = Integer.toHexString(newSubObjectIndex);
+        if (Integer.valueOf(subObjectId) < 10) {
+            subObjectId = "0" + subObjectId;
+        }
+        byte[] subObjectindex = DatatypeConverter.parseHexBinary(subObjectId);
+
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj = new org.epsg.openconfigurator.xmlbinding.projectfile.Object();
+        forcedObj.setIndex(objectIndex);
+        forcedObj.setSubindex(subObjectindex);
+        module.forceObjectActualValue(forcedObj, force);
+
+    }
+
     /**
      * @return Access type of sub-object.
      */
@@ -1013,6 +1035,11 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         return isModule;
     }
 
+    public boolean isModuleObjectForced(long moduleObjectIndex,
+            int moduleSubobjectindex) {
+        return module.isObjectIdForced(moduleObjectIndex, moduleSubobjectindex);
+    }
+
     /**
      * Checks for forced objects.
      *
@@ -1071,6 +1098,27 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         }
     }
 
+    public void setActualValue(final String actualValue, boolean writeToXdc,
+            boolean moduleSubObject) throws IOException, JDOMException {
+        TObjectAccessType accessType = getAccessType();
+        if (accessType != null) {
+            if ((accessType == TObjectAccessType.RO)
+                    || (accessType == TObjectAccessType.CONST)) {
+                throw new RuntimeException("Restricted access to sub-object "
+                        + "'" + getName() + "'" + " to set the actual value.");
+            }
+        }
+
+        this.actualValue = actualValue;
+
+        if (writeToXdc) {
+            if (moduleSubObject) {
+                OpenConfiguratorProjectUtils.updateObjectAttributeActualValue(
+                        getModule(), this, actualValue);
+            }
+        }
+    }
+
     /*
      * (non-Javadoc)
      *
@@ -1082,4 +1130,5 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public void setError(String errorMessage) {
         configurationError = errorMessage;
     }
+
 }
