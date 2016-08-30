@@ -364,7 +364,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         gd_grpConfigurationFile.widthHint = 558;
         grpConfigurationFile.setLayoutData(gd_grpConfigurationFile);
         grpConfigurationFile.setText(CONFIGURATION_FILE_LABEL);
-        grpConfigurationFile.setLayout(new GridLayout(5, false));
+        grpConfigurationFile.setLayout(new GridLayout(4, false));
 
         moduleTypeLabel = new Label(grpConfigurationFile, SWT.NONE);
         moduleTypeLabel.setBounds(71, 148, 69, 15);
@@ -374,13 +374,14 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 SWT.BORDER | SWT.READ_ONLY);
         moduleTypeText.setLayoutData(
                 new GridData(SWT.LEFT, SWT.CENTER, false, false, 2, 1));
+        new Label(grpConfigurationFile, SWT.NONE);
 
         Label lblXddxdc = new Label(grpConfigurationFile, SWT.NONE);
         lblXddxdc.setText(NODE_CONFIGURATION_LABEL);
 
         nodeConfigurationPath = new Text(grpConfigurationFile, SWT.BORDER);
         nodeConfigurationPath.setLayoutData(
-                new GridData(SWT.FILL, SWT.FILL, true, false, 3, 1));
+                new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
 
         nodeConfigurationPath.setToolTipText(nodeConfigurationPath.getText());
         nodeConfigurationPath

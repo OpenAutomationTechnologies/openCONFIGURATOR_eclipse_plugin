@@ -3914,7 +3914,9 @@ public class OpenConfiguratorLibraryUtils {
                     break;
                 case "next":
                     moduleAddressing = ModuleAddressing.NEXT;
+                    break;
                 default:
+                    System.err.println("Invalid Module Addressing.");
                     break;
             }
         }
@@ -5002,73 +5004,73 @@ public class OpenConfiguratorLibraryUtils {
                     .getModuleModel();
             moduleObj = mod;
         }
-        org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects forcedObjects = moduleObj
-                .getForcedObjects();
+        if (moduleObj != null) {
+            org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects forcedObjects = moduleObj
+                    .getForcedObjects();
 
-        if (forcedObjects == null) {
-            // Ignore if no objects are forced and return success.
-            return libApiRes;
-        }
-
-        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj : forcedObjects
-                .getObject()) {
-            byte[] forcedObjectId = forcedObj.getIndex();
-            byte[] forcedSubObjectId = forcedObj.getSubindex();
-
-            if (forcedSubObjectId == null) {
-                PowerlinkObject plkObj = module
-                        .updateModuleObjectsFromLibrary(forcedObjectId);
-                if (plkObj == null) {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(
-                                    "Module Object ID 0x"
-                                            + DatatypeConverter.printHexBinary(
-                                                    forcedObjectId)
-                                            + " is forced and is not available in the XDD/XDC file.",
-                                    module.getProject().getName());
-                    continue;
-                }
-                System.err.println(
-                        "Forced Object from module.." + plkObj.getNameWithId());
-                String objectIndex = DatatypeConverter
-                        .printHexBinary(forcedObjectId);
-                long moduleObjectIndex = Long.parseLong(objectIndex, 16);
-                libApiRes = OpenConfiguratorLibraryUtils.forceObject(plkObj,
-                        true, moduleObjectIndex);
-            } else {
-                PowerlinkSubobject plkSubObj = module
-                        .updateModuleSubObjectsFromLibrary(forcedObjectId,
-                                forcedSubObjectId);
-
-                if (plkSubObj == null) {
-                    System.err.println(
-                            "Object is forced which is not available in the XDD/XDC file");
-
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(
-                                    "Module Object ID 0x"
-                                            + DatatypeConverter.printHexBinary(
-                                                    forcedObjectId)
-                                            + "/0x"
-                                            + DatatypeConverter.printHexBinary(
-                                                    forcedSubObjectId)
-                                            + " is forced and is not available in the XDD/XDC file.",
-                                    module.getNode().getNetworkId());
-                    continue;
-                }
-                System.err.println("Forced SubObject from module.."
-                        + plkSubObj.getNameWithId());
-                String objectIndex = DatatypeConverter
-                        .printHexBinary(forcedObjectId);
-                long moduleObjectIndex = Long.parseLong(objectIndex, 16);
-                String subobjectIndex = DatatypeConverter
-                        .printHexBinary(forcedSubObjectId);
-                int moduleSubObjectindex = Integer.parseInt(subobjectIndex, 16);
-                libApiRes = OpenConfiguratorLibraryUtils.forceSubObject(
-                        plkSubObj, true, moduleObjectIndex,
-                        moduleSubObjectindex);
+            if (forcedObjects == null) {
+                // Ignore if no objects are forced and return success.
+                return libApiRes;
             }
 
+            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object forcedObj : forcedObjects
+                    .getObject()) {
+                byte[] forcedObjectId = forcedObj.getIndex();
+                byte[] forcedSubObjectId = forcedObj.getSubindex();
+
+                if (forcedSubObjectId == null) {
+                    PowerlinkObject plkObj = module
+                            .updateModuleObjectsFromLibrary(forcedObjectId);
+                    if (plkObj == null) {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage("Module Object ID 0x"
+                                        + DatatypeConverter
+                                                .printHexBinary(forcedObjectId)
+                                        + " is forced and is not available in the XDD/XDC file.",
+                                        module.getProject().getName());
+                        continue;
+                    }
+                    System.err.println("Forced Object from module.."
+                            + plkObj.getNameWithId());
+                    String objectIndex = DatatypeConverter
+                            .printHexBinary(forcedObjectId);
+                    long moduleObjectIndex = Long.parseLong(objectIndex, 16);
+                    libApiRes = OpenConfiguratorLibraryUtils.forceObject(plkObj,
+                            true, moduleObjectIndex);
+                } else {
+                    PowerlinkSubobject plkSubObj = module
+                            .updateModuleSubObjectsFromLibrary(forcedObjectId,
+                                    forcedSubObjectId);
+
+                    if (plkSubObj == null) {
+                        System.err.println(
+                                "Object is forced which is not available in the XDD/XDC file");
+
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage("Module Object ID 0x"
+                                        + DatatypeConverter
+                                                .printHexBinary(forcedObjectId)
+                                        + "/0x"
+                                        + DatatypeConverter.printHexBinary(
+                                                forcedSubObjectId)
+                                        + " is forced and is not available in the XDD/XDC file.",
+                                        module.getNode().getNetworkId());
+                        continue;
+                    }
+                    System.err.println("Forced SubObject from module.."
+                            + plkSubObj.getNameWithId());
+                    String objectIndex = DatatypeConverter
+                            .printHexBinary(forcedObjectId);
+                    long moduleObjectIndex = Long.parseLong(objectIndex, 16);
+                    String subobjectIndex = DatatypeConverter
+                            .printHexBinary(forcedSubObjectId);
+                    int moduleSubObjectindex = Integer.parseInt(subobjectIndex,
+                            16);
+                    libApiRes = OpenConfiguratorLibraryUtils.forceSubObject(
+                            plkSubObj, true, moduleObjectIndex,
+                            moduleSubObjectindex);
+                }
+            }
             if (!libApiRes.IsSuccessful()) {
                 System.err.println("The libAPIRES == = =" + libApiRes);
                 return libApiRes;

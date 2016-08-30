@@ -120,46 +120,43 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
-        } else {
-
-            try {
-                if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
-                    Files.createDirectory(outputpath);
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK, "Output path:"
-                                + outputpath.toString() + " does not exist.",
-                        e1);
-                throw new CoreException(errorStatus);
+        }
+        try {
+            if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
+                Files.createDirectory(outputpath);
             }
+        } catch (IOException e1) {
+            e1.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK,
+                    "Output path:" + outputpath.toString() + " does not exist.",
+                    e1);
+            throw new CoreException(errorStatus);
+        }
 
-            // String[1] is always empty.
-            boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
-            if (!retVal) {
-                return retVal;
-            }
+        // String[1] is always empty.
+        boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
+        if (!retVal) {
+            return retVal;
+        }
 
-            ByteBuffer buffer = ByteBuffer
-                    .allocate((int) cdcByteCollection.size());
+        ByteBuffer buffer = ByteBuffer.allocate((int) cdcByteCollection.size());
 
-            for (int i = 0; i < cdcByteCollection.size(); i++) {
-                short value = cdcByteCollection.get(i);
-                // buffer.putShort(value);
-                buffer.put((byte) (value & 0xFF));
-                // buffer.put((byte) ((value >> 8) & 0xff));
-            }
+        for (int i = 0; i < cdcByteCollection.size(); i++) {
+            short value = cdcByteCollection.get(i);
+            // buffer.putShort(value);
+            buffer.put((byte) (value & 0xFF));
+            // buffer.put((byte) ((value >> 8) & 0xff));
+        }
 
-            retVal = createMnobdCdc(outputpath, buffer);
-            if (!retVal) {
-                return retVal;
-            }
+        retVal = createMnobdCdc(outputpath, buffer);
+        if (!retVal) {
+            return retVal;
+        }
 
-            retVal = createMnobdHexTxt(outputpath, buffer);
-            if (!retVal) {
-                return retVal;
-            }
+        retVal = createMnobdHexTxt(outputpath, buffer);
+        if (!retVal) {
+            return retVal;
         }
         return true;
     }
@@ -188,23 +185,21 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
-        } else {
-            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_H);
+        }
+        java.nio.file.Path targetFilePath = targetPath.resolve(XAP_H);
 
-            try {
-                if (!Files.exists(targetPath)) {
-                    Files.createDirectory(targetPath);
-                }
-                Files.write(targetFilePath, piDataOutput[0].getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK,
-                        "Output file:" + targetFilePath.toString()
-                                + " is not accessible.",
-                        e);
-                throw new CoreException(errorStatus);
+        try {
+            if (!Files.exists(targetPath)) {
+                Files.createDirectory(targetPath);
             }
+            Files.write(targetFilePath, piDataOutput[0].getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
         }
 
         return true;
@@ -234,24 +229,21 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
-        } else {
-            java.nio.file.Path targetFilePath = targetPath
-                    .resolve(PROCESSIMAGE_CS);
+        }
+        java.nio.file.Path targetFilePath = targetPath.resolve(PROCESSIMAGE_CS);
 
-            try {
-                if (!Files.exists(targetPath)) {
-                    Files.createDirectory(targetPath);
-                }
-                Files.write(targetFilePath, piDataOutput[0].getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK,
-                        "Output file:" + targetFilePath.toString()
-                                + " is not accessible.",
-                        e);
-                throw new CoreException(errorStatus);
+        try {
+            if (!Files.exists(targetPath)) {
+                Files.createDirectory(targetPath);
             }
+            Files.write(targetFilePath, piDataOutput[0].getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
         }
         return true;
     }
@@ -325,27 +317,25 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             System.err.println("Build ERR "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             throw new CoreException(errorStatus);
-        } else {
-            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_XML);
+        }
+        java.nio.file.Path targetFilePath = targetPath.resolve(XAP_XML);
 
-            try {
-                if (!Files.exists(targetPath)) {
-                    Files.createDirectory(targetPath);
-                }
-                // Write XAP.xml file in UTF-8 encoding.
-                Charset charset = Charset.forName("UTF-8");
-                ArrayList<String> lines = new ArrayList<>();
-                lines.add(piDataOutput[0]);
-                Files.write(targetFilePath, lines, charset);
-            } catch (IOException e) {
-                e.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK,
-                        "Output file:" + targetFilePath.toString()
-                                + " is not accessible.",
-                        e);
-                throw new CoreException(errorStatus);
+        try {
+            if (!Files.exists(targetPath)) {
+                Files.createDirectory(targetPath);
             }
+            // Write XAP.xml file in UTF-8 encoding.
+            Charset charset = Charset.forName("UTF-8");
+            ArrayList<String> lines = new ArrayList<>();
+            lines.add(piDataOutput[0]);
+            Files.write(targetFilePath, lines, charset);
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
         }
         return true;
     }
@@ -667,6 +657,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                             .format(BUILD_FAILED_ERROR_MESSAGE, networkId));
                 } else {
                     // Displays Info message in console.
+                    System.err.println("Build output..." + buildPiSuccess);
                     displayInfoMessage(MessageFormat
                             .format(BUILD_COMPLETED_MESSAGE, networkId));
                     displayInfoMessage("Generated output files at: "

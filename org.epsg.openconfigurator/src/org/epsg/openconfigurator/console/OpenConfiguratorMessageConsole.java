@@ -192,12 +192,7 @@ public class OpenConfiguratorMessageConsole {
                 + projectName + "] " + message;
         MessageConsoleStream out = getInfoMessageStream();
         out.println(fullMessage);
-        try {
-            out.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
     }
 
     /**
@@ -217,12 +212,6 @@ public class OpenConfiguratorMessageConsole {
                         + message;
                 MessageConsoleStream out = getErrorMessageStream();
                 out.println(fullMessage);
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             }
         });
     }
@@ -240,12 +229,6 @@ public class OpenConfiguratorMessageConsole {
 
                 MessageConsoleStream out = getLibraryMessageStream();
                 out.println(message);
-                try {
-                    out.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
             }
         });
     }

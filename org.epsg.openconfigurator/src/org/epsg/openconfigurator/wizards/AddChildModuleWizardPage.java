@@ -69,7 +69,7 @@ public class AddChildModuleWizardPage extends WizardPage {
     public static final String DIALOG_TILE = "POWERLINK module";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to the network.";
 
-    private static Node node;
+    private Node node;
 
     private HeadNodeInterface interfaceObj;
     private Spinner position;

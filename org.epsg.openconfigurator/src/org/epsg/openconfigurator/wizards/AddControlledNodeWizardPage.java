@@ -517,15 +517,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         nodeName.addVerifyListener(nameVerifyListener);
     }
 
-    private void handleStationTypeChanged(int selectionIndex) {
-        if (selectionIndex == 2) {
-            setErrorMessage("Multiplexed operation currently not supported.");
-        } else {
-            setErrorMessage(null);
-        }
-
-    }
-
     /**
      * @return The error status of this page.
      */

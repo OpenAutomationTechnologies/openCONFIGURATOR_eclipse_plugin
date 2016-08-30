@@ -73,6 +73,33 @@ import org.jdom2.JDOMException;
  */
 public class Module {
 
+    private static void removeForcedObject(ForcedObjects forcedObjTag,
+            org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
+        org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
+        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                .getObject()) {
+
+            if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                    forceObj.getIndex())) {
+                if (forceObj.getSubindex() == null) {
+                    tempForcedObjToBeRemoved = tempForceObj;
+                    break;
+                } else {
+                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                            forceObj.getSubindex())) {
+                        tempForcedObjToBeRemoved = tempForceObj;
+                        break;
+                    }
+                }
+            }
+        }
+
+        if (tempForcedObjToBeRemoved != null) {
+            forcedObjTag.getObject().remove(tempForcedObjToBeRemoved);
+        }
+
+    }
+
     private PowerlinkRootNode rootNode;
 
     private Object moduleModel;
@@ -365,27 +392,31 @@ public class Module {
 
         if (force) {
             boolean alreadyForced = false;
-            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
-                    .getObject()) {
-                System.err.println("The forced Object.." + DatatypeConverter
-                        .printHexBinary(tempForceObj.getIndex()));
-                if (java.util.Arrays.equals(tempForceObj.getIndex(),
-                        forceObj.getIndex())) {
-                    if (forceObj.getSubindex() == null) {
-                        alreadyForced = true;
-                        break;
-                    } else {
-                        if (java.util.Arrays.equals(tempForceObj.getSubindex(),
-                                forceObj.getSubindex())) {
+            if (forcedObjTag != null) {
+                for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
+                        .getObject()) {
+                    System.err.println("The forced Object.." + DatatypeConverter
+                            .printHexBinary(tempForceObj.getIndex()));
+                    if (java.util.Arrays.equals(tempForceObj.getIndex(),
+                            forceObj.getIndex())) {
+                        if (forceObj.getSubindex() == null) {
                             alreadyForced = true;
                             break;
+                        } else {
+                            if (java.util.Arrays.equals(
+                                    tempForceObj.getSubindex(),
+                                    forceObj.getSubindex())) {
+                                alreadyForced = true;
+                                break;
+                            }
                         }
                     }
                 }
             }
-
             if (!alreadyForced) {
-                forcedObjTag.getObject().add(forceObj);
+                if (forcedObjTag != null) {
+                    forcedObjTag.getObject().add(forceObj);
+                }
             }
         }
     }
@@ -899,33 +930,6 @@ public class Module {
                 }
             }
 
-        }
-
-    }
-
-    private void removeForcedObject(ForcedObjects forcedObjTag,
-            org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
-        org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
-        for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
-                .getObject()) {
-
-            if (java.util.Arrays.equals(tempForceObj.getIndex(),
-                    forceObj.getIndex())) {
-                if (forceObj.getSubindex() == null) {
-                    tempForcedObjToBeRemoved = tempForceObj;
-                    break;
-                } else {
-                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
-                            forceObj.getSubindex())) {
-                        tempForcedObjToBeRemoved = tempForceObj;
-                        break;
-                    }
-                }
-            }
-        }
-
-        if (tempForcedObjToBeRemoved != null) {
-            forcedObjTag.getObject().remove(tempForcedObjToBeRemoved);
         }
 
     }
