@@ -52,6 +52,7 @@ import org.eclipse.jface.viewers.ColumnViewer;
 import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.EditingSupport;
+import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -72,6 +73,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.VerifyEvent;
 import org.eclipse.swt.events.VerifyListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
@@ -763,6 +765,7 @@ public class MappingView extends ViewPart {
                     }
                 } else {
                     // Do nothing.
+                    System.err.println("Invalid PDO type.");
                 }
             }
             return new Object[0];
@@ -882,12 +885,31 @@ public class MappingView extends ViewPart {
      *
      */
     private class PdoTableLabelProvider extends LabelProvider
-            implements ITableLabelProvider {
+            implements ITableLabelProvider, IColorProvider {
 
         private PdoType pdoType;
 
         public PdoTableLabelProvider(PdoType pdoType) {
             this.pdoType = pdoType;
+        }
+
+        @Override
+        public Color getBackground(Object element) {
+            if (element instanceof PowerlinkSubobject) {
+                PowerlinkSubobject mappParamSubObj = (PowerlinkSubobject) element;
+
+                int index = mappParamSubObj.getId();
+                Table table = tpdoTableViewer.getTable();
+                table.setLinesVisible(true);
+
+                if ((index % 2) == 0) {
+                    return Display.getCurrent()
+                            .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
+                } else {
+                    return Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
+                }
+            }
+            return null;
         }
 
         @Override
@@ -1094,9 +1116,6 @@ public class MappingView extends ViewPart {
 
                     if (element instanceof PowerlinkSubobject) {
                         PowerlinkSubobject data = (PowerlinkSubobject) element;
-                        System.err.println(
-                                "Mappable Object Name.....@#%&%&%*^(*&))*....................."
-                                        + getMappableObjectName(data));
                         return getMappableObjectName(data);
                     }
                     break;
@@ -1171,6 +1190,12 @@ public class MappingView extends ViewPart {
                     break;
             }
             return element.toString();
+        }
+
+        @Override
+        public Color getForeground(Object element) {
+            // TODO Auto-generated method stub
+            return null;
         }
     }
 
@@ -1478,9 +1503,6 @@ public class MappingView extends ViewPart {
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
                     nodeObj = module.getNode();
-                    // setPartName(nodeObj.getNodeIDWithName());
-                    // Set null as input to the view, when the node is disabled.
-                    // displayMappingView(nodeObj);
                     setPartName("Mapping View");
 
                     // Summary
@@ -1877,23 +1899,6 @@ public class MappingView extends ViewPart {
                 tpdoSummaryClmnMappingVersion
                         .setText(PDO_SECTION_MAPPING_VERSION_LABEL);
 
-                // Commented for the bug in eclipse 4.4.0 with Button.SetText()
-                //
-                // Button btnCheckButton = new Button(sctnNewSection,
-                // SWT.CHECK);
-                // formToolkit.adapt(btnCheckButton, true, true);
-                // sctnNewSection.setTextClient(btnCheckButton);
-                // btnCheckButton.setImage(null);
-                // btnCheckButton.setText(PDO_SECTION_SHOW_ONLY_NON_EMPTY_LABEL);
-                // btnCheckButton.addSelectionListener(new SelectionAdapter() {
-                // @Override
-                // public void widgetSelected(SelectionEvent e) {
-                // tpdoSummaryOnlyShowChannelsWithData =
-                // !tpdoSummaryOnlyShowChannelsWithData;
-                // tpdoSummaryTableViewer.refresh();
-                // }
-                // });
-
                 tpdoSummaryTable.addListener(SWT.Resize, new Listener() {
                     @Override
                     public void handleEvent(Event event) {
@@ -1966,25 +1971,6 @@ public class MappingView extends ViewPart {
                 rpdoSummaryClmnMappingVersion
                         .setText(PDO_SECTION_MAPPING_VERSION_LABEL);
 
-                // Commented for the bug in eclipse 4.4.0 with Button.SetText()
-                //
-                // Button btnOnlyShowChannels = new Button(sctnRpdoChannel,
-                // SWT.CHECK);
-                // formToolkit.adapt(btnOnlyShowChannels, true, true);
-                // sctnRpdoChannel.setTextClient(btnOnlyShowChannels);
-                // btnOnlyShowChannels
-                // .setText(PDO_SECTION_SHOW_ONLY_NON_EMPTY_LABEL);
-                // btnOnlyShowChannels
-                // .addSelectionListener(new SelectionAdapter() {
-                //
-                // @Override
-                // public void widgetSelected(SelectionEvent e) {
-                // rpdoSummaryOnlyShowChannelsWithData =
-                // !rpdoSummaryOnlyShowChannelsWithData;
-                // rpdoSummaryTableViewer.refresh();
-                // }
-                // });
-
                 rpdoSummaryTable.addListener(SWT.Resize, new Listener() {
                     @Override
                     public void handleEvent(Event event) {
@@ -2015,7 +2001,6 @@ public class MappingView extends ViewPart {
                 Composite tpdoHeaderFrame = new Composite(composite_3,
                         SWT.BORDER);
                 tpdoHeaderFrame.setLayout(new GridLayout(5, false));
-                // gd_tpdoHeaderFrame.heightHint = 61;
                 tpdoHeaderFrame.setLayoutData(
                         new GridData(SWT.FILL, SWT.TOP, true, false, 1, 1));
 
@@ -2109,7 +2094,7 @@ public class MappingView extends ViewPart {
                 tblclmnSno.setText(PDO_TABLE_COLUMN_NO_LABEL);
 
                 tpdoMappingObjectColumn = new TableViewerColumn(tpdoTableViewer,
-                        SWT.NONE);
+                        SWT.BORDER | SWT.FULL_SELECTION);
 
                 TableColumn tblclmnMappingObject = tpdoMappingObjectColumn
                         .getColumn();
@@ -2346,7 +2331,7 @@ public class MappingView extends ViewPart {
                 tblclmnSno.setText(PDO_TABLE_COLUMN_NO_LABEL);
 
                 rpdoMappingObjectColumn = new TableViewerColumn(rpdoTableViewer,
-                        SWT.NONE);
+                        SWT.BORDER | SWT.FULL_SELECTION);
 
                 TableColumn tblclmnMappingObject = rpdoMappingObjectColumn
                         .getColumn();
