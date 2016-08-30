@@ -541,6 +541,112 @@ public class IndustrialNetworkView extends ViewPart
     // Refresh action message string.
     public static final String REFRESH_ACTION_MESSAGE = "Refresh (F5)";
 
+    /**
+     * Verifies the enabling of module based on the module type of connected
+     * modules.
+     *
+     * @param module Instance of Module.
+     * @return <code>true</code> module is enabled, <code>false</code> module is
+     *         disabled.
+     */
+    private static boolean canModuleEnabled(Module module) {
+        boolean enable = false;
+        int enabledModulePosition = module.getPosition();
+        int previousModulePosition = 0;
+        HeadNodeInterface interfaceObj = module.getInterfaceOfModule();
+        List<Integer> positionToBeChecked = new ArrayList<>();
+        List<Integer> previousPositionList = new ArrayList<>();
+        Set<Integer> positionset = interfaceObj.getModuleCollection().keySet();
+        for (Integer pos : positionset) {
+            if (pos < enabledModulePosition) {
+                previousModulePosition = pos;
+                previousPositionList.add(previousModulePosition);
+            }
+
+            if (pos > enabledModulePosition) {
+                positionToBeChecked.add(pos);
+            }
+        }
+        Module enabledPositionModule = interfaceObj.getModuleCollection()
+                .get(enabledModulePosition);
+        Collections.sort(previousPositionList, Collections.reverseOrder());
+        if (previousModulePosition != 0) {
+            for (Integer previousPosition : previousPositionList) {
+                System.err.println(
+                        "Previous position!@#$ . ..." + previousPosition);
+                Module previousPositionModule = interfaceObj
+                        .getModuleCollection().get(previousPosition);
+                List<ModuleType> previousModuleTypeList = previousPositionModule
+                        .getModuleInterface().getModuleTypeList()
+                        .getModuleType();
+                if (previousPositionModule.isEnabled()) {
+                    for (ModuleType moduleType : previousModuleTypeList) {
+                        String previousModuleType = moduleType.getType();
+                        String enabledPositionModuleType = enabledPositionModule
+                                .getModuleInterface().getType();
+                        System.err.println("Previous Module Position type ...."
+                                + previousModuleType);
+                        System.err.println("Enabled Module Position type ...."
+                                + enabledPositionModuleType);
+                        if (previousModuleType
+                                .equals(enabledPositionModuleType)) {
+                            System.err.println(
+                                    "Previous module equals enabled module.....");
+                            enable = true;
+                        } else {
+                            return false;
+                        }
+                    }
+                }
+                if (enable) {
+                    break;
+                }
+            }
+        } else {
+            String previousModuleType = interfaceObj.getInterfaceType();
+            String enabledPositionModuleType = enabledPositionModule
+                    .getModuleInterface().getType();
+            if (previousModuleType.equals(enabledPositionModuleType)) {
+                System.err
+                        .println("Previous module equals enabled module.....");
+                enable = true;
+            } else {
+                return false;
+            }
+        }
+
+        for (Integer nextPosition : positionToBeChecked) {
+            System.err.println("Next position @#$#%......." + nextPosition);
+            Module nextPositionModule = interfaceObj.getModuleCollection()
+                    .get(nextPosition);
+            if (nextPositionModule.isEnabled()) {
+                String nextPositionModuleType = nextPositionModule
+                        .getModuleInterface().getType();
+                List<ModuleType> enabledModuleTypeList = enabledPositionModule
+                        .getModuleInterface().getModuleTypeList()
+                        .getModuleType();
+                for (ModuleType moduletype : enabledModuleTypeList) {
+                    String enabledModuleType = moduletype.getType();
+                    System.err.println(
+                            "Enabled module type.." + enabledModuleType);
+                    System.err.println("Next position module type.."
+                            + nextPositionModuleType);
+                    if (enabledModuleType.equals(nextPositionModuleType)) {
+                        enable = true;
+
+                    } else {
+                        enable = false;
+                    }
+                }
+                break;
+            }
+
+        }
+
+        System.err.println("Enable..............................." + enable);
+        return enable;
+    }
+
     private static void disableModule(Module module)
             throws JDOMException, IOException {
         int removedModulePosition = module.getPosition();
@@ -773,11 +879,11 @@ public class IndustrialNetworkView extends ViewPart
      * Show object dictionary.
      */
     private Action showObjectDictionary;
-
     /**
      * Show Properties action.
      */
     private Action showProperties;
+
     /**
      * Delete node action.
      */
@@ -786,7 +892,6 @@ public class IndustrialNetworkView extends ViewPart
     /**
      * Enable/Disable node action.
      */
-    // private Action enableDisableNode;
     private Action enable;
 
     private Action disable;
@@ -870,112 +975,6 @@ public class IndustrialNetworkView extends ViewPart
      * The constructor.
      */
     public IndustrialNetworkView() {
-    }
-
-    /**
-     * Verifies the enabling of module based on the module type of connected
-     * modules.
-     *
-     * @param module Instance of Module.
-     * @return <code>true</code> module is enabled, <code>false</code> module is
-     *         disabled.
-     */
-    private boolean canModuleEnabled(Module module) {
-        boolean enable = false;
-        int enabledModulePosition = module.getPosition();
-        int previousModulePosition = 0;
-        HeadNodeInterface interfaceObj = module.getInterfaceOfModule();
-        List<Integer> positionToBeChecked = new ArrayList<>();
-        List<Integer> previousPositionList = new ArrayList<>();
-        Set<Integer> positionset = interfaceObj.getModuleCollection().keySet();
-        for (Integer pos : positionset) {
-            if (pos < enabledModulePosition) {
-                previousModulePosition = pos;
-                previousPositionList.add(previousModulePosition);
-            }
-
-            if (pos > enabledModulePosition) {
-                positionToBeChecked.add(pos);
-            }
-        }
-        Module enabledPositionModule = interfaceObj.getModuleCollection()
-                .get(enabledModulePosition);
-        Collections.sort(previousPositionList, Collections.reverseOrder());
-        if (previousModulePosition != 0) {
-            for (Integer previousPosition : previousPositionList) {
-                System.err.println(
-                        "Previous position!@#$ . ..." + previousPosition);
-                Module previousPositionModule = interfaceObj
-                        .getModuleCollection().get(previousPosition);
-                List<ModuleType> previousModuleTypeList = previousPositionModule
-                        .getModuleInterface().getModuleTypeList()
-                        .getModuleType();
-                if (previousPositionModule.isEnabled()) {
-                    for (ModuleType moduleType : previousModuleTypeList) {
-                        String previousModuleType = moduleType.getType();
-                        String enabledPositionModuleType = enabledPositionModule
-                                .getModuleInterface().getType();
-                        System.err.println("Previous Module Position type ...."
-                                + previousModuleType);
-                        System.err.println("Enabled Module Position type ...."
-                                + enabledPositionModuleType);
-                        if (previousModuleType
-                                .equals(enabledPositionModuleType)) {
-                            System.err.println(
-                                    "Previous module equals enabled module.....");
-                            enable = true;
-                        } else {
-                            return false;
-                        }
-                    }
-                }
-                if (enable) {
-                    break;
-                }
-            }
-        } else {
-            String previousModuleType = interfaceObj.getInterfaceType();
-            String enabledPositionModuleType = enabledPositionModule
-                    .getModuleInterface().getType();
-            if (previousModuleType.equals(enabledPositionModuleType)) {
-                System.err
-                        .println("Previous module equals enabled module.....");
-                enable = true;
-            } else {
-                return false;
-            }
-        }
-
-        for (Integer nextPosition : positionToBeChecked) {
-            System.err.println("Next position @#$#%......." + nextPosition);
-            Module nextPositionModule = interfaceObj.getModuleCollection()
-                    .get(nextPosition);
-            if (nextPositionModule.isEnabled()) {
-                String nextPositionModuleType = nextPositionModule
-                        .getModuleInterface().getType();
-                List<ModuleType> enabledModuleTypeList = enabledPositionModule
-                        .getModuleInterface().getModuleTypeList()
-                        .getModuleType();
-                for (ModuleType moduletype : enabledModuleTypeList) {
-                    String enabledModuleType = moduletype.getType();
-                    System.err.println(
-                            "Enabled module type.." + enabledModuleType);
-                    System.err.println("Next position module type.."
-                            + nextPositionModuleType);
-                    if (enabledModuleType.equals(nextPositionModuleType)) {
-                        enable = true;
-
-                    } else {
-                        enable = false;
-                    }
-                }
-                break;
-            }
-
-        }
-
-        System.err.println("Enable..............................." + enable);
-        return enable;
     }
 
     /**
@@ -2093,9 +2092,6 @@ public class IndustrialNetworkView extends ViewPart
 
                                                 moduleValue.setPositions(String
                                                         .valueOf(newPosition));
-                                                // moduleValue.setAddress(String
-                                                // .valueOf(newPosition));
-                                                // return;
 
                                             } else {
                                                 System.err.println(
@@ -2113,8 +2109,6 @@ public class IndustrialNetworkView extends ViewPart
                                                                 + newPosition);
                                                 moduleValue.setPositions(String
                                                         .valueOf(newPosition));
-                                                // moduleValue.setAddress(String
-                                                // .valueOf(newPosition));
                                                 if (mod.isEnabled()) {
                                                     mod.setEnabled(false);
                                                 }

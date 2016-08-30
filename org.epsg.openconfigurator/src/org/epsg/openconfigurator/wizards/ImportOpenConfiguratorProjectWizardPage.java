@@ -326,6 +326,32 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
     private static final String NO_PROJECTS_FOUND_MESSAGE = "No projects are found to import.";
 
     /**
+     * Searches for the project file with the extension .xml and returns
+     *
+     * @param directory Location to search for the project file.
+     *
+     * @return The project file, null otherwise.
+     */
+    private static File getProjectFile(final File directory) {
+
+        File[] files = directory.listFiles(new FilenameFilter() {
+            @Override
+            public boolean accept(File dir, String name) {
+                return (name.toLowerCase().endsWith(
+                        ImportOpenConfiguratorProjectWizardPage.XML_EXTENSION_LABEL)
+                        && !name.equalsIgnoreCase(
+                                ImportOpenConfiguratorProjectWizardPage.XAP_XML_LABEL));
+            }
+        });
+
+        if ((files != null) && (files.length > 0)) {
+            return files[0];
+        }
+
+        return null;
+    }
+
+    /**
      * Check if the project folder is already in workspace or not.
      *
      * @param projectName Project name
@@ -412,6 +438,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         }
 
     };
+
     /**
      * Check state listener to handle the check events of the project list
      * viewer.
@@ -463,11 +490,11 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * List projects from directory radio button.
      */
     private Button projectFromDirectoryRadio;
-
     /**
      * Directory text box.
      */
     private Text directoryPathField;
+
     /**
      * Checkbox based tree viewer to list all the available projects.
      */
@@ -1032,32 +1059,6 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         });
         Dialog.applyDialogFont(refresh);
         setButtonLayoutData(refresh);
-    }
-
-    /**
-     * Searches for the project file with the extension .xml and returns
-     *
-     * @param directory Location to search for the project file.
-     *
-     * @return The project file, null otherwise.
-     */
-    private File getProjectFile(final File directory) {
-
-        File[] files = directory.listFiles(new FilenameFilter() {
-            @Override
-            public boolean accept(File dir, String name) {
-                return (name.toLowerCase().endsWith(
-                        ImportOpenConfiguratorProjectWizardPage.XML_EXTENSION_LABEL)
-                        && !name.equalsIgnoreCase(
-                                ImportOpenConfiguratorProjectWizardPage.XAP_XML_LABEL));
-            }
-        });
-
-        if ((files != null) && (files.length > 0)) {
-            return files[0];
-        }
-
-        return null;
     }
 
     /**

@@ -89,6 +89,70 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String ERROR_RMN_NOT_SUPPORTED = "{0} does not support RMN.";
     private static final String ERROR_RMN_WITH_CHAINED_STATION = "POWERLINK network with chained station cannot have RMN.";
 
+    /**
+     * @return The list of nodes from POWERLINK root node.
+     */
+    private static PowerlinkRootNode getNodelist() {
+        IViewPart viewPart = PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getActivePage()
+                .findView(IndustrialNetworkView.ID);
+        if (viewPart instanceof IndustrialNetworkView) {
+            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
+            PowerlinkRootNode nodeList = industrialView.getNodeList();
+            return nodeList;
+        }
+        return null;
+    }
+
+    /**
+     * Checks for node available in the given node ID list or not.
+     *
+     * @param nodeIdList The list of node IDs.
+     * @param nodeIdTobeChecked the node ID to be checked.
+     * @return <code>True</code> if node is already present <code>False</code>
+     *         otherwise.
+     */
+    private static boolean isNodeIdAvailable(List<Short> nodeIdList,
+            short nodeIdTobeChecked) {
+
+        boolean nodeIdAvailable = false;
+        for (Short nodeId : nodeIdList) {
+            if (nodeId.shortValue() == nodeIdTobeChecked) {
+                nodeIdAvailable = true;
+            }
+        }
+        return nodeIdAvailable;
+    }
+
+    /**
+     * Checks for the valid name for the master node.
+     *
+     * @param nodeName Name
+     * @return true if valid, false otherwise.
+     */
+    private static boolean isNodeNameValid(final String nodeName) {
+        boolean retval = false;
+
+        if (nodeName == null) {
+            return retval;
+        }
+
+        if (nodeName.length() == 0) {
+            return retval;
+        }
+
+        // Space as first character is not allowed. ppc:tNonEmptyString
+        if (nodeName.charAt(0) == ' ') {
+            return retval;
+        }
+
+        if (nodeName.length() > 0) {
+            retval = true;
+        }
+
+        return retval;
+    }
+
     private static boolean isValidCnNodeId(short cnNodeId) {
         if ((cnNodeId >= IPowerlinkConstants.CN_MIN_NODE_ID)
                 && (cnNodeId <= IPowerlinkConstants.CN_MAX_NODE_ID)) {
@@ -372,21 +436,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
     }
 
     /**
-     * @return The list of nodes from POWERLINK root node.
-     */
-    private PowerlinkRootNode getNodelist() {
-        IViewPart viewPart = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage()
-                .findView(IndustrialNetworkView.ID);
-        if (viewPart instanceof IndustrialNetworkView) {
-            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-            PowerlinkRootNode nodeList = industrialView.getNodeList();
-            return nodeList;
-        }
-        return null;
-    }
-
-    /**
      * @return The name of the node selected.
      */
     String getNodeName() {
@@ -450,26 +499,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         return errorField;
     }
 
-    /**
-     * Checks for node available in the given node ID list or not.
-     *
-     * @param nodeIdList The list of node IDs.
-     * @param nodeIdTobeChecked the node ID to be checked.
-     * @return <code>True</code> if node is already present <code>False</code>
-     *         otherwise.
-     */
-    private boolean isNodeIdAvailable(List<Short> nodeIdList,
-            short nodeIdTobeChecked) {
-
-        boolean nodeIdAvailable = false;
-        for (Short nodeId : nodeIdList) {
-            if (nodeId.shortValue() == nodeIdTobeChecked) {
-                nodeIdAvailable = true;
-            }
-        }
-        return nodeIdAvailable;
-    }
-
     private boolean isNodeIdAvailableInModel(String nodeId) {
         List<Short> nodeIdList = getNodeIDs();
         boolean retVal = false;
@@ -482,35 +511,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         }
 
         return retVal;
-    }
-
-    /**
-     * Checks for the valid name for the master node.
-     *
-     * @param nodeName Name
-     * @return true if valid, false otherwise.
-     */
-    private boolean isNodeNameValid(final String nodeName) {
-        boolean retval = false;
-
-        if (nodeName == null) {
-            return retval;
-        }
-
-        if (nodeName.length() == 0) {
-            return retval;
-        }
-
-        // Space as first character is not allowed. ppc:tNonEmptyString
-        if (nodeName.charAt(0) == ' ') {
-            return retval;
-        }
-
-        if (nodeName.length() > 0) {
-            retval = true;
-        }
-
-        return retval;
     }
 
     /**

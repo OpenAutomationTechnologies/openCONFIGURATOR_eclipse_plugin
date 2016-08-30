@@ -93,6 +93,264 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
 
     /**
+     * Build the concise device configuration outputs in the specified output
+     * path.
+     *
+     * @param networkId The network ID.
+     * @param outputpath The location to save the output files.
+     * @param monitor Monitor instance to update the progress activity.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean buildConciseDeviceConfiguration(
+            final String networkId, java.nio.file.Path outputpath,
+            final IProgressMonitor monitor) throws CoreException {
+        String configurationOutput[] = new String[1];
+        ByteCollection cdcByteCollection = new ByteCollection();
+
+        Result res = OpenConfiguratorCore.GetInstance().BuildConfiguration(
+                networkId, configurationOutput, cdcByteCollection);
+
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // Displays error message in console.
+            displayLibraryErrorMessage(res);
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+
+            try {
+                if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
+                    Files.createDirectory(outputpath);
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK, "Output path:"
+                                + outputpath.toString() + " does not exist.",
+                        e1);
+                throw new CoreException(errorStatus);
+            }
+
+            // String[1] is always empty.
+            boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
+            if (!retVal) {
+                return retVal;
+            }
+
+            ByteBuffer buffer = ByteBuffer
+                    .allocate((int) cdcByteCollection.size());
+
+            for (int i = 0; i < cdcByteCollection.size(); i++) {
+                short value = cdcByteCollection.get(i);
+                // buffer.putShort(value);
+                buffer.put((byte) (value & 0xFF));
+                // buffer.put((byte) ((value >> 8) & 0xff));
+            }
+
+            retVal = createMnobdCdc(outputpath, buffer);
+            if (!retVal) {
+                return retVal;
+            }
+
+            retVal = createMnobdHexTxt(outputpath, buffer);
+            if (!retVal) {
+                return retVal;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Writes the processimage variables for the specified node ID. The format
+     * is usable in the 'C' language.
+     *
+     * @param networkId The network ID.
+     * @param nodeId The node for which the processimage to be generated.
+     * @param targetPath The location to save the output file.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean buildCProcessImage(String networkId, short nodeId,
+            java.nio.file.Path targetPath) throws CoreException {
+        String piDataOutput[] = new String[1];
+        Result res = OpenConfiguratorCore.GetInstance()
+                .BuildCProcessImage(networkId, nodeId, piDataOutput);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // Displays error message in console.
+            displayLibraryErrorMessage(res);
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_H);
+
+            try {
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectory(targetPath);
+                }
+                Files.write(targetFilePath, piDataOutput[0].getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        e);
+                throw new CoreException(errorStatus);
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Writes the processimage variables for the specified node ID. The format
+     * is usable in the 'C#' language.
+     *
+     * @param networkId The network ID.
+     * @param nodeId The node for which the processimage to be generated.
+     * @param targetPath The location to save the output file.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean buildCSharpProcessImage(String networkId,
+            short nodeId, java.nio.file.Path targetPath) throws CoreException {
+        String piDataOutput[] = new String[1];
+        Result res = OpenConfiguratorCore.GetInstance()
+                .BuildNETProcessImage(networkId, nodeId, piDataOutput);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // Displays error message in console.
+            displayLibraryErrorMessage(res);
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+            java.nio.file.Path targetFilePath = targetPath
+                    .resolve(PROCESSIMAGE_CS);
+
+            try {
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectory(targetPath);
+                }
+                Files.write(targetFilePath, piDataOutput[0].getBytes());
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        e);
+                throw new CoreException(errorStatus);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Build the ProcessImage descriptions for currently active project.
+     *
+     * @param networkId The network ID.
+     * @param targetPath The location to save the output files.
+     * @param monitor Monitor instance to update the progress activity.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean buildProcessImageDescriptions(String networkId,
+            java.nio.file.Path targetPath, IProgressMonitor monitor)
+            throws CoreException {
+
+        ByteCollection nodeIdCollection = new ByteCollection();
+        Result res = OpenConfiguratorCore.GetInstance()
+                .GetAvailableNodeIds(networkId, nodeIdCollection);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // Displays error message in console.
+            displayLibraryErrorMessage(res);
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        }
+
+        boolean ret = false;
+        for (int i = 0; i < nodeIdCollection.size(); i++) {
+            short value = nodeIdCollection.get(i);
+            java.nio.file.Path processImagePath = targetPath;
+            if (value != IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                processImagePath = processImagePath
+                        .resolve(String.valueOf(value));
+                // NOTE: Remove 'continue' to generate the Individual CN's PI
+                // descriptions.
+                continue;
+            }
+            ret = buildCProcessImage(networkId, value, processImagePath);
+            ret = buildXmlProcessImage(networkId, value, processImagePath);
+            ret = buildCSharpProcessImage(networkId, value, processImagePath);
+        }
+        return ret;
+    }
+
+    /**
+     * Writes the processimage variables for the specified node ID. The
+     * processimage variable are available in the XML format.
+     *
+     * @param networkId The network ID.
+     * @param nodeId The node for which the processimage to be generated.
+     * @param targetPath The location to save the output file.
+     * @return <code>True</code> if successful and <code>False</code> otherwise.
+     * @throws CoreException
+     */
+    private static boolean buildXmlProcessImage(String networkId, short nodeId,
+            java.nio.file.Path targetPath) throws CoreException {
+        String piDataOutput[] = new String[1];
+        Result res = OpenConfiguratorCore.GetInstance()
+                .BuildXMLProcessImage(networkId, nodeId, piDataOutput);
+        if (!res.IsSuccessful()) {
+            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
+                    IStatus.OK,
+                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
+            // Displays error message in console.
+            displayLibraryErrorMessage(res);
+            System.err.println("Build ERR "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            throw new CoreException(errorStatus);
+        } else {
+            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_XML);
+
+            try {
+                if (!Files.exists(targetPath)) {
+                    Files.createDirectory(targetPath);
+                }
+                // Write XAP.xml file in UTF-8 encoding.
+                Charset charset = Charset.forName("UTF-8");
+                ArrayList<String> lines = new ArrayList<>();
+                lines.add(piDataOutput[0]);
+                Files.write(targetFilePath, lines, charset);
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        e);
+                throw new CoreException(errorStatus);
+            }
+        }
+        return true;
+    }
+
+    /**
      * Create the mnobd.cdc in the specified output folder.
      *
      * @param outputFolder Location to save the file.
@@ -254,264 +512,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         // Prevents build if no change has occurred in the project.
         rememberLastBuiltState();
         return null;
-    }
-
-    /**
-     * Build the concise device configuration outputs in the specified output
-     * path.
-     *
-     * @param networkId The network ID.
-     * @param outputpath The location to save the output files.
-     * @param monitor Monitor instance to update the progress activity.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean buildConciseDeviceConfiguration(final String networkId,
-            java.nio.file.Path outputpath, final IProgressMonitor monitor)
-            throws CoreException {
-        String configurationOutput[] = new String[1];
-        ByteCollection cdcByteCollection = new ByteCollection();
-
-        Result res = OpenConfiguratorCore.GetInstance().BuildConfiguration(
-                networkId, configurationOutput, cdcByteCollection);
-
-        if (!res.IsSuccessful()) {
-            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    IStatus.OK,
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // Displays error message in console.
-            displayLibraryErrorMessage(res);
-            System.err.println("Build ERR "
-                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
-            throw new CoreException(errorStatus);
-        } else {
-
-            try {
-                if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
-                    Files.createDirectory(outputpath);
-                }
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK, "Output path:"
-                                + outputpath.toString() + " does not exist.",
-                        e1);
-                throw new CoreException(errorStatus);
-            }
-
-            // String[1] is always empty.
-            boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
-            if (!retVal) {
-                return retVal;
-            }
-
-            ByteBuffer buffer = ByteBuffer
-                    .allocate((int) cdcByteCollection.size());
-
-            for (int i = 0; i < cdcByteCollection.size(); i++) {
-                short value = cdcByteCollection.get(i);
-                // buffer.putShort(value);
-                buffer.put((byte) (value & 0xFF));
-                // buffer.put((byte) ((value >> 8) & 0xff));
-            }
-
-            retVal = createMnobdCdc(outputpath, buffer);
-            if (!retVal) {
-                return retVal;
-            }
-
-            retVal = createMnobdHexTxt(outputpath, buffer);
-            if (!retVal) {
-                return retVal;
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Writes the processimage variables for the specified node ID. The format
-     * is usable in the 'C' language.
-     *
-     * @param networkId The network ID.
-     * @param nodeId The node for which the processimage to be generated.
-     * @param targetPath The location to save the output file.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean buildCProcessImage(String networkId, short nodeId,
-            java.nio.file.Path targetPath) throws CoreException {
-        String piDataOutput[] = new String[1];
-        Result res = OpenConfiguratorCore.GetInstance()
-                .BuildCProcessImage(networkId, nodeId, piDataOutput);
-        if (!res.IsSuccessful()) {
-            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    IStatus.OK,
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // Displays error message in console.
-            displayLibraryErrorMessage(res);
-            System.err.println("Build ERR "
-                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
-            throw new CoreException(errorStatus);
-        } else {
-            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_H);
-
-            try {
-                if (!Files.exists(targetPath)) {
-                    Files.createDirectory(targetPath);
-                }
-                Files.write(targetFilePath, piDataOutput[0].getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK,
-                        "Output file:" + targetFilePath.toString()
-                                + " is not accessible.",
-                        e);
-                throw new CoreException(errorStatus);
-            }
-        }
-
-        return true;
-    }
-
-    /**
-     * Writes the processimage variables for the specified node ID. The format
-     * is usable in the 'C#' language.
-     *
-     * @param networkId The network ID.
-     * @param nodeId The node for which the processimage to be generated.
-     * @param targetPath The location to save the output file.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean buildCSharpProcessImage(String networkId, short nodeId,
-            java.nio.file.Path targetPath) throws CoreException {
-        String piDataOutput[] = new String[1];
-        Result res = OpenConfiguratorCore.GetInstance()
-                .BuildNETProcessImage(networkId, nodeId, piDataOutput);
-        if (!res.IsSuccessful()) {
-            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    IStatus.OK,
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // Displays error message in console.
-            displayLibraryErrorMessage(res);
-            System.err.println("Build ERR "
-                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
-            throw new CoreException(errorStatus);
-        } else {
-            java.nio.file.Path targetFilePath = targetPath
-                    .resolve(PROCESSIMAGE_CS);
-
-            try {
-                if (!Files.exists(targetPath)) {
-                    Files.createDirectory(targetPath);
-                }
-                Files.write(targetFilePath, piDataOutput[0].getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK,
-                        "Output file:" + targetFilePath.toString()
-                                + " is not accessible.",
-                        e);
-                throw new CoreException(errorStatus);
-            }
-        }
-        return true;
-    }
-
-    /**
-     * Build the ProcessImage descriptions for currently active project.
-     *
-     * @param networkId The network ID.
-     * @param targetPath The location to save the output files.
-     * @param monitor Monitor instance to update the progress activity.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean buildProcessImageDescriptions(String networkId,
-            java.nio.file.Path targetPath, IProgressMonitor monitor)
-            throws CoreException {
-
-        ByteCollection nodeIdCollection = new ByteCollection();
-        Result res = OpenConfiguratorCore.GetInstance()
-                .GetAvailableNodeIds(networkId, nodeIdCollection);
-        if (!res.IsSuccessful()) {
-            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    IStatus.OK,
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // Displays error message in console.
-            displayLibraryErrorMessage(res);
-            System.err.println("Build ERR "
-                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
-            throw new CoreException(errorStatus);
-        }
-
-        boolean ret = false;
-        for (int i = 0; i < nodeIdCollection.size(); i++) {
-            short value = nodeIdCollection.get(i);
-            java.nio.file.Path processImagePath = targetPath;
-            if (value != IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                processImagePath = processImagePath
-                        .resolve(String.valueOf(value));
-                // NOTE: Remove 'continue' to generate the Individual CN's PI
-                // descriptions.
-                continue;
-            }
-            ret = buildCProcessImage(networkId, value, processImagePath);
-            ret = buildXmlProcessImage(networkId, value, processImagePath);
-            ret = buildCSharpProcessImage(networkId, value, processImagePath);
-        }
-        return ret;
-    }
-
-    /**
-     * Writes the processimage variables for the specified node ID. The
-     * processimage variable are available in the XML format.
-     *
-     * @param networkId The network ID.
-     * @param nodeId The node for which the processimage to be generated.
-     * @param targetPath The location to save the output file.
-     * @return <code>True</code> if successful and <code>False</code> otherwise.
-     * @throws CoreException
-     */
-    private boolean buildXmlProcessImage(String networkId, short nodeId,
-            java.nio.file.Path targetPath) throws CoreException {
-        String piDataOutput[] = new String[1];
-        Result res = OpenConfiguratorCore.GetInstance()
-                .BuildXMLProcessImage(networkId, nodeId, piDataOutput);
-        if (!res.IsSuccessful()) {
-            IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
-                    IStatus.OK,
-                    OpenConfiguratorLibraryUtils.getErrorMessage(res), null);
-            // Displays error message in console.
-            displayLibraryErrorMessage(res);
-            System.err.println("Build ERR "
-                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
-            throw new CoreException(errorStatus);
-        } else {
-            java.nio.file.Path targetFilePath = targetPath.resolve(XAP_XML);
-
-            try {
-                if (!Files.exists(targetPath)) {
-                    Files.createDirectory(targetPath);
-                }
-                // Write XAP.xml file in UTF-8 encoding.
-                Charset charset = Charset.forName("UTF-8");
-                ArrayList<String> lines = new ArrayList<>();
-                lines.add(piDataOutput[0]);
-                Files.write(targetFilePath, lines, charset);
-            } catch (IOException e) {
-                e.printStackTrace();
-                IStatus errorStatus = new Status(IStatus.ERROR,
-                        Activator.PLUGIN_ID, IStatus.OK,
-                        "Output file:" + targetFilePath.toString()
-                                + " is not accessible.",
-                        e);
-                throw new CoreException(errorStatus);
-            }
-        }
-        return true;
     }
 
     /**

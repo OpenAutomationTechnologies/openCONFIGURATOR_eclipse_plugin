@@ -122,9 +122,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         position = new Spinner(container, SWT.BORDER);
         position.setBounds(169, 7, 47, 22);
         position.setMaximum(interfaceObj.getMaxModules().intValue());
-        // position.addModifyListener(positionModifyListener);
         position.setEnabled(false);
-        // position.setSelection(getNewPosition());
 
         if (!interfaceObj.isUnUsedSlots()) {
             position.setEnabled(false);
@@ -311,10 +309,9 @@ public class AddChildModuleWizardPage extends WizardPage {
 
         if (String.valueOf(interfaceObj.getModuleAddressing())
                 .equalsIgnoreCase("POSITION")) {
-            // position.removeModifyListener(positionModifyListener);
+
             addressText.removeModifyListener(addressModifyListener);
-            // addressText.removeVerifyListener(addressVerifyListener);
-            // position.setEnabled(false);
+
             addressText.setEnabled(false);
             if (moduleSize != 0) {
                 System.err.println("Key set of module position"
@@ -586,7 +583,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         } else {
             setErrorMessage("The module cannot be placed at position "
                     + position.getText() + ".");
-            // getContainer().showPage(getPreviousPage());
+
             pageComplete = false;
         }
 
