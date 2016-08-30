@@ -474,9 +474,15 @@ public class ProjectJDomOperation {
                         subObject.getIdRaw());
                 newObjElement.setAttribute(subObjAttr);
             }
-
-            JDomUtil.addNewElement(document, forcedTagXpath,
-                    OPENCONFIGURATOR_NAMESPACE, newObjElement);
+            if (node.isModularheadNode()) {
+                int index = getChildIndexbelowNode(document, node);
+                index = index - 1;
+                JDomUtil.addNewElement(document, forcedTagXpath,
+                        OPENCONFIGURATOR_NAMESPACE, newObjElement, index);
+            } else {
+                JDomUtil.addNewElement(document, forcedTagXpath,
+                        OPENCONFIGURATOR_NAMESPACE, newObjElement);
+            }
         } else {
 
             Element newObjElement = new Element(
@@ -496,9 +502,15 @@ public class ProjectJDomOperation {
             Element newElement = new Element(
                     IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT);
             newElement.setContent(newObjElement);
-
-            JDomUtil.addNewElement(document, node.getXpath(),
-                    OPENCONFIGURATOR_NAMESPACE, newElement);
+            if (node.isModularheadNode()) {
+                int index = getChildIndexbelowNode(document, node);
+                index = index - 1;
+                JDomUtil.addNewElement(document, node.getXpath(),
+                        OPENCONFIGURATOR_NAMESPACE, newElement, index);
+            } else {
+                JDomUtil.addNewElement(document, node.getXpath(),
+                        OPENCONFIGURATOR_NAMESPACE, newElement);
+            }
         }
     }
 

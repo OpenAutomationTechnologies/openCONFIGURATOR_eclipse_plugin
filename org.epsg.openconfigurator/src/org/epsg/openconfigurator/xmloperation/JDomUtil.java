@@ -108,6 +108,21 @@ public class JDomUtil {
      *
      * @param doc The file instance.
      * @param xpath The parent path.
+     * @param namespace Namespace of the element.
+     * @param newElement The new element to be added.
+     */
+    public static void addNewElement(Document doc, String xpath,
+            Namespace namespace, Element newElement, int index) {
+        System.out.println("addNewElement: " + xpath);
+        addNewElementWithIndex(doc, getXPathExpressionElement(xpath, namespace),
+                newElement, index);
+    }
+
+    /**
+     * Adds the new element under the xpath specified available in the document.
+     *
+     * @param doc The file instance.
+     * @param xpath The parent path.
      * @param newElement The new element to be added.
      */
     public static void addNewElement(Document doc,
@@ -173,6 +188,26 @@ public class JDomUtil {
             }
             newElement.detach();
             element.addContent(newElement);
+        }
+    }
+
+    /**
+     * Adds the new element under the xpath specified available in the document.
+     *
+     * @param doc The file instance.
+     * @param xpath The parent path.
+     * @param newElement The new element to be added.
+     */
+    public static void addNewElementWithIndex(Document doc,
+            XPathExpression<Element> xpath, Element newElement, int index) {
+
+        List<Element> elementsList = xpath.evaluate(doc);
+        for (Element element : elementsList) {
+            newElement.setNamespace(element.getNamespace());
+            for (Element newChildElement : newElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
+            element.addContent(index, newElement);
         }
     }
 

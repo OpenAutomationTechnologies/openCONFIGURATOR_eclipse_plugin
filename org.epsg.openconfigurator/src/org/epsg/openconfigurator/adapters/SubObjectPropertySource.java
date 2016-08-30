@@ -292,11 +292,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     break;
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
-                    if (isModuleSubObject()) {
-                        retObj = plkSubObject.getActualValue();
-                    } else {
-                        retObj = plkSubObject.getActualValue();
-                    }
+                    retObj = plkSubObject.getActualValue();
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:
                     if (isModuleSubObject()) {
@@ -393,28 +389,26 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
     protected String handleForceActualValue(Object value) {
         if (plkSubObject.getActualValue().isEmpty()) {
             return "Set some value in the actual value field.";
+        }
+        if (isModuleSubObject()) {
+            long newObjectIndex = OpenConfiguratorLibraryUtils
+                    .getModuleObjectsIndex(plkSubObject.getModule(),
+                            plkSubObject.getObject().getId());
+            int newSubObjectIndex = OpenConfiguratorLibraryUtils
+                    .getModuleObjectSubIndex(plkSubObject.getModule(),
+                            plkSubObject);
+            System.err.println("The module sub-object.." + newSubObjectIndex);
+            Result res = OpenConfiguratorLibraryUtils
+                    .validateForceSubObjectActualValue(plkSubObject,
+                            newObjectIndex, newSubObjectIndex);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
+            }
         } else {
-            if (isModuleSubObject()) {
-                long newObjectIndex = OpenConfiguratorLibraryUtils
-                        .getModuleObjectsIndex(plkSubObject.getModule(),
-                                plkSubObject.getObject().getId());
-                int newSubObjectIndex = OpenConfiguratorLibraryUtils
-                        .getModuleObjectSubIndex(plkSubObject.getModule(),
-                                plkSubObject);
-                System.err
-                        .println("The module sub-object.." + newSubObjectIndex);
-                Result res = OpenConfiguratorLibraryUtils
-                        .validateForceSubObjectActualValue(plkSubObject,
-                                newObjectIndex, newSubObjectIndex);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
-                }
-            } else {
-                Result res = OpenConfiguratorLibraryUtils
-                        .validateForceSubObjectActualValue(plkSubObject);
-                if (!res.IsSuccessful()) {
-                    return OpenConfiguratorLibraryUtils.getErrorMessage(res);
-                }
+            Result res = OpenConfiguratorLibraryUtils
+                    .validateForceSubObjectActualValue(plkSubObject);
+            if (!res.IsSuccessful()) {
+                return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
         }
         return null;
@@ -605,7 +599,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                             } else {
                                 // Success - update the OBD
                                 plkSubObject.setActualValue((String) value,
-                                        true, isModuleSubObject());
+                                        true);
                             }
                         }
 

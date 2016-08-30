@@ -400,7 +400,6 @@ public class XddJdomOperation {
     private static String getIEC_DataType(TVarDeclaration parameter) {
         // TODO: Provide support for datatypeID ref also.
 
-        // parameter.getDataTypeIDRef()
         if (parameter.getBITSTRING() != null) {
             return "BITSTRING";
         } else if (parameter.getBOOL() != null) {
@@ -513,13 +512,14 @@ public class XddJdomOperation {
             PowerlinkSubobject subobject, String actualValue) {
         Attribute newAttribute = new Attribute(OBJECT_ACTUAL_VALUE,
                 actualValue);
+        System.err
+                .println("Sub_Object xpath for node.." + subobject.getXpath());
         JDomUtil.setAttribute(document, subobject.getXpath(),
                 POWERLINK_XDD_NAMESPACE, newAttribute);
     }
 
     private static void updateApplicationProcess(Document document) {
 
-        // String xpath = "//plk:ProfileBody[@fileCreator='kalycito']";
         String xpath = "//plk:ProfileBody[@*[local-name()='type']='ProfileBody_Device_Powerlink_Modular_Head']";
         String applicationProcessXpath = xpath + "/plk:ApplicationProcess";
 
@@ -563,8 +563,6 @@ public class XddJdomOperation {
                     POWERLINK_XDD_NAMESPACE, newParamGroupElement);
 
         }
-
-        //
 
     }
 
@@ -1425,8 +1423,6 @@ public class XddJdomOperation {
                     parameterGrp.getConditionalUniqueIDRef());
             String paramUniqueId = OpenConfiguratorLibraryUtils
                     .getModuleParameterUniqueID(module, oldparamUniqueId);
-            System.err.println(
-                    "Module parameter Conditional uId.." + paramUniqueId);
             attribList.add(
                     new Attribute("conditionalUniqueIDRef", paramUniqueId));
         }
@@ -1463,7 +1459,6 @@ public class XddJdomOperation {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterGrp
                     .getConditionalUniqueIDRef();
             updateParameterListsToHeadXDC(document, param, module);
-            System.err.println("The Parameter updated in the head node...");
         }
     }
 
@@ -1486,8 +1481,6 @@ public class XddJdomOperation {
                     parameterGrp.getConditionalUniqueIDRef());
             String paramUniqueId = OpenConfiguratorLibraryUtils
                     .getModuleParameterUniqueID(module, oldparamUniqueId);
-            System.err.println(
-                    "Module parameter Conditional uId.." + paramUniqueId);
             attribList.add(
                     new Attribute("conditionalUniqueIDRef", paramUniqueId));
         }
@@ -1524,7 +1517,6 @@ public class XddJdomOperation {
             TParameterList.Parameter param = (TParameterList.Parameter) parameterGrp
                     .getConditionalUniqueIDRef();
             updateParameterListsToHeadXDC(document, param, module);
-            System.err.println("The Parameter updated in the head node...");
         }
     }
 
@@ -1570,8 +1562,6 @@ public class XddJdomOperation {
         String parameterTemplateXpath = PARAMETER_GROUP_LIST_XPATH
                 + "/plk:parameterGroup[@uniqueID='" + newUniqueID + "']"
                 + "/plk:parameterGroup[@uniqueID='" + uniqueId + "']";
-        System.err.println(
-                "Xpath of parameter child group..." + parameterTemplateXpath);
 
         Element newLabelelement = new Element("label");
         List<Attribute> attribListlbl = newLabelelement.getAttributes();
@@ -1579,8 +1569,6 @@ public class XddJdomOperation {
         newLabelelement.setText(new LabelDescription(
                 parameterGrp.getLabelOrDescriptionOrLabelRef()).getText());
 
-        System.err.println("The child param label...." + new LabelDescription(
-                parameterGrp.getLabelOrDescriptionOrLabelRef()).getText());
         JDomUtil.addNewElement(document, parameterTemplateXpath,
                 POWERLINK_XDD_NAMESPACE, newLabelelement);
 
@@ -1656,17 +1644,12 @@ public class XddJdomOperation {
         String parameterTemplateXpath = xpath
                 + "/plk:parameterGroup[@uniqueID='" + uniqueId + "']";
 
-        System.err.println(
-                "Xpath of parameter child group..." + parameterTemplateXpath);
-
         Element newLabelelement = new Element("label");
         List<Attribute> attribListlbl = newLabelelement.getAttributes();
         attribListlbl.add(new Attribute("lang", "en"));
         newLabelelement.setText(new LabelDescription(
                 parameterGrp.getLabelOrDescriptionOrLabelRef()).getText());
 
-        System.err.println("The child param label...." + new LabelDescription(
-                parameterGrp.getLabelOrDescriptionOrLabelRef()).getText());
         JDomUtil.addNewElements(document, parameterTemplateXpath,
                 POWERLINK_XDD_NAMESPACE, newLabelelement);
 
@@ -1682,7 +1665,6 @@ public class XddJdomOperation {
         String paramGrpXpath = xpath + "/plk:parameterGroup[@uniqueID='"
                 + uniqueId + "']";
         if (parameterGroupReferenceList != null) {
-            System.err.println("Parameter child group......." + paramGrpXpath);
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
@@ -1705,8 +1687,6 @@ public class XddJdomOperation {
         String oldparamUniqueId = parameter.getUniqueID();
         String paramUniqueId = OpenConfiguratorLibraryUtils
                 .getModuleParameterUniqueID(module, oldparamUniqueId);
-
-        System.err.println("New param UniqueID..." + paramUniqueId);
 
         String access = parameter.getAccess();
         if (access == null) {

@@ -236,7 +236,11 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             objectIdRaw = "0000";
             objectIdL = 0000;
             objectId = "0x" + objectIdRaw;
-            xpath = "//plk:Object[@index='" + objectIdRaw + "']";
+            if (objectIdRaw == "0000") {
+                xpath = "//plk:Object[@name='" + object.getName() + "']";
+            } else {
+                xpath = "//plk:Object[@index='" + objectIdRaw + "']";
+            }
         }
         name = object.getName();
 
