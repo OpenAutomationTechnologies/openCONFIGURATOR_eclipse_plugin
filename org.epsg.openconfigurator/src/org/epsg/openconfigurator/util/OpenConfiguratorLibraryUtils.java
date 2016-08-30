@@ -914,6 +914,11 @@ public class OpenConfiguratorLibraryUtils {
             return libApiRes;
         }
 
+        libApiRes = updateForcedObjectsIntoLibary(module);
+        if (!libApiRes.IsSuccessful()) {
+            return libApiRes;
+        }
+
         return libApiRes;
 
     }
@@ -958,38 +963,20 @@ public class OpenConfiguratorLibraryUtils {
                         + getModuleObjectsIndex(module, object.getId()));
 
                 if (libApiRes.IsSuccessful()) {
-                    libApiRes = core.SetObjectLimits(node.getNetworkId(),
-                            node.getNodeId(),
-                            getModuleObjectsIndex(module, object.getId()),
-                            object.getLowLimit(), object.getHighLimit());
-                    if (!libApiRes.IsSuccessful()) {
-                        object.setError(getErrorMessage(libApiRes));
-                        System.err.println("SetObjectLimits WARN: "
-                                + getErrorMessage(libApiRes) + " Index..."
-                                + getLong(object.getIndex()));
+                    if ((!object.getLowLimit().isEmpty())
+                            || (!object.getHighLimit().isEmpty())) {
+                        libApiRes = core.SetObjectLimits(node.getNetworkId(),
+                                node.getNodeId(),
+                                getModuleObjectsIndex(module, object.getId()),
+                                object.getLowLimit(), object.getHighLimit());
+                        if (!libApiRes.IsSuccessful()) {
+                            object.setError(getErrorMessage(libApiRes));
+                            System.err.println("SetObjectLimits WARN: "
+                                    + getErrorMessage(libApiRes) + " Index..."
+                                    + getLong(object.getIndex()));
+                        }
                     }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectIndex(module,
-                    // getModuleObjectIndex(module),
-                    // object);
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectInNode(node, object,
-                    // module,
-                    // getModuleObjectIndex(module));
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
+
                 } else {
                     object.setError(getErrorMessage(libApiRes));
                     OpenConfiguratorMessageConsole.getInstance()
@@ -1019,28 +1006,7 @@ public class OpenConfiguratorLibraryUtils {
                         System.err.println("CreateParameterObject WARN: "
                                 + getErrorMessage(libApiRes));
                     }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectIndex(module,
-                    // getModuleObjectIndex(module),
-                    // object);
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleObjectInNode(node, object,
-                    // module,
-                    // getModuleObjectIndex(module));
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
+
                 } else if (object.getUniqueIDRef() instanceof TParameterGroup) {
                     TParameterGroup parameter = (TParameterGroup) object
                             .getUniqueIDRef();
@@ -1065,6 +1031,7 @@ public class OpenConfiguratorLibraryUtils {
 
             } else if ((object.getDataType() == null)
                     && (object.getUniqueIDRef() != null)) {
+                PlkDataType datatype = PlkDataType.UNDEFINED;
                 if (object
                         .getUniqueIDRef() instanceof TParameterList.Parameter) {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
@@ -1864,14 +1831,22 @@ public class OpenConfiguratorLibraryUtils {
                         node.getNodeId(), object.getId(), objectType,
                         object.getName(), dataType, accessType, mapping,
                         object.getDefaultValue(), actualValue);
+
                 if (libApiRes.IsSuccessful()) {
-                    libApiRes = core.SetObjectLimits(node.getNetworkId(),
-                            node.getNodeId(), object.getId(),
-                            object.getLowLimit(), object.getHighLimit());
-                    if (!libApiRes.IsSuccessful()) {
-                        object.setError(getErrorMessage(libApiRes));
-                        System.err.println("SetObjectLimits WARN: "
-                                + getErrorMessage(libApiRes));
+                    if ((!object.getLowLimit().isEmpty())
+                            || (!object.getHighLimit().isEmpty())) {
+                        System.err.println("Node Id" + node.getNodeId()
+                                + " Object low Lmit...." + object.getLowLimit()
+                                + " Object high limit..."
+                                + object.getHighLimit());
+                        libApiRes = core.SetObjectLimits(node.getNetworkId(),
+                                node.getNodeId(), object.getId(),
+                                object.getLowLimit(), object.getHighLimit());
+                        if (!libApiRes.IsSuccessful()) {
+                            object.setError(getErrorMessage(libApiRes));
+                            System.err.println("SetObjectLimits WARN: "
+                                    + getErrorMessage(libApiRes));
+                        }
                     }
                 } else {
                     object.setError(getErrorMessage(libApiRes));
@@ -2881,26 +2856,21 @@ public class OpenConfiguratorLibraryUtils {
 
                 if (libApiRes.IsSuccessful()) {
                     System.err.println("Index#####......" + index);
-                    libApiRes = core.SetSubObjectLimits(node.getNetworkId(),
-                            node.getNodeId(), index,
-                            (short) getModuleObjectsSubIndex(module, subObject,
-                                    subObject.getObject().getId()),
-                            subObject.getLowLimit(), subObject.getHighLimit());
-                    if (!libApiRes.IsSuccessful()) {
-                        subObject.setError(getErrorMessage(libApiRes));
-                        System.err.println("Module sub-object limits WARN: "
-                                + getErrorMessage(libApiRes));
+                    if ((!subObject.getLowLimit().isEmpty())
+                            || (!subObject.getHighLimit().isEmpty())) {
+                        libApiRes = core.SetSubObjectLimits(node.getNetworkId(),
+                                node.getNodeId(), index,
+                                (short) getModuleObjectsSubIndex(module,
+                                        subObject,
+                                        subObject.getObject().getId()),
+                                subObject.getLowLimit(),
+                                subObject.getHighLimit());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            System.err.println("Module sub-object limits WARN: "
+                                    + getErrorMessage(libApiRes));
+                        }
                     }
-                    // else {
-                    // try {
-                    // OpenConfiguratorProjectUtils
-                    // .updateModuleSubObjectInNode(node, module,
-                    // index, subObject);
-                    // } catch (JDOMException | IOException e) {
-                    // // TODO Auto-generated catch block
-                    // e.printStackTrace();
-                    // }
-                    // }
 
                 } else {
                     subObject.setError(getErrorMessage(libApiRes));
@@ -2978,6 +2948,7 @@ public class OpenConfiguratorLibraryUtils {
                     }
                 } else if ((subObject.getUniqueIDRef() != null)
                         && (subObject.getDataType() == null)) {
+                    PlkDataType dataType = PlkDataType.UNDEFINED;
                     if (subObject
                             .getUniqueIDRef() instanceof TParameterList.Parameter) {
                         Parameter parameter = (Parameter) subObject
@@ -3096,13 +3067,17 @@ public class OpenConfiguratorLibraryUtils {
                         accessType, pdoMapping, subObject.getDefaultValue(),
                         actualValue);
                 if (libApiRes.IsSuccessful()) {
-                    libApiRes = core.SetSubObjectLimits(node.getNetworkId(),
-                            node.getNodeId(), object.getId(), subObject.getId(),
-                            subObject.getLowLimit(), subObject.getHighLimit());
-                    if (!libApiRes.IsSuccessful()) {
-                        subObject.setError(getErrorMessage(libApiRes));
-                        System.err
-                                .println("WARN: " + getErrorMessage(libApiRes));
+                    if ((!subObject.getLowLimit().isEmpty())
+                            || (!subObject.getHighLimit().isEmpty())) {
+                        libApiRes = core.SetSubObjectLimits(node.getNetworkId(),
+                                node.getNodeId(), object.getId(),
+                                subObject.getId(), subObject.getLowLimit(),
+                                subObject.getHighLimit());
+                        if (!libApiRes.IsSuccessful()) {
+                            subObject.setError(getErrorMessage(libApiRes));
+                            System.err.println(
+                                    "WARN: " + getErrorMessage(libApiRes));
+                        }
                     }
                 } else {
                     subObject.setError(getErrorMessage(libApiRes));
@@ -3454,7 +3429,6 @@ public class OpenConfiguratorLibraryUtils {
     public static Result forceSubObject(PowerlinkSubobject plkSubObject,
             boolean result, long newObjectIndex, int newSubObjectIndex) {
         String actualValue = plkSubObject.getActualValue();
-
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
                 newObjectIndex, (short) newSubObjectIndex, actualValue, result,
@@ -3940,7 +3914,6 @@ public class OpenConfiguratorLibraryUtils {
                     break;
                 case "next":
                     moduleAddressing = ModuleAddressing.NEXT;
-                    break;
                 default:
                     break;
             }
@@ -4193,10 +4166,9 @@ public class OpenConfiguratorLibraryUtils {
             return res;
         }
 
-        for (MapIterator iterator = objectCollection.iterator(); iterator
-                .hasNext();) {
+        MapIterator iterator = objectCollection.iterator();
+        while (iterator.hasNext()) {
             String actualValue = iterator.GetValue();
-
             Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<>(
                     iterator.GetKey().getFirst(),
                     iterator.GetKey().getSecond());
@@ -4204,6 +4176,17 @@ public class OpenConfiguratorLibraryUtils {
             iterator.next();
         }
         // Persist actual value of objects into XDC.
+        // for (MapIterator iterator = objectCollection.iterator(); iterator
+        // .hasNext();) {
+        // String actualValue = iterator.GetValue();
+        //
+        // Map.Entry<Long, Integer> entryVal = new AbstractMap.SimpleEntry<>(
+        // iterator.GetKey().getFirst(),
+        // iterator.GetKey().getSecond());
+        // objectJCollection.put(entryVal, actualValue);
+        // iterator.next();
+        // }
+
         return res;
     }
 
@@ -4373,7 +4356,8 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     private static Result importProfileBodyCommunicationNetworkPowerlinkModularChild(
-            Module module) {
+            Module module,
+            ProfileBodyCommunicationNetworkPowerlinkModularChild profileBodyDatatype) {
 
         Result libApiRes = addModuleObjectDictionary(module,
                 module.getObjectDictionary());
@@ -4566,7 +4550,8 @@ public class OpenConfiguratorLibraryUtils {
                         (ProfileBodyDevicePowerlinkModularChild) profileBodyDatatype);
             } else if (profileBodyDatatype instanceof ProfileBodyCommunicationNetworkPowerlinkModularChild) {
                 libApiRes = importProfileBodyCommunicationNetworkPowerlinkModularChild(
-                        module);
+                        module,
+                        (ProfileBodyCommunicationNetworkPowerlinkModularChild) profileBodyDatatype);
             } else {
                 System.err.println(
                         "Unknown profile body datatype:" + profileBodyDatatype);
@@ -5017,9 +5002,6 @@ public class OpenConfiguratorLibraryUtils {
                     .getModuleModel();
             moduleObj = mod;
         }
-        if (moduleObj == null) {
-            return libApiRes;
-        }
         org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface.Module.ForcedObjects forcedObjects = moduleObj
                 .getForcedObjects();
 
@@ -5139,7 +5121,7 @@ public class OpenConfiguratorLibraryUtils {
                 if (plkObj == null) {
                     OpenConfiguratorMessageConsole.getInstance()
                             .printErrorMessage(
-                                    "Object ID 0x"
+                                    "Node Object ID 0x"
                                             + DatatypeConverter.printHexBinary(
                                                     forcedObjectId)
                                             + " is forced and is not available in the XDD/XDC file.",
@@ -5159,7 +5141,7 @@ public class OpenConfiguratorLibraryUtils {
 
                     OpenConfiguratorMessageConsole.getInstance()
                             .printErrorMessage(
-                                    "Object ID 0x"
+                                    "Node Object ID 0x"
                                             + DatatypeConverter.printHexBinary(
                                                     forcedObjectId)
                                             + "/0x"
@@ -5248,7 +5230,7 @@ public class OpenConfiguratorLibraryUtils {
             long newObjectIndex,int newSubObjectindex) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
-                newObjectIndex, plkSubObject.getId(), value,
+                newObjectIndex, (short) newSubObjectindex, value,
                 plkSubObject.isObjectForced(), true);
         return res;
     }
