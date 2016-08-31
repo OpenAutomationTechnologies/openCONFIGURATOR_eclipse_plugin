@@ -6,7 +6,7 @@
 	<classpathentry exported="true" kind="lib" path="os/org.epsg.openconfigurator.wrapper.jar"/>
 	<classpathentry exported="true" kind="lib" path="os/jdom-2.0.6/jdom-2.0.6.jar"/>
 	<classpathentry exported="true" kind="lib" path="os/jdom-2.0.6/lib/jaxen-1.1.6.jar"/>
-	<classpathentry exported="true" kind="lib" path="os/commons-io-2.4/commons-io-2.4.jar"/>
-	<classpathentry exported="true" kind="lib" path="os/commons-lang-2.6/commons-lang-2.6.jar"/>
+	<classpathentry exported="true" kind="lib" path="os/commons-io-2.5/commons-io-2.5.jar"/>
+	<classpathentry exported="true" kind="lib" path="os/commons-lang3-3.4/commons-lang3-3.4.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

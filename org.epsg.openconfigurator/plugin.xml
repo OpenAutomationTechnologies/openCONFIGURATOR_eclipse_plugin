@@ -1,368 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-
-   <extension
-         point="org.eclipse.ui.views">
-      <category
-            name="Industrial Automation"
-            id="org.epsg.openconfigurator.view.category">
-      </category>
-      <view
-            name="POWERLINK Network"
-            icon="icons/window_16.gif"
-            category="org.epsg.openconfigurator.view.category"
-            class="org.epsg.openconfigurator.views.IndustrialNetworkView"
-            id="org.epsg.openconfigurator.views.IndustrialNetworkView">
-      </view>
-      <view
-            allowMultiple="false"
-            category="org.epsg.openconfigurator.view.category"
-            class="org.epsg.openconfigurator.views.ObjectDictionaryView"
-            icon="icons/obd.gif"
-            id="org.epsg.openconfigurator.views.ObjectDictionaryView"
-            name="Object Dictionary">
-      </view>
-      <view
-            category="org.epsg.openconfigurator.view.category"
-            class="org.epsg.openconfigurator.views.mapping.MappingView"
-            icon="icons/mapping.gif"
-            id="org.epsg.openconfigurator.views.MappingView"
-            name="Mapping View">
-      </view>
-   </extension>
-   <extension
-         point="org.eclipse.ui.perspectives">
-      <perspective
-            class="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective"
-            icon="icons/releng_gears.gif"
-            id="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective"
-            name="Industrial Automation">
-      </perspective>
-   </extension>
-   <extension
-         point="org.eclipse.ui.editors">
-      <editor
-            class="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
-            default="true"
-            icon="icons/releng_gears.gif"
-            id="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor"
-            name="POWERLINK Project editor">
-         <contentTypeBinding
-               contentTypeId="org.epsg.openconfigurator.contenttype.projectfile">
-         </contentTypeBinding>
-      </editor>
-   </extension>
-   <extension
-         id="industrialNetworkBuilder"
-         name="openCONFIGURATOR builder"
-         point="org.eclipse.core.resources.builders">
-      <builder
-            hasNature="true">
-         <run
-               class="org.epsg.openconfigurator.builder.PowerlinkNetworkProjectBuilder">
-         </run>
-      </builder>
-   </extension>
-   <extension
-         id="openConfNature"
-         name="openConfigurator"
-         point="org.eclipse.core.resources.natures">
-      <runtime>
-         <run
-               class="org.epsg.openconfigurator.builder.PowerlinkNetworkProjectNature">
-         </run>
-      </runtime>
-      <builder
-            id="org.epsg.openconfigurator.industrialNetworkBuilder">
-      </builder>
-   </extension>
-   <extension
-         point="org.eclipse.ui.commands">
-      <category
-            id="org.epsg.openconfigurator.openConfNature.category"
-            name="openConfigurator commands">
-      </category>
-      <command
-            categoryId="org.epsg.openconfigurator.openConfNature.category"
-            defaultHandler="org.epsg.openconfigurator.builder.AddRemovePowerlinkNetworkProjectNatureHandler"
-            id="org.epsg.openconfigurator.addRemoveOpenCONFIGURATORprojectNature"
-            name="Add/RemoveopenConfigurator">
-      </command>
-   </extension>
-   <extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
-         <command
-               commandId="org.epsg.openconfigurator.addRemoveOpenCONFIGURATORprojectNature"
-               label="Remove openCONFIGURATOR builder"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <test
-                              property="org.eclipse.core.resources.projectNature"
-                              value="org.epsg.openconfigurator.openConfNature">
-                        </test>
-                     </adapt>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-         <command
-               commandId="org.epsg.openconfigurator.addRemoveOpenCONFIGURATORprojectNature"
-               label="Add openCONFIGURATOR builder"
-               style="push">
-            <visibleWhen
-                  checkEnabled="false">
-               <with
-                     variable="selection">
-                  <count
-                        value="1">
-                  </count>
-                  <iterate>
-                     <adapt
-                           type="org.eclipse.core.resources.IProject">
-                        <not>
-                           <test
-                                 property="org.eclipse.core.resources.projectNature"
-                                 value="org.epsg.openconfigurator.openConfNature">
-                           </test>
-                        </not>
-                     </adapt>
-                  </iterate>
-               </with>
-            </visibleWhen>
-         </command>
-      </menuContribution>
-   </extension>
-   <extension
-         id="xmlProblem"
-         name="XML Problem"
-         point="org.eclipse.core.resources.markers">
-      <super
-            type="org.eclipse.core.resources.problemmarker">
-      </super>
-      <persistent
-            value="true">
-      </persistent>
-   </extension>
-   <extension
-         point="org.eclipse.ui.ide.projectNatureImages">
-      <image
-            icon="icons/window_16.gif"
-            id="org.epsg.openconfigurator.image"
-            natureId="org.epsg.openconfigurator.openConfNature">
-      </image>
-   </extension>
-   <extension
-         point="org.eclipse.ui.newWizards">
-      <category
-            id="org.epsg.openconfigurator.category"
-            name="Industrial Automation">
-      </category>
-      <wizard
-            category="org.epsg.openconfigurator.category"
-            class="org.epsg.openconfigurator.wizards.NewPowerlinkNetworkProjectWizard"
-            finalPerspective="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective"
-            icon="icons/window_16.gif"
-            id="org.epsg.openconfigurator.newproject.wizard"
-            name="New POWERLINK network"
-            project="true">
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.ui.navigator.viewer">
-      <viewerActionBinding
-            viewerId="org.epsg.openconfigurator.navigator">
-         <includes>
-            <actionExtension
-                  pattern="org.eclipse.ui.navigator.resources.*">
-            </actionExtension>
-         </includes>
-      </viewerActionBinding>
-      <viewerContentBinding
-            viewerId="org.epsg.openconfigurator.navigator">
-         <includes>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resourceContent">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.filters.*">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.linkHelper">
-            </contentExtension>
-            <contentExtension
-                  pattern="org.eclipse.ui.navigator.resources.workingSets">
-            </contentExtension>
-         </includes>
-      </viewerContentBinding>
-   </extension>
-   <extension
-         point="org.eclipse.ui.importWizards">
-      <category
-            id="org.epsg.openconfigurator.category"
-            name="Industrial Automation">
-      </category>
-      <wizard
-            category="org.epsg.openconfigurator.category"
-            class="org.epsg.openconfigurator.wizards.ImportPowerlinkNetworkProjectWizard"
-            icon="icons/openconfigurator.gif"
-            id="org.epsg.openconfigurator.wizard.importproject"
-            name="Existing openCONFIGURATOR projects">
-      </wizard>
-   </extension>
-   <extension
-         point="org.eclipse.core.contenttype.contentTypes">
-      <content-type
-            base-type="org.eclipse.core.runtime.xml"
-            file-extensions="xml"
-            id="org.epsg.openconfigurator.contenttype.projectfile"
-            name="openCONFIGURATOR project files"
-            priority="high">
-         <describer
-               class="org.epsg.openconfigurator.content.OpenConfiguratorProjectXmlContentDescriber">
-         </describer>
-      </content-type>
-   </extension>
-   <extension
-         point="org.eclipse.core.runtime.adapters">
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.Node"
-            class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.PowerlinkObject"
-            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.PowerlinkSubobject"
-            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.ParameterReference"
-            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.Parameter"
-            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.ParameterGroup"
-            class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.HeadNodeInterface"
-            class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-      <factory
-            adaptableType="org.epsg.openconfigurator.model.Module"
-            class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
-         <adapter
-               type="org.eclipse.ui.views.properties.IPropertySource">
-         </adapter>
-      </factory>
-   </extension>
-   <extension
-         point="org.eclipse.ui.decorators">
-      <decorator
-            class="org.epsg.openconfigurator.views.ObjectDictionaryLabelDecorator"
-            icon="icons/lock_overlay.gif"
-            id="org.epsg.openconfigurator.decorator.nonwritableobjects"
-            label="lockoverlay"
-            lightweight="true"
-            location="BOTTOM_RIGHT"
-            state="true">
-          <enablement>
-            <objectClass
-                  name="org.epsg.openconfigurator.model.AbstractPowerlinkObject">
-            </objectClass>
-         </enablement>
-      </decorator>
-   </extension>
-   <extension
-         point="org.eclipse.ui.decorators">
-      <decorator
-            class="org.epsg.openconfigurator.views.NodeLabelDecorator"
-            id="org.epsg.openconfigurator.decorator.stationtype"
-            label="stationtype"
-            lightweight="true"
-            location="BOTTOM_RIGHT"
-            state="true">
-         <enablement>
-            <objectClass
-                  name="org.epsg.openconfigurator.model.Node">
-            </objectClass>
-         </enablement>
-      </decorator>
-   </extension>
-      <extension point="org.eclipse.ui.intro.configExtension">
-     <configExtension
-           configId="org.eclipse.ui.intro.universalConfig"
-           content="welcome.xml" >
-     </configExtension>
-     <theme default="false"
-           id="org.epsg.openconfigurator.theme"
-           name="%theme.name.0"
-           path="."
-           previewImage="icons/window_16.gif">
-           <property name="launchbarOverviewIcon" value="icons/window_32.png"/>
-     </theme>
-  </extension>
-      <extension
-            point="org.eclipse.ui.decorators">
-         <decorator
-               adaptable="true"
-               class="org.epsg.openconfigurator.views.ObjectDictionaryLabelDecorator"
-               icon="icons/lock_overlay.gif"
-               id="org.epsg.openconfigurator.decorator.locked"
-               label="LockedOverlay"
-               lightweight="true"
-               location="BOTTOM_RIGHT"
-               objectClass="org.epsg.openconfigurator.model.ParameterReference"
-               state="true">
-         </decorator>
-      </extension>
-      <extension
-            point="org.eclipse.ui.decorators">
-         <decorator
-               class="org.epsg.openconfigurator.views.NodeLabelDecorator"
-               icon="icons/error_overlay.gif"
-               id="org.epsg.openconfigurator.decorator.erroroverlay"
-               label="erroroverlay"
-               lightweight="true"
-               location="BOTTOM_RIGHT"
-               state="true">
-         </decorator>
-      </extension>
+	<extension point="org.eclipse.ui.views">
+		<category name="Industrial Automation" id="org.epsg.openconfigurator.view.category"/>
+		<view name="POWERLINK Network" icon="icons/window_16.gif" category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.IndustrialNetworkView" id="org.epsg.openconfigurator.views.IndustrialNetworkView"/>
+		<view allowMultiple="false" category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.ObjectDictionaryView" icon="icons/obd.gif" id="org.epsg.openconfigurator.views.ObjectDictionaryView" name="Object Dictionary"/>
+		<view category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.mapping.MappingView" icon="icons/mapping.gif" id="org.epsg.openconfigurator.views.MappingView" name="Mapping View"/>
+	</extension>
+	<extension point="org.eclipse.ui.perspectives">
+		<perspective class="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective" icon="icons/releng_gears.gif" id="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective" name="Industrial Automation"/>
+	</extension>
+	<extension point="org.eclipse.ui.editors">
+		<editor class="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor" default="true" icon="icons/releng_gears.gif" id="org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor" name="POWERLINK Project editor">
+			<contentTypeBinding contentTypeId="org.epsg.openconfigurator.contenttype.projectfile"/>
+		</editor>
+	</extension>
+	<extension id="industrialNetworkBuilder" name="openCONFIGURATOR builder" point="org.eclipse.core.resources.builders">
+		<builder hasNature="true">
+			<run class="org.epsg.openconfigurator.builder.PowerlinkNetworkProjectBuilder"/>
+		</builder>
+	</extension>
+	<extension id="openConfNature" name="openConfigurator" point="org.eclipse.core.resources.natures">
+		<runtime>
+			<run class="org.epsg.openconfigurator.builder.PowerlinkNetworkProjectNature"/>
+		</runtime>
+		<builder id="org.epsg.openconfigurator.industrialNetworkBuilder"/>
+	</extension>
+	<extension point="org.eclipse.ui.commands">
+		<category id="org.epsg.openconfigurator.openConfNature.category" name="openConfigurator commands"/>
+		<command categoryId="org.epsg.openconfigurator.openConfNature.category" defaultHandler="org.epsg.openconfigurator.builder.AddRemovePowerlinkNetworkProjectNatureHandler" id="org.epsg.openconfigurator.addRemoveOpenCONFIGURATORprojectNature" name="Add/RemoveopenConfigurator"/>
+	</extension>
+	<extension point="org.eclipse.ui.menus">
+		<menuContribution locationURI="popup:org.eclipse.ui.projectConfigure?after=additions">
+			<command commandId="org.epsg.openconfigurator.addRemoveOpenCONFIGURATORprojectNature" label="Remove openCONFIGURATOR builder" style="push">
+				<visibleWhen checkEnabled="false">
+					<with variable="selection">
+						<count value="1"/>
+						<iterate>
+							<adapt type="org.eclipse.core.resources.IProject">
+								<test property="org.eclipse.core.resources.projectNature" value="org.epsg.openconfigurator.openConfNature"/>
+							</adapt>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+			<command commandId="org.epsg.openconfigurator.addRemoveOpenCONFIGURATORprojectNature" label="Add openCONFIGURATOR builder" style="push">
+				<visibleWhen checkEnabled="false">
+					<with variable="selection">
+						<count value="1"/>
+						<iterate>
+							<adapt type="org.eclipse.core.resources.IProject">
+								<not>
+									<test property="org.eclipse.core.resources.projectNature" value="org.epsg.openconfigurator.openConfNature"/>
+								</not>
+							</adapt>
+						</iterate>
+					</with>
+				</visibleWhen>
+			</command>
+		</menuContribution>
+	</extension>
+	<extension id="xmlProblem" name="XML Problem" point="org.eclipse.core.resources.markers">
+		<super type="org.eclipse.core.resources.problemmarker"/>
+		<persistent value="true"/>
+	</extension>
+	<extension point="org.eclipse.ui.ide.projectNatureImages">
+		<image icon="icons/window_16.gif" id="org.epsg.openconfigurator.image" natureId="org.epsg.openconfigurator.openConfNature"/>
+	</extension>
+	<extension point="org.eclipse.ui.newWizards">
+		<category id="org.epsg.openconfigurator.category" name="Industrial Automation"/>
+		<wizard category="org.epsg.openconfigurator.category" class="org.epsg.openconfigurator.wizards.NewPowerlinkNetworkProjectWizard" finalPerspective="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective" icon="icons/window_16.gif" id="org.epsg.openconfigurator.newproject.wizard" name="New POWERLINK network" project="true"/>
+	</extension>
+	<extension point="org.eclipse.ui.navigator.viewer">
+		<viewerActionBinding viewerId="org.epsg.openconfigurator.navigator">
+			<includes>
+				<actionExtension pattern="org.eclipse.ui.navigator.resources.*"/>
+			</includes>
+		</viewerActionBinding>
+		<viewerContentBinding viewerId="org.epsg.openconfigurator.navigator">
+			<includes>
+				<contentExtension pattern="org.eclipse.ui.navigator.resourceContent"/>
+				<contentExtension pattern="org.eclipse.ui.navigator.resources.filters.*"/>
+				<contentExtension pattern="org.eclipse.ui.navigator.resources.linkHelper"/>
+				<contentExtension pattern="org.eclipse.ui.navigator.resources.workingSets"/>
+			</includes>
+		</viewerContentBinding>
+	</extension>
+	<extension point="org.eclipse.ui.importWizards">
+		<category id="org.epsg.openconfigurator.category" name="Industrial Automation"/>
+		<wizard category="org.epsg.openconfigurator.category" class="org.epsg.openconfigurator.wizards.ImportPowerlinkNetworkProjectWizard" icon="icons/openconfigurator.gif" id="org.epsg.openconfigurator.wizard.importproject" name="Existing openCONFIGURATOR projects"/>
+	</extension>
+	<extension point="org.eclipse.core.contenttype.contentTypes">
+		<content-type base-type="org.eclipse.core.runtime.xml" file-extensions="xml" id="org.epsg.openconfigurator.contenttype.projectfile" name="openCONFIGURATOR project files" priority="high">
+			<describer class="org.epsg.openconfigurator.content.OpenConfiguratorProjectXmlContentDescriber"/>
+		</content-type>
+	</extension>
+	<extension point="org.eclipse.core.runtime.adapters">
+		<factory adaptableType="org.epsg.openconfigurator.model.Node" class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.PowerlinkObject" class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.PowerlinkSubobject" class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.ParameterReference" class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.Parameter" class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.ParameterGroup" class="org.epsg.openconfigurator.adapters.ObjectAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.HeadNodeInterface" class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+		<factory adaptableType="org.epsg.openconfigurator.model.Module" class="org.epsg.openconfigurator.adapters.NodeAdapterFactory">
+			<adapter type="org.eclipse.ui.views.properties.IPropertySource"/>
+		</factory>
+	</extension>
+	<extension point="org.eclipse.ui.decorators">
+		<decorator class="org.epsg.openconfigurator.views.ObjectDictionaryLabelDecorator" icon="icons/lock_overlay.gif" id="org.epsg.openconfigurator.decorator.nonwritableobjects" label="lockoverlay" lightweight="true" location="BOTTOM_RIGHT" state="true">
+			<enablement>
+				<objectClass name="org.epsg.openconfigurator.model.AbstractPowerlinkObject"/>
+			</enablement>
+		</decorator>
+	</extension>
+	<extension point="org.eclipse.ui.decorators">
+		<decorator class="org.epsg.openconfigurator.views.NodeLabelDecorator" id="org.epsg.openconfigurator.decorator.stationtype" label="stationtype" lightweight="true" location="BOTTOM_RIGHT" state="true">
+			<enablement>
+				<objectClass name="org.epsg.openconfigurator.model.Node"/>
+			</enablement>
+		</decorator>
+	</extension>
+	<extension point="org.eclipse.ui.intro.configExtension">
+		<configExtension configId="org.eclipse.ui.intro.universalConfig" content="welcome.xml" />
+		<theme default="false" id="org.epsg.openconfigurator.theme" name="%theme.name.0" path="." previewImage="icons/window_16.gif">
+			<property name="launchbarOverviewIcon" value="icons/window_32.png"/>
+		</theme>
+	</extension>
+	<extension point="org.eclipse.ui.decorators">
+		<decorator adaptable="true" class="org.epsg.openconfigurator.views.ObjectDictionaryLabelDecorator" icon="icons/lock_overlay.gif" id="org.epsg.openconfigurator.decorator.locked" label="LockedOverlay" lightweight="true" location="BOTTOM_RIGHT" state="true">
+			<enablement>
+				<objectClass name="org.epsg.openconfigurator.model.ParameterReference"/>
+			</enablement>
+		</decorator>
+	</extension>
 </plugin>

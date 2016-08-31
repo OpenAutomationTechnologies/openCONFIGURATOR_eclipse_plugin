@@ -39,7 +39,7 @@ import java.net.URL;
 import java.text.MessageFormat;
 
 import org.apache.commons.io.input.Tailer;
-import org.apache.commons.lang.SystemUtils;
+import org.apache.commons.lang3.SystemUtils;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.jface.dialogs.MessageDialog;

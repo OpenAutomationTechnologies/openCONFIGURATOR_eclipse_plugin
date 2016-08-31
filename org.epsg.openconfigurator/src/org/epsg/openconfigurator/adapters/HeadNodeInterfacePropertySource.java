@@ -34,7 +34,7 @@ package org.epsg.openconfigurator.adapters;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
@@ -84,7 +84,7 @@ public class HeadNodeInterfacePropertySource extends AbstractNodePropertySource
 
     @Override
     public IPropertyDescriptor[] getPropertyDescriptors() {
-        List<IPropertyDescriptor> propertyList = new ArrayList<IPropertyDescriptor>();
+        List<IPropertyDescriptor> propertyList = new ArrayList<>();
         addInterfacePropertyDescriptors(propertyList);
 
         IPropertyDescriptor[] propertyDescriptorArray = {};

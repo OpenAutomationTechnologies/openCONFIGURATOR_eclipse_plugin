@@ -3,7 +3,4 @@
   <classpathentry kind="output" path="target/classes"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
   <classpathentry kind="src" path="/org.epsg.openconfigurator"/>
-  <classpathentry kind="lib" path="/org.epsg.openconfigurator/os/org.epsg.openconfigurator.wrapper.jar"/>
-  <classpathentry kind="lib" path="/org.epsg.openconfigurator/os/jdom-2.0.6/jdom-2.0.6.jar"/>
-  <classpathentry kind="lib" path="/org.epsg.openconfigurator/os/jdom-2.0.6/lib/jaxen-1.1.6.jar"/>
 </classpath>
