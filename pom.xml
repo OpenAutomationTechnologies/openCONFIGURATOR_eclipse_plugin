@@ -70,4 +70,13 @@
         <module>org.epsg.openconfigurator.feature</module>
         <module>org.epsg.openconfigurator.updatesite</module>
     </modules>
+	<reporting>
+		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>findbugs-maven-plugin</artifactId>
+				<version>${findbugs.version}</version>
+			</plugin>
+		</plugins>
+	</reporting>
 </project>
