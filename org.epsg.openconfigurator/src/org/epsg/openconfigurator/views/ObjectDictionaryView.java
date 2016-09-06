@@ -358,6 +358,8 @@ public class ObjectDictionaryView extends ViewPart
 
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
+                    moduleSelection = false;
+                    nodeSelection = true;
                     // Set input only if the node is enabled.
                     if (nodeObj.isEnabled()) {
                         sourcePart = part;
@@ -366,11 +368,16 @@ public class ObjectDictionaryView extends ViewPart
                     }
                 } else if (selectedObj instanceof Module) {
                     moduleObj = (Module) selectedObj;
+                    nodeSelection = false;
+                    moduleSelection = true;
                     if (moduleObj.isEnabled()) {
                         sourcePart = part;
                         setPartName(moduleObj.getModuleName());
                         treeViewer.setInput(moduleObj);
                     }
+                } else {
+                    nodeSelection = false;
+                    moduleSelection = false;
                 }
             }
 
@@ -611,6 +618,9 @@ public class ObjectDictionaryView extends ViewPart
     private boolean forcedObjectsVisible = true;
     private boolean parametersVisible = false;
 
+    private boolean nodeSelection = false;
+    private boolean moduleSelection = false;
+
     private Action hideCommunicationProfileObjects;
     private Action hideStandardisedDeviceProfileObjects;
     private Action hideNonMappableObjects;
@@ -661,8 +671,22 @@ public class ObjectDictionaryView extends ViewPart
         refreshAction = new Action("Refresh") {
             @Override
             public void run() {
-                treeViewer.refresh();
-                treeViewer.setInput(nodeObj);
+                if (parametersVisible) {
+                    if (moduleSelection) {
+                        treeViewer.setInput(moduleObj);
+                    }
+                    if (nodeSelection) {
+                        treeViewer.setInput(nodeObj);
+                    }
+                } else {
+                    treeViewer.refresh();
+                    if (moduleSelection) {
+                        treeViewer.setInput(moduleObj);
+                    }
+                    if (nodeSelection) {
+                        treeViewer.setInput(nodeObj);
+                    }
+                }
             }
         };
         refreshAction.setToolTipText("Refresh");
@@ -677,10 +701,12 @@ public class ObjectDictionaryView extends ViewPart
                     parametersVisible = true;
                     toggleParameterView
                             .setToolTipText("Switch to Object Dictionary View");
+                    contributeToActionBars();
                 } else {
                     parametersVisible = false;
                     toggleParameterView
                             .setToolTipText("Switch to Parameter View");
+                    contributeToActionBars();
                 }
                 treeViewer.refresh();
             }
@@ -897,14 +923,20 @@ public class ObjectDictionaryView extends ViewPart
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
-        manager.removeAll();
-        manager.add(refreshAction);
-        manager.add(toggleParameterView);
-        manager.add(new Separator());
-        manager.add(hideNonMappableObjects);
-        manager.add(hideCommunicationProfileObjects);
-        manager.add(hideStandardisedDeviceProfileObjects);
-        manager.add(hideNonForcedObjects);
+        if (parametersVisible) {
+            manager.removeAll();
+            manager.add(refreshAction);
+            manager.add(toggleParameterView);
+        } else {
+            manager.removeAll();
+            manager.add(refreshAction);
+            manager.add(toggleParameterView);
+            manager.add(new Separator());
+            manager.add(hideNonMappableObjects);
+            manager.add(hideCommunicationProfileObjects);
+            manager.add(hideStandardisedDeviceProfileObjects);
+            manager.add(hideNonForcedObjects);
+        }
     }
 
     public Control getControl() {

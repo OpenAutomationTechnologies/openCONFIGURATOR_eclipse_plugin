@@ -61,6 +61,7 @@ import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.IFormColors;
@@ -124,9 +125,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String PATH_SECTION_ADD_LABEL = "Add...";
     private static final String PATH_SECTION_OUTPUT_PATH_LABEL = "Output path:";
 
-    private static final String NETWORK_VIEW_SECTION_HEADING = "POWERLINK Network View";
-    private static final String NETWORK_VIEW_SECTION_HEADING_DESCRIPTION = "Links the POWERLINK network view of the project.";
-    private static final String NETWORK_VIEW_SECTION_HYPERLINK_LABEL = "POWERLINK network view";
+    private static final String NETWORK_VIEW_SECTION_HEADING = "Views";
+    private static final String NETWORK_VIEW_SECTION_HYPERLINK_LABEL = "Show POWERLINK network";
 
     private static final String NO_ROWS_SELECTED_ERROR = "No rows selected.";
     private static final String MULTIPSE_SELECTION_NOT_ALLOWED_ERROR = "Multiple rows selection is not supported.";
@@ -1021,8 +1021,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         managedForm.getToolkit().paintBordersFor(sctnGenerator);
         sctnGenerator.setText(
                 IndustrialNetworkProjectEditorPage.NETWORK_VIEW_SECTION_HEADING);
-        sctnGenerator.setDescription(
-                IndustrialNetworkProjectEditorPage.NETWORK_VIEW_SECTION_HEADING_DESCRIPTION);
 
         Composite client = toolkit.createComposite(sctnGenerator, SWT.WRAP);
         GridLayout layout = new GridLayout(4, false);
@@ -1043,8 +1041,16 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             @Override
             public void linkActivated(HyperlinkEvent e) {
                 try {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().showView(IndustrialNetworkView.ID);
+                    IViewPart view = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IndustrialNetworkView.ID);
+                    if (view instanceof IndustrialNetworkView) {
+                        IndustrialNetworkView networkView = (IndustrialNetworkView) view;
+                        networkView.handleRefresh();
+                        networkView.editorActivated(getEditor());
+                        networkView.handleRefresh();
+                    }
+
                 } catch (PartInitException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();

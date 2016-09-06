@@ -410,7 +410,7 @@ public class ValidateXddWizardPage extends WizardPage {
         grpConfigurationFile.setText(CONFIGURATION_FILE_LABEL);
         grpConfigurationFile.setLayout(new GridLayout(4, false));
 
-        btnDefault = new Button(grpConfigurationFile, SWT.CHECK);
+        btnDefault = new Button(grpConfigurationFile, SWT.RADIO);
         btnDefault.setText(DEFAULT_CONFIGURATION_LABEL);
 
         btnCustom = new Button(grpConfigurationFile, SWT.RADIO);
