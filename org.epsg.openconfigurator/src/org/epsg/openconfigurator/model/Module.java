@@ -819,7 +819,8 @@ public class Module {
         for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
                 .getObject()) {
             String objectIndex = Long.toHexString(newObjectIndex);
-            byte[] objectId = DatatypeConverter.parseHexBinary(objectIndex);
+            byte[] objectId = DatatypeConverter
+                    .parseHexBinary(objectIndex.toUpperCase());
 
             if (java.util.Arrays.equals(tempForceObj.getIndex(), objectId)) {
                 alreadyForced = true;
@@ -847,11 +848,11 @@ public class Module {
             String objectIndex = Long.toHexString(moduleObjectIndex);
             byte[] objectId = DatatypeConverter.parseHexBinary(objectIndex);
             String subobjectindex = Integer.toHexString(moduleSubobjectindex);
-            if (Integer.valueOf(subobjectindex) < 10) {
+            if (moduleSubobjectindex < 16) {
                 subobjectindex = "0" + subobjectindex;
             }
             byte[] subObjectId = DatatypeConverter
-                    .parseHexBinary(subobjectindex);
+                    .parseHexBinary(subobjectindex.toUpperCase());
             if (java.util.Arrays.equals(tempForceObj.getIndex(), objectId)) {
                 if (subObjectId == null) {
                     alreadyForced = true;

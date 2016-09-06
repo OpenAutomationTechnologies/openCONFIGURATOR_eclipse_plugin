@@ -83,7 +83,6 @@ public class ObjectDictionaryLabelDecorator
                             IDecoration.BOTTOM_RIGHT);
                 }
             }
-
             // Only VAR type is allowed to be edited.
             if ((obj.getObjectType() == 7)) {
                 TObjectAccessType accessType = obj.getAccessType();
@@ -136,7 +135,6 @@ public class ObjectDictionaryLabelDecorator
                             IDecoration.BOTTOM_RIGHT);
                 }
             }
-
             // Only VAR type is allowed to be edited.
             if ((subObj.getObjectType() == 7)) {
                 TObjectAccessType accessType = subObj.getAccessType();
