@@ -35,6 +35,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
+import java.text.MessageFormat;
 import java.util.List;
 
 import javax.xml.bind.JAXBException;
@@ -75,7 +76,6 @@ public class NewNodeWizard extends Wizard {
     public static final String ERROR_NODE_MODEL = "Invalid node model.";
 
     private static final String CNPRES_CHAINING_ERROR_MESSAGE = "The node {0} does not support PRes Chaining operation.";
-    private static final String MNPRES_CHAINING_ERROR_MESSAGE = "The MN {0} does not support PRes Chaining operation.";
     private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
     private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported.";
 
@@ -165,24 +165,14 @@ public class NewNodeWizard extends Wizard {
         if (val == 1) {
             // Checks the value of PresChaining from the XDD
             // model of MN and CN.
-            Node mnNode = cnNode.getPowerlinkRootNode().getMN();
-            boolean mnPresChaining = mnNode.getNetworkManagement()
-                    .getMnFeatures().isDLLMNPResChaining();
-            if (!mnPresChaining) {
-
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        MNPRES_CHAINING_ERROR_MESSAGE,
-                        cnNode.getProject().getName());
-                getContainer().showPage(addNodePage);
-                return false;
-            }
 
             boolean cnPresChaining = cnNode.getNetworkManagement()
                     .getCnFeatures().isDLLCNPResChaining();
             if (!cnPresChaining) {
                 // do not allow
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        CNPRES_CHAINING_ERROR_MESSAGE,
+                        MessageFormat.format(CNPRES_CHAINING_ERROR_MESSAGE,
+                                cnNode.getNodeIDWithName()),
                         cnNode.getProject().getName());
                 getContainer().showPage(addNodePage);
                 return false;

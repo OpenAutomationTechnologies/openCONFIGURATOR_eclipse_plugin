@@ -72,8 +72,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String NODE_TYPES[] = { CONTROLLED_NODE_LABEL,
             REDUNDANT_MANAGING_NODE_LABEL };
 
-    private static final String STATION_TYPES[] = { "Normal", "Chained",
-            "Multiplexed" };
+    private static final String STATION_TYPES[] = { "Normal", "Chained" };
 
     private static final String DIALOG_PAGE_NAME = "AddCnwizardPage"; //$NON-NLS-1$
     public static final String DIALOG_TILE = "POWERLINK node";
@@ -91,6 +90,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
     private static final String ERROR_INVALID_NODE_NAME = "Enter a valid node name.";
     private static final String ERROR_RMN_NOT_SUPPORTED = "{0} does not support RMN.";
     private static final String ERROR_RMN_WITH_CHAINED_STATION = "POWERLINK network with chained station cannot have RMN.";
+    private static final String MNPRES_CHAINING_ERROR_MESSAGE = "The MN {0} does not support PRes Chaining operation.";
+    private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
 
     /**
      * @return The list of nodes from POWERLINK root node.
@@ -217,6 +218,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
      */
     private Object nodeModel = null; // TCN/TRMN
 
+    private boolean validStationType = true;
+
     /**
      * Create the wizard.
      */
@@ -312,7 +315,14 @@ public class AddControlledNodeWizardPage extends WizardPage {
         stationTypeCombo.setBounds(121, 137, 117, 23);
         stationTypeCombo.setItems(STATION_TYPES);
         stationTypeCombo.select(0);
+        stationTypeCombo.addSelectionListener(new SelectionAdapter() {
 
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                handleStationTypeChanged();
+            }
+
+        });
     }
 
     /**
@@ -517,6 +527,34 @@ public class AddControlledNodeWizardPage extends WizardPage {
         nodeName.addVerifyListener(nameVerifyListener);
     }
 
+    private void handleStationTypeChanged() {
+
+        if (stationTypeCombo.getText().equalsIgnoreCase("Chained")) {
+
+            List<TRMN> rmnNodes = nodeCollection.getRMN();
+            if (rmnNodes.size() > 0) {
+
+                setPageComplete(false);
+                setErrorMessage(CHAINED_STATION_ERROR_MESSAGE);
+            }
+
+            Node mnNode = getNodelist().getMN();
+            if (!mnNode.getNetworkManagement().getMnFeatures()
+                    .isDLLMNPResChaining()) {
+
+                setPageComplete(false);
+                setErrorMessage(
+                        MessageFormat.format(MNPRES_CHAINING_ERROR_MESSAGE,
+                                mnNode.getNodeIDWithName()));
+            }
+
+        } else {
+            setErrorMessage(null);
+            setPageComplete(true);
+        }
+
+    }
+
     /**
      * @return The error status of this page.
      */
@@ -578,7 +616,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
         IWizardPage nextPage = getNextPage();
         if (nextPage instanceof ValidateXddWizardPage) {
             ValidateXddWizardPage validatePage = (ValidateXddWizardPage) nextPage;
-            if (nodeTypeCombo.getText().equals(REDUNDANT_MANAGING_NODE_LABEL)) {
+            if (nodeTypeCombo.getText()
+                    .equalsIgnoreCase(REDUNDANT_MANAGING_NODE_LABEL)) {
                 Node mnNode = getNodelist().getMN();
                 if (!mnNode.getNetworkManagement().getMnFeatures()
                         .isNMTMNRedundancy()) {
@@ -600,8 +639,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
                 validatePage.resetRmnWizard();
 
-            } else {
+            } else if (nodeTypeCombo.getText()
+                    .equalsIgnoreCase(CONTROLLED_NODE_LABEL)) {
                 validatePage.resetCnWizard();
+
             }
         } else {
             System.err.println("Invalid wizard page.");
