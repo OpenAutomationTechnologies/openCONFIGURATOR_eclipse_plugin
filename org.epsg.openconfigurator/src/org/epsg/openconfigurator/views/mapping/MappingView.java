@@ -926,8 +926,6 @@ public class MappingView extends ViewPart {
                         PowerlinkSubobject mapParamObj = (PowerlinkSubobject) element;
 
                         String value = mapParamObj.getActualDefaultValue();
-                        System.err.println(
-                                "The mapping value of TPDO/RPDO" + value);
 
                         if (value.isEmpty()) {
                             value = emptyObject.getActualValue();
@@ -1590,6 +1588,11 @@ public class MappingView extends ViewPart {
 
     private SelectionListener tpdoActionsDownBtnSelectionListener;
     private SelectionListener tpdoActionsUpBtnSelectionListener;
+    private SelectionListener tpdoDisableProfileObjectBtnSelectionListener;
+
+    private Button tpdoBtnCheckButton;
+    public boolean tpdoProfileObjectSelection = false;
+
     /**
      * RPDO page controls
      */
@@ -1629,6 +1632,10 @@ public class MappingView extends ViewPart {
     private SelectionListener rpdoActionsClearBtnSelectionListener;
     private SelectionListener rpdoActionsDownBtnSelectionListener;
     private SelectionListener rpdoActionsUpBtnSelectionListener;
+    private SelectionListener rpdoDisableProfileObjectBtnSelectionListener;
+
+    private Button rpdoBtnCheckButton;
+    public boolean rpdoProfileObjectSelection = false;
 
     /**
      * Common GUI controls
@@ -2186,6 +2193,25 @@ public class MappingView extends ViewPart {
                 tpdoNodeComboSelectionChangeListener = new PdoNodeIdComboSelectionChangedListener(
                         tpdoChannelComboViewer);
 
+                new Label(tpdoHeaderFrame, SWT.NONE);
+                new Label(tpdoHeaderFrame, SWT.NONE);
+                new Label(tpdoHeaderFrame, SWT.NONE);
+                new Label(tpdoHeaderFrame, SWT.NONE);
+
+                tpdoBtnCheckButton = new Button(tpdoHeaderFrame, SWT.CHECK);
+                tpdoBtnCheckButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        tpdoProfileObjectSelection = tpdoBtnCheckButton
+                                .getSelection();
+                        tpdoMappingObjClmnEditingSupport.setInput(
+                                getMappableObjectsList(nodeObj, PdoType.TPDO));
+                        tpdoTableViewer.refresh();
+                    }
+                });
+                formToolkit.adapt(tpdoBtnCheckButton, true, true);
+                tpdoBtnCheckButton.setText("Disable Profile Objects");
+
                 tpdoChannelComboViewer
                         .setContentProvider(ArrayContentProvider.getInstance());
                 tpdoChannelComboViewer
@@ -2458,6 +2484,28 @@ public class MappingView extends ViewPart {
                         rpdoActionsDownBtnSelectionListener);
                 rpdoActionsClearBtnSelectionListener = new PdoActionsClearButtonSelectionListener(
                         rpdoChannelComboViewer, rpdoTableViewer);
+
+                new Label(composite_5, SWT.NONE);
+                new Label(composite_5, SWT.NONE);
+                new Label(composite_5, SWT.NONE);
+                new Label(composite_5, SWT.NONE);
+
+                rpdoBtnCheckButton = new Button(composite_5, SWT.CHECK);
+                rpdoBtnCheckButton.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        rpdoProfileObjectSelection = rpdoBtnCheckButton
+                                .getSelection();
+                        rpdoMappingObjClmnEditingSupport.setInput(
+                                getMappableObjectsList(nodeObj, PdoType.RPDO));
+                        rpdoTableViewer.refresh();
+                    }
+                });
+
+                formToolkit.adapt(rpdoBtnCheckButton, true, true);
+                rpdoBtnCheckButton.setText("Disable Profile Objects");
+
+                new Label(composite_5, SWT.NONE);
                 clrbutton.addSelectionListener(
                         rpdoActionsClearBtnSelectionListener);
             }
@@ -2829,12 +2877,39 @@ public class MappingView extends ViewPart {
                                         .getTpdoMappableObjectList();
                                 for (PowerlinkObject plkObj : tpdoMappableObjListOfModule) {
                                     if (plkObj.isTpdoMappable()) {
-                                        objectList.add(plkObj);
+                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsIndex(
+                                                        plkObj.getModule(),
+                                                        plkObj.getId());
+                                        if (tpdoProfileObjectSelection) {
+                                            if ((objectIndex < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                                    || (objectIndex > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                                                objectList.add(plkObj);
+                                            }
+
+                                        } else {
+                                            objectList.add(plkObj);
+                                        }
                                     }
 
                                     for (PowerlinkSubobject plkSubobj : plkObj
                                             .getTpdoMappableObjectList()) {
-                                        objectList.add(plkSubobj);
+                                        if (tpdoProfileObjectSelection) {
+                                            long objectIndex = OpenConfiguratorLibraryUtils
+                                                    .getModuleObjectsIndex(
+                                                            plkSubobj
+                                                                    .getModule(),
+                                                            plkSubobj
+                                                                    .getObject()
+                                                                    .getId());
+                                            if ((objectIndex < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                                    || (objectIndex > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                                                objectList.add(plkSubobj);
+                                            }
+
+                                        } else {
+                                            objectList.add(plkSubobj);
+                                        }
                                     }
                                 }
                             } else if (pdoType == PdoType.RPDO) {
@@ -2844,12 +2919,39 @@ public class MappingView extends ViewPart {
 
                                 for (PowerlinkObject plkObj : rpdoMappableObjListOfModule) {
                                     if (plkObj.isRpdoMappable()) {
-                                        objectList.add(plkObj);
+                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsIndex(
+                                                        plkObj.getModule(),
+                                                        plkObj.getId());
+                                        if (rpdoProfileObjectSelection) {
+                                            if ((objectIndex < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                                    || (objectIndex > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                                                objectList.add(plkObj);
+                                            }
+
+                                        } else {
+                                            objectList.add(plkObj);
+                                        }
                                     }
 
                                     for (PowerlinkSubobject plkSubobj : plkObj
                                             .getRpdoMappableObjectList()) {
-                                        objectList.add(plkSubobj);
+                                        if (rpdoProfileObjectSelection) {
+                                            long objectIndex = OpenConfiguratorLibraryUtils
+                                                    .getModuleObjectsIndex(
+                                                            plkSubobj
+                                                                    .getModule(),
+                                                            plkSubobj
+                                                                    .getObject()
+                                                                    .getId());
+                                            if ((objectIndex < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                                    || (objectIndex > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                                                objectList.add(plkSubobj);
+                                            }
+
+                                        } else {
+                                            objectList.add(plkSubobj);
+                                        }
                                     }
                                 }
                             }
@@ -2868,12 +2970,30 @@ public class MappingView extends ViewPart {
 
             for (PowerlinkObject plkObj : tpdoMappableObjList) {
                 if (plkObj.isTpdoMappable()) {
-                    objectList.add(plkObj);
+                    if (tpdoProfileObjectSelection) {
+                        if ((plkObj
+                                .getId() < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                || (plkObj
+                                        .getId() > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                            objectList.add(plkObj);
+                        }
+                    } else {
+                        objectList.add(plkObj);
+                    }
                 }
 
                 for (PowerlinkSubobject plkSubobj : plkObj
                         .getTpdoMappableObjectList()) {
-                    objectList.add(plkSubobj);
+                    if (tpdoProfileObjectSelection) {
+                        if ((plkSubobj.getObject()
+                                .getId() < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                || (plkSubobj.getObject()
+                                        .getId() > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                            objectList.add(plkSubobj);
+                        }
+                    } else {
+                        objectList.add(plkSubobj);
+                    }
                 }
             }
         } else if (pdoType == PdoType.RPDO) {
@@ -2882,12 +3002,30 @@ public class MappingView extends ViewPart {
 
             for (PowerlinkObject plkObj : rpdoMappableObjList) {
                 if (plkObj.isRpdoMappable()) {
-                    objectList.add(plkObj);
+                    if (rpdoProfileObjectSelection) {
+                        if ((plkObj
+                                .getId() < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                || (plkObj
+                                        .getId() > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                            objectList.add(plkObj);
+                        }
+                    } else {
+                        objectList.add(plkObj);
+                    }
                 }
 
                 for (PowerlinkSubobject plkSubobj : plkObj
                         .getRpdoMappableObjectList()) {
-                    objectList.add(plkSubobj);
+                    if (rpdoProfileObjectSelection) {
+                        if ((plkSubobj.getObject()
+                                .getId() < IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
+                                || (plkSubobj.getObject()
+                                        .getId() > IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
+                            objectList.add(plkSubobj);
+                        }
+                    } else {
+                        objectList.add(plkSubobj);
+                    }
                 }
             }
         } else {
