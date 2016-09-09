@@ -218,8 +218,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
      */
     private Object nodeModel = null; // TCN/TRMN
 
-    private boolean validStationType = true;
-
     /**
      * Create the wizard.
      */
@@ -539,7 +537,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
             }
 
             Node mnNode = getNodelist().getMN();
-            if (!mnNode.getNetworkManagement().getMnFeatures()
+            if (!mnNode.getNetworkManagement().getMnFeaturesOfNode()
                     .isDLLMNPResChaining()) {
 
                 setPageComplete(false);
@@ -602,6 +600,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
             return false;
         }
 
+        // The value of nameValid,nodeIdAlreadyAvailable,nodeIdValid is not true
+        // for all cases.
         boolean pageComplete = (super.isPageComplete() && nodeIdValid
                 && !nodeIdAlreadyAvailable && nameValid);
 
@@ -619,7 +619,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
             if (nodeTypeCombo.getText()
                     .equalsIgnoreCase(REDUNDANT_MANAGING_NODE_LABEL)) {
                 Node mnNode = getNodelist().getMN();
-                if (!mnNode.getNetworkManagement().getMnFeatures()
+                if (!mnNode.getNetworkManagement().getMnFeaturesOfNode()
                         .isNMTMNRedundancy()) {
                     setErrorMessage(
                             MessageFormat.format(ERROR_RMN_NOT_SUPPORTED,

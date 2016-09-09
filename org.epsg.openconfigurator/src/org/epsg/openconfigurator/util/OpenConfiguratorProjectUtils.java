@@ -217,7 +217,7 @@ public final class OpenConfiguratorProjectUtils {
                 cn.remove(nodeObjectModel);
             } else {
                 System.err.println("Remove from openCONF model failed. Node ID:"
-                        + node.getNodeId() + " modelType:" + nodeObjectModel);
+                        + node.getCnNodeId() + " modelType:" + nodeObjectModel);
                 return false;
             }
         } else {
@@ -454,60 +454,58 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void importModuleConfigurationFile(Module newModule)
             throws IOException {
-        java.nio.file.Path moduleImportFile = new File(newModule.getPathToXdc())
-                .toPath();
+        java.nio.file.Path moduleImportFile = new File(
+                newModule.getModulePathToXdc()).toPath();
         java.nio.file.Path projectRootPath = newModule.getProject()
                 .getLocation().toFile().toPath();
         String extensionXdd = StringUtils.EMPTY;
         if (moduleImportFile != null) {
-            if (moduleImportFile.getFileName() != null) {
-                if ((moduleImportFile.getFileName() != null)) {
-                    extensionXdd = FilenameUtils.removeExtension(
-                            moduleImportFile.getFileName().toString());
+            if ((moduleImportFile.getFileName() != null)) {
+                extensionXdd = FilenameUtils.removeExtension(
+                        moduleImportFile.getFileName().toString());
 
-                    extensionXdd += "_" + newModule.getPosition()
-                            + IPowerlinkProjectSupport.XDC_EXTENSION;
+                extensionXdd += "_" + newModule.getPosition()
+                        + IPowerlinkProjectSupport.XDC_EXTENSION;
 
-                    java.nio.file.Path nodeImportFile = new File(
-                            newModule.getNode().getPathToXDC()).toPath();
-                    String nodeName = StringUtils.EMPTY;
-                    if (nodeImportFile != null) {
-                        if ((nodeImportFile.getFileName() != null)) {
-                            nodeName = FilenameUtils.removeExtension(String
-                                    .valueOf(nodeImportFile.getFileName()));
+                java.nio.file.Path nodeImportFile = new File(
+                        newModule.getNode().getPathToXDC()).toPath();
+                String nodeName = StringUtils.EMPTY;
+                if (nodeImportFile != null) {
+                    if ((nodeImportFile.getFileName() != null)) {
+                        nodeName = FilenameUtils.removeExtension(
+                                String.valueOf(nodeImportFile.getFileName()));
 
-                            String targetConfigurationPath = projectRootPath
-                                    .toString() + IPath.SEPARATOR
-                                    + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
-                                    + IPath.SEPARATOR + nodeName
-                                    + IPath.SEPARATOR + extensionXdd;
-                            String targetDirectoryPath = projectRootPath
-                                    .toString() + IPath.SEPARATOR
-                                    + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR;
+                        String targetConfigurationPath = projectRootPath
+                                .toString() + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                                + IPath.SEPARATOR + nodeName + IPath.SEPARATOR
+                                + extensionXdd;
+                        String targetDirectoryPath = projectRootPath.toString()
+                                + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR;
 
-                            java.nio.file.Files.createDirectories(
-                                    Paths.get(targetDirectoryPath
-                                            + IPath.SEPARATOR + nodeName));
+                        java.nio.file.Files
+                                .createDirectories(Paths.get(targetDirectoryPath
+                                        + IPath.SEPARATOR + nodeName));
 
-                            java.nio.file.Files.copy(moduleImportFile,
-                                    new java.io.File(targetConfigurationPath)
-                                            .toPath(),
-                                    java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
-                                    java.nio.file.StandardCopyOption.REPLACE_EXISTING,
-                                    java.nio.file.LinkOption.NOFOLLOW_LINKS);
+                        java.nio.file.Files.copy(moduleImportFile,
+                                new java.io.File(targetConfigurationPath)
+                                        .toPath(),
+                                java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                                java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                                java.nio.file.LinkOption.NOFOLLOW_LINKS);
 
-                            java.nio.file.Path pathRelative = projectRootPath
-                                    .relativize(
-                                            Paths.get(targetConfigurationPath));
+                        java.nio.file.Path pathRelative = projectRootPath
+                                .relativize(Paths.get(targetConfigurationPath));
 
-                            String relativePath = pathRelative.toString();
-                            relativePath = relativePath.replace('\\', '/');
+                        String relativePath = pathRelative.toString();
+                        relativePath = relativePath.replace('\\', '/');
 
-                            newModule.setPathToXDC(relativePath);
-                        }
+                        newModule.setPathToXDC(relativePath);
                     }
                 }
             }
+
         }
     }
 
@@ -579,7 +577,7 @@ public final class OpenConfiguratorProjectUtils {
                         // Append node ID and the 'XDC' extension to the
                         // configuration
                         // file.
-                        extensionXdd += "_" + newNode.getNodeId()
+                        extensionXdd += "_" + newNode.getCnNodeId()
                                 + IPowerlinkProjectSupport.XDC_EXTENSION;
 
                         String targetConfigurationPath = projectRootPath
@@ -623,7 +621,8 @@ public final class OpenConfiguratorProjectUtils {
                                 + String.valueOf(nodeImportFile.getFileName()));
 
                 // Copy the Node configuration to deviceImport dir
-
+                // The declared local variable performs copy operation and will
+                // not be used anywhere.
                 nodeImportFile = java.nio.file.Files.copy(
                         new java.io.File(nodeImportFile.toString()).toPath(),
                         new java.io.File(targetImportPath).toPath(),
@@ -974,9 +973,9 @@ public final class OpenConfiguratorProjectUtils {
 
         java.nio.file.Path nodeImportFile = new File(
                 module.getNode().getPathToXDC()).toPath();
-        if (module.getPathToXdc() != null) {
+        if (module.getModulePathToXdc() != null) {
             java.nio.file.Path moduleImportFile = new File(
-                    module.getPathToXdc()).toPath();
+                    module.getModulePathToXdc()).toPath();
 
             java.nio.file.Path projectRootPath = module.getProject()
                     .getLocation().toFile().toPath();
@@ -1040,7 +1039,7 @@ public final class OpenConfiguratorProjectUtils {
                             // Set the relative path to the CN object
                             module.setPathToXDC(relativePath);
                             System.err.println("The module get Path to XDC.."
-                                    + module.getPathToXdc());
+                                    + module.getModulePathToXdc());
                         }
                     }
                 }
@@ -1266,7 +1265,7 @@ public final class OpenConfiguratorProjectUtils {
             if ((nodeImportFile.getFileName() != null)) {
                 xddNameWithExtension = String
                         .valueOf(nodeImportFile.getFileName());
-                String oldNodeSuffix = "_" + node.getNodeId()
+                String oldNodeSuffix = "_" + node.getCnNodeId()
                         + IPowerlinkProjectSupport.XDC_EXTENSION;
 
                 String xddFileNameWithNoSuffix = xddNameWithExtension.substring(

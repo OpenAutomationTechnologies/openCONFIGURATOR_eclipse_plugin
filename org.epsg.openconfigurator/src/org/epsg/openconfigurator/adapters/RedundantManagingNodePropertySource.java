@@ -226,7 +226,7 @@ public class RedundantManagingNodePropertySource
                 String objectId = (String) id;
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
-                        if (rmn.getName() != null) {
+                        if (!rmn.getName().isEmpty()) {
                             retObj = rmn.getName();
                         } else {
                             retObj = "";
@@ -289,6 +289,8 @@ public class RedundantManagingNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),
@@ -353,7 +355,7 @@ public class RedundantManagingNodePropertySource
                     return ERROR_RMN_ID_RANGE;
                 }
 
-                if (nodeIDvalue == redundantManagingNode.getNodeId()) {
+                if (nodeIDvalue == redundantManagingNode.getCnNodeId()) {
                     return null;
                 }
 
@@ -400,7 +402,7 @@ public class RedundantManagingNodePropertySource
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getNodeId(),
+                                redundantManagingNode.getCnNodeId(),
                                 IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
                                 IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID,
                                 String.valueOf(longValue), false);
@@ -444,7 +446,7 @@ public class RedundantManagingNodePropertySource
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
                     redundantManagingNode.getNetworkId(),
-                    redundantManagingNode.getNodeId(), nodeName);
+                    redundantManagingNode.getCnNodeId(), nodeName);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -486,7 +488,7 @@ public class RedundantManagingNodePropertySource
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getNodeId(),
+                                redundantManagingNode.getCnNodeId(),
                                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
                                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID,
                                 String.valueOf(longValue), false);
@@ -538,6 +540,8 @@ public class RedundantManagingNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
+        // The variable res is dead stored, so that it may return value if the
+        // result fails in all below conditions.
         Result res = new Result();
         try {
             if (id instanceof String) {
@@ -546,7 +550,7 @@ public class RedundantManagingNodePropertySource
                     case IAbstractNodeProperties.NODE_NAME_OBJECT: {
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getNodeId(),
+                                redundantManagingNode.getCnNodeId(),
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -558,7 +562,7 @@ public class RedundantManagingNodePropertySource
                     }
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT: {
                         short nodeIDvalue = Short.valueOf(((String) value));
-                        short oldNodeId = redundantManagingNode.getNodeId();
+                        short oldNodeId = redundantManagingNode.getCnNodeId();
                         redundantManagingNode.getPowerlinkRootNode()
                                 .setNodeId(oldNodeId, nodeIDvalue);
                         break;
@@ -570,7 +574,7 @@ public class RedundantManagingNodePropertySource
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetRedundantManagingNodeWaitNotActive(
                                         redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getNodeId(),
+                                        redundantManagingNode.getCnNodeId(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             redundantManagingNode.setRmnWaitNotActive(
@@ -585,7 +589,7 @@ public class RedundantManagingNodePropertySource
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetRedundantManagingNodePriority(
                                         redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getNodeId(),
+                                        redundantManagingNode.getCnNodeId(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             redundantManagingNode.setRmnPriority(
@@ -652,6 +656,10 @@ public class RedundantManagingNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            // RunTimeException is caught whenever an exception is caught during
+            // run time to avoid unnecessary caught of exceptions.
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),

@@ -221,7 +221,7 @@ public class ProjectJDomOperation {
 
             attribList.add(
                     new Attribute(IControlledNodeProperties.MODULE_PATH_TO_XDC,
-                            module.getPathToXdc()));
+                            module.getModulePathToXdc()));
 
             attribList
                     .add(new Attribute(IControlledNodeProperties.MODULE_ENABLED,
@@ -270,7 +270,7 @@ public class ProjectJDomOperation {
 
             attribList.add(
                     new Attribute(IControlledNodeProperties.MODULE_PATH_TO_XDC,
-                            module.getPathToXdc()));
+                            module.getModulePathToXdc()));
 
             attribList
                     .add(new Attribute(IControlledNodeProperties.MODULE_ENABLED,
@@ -298,7 +298,7 @@ public class ProjectJDomOperation {
         } else if (node.getNodeModel() instanceof TRMN) {
             addRedundantManagingNode(document, (TRMN) node.getNodeModel());
         } else {
-            System.err.println("Unsupported node ID:" + node.getNodeId()
+            System.err.println("Unsupported node ID:" + node.getCnNodeId()
                     + " modelType:" + node.getNodeModel());
         }
     }
@@ -391,7 +391,7 @@ public class ProjectJDomOperation {
 
             if (powerlinkSubobject != null) {
                 String subObjectIndex = Integer.toHexString(newSubObjectIndex);
-                if (Integer.valueOf(subObjectIndex) < 10) {
+                if (newSubObjectIndex < 16) {
                     subObjectIndex = "0" + subObjectIndex;
                 }
                 Attribute subObjAttr = new Attribute(
@@ -414,7 +414,7 @@ public class ProjectJDomOperation {
 
             if (powerlinkSubobject != null) {
                 String subObjectIndex = Integer.toHexString(newSubObjectIndex);
-                if (Integer.valueOf(subObjectIndex) < 10) {
+                if (newSubObjectIndex < 16) {
                     subObjectIndex = "0" + subObjectIndex;
                 }
                 Attribute subObjAttr = new Attribute(
@@ -525,7 +525,8 @@ public class ProjectJDomOperation {
                     .size(); childCount++) {
                 for (Element child : childElement) {
                     int index = parentElement.indexOf(child);
-                    if (child.getQualifiedName() == "InterfaceList") {
+                    if (child.getQualifiedName()
+                            .equalsIgnoreCase("InterfaceList")) {
                         return index;
                     }
                 }
@@ -533,7 +534,7 @@ public class ProjectJDomOperation {
         } else {
             System.err.println(
                     "No child elements are available for the given Node with ID = "
-                            + node.getNodeId());
+                            + node.getCnNodeId());
         }
         return 0;
     }
@@ -558,7 +559,7 @@ public class ProjectJDomOperation {
                 + Long.toHexString(newObjectIndex) + "']";
         if (subObject != null) {
             String subObjectIndex = Integer.toHexString(newSubObjectIndex);
-            if (Integer.valueOf(subObjectIndex) < 10) {
+            if (newSubObjectIndex < 16) {
                 subObjectIndex = "0" + subObjectIndex;
             }
             xpath += "[@" + IAbstractNodeProperties.NODE_OBJECTS_SUBINDEX_OBJECT

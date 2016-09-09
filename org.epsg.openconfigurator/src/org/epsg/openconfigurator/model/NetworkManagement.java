@@ -72,7 +72,7 @@ public class NetworkManagement {
     /**
      * @return Instance of TCNFeatures.
      */
-    public TCNFeatures getCnFeatures() {
+    public TCNFeatures getCnFeaturesOfNode() {
         return cnFeatures;
     }
 
@@ -86,7 +86,7 @@ public class NetworkManagement {
     /**
      * @return Instance of TMNFeatures.
      */
-    public TMNFeatures getMnFeatures() {
+    public TMNFeatures getMnFeaturesOfNode() {
         return mnFeatures;
     }
 

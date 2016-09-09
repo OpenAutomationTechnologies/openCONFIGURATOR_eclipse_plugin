@@ -167,7 +167,7 @@ public class NewNodeWizard extends Wizard {
             // model of MN and CN.
 
             boolean cnPresChaining = cnNode.getNetworkManagement()
-                    .getCnFeatures().isDLLCNPResChaining();
+                    .getCnFeaturesOfNode().isDLLCNPResChaining();
             if (!cnPresChaining) {
                 // do not allow
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,

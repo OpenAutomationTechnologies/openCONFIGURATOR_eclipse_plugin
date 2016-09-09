@@ -290,7 +290,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         param.getNode().getNetworkId(),
-                                        param.getNode().getNodeId(),
+                                        param.getNode().getCnNodeId(),
                                         param.getUniqueId(), actualValue);
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils

@@ -167,7 +167,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             propertyList.add(denotationDescriptor);
         }
 
-        if (plkObject.getPdoMapping() != null) {
+        if (plkObject.getPdoMappingObject() != null) {
             propertyList.add(pdoMappingDescriptor);
         }
 
@@ -284,7 +284,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     retObj = plkObject.getDenotation();
                     break;
                 case OBJ_PDO_MAPPING_ID:
-                    retObj = plkObject.getPdoMapping().value();
+                    retObj = plkObject.getPdoMappingObject().value();
                     break;
                 case OBJ_OBJFLAGS_ID:
                     retObj = plkObject.getObjFlags();
@@ -354,6 +354,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         if (plkObject.getActualValue().isEmpty()) {
             return "Set some value in the actual value field.";
         } else if (plkObject.getActualValue() != null) {
+            // Redundant null check is made to prevent the project from any
+            // unexpected failure.
             if (isModuleObject()) {
                 long newObjectIndex = OpenConfiguratorLibraryUtils
                         .getModuleObjectsIndex(plkObject.getModule(),
@@ -371,8 +373,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     return OpenConfiguratorLibraryUtils.getErrorMessage(res);
                 }
             }
-        }
 
+        }
         return null;
     }
 
@@ -475,6 +477,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 }
             }
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     e.getMessage(), plkObject.getNode().getNetworkId());
@@ -576,6 +580,10 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 }
             }
 
+        } catch (RuntimeException e) {
+            // RunTimeException is caught whenever an exception is caught during
+            // run time to avoid unnecessary caught of exceptions.
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     e.getMessage(), plkObject.getNode().getNetworkId());

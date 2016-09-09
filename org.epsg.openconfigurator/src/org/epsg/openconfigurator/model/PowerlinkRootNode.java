@@ -173,7 +173,7 @@ public class PowerlinkRootNode {
             return false;
         }
 
-        nodeCollection.put(Short.valueOf(node.getNodeId()), node);
+        nodeCollection.put(Short.valueOf(node.getCnNodeId()), node);
 
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
@@ -279,7 +279,7 @@ public class PowerlinkRootNode {
      */
     public Node getMN() {
         Node mnNode = nodeCollection
-                .get(new Short(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+                .get(Short.valueOf(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
         return mnNode;
     }
 
@@ -371,6 +371,7 @@ public class PowerlinkRootNode {
     public Status importNodes(IFile projectFile,
             TNetworkConfiguration networkCfg, IProgressMonitor monitor) {
         Node processingNode = new Node();
+        // ProcessingModule is used within the try block.
         Module processingModule = new Module();
 
         try {
@@ -396,7 +397,7 @@ public class PowerlinkRootNode {
 
                 Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
                 if (res.IsSuccessful()) {
-                    nodeCollection.put(newNode.getNodeId(), newNode);
+                    nodeCollection.put(newNode.getCnNodeId(), newNode);
                 } else {
                     return new Status(IStatus.ERROR,
                             org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -459,7 +460,7 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    Short.valueOf(processingNode.getNodeId()),
+                                    Short.valueOf(processingNode.getCnNodeId()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -474,7 +475,7 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    Short.valueOf(processingNode.getNodeId()),
+                                    Short.valueOf(processingNode.getCnNodeId()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -507,7 +508,7 @@ public class PowerlinkRootNode {
                         processingNode.setError(errorMessage);
                     }
                 }
-                nodeCollection.put(Short.valueOf(processingNode.getNodeId()),
+                nodeCollection.put(Short.valueOf(processingNode.getCnNodeId()),
                         processingNode);
                 monitor.worked(1);
 
@@ -683,7 +684,7 @@ public class PowerlinkRootNode {
                     if (!res.IsSuccessful()) {
                         newNode.setError(OpenConfiguratorLibraryUtils
                                 .getErrorMessage(res));
-                        nodeCollection.put(Short.valueOf(newNode.getNodeId()),
+                        nodeCollection.put(Short.valueOf(newNode.getCnNodeId()),
                                 newNode);
                         return new Status(IStatus.ERROR,
                                 org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -703,7 +704,7 @@ public class PowerlinkRootNode {
                                     processingNode.getProject().getName());
                     processingNode.setError(errorMessage);
                 }
-                nodeCollection.put(Short.valueOf(processingNode.getNodeId()),
+                nodeCollection.put(Short.valueOf(processingNode.getCnNodeId()),
                         processingNode);
                 monitor.worked(1);
             }
@@ -888,7 +889,7 @@ public class PowerlinkRootNode {
                     }
                 }
                 // Remove from the viewer node collection.
-                Object moduleObjectModel = module.getModuleModel();
+                Object moduleObjectModel = module.getModelOfModule();
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
                     int position = module.getPosition();
                     module.getInterfaceOfModule().getModuleNameCollection()
@@ -1040,7 +1041,7 @@ public class PowerlinkRootNode {
                     } else {
                         System.err.println(
                                 "Remove from openCONF model failed. Node ID:"
-                                        + node.getNodeId() + " modelType:"
+                                        + node.getCnNodeId() + " modelType:"
                                         + nodeObjectModel);
                     }
                 } else {
@@ -1178,7 +1179,7 @@ public class PowerlinkRootNode {
                     Node oldNode = nodeCollection.get(oldNodeId);
 
                     try {
-                        oldNode.setNodeId(newNodeId);
+                        oldNode.setCnNodeId(newNodeId);
 
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetNodeId(oldNode.getNetworkId(), oldNodeId,

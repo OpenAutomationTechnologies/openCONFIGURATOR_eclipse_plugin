@@ -94,6 +94,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
          * @param name The name of the configuration.
          */
         public BuilderConfiguration(String name) {
+            // It is not required to be a static inner class.
             this.name = name;
         }
 

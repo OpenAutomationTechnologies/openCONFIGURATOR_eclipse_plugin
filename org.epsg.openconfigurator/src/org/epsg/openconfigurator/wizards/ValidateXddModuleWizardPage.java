@@ -201,6 +201,8 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         setTitle(DIALOG_TILE);
         setDescription(DIALOG_DESCRIPTION);
 
+        // The unread customConfiguration variable defines a empty value to
+        // clear the path text box in wizard page.
         customConfiguration = "";
     }
 
@@ -240,6 +242,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 List<ModuleType> moduleTypeList = getModuleTypeList()
                         .getModuleType();
                 boolean validModuleType = true;
+                // Verifies the null value from the list.
                 if (moduleTypeList != null) {
                     for (ModuleType moduleType : moduleTypeList) {
                         if ((moduleTypeText.getText()
@@ -282,6 +285,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                                 }
                             }
                         } else {
+                            // The moduleTypes variable will be updated if the
+                            // head node interface does not contain any module
+                            // collection.
                             moduleTypes = moduleType.getType();
                         }
                     }
@@ -340,6 +346,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
      *
      * @param parent Parent composite
      */
+    @SuppressWarnings("unused")
     @Override
     public void createControl(Composite parent) {
 
@@ -628,6 +635,8 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                     new Color(Display.getDefault(), 255, 255, 255));
             errorinfo.setEnabled(true);
         }
+
+        // The value of nodeConfigurationValid is not true for all cases.
         if (!nodeConfigurationValid) {
             setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
             return false;

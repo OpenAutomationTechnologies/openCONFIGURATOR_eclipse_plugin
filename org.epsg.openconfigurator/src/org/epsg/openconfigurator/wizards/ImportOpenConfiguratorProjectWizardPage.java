@@ -121,6 +121,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * @author Ramakrishnan P
      *
      */
+    // It is not required to be a static inner class.
     private final class ConflictingProjectFilter extends ViewerFilter {
 
         @Override
@@ -197,9 +198,11 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      *
      */
     private final class ProjectRecord {
+
         /**
          * The project file.
          */
+        // It is not required to be a static inner class.
         private File projectSystemFile;
 
         /**
@@ -953,7 +956,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
 
                     @Override
                     public Object[] getChildren(Object parentElement) {
-                        return null;
+                        return new Object[0];
                     }
 
                     @Override

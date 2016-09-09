@@ -155,6 +155,7 @@ public final class OpenConfiguratorProjectMarshaller {
      * @throws FileNotFoundException
      * @throws MalformedURLException
      */
+    @SuppressWarnings("resource")
     public static OpenCONFIGURATORProject unmarshallOpenConfiguratorProject(
             final File file)
             throws JAXBException, SAXException, ParserConfigurationException,

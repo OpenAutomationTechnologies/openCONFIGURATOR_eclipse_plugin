@@ -62,9 +62,9 @@ public class ParameterGroup {
 
     private Parameter conditionalParameter;
     private String conditionalValue;
-    private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<String, ParameterGroup>();
+    private HashMap<String, ParameterGroup> parameterGroupMap = new HashMap<>();
 
-    private HashMap<String, ParameterReference> parameterRefMap = new HashMap<String, ParameterReference>();
+    private HashMap<String, ParameterReference> parameterRefMap = new HashMap<>();
 
     private ObjectDictionary objectDictionary;
 
@@ -102,6 +102,8 @@ public class ParameterGroup {
 
         List<Object> parameterGroupReferenceList = grp
                 .getParameterGroupOrParameterRef();
+        // Redundant null check is made to prevent the project from any
+        // unexpected failure.
         if (parameterGroupReferenceList != null) {
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
@@ -160,7 +162,7 @@ public class ParameterGroup {
      * @return List of parameter group.
      */
     public List<ParameterGroup> getParameterGroupList() {
-        List<ParameterGroup> valueList = new ArrayList<ParameterGroup>(
+        List<ParameterGroup> valueList = new ArrayList<>(
                 parameterGroupMap.values());
         return valueList;
     }
@@ -169,7 +171,7 @@ public class ParameterGroup {
      * @return List of parameter reference available in the parameter group.
      */
     public List<ParameterReference> getParameterRefList() {
-        List<ParameterReference> valueList = new ArrayList<ParameterReference>(
+        List<ParameterReference> valueList = new ArrayList<>(
                 parameterRefMap.values());
         return valueList;
     }

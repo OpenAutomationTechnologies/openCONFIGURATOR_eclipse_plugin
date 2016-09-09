@@ -200,9 +200,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         public void widgetSelected(SelectionEvent e) {
             if (e.widget == autoGenerationCombo) {
 
-                if (autoGenerationCombo.getText() != currentProject
-                        .getProjectConfiguration()
-                        .getActiveAutoGenerationSetting()) {
+                if (!autoGenerationCombo.getText().equalsIgnoreCase(
+                        currentProject.getProjectConfiguration()
+                                .getActiveAutoGenerationSetting())) {
 
                     Result libApiRes = OpenConfiguratorCore.GetInstance()
                             .SetActiveConfiguration(editor.getNetworkId(),
@@ -1107,7 +1107,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      *
      * @return OpenCONFIGURATORProject instance
      */
-    public OpenCONFIGURATORProject getOpenCONFIGURATORProject() {
+    public OpenCONFIGURATORProject getOpenCONFIGURATORProjectFromEditor() {
         // TODO: Remove this not needed for the main editor. It has the instance
         // already.
         return currentProject;

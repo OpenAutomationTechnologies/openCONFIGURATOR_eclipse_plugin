@@ -166,6 +166,8 @@ public final class XddMarshaller {
             input = new InputSource(reader);
             input.setSystemId(file.toURI().toString());
             return unmarshallXDD(input);
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             if (bomIn != null) {
                 bomIn.close();

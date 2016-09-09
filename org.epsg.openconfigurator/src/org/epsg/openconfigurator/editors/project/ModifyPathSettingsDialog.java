@@ -85,6 +85,7 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
      * @author Ramakrishnan P
      *
      */
+    // It is not required to be a static inner class.
     private class PathSettingsContentProvider
             implements IStructuredContentProvider {
         /**

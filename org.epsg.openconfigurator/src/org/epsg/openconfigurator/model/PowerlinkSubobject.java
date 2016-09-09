@@ -479,7 +479,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         String objectId = Long.toHexString(newObjectIndex);
         byte[] objectIndex = DatatypeConverter.parseHexBinary(objectId);
         String subObjectId = Integer.toHexString(newSubObjectIndex);
-        if (Integer.valueOf(subObjectId) < 10) {
+        if (newSubObjectIndex < 16) {
             subObjectId = "0" + subObjectId;
         }
         byte[] subObjectindex = DatatypeConverter.parseHexBinary(subObjectId);
@@ -871,7 +871,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public short getNodeId() {
-        return nodeInstance.getNodeId();
+        return nodeInstance.getCnNodeId();
     }
 
     /**
@@ -911,7 +911,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      * @return PDO mapping of sub object.
      */
     @Override
-    public TObjectPDOMapping getPdoMapping() {
+    public TObjectPDOMapping getPdoMappingObject() {
         return pdoMapping;
     }
 
@@ -962,7 +962,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
         return 0;
     }
 
-    public byte[] getSubIndex() {
+    public byte[] getSubIndexOfSubObject() {
         return idByte;
     }
 

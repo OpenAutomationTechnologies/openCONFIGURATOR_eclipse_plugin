@@ -135,6 +135,7 @@ public class IndustrialNetworkView extends ViewPart
      * @author Ramakrishnan P
      *
      */
+    // It is not required to be a static inner class.
     private class EmptyNetworkView {
         @Override
         public String toString() {
@@ -150,6 +151,7 @@ public class IndustrialNetworkView extends ViewPart
      * @author Ramakrishnan P
      *
      */
+    // It is not required to be a static inner class.
     private class NodeBasedSorter extends ViewerComparator {
 
         @Override
@@ -161,13 +163,13 @@ public class IndustrialNetworkView extends ViewPart
                 Node nodeSecond = (Node) e2;
 
                 if (nodeSecond
-                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
                 }
                 compare = nodeFirst.getPlkOperationMode()
                         .compareTo(nodeSecond.getPlkOperationMode());
                 if (compare == 0) {
-                    return nodeFirst.getNodeId() - nodeSecond.getNodeId();
+                    return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
                 }
 
             } else if ((e1 instanceof Module) && (e2 instanceof Module)) {
@@ -189,6 +191,7 @@ public class IndustrialNetworkView extends ViewPart
      * @author Ramakrishnan P
      *
      */
+    // It is not required to be a static inner class.
     private class NodeIdSorter extends ViewerComparator {
 
         @Override
@@ -198,10 +201,10 @@ public class IndustrialNetworkView extends ViewPart
                 Node nodeFirst = (Node) e1;
                 Node nodeSecond = (Node) e2;
                 if (nodeSecond
-                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
                 } else {
-                    return nodeFirst.getNodeId() - nodeSecond.getNodeId();
+                    return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
                 }
 
             }
@@ -252,7 +255,7 @@ public class IndustrialNetworkView extends ViewPart
             }
 
             System.err.println("Returning empty object. Parent:" + parent);
-            return null;
+            return new Object[0];
         }
 
         @Override
@@ -277,7 +280,7 @@ public class IndustrialNetworkView extends ViewPart
                         return obj;
                     }
                 }
-                return null;
+                return new Object[0];
 
             }
 
@@ -299,7 +302,7 @@ public class IndustrialNetworkView extends ViewPart
                 }
             } else if (child instanceof Module) {
                 Module module = (Module) child;
-                Object moduleModel = module.getModuleModel();
+                Object moduleModel = module.getModelOfModule();
                 if (moduleModel instanceof InterfaceList.Interface.Module) {
                     return module.getInterfaceOfModule();
                 }
@@ -324,11 +327,10 @@ public class IndustrialNetworkView extends ViewPart
                     // TODO implement for Modular RMN
                     return false;
                 } else if (interfaceModel != null) {
-                    if (interfaceModel instanceof HeadNodeInterface) {
-                        ArrayList<HeadNodeInterface> interfaceList = rootNode
-                                .getInterfaceList();
-                        return (interfaceList.size() > 0 ? true : false);
-                    }
+                    ArrayList<HeadNodeInterface> interfaceList = rootNode
+                            .getInterfaceList();
+                    return (interfaceList.size() > 0 ? true : false);
+
                 }
             }
 
@@ -360,6 +362,7 @@ public class IndustrialNetworkView extends ViewPart
         Image interfaceIcon;
         Image moduleIcon;
 
+        // It is not required to be a static inner class.
         ViewLabelProvider() {
             mnIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(IPluginImages.MN_ICON).createImage();
@@ -456,7 +459,7 @@ public class IndustrialNetworkView extends ViewPart
 
             if (obj instanceof Module) {
                 Module module = (Module) obj;
-                Object moduleObjectModel = module.getModuleModel();
+                Object moduleObjectModel = module.getModelOfModule();
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
                     InterfaceList.Interface.Module moduleModel = (InterfaceList.Interface.Module) moduleObjectModel;
                     if (moduleModel.isEnabled()) {
@@ -489,7 +492,7 @@ public class IndustrialNetworkView extends ViewPart
             }
             if (obj instanceof Module) {
                 Module module = (Module) obj;
-                Object moduleObjModel = module.getModuleModel();
+                Object moduleObjModel = module.getModelOfModule();
                 if (moduleObjModel instanceof InterfaceList.Interface.Module) {
                     InterfaceList.Interface.Module mod = (InterfaceList.Interface.Module) moduleObjModel;
                     return mod.getName() + " (" + mod.getAddress() + ")";
@@ -1269,7 +1272,7 @@ public class IndustrialNetworkView extends ViewPart
         for (Object selectedObject : selectedObjectsList) {
             if (selectedObject instanceof Node) {
                 Node node = (Node) selectedObject;
-
+                // The variable res is used within the try block.
                 Result res = new Result();
                 // checks for valid XDC file
                 if (!node.hasError()) {
@@ -1492,7 +1495,7 @@ public class IndustrialNetworkView extends ViewPart
                 }
             } else if (selectedObject instanceof Module) {
                 Module module = (Module) selectedObject;
-                Object moduleObjectModel = module.getModuleModel();
+                Object moduleObjectModel = module.getModelOfModule();
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
                     MessageDialog dialog = new MessageDialog(null,
                             "Delete node", null,
@@ -2021,6 +2024,7 @@ public class IndustrialNetworkView extends ViewPart
                 "POWERLINK Network", message);
     }
 
+    @SuppressWarnings("null")
     private void validateModule(Module module)
             throws JDOMException, IOException {
         int removedModulePosition = module.getPosition();
@@ -2041,9 +2045,6 @@ public class IndustrialNetworkView extends ViewPart
         }
 
         Collections.sort(previousPositionList, Collections.reverseOrder());
-        System.err
-                .println("previous position list ...." + previousPositionList);
-        System.err.println("next position list ...." + positionToBeChecked);
         if (previousPositionList.size() > 0) {
             for (Integer previousModulePosition : previousPositionList) {
                 System.err.println(
@@ -2054,11 +2055,11 @@ public class IndustrialNetworkView extends ViewPart
                         .getModuleInterface().getModuleTypeList()
                         .getModuleType();
                 if (previousPositionModule.isEnabled()) {
+                    // The variable positionToBeChecked undergoes redundant null
+                    // check in order to ensure the lists are not empty, Hence
+                    // unnecessary code blocks will not be executed.
                     if (positionToBeChecked != null) {
                         for (Integer posit : positionToBeChecked) {
-                            System.err.println("Previous pos#@$^^........"
-                                    + previousModulePosition);
-                            System.err.println("Next pos#@^^........" + posit);
                             Module mod = interfaceObj.getModuleCollection()
                                     .get(posit);
                             if (mod != null) {

@@ -451,6 +451,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),
@@ -489,7 +491,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
+                                mnNode.getCnNodeId(),
                                 IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
                                 IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID,
                                 String.valueOf(resultVal), false);
@@ -538,7 +540,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
+                                mnNode.getCnNodeId(),
                                 INetworkProperties.ASYNC_MTU_OBJECT_ID,
                                 INetworkProperties.ASYNC_MTU_SUBOBJECT_ID,
                                 String.valueOf(asyncMtuValue), false);
@@ -585,7 +587,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
+                                mnNode.getCnNodeId(),
                                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
                                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
                                 String.valueOf(resultVal), false);
@@ -626,7 +628,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateObjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
+                                mnNode.getCnNodeId(),
                                 INetworkProperties.CYCLE_TIME_OBJECT_ID,
                                 (String) value, false);
                 if (!validateResult.IsSuccessful()) {
@@ -705,7 +707,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
+                                mnNode.getCnNodeId(),
                                 INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
                                 INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID,
                                 String.valueOf(multiplxCyclVal), false);
@@ -785,7 +787,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getNodeId(),
+                                mnNode.getCnNodeId(),
                                 INetworkProperties.PRESCALER_OBJECT_ID,
                                 INetworkProperties.PRESCALER_SUBOBJECT_ID,
                                 String.valueOf(preScalarVal), false);
@@ -824,7 +826,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    mnNode.getNetworkId(), mnNode.getNodeId(), nodeName);
+                    mnNode.getNetworkId(), mnNode.getCnNodeId(), nodeName);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -867,6 +869,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
      */
     @Override
     public void setPropertyValue(Object id, Object value) {
+        // The variable res is dead stored, so that it may return value if the
+        // result fails in all below conditions.
         Result res = new Result();
         try {
             if (id instanceof String) {
@@ -874,7 +878,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                                mnNode.getNetworkId(), mnNode.getNodeId(),
+                                mnNode.getNetworkId(), mnNode.getCnNodeId(),
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -896,7 +900,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                                 * 1000;
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetLossOfSocTolerance(mnNode.getNetworkId(),
-                                        mnNode.getNodeId(), lossOfSocTolerance);
+                                        mnNode.getCnNodeId(),
+                                        lossOfSocTolerance);
                         if (res.IsSuccessful()) {
                             mnNode.setLossOfSocTolerance(lossOfSocTolerance);
                         } else {
@@ -920,7 +925,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                     case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetAsyncSlotTimeout(mnNode.getNetworkId(),
-                                        mnNode.getNodeId(),
+                                        mnNode.getCnNodeId(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             mnNode.setAsyncSlotTimeout(
@@ -933,10 +938,10 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetAsndMaxNr(
-                                mnNode.getNetworkId(), mnNode.getNodeId(),
+                                mnNode.getNetworkId(), mnNode.getCnNodeId(),
                                 Short.decode((String) value));
                         if (res.IsSuccessful()) {
-                            mnNode.setAsndMaxNumber(
+                            mnNode.setAsndMaxNumberOfNode(
                                     Short.decode((String) value));
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -1003,7 +1008,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         res = OpenConfiguratorCore.GetInstance().SetAsyncMtu(
                                 mnNode.getNetworkId(), asyncMtuValue);
                         if (res.IsSuccessful()) {
-                            mnNode.setAsyncMtu(asyncMtuValue);
+                            mnNode.setAsyncMtuOfNode(asyncMtuValue);
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -1047,6 +1052,10 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            // RunTimeException is caught whenever an exception is caught during
+            // run time to avoid unnecessary caught of exceptions.
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printErrorMessage(e.getMessage(), mnNode.getNetworkId());

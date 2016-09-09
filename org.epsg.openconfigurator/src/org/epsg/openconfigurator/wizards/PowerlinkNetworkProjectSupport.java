@@ -40,7 +40,6 @@ import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.epsg.openconfigurator.builder.PowerlinkNetworkProjectNature;
 
 public class PowerlinkNetworkProjectSupport {
@@ -53,8 +52,7 @@ public class PowerlinkNetworkProjectSupport {
             newNatures[prevNatures.length] = PowerlinkNetworkProjectNature.NATURE_ID;
             description.setNatureIds(newNatures);
 
-            IProgressMonitor monitor = null;
-            project.setDescription(description, monitor);
+            project.setDescription(description, null);
         }
     }
 

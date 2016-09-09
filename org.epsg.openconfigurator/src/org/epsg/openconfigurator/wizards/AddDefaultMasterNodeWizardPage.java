@@ -276,6 +276,7 @@ final class AddDefaultMasterNodeWizardPage extends WizardPage {
             return canPageComplete;
         }
 
+        // The value of mnNameValid is not true for all cases.
         canPageComplete = (pageComplete && mnNameValid);
 
         return canPageComplete;

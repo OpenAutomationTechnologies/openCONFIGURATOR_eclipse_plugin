@@ -47,7 +47,6 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Spinner;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
-import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
@@ -68,8 +67,6 @@ public class AddChildModuleWizardPage extends WizardPage {
     private static final String DIALOG_PAGE_NAME = "AddCNModulewizardPage"; //$NON-NLS-1$
     public static final String DIALOG_TILE = "POWERLINK module";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to the network.";
-
-    private Node node;
 
     private HeadNodeInterface interfaceObj;
     private Spinner position;
@@ -106,7 +103,6 @@ public class AddChildModuleWizardPage extends WizardPage {
         super(DIALOG_PAGE_NAME);
         interfaceObj = selectedNodeObj;
         System.out.println("Constructor called........");
-        node = selectedNodeObj.getNode();
 
         setTitle(DIALOG_TILE);
         setDescription(DIALOG_DESCRIPTION);
@@ -124,7 +120,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         position.setMaximum(interfaceObj.getMaxModules().intValue());
         position.setEnabled(false);
 
-        if (!interfaceObj.isUnUsedSlots()) {
+        if (!interfaceObj.isInterfaceUnUsedSlots()) {
             position.setEnabled(false);
         }
 
@@ -167,8 +163,8 @@ public class AddChildModuleWizardPage extends WizardPage {
      * @return The instance of TModuleInterface fron the XDD model
      */
     public TModuleInterface getModuleInterface() {
-        if (getXDDModel() != null) {
-            List<ISO15745Profile> profiles = getXDDModel().getISO15745Profile();
+        if (getXDDModelOfModule() != null) {
+            List<ISO15745Profile> profiles = getXDDModelOfModule().getISO15745Profile();
             for (ISO15745Profile profile : profiles) {
                 ProfileBodyDataType profileBodyDatatype = profile
                         .getProfileBody();
@@ -205,7 +201,7 @@ public class AddChildModuleWizardPage extends WizardPage {
     /**
      * @return Instance of XDD model
      */
-    public ISO15745ProfileContainer getXDDModel() {
+    public ISO15745ProfileContainer getXDDModelOfModule() {
         IWizardPage previousPage = getPreviousPage();
         if (previousPage instanceof ValidateXddModuleWizardPage) {
             ValidateXddModuleWizardPage xddPage = (ValidateXddModuleWizardPage) previousPage;
@@ -512,7 +508,7 @@ public class AddChildModuleWizardPage extends WizardPage {
             pageComplete = true;
         }
 
-        if (!interfaceObj.isUnUsedSlots()) {
+        if (!interfaceObj.isInterfaceUnUsedSlots()) {
             setErrorMessage("Unused slots not available.");
             return false;
         } else {
@@ -589,7 +585,7 @@ public class AddChildModuleWizardPage extends WizardPage {
 
         if (!(interfaceObj.hasModules())) {
             System.err.println("POsition...." + position.getText());
-            if ((position.getText()) != "1") {
+            if ((position.getText()).equalsIgnoreCase("1")) {
                 if (!(position.getMinimum() == 1)) {
                     setErrorMessage("Module cannot be placed at position "
                             + position.getText() + ". The interface ('"

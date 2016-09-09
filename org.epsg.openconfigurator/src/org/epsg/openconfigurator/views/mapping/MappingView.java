@@ -591,6 +591,9 @@ public class MappingView extends ViewPart {
 
                         } else if (value instanceof PowerlinkObject) {
                             PowerlinkObject objectTobeMapped = (PowerlinkObject) value;
+                            // The variable res is dead stored, so that it may
+                            // return value if the
+                            // result fails in all below conditions.
                             Result res = new Result();
                             if (objectTobeMapped == emptyObject) {
                                 res = OpenConfiguratorLibraryUtils
@@ -663,6 +666,7 @@ public class MappingView extends ViewPart {
     private class PdoNodeListLabelProvider extends LabelProvider {
         private PdoType pdoType;
 
+        // It is not required to be a static inner class.
         public PdoNodeListLabelProvider(PdoType pdoType) {
             this.pdoType = pdoType;
         }
@@ -677,22 +681,22 @@ public class MappingView extends ViewPart {
             if (element instanceof Node) {
                 Node node = (Node) element;
                 if (pdoType == PdoType.TPDO) {
-                    if (node.getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getNodeId()
+                    if (node.getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                        return node.getName() + " PRes(" + node.getCnNodeId()
                                 + ")";
                     } else if (node
-                            .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getNodeId()
+                            .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        return node.getName() + " PRes(" + node.getCnNodeId()
                                 + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
                 } else if (pdoType == PdoType.RPDO) {
-                    if (node.getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return "MN" + " PReq(" + node.getNodeId() + ")";
+                    if (node.getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                        return "MN" + " PReq(" + node.getCnNodeId() + ")";
                     } else if (node
-                            .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getNodeId()
+                            .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        return node.getName() + " PRes(" + node.getCnNodeId()
                                 + ")";
                     } else {
                         return node.getNodeIDWithName();
@@ -816,7 +820,7 @@ public class MappingView extends ViewPart {
                         Node targetNode = null;
                         for (Node node : targetNodeIdList) {
 
-                            if (node.getNodeId() == targetNodeId) {
+                            if (node.getCnNodeId() == targetNodeId) {
                                 targetNode = node;
                             }
                         }
@@ -825,32 +829,32 @@ public class MappingView extends ViewPart {
 
                             if (pdoType == PdoType.TPDO) {
                                 if (targetNode
-                                        .getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                                        .getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getNodeId() + ")";
+                                            + targetNode.getCnNodeId() + ")";
                                 } else if (nodeObj == targetNode) {
-                                    return "Self(" + targetNode.getNodeId()
+                                    return "Self(" + targetNode.getCnNodeId()
                                             + ")";
                                 } else if (targetNode
-                                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     // TODO Check;
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getNodeId() + ")";
+                                            + targetNode.getCnNodeId() + ")";
                                 } else {
                                     return targetNode.getNodeIDWithName();
                                 }
                             } else if (pdoType == PdoType.RPDO) {
                                 if (targetNode
-                                        .getNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                                        .getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return "MN" + " PReq("
-                                            + targetNode.getNodeId() + ")";
+                                            + targetNode.getCnNodeId() + ")";
                                 } else if (nodeObj == targetNode) {
-                                    return "Self(" + targetNode.getNodeId()
+                                    return "Self(" + targetNode.getCnNodeId()
                                             + ")";
                                 } else if (targetNode
-                                        .getNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getNodeId() + ")";
+                                            + targetNode.getCnNodeId() + ")";
                                 } else {
                                     return targetNode.getNodeIDWithName();
                                 }
@@ -898,16 +902,6 @@ public class MappingView extends ViewPart {
             if (element instanceof PowerlinkSubobject) {
                 PowerlinkSubobject mappParamSubObj = (PowerlinkSubobject) element;
 
-                int index = mappParamSubObj.getId();
-                Table table = tpdoTableViewer.getTable();
-                table.setLinesVisible(true);
-
-                if ((index % 2) == 0) {
-                    return Display.getCurrent()
-                            .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
-                } else {
-                    return Display.getCurrent().getSystemColor(SWT.COLOR_WHITE);
-                }
             }
             return null;
         }
@@ -1159,7 +1153,7 @@ public class MappingView extends ViewPart {
 
                         String value = mapParamObj.getActualDefaultValue();
 
-                        if (value == null) {
+                        if (value.isEmpty()) {
                             return emptyObject.getActualValue();
                         }
 
@@ -1173,12 +1167,7 @@ public class MappingView extends ViewPart {
                     }
                     break;
                 }
-                case 5: {
-                    if (element instanceof PowerlinkSubobject) {
-                        return StringUtils.EMPTY;
-                    }
-                    break;
-                }
+                case 5:
                 case 6:
                     if (element instanceof PowerlinkSubobject) {
                         return StringUtils.EMPTY;
@@ -1588,7 +1577,6 @@ public class MappingView extends ViewPart {
 
     private SelectionListener tpdoActionsDownBtnSelectionListener;
     private SelectionListener tpdoActionsUpBtnSelectionListener;
-    private SelectionListener tpdoDisableProfileObjectBtnSelectionListener;
 
     private Button tpdoBtnCheckButton;
     public boolean tpdoProfileObjectSelection = false;
@@ -1632,7 +1620,6 @@ public class MappingView extends ViewPart {
     private SelectionListener rpdoActionsClearBtnSelectionListener;
     private SelectionListener rpdoActionsDownBtnSelectionListener;
     private SelectionListener rpdoActionsUpBtnSelectionListener;
-    private SelectionListener rpdoDisableProfileObjectBtnSelectionListener;
 
     private Button rpdoBtnCheckButton;
     public boolean rpdoProfileObjectSelection = false;
@@ -1816,6 +1803,7 @@ public class MappingView extends ViewPart {
      *
      * @param parent The parent composite.
      */
+    @SuppressWarnings("unused")
     @Override
     public void createPartControl(Composite parent) {
         Composite container = new Composite(parent, SWT.NONE);
@@ -2341,6 +2329,7 @@ public class MappingView extends ViewPart {
                 table.setHeaderVisible(true);
                 table.setLinesVisible(true);
                 table.addListener(SWT.MeasureItem, new Listener() {
+
                     @Override
                     public void handleEvent(Event event) {
                         // Resize the row height for the button group to fit
@@ -2532,6 +2521,7 @@ public class MappingView extends ViewPart {
                     rpdoTableViewer.refresh();
                 }
             }
+
         });
 
         createActions();
@@ -3177,7 +3167,7 @@ public class MappingView extends ViewPart {
         Node targetNode = null;
         for (Node node : targetNodeIdList) {
 
-            if (node.getNodeId() == targetNodeId) {
+            if (node.getCnNodeId() == targetNodeId) {
                 targetNode = node;
             }
         }

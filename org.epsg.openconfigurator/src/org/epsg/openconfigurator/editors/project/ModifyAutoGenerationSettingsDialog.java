@@ -187,6 +187,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
      *
      * @author Ramakrishnan P
      */
+    // It is not required to be a static inner class.
     class AutoGenerationSettingsContentProvider
             implements IStructuredContentProvider {
         /**

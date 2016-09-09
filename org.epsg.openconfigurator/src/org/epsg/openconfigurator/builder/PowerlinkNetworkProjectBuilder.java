@@ -280,6 +280,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             short value = nodeIdCollection.get(i);
             java.nio.file.Path processImagePath = targetPath;
             if (value != IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                // The variable processimagePath does not store any values,
+                // instead it resolves the value received from node collection.
                 processImagePath = processImagePath
                         .resolve(String.valueOf(value));
                 // NOTE: Remove 'continue' to generate the Individual CN's PI
@@ -501,7 +503,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         }
         // Prevents build if no change has occurred in the project.
         rememberLastBuiltState();
-        return null;
+        return new IProject[0];
     }
 
     /**

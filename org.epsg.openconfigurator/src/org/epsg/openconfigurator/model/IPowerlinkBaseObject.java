@@ -134,7 +134,7 @@ public interface IPowerlinkBaseObject {
     /**
      * @return PDO mapping objects
      */
-    public TObjectPDOMapping getPdoMapping();
+    public TObjectPDOMapping getPdoMappingObject();
 
     /**
      * @return current POWERLINK network project.

@@ -126,7 +126,7 @@ public class HeadNodeInterfacePropertySource extends AbstractNodePropertySource
                         retObj = devModularInterface.getModuleAddressing();
                         break;
                     case IAbstractNodeProperties.INTERFACE_UNUSED_SLOTS_OBJECT:
-                        if (devModularInterface.isUnUsedSlots()) {
+                        if (devModularInterface.isInterfaceUnUsedSlots()) {
                             retObj = "true";
                         } else {
                             retObj = "false";
@@ -140,6 +140,8 @@ public class HeadNodeInterfacePropertySource extends AbstractNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),

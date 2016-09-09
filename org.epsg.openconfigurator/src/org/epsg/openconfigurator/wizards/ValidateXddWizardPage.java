@@ -293,12 +293,12 @@ public class ValidateXddWizardPage extends WizardPage {
                     }
                     case REDUNDANT_MANAGING_NODE: {
                         if (newNode
-                                .getNodeId() > IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                .getCnNodeId() > IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                             // This is an RMN
                             if (netWrkMgmt.getGeneralFeatures()
                                     .isDLLFeatureMN()) {
                                 TMNFeatures mnFeatures = netWrkMgmt
-                                        .getMnFeatures();
+                                        .getMnFeaturesOfNode();
                                 if (mnFeatures != null) {
                                     if (!mnFeatures.isNMTMNRedundancy()) {
                                         getErrorStyledText(
@@ -673,6 +673,8 @@ public class ValidateXddWizardPage extends WizardPage {
             setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
             return false;
         }
+
+        // The value of nodeConfigurationValid is not true in all cases.
         boolean pageComplete = (super.isPageComplete())
                 && nodeConfigurationValid;
 

@@ -77,7 +77,7 @@ public class ModuleManagement {
     /**
      * @return The interface list of modular node.
      */
-    public List<Interface> getInterfacelist() {
+    public List<Interface> getInterfacelistOfNode() {
         return interfacelist;
     }
 

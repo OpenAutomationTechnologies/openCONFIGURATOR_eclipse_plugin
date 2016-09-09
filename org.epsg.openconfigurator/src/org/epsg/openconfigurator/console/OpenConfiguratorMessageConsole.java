@@ -190,6 +190,7 @@ public class OpenConfiguratorMessageConsole {
             final String projectName) {
         String fullMessage = "[" + getCurrentTime() + "] [INFO] " + "["
                 + projectName + "] " + message;
+        @SuppressWarnings("resource")
         MessageConsoleStream out = getInfoMessageStream();
         out.println(fullMessage);
 
@@ -210,6 +211,7 @@ public class OpenConfiguratorMessageConsole {
                         .getErrorMessage(res);
                 String fullMessage = "[" + getCurrentTime() + "] [ERROR] "
                         + message;
+                @SuppressWarnings("resource")
                 MessageConsoleStream out = getErrorMessageStream();
                 out.println(fullMessage);
             }
@@ -227,6 +229,7 @@ public class OpenConfiguratorMessageConsole {
             @Override
             public void run() {
 
+                @SuppressWarnings("resource")
                 MessageConsoleStream out = getLibraryMessageStream();
                 out.println(message);
             }

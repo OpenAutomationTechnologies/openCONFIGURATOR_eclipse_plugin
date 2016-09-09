@@ -337,7 +337,7 @@ public class Node {
         objectDictionary = new ObjectDictionary(this, xddModel);
         networkmanagement = new NetworkManagement(this, xddModel);
         moduleManagement = new ModuleManagement(this, xddModel);
-        List<Interface> interfaceList = moduleManagement.getInterfacelist();
+        List<Interface> interfaceList = moduleManagement.getInterfacelistOfNode();
         for (Interface interfaces : interfaceList) {
             headNodeInterface = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(headNodeInterface);
@@ -384,15 +384,15 @@ public class Node {
         int val = ((Integer) stationTypeChanged).intValue();
         if (val == 0) { // Normal Station.
             res = OpenConfiguratorCore.GetInstance()
-                    .ResetOperationMode(getNetworkId(), getNodeId());
+                    .ResetOperationMode(getNetworkId(), getCnNodeId());
             plkMode = PlkOperationMode.NORMAL;
         } else if (val == 1) {
             res = OpenConfiguratorCore.GetInstance()
-                    .SetOperationModeChained(getNetworkId(), getNodeId());
+                    .SetOperationModeChained(getNetworkId(), getCnNodeId());
             plkMode = PlkOperationMode.CHAINED;
         } else if (val == 2) {
             res = OpenConfiguratorCore.GetInstance()
-                    .SetOperationModeMultiplexed(getNetworkId(), getNodeId(),
+                    .SetOperationModeMultiplexed(getNetworkId(), getCnNodeId(),
                             (short) tcn.getForcedMultiplexedCycle());
             plkMode = PlkOperationMode.MULTIPLEXED;
         }
@@ -753,7 +753,7 @@ public class Node {
     /**
      * @return The node ID.
      */
-    public short getNodeId() {
+    public short getCnNodeId() {
         return nodeId;
     }
 
@@ -1100,7 +1100,7 @@ public class Node {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public void setAsndMaxNumber(Short value)
+    public void setAsndMaxNumberOfNode(Short value)
             throws JDOMException, IOException {
         if (value == null) {
             // FIXME: throw invalid argument.
@@ -1121,7 +1121,7 @@ public class Node {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public void setAsyncMtu(Integer value) throws JDOMException, IOException {
+    public void setAsyncMtuOfNode(Integer value) throws JDOMException, IOException {
         if (value == null) {
             // FIXME: throw invalid argument.
             return;
@@ -1509,7 +1509,7 @@ public class Node {
      * @throws JDOMException Error with time modifications.
      * @throws InterruptedException Error with interrupt in thread.
      */
-    public void setNodeId(short newNodeId)
+    public void setCnNodeId(short newNodeId)
             throws IOException, JDOMException, InterruptedException {
         // Update the new node id in the XDC file.
         OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,

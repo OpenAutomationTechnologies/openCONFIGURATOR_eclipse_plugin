@@ -119,7 +119,7 @@ public class PdoChannel {
         String value = nrEntriesSubObj.getActualValue();
         if (value.isEmpty()) {
             value = nrEntriesSubObj.getDefaultValue();
-            if (value == null) {
+            if (value.isEmpty()) {
                 System.err.println("No default/actual value");
                 return 0;
             }

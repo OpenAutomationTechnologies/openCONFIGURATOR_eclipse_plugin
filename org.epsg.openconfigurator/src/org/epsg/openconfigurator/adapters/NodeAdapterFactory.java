@@ -131,7 +131,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
                     return null;
                 }
 
-                Object moduleObjectModel = moduleObj.getModuleModel();
+                Object moduleObjectModel = moduleObj.getModelOfModule();
                 if (moduleObjectModel instanceof InterfaceList.Interface.Module) {
                     TModuleAddressingHead moduleaddressing = moduleObj
                             .getInterfaceOfModule().getModuleAddressing();

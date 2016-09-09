@@ -154,6 +154,7 @@ public class ObjectDictionaryView extends ViewPart
      * PatternFilter class to always show sub objects after filtering of
      * objects.
      */
+    // It is not required to be a static inner class.
     private class PowerlinkObjectPatternFilter extends PatternFilter {
 
         @Override
@@ -189,6 +190,7 @@ public class ObjectDictionaryView extends ViewPart
         Image parameterReferenceIcon;
         Image varDeclarationIcon;
 
+        // It is not required to be a static inner class.
         TreeLabelProvider() {
             objectIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(IPluginImages.OBD_OBJECT_ICON)
@@ -432,7 +434,7 @@ public class ObjectDictionaryView extends ViewPart
             } else {
                 System.err.println("GetChildren" + parentElement);
             }
-            return null;
+            return new Object[0];
         }
 
         @Override

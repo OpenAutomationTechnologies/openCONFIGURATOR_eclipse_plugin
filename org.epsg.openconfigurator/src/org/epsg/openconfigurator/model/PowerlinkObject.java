@@ -542,7 +542,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
 
     public synchronized void forceActualValue(Module module, boolean force,
             boolean writeToProjectFile, long newObjectIndex)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         if (writeToProjectFile) {
             OpenConfiguratorProjectUtils.forceActualValue(module, getNode(),
                     this, null, force, newObjectIndex);
@@ -875,7 +875,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      */
     @Override
     public short getNodeId() {
-        return nodeInstance.getNodeId();
+        return nodeInstance.getCnNodeId();
     }
 
     /**
@@ -904,7 +904,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      * Returns Mapping object from the XDC model
      */
     @Override
-    public TObjectPDOMapping getPdoMapping() {
+    public TObjectPDOMapping getPdoMappingObject() {
         return pdoMapping;
     }
 

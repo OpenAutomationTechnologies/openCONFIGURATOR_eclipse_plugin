@@ -426,7 +426,7 @@ public class Module {
      */
     public String getAbsolutePathToXdc() {
         String pathToXdc = getProject().getLocation().toString();
-        String xdcPath = getPathToXdc();
+        String xdcPath = getModulePathToXdc();
         pathToXdc = pathToXdc + IPath.SEPARATOR + xdcPath;
         return pathToXdc;
     }
@@ -560,6 +560,13 @@ public class Module {
     }
 
     /**
+     * @return Model of module.
+     */
+    public Object getModelOfModule() {
+        return moduleModel;
+    }
+
+    /**
      * @return Value of module addressing in interface.
      */
     public TModuleAddressingChild getModuleAddressing() {
@@ -589,17 +596,28 @@ public class Module {
     }
 
     /**
-     * @return Model of module.
-     */
-    public Object getModuleModel() {
-        return moduleModel;
-    }
-
-    /**
      * @return Name of Module.
      */
     public String getModuleName() {
         return moduleName;
+    }
+
+    /**
+     * @return The path of module XDC.
+     */
+    public String getModulePathToXdc() {
+        String pathToXdc = StringUtils.EMPTY;
+
+        if (moduleModel == null) {
+            return pathToXdc;
+        }
+
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            pathToXdc = module.getPathToXDC();
+        }
+
+        return pathToXdc;
     }
 
     /**
@@ -693,24 +711,6 @@ public class Module {
 
         }
         return uniqueId;
-    }
-
-    /**
-     * @return The path of module XDC.
-     */
-    public String getPathToXdc() {
-        String pathToXdc = StringUtils.EMPTY;
-
-        if (moduleModel == null) {
-            return pathToXdc;
-        }
-
-        if (moduleModel instanceof InterfaceList.Interface.Module) {
-            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-            pathToXdc = module.getPathToXDC();
-        }
-
-        return pathToXdc;
     }
 
     /**
@@ -1330,7 +1330,8 @@ public class Module {
         OpenConfiguratorProjectUtils.updateModuleConfigurationPath(this,
                 position);
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
-                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXdc());
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT,
+                getModulePathToXdc());
 
         Module newModule = getInterfaceOfModule().getModuleCollection()
                 .get(position);
@@ -1342,9 +1343,9 @@ public class Module {
                 oldPosition);
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
                 IAbstractNodeProperties.NODE_CONIFG_OBJECT,
-                newModule.getPathToXdc());
+                newModule.getModulePathToXdc());
 
-        Object moduleObjModel = getModuleModel();
+        Object moduleObjModel = getModelOfModule();
         if (moduleObjModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module moduleModelObj = (InterfaceList.Interface.Module) moduleObjModel;
             moduleModelObj.setPosition(BigInteger.valueOf(position));
@@ -1359,7 +1360,7 @@ public class Module {
                     + e.getCause().getMessage());
         }
 
-        Object newmoduleObjModel = newModule.getModuleModel();
+        Object newmoduleObjModel = newModule.getModelOfModule();
         if (newmoduleObjModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module newmoduleModelObj = (InterfaceList.Interface.Module) newmoduleObjModel;
             newmoduleModelObj.setPosition(BigInteger.valueOf(oldPosition));
@@ -1394,7 +1395,8 @@ public class Module {
         OpenConfiguratorProjectUtils.updateModuleConfigurationPath(this,
                 position);
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
-                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXdc());
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT,
+                getModulePathToXdc());
 
         Module newModule = getInterfaceOfModule().getModuleCollection()
                 .get(position);
@@ -1408,9 +1410,9 @@ public class Module {
                 oldPosition);
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(newModule,
                 IAbstractNodeProperties.NODE_CONIFG_OBJECT,
-                newModule.getPathToXdc());
+                newModule.getModulePathToXdc());
 
-        Object moduleObjModel = getModuleModel();
+        Object moduleObjModel = getModelOfModule();
         if (moduleObjModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module moduleModelObj = (InterfaceList.Interface.Module) moduleObjModel;
             moduleModelObj.setPosition(BigInteger.valueOf(position));
@@ -1418,7 +1420,7 @@ public class Module {
             getInterfaceOfModule().getModuleCollection().put(position, this);
         }
 
-        Object newmoduleObjModel = newModule.getModuleModel();
+        Object newmoduleObjModel = newModule.getModelOfModule();
         if (newmoduleObjModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module newmoduleModelObj = (InterfaceList.Interface.Module) newmoduleObjModel;
             newmoduleModelObj.setPosition(BigInteger.valueOf(oldPosition));

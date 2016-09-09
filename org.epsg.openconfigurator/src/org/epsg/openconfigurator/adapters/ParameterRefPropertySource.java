@@ -304,7 +304,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             paramRef.getUniqueId());
             Result res = OpenConfiguratorCore.GetInstance()
                     .SetParameterActualValue(paramRef.getNode().getNetworkId(),
-                            paramRef.getNode().getNodeId(), newParameterName,
+                            paramRef.getNode().getCnNodeId(), newParameterName,
                             actualvalue);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
@@ -312,7 +312,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         } else {
             Result res = OpenConfiguratorCore.GetInstance()
                     .SetParameterActualValue(paramRef.getNode().getNetworkId(),
-                            paramRef.getNode().getNodeId(),
+                            paramRef.getNode().getCnNodeId(),
                             parameter.getUniqueId(), actualvalue);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
@@ -405,7 +405,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         paramRef.getNode().getNetworkId(),
-                                        paramRef.getNode().getNodeId(),
+                                        paramRef.getNode().getCnNodeId(),
                                         newParameterName, defaultValue);
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils
@@ -466,6 +466,9 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
         if (id instanceof String) {
             String objectId = (String) id;
+            // The variable res is dead stored, so that it may return value if
+            // the
+            // result fails in all below conditions.
             Result res = new Result();
             switch (objectId) {
                 case PARAM_ACTUAL_VALUE_ID:
@@ -480,7 +483,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getNodeId(),
+                                            paramRef.getNode().getCnNodeId(),
                                             newParameterName, actualValue);
                             if (!res.IsSuccessful()) {
                                 System.err.println(OpenConfiguratorLibraryUtils
@@ -492,7 +495,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getNodeId(),
+                                            paramRef.getNode().getCnNodeId(),
                                             paramRef.getUniqueId(),
                                             actualValue);
                             if (!res.IsSuccessful()) {
@@ -527,7 +530,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                         .SetParameterActualValue(
                                                 paramRef.getNode()
                                                         .getNetworkId(),
-                                                paramRef.getNode().getNodeId(),
+                                                paramRef.getNode().getCnNodeId(),
                                                 newParameterName, val);
                                 if (!res.IsSuccessful()) {
                                     System.err.println(
@@ -548,7 +551,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                         .SetParameterActualValue(
                                                 paramRef.getNode()
                                                         .getNetworkId(),
-                                                paramRef.getNode().getNodeId(),
+                                                paramRef.getNode().getCnNodeId(),
                                                 paramRef.getUniqueId(), val);
                                 if (!res.IsSuccessful()) {
                                     System.err.println(
@@ -566,6 +569,11 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
 
                             }
                         }
+                    } catch (RuntimeException e) {
+                        // RunTimeException is caught whenever an exception is
+                        // caught during
+                        // run time to avoid unnecessary caught of exceptions.
+                        throw e;
                     } catch (Exception e) {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(e.getCause().getMessage(),

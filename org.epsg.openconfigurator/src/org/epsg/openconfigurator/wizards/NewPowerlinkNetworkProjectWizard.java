@@ -325,6 +325,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
 
         ISO15745ProfileContainer xddModel = null;
         try {
+            // Dead store on xddmodel because of the unmarshall operation.
             xddModel = XddMarshaller.unmarshallXDDFile(xdcPath.toFile());
             validateXddPage.getErrorStyledText("");
         } catch (FileNotFoundException | UnsupportedEncodingException
@@ -346,6 +347,8 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
 
             createNewProjectFile();
 
+            // Redundant null check is made to prevent the project from any
+            // unexpected failure.
             if (newProjectHandle != null) {
                 newProjectHandle.refreshLocal(IResource.DEPTH_INFINITE,
                         new NullProgressMonitor());

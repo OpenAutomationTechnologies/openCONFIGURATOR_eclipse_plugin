@@ -170,6 +170,16 @@ public class HeadNodeInterface {
     }
 
     /**
+     * @return Unique Id of interface from XDD model.
+     */
+    public String getInterfaceUniqueId() {
+        if (uniqueIDRef instanceof TInterfaceList.Interface) {
+            return intfc.getUniqueID();
+        }
+        return null;
+    }
+
+    /**
      * @return the label description of head node interface.
      */
     public List<Object> getLabelDescription() {
@@ -230,16 +240,6 @@ public class HeadNodeInterface {
     }
 
     /**
-     * @return Unique Id of interface from XDD model.
-     */
-    public String getUniqueId() {
-        if (uniqueIDRef instanceof TInterfaceList.Interface) {
-            return intfc.getUniqueID();
-        }
-        return null;
-    }
-
-    /**
      * @return The uniqueIdRef object of interface.
      */
     public Object getUniqueIDRef() {
@@ -258,18 +258,18 @@ public class HeadNodeInterface {
     }
 
     /**
+     * @return <true> if any slots of interface is unused, <false> otherwise.
+     */
+    public boolean isInterfaceUnUsedSlots() {
+        return unUsedSlots;
+    }
+
+    /**
      * @return <true> if multiple type of modules can be connected to the
      *         interface, <false> otherwise.
      */
     public boolean isMultipleModules() {
         return multipleModules;
-    }
-
-    /**
-     * @return <true> if any slots of interface is unused, <false> otherwise.
-     */
-    public boolean isUnUsedSlots() {
-        return unUsedSlots;
     }
 
     /**
@@ -395,7 +395,7 @@ public class HeadNodeInterface {
      *
      * @param unUsedSlots <true> if unused slots available, <false> otherwise.
      */
-    public void setUnUsedSlots(boolean unUsedSlots) {
+    public void setInterfaceUnUsedSlots(boolean unUsedSlots) {
         this.unUsedSlots = unUsedSlots;
     }
 

@@ -529,7 +529,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         long[] presTimeOutInNs = new long[1];
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .GetPResTimeOut(cnNode.getNetworkId(),
-                                        cnNode.getNodeId(), presTimeOutInNs);
+                                        cnNode.getCnNodeId(), presTimeOutInNs);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -546,6 +546,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),
@@ -592,14 +594,14 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 // model of MN and CN.
                 Node mnNode = cnNode.getPowerlinkRootNode().getMN();
                 boolean mnPresChaining = mnNode.getNetworkManagement()
-                        .getMnFeatures().isDLLMNPResChaining();
+                        .getMnFeaturesOfNode().isDLLMNPResChaining();
                 if (!mnPresChaining) {
                     return MessageFormat.format(MNPRES_CHAINING_ERROR_MESSAGE,
                             mnNode.getNodeIDWithName());
                 }
 
                 boolean cnPresChaining = cnNode.getNetworkManagement()
-                        .getCnFeatures().isDLLCNPResChaining();
+                        .getCnFeaturesOfNode().isDLLCNPResChaining();
                 if (!cnPresChaining) {
                     // do not allow
                     return MessageFormat.format(CNPRES_CHAINING_ERROR_MESSAGE,
@@ -640,8 +642,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     .validateSubobjectActualValue(cnNode.getNetworkId(),
                             IPowerlinkConstants.MN_DEFAULT_NODE_ID,
                             INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
-                            cnNode.getNodeId(), String.valueOf(presTimeoutInNs),
-                            false);
+                            cnNode.getCnNodeId(),
+                            String.valueOf(presTimeoutInNs), false);
             if (!validateResult.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils
                         .getErrorMessage(validateResult);
@@ -674,7 +676,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     return INVALID_CN_NODE_ID;
                 }
 
-                if (nodeIDvalue == cnNode.getNodeId()) {
+                if (nodeIDvalue == cnNode.getCnNodeId()) {
                     return null;
                 }
 
@@ -707,7 +709,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    cnNode.getNetworkId(), cnNode.getNodeId(), nodeName);
+                    cnNode.getNetworkId(), cnNode.getCnNodeId(), nodeName);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -755,7 +757,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                                cnNode.getNetworkId(), cnNode.getNodeId(),
+                                cnNode.getNetworkId(), cnNode.getCnNodeId(),
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -767,7 +769,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
                         short nodeIDvalue = Short.valueOf(((String) value));
 
-                        short oldNodeId = cnNode.getNodeId();
+                        short oldNodeId = cnNode.getCnNodeId();
                         cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
                                 nodeIDvalue);
                         break;
@@ -782,19 +784,20 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                 res = OpenConfiguratorCore.GetInstance()
                                         .ResetOperationMode(
                                                 cnNode.getNetworkId(),
-                                                cnNode.getNodeId());
+                                                cnNode.getCnNodeId());
                                 plkMode = PlkOperationMode.NORMAL;
                             } else if (val == 1) {
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetOperationModeChained(
                                                 cnNode.getNetworkId(),
-                                                cnNode.getNodeId());
+                                                cnNode.getCnNodeId());
                                 plkMode = PlkOperationMode.CHAINED;
                             } else if (val == 2) {
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetOperationModeMultiplexed(
                                                 cnNode.getNetworkId(),
-                                                cnNode.getNodeId(), (short) tcn
+                                                cnNode.getCnNodeId(),
+                                                (short) tcn
                                                         .getForcedMultiplexedCycle());
                                 plkMode = PlkOperationMode.MULTIPLEXED;
                             }
@@ -1011,7 +1014,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         long presTimeoutInNs = Long.decode((String) value)
                                 .longValue() * 1000;
                         res = OpenConfiguratorCore.GetInstance().SetPResTimeOut(
-                                cnNode.getNetworkId(), cnNode.getNodeId(),
+                                cnNode.getNetworkId(), cnNode.getCnNodeId(),
                                 presTimeoutInNs);
                         if (res.IsSuccessful()) {
                             cnNode.setCnPresTimeout(
@@ -1031,6 +1034,12 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             } else {
                 System.err.println("Invalid object ID:" + id);
             }
+        } catch (RuntimeException e) {
+            // RunTimeException is caught whenever an exception is caught during
+            // run time to avoid unnecessary caught of exceptions.
+            OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                    "Property: " + id + " " + e.getMessage(),
+                    cnNode.getNetworkId());
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),

@@ -30,7 +30,6 @@
  *******************************************************************************/
 package org.epsg.openconfigurator.views;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ILightweightLabelDecorator;
@@ -175,7 +174,7 @@ public class ObjectDictionaryLabelDecorator
 
             if (!((paramRef.getActualValue() == null)
                     || (paramRef.getActualValue().isEmpty())
-                    || (paramRef.getActualValue() == StringUtils.EMPTY)
+                    || (paramRef.getActualValue().isEmpty())
                     || (paramRef.getActualValue().equals("off")))) {
                 decoration.addOverlay(
                         org.epsg.openconfigurator.Activator.getImageDescriptor(

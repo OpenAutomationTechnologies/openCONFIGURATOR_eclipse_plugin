@@ -108,6 +108,9 @@ import org.jdom2.JDOMException;
                                     "Object " + commParam.getIdHex()
                                             + "/0x1 does not exists!");
                         } else {
+                            // Redundant null check is made to prevent the
+                            // project from any
+                            // unexpected failure.
                             if (node.getNodeIdString() != null) {
                                 Result res = OpenConfiguratorLibraryUtils
                                         .setSubObjectActualValue(subObj,

@@ -130,7 +130,7 @@ public class XddJdomOperation {
     public static void addConnectedModules(Document document,
             HeadNodeInterface headNodeInterface,
             Map<Integer, Module> moduleCollection) {
-        String uniqueID = headNodeInterface.getUniqueId();
+        String uniqueID = headNodeInterface.getInterfaceUniqueId();
         String interfaceXpath = INTERFACE_LIST_XPATH
                 + "/plk:interface[@uniqueID='" + uniqueID + "']";
         String connectedModuleXPath = interfaceXpath
@@ -209,7 +209,7 @@ public class XddJdomOperation {
 
     public static void deleteConnectedModules(Document document, Module module,
             boolean finalModuleCheck) {
-        String uniqueID = module.getInterfaceOfModule().getUniqueId();
+        String uniqueID = module.getInterfaceOfModule().getInterfaceUniqueId();
         String interfaceXpath = INTERFACE_LIST_XPATH
                 + "/plk:interface[@uniqueID='" + uniqueID + "']";
         String connectedModuleXPath = interfaceXpath
@@ -263,19 +263,20 @@ public class XddJdomOperation {
                     .size(); childCount++) {
                 for (Element child : childElement) {
                     int index = parentElement.indexOf(child);
-                    if (child.getQualifiedName() == PARAMETER_DEFAULT_VALUE) {
+                    if (child.getQualifiedName()
+                            .equalsIgnoreCase(PARAMETER_DEFAULT_VALUE)) {
                         return index;
-                    } else if (child
-                            .getQualifiedName() == PARAMETER_SUBSTITUTE_VALUE) {
+                    } else if (child.getQualifiedName()
+                            .equalsIgnoreCase(PARAMETER_SUBSTITUTE_VALUE)) {
                         return index;
-                    } else if (child
-                            .getQualifiedName() == PARAMETER_ALLOWED_VALUE) {
+                    } else if (child.getQualifiedName()
+                            .equalsIgnoreCase(PARAMETER_ALLOWED_VALUE)) {
                         return index;
-                    } else if (child
-                            .getQualifiedName() == PARAMETER_UNIT_ELEMENT) {
+                    } else if (child.getQualifiedName()
+                            .equalsIgnoreCase(PARAMETER_UNIT_ELEMENT)) {
                         return index;
-                    } else if (child
-                            .getQualifiedName() == PARAMETER_PROPERTY_ELEMENT) {
+                    } else if (child.getQualifiedName()
+                            .equalsIgnoreCase(PARAMETER_PROPERTY_ELEMENT)) {
                         return index;
                     }
                 }
@@ -718,11 +719,9 @@ public class XddJdomOperation {
                                         plkObj.getDefaultValue()));
                             }
 
-                            if (plkObj.getActualValue() != null) {
-                                if (!(plkObj.getActualValue().isEmpty())) {
-                                    attribList.add(new Attribute("actualValue",
-                                            plkObj.getActualValue()));
-                                }
+                            if (!(plkObj.getActualValue().isEmpty())) {
+                                attribList.add(new Attribute("actualValue",
+                                        plkObj.getActualValue()));
                             }
 
                             if (!(plkObj.getHighLimit().isEmpty())) {
@@ -949,13 +948,9 @@ public class XddJdomOperation {
                                             plkSubObj.getDefaultValue()));
                                 }
 
-                                if (plkSubObj.getActualValue() != null) {
-                                    if (!(plkSubObj.getActualValue()
-                                            .isEmpty())) {
-                                        attribList.add(new Attribute(
-                                                "actualValue",
-                                                plkSubObj.getActualValue()));
-                                    }
+                                if (!(plkSubObj.getActualValue().isEmpty())) {
+                                    attribList.add(new Attribute("actualValue",
+                                            plkSubObj.getActualValue()));
                                 }
 
                                 if (!(plkSubObj.getHighLimit().isEmpty())) {
@@ -1210,6 +1205,8 @@ public class XddJdomOperation {
 
             List<Object> parameterGroupReferenceList = parameterGrp
                     .getParameterGroupOrParameterRef();
+            // Redundant null check is made to prevent the project from any
+            // unexpected failure.
             if (parameterGroupReferenceList != null) {
                 for (Object parameterGroupReference : parameterGroupReferenceList) {
                     if (parameterGroupReference instanceof TParameterGroup) {
@@ -1262,6 +1259,8 @@ public class XddJdomOperation {
 
             List<Object> parameterGroupReferenceList = parameterGrp
                     .getParameterGroupOrParameterRef();
+            // Redundant null check is made to prevent the project from any
+            // unexpected failure.
             if (parameterGroupReferenceList != null) {
                 for (Object parameterGroupReference : parameterGroupReferenceList) {
                     if (parameterGroupReference instanceof TParameterGroup) {
@@ -1583,8 +1582,9 @@ public class XddJdomOperation {
                 .getParameterGroupOrParameterRef();
         String paramGrpXpath = xpath + "/plk:parameterGroup[@uniqueID='"
                 + uniqueId + "']";
+        // Redundant null check is made to prevent the project from any
+        // unexpected failure.
         if (parameterGroupReferenceList != null) {
-            System.err.println("Parameter child group......." + paramGrpXpath);
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
@@ -1665,6 +1665,8 @@ public class XddJdomOperation {
         String paramGrpXpath = xpath + "/plk:parameterGroup[@uniqueID='"
                 + uniqueId + "']";
         if (parameterGroupReferenceList != null) {
+            // Redundant null check is made to prevent the project from any
+            // unexpected failure.
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
@@ -2457,7 +2459,7 @@ public class XddJdomOperation {
                     Element maxvalueElement = new Element("maxValue");
                     List<Attribute> attribValue = maxvalueElement
                             .getAttributes();
-                    attribValue.add(new Attribute("value", minValue));
+                    attribValue.add(new Attribute("value", maxValue));
                     JDomUtil.addNewElement(document,
                             allowedModulesXPath + "/plk:range",
                             POWERLINK_XDD_NAMESPACE, maxvalueElement);

@@ -241,6 +241,8 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         break;
                 }
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             retObj = StringUtils.EMPTY;
@@ -270,7 +272,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                             .getInterfaceType();
                     if (!(moduleType.equals(interfaceType))) {
                         return INVALID_POSITION_ERROR_MESSAGE
-                                + module.getNode().getNodeId();
+                                + module.getNode().getCnNodeId();
                     }
                 }
 
@@ -448,7 +450,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
      */
     public void setModuledata(Module moduleObj,
             TModuleAddressingHead moduleAddressing) {
-        Object moduleModel = moduleObj.getModuleModel();
+        Object moduleModel = moduleObj.getModelOfModule();
         this.moduleAddressing = moduleAddressing;
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             moduleObjModel = (InterfaceList.Interface.Module) moduleModel;
@@ -484,6 +486,8 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         break;
                 }
             }
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
         }

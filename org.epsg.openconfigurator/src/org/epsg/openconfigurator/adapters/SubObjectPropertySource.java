@@ -185,7 +185,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
             propertyList.add(denotationDescriptor);
         }
 
-        if (plkSubObject.getPdoMapping() != null) {
+        if (plkSubObject.getPdoMappingObject() != null) {
             propertyList.add(pdoMappingDescriptor);
         }
 
@@ -317,7 +317,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                     retObj = plkSubObject.getDenotation();
                     break;
                 case OBJ_PDO_MAPPING_ID:
-                    retObj = plkSubObject.getPdoMapping().value();
+                    retObj = plkSubObject.getPdoMappingObject().value();
                     break;
                 case OBJ_OBJFLAGS_ID:
                     retObj = plkSubObject.getObjFlags();
@@ -484,6 +484,8 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 }
             }
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     e.getMessage(),
@@ -549,6 +551,8 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 }
             }
 
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     e.getMessage(),
@@ -659,6 +663,10 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 }
             }
 
+        } catch (RuntimeException e) {
+            // RunTimeException is caught whenever an exception is caught during
+            // run time to avoid unnecessary caught of exceptions.
+            throw e;
         } catch (Exception e) {
             System.err.println("The proerty of sub object.." + e.getMessage());
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(

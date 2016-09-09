@@ -291,6 +291,8 @@ public class JDomUtil {
             reader.close();
 
             return document;
+        } catch (RuntimeException e) {
+            throw e;
         } catch (Exception e) {
             if (bomIn != null) {
                 bomIn.close();
@@ -479,6 +481,5 @@ public class JDomUtil {
         FileWriter fileWriter = new FileWriter(xmlFile);
         xmlOutput.output(document, fileWriter);
         fileWriter.close();
-
     }
 }
