@@ -51,6 +51,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -112,7 +113,7 @@ public final class OpenConfiguratorProjectUtils {
     public static final String TOOL_VERSION_ATTRIBUTE = "toolVersion";
     public static final String MODIFIED_BY_ATTRIBUTE = "modifiedBy";
 
-    private static ArrayList<String> defaultBuildConfigurationIdList;
+    public static ArrayList<String> defaultBuildConfigurationIdList;
 
     private static final String UPGRADE_MESSAGE = "Upgrading openCONFIGURATOR project version {0} to version {1}.";
 
@@ -817,6 +818,16 @@ public final class OpenConfiguratorProjectUtils {
 
     }
 
+    public static void removeIDEConfiguration(IFile projectFile)
+            throws JDOMException, IOException {
+        String projectXmlLocation = projectFile.getLocation().toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+        ProjectJDomOperation.removeIDEConfigurationSettings(document);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+    }
+
     /**
      * Update the position and address of module in the project file for move
      * up/down menu actions.
@@ -1514,6 +1525,23 @@ public final class OpenConfiguratorProjectUtils {
         return res;
     }
 
+    public static void updateProjectSourceFile(File projectSystemFile2)
+            throws JDOMException, IOException {
+        File xmlFile = projectSystemFile2;
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        ProjectJDomOperation.removeIDEConfigurationSettings(document);
+
+        ProjectJDomOperation.updateOutputPath(document);
+
+        ProjectJDomOperation.updateAutoGenerationSettings(document);
+
+        // ProjectJDomOperation.updatePathToXDC(document);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+
+    }
+
     /**
      * Upgrade openCONFIGURATOR project to conform with 2.0 schema. Add default
      * fields for AutoGeneration Settings.
@@ -1539,7 +1567,8 @@ public final class OpenConfiguratorProjectUtils {
             OpenConfiguratorProjectUtils.updateGeneratorInformation(project);
             return true;
         } else if ((toolVersionAvailable.equalsIgnoreCase("1.4.1")
-                || toolVersionAvailable.equalsIgnoreCase("1.4.0"))) {
+                || toolVersionAvailable.equalsIgnoreCase("1.4.0")
+                || toolVersionAvailable.equalsIgnoreCase("1.0"))) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printInfoMessage(MessageFormat.format(UPGRADE_MESSAGE,
                             toolVersionAvailable, GENERATOR_TOOL_VERSION), "");

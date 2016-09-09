@@ -1191,6 +1191,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         } else {
             setEnabledSettingsControls(true);
         }
+
     }
 
     /**

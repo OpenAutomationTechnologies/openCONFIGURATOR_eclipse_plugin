@@ -61,6 +61,7 @@ import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
@@ -104,7 +105,9 @@ import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.builder.PowerlinkNetworkProjectNature;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
+import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
 /**
@@ -234,6 +237,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             projectSystemFile = file;
             updateProjectName();
             updateProjectFlags();
+            updateProjectSource(projectSystemFile);
         }
 
         /**
@@ -294,6 +298,17 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         private void updateProjectName() {
             projectName = FilenameUtils
                     .removeExtension(projectSystemFile.getName());
+        }
+
+        private void updateProjectSource(File projectSystemFile2) {
+            try {
+                OpenConfiguratorProjectUtils
+                        .updateProjectSourceFile(projectSystemFile2);
+            } catch (JDOMException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
         }
     }
 
@@ -761,10 +776,9 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             monitor.beginTask(
                     ImportOpenConfiguratorProjectWizardPage.CREATE_PROJECTS_TASK_LABEL,
                     100);
-            project.create(selectedProjectRecord.description,
-                    new SubProgressMonitor(monitor, 30));
-            project.open(IResource.BACKGROUND_REFRESH,
-                    new SubProgressMonitor(monitor, 70));
+            SubMonitor submonitor = SubMonitor.convert(monitor);
+            project.create(selectedProjectRecord.description, submonitor);
+            project.open(IResource.BACKGROUND_REFRESH, submonitor);
 
         } catch (CoreException e) {
             throw new InvocationTargetException(e);

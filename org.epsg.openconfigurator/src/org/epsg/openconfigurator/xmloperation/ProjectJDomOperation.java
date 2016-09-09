@@ -671,6 +671,17 @@ public class ProjectJDomOperation {
         }
     }
 
+    public static void removeIDEConfigurationSettings(Document document) {
+        String xpath = "//oc:IDEConfiguration";
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            JDomUtil.removeElement(document, xpath, OPENCONFIGURATOR_NAMESPACE);
+        } else {
+            System.err.println("IDE configuration Xpath not present.");
+        }
+
+    }
+
     /**
      * Update modified values of module in project file.
      *
@@ -684,6 +695,47 @@ public class ProjectJDomOperation {
         JDomUtil.updateAttribute(document, module.getNameXpath(),
                 OPENCONFIGURATOR_NAMESPACE,
                 new Attribute(attributeName, attributeValue));
+    }
+
+    public static void updateAutoGenerationSettings(Document document) {
+        String xpath = "//oc:ProjectConfiguration";
+        JDomUtil.updateAttribute(document, xpath, OPENCONFIGURATOR_NAMESPACE,
+                new Attribute("activeAutoGenerationSetting", "all"));
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            String pathSettingsXpath = xpath + "/oc:AutoGenerationSettings";
+            if (JDomUtil.isXpathPresent(document, pathSettingsXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                JDomUtil.updateAttribute(document, pathSettingsXpath,
+                        OPENCONFIGURATOR_NAMESPACE, new Attribute("id", "all"));
+                Element noneAutoGenerateElement = new Element(
+                        "AutoGenerationSettings");
+                Attribute objAttr = new Attribute("id", "none");
+                noneAutoGenerateElement.setAttribute(objAttr);
+
+                Element customAutoGenerateElement = new Element(
+                        "AutoGenerationSettings");
+                Attribute customobjAttr = new Attribute("id", "custom");
+                customAutoGenerateElement.setAttribute(customobjAttr);
+                String noneXPath = xpath
+                        + "/oc:AutoGenerationSettings[@id='none']";
+                String customXPath = xpath
+                        + "/oc:AutoGenerationSettings[@id='custom']";
+                if (!JDomUtil.isXpathPresent(document, noneXPath,
+                        OPENCONFIGURATOR_NAMESPACE)) {
+                    JDomUtil.addNewElement(document, xpath,
+                            OPENCONFIGURATOR_NAMESPACE,
+                            noneAutoGenerateElement);
+                }
+
+
+            } else {
+                System.err.println("AutoGeneraton setttings Xpath not present");
+            }
+        } else {
+            System.err.println("Project Configuration Xpath not present.");
+        }
+
     }
 
     /**
@@ -736,4 +788,29 @@ public class ProjectJDomOperation {
                 OPENCONFIGURATOR_NAMESPACE,
                 new Attribute(attributeName, attributeValue));
     }
+
+    public static void updateOutputPath(Document document) {
+        String xpath = "//oc:ProjectConfiguration";
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            String pathSettingsXpath = xpath + "/oc:PathSettings";
+            if (JDomUtil.isXpathPresent(document, pathSettingsXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                String pathXPath = pathSettingsXpath + "/oc:Path";
+                if (JDomUtil.isXpathPresent(document, pathXPath,
+                        OPENCONFIGURATOR_NAMESPACE)) {
+                    JDomUtil.updateAttribute(document, pathXPath,
+                            OPENCONFIGURATOR_NAMESPACE,
+                            new Attribute("path", "output"));
+                } else {
+                    System.err.println("PAth  Xpath not present");
+                }
+            } else {
+                System.err.println("PAth setttings Xpath not present");
+            }
+        } else {
+            System.err.println("Project Configuration Xpath not present.");
+        }
+    }
+
 }
