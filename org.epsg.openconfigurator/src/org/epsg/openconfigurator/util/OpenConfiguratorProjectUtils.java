@@ -132,6 +132,7 @@ public final class OpenConfiguratorProjectUtils {
         for (int i = 0; i < support.size(); i++) {
             OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList
                     .add(support.get(i));
+            break;
         }
     }
 
