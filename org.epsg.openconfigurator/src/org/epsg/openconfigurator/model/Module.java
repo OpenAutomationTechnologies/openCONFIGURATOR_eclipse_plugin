@@ -214,9 +214,11 @@ public class Module {
 
         if (prevModulePosition != 0) {
             preTypetoBeChecked = preModule.getModuleInterface().getType();
-            prevModuleTypetoBeChecked = newModule.getModuleType();
+            prevModuleTypetoBeChecked = newModule.getModuleInterface()
+                    .getType();
         } else {
-            prevModuleTypetoBeChecked = newModule.getModuleType();
+            prevModuleTypetoBeChecked = newModule.getModuleInterface()
+                    .getType();
             preTypetoBeChecked = newModule.getInterfaceOfModule()
                     .getInterfaceType();
         }
@@ -231,9 +233,9 @@ public class Module {
 
             return "Module cannot be moved because "
                     + currentModule.getModuleName() + " with module type "
-                    + nextTypetoBeChecked + " does not match "
+                    + nextonTypetoBeChecked + " does not match "
                     + nextModule.getModuleName() + " module type "
-                    + nextModule.getModuleInterface().getType() + ".";
+                    + nextTypetoBeChecked + ".";
         }
 
         if (!(preTypetoBeChecked.equalsIgnoreCase(prevModuleTypetoBeChecked))) {
