@@ -172,16 +172,16 @@ public class ObjectDictionaryLabelDecorator
                         IDecoration.BOTTOM_LEFT);
             }
 
-            if (!((paramRef.getActualValue() == null)
-                    || (paramRef.getActualValue().isEmpty())
-                    || (paramRef.getActualValue().isEmpty())
-                    || (paramRef.getActualValue().equals("off")))) {
-                decoration.addOverlay(
-                        org.epsg.openconfigurator.Activator.getImageDescriptor(
-                                IPluginImages.OBD_PARAMETER_ACTUAL_VALUE_OVERLAY_ICON),
-                        IDecoration.BOTTOM_LEFT);
+            if (!(paramRef.getActualValue() == null)) {
+                if (!(paramRef.getActualValue()
+                        .equalsIgnoreCase(paramRef.getDefaultValue()))) {
+                    decoration.addOverlay(
+                            org.epsg.openconfigurator.Activator
+                                    .getImageDescriptor(
+                                            IPluginImages.OBD_PARAMETER_ACTUAL_VALUE_OVERLAY_ICON),
+                            IDecoration.BOTTOM_LEFT);
+                }
             }
-
         }
     }
 
