@@ -66,7 +66,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.NetworkManagement;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
-import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
@@ -98,8 +97,6 @@ public class ValidateXddWizardPage extends WizardPage {
     private static final String DIALOG_PAGE_NAME = "ValidateXddwizardPage";
     private static final String BROWSE_CONFIGURATION_LABEL = "Browse...";
     private static final String IMPORT_CN_CONFIGURATION_FILE_DIALOG_LABEL = "Import node's XDD/XDC";
-    private static final String ERROR_DEFAULT_CN_XDD_NOT_FOUND = "Default CN XDD not found.";
-    private static final String ERROR_DEFAULT_RMN_XDD_NOT_FOUND = "Default Redundant managing XDD not found.";
     private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid XDD/XDC file.";
     private static final String ERROR_CHOOSE_VALID_PATH_MESSAGE = "XDD/XDC file does not exist in the path: ";
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
@@ -139,14 +136,14 @@ public class ValidateXddWizardPage extends WizardPage {
     /**
      * Default controlled node XDD path.
      */
-    private final String defaultCnXDD;
+    private String defaultCnXDD;
 
     private Group grpConfigurationFile;
 
     /**
      * Default managing node XDD path.
      */
-    private final String defaultMnXDD;
+    private String defaultMnXDD;
 
     /**
      * Custom radio button.
@@ -197,30 +194,7 @@ public class ValidateXddWizardPage extends WizardPage {
         super(DIALOG_PAGE_NAME);
         setTitle(AddControlledNodeWizardPage.DIALOG_TILE);
         setDescription(DIALOG_DESCRIPTION);
-        String cnXddPath = IOpenConfiguratorResource.DEFAULT_CN_XDD;
 
-        try {
-            cnXddPath = org.epsg.openconfigurator.Activator
-                    .getAbsolutePath(IOpenConfiguratorResource.DEFAULT_CN_XDD);
-        } catch (IOException e) {
-            e.printStackTrace();
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    ERROR_DEFAULT_CN_XDD_NOT_FOUND, "");
-        }
-
-        defaultCnXDD = cnXddPath;
-
-        String mnXddPath = IOpenConfiguratorResource.DEFAULT_MN_XDD;
-        try {
-            mnXddPath = org.epsg.openconfigurator.Activator
-                    .getAbsolutePath(IOpenConfiguratorResource.DEFAULT_MN_XDD);
-        } catch (IOException e) {
-            e.printStackTrace();
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    ERROR_DEFAULT_RMN_XDD_NOT_FOUND, "");
-        }
-
-        defaultMnXDD = mnXddPath;
         customConfiguration = "";
     }
 
