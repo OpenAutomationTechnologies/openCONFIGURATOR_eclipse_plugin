@@ -33,7 +33,6 @@
  *******************************************************************************/
 package org.epsg.openconfigurator.console;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -171,12 +170,6 @@ public class OpenConfiguratorMessageConsole {
                 + projectName + "] " + message;
         MessageConsoleStream out = getErrorMessageStream();
         out.println(fullMessage);
-        try {
-            out.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
     }
 
     /**

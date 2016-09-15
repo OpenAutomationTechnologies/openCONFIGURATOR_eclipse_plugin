@@ -64,6 +64,7 @@ public interface IPluginImages {
     public final static String FILTER_ICON = "icons/filter.gif";
     public final static String WARNING_ICON = "icons/warning.gif";
     public final static String SIGNED_YES_ICON = "icons/signed_yes.gif";
+    public final static String SIGNED_DISABLE_ICON = "icons/signed_disable.gif";
     public final static String ARROW_DOWN_ICON = "icons/arrow_down.gif";
     public final static String ARROW_UP_ICON = "icons/arrow_up.gif";
     public final static String CLEAR_ICON = "icons/clear.gif";

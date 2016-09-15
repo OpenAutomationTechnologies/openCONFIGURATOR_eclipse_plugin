@@ -303,7 +303,10 @@ public class MappingView extends ViewPart {
                                             nodeObj.getProject().getName());
                             e1.printStackTrace();
                         }
-
+                        tpdoEnabledEntriesCount = getEnabledEntriesCount(
+                                pdoChannel.getPdoType());
+                        rpdoEnabledEntriesCount = getEnabledEntriesCount(
+                                pdoChannel.getPdoType());
                         tableViewer.refresh();
                     }
                 } else {
@@ -793,6 +796,7 @@ public class MappingView extends ViewPart {
         PdoType pdoType;
 
         public PdoSummaryTableLabelProvider(PdoType pdoType) {
+            System.err.println("THe valid value...........");
             this.pdoType = pdoType;
         }
 
@@ -894,7 +898,9 @@ public class MappingView extends ViewPart {
         private PdoType pdoType;
 
         public PdoTableLabelProvider(PdoType pdoType) {
+
             this.pdoType = pdoType;
+
         }
 
         @Override
@@ -908,6 +914,7 @@ public class MappingView extends ViewPart {
 
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
+
             switch (columnIndex) {
                 case 0:
                     // No Column - Nothing to do.
@@ -917,6 +924,7 @@ public class MappingView extends ViewPart {
                     break;
                 case 2: // Images for the status column.
                     if (element instanceof PowerlinkSubobject) {
+
                         PowerlinkSubobject mapParamObj = (PowerlinkSubobject) element;
 
                         String value = mapParamObj.getActualDefaultValue();
@@ -988,6 +996,34 @@ public class MappingView extends ViewPart {
                                                                             .getId());
                                                     if (objectIdValue == objectIndex) {
                                                         if (subObjectIndex == subObjectIdValue) {
+                                                            switch (pdoType) {
+
+                                                                case TPDO:
+                                                                    System.err
+                                                                            .println(
+                                                                                    "The IDRaw of object.."
+                                                                                            + mapParamObj
+                                                                                                    .getId());
+
+                                                                    count = tpdoEnabledEntriesCount
+                                                                            - 1;
+                                                                    tpdoEnabledEntriesCount = count;
+
+                                                                    if (tpdoEnabledEntriesCount < 0) {
+                                                                        return signedDisableImage;
+                                                                    }
+                                                                    break;
+                                                                case RPDO:
+
+                                                                    count = rpdoEnabledEntriesCount
+                                                                            - 1;
+                                                                    rpdoEnabledEntriesCount = count;
+
+                                                                    if (rpdoEnabledEntriesCount < 0) {
+                                                                        return signedDisableImage;
+                                                                    }
+                                                                    break;
+                                                            }
                                                             return signedYesImage;
                                                         }
                                                     }
@@ -1011,6 +1047,29 @@ public class MappingView extends ViewPart {
                                                                             .getId());
                                                     if (objectIdValue == objectIndex) {
                                                         if (subObjectIndex == subObjectIdValue) {
+                                                            switch (pdoType) {
+
+                                                                case TPDO:
+
+                                                                    count = tpdoEnabledEntriesCount
+                                                                            - 1;
+                                                                    tpdoEnabledEntriesCount = count;
+
+                                                                    if (tpdoEnabledEntriesCount < 0) {
+                                                                        return signedDisableImage;
+                                                                    }
+                                                                    break;
+                                                                case RPDO:
+
+                                                                    count = rpdoEnabledEntriesCount
+                                                                            - 1;
+                                                                    rpdoEnabledEntriesCount = count;
+
+                                                                    if (rpdoEnabledEntriesCount < 0) {
+                                                                        return signedDisableImage;
+                                                                    }
+                                                                    break;
+                                                            }
                                                             return signedYesImage;
                                                         }
                                                     }
@@ -1078,9 +1137,60 @@ public class MappingView extends ViewPart {
                                     if (!mappableSubObject.isTpdoMappable()) {
                                         return warningImage;
                                     }
+
                                     break;
                                 default:
                             }
+
+                        }
+
+                        switch (pdoType) {
+
+                            case TPDO:
+                                System.err.println("The IDRaw of object.."
+                                        + mapParamObj.getId());
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        tpdoEnabledEntriesCount = Integer
+                                                .valueOf(
+                                                        tpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                                count = tpdoEnabledEntriesCount - 1;
+                                tpdoEnabledEntriesCount = count;
+
+                                if (tpdoEnabledEntriesCount < 0) {
+                                    return signedDisableImage;
+                                }
+                                break;
+                            case RPDO:
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        rpdoEnabledEntriesCount = Integer
+                                                .valueOf(
+                                                        rpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                        // Integer
+                                        // .valueOf(mapParamObj.getObject()
+                                        // .getSubObject((short) 0)
+                                        // .getActualDefaultValue());
+
+                                    } catch (Exception e) {
+
+                                    }
+                                }
+                                count = rpdoEnabledEntriesCount - 1;
+                                rpdoEnabledEntriesCount = count;
+
+                                if (rpdoEnabledEntriesCount < 0) {
+                                    return signedDisableImage;
+                                }
+                                break;
                         }
 
                         return signedYesImage;
@@ -1581,6 +1691,10 @@ public class MappingView extends ViewPart {
     private Button tpdoBtnCheckButton;
     public boolean tpdoProfileObjectSelection = false;
 
+    private int tpdoEnabledEntriesCount;
+
+    private int count = 0;
+
     /**
      * RPDO page controls
      */
@@ -1624,6 +1738,8 @@ public class MappingView extends ViewPart {
     private Button rpdoBtnCheckButton;
     public boolean rpdoProfileObjectSelection = false;
 
+    private int rpdoEnabledEntriesCount;
+
     /**
      * Common GUI controls
      */
@@ -1637,6 +1753,7 @@ public class MappingView extends ViewPart {
 
     private final Image errorImage;
     private final Image signedYesImage;
+    private final Image signedDisableImage;
 
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
@@ -1739,6 +1856,9 @@ public class MappingView extends ViewPart {
                 .getImageDescriptor(IPluginImages.ERROR_ICON).createImage();
         signedYesImage = org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.SIGNED_YES_ICON)
+                .createImage();
+        signedDisableImage = org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.SIGNED_DISABLE_ICON)
                 .createImage();
     }
 
@@ -2595,7 +2715,9 @@ public class MappingView extends ViewPart {
         }
 
         handlePdoTableResize(PdoType.TPDO, showAdvancedview.isChecked());
-
+        tpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.TPDO);
+        System.err.println("The count for enabled entries in TPDO..."
+                + tpdoEnabledEntriesCount);
         // RPDO Page
         List<RpdoChannel> rpdoChannels = nodeObj.getObjectDictionary()
                 .getRpdoChannelsList();
@@ -2613,6 +2735,7 @@ public class MappingView extends ViewPart {
         }
 
         handlePdoTableResize(PdoType.RPDO, showAdvancedview.isChecked());
+        rpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.RPDO);
     }
 
     @Override
@@ -2631,6 +2754,7 @@ public class MappingView extends ViewPart {
         warningImage.dispose();
         errorImage.dispose();
         signedYesImage.dispose();
+        signedDisableImage.dispose();
     }
 
     /**
@@ -2641,6 +2765,28 @@ public class MappingView extends ViewPart {
     private void fillLocalToolBar(IToolBarManager manager) {
         manager.removeAll();
         manager.add(showAdvancedview);
+    }
+
+    private int getEnabledEntriesCount(PdoType pdoType) {
+        try {
+            switch (pdoType) {
+                case TPDO:
+                    tpdoEnabledEntriesCount = Integer.valueOf(
+                            tpdoEnabledMappingEntriesText.getText().trim());
+                    return tpdoEnabledEntriesCount;
+
+                case RPDO:
+                    rpdoEnabledEntriesCount = Integer.valueOf(
+                            rpdoEnabledMappingEntriesText.getText().trim());
+                    return rpdoEnabledEntriesCount;
+
+                default:
+                    break;
+            }
+        } catch (Exception e) {
+
+        }
+        return 0;
     }
 
     /**
