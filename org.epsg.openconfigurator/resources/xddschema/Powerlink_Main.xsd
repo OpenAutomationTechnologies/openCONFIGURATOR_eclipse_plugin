@@ -32,7 +32,7 @@
 
 *******************************************************************************
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified" version="0.15">
 	<xsd:include schemaLocation="ISO15745ProfileContainer.xsd"/>
 	<xsd:include schemaLocation="ProfileBody_Device_Powerlink.xsd"/>
 	<xsd:include schemaLocation="ProfileBody_CommunicationNetwork_Powerlink.xsd"/>

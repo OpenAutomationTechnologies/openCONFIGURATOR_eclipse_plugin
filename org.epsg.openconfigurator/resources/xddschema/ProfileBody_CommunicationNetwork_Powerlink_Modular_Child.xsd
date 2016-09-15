@@ -122,11 +122,11 @@
 			<xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
 				<xsd:complexType>
 					<xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
-					<xsd:attribute name="subIndex" type="xdd:dt_ParameterSubIndex" use="required"/>
+					<xsd:attribute name="subIndex" type="xdd:t_SubIndex" use="required"/>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="index" type="xdd:dt_ParameterIndex" use="optional"/>
+		<xsd:attribute name="index" type="xdd:t_Index" use="optional"/>
 		<xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
 		<xsd:attribute name="rangeSelector" type="xsd:string" use="required">
 			<xsd:annotation>

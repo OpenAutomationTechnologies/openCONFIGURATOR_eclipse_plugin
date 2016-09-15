@@ -39,6 +39,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="NMTMNDNA" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTMNRedundancy" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="DLLMNRingRedundancy" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
+ *       &lt;attribute name="NMTMNMaxAsynchronousSlots" type="{http://www.w3.org/2001/XMLSchema}unsignedByte" default="1" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -103,6 +104,9 @@ public class TMNFeatures {
     protected Boolean nmtmnRedundancy;
     @XmlAttribute(name = "DLLMNRingRedundancy")
     protected Boolean dllmnRingRedundancy;
+    @XmlAttribute(name = "NMTMNMaxAsynchronousSlots")
+    @XmlSchemaType(name = "unsignedByte")
+    protected Short nmtmnMaxAsynchronousSlots;
 
     /**
      * Gets the value of the dllErrMNMultipleMN property.
@@ -622,6 +626,34 @@ public class TMNFeatures {
      */
     public void setDLLMNRingRedundancy(Boolean value) {
         this.dllmnRingRedundancy = value;
+    }
+
+    /**
+     * Gets the value of the nmtmnMaxAsynchronousSlots property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Short }
+     *     
+     */
+    public short getNMTMNMaxAsynchronousSlots() {
+        if (nmtmnMaxAsynchronousSlots == null) {
+            return ((short) 1);
+        } else {
+            return nmtmnMaxAsynchronousSlots;
+        }
+    }
+
+    /**
+     * Sets the value of the nmtmnMaxAsynchronousSlots property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Short }
+     *     
+     */
+    public void setNMTMNMaxAsynchronousSlots(Short value) {
+        this.nmtmnMaxAsynchronousSlots = value;
     }
 
 }

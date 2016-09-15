@@ -35,12 +35,12 @@
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xdd="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
 	<xsd:include schemaLocation="TextResource.xsd"/>
 	<xsd:include schemaLocation="CommonElements.xsd"/>
-	<xsd:simpleType name="dt_ParameterIndex">
+	<xsd:simpleType name="t_Index">
 		<xsd:restriction base="xsd:hexBinary">
 			<xsd:length value="2"/>
 		</xsd:restriction>
 	</xsd:simpleType>
-	<xsd:simpleType name="dt_ParameterSubIndex">
+	<xsd:simpleType name="t_SubIndex">
 		<xsd:restriction base="xsd:hexBinary">
 			<xsd:length value="1"/>
 		</xsd:restriction>

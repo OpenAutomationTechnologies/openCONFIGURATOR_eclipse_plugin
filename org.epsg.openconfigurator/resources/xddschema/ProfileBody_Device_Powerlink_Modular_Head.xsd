@@ -123,8 +123,8 @@
 					<xsd:attribute name="unusedSlots" type="xsd:boolean" use="required"/>
 					<xsd:attribute name="moduleAddressing" type="xdd:t_moduleAddressingHead" use="required"/>
 					<xsd:attribute name="multipleModules" type="xsd:boolean" use="optional" default="true"/>
-					<xsd:attribute name="identList" type="xdd:dt_ParameterIndex" use="optional"/>
-					<xsd:attribute name="firmwareList" type="xdd:dt_ParameterIndex" use="optional"/>
+					<xsd:attribute name="identList" type="xdd:t_Index" use="optional"/>
+					<xsd:attribute name="firmwareList" type="xdd:t_Index" use="optional"/>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>

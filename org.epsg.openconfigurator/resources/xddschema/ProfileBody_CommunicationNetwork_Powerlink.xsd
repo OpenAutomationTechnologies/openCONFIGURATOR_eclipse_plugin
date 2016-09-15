@@ -125,16 +125,33 @@ W. Seiss      | 09.09.2010 | + Cleanup / restructuring
 
 B. Avramov    | 01.12.2015 | + Added optional specification version to profile
 C. Ruecker    | V 0.14     | + Added DNA feature entries
-              |            |    * NMTDNA
+              |            |    * NMTMNDNA
+              |            |    * NMTCNDNA
               |            |    * NMTCNSetNodeNumberTime
               |            | + Added MN Redundance feature entries
               |            |    * NMTMNRedundancy
-              |            | + Added classificationList
-              |            | + Added connectorList
+              |            |    * DLLMNRingRedundancy
+              |            | + Added general feature entries
+              |            |    * NMTExtNmtCmds
+              |            |    * NMTIsochronous
+              |            |    * NMTNodeIDBySW
+              |            |    * PDODynamicMapping
+              |            |    * SDOSupportASnd
+              |            |    * SDOSupportPDO
+              |            |    * SDOSupportUdpIp
+              |            |    * DLLMultiplePReqPRes
+              |            |    * NMTServiceUdpIp
+              |            |    * NMTCNPreOp2ToReady2Op
+              |            |    * NMTCNMaxAInv
+              |            | + Added classification list
+              |            | + Added connector list
+              |            | + Added firmware list
+              |            | + Added type to picture element
+              |            | + Added conditional mechanism to parameter groups
 
 C. Ruecker    | 15.12.2015 | + Modular Device Support
-              | V 0.15     |	* Added abstract types for modular node
-              |            |
+              | V 0.15     |    * Added abstract types for modular head node
+              |            |    * Added abstract types for modular child node
               |            |
               |            |
 *******************************************************************************
@@ -525,6 +542,7 @@ C. Ruecker    | 15.12.2015 | + Modular Device Support
 		<xsd:attribute name="NMTMNDNA" type="xsd:boolean" use="optional" default="false"/>
 		<xsd:attribute name="NMTMNRedundancy" type="xsd:boolean" use="optional" default="false"/>
 		<xsd:attribute name="DLLMNRingRedundancy" type="xsd:boolean" use="optional" default="false"/>
+		<xsd:attribute name="NMTMNMaxAsynchronousSlots" type="xsd:unsignedByte" use="optional" default="1"/>
 	</xsd:complexType>
 	<!-- POWERLINK CN features -->
 	<xsd:complexType name="t_CNFeatures">

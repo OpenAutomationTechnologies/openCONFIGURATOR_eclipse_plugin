@@ -228,19 +228,19 @@
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="baseIndex" type="xdd:dt_ParameterIndex" use="required">
+			<xsd:attribute name="baseIndex" type="xdd:t_Index" use="required">
 				<xsd:annotation>
 					<xsd:documentation xml:lang="en">Defines the base index for the interface range.
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="maxIndex" type="xdd:dt_ParameterIndex" use="optional">
+			<xsd:attribute name="maxIndex" type="xdd:t_Index" use="optional">
 				<xsd:annotation>
 					<xsd:documentation xml:lang="en">Defines the maximum index that can be used in the interface range. Can be omitted if the sortMode attribute value "subindex" is chosen.
 					</xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
-			<xsd:attribute name="maxSubIndex" type="xdd:dt_ParameterSubIndex" use="required">
+			<xsd:attribute name="maxSubIndex" type="xdd:t_SubIndex" use="required">
 				<xsd:annotation>
 					<xsd:documentation xml:lang="en">Defines the maximum number of subindices that can be used for every index in the range.
 					</xsd:documentation>
@@ -280,11 +280,11 @@
 			<xsd:element name="SubObject" minOccurs="0" maxOccurs="255">
 				<xsd:complexType>
 					<xsd:attributeGroup ref="xdd:ag_Powerlink_Object"/>
-					<xsd:attribute name="subIndex" type="xdd:dt_ParameterSubIndex" use="required"/>
+					<xsd:attribute name="subIndex" type="xdd:t_SubIndex" use="required"/>
 				</xsd:complexType>
 			</xsd:element>
 		</xsd:sequence>
-		<xsd:attribute name="index" type="xdd:dt_ParameterIndex" use="optional"/>
+		<xsd:attribute name="index" type="xdd:t_Index" use="optional"/>
 		<xsd:attribute name="subNumber" type="xsd:unsignedByte" use="optional"/>
 		<xsd:attribute name="rangeSelector" type="xsd:string" use="optional">
 			<xsd:annotation>
