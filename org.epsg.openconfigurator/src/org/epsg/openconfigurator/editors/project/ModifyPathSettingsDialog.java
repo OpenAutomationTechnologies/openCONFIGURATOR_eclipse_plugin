@@ -99,6 +99,7 @@ public class ModifyPathSettingsDialog extends TitleAreaDialog {
         /**
          * Returns the input elements
          */
+        @SuppressWarnings("rawtypes")
         @Override
         public Object[] getElements(Object inputElement) {
             return ((List) inputElement).toArray();

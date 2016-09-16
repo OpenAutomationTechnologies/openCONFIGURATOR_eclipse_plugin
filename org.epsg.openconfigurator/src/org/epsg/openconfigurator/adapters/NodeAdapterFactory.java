@@ -76,8 +76,10 @@ public class NodeAdapterFactory implements IAdapterFactory {
      */
     ModulePropertySource modulePropertySource;
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getAdapter(Object adaptableObject, Class adapterType) {
+    public Object getAdapter(Object adaptableObject,
+            @SuppressWarnings("rawtypes") Class adapterType) {
         if (adapterType == IPropertySource.class) {
             if (adaptableObject instanceof Node) {
                 Node nodeObj = (Node) adaptableObject;
@@ -149,6 +151,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
 
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Class[] getAdapterList() {
         return new Class[] { IPropertySource.class };

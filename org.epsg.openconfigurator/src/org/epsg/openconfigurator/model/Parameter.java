@@ -280,9 +280,8 @@ public class Parameter implements IParameter {
                 if (parameterTemplate.getAccess() != null) {
                     return ParameterAccess
                             .fromValue(parameterTemplate.getAccess());
-                } else {
-                    return ParameterAccess.UNDEFINED;
                 }
+                return ParameterAccess.UNDEFINED;
 
             }
         }
@@ -301,9 +300,8 @@ public class Parameter implements IParameter {
 
                 if (parameterTemplate.getActualValue() != null) {
                     return parameterTemplate.getActualValue().getValue();
-                } else {
-                    return StringUtils.EMPTY;
                 }
+                return StringUtils.EMPTY;
             }
 
         } else if (actualValue.contains("Â")) {
@@ -364,9 +362,8 @@ public class Parameter implements IParameter {
 
                 if (parameterTemplate.getDefaultValue() != null) {
                     return parameterTemplate.getDefaultValue().getValue();
-                } else {
-                    return StringUtils.EMPTY;
                 }
+                return StringUtils.EMPTY;
 
             }
         } else if (defaultValue.contains("Â")) {
@@ -456,7 +453,7 @@ public class Parameter implements IParameter {
      * @see org.epsg.openconfigurator.model.IParameter#getUniqueId()
      */
     @Override
-    public String getUniqueId() {
+    public String getParameterUniqueId() {
         return uniqueId;
     }
 

@@ -73,8 +73,10 @@ public class ObjectAdapterFactory implements IAdapterFactory {
      */
     private ParameterGroupPropertySource parameterGroupPropertySource;
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object getAdapter(Object adaptableObject, Class adapterType) {
+    public Object getAdapter(Object adaptableObject,
+            @SuppressWarnings("rawtypes") Class adapterType) {
         if (adapterType == IPropertySource.class) {
 
             if (adaptableObject instanceof PowerlinkObject) {
@@ -129,6 +131,7 @@ public class ObjectAdapterFactory implements IAdapterFactory {
         return null;
     }
 
+    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
     public Class[] getAdapterList() {
         return new Class[] { IPropertySource.class };

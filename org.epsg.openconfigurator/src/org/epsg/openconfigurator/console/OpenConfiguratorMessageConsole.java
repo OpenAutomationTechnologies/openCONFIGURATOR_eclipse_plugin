@@ -168,6 +168,7 @@ public class OpenConfiguratorMessageConsole {
             final String projectName) {
         String fullMessage = "[" + getCurrentTime() + "] [ERROR] " + "["
                 + projectName + "] " + message;
+        @SuppressWarnings("resource")
         MessageConsoleStream out = getErrorMessageStream();
         out.println(fullMessage);
     }

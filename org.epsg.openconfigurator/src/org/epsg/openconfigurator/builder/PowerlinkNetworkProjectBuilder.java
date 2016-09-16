@@ -488,8 +488,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      * java.util.Map, org.eclipse.core.runtime.IProgressMonitor)
      */
     @Override
-    protected IProject[] build(final int kind, Map args,
-            IProgressMonitor monitor) throws CoreException {
+    protected IProject[] build(final int kind,
+            @SuppressWarnings("rawtypes") Map args, IProgressMonitor monitor)
+            throws CoreException {
         switch (kind) {
             case IncrementalProjectBuilder.FULL_BUILD:
             case IncrementalProjectBuilder.CLEAN_BUILD:

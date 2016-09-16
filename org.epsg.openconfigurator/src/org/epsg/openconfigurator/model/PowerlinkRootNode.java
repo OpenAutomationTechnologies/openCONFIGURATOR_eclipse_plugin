@@ -110,6 +110,7 @@ public class PowerlinkRootNode {
     private Map<Short, Node> nodeCollection = new HashMap<>();
     private OpenCONFIGURATORProject currentProject;
 
+    @SuppressWarnings("rawtypes")
     private ListenerList nodePropertyChangeListeners = new ListenerList(
             ListenerList.IDENTITY);
 
@@ -198,6 +199,7 @@ public class PowerlinkRootNode {
      * @param listener Instance of INodePropertyChangeListener to listen the
      *            change event
      */
+    @SuppressWarnings("unchecked")
     public void addNodePropertyChangeListener(
             INodePropertyChangeListener listener) {
         // Store the listener object

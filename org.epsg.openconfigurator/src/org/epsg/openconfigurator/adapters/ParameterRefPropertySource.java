@@ -138,7 +138,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             propertyList.add(actualValueReadOnlyDescriptor);
         } else {
             Parameter param = paramRef.getObjectDictionary()
-                    .getParameter(paramRef.getUniqueId());
+                    .getParameter(paramRef.getParameterUniqueId());
             ParameterAccess access = param.getAccess();
             if ((access == ParameterAccess.CONST)
                     || (access == ParameterAccess.NO_ACCESS)
@@ -202,7 +202,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case UNIQUE_ID:
-                    retObj = paramRef.getUniqueId();
+                    retObj = paramRef.getParameterUniqueId();
                     break;
                 case PARAM_NAME_ID:
                     retObj = paramRef.getLabelDescription().getText();
@@ -293,7 +293,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
      * @return The error statement for invalid actual value.
      */
     private String handleParameterReferenceActualValue(Object value) {
-        String parameterRefUniqueID = paramRef.getUniqueId();
+        String parameterRefUniqueID = paramRef.getParameterUniqueId();
         Parameter parameter = paramRef.getObjectDictionary()
                 .getParameter(parameterRefUniqueID);
         String actualvalue = (String) value;
@@ -301,7 +301,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             String newParameterName = OpenConfiguratorLibraryUtils
                     .getModuleParameterUniqueID(
                             paramRef.getObjectDictionary().getModule(),
-                            paramRef.getUniqueId());
+                            paramRef.getParameterUniqueId());
             Result res = OpenConfiguratorCore.GetInstance()
                     .SetParameterActualValue(paramRef.getNode().getNetworkId(),
                             paramRef.getNode().getCnNodeId(), newParameterName,
@@ -313,7 +313,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             Result res = OpenConfiguratorCore.GetInstance()
                     .SetParameterActualValue(paramRef.getNode().getNetworkId(),
                             paramRef.getNode().getCnNodeId(),
-                            parameter.getUniqueId(), actualvalue);
+                            parameter.getParameterUniqueId(), actualvalue);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -401,7 +401,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                 .getModuleParameterUniqueID(
                                         paramRef.getObjectDictionary()
                                                 .getModule(),
-                                        paramRef.getUniqueId());
+                                        paramRef.getParameterUniqueId());
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         paramRef.getNode().getNetworkId(),
@@ -479,7 +479,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                     .getModuleParameterUniqueID(
                                             paramRef.getObjectDictionary()
                                                     .getModule(),
-                                            paramRef.getUniqueId());
+                                            paramRef.getParameterUniqueId());
                             res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
@@ -496,7 +496,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
                                             paramRef.getNode().getCnNodeId(),
-                                            paramRef.getUniqueId(),
+                                            paramRef.getParameterUniqueId(),
                                             actualValue);
                             if (!res.IsSuccessful()) {
                                 System.err.println(OpenConfiguratorLibraryUtils
@@ -525,7 +525,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                         .getModuleParameterUniqueID(
                                                 paramRef.getObjectDictionary()
                                                         .getModule(),
-                                                paramRef.getUniqueId());
+                                                paramRef.getParameterUniqueId());
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetParameterActualValue(
                                                 paramRef.getNode()
@@ -552,7 +552,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                                 paramRef.getNode()
                                                         .getNetworkId(),
                                                 paramRef.getNode().getCnNodeId(),
-                                                paramRef.getUniqueId(), val);
+                                                paramRef.getParameterUniqueId(), val);
                                 if (!res.IsSuccessful()) {
                                     System.err.println(
                                             OpenConfiguratorLibraryUtils

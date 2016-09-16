@@ -547,7 +547,7 @@ public class ValidateXddWizardPage extends WizardPage {
             return adMnPage.getNode();
         } else if (previousPage instanceof AddModuleWizardPage) {
             AddModuleWizardPage adModulePage = (AddModuleWizardPage) previousPage;
-            return adModulePage.getModulemodel();
+            return adModulePage.getModulemodelinWizard();
         }
         return null;
     }
@@ -579,6 +579,7 @@ public class ValidateXddWizardPage extends WizardPage {
         return xddModel;
     }
 
+    @SuppressWarnings("unused")
     private void handleDefaultRadioButtonSelectionChanged(SelectionEvent e) {
         if (btnDefault.getSelection()) {
             nodeConfigurationPath.setEnabled(false);
@@ -638,11 +639,9 @@ public class ValidateXddWizardPage extends WizardPage {
             errorinfo.setEnabled(false);
 
             return false;
-        } else {
-            errorinfo.setBackground(
-                    new Color(Display.getDefault(), 255, 255, 255));
-            errorinfo.setEnabled(true);
         }
+        errorinfo.setBackground(new Color(Display.getDefault(), 255, 255, 255));
+        errorinfo.setEnabled(true);
         if (!nodeConfigurationValid) {
             setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
             return false;

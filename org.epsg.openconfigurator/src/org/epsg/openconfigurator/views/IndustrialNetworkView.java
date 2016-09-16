@@ -203,9 +203,8 @@ public class IndustrialNetworkView extends ViewPart
                 if (nodeSecond
                         .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
-                } else {
-                    return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
                 }
+                return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
 
             }
 
@@ -262,27 +261,24 @@ public class IndustrialNetworkView extends ViewPart
         public Object[] getElements(Object parent) {
             if (parent == null) {
                 return new Object[] { new EmptyNetworkView() };
-            } else {
-                if (parent instanceof PowerlinkRootNode) {
-                    PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
-
-                    LinkedHashSet<Node> nodeCollection = new LinkedHashSet<>();
-
-                    List<Node> nodeList = powerlinkRoot.getNodeLists(parent);
-
-                    nodeCollection.addAll(nodeList);
-
-                    Object[] obj = nodeCollection.toArray();
-
-                    if (nodeCollection.size() == 0) {
-                        return new Object[] { new EmptyNetworkView() };
-                    } else {
-                        return obj;
-                    }
-                }
-                return new Object[0];
-
             }
+            if (parent instanceof PowerlinkRootNode) {
+                PowerlinkRootNode powerlinkRoot = (PowerlinkRootNode) parent;
+
+                LinkedHashSet<Node> nodeCollection = new LinkedHashSet<>();
+
+                List<Node> nodeList = powerlinkRoot.getNodeLists(parent);
+
+                nodeCollection.addAll(nodeList);
+
+                Object[] obj = nodeCollection.toArray();
+
+                if (nodeCollection.size() == 0) {
+                    return new Object[] { new EmptyNetworkView() };
+                }
+                return obj;
+            }
+            return new Object[0];
 
         }
 
@@ -435,9 +431,8 @@ public class IndustrialNetworkView extends ViewPart
                     TCN cnModel = (TCN) nodeObjectModel;
                     if (cnModel.isEnabled()) {
                         return cnEnabledIcon;
-                    } else {
-                        return cnDisabledIcon;
                     }
+                    return cnDisabledIcon;
                 }
                 if (nodeObjectModel instanceof TRMN) {
                     return rmnIcon;
@@ -452,9 +447,8 @@ public class IndustrialNetworkView extends ViewPart
                 if (interfaceModel.getNode().isEnabled()) {
                     return interfaceIcon;
 
-                } else {
-                    return cnDisabledIcon;
                 }
+                return cnDisabledIcon;
             }
 
             if (obj instanceof Module) {
@@ -464,9 +458,8 @@ public class IndustrialNetworkView extends ViewPart
                     InterfaceList.Interface.Module moduleModel = (InterfaceList.Interface.Module) moduleObjectModel;
                     if (moduleModel.isEnabled()) {
                         return moduleIcon;
-                    } else {
-                        return cnDisabledIcon;
                     }
+                    return cnDisabledIcon;
                 }
 
             }
@@ -707,9 +700,8 @@ public class IndustrialNetworkView extends ViewPart
                                 if (previousModuleType.equalsIgnoreCase(
                                         nextPositionModuleType)) {
                                     return;
-                                } else {
-                                    mod.setEnabled(false);
                                 }
+                                mod.setEnabled(false);
 
                             }
                         }
@@ -730,9 +722,8 @@ public class IndustrialNetworkView extends ViewPart
                     if (previousModuleType
                             .equalsIgnoreCase(nextPositionModuleType)) {
                         return;
-                    } else {
-                        mod.setEnabled(false);
                     }
+                    mod.setEnabled(false);
 
                 }
             }
@@ -1172,6 +1163,7 @@ public class IndustrialNetworkView extends ViewPart
             return;
         }
 
+        @SuppressWarnings("rawtypes")
         List selectedObjectsList = selection.toList();
 
         for (Object selectedObject : selectedObjectsList) {
@@ -1267,6 +1259,7 @@ public class IndustrialNetworkView extends ViewPart
             return;
         }
 
+        @SuppressWarnings("rawtypes")
         List selectedObjectsList = selection.toList();
 
         for (Object selectedObject : selectedObjectsList) {
@@ -1440,6 +1433,7 @@ public class IndustrialNetworkView extends ViewPart
             return;
         }
 
+        @SuppressWarnings("rawtypes")
         List selectedObjectsList = selection.toList();
 
         for (Object selectedObject : selectedObjectsList) {
@@ -1925,6 +1919,7 @@ public class IndustrialNetworkView extends ViewPart
             return;
         }
 
+        @SuppressWarnings("rawtypes")
         List selectedObjectsList = selection.toList();
 
         for (Object selectedObject : selectedObjectsList) {
@@ -1963,6 +1958,7 @@ public class IndustrialNetworkView extends ViewPart
             return;
         }
 
+        @SuppressWarnings("rawtypes")
         List selectedObjectsList = selection.toList();
 
         for (Object selectedObject : selectedObjectsList) {
@@ -2168,17 +2164,14 @@ public class IndustrialNetworkView extends ViewPart
                             moduleValue
                                     .setPositions(String.valueOf(newPosition));
                             return;
-                        } else {
-                            Module moduleValue = interfaceObj
-                                    .getModuleCollection().get(position);
-                            int newPosition = position - 1;
-                            System.err.println("new posit..... " + newPosition);
-
-                            moduleValue
-                                    .setPositions(String.valueOf(newPosition));
-                            moduleValue.setEnabled(false);
-
                         }
+                        Module moduleValue = interfaceObj.getModuleCollection()
+                                .get(position);
+                        int newPosition = position - 1;
+                        System.err.println("new posit..... " + newPosition);
+
+                        moduleValue.setPositions(String.valueOf(newPosition));
+                        moduleValue.setEnabled(false);
                     } else {
                         if (nextModuletype != null) {
                             if (previousModuleType
@@ -2191,22 +2184,19 @@ public class IndustrialNetworkView extends ViewPart
                                         String.valueOf(newPosition));
                                 return;
 
-                            } else {
-                                System.err.println("Disabled module name.."
-                                        + moduleObj.getModuleName());
-                                System.err.println("posit..... " + position);
+                            }
+                            System.err.println("Disabled module name.."
+                                    + moduleObj.getModuleName());
+                            System.err.println("posit..... " + position);
 
-                                Module moduleValue = interfaceObj
-                                        .getModuleCollection().get(position);
-                                int newPosition = position - 1;
-                                System.err.println(
-                                        "new posit..... " + newPosition);
-                                moduleValue.setPositions(
-                                        String.valueOf(newPosition));
-                                if (moduleObj.isEnabled()) {
-                                    moduleObj.setEnabled(false);
-                                }
-
+                            Module moduleValue = interfaceObj
+                                    .getModuleCollection().get(position);
+                            int newPosition = position - 1;
+                            System.err.println("new posit..... " + newPosition);
+                            moduleValue
+                                    .setPositions(String.valueOf(newPosition));
+                            if (moduleObj.isEnabled()) {
+                                moduleObj.setEnabled(false);
                             }
                         }
                     }

@@ -130,7 +130,7 @@ public final class OpenConfiguratorProjectUtils {
                     + OpenConfiguratorLibraryUtils.getErrorMessage(libApiRes));
         }
 
-        for (int i = 0; i < support.size(); i++) {
+        for (int i = 0; i < support.size();) {
             OpenConfiguratorProjectUtils.defaultBuildConfigurationIdList
                     .add(support.get(i));
             break;

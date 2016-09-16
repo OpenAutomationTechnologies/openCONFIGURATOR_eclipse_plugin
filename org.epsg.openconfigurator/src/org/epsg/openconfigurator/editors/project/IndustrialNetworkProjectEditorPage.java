@@ -951,6 +951,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
             }
 
+            @SuppressWarnings("rawtypes")
             @Override
             public Object[] getElements(Object inputElement) {
                 return ((List) inputElement).toArray();

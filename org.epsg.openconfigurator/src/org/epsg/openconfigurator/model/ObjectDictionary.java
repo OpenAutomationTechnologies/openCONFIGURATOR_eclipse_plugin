@@ -266,14 +266,14 @@ public class ObjectDictionary {
                     List<ParameterReference> prmRefList = cpgrp
                             .getParameterRefList();
                     for (ParameterReference prmRef : prmRefList) {
-                        Parameter param = getParameter(prmRef.getUniqueId());
+                        Parameter param = getParameter(prmRef.getParameterUniqueId());
                         parameterList.add(param);
                     }
                 }
             }
             List<ParameterReference> prmRefList = pgrp.getParameterRefList();
             for (ParameterReference prmRef : prmRefList) {
-                Parameter param = getParameter(prmRef.getUniqueId());
+                Parameter param = getParameter(prmRef.getParameterUniqueId());
                 parameterList.add(param);
             }
         }
@@ -462,7 +462,7 @@ public class ObjectDictionary {
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
                                 Parameter p = new Parameter(node, param);
-                                parameterListMap.put(p.getUniqueId(), p);
+                                parameterListMap.put(p.getParameterUniqueId(), p);
                             }
                         }
 
@@ -496,7 +496,7 @@ public class ObjectDictionary {
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
                                 Parameter p = new Parameter(node, param);
-                                parameterListMap.put(p.getUniqueId(), p);
+                                parameterListMap.put(p.getParameterUniqueId(), p);
                             }
                         }
 
@@ -529,7 +529,7 @@ public class ObjectDictionary {
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
                                 Parameter p = new Parameter(node, param);
-                                parameterListMap.put(p.getUniqueId(), p);
+                                parameterListMap.put(p.getParameterUniqueId(), p);
                             }
                         }
 

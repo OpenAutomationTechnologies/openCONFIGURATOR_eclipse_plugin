@@ -284,7 +284,7 @@ public class XddJdomOperation {
         } else {
             System.err.println(
                     "No child elements are available for the given parameter with uniqueID = "
-                            + parameter.getUniqueId());
+                            + parameter.getParameterUniqueId());
         }
         return 0;
     }
@@ -1683,6 +1683,7 @@ public class XddJdomOperation {
 
     }
 
+    @SuppressWarnings("unused")
     private static void updateParameterListsToHeadXDC(Document document,
             TParameterList.Parameter parameter, Module module) {
 
@@ -1958,6 +1959,7 @@ public class XddJdomOperation {
         }
     }
 
+    @SuppressWarnings("unused")
     private static void updateParameterListToHeadXDC(Document document,
             TParameterList.Parameter parameter, Module module) {
 
@@ -2356,6 +2358,7 @@ public class XddJdomOperation {
 
     }
 
+    @SuppressWarnings("unused")
     private static void updatePrameterTemplateListInHeadNode(Document document,
             TParameterTemplate parameteratemplateModel) {
 

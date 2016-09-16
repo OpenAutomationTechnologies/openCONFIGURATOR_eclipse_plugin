@@ -164,7 +164,8 @@ public class AddChildModuleWizardPage extends WizardPage {
      */
     public TModuleInterface getModuleInterface() {
         if (getXDDModelOfModule() != null) {
-            List<ISO15745Profile> profiles = getXDDModelOfModule().getISO15745Profile();
+            List<ISO15745Profile> profiles = getXDDModelOfModule()
+                    .getISO15745Profile();
             for (ISO15745Profile profile : profiles) {
                 ProfileBodyDataType profileBodyDatatype = profile
                         .getProfileBody();
@@ -476,44 +477,39 @@ public class AddChildModuleWizardPage extends WizardPage {
             setErrorMessage(
                     "Module cannot be placed in the specified position.");
             return false;
-        } else {
-            setErrorMessage(null);
-            pageComplete = true;
         }
+        setErrorMessage(null);
+        pageComplete = true;
 
         if (!isMaxaddressValid) {
             setErrorMessage(
                     "Module cannot be placed in the specified address.");
             return false;
-        } else {
-            setErrorMessage(null);
-            pageComplete = true;
         }
+        setErrorMessage(null);
+        pageComplete = true;
 
         if (!isMinAddressValid) {
             setErrorMessage(
                     "Module cannot be placed in the specified address.");
             return false;
-        } else {
-            setErrorMessage(null);
-            pageComplete = true;
         }
+        setErrorMessage(null);
+        pageComplete = true;
 
         if (!isMinPositionValid) {
             setErrorMessage(
                     "Module cannot be placed in the specified position.");
             return false;
-        } else {
-            setErrorMessage(null);
-            pageComplete = true;
         }
+        setErrorMessage(null);
+        pageComplete = true;
 
         if (!interfaceObj.isInterfaceUnUsedSlots()) {
             setErrorMessage("Unused slots not available.");
             return false;
-        } else {
-            pageComplete = true;
         }
+        pageComplete = true;
 
         Set<Integer> positionList = interfaceObj.getModuleCollection().keySet();
         if (positionList == null) {
@@ -563,9 +559,8 @@ public class AddChildModuleWizardPage extends WizardPage {
         if (!validAddress) {
             setErrorMessage("The Module address already exists.");
             return false;
-        } else {
-            pageComplete = true;
         }
+        pageComplete = true;
 
         if (isAddressValid(addressText.getText())) {
 

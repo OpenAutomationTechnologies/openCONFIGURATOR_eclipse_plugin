@@ -697,6 +697,7 @@ public class ProjectJDomOperation {
                 new Attribute(attributeName, attributeValue));
     }
 
+    @SuppressWarnings("unused")
     public static void updateAutoGenerationSettings(Document document) {
         String xpath = "//oc:ProjectConfiguration";
         JDomUtil.updateAttribute(document, xpath, OPENCONFIGURATOR_NAMESPACE,
@@ -727,7 +728,6 @@ public class ProjectJDomOperation {
                             OPENCONFIGURATOR_NAMESPACE,
                             noneAutoGenerateElement);
                 }
-
 
             } else {
                 System.err.println("AutoGeneraton setttings Xpath not present");

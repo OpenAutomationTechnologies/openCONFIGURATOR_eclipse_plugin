@@ -84,12 +84,11 @@ public class Module {
                 if (forceObj.getSubindex() == null) {
                     tempForcedObjToBeRemoved = tempForceObj;
                     break;
-                } else {
-                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
-                            forceObj.getSubindex())) {
-                        tempForcedObjToBeRemoved = tempForceObj;
-                        break;
-                    }
+                }
+                if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                        forceObj.getSubindex())) {
+                    tempForcedObjToBeRemoved = tempForceObj;
+                    break;
                 }
             }
         }
@@ -246,16 +245,14 @@ public class Module {
                         + preTypetoBeChecked + " does not match "
                         + newModule.getModuleName() + " module type "
                         + prevModuleTypetoBeChecked + ".";
-            } else {
-                return "Module cannot be moved because "
-                        + newModule.getInterfaceOfModule().getInterfaceUId()
-                        + " with module type "
-                        + newModule.getInterfaceOfModule().getInterfaceType()
-                        + " does not match " + newModule.getModuleName()
-                        + " module type "
-                        + newModule.getModuleInterface().getType() + ".";
-
             }
+            return "Module cannot be moved because "
+                    + newModule.getInterfaceOfModule().getInterfaceUId()
+                    + " with module type "
+                    + newModule.getInterfaceOfModule().getInterfaceType()
+                    + " does not match " + newModule.getModuleName()
+                    + " module type " + newModule.getModuleInterface().getType()
+                    + ".";
         }
 
         if (!(currentModule.getModuleInterface().getType()
@@ -326,16 +323,14 @@ public class Module {
                         + previousTypetoBeChecked + " does not match "
                         + prevModule.getModuleName() + " module type "
                         + preModuleTypetoBeChecked + ".";
-            } else {
-                return "Module cannot be moved because "
-                        + currentModule.getModuleName() + " with module type "
-                        + previousTypetoBeChecked + " does not match "
-                        + currentModule.getInterfaceOfModule().getInterfaceUId()
-                        + " interface type " + currentModule
-                                .getInterfaceOfModule().getInterfaceType()
-                        + ".";
-
             }
+            return "Module cannot be moved because "
+                    + currentModule.getModuleName() + " with module type "
+                    + previousTypetoBeChecked + " does not match "
+                    + currentModule.getInterfaceOfModule().getInterfaceUId()
+                    + " interface type "
+                    + currentModule.getInterfaceOfModule().getInterfaceType()
+                    + ".";
         }
 
         if (!(nextTypetoBeChecked.equalsIgnoreCase(newModuleTypetoBeChecked))) {
@@ -404,13 +399,11 @@ public class Module {
                         if (forceObj.getSubindex() == null) {
                             alreadyForced = true;
                             break;
-                        } else {
-                            if (java.util.Arrays.equals(
-                                    tempForceObj.getSubindex(),
-                                    forceObj.getSubindex())) {
-                                alreadyForced = true;
-                                break;
-                            }
+                        }
+                        if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                                forceObj.getSubindex())) {
+                            alreadyForced = true;
+                            break;
                         }
                     }
                 }
@@ -1225,45 +1218,40 @@ public class Module {
                 moduleTobeDisabled.setEnabled(false);
                 validatePreviousPosition(oldPosition);
                 return;
-            } else {
-                return;
             }
-        } else {
-            OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
-                    IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
-            System.err.println("oldPOsition..... .." + oldPosition);
-            if (moduleModel instanceof InterfaceList.Interface.Module) {
-                InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
-                Integer position = Integer.valueOf(value);
+            return;
+        }
+        OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
+                IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
+        System.err.println("oldPOsition..... .." + oldPosition);
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
+            Integer position = Integer.valueOf(value);
 
-                Result res = OpenConfiguratorLibraryUtils.moveModule(this,
-                        oldPosition, position);
-                if (res.IsSuccessful()) {
-                    module.setPosition(BigInteger.valueOf(position));
-                    getInterfaceOfModule().getModuleCollection()
-                            .remove(oldPosition);
-                    getInterfaceOfModule().getModuleCollection().put(position,
-                            this);
-                    if (String
-                            .valueOf(getInterfaceOfModule()
-                                    .getModuleAddressing())
-                            .equalsIgnoreCase("POSITION")) {
-                        setAddress(value);
-                    }
-                } else {
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printLibraryErrorMessage(res);
-
+            Result res = OpenConfiguratorLibraryUtils.moveModule(this,
+                    oldPosition, position);
+            if (res.IsSuccessful()) {
+                module.setPosition(BigInteger.valueOf(position));
+                getInterfaceOfModule().getModuleCollection()
+                        .remove(oldPosition);
+                getInterfaceOfModule().getModuleCollection().put(position,
+                        this);
+                if (String.valueOf(getInterfaceOfModule().getModuleAddressing())
+                        .equalsIgnoreCase("POSITION")) {
+                    setAddress(value);
                 }
             } else {
-                System.err.println("Invalid module model.");
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+
             }
-
-            rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
-
-            validatePreviousPosition(oldPosition);
-
+        } else {
+            System.err.println("Invalid module model.");
         }
+
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+
+        validatePreviousPosition(oldPosition);
     }
 
     /**
@@ -1747,11 +1735,10 @@ public class Module {
                     if ((previousModuleType.equals(nextModuleType))) {
                         System.err.println("Equals......");
                         return;
-                    } else {
-                        System.err.println("Equals245......");
-                        System.err.println("Not Equals......");
-                        nextModule.setEnabled(false);
                     }
+                    System.err.println("Equals245......");
+                    System.err.println("Not Equals......");
+                    nextModule.setEnabled(false);
                 }
             }
 

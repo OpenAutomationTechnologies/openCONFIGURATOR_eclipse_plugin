@@ -151,12 +151,11 @@ public class Node {
                 if (forcedObjToBeRemoved.getSubindex() == null) {
                     tempForcedObjToBeRemoved = tempForceObj;
                     break;
-                } else {
-                    if (java.util.Arrays.equals(tempForceObj.getSubindex(),
-                            forcedObjToBeRemoved.getSubindex())) {
-                        tempForcedObjToBeRemoved = tempForceObj;
-                        break;
-                    }
+                }
+                if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                        forcedObjToBeRemoved.getSubindex())) {
+                    tempForcedObjToBeRemoved = tempForceObj;
+                    break;
                 }
             }
         }
@@ -337,7 +336,8 @@ public class Node {
         objectDictionary = new ObjectDictionary(this, xddModel);
         networkmanagement = new NetworkManagement(this, xddModel);
         moduleManagement = new ModuleManagement(this, xddModel);
-        List<Interface> interfaceList = moduleManagement.getInterfacelistOfNode();
+        List<Interface> interfaceList = moduleManagement
+                .getInterfacelistOfNode();
         for (Interface interfaces : interfaceList) {
             headNodeInterface = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(headNodeInterface);
@@ -499,13 +499,11 @@ public class Node {
                         if (forceObj.getSubindex() == null) {
                             alreadyForced = true;
                             break;
-                        } else {
-                            if (java.util.Arrays.equals(
-                                    tempForceObj.getSubindex(),
-                                    forceObj.getSubindex())) {
-                                alreadyForced = true;
-                                break;
-                            }
+                        }
+                        if (java.util.Arrays.equals(tempForceObj.getSubindex(),
+                                forceObj.getSubindex())) {
+                            alreadyForced = true;
+                            break;
                         }
                     }
                 }
@@ -565,6 +563,13 @@ public class Node {
                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID);
         return asyncSlotTimeoutValue;
+    }
+
+    /**
+     * @return The node ID.
+     */
+    public short getCnNodeId() {
+        return nodeId;
     }
 
     /**
@@ -748,13 +753,6 @@ public class Node {
      */
     public NetworkManagement getNetworkManagement() {
         return networkmanagement;
-    }
-
-    /**
-     * @return The node ID.
-     */
-    public short getCnNodeId() {
-        return nodeId;
     }
 
     /**
@@ -1121,7 +1119,8 @@ public class Node {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public void setAsyncMtuOfNode(Integer value) throws JDOMException, IOException {
+    public void setAsyncMtuOfNode(Integer value)
+            throws JDOMException, IOException {
         if (value == null) {
             // FIXME: throw invalid argument.
             return;
@@ -1152,6 +1151,41 @@ public class Node {
                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
                 value.toString());
+    }
+
+    /**
+     * Set modified node Id to node model.
+     *
+     * @param newNodeId The value of node ID for modification
+     * @throws IOException Error with XDC file modifications.
+     * @throws JDOMException Error with time modifications.
+     * @throws InterruptedException Error with interrupt in thread.
+     */
+    public void setCnNodeId(short newNodeId)
+            throws IOException, JDOMException, InterruptedException {
+        // Update the new node id in the XDC file.
+        OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
+                String.valueOf(newNodeId));
+
+        // Update the node configuration path in the project file.
+        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
+                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXDC());
+
+        // Set the new node id into the project file.
+        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
+                IAbstractNodeProperties.NODE_ID_OBJECT,
+                String.valueOf(newNodeId));
+
+        // Update the new node id.
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            cn.setNodeID(String.valueOf(newNodeId));
+        } else if (nodeModel instanceof TRMN) {
+            TRMN rmn = (TRMN) nodeModel;
+            rmn.setNodeID(String.valueOf(newNodeId));
+        }
+
+        nodeId = newNodeId;
     }
 
     /**
@@ -1499,41 +1533,6 @@ public class Node {
         } else {
             tcn = null;
         }
-    }
-
-    /**
-     * Set modified node Id to node model.
-     *
-     * @param newNodeId The value of node ID for modification
-     * @throws IOException Error with XDC file modifications.
-     * @throws JDOMException Error with time modifications.
-     * @throws InterruptedException Error with interrupt in thread.
-     */
-    public void setCnNodeId(short newNodeId)
-            throws IOException, JDOMException, InterruptedException {
-        // Update the new node id in the XDC file.
-        OpenConfiguratorProjectUtils.updateNodeConfigurationPath(this,
-                String.valueOf(newNodeId));
-
-        // Update the node configuration path in the project file.
-        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
-                IAbstractNodeProperties.NODE_CONIFG_OBJECT, getPathToXDC());
-
-        // Set the new node id into the project file.
-        OpenConfiguratorProjectUtils.updateNodeAttributeValue(this,
-                IAbstractNodeProperties.NODE_ID_OBJECT,
-                String.valueOf(newNodeId));
-
-        // Update the new node id.
-        if (nodeModel instanceof TCN) {
-            TCN cn = (TCN) nodeModel;
-            cn.setNodeID(String.valueOf(newNodeId));
-        } else if (nodeModel instanceof TRMN) {
-            TRMN rmn = (TRMN) nodeModel;
-            rmn.setNodeID(String.valueOf(newNodeId));
-        }
-
-        nodeId = newNodeId;
     }
 
     /**

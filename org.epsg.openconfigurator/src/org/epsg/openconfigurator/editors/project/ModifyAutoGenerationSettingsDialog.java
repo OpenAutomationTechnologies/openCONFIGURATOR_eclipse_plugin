@@ -201,6 +201,7 @@ public final class ModifyAutoGenerationSettingsDialog extends TitleAreaDialog {
         /**
          * Returns the Person objects
          */
+        @SuppressWarnings("rawtypes")
         @Override
         public Object[] getElements(Object inputElement) {
             return ((List) inputElement).toArray();

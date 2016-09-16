@@ -97,7 +97,7 @@ public interface IParameter {
     /**
      * @return The parameter unique ID.
      */
-    public String getUniqueId();
+    public String getParameterUniqueId();
 
     /**
      * @return The Unit label of parameter.

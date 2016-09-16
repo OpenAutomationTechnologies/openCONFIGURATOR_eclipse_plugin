@@ -870,7 +870,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      * @return Id of the node.
      */
     @Override
-    public short getNodeId() {
+    public short getCNNodeId() {
         return nodeInstance.getCnNodeId();
     }
 
@@ -951,7 +951,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
     public long getSize() {
         long size[] = new long[2];
         Result res = OpenConfiguratorCore.GetInstance().GetObjectSize(
-                getNetworkId(), getNodeId(), object.getId(), size);
+                getNetworkId(), getCNNodeId(), object.getId(), size);
         if (!res.IsSuccessful()) {
             System.err.println("Error getting the Size "
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));

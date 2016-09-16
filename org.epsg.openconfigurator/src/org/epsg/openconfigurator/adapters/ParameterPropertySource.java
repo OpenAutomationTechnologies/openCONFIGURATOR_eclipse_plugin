@@ -146,7 +146,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case UNIQUE_ID:
-                    retObj = param.getUniqueId();
+                    retObj = param.getParameterUniqueId();
                     break;
                 case PARAM_NAME_ID:
                     retObj = param.getLabelDescription().getText();
@@ -291,7 +291,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
                                 .SetParameterActualValue(
                                         param.getNode().getNetworkId(),
                                         param.getNode().getCnNodeId(),
-                                        param.getUniqueId(), actualValue);
+                                        param.getParameterUniqueId(), actualValue);
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));

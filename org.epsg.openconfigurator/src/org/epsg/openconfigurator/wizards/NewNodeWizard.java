@@ -138,9 +138,8 @@ public class NewNodeWizard extends Wizard {
     public boolean canFinish() {
         if (getContainer().getCurrentPage() == addNodePage) {
             return false;
-        } else {
-            return validateXddPage.isPageComplete() && true;
         }
+        return validateXddPage.isPageComplete() && true;
 
     }
 
@@ -264,9 +263,8 @@ public class NewNodeWizard extends Wizard {
             getContainer().showPage(addNodePage);
             // addNodePage.setErrorMessage(CHAINED_STATION_ERROR_MESSAGE);
             return false;
-        } else {
-            addNodePage.setErrorMessage("");
         }
+        addNodePage.setErrorMessage("");
 
         try {
             OpenConfiguratorProjectUtils.importNodeConfigurationFile(newNode);

@@ -140,6 +140,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
     /**
      * This is to restore the custom configuration.
      */
+    @SuppressWarnings("unused")
     private String customConfiguration;
 
     /**
@@ -209,6 +210,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
     /**
      * validates the path of xddFile.
      */
+    @SuppressWarnings("unused")
     public boolean checkXddModel() {
         try {
             getInfoStyledText("");
@@ -504,7 +506,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         IWizardPage previousPage = getPreviousPage();
         if (previousPage instanceof AddModuleWizardPage) {
             AddModuleWizardPage adModulePage = (AddModuleWizardPage) previousPage;
-            return adModulePage.getModulemodel();
+            return adModulePage.getModulemodelinWizard();
         }
 
         return null;
@@ -520,9 +522,8 @@ public class ValidateXddModuleWizardPage extends WizardPage {
         if (nodeobj instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module moduleModel = (InterfaceList.Interface.Module) nodeobj;
             return moduleModel.getName();
-        } else {
-            System.err.println("Invalid node model.");
         }
+        System.err.println("Invalid node model.");
         return null;
     }
 
@@ -534,10 +535,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
             ModuleTypeList moduletypeList = getModuleInterface()
                     .getModuleTypeList();
             return moduletypeList;
-        } else {
-            System.err.println("Module Type list is null");
-            return null;
         }
+        System.err.println("Module Type list is null");
+        return null;
     }
 
     /**
@@ -615,9 +615,8 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                     modType = mod.getModuleType();
                     moduleTypeText.setText(modType);
                     break;
-                } else {
-                    moduleTypeText.setText(modType);
                 }
+                moduleTypeText.setText(modType);
 
             }
 
@@ -630,11 +629,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
             errorinfo.setEnabled(false);
 
             return false;
-        } else {
-            errorinfo.setBackground(
-                    new Color(Display.getDefault(), 255, 255, 255));
-            errorinfo.setEnabled(true);
         }
+        errorinfo.setBackground(new Color(Display.getDefault(), 255, 255, 255));
+        errorinfo.setEnabled(true);
 
         // The value of nodeConfigurationValid is not true for all cases.
         if (!nodeConfigurationValid) {

@@ -124,7 +124,7 @@ public interface IPowerlinkBaseObject {
     /**
      * @return Id of node with respect to POWERLINK object.
      */
-    public short getNodeId();
+    public short getCNNodeId();
 
     /**
      * @return DataType of the given object.

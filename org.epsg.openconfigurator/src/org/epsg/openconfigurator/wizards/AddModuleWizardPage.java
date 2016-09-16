@@ -170,7 +170,7 @@ public class AddModuleWizardPage extends WizardPage {
     /**
      * @return Instance of Module object model
      */
-    public Object getModulemodel() {
+    public Object getModulemodelinWizard() {
         return moduleModel;
     }
 

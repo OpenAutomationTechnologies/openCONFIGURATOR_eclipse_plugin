@@ -289,11 +289,10 @@ public class ObjectDictionaryView extends ViewPart
                 VarDecleration varDecl = (VarDecleration) element;
                 if (varDecl.getName() != null) {
                     return varDecl.getName();
-                } else {
-                    LabelDescription labelDesc = varDecl.getLabelDescription();
-                    if (labelDesc != null) {
-                        return labelDesc.getText();
-                    }
+                }
+                LabelDescription labelDesc = varDecl.getLabelDescription();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
                 }
             } else if (element instanceof ParameterGroup) {
                 ParameterGroup pgmGrp = (ParameterGroup) element;
@@ -501,12 +500,11 @@ public class ObjectDictionaryView extends ViewPart
                     }
                     return visibleObjectsList.toArray();
 
-                } else {
-                    List<PowerlinkObject> objectsList = nodeObj
-                            .getObjectDictionary().getObjectsList();
-
-                    return objectsList.toArray();
                 }
+                List<PowerlinkObject> objectsList = nodeObj
+                        .getObjectDictionary().getObjectsList();
+
+                return objectsList.toArray();
             } else if (inputElement instanceof Module) {
                 Module moduleObj = (Module) inputElement;
                 if (parametersVisible) {
@@ -567,11 +565,10 @@ public class ObjectDictionaryView extends ViewPart
                         visibleObjectsList.add("");
                     }
                     return visibleObjectsList.toArray();
-                } else {
-                    List<PowerlinkObject> objectsList = moduleObj
-                            .getObjectDictionary().getObjectsList();
-                    return objectsList.toArray();
                 }
+                List<PowerlinkObject> objectsList = moduleObj
+                        .getObjectDictionary().getObjectsList();
+                return objectsList.toArray();
             }
 
             return new Object[] { new EmptyObjectDictionary() };

@@ -925,6 +925,7 @@ public class OpenConfiguratorLibraryUtils {
 
     }
 
+    @SuppressWarnings("unused")
     private static Result addModuleObjectDictionary(Module module,
             ObjectDictionary objectDict) throws NullPointerException {
         Result libApiRes = null;
@@ -2820,6 +2821,7 @@ public class OpenConfiguratorLibraryUtils {
         return libApiRes;
     }
 
+    @SuppressWarnings("unused")
     private static Result addSubObjects(Module module, PowerlinkObject object,
             long index) {
         Result libApiRes = new Result();
@@ -3390,7 +3392,7 @@ public class OpenConfiguratorLibraryUtils {
      */
     public static Result forceObject(PowerlinkObject plkObject, boolean force) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(),
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
                 plkObject.getId(), plkObject.getActualValue(), force, false);
         return res;
     }
@@ -3405,7 +3407,7 @@ public class OpenConfiguratorLibraryUtils {
     public static Result forceObject(PowerlinkObject plkObject, boolean result,
             long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(), newObjectIndex,
+                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
                 plkObject.getActualValue(), result, false);
         return res;
     }
@@ -3422,7 +3424,7 @@ public class OpenConfiguratorLibraryUtils {
         String actualValue = plkSubObject.getActualValue();
 
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 plkSubObject.getObject().getId(), plkSubObject.getId(),
                 actualValue, force, false);
         return res;
@@ -3440,7 +3442,7 @@ public class OpenConfiguratorLibraryUtils {
             boolean result, long newObjectIndex, int newSubObjectIndex) {
         String actualValue = plkSubObject.getActualValue();
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 newObjectIndex, (short) newSubObjectIndex, actualValue, result,
                 false);
         return res;
@@ -4374,6 +4376,7 @@ public class OpenConfiguratorLibraryUtils {
         return libApiRes;
     }
 
+    @SuppressWarnings("unused")
     private static Result importProfileBodyCommunicationNetworkPowerlinkModularChild(
             Module module,
             ProfileBodyCommunicationNetworkPowerlinkModularChild profileBodyDatatype) {
@@ -4912,7 +4915,7 @@ public class OpenConfiguratorLibraryUtils {
     public static Result setModuleObjectActualValue(PowerlinkObject plkObject,
             String value, long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(), newObjectIndex,
+                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
                 value, plkObject.isObjectForced(), false);
         return res;
     }
@@ -4929,7 +4932,7 @@ public class OpenConfiguratorLibraryUtils {
             PowerlinkSubobject plkSubObject, String actualValue,
             long newObjectIndex, int newSubObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 newObjectIndex, (short) newSubObjectIndex, actualValue,
                 plkSubObject.isObjectForced(), false);
 
@@ -4970,7 +4973,7 @@ public class OpenConfiguratorLibraryUtils {
     public static Result setObjectActualValue(PowerlinkObject plkObject,
             String actualValue) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(),
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
                 plkObject.getId(), actualValue, plkObject.isObjectForced(),
                 false);
         return res;
@@ -4989,7 +4992,7 @@ public class OpenConfiguratorLibraryUtils {
                 + plkSubObject.getObject().getIdHex() + "/"
                 + plkSubObject.getIdHex() + " Value:" + actualValue);
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 plkSubObject.getObject().getId(), plkSubObject.getId(),
                 actualValue, plkSubObject.isObjectForced(), false);
 
@@ -5240,7 +5243,7 @@ public class OpenConfiguratorLibraryUtils {
     public static Result validateModuleObjectActualValue(
             PowerlinkObject plkObject, String value, long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(), newObjectIndex,
+                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
                 value, plkObject.isObjectForced(), true);
         return res;
     }
@@ -5257,7 +5260,7 @@ public class OpenConfiguratorLibraryUtils {
             PowerlinkSubobject plkSubObject, String value,
             long newObjectIndex,int newSubObjectindex) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 newObjectIndex, (short) newSubObjectindex, value,
                 plkSubObject.isObjectForced(), true);
         return res;
@@ -5273,7 +5276,7 @@ public class OpenConfiguratorLibraryUtils {
     public static Result validateObjectActualValue(PowerlinkObject plkObject,
             String actualValue) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(),
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
                 plkObject.getId(), actualValue, plkObject.isObjectForced(),
                 true);
         return res;
@@ -5282,7 +5285,7 @@ public class OpenConfiguratorLibraryUtils {
     private static Result validateObjectActualValue(PowerlinkObject plkObject,
             String actualValue, long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getNodeId(), newObjectIndex,
+                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
                 actualValue, plkObject.isObjectForced(), true);
         return res;
     }
@@ -5317,7 +5320,7 @@ public class OpenConfiguratorLibraryUtils {
     public static Result validateSubobjectActualValue(
             PowerlinkSubobject plkSubObject, String actualValue) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 plkSubObject.getObject().getId(), plkSubObject.getId(),
                 actualValue, plkSubObject.isObjectForced(), true);
         return res;
@@ -5327,7 +5330,7 @@ public class OpenConfiguratorLibraryUtils {
             PowerlinkSubobject plkSubObject, String actualValue,
             long newObjectIndex, int newSubObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
-                plkSubObject.getNetworkId(), plkSubObject.getNodeId(),
+                plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 newObjectIndex, (short) newSubObjectIndex, actualValue,
                 plkSubObject.isObjectForced(), true);
         return res;

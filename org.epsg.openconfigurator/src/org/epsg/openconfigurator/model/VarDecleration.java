@@ -102,10 +102,9 @@ public class VarDecleration {
     public long getSize() {
         if (size != null) {
             return size.longValue();
-        } else {
-            // Return default value of TVarDeclaration Size attribute
-            return 1;
         }
+        // Return default value of TVarDeclaration Size attribute
+        return 1;
     }
 
     /**

@@ -297,6 +297,7 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
     /**
      * {@inheritDoc}
      */
+    @SuppressWarnings("unused")
     @Override
     public boolean performFinish() {
 

@@ -139,7 +139,7 @@ public class NewModuleWizard extends Wizard {
 
     @Override
     public boolean performFinish() {
-        Object moduleObject = addModulePage.getModulemodel();
+        Object moduleObject = addModulePage.getModulemodelinWizard();
         Path xdcPath = validateXddModulePage.getNodeConfigurationPath();
         int position = addChildmodulePage.getPosition();
         int address = addChildmodulePage.getAddress();

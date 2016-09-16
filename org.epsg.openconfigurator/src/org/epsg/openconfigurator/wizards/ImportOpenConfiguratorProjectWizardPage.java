@@ -62,7 +62,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -789,6 +788,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
         // import operation to import project files if copy checkbox is selected
         if (copyFiles && (importSource != null)) {
 
+            @SuppressWarnings("rawtypes")
             List filesToImport = FileSystemStructureProvider.INSTANCE
                     .getChildren(importSource.getParentFile());
             ImportOperation operation = new ImportOperation(
@@ -894,10 +894,11 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                     }
                     for (Object selectProject : selectedProjectsList) {
                         try {
+                            SubMonitor subMonitor = SubMonitor.convert(monitor);
                             ImportOpenConfiguratorProjectWizardPage.this
                                     .createProjectDescription(
                                             (ProjectRecord) selectProject,
-                                            new SubProgressMonitor(monitor, 1));
+                                            subMonitor);
                         } catch (IOException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();

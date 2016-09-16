@@ -740,36 +740,34 @@ public class MappingView extends ViewPart {
 
                     if (!tpdoSummaryOnlyShowChannelsWithData) {
                         return tpdoChannels.toArray();
-                    } else {
-                        List<TpdoChannel> pdoChannels = new ArrayList<>();
-                        for (TpdoChannel tpdo : tpdoChannels) {
-                            long size = OpenConfiguratorLibraryUtils
-                                    .getChannelSize(tpdo);
-                            if (size > 0) {
-                                pdoChannels.add(tpdo);
-                            }
-                        }
-                        return pdoChannels.toArray();
                     }
+                    List<TpdoChannel> pdoChannels = new ArrayList<>();
+                    for (TpdoChannel tpdo : tpdoChannels) {
+                        long size = OpenConfiguratorLibraryUtils
+                                .getChannelSize(tpdo);
+                        if (size > 0) {
+                            pdoChannels.add(tpdo);
+                        }
+                    }
+                    return pdoChannels.toArray();
                 } else if (pdoType == PdoType.RPDO) {
                     List<RpdoChannel> rpdoChannels = node.getObjectDictionary()
                             .getRpdoChannelsList();
 
                     if (!rpdoSummaryOnlyShowChannelsWithData) {
                         return rpdoChannels.toArray();
-                    } else {
-                        List<RpdoChannel> pdoChannels = new ArrayList<>();
-                        for (RpdoChannel rpdo : rpdoChannels) {
-                            long size = OpenConfiguratorLibraryUtils
-                                    .getChannelSize(rpdo);
-
-                            if (size > 0) {
-                                pdoChannels.add(rpdo);
-                            }
-
-                        }
-                        return pdoChannels.toArray();
                     }
+                    List<RpdoChannel> pdoChannels = new ArrayList<>();
+                    for (RpdoChannel rpdo : rpdoChannels) {
+                        long size = OpenConfiguratorLibraryUtils
+                                .getChannelSize(rpdo);
+
+                        if (size > 0) {
+                            pdoChannels.add(rpdo);
+                        }
+
+                    }
+                    return pdoChannels.toArray();
                 } else {
                     // Do nothing.
                     System.err.println("Invalid PDO type.");
@@ -904,15 +902,6 @@ public class MappingView extends ViewPart {
         }
 
         @Override
-        public Color getBackground(Object element) {
-            if (element instanceof PowerlinkSubobject) {
-                PowerlinkSubobject mappParamSubObj = (PowerlinkSubobject) element;
-
-            }
-            return null;
-        }
-
-        @Override
         public Image getColumnImage(Object element, int columnIndex) {
 
             switch (columnIndex) {
@@ -1023,6 +1012,8 @@ public class MappingView extends ViewPart {
                                                                         return signedDisableImage;
                                                                     }
                                                                     break;
+                                                                default:
+                                                                    break;
                                                             }
                                                             return signedYesImage;
                                                         }
@@ -1068,6 +1059,8 @@ public class MappingView extends ViewPart {
                                                                     if (rpdoEnabledEntriesCount < 0) {
                                                                         return signedDisableImage;
                                                                     }
+                                                                    break;
+                                                                default:
                                                                     break;
                                                             }
                                                             return signedYesImage;
@@ -1157,7 +1150,7 @@ public class MappingView extends ViewPart {
                                                                 .getText()
                                                                 .trim());
                                     } catch (Exception e) {
-
+                                        e.printStackTrace();
                                     }
                                 }
                                 count = tpdoEnabledEntriesCount - 1;
@@ -1181,7 +1174,7 @@ public class MappingView extends ViewPart {
                                         // .getActualDefaultValue());
 
                                     } catch (Exception e) {
-
+                                        e.printStackTrace();
                                     }
                                 }
                                 count = rpdoEnabledEntriesCount - 1;
@@ -1190,6 +1183,8 @@ public class MappingView extends ViewPart {
                                 if (rpdoEnabledEntriesCount < 0) {
                                     return signedDisableImage;
                                 }
+                                break;
+                            default:
                                 break;
                         }
 
@@ -1291,6 +1286,12 @@ public class MappingView extends ViewPart {
 
         @Override
         public Color getForeground(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Color getBackground(Object element) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -2784,7 +2785,7 @@ public class MappingView extends ViewPart {
                     break;
             }
         } catch (Exception e) {
-
+            e.printStackTrace();
         }
         return 0;
     }

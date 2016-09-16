@@ -116,7 +116,7 @@ public class ParameterGroup {
                     TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                     ParameterReference paramRef = new ParameterReference(node,
                             this, objectDictionary, parameterReferenceModel);
-                    parameterRefMap.put(paramRef.getUniqueId(), paramRef);
+                    parameterRefMap.put(paramRef.getParameterUniqueId(), paramRef);
                 }
             }
         }

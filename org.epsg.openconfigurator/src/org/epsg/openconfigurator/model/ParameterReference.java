@@ -129,16 +129,15 @@ public class ParameterReference implements IParameter {
     public String getActualValue() {
         if (parameter.getActualValue() != null) {
             return parameter.getActualValue();
+        }
+        if (parameter.getDefaultValue() != null) {
+            parameter.getDefaultValue();
         } else {
-            if (parameter.getDefaultValue() != null) {
-                parameter.getDefaultValue();
-            } else {
-                if (actualValue != null) {
-                    if (actualValue.contains("Â")) {
-                        actualValue = actualValue.replace("Â", "");
-                    }
-                    return actualValue;
+            if (actualValue != null) {
+                if (actualValue.contains("Â")) {
+                    actualValue = actualValue.replace("Â", "");
                 }
+                return actualValue;
             }
         }
         return null;
@@ -283,9 +282,9 @@ public class ParameterReference implements IParameter {
      * @see org.epsg.openconfigurator.model.IParameter#getUniqueId()
      */
     @Override
-    public String getUniqueId() {
+    public String getParameterUniqueId() {
         if (parameter != null) {
-            return parameter.getUniqueId();
+            return parameter.getParameterUniqueId();
         }
         return null;
 
@@ -339,12 +338,12 @@ public class ParameterReference implements IParameter {
         actualValue = value;
         parameterReference.setActualValue(value);
         if (getObjectDictionary().isModule()) {
-            Parameter param = getObjectDictionary().getParameter(getUniqueId());
+            Parameter param = getObjectDictionary().getParameter(getParameterUniqueId());
             param.setActualValue(value);
             OpenConfiguratorProjectUtils.updateParameterActualValue(
                     getObjectDictionary().getModule(), param, actualValue);
         } else {
-            Parameter param = getObjectDictionary().getParameter(getUniqueId());
+            Parameter param = getObjectDictionary().getParameter(getParameterUniqueId());
             param.setActualValue(value);
             OpenConfiguratorProjectUtils.updateParameterActualValue(node, param,
                     actualValue);

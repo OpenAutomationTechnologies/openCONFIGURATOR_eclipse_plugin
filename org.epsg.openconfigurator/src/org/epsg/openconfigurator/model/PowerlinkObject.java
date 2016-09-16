@@ -874,7 +874,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
      * @return Id of the node from the node model.
      */
     @Override
-    public short getNodeId() {
+    public short getCNNodeId() {
         return nodeInstance.getCnNodeId();
     }
 
