@@ -243,11 +243,11 @@ public class AddControlledNodeWizardPage extends WizardPage {
         setControl(container);
 
         Label lblNodeType = new Label(container, SWT.NONE);
-        lblNodeType.setBounds(21, 10, 73, 23);
+        lblNodeType.setBounds(21, 13, 73, 23);
         lblNodeType.setText(NODE_TYPE_LABEL);
 
         nodeTypeCombo = new Combo(container, SWT.READ_ONLY);
-        nodeTypeCombo.setBounds(121, 10, 219, 23);
+        nodeTypeCombo.setBounds(121, 13, 219, 23);
         nodeTypeCombo.setItems(NODE_TYPES);
         nodeTypeCombo.select(0);
         nodeTypeCombo.addSelectionListener(new SelectionAdapter() {
@@ -259,14 +259,14 @@ public class AddControlledNodeWizardPage extends WizardPage {
         });
 
         Label lblNodeId = new Label(container, SWT.NONE);
-        lblNodeId.setBounds(21, 48, 55, 19);
+        lblNodeId.setBounds(21, 58, 55, 19);
         lblNodeId.setText(NODE_ID_LABEL);
 
         nodeIdSpinner = new Spinner(container, SWT.BORDER);
         nodeIdSpinner.setMaximum(IPowerlinkConstants.CN_MAX_NODE_ID);
         nodeIdSpinner.setMinimum(IPowerlinkConstants.CN_MIN_NODE_ID);
         nodeIdSpinner.setSelection(getNewCnNodeId());
-        nodeIdSpinner.setBounds(121, 45, 117, 22);
+        nodeIdSpinner.setBounds(121, 58, 117, 22);
         nodeIdSpinner.addModifyListener(new ModifyListener() {
 
             @Override
@@ -276,11 +276,11 @@ public class AddControlledNodeWizardPage extends WizardPage {
         });
 
         Label lblName = new Label(container, SWT.NONE);
-        lblName.setBounds(21, 89, 55, 21);
+        lblName.setBounds(21, 103, 55, 21);
         lblName.setText(NAME_LABEL);
 
         nodeName = new Text(container, SWT.BORDER);
-        nodeName.setBounds(121, 89, 291, 21);
+        nodeName.setBounds(121, 103, 291, 21);
         nodeName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -297,20 +297,20 @@ public class AddControlledNodeWizardPage extends WizardPage {
         nodeName.setFocus();
 
         lblNodeIdRangeValue = new Label(container, SWT.LEFT);
-        lblNodeIdRangeValue.setBounds(301, 48, 133, 15);
+        lblNodeIdRangeValue.setBounds(302, 58, 133, 15);
         lblNodeIdRangeValue.setText(
                 nodeIdSpinner.getMinimum() + "-" + nodeIdSpinner.getMaximum());
 
         Label lblRange = new Label(container, SWT.NONE);
-        lblRange.setBounds(244, 48, 51, 19);
+        lblRange.setBounds(244, 58, 51, 19);
         lblRange.setText(RANGE_LABEL);
 
         Label lblNewLabel = new Label(container, SWT.NONE);
-        lblNewLabel.setBounds(21, 137, 73, 23);
+        lblNewLabel.setBounds(21, 148, 73, 23);
         lblNewLabel.setText("Station Type:");
 
         stationTypeCombo = new Combo(container, SWT.READ_ONLY);
-        stationTypeCombo.setBounds(121, 137, 117, 23);
+        stationTypeCombo.setBounds(121, 148, 117, 23);
         stationTypeCombo.setItems(STATION_TYPES);
         stationTypeCombo.select(0);
         stationTypeCombo.addSelectionListener(new SelectionAdapter() {

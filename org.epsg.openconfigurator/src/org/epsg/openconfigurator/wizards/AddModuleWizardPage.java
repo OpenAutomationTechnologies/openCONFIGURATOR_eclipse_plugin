@@ -126,7 +126,7 @@ public class AddModuleWizardPage extends WizardPage {
         lblNodeType.setText("Node ID:");
 
         nodeIdText = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-        nodeIdText.setBounds(126, 7, 76, 21);
+        nodeIdText.setBounds(126, 10, 76, 21);
         nodeIdText.setText(getHeadNodeId());
 
         Label lblInterfaceId = new Label(container, SWT.NONE);
@@ -134,15 +134,15 @@ public class AddModuleWizardPage extends WizardPage {
         lblInterfaceId.setText("Interface ID:");
 
         interfaceIdText = new Text(container, SWT.BORDER | SWT.READ_ONLY);
-        interfaceIdText.setBounds(126, 46, 76, 21);
+        interfaceIdText.setBounds(126, 49, 76, 21);
         interfaceIdText.setText(interfaceObj.getInterfaceUniqueId());
 
         Label lblName = new Label(container, SWT.NONE);
-        lblName.setBounds(48, 86, 55, 15);
+        lblName.setBounds(48, 88, 55, 15);
         lblName.setText("Name:");
 
         moduleName = new Text(container, SWT.BORDER);
-        moduleName.setBounds(126, 83, 160, 21);
+        moduleName.setBounds(126, 88, 160, 21);
         moduleName.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -158,6 +158,13 @@ public class AddModuleWizardPage extends WizardPage {
         moduleName.addVerifyListener(moduleNameVerifyListener);
         moduleName.setFocus();
 
+    }
+
+    /**
+     * @return NodeId in which the module is connected.
+     */
+    public String getHeadNodeId() {
+        return interfaceObj.getNode().getNodeIdString();
     }
 
     /**
@@ -179,13 +186,6 @@ public class AddModuleWizardPage extends WizardPage {
      */
     public Node getNode() {
         return interfaceObj.getNode();
-    }
-
-    /**
-     * @return NodeId in which the module is connected.
-     */
-    public String getHeadNodeId() {
-        return interfaceObj.getNode().getNodeIdString();
     }
 
     @Override

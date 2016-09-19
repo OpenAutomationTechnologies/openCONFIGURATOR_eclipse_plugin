@@ -116,7 +116,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         setControl(container);
 
         position = new Spinner(container, SWT.BORDER);
-        position.setBounds(169, 7, 47, 22);
+        position.setBounds(169, 10, 47, 22);
         position.setMaximum(interfaceObj.getMaxModules().intValue());
         position.setEnabled(false);
 
@@ -129,7 +129,7 @@ public class AddChildModuleWizardPage extends WizardPage {
         positionlabel.setText("Position:");
 
         enabled = new Button(container, SWT.CHECK);
-        enabled.setBounds(71, 96, 93, 16);
+        enabled.setBounds(71, 98, 93, 16);
         enabled.setText("Enabled");
         enabled.setSelection(true);
 
@@ -142,11 +142,11 @@ public class AddChildModuleWizardPage extends WizardPage {
         positionRangevalue.setText(String.valueOf(position.getMaximum()));
 
         addressLabel = new Label(container, SWT.NONE);
-        addressLabel.setBounds(71, 136, 55, 15);
+        addressLabel.setBounds(71, 142, 55, 15);
         addressLabel.setText("Address:");
 
         addressText = new Spinner(container, SWT.BORDER);
-        addressText.setBounds(169, 130, 76, 21);
+        addressText.setBounds(169, 142, 76, 21);
         addressText.setMaximum(interfaceObj.getMaxModules().intValue());
         addressText.addModifyListener(addressModifyListener);
 
