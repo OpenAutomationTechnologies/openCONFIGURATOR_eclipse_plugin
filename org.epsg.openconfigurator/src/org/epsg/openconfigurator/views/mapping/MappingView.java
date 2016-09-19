@@ -902,6 +902,12 @@ public class MappingView extends ViewPart {
         }
 
         @Override
+        public Color getBackground(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
         public Image getColumnImage(Object element, int columnIndex) {
 
             switch (columnIndex) {
@@ -1168,10 +1174,6 @@ public class MappingView extends ViewPart {
                                                         rpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
-                                        // Integer
-                                        // .valueOf(mapParamObj.getObject()
-                                        // .getSubObject((short) 0)
-                                        // .getActualDefaultValue());
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -1286,12 +1288,6 @@ public class MappingView extends ViewPart {
 
         @Override
         public Color getForeground(Object element) {
-            // TODO Auto-generated method stub
-            return null;
-        }
-
-        @Override
-        public Color getBackground(Object element) {
             // TODO Auto-generated method stub
             return null;
         }
@@ -1593,6 +1589,7 @@ public class MappingView extends ViewPart {
 
                 sourcePart = part;
                 if (selectedObj instanceof Node) {
+                    System.err.println("Single Selection...");
                     nodeObj = (Node) selectedObj;
                     setPartName(nodeObj.getNodeIDWithName());
 
@@ -2674,6 +2671,7 @@ public class MappingView extends ViewPart {
             tpdoEnabledMappingEntriesText.setText(StringUtils.EMPTY);
             tpdoEnabledMappingEntriesText
                     .addVerifyListener(enabledEntriesVerifyListener);
+            tpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.TPDO);
             tpdoEnabledMappingEntriesText.setEnabled(false);
             tpdoChannelSize.setText(StringUtils.EMPTY);
 
@@ -2688,6 +2686,7 @@ public class MappingView extends ViewPart {
             rpdoEnabledMappingEntriesText.setText(StringUtils.EMPTY);
             rpdoEnabledMappingEntriesText
                     .addVerifyListener(enabledEntriesVerifyListener);
+            rpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.RPDO);
             rpdoEnabledMappingEntriesText.setEnabled(false);
             rpdoChannelSize.setText(StringUtils.EMPTY);
             return;
@@ -3383,6 +3382,7 @@ public class MappingView extends ViewPart {
                     .addVerifyListener(enabledEntriesVerifyListener);
             tpdoEnabledMappingEntriesText.addModifyListener(
                     tpdoEnabledMappingEntriesTextModifyListener);
+            tpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.TPDO);
 
         } else if (pdoChannel.getPdoType() == PdoType.RPDO) {
             // RPDO
@@ -3398,9 +3398,11 @@ public class MappingView extends ViewPart {
                     .addVerifyListener(enabledEntriesVerifyListener);
             rpdoEnabledMappingEntriesText.addModifyListener(
                     rpdoEnabledMappingEntriesTextModifyListener);
+            rpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.RPDO);
         } else {
             System.err.println("Invalid pdo type" + pdoChannel.getPdoType());
         }
+        updatePdoTable(pdoChannel);
     }
 
     /**
