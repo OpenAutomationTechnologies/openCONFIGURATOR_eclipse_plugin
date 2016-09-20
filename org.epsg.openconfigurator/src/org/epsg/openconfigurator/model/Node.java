@@ -378,45 +378,46 @@ public class Node {
                     System.err.println("Invalid Selection.");
                     break;
             }
-        }
 
-        PlkOperationMode plkMode = null;
-        int val = ((Integer) stationTypeChanged).intValue();
-        if (val == 0) { // Normal Station.
-            res = OpenConfiguratorCore.GetInstance()
-                    .ResetOperationMode(getNetworkId(), getCnNodeId());
-            plkMode = PlkOperationMode.NORMAL;
-        } else if (val == 1) {
-            res = OpenConfiguratorCore.GetInstance()
-                    .SetOperationModeChained(getNetworkId(), getCnNodeId());
-            plkMode = PlkOperationMode.CHAINED;
-        } else if (val == 2) {
-            res = OpenConfiguratorCore.GetInstance()
-                    .SetOperationModeMultiplexed(getNetworkId(), getCnNodeId(),
-                            (short) tcn.getForcedMultiplexedCycle());
-            plkMode = PlkOperationMode.MULTIPLEXED;
-        }
-        if (plkMode != null) {
-            if (res.IsSuccessful()) {
-                setPlkOperationMode(plkMode);
-            } else {
-                OpenConfiguratorMessageConsole.getInstance()
-                        .printLibraryErrorMessage(res);
+            PlkOperationMode plkMode = null;
+            int val = ((Integer) stationTypeChanged).intValue();
+            if (val == 0) { // Normal Station.
+                res = OpenConfiguratorCore.GetInstance()
+                        .ResetOperationMode(getNetworkId(), getCnNodeId());
+                plkMode = PlkOperationMode.NORMAL;
+            } else if (val == 1) {
+                res = OpenConfiguratorCore.GetInstance()
+                        .SetOperationModeChained(getNetworkId(), getCnNodeId());
+                plkMode = PlkOperationMode.CHAINED;
+            } else if (val == 2) {
+                res = OpenConfiguratorCore.GetInstance()
+                        .SetOperationModeMultiplexed(getNetworkId(),
+                                getCnNodeId(),
+                                (short) tcn.getForcedMultiplexedCycle());
+                plkMode = PlkOperationMode.MULTIPLEXED;
             }
-        } else {
-            System.err.println("Invalid POWERLINK operation mode");
+            if (plkMode != null) {
+                if (res.IsSuccessful()) {
+                    setPlkOperationMode(plkMode);
+                } else {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printLibraryErrorMessage(res);
+                }
+            } else {
+                System.err.println("Invalid POWERLINK operation mode");
+            }
+
+            // Node Assignment values will be modified by the
+            // library. So refresh the project file data.
+            OpenConfiguratorProjectUtils.updateNodeAssignmentValues(this);
+
+            // RPDO nodeID will be changed by the library. So
+            // refresh the node XDD data
+            OpenConfiguratorProjectUtils.persistNodeData(this);
+
+            // Updates the generator attributes in project file.
+            OpenConfiguratorProjectUtils.updateGeneratorInfo(this);
         }
-        // Node Assignment values will be modified by the
-        // library. So refresh the project file data.
-        OpenConfiguratorProjectUtils.updateNodeAssignmentValues(this);
-
-        // RPDO nodeID will be changed by the library. So
-        // refresh the node XDD data
-        OpenConfiguratorProjectUtils.persistNodeData(this);
-
-        // Updates the generator attributes in project file.
-        OpenConfiguratorProjectUtils.updateGeneratorInfo(this);
-
     }
 
     /**
