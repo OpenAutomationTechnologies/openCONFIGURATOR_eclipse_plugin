@@ -241,6 +241,11 @@ public class ValidateXddModuleWizardPage extends WizardPage {
 
                 String moduleInterfaceType = getModuleInterface().getType();
                 String moduleTypeVal = StringUtils.EMPTY;
+                String moduleId = getModuleInterface().getChildID();
+                int position = 0;
+
+                // BigInteger modulePosition = getModuleInterface().getP
+
                 List<ModuleType> moduleTypeList = getModuleTypeList()
                         .getModuleType();
                 boolean validModuleType = true;
@@ -269,19 +274,18 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                                 Collection<Module> moduleCollection = headNodeInetrfaceObject
                                         .getModuleCollection().values();
 
+                                List<String> moduleChildId = new ArrayList<>();
                                 for (Module mod : moduleCollection) {
-                                    System.err
-                                            .println("Module Collection name..."
-                                                    + mod.getModuleName());
+                                    moduleChildId.add(mod.getChildID());
+                                }
+                                for (Module mod : moduleCollection) {
                                     moduleTypes = mod.getModuleInterface()
                                             .getType();
-                                    System.err.println(
-                                            "Module type = " + moduleTypes);
-                                    if (moduleTypes
-                                            .equals(moduleType.getType())) {
-                                        moduleTypeVal = moduleType.getType();
+
+                                    if (moduleChildId.contains(moduleId)) {
+                                        position = mod.getPosition();
                                         setErrorMessage(
-                                                "Module Type already available");
+                                                "Module ID already exists.");
                                         validModuleType = false;
                                     }
                                 }
@@ -295,10 +299,20 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                     }
                 }
                 if (!validModuleType) {
-                    getErrorStyledText(
-                            "The XDD/XDC has module type " + moduleInterfaceType
-                                    + " but the interface only supports module type "
-                                    + moduleTypeText.getText() + ".");
+
+                    if (headNodeInetrfaceObject.isMultipleModules()) {
+                        setErrorMessage("Module type already exists.");
+                        getErrorStyledText("The XDD/XDC has module type "
+                                + moduleInterfaceType
+                                + " but the interface only supports module type "
+                                + moduleTypeText.getText() + ".");
+
+                    } else {
+                        getErrorStyledText("Module ID " + "'" + moduleId + "'"
+                                + " already exists on position " + position
+                                + ".");
+
+                    }
                     return false;
                 }
 
@@ -306,6 +320,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                         .equalsIgnoreCase(moduleInterfaceType)) {
 
                 } else {
+                    setErrorMessage("Module type already exists.");
                     getErrorStyledText(
                             "The XDD/XDC has module type " + moduleInterfaceType
                                     + " but the interface only supports module type "
