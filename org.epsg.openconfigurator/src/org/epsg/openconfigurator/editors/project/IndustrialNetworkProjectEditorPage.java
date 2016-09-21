@@ -510,6 +510,14 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private SelectionAdapter autoGenerationSettingsTableAdapter = new SelectionAdapter() {
         @Override
         public void widgetSelected(SelectionEvent e) {
+            int[] selectionIndex = agSettingsTable.getSelectionIndices();
+            if (selectionIndex.length > 0) {
+                editSettingsButton.setEnabled(true);
+                deleteSettingsButton.setEnabled(true);
+            } else {
+                editSettingsButton.setEnabled(false);
+                deleteSettingsButton.setEnabled(false);
+            }
             if (e.widget == agSettingsTable) {
                 if (e.detail == SWT.CHECK) {
                     TableItem[] selectedItemList = agSettingsTable
@@ -596,6 +604,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 .addSelectionListener(autoGenerationSettingsTableAdapter);
         pathComboViewer
                 .addSelectionChangedListener(outputPathSelectionListener);
+
     }
 
     /**
@@ -1332,6 +1341,15 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 .getColumnCount(); loopIndex++) {
             agSettingsTable.getColumn(loopIndex).pack();
         }
+
+        int[] selectionIndex = agSettingsTable.getSelectionIndices();
+        if (selectionIndex.length <= 0) {
+            editSettingsButton.setEnabled(false);
+            deleteSettingsButton.setEnabled(false);
+        } else {
+            editSettingsButton.setEnabled(true);
+            deleteSettingsButton.setEnabled(true);
+        }
     }
 
     /**
@@ -1377,6 +1395,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         addSettingsButton.setEnabled(enabled);
         editSettingsButton.setEnabled(enabled);
         deleteSettingsButton.setEnabled(enabled);
+        int[] selectedIndices = agSettingsTable.getSelectionIndices();
+        System.err.println("Selection indices....." + selectedIndices.length);
+        if (selectedIndices.length <= 0) {
+            editSettingsButton.setEnabled(false);
+            deleteSettingsButton.setEnabled(false);
+        }
     }
 
     /**
