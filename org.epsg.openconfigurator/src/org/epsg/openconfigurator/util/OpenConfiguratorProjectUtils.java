@@ -107,7 +107,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static final String GENERATOR_VENDOR = "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H."; ////$NON-NLS-1$
     public static final String GENERATOR_TOOL_NAME = "Ethernet POWERLINK openCONFIGURATOR"; ////$NON-NLS-1$
-    public static final String GENERATOR_TOOL_VERSION = "2.1.0"; ////$NON-NLS-1$
+    public static final String GENERATOR_TOOL_VERSION = "2.1.1"; ////$NON-NLS-1$
     public static final String SYSTEM_USER_NAME_ID = "user.name";
     public static final String MODIFIED_ON_ATTRIBUTE = "modifiedOn";
     public static final String TOOL_VERSION_ATTRIBUTE = "toolVersion";
@@ -257,7 +257,7 @@ public final class OpenConfiguratorProjectUtils {
     public static void forceActualValue(Module module, Node node,
             PowerlinkObject powerlinkObject, PowerlinkSubobject subObject,
             boolean force, long newObjectIndex)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
         File xmlFile = new File(projectXmlLocation);
@@ -279,7 +279,7 @@ public final class OpenConfiguratorProjectUtils {
     public static void forceActualValue(Module module, Node node,
             PowerlinkObject object, PowerlinkSubobject powerlinkSubobject,
             boolean force, long newObjectIndex, int newSubObjectIndex)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
         File xmlFile = new File(projectXmlLocation);
@@ -310,7 +310,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void forceActualValue(final Node node, PowerlinkObject object,
             PowerlinkSubobject subObject, boolean force)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
         File xmlFile = new File(projectXmlLocation);
@@ -841,7 +841,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void swapModuleAttributeValue(Module module,
             String attributeName, String attributeValue)
-            throws IOException, JDOMException {
+                    throws IOException, JDOMException {
         String projectXmlLocation = module.getNode().getProjectXml()
                 .getLocation().toString();
         File xmlFile = new File(projectXmlLocation);
@@ -872,7 +872,7 @@ public final class OpenConfiguratorProjectUtils {
     public static void updateConnectedModuleList(Node node,
             HeadNodeInterface headNodeInterface,
             Map<Integer, Module> moduleCollection)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         File xdcFile = new File(node.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -961,7 +961,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateModuleAttributeValue(final Module module,
             final String attributeName, final String attributeValue)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
 
         String projectXmlLocation = module.getNode().getProjectXml()
                 .getLocation().toString();
@@ -1072,7 +1072,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateModuleObjectIndex(Module module,
             long moduleObjectIndex, PowerlinkObject object)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         File xdcFile = new File(module.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1135,7 +1135,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateModuleSubObjectInNode(Node node, Module module,
             long index, PowerlinkSubobject subObject, int subIndex)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         File xdcFile = new File(node.getOutputPathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1160,7 +1160,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateNetworkAttributeValue(final Node node,
             final String attributeName, final String attributeValue)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
 
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
@@ -1237,7 +1237,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateNodeAttributeValue(final Node node,
             final String attributeName, final String attributeValue)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
 
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
@@ -1317,7 +1317,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static void updateObjectAttributeActualValue(Module module,
             PowerlinkObject powerlinkObject, String actualValue)
-            throws IOException, JDOMException {
+                    throws IOException, JDOMException {
         File xdcFile = new File(module.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1333,7 +1333,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static void updateObjectAttributeActualValue(Module module,
             PowerlinkSubobject object, String actualValue)
-            throws IOException, JDOMException {
+                    throws IOException, JDOMException {
         File xdcFile = new File(module.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1357,7 +1357,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateObjectAttributeActualValue(final Node node,
             final PowerlinkObject object, String actualValue)
-            throws IOException, JDOMException {
+                    throws IOException, JDOMException {
         File xdcFile = new File(node.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1380,7 +1380,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateObjectAttributeActualValue(final Node node,
             final PowerlinkSubobject object, String actualValue)
-            throws IOException, JDOMException {
+                    throws IOException, JDOMException {
         File xdcFile = new File(node.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1403,7 +1403,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateParameterActualValue(Module module,
             Parameter parameter, String actualValue)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         File xdcFile = new File(module.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1427,7 +1427,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateParameterActualValue(Node node,
             Parameter parameter, String actualValue)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         File xdcFile = new File(node.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 
@@ -1453,7 +1453,7 @@ public final class OpenConfiguratorProjectUtils {
      */
     public static void updateParameterReferenceActualValue(Node node,
             ParameterReference parameterReference, String actualValue)
-            throws JDOMException, IOException {
+                    throws JDOMException, IOException {
         File xdcFile = new File(node.getAbsolutePathToXdc());
         org.jdom2.Document document = JDomUtil.getXmlDocument(xdcFile);
 

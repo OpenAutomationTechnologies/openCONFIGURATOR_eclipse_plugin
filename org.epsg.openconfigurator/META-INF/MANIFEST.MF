@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Ethernet POWERLINK openCONFIGURATOR
 Bundle-SymbolicName: org.epsg.openconfigurator;singleton:=true
-Bundle-Version: 2.1.0.qualifier
+Bundle-Version: 2.1.1.qualifier
 Bundle-Activator: org.epsg.openconfigurator.Activator
 Bundle-Vendor: Kalycito Infotech Pvt Ltd. and Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
 Require-Bundle: org.eclipse.ui,
