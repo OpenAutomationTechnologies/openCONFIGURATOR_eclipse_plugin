@@ -362,19 +362,23 @@ public class ObjectDictionaryView extends ViewPart
                     moduleSelection = false;
                     nodeSelection = true;
                     // Set input only if the node is enabled.
-                    if (nodeObj.isEnabled()) {
-                        sourcePart = part;
-                        setPartName(nodeObj.getNodeIDWithName());
-                        treeViewer.setInput(nodeObj);
+                    if (nodeObj.getISO15745ProfileContainer() != null) {
+                        if (nodeObj.isEnabled()) {
+                            sourcePart = part;
+                            setPartName(nodeObj.getNodeIDWithName());
+                            treeViewer.setInput(nodeObj);
+                        }
                     }
                 } else if (selectedObj instanceof Module) {
                     moduleObj = (Module) selectedObj;
                     nodeSelection = false;
                     moduleSelection = true;
-                    if (moduleObj.isEnabled()) {
-                        sourcePart = part;
-                        setPartName(moduleObj.getModuleName());
-                        treeViewer.setInput(moduleObj);
+                    if (moduleObj.getISO15745ProfileContainer() != null) {
+                        if (moduleObj.isEnabled()) {
+                            sourcePart = part;
+                            setPartName(moduleObj.getModuleName());
+                            treeViewer.setInput(moduleObj);
+                        }
                     }
                 } else {
                     nodeSelection = false;
@@ -887,8 +891,18 @@ public class ObjectDictionaryView extends ViewPart
                         }
                     }
                     if (!forcedObjectsVisible) {
-                        if (!obj.isObjectForced()) {
-                            return false;
+                        if (obj.isModuleObject()) {
+                            long newObjectIndex = OpenConfiguratorLibraryUtils
+                                    .getModuleObjectsIndex(obj.getModule(),
+                                            obj.getId());
+
+                            if (!obj.isModuleObjectForced(newObjectIndex)) {
+                                return false;
+                            }
+                        } else {
+                            if (!obj.isObjectForced()) {
+                                return false;
+                            }
                         }
                     }
                 } else if (element instanceof PowerlinkSubobject) {

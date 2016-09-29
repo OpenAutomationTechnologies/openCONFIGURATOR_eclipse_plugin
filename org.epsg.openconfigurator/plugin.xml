@@ -148,4 +148,11 @@
 			</enablement>
 		</decorator>
 	</extension>
+	<extension point="org.eclipse.ui.decorators">
+		<decorator adaptable="true" class="org.epsg.openconfigurator.views.NodeLabelDecorator" icon="icons/error_overlay.gif" id="org.epsg.openconfigurator.erroroverlay" label="ErrorOverlay" lightweight="true" location="BOTTOM_LEFT" state="true">
+			<enablement>
+				<objectClass name="org.epsg.openconfigurator.model.Module"/>
+			</enablement>
+		</decorator>
+	</extension>
 </plugin>

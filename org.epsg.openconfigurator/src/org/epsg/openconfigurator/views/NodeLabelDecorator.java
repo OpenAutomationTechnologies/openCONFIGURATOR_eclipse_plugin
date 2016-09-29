@@ -85,7 +85,8 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
                         IDecoration.BOTTOM_LEFT);
 
             }
-        } else if (element instanceof Module) {
+        }
+        if (element instanceof Module) {
 
             Module moduleObj = (Module) element;
             if (moduleObj.hasError()) {

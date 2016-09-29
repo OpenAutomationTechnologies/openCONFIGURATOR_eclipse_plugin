@@ -500,6 +500,14 @@ public class PowerlinkRootNode {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(errorMessage,
                                         processingNode.getProject().getName());
+                    } else if (e instanceof NullPointerException) {
+                        String errorMessage = " The XDD/XDC file of node "
+                                + processingNode.getNodeIDWithName()
+                                + " is not available.";
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(errorMessage,
+                                        processingNode.getProject().getName());
+                        processingNode.setError(errorMessage);
                     } else {
                         String errorMessage = e.getCause().getMessage()
                                 + " for the XDD/XDC file of node "
@@ -623,6 +631,15 @@ public class PowerlinkRootNode {
                                             .printErrorMessage(errorMessage,
                                                     processingNode.getProject()
                                                             .getName());
+                                } else if (e instanceof NullPointerException) {
+                                    String errorMessage = " The XDD/XDC file of node "
+                                            + processingNode.getNodeIDWithName()
+                                            + " is not available.";
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage(errorMessage,
+                                                    processingNode.getProject()
+                                                            .getName());
+                                    processingModule.setError(errorMessage);
                                 } else {
                                     String errorMessage = e.getCause()
                                             .getMessage()
@@ -856,8 +873,8 @@ public class PowerlinkRootNode {
      * Removes the module from the project.
      *
      * @param module Instance of module to be removed.
-     * @param finalModuleCheck <true> if module is a final module, <false>
-     *            otherwise.
+     * @param finalModuleCheck <true> if module is a final module,
+     *            <false> otherwise.
      * @return <code>true</code> if module is removed. <code>false</code> if
      *         module is not removed.
      */
