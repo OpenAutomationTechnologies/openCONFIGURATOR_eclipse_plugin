@@ -52,6 +52,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -665,8 +666,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 .setForeground(toolkit.getColors().getColor(IFormColors.TITLE));
 
         agSettingsTable = toolkit.createTable(clientComposite,
-                SWT.CHECK | SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL
-                        | SWT.H_SCROLL | SWT.FULL_SELECTION);
+                SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL
+                        | SWT.FULL_SELECTION);
         gd = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 3);
         gd.heightHint = 100;
         agSettingsTable.setLayoutData(gd);
@@ -1333,6 +1334,11 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     item.setText(0, setting.getName());
                     item.setText(1, setting.getValue());
                     item.setChecked(setting.isEnabled());
+
+                    if (!setting.isEnabled()) {
+                        item.setForeground(Display.getDefault()
+                                .getSystemColor(SWT.COLOR_DARK_GRAY));
+                    }
                 }
             }
         }
