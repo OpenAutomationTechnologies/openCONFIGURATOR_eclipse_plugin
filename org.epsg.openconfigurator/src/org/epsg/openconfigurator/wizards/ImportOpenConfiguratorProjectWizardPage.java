@@ -47,6 +47,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -103,6 +104,7 @@ import org.eclipse.ui.wizards.datatransfer.FileSystemStructureProvider;
 import org.eclipse.ui.wizards.datatransfer.ImportOperation;
 import org.epsg.openconfigurator.Activator;
 import org.epsg.openconfigurator.builder.PowerlinkNetworkProjectNature;
+import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectMarshaller;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
@@ -237,6 +239,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             updateProjectName();
             updateProjectFlags();
             updateProjectSource(projectSystemFile);
+            updateXDCPath(projectSystemFile);
         }
 
         /**
@@ -303,6 +306,17 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             try {
                 OpenConfiguratorProjectUtils
                         .updateProjectSourceFile(projectSystemFile2);
+            } catch (JDOMException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        }
+
+        private void updateXDCPath(File projectSystemFile) {
+            try {
+                OpenConfiguratorProjectUtils
+                        .updateProjectXDCSourceFile(projectSystemFile);
             } catch (JDOMException | IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -715,7 +729,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      */
     private void createProjectDescription(ProjectRecord selectedProjectRecord,
             IProgressMonitor monitor) throws InvocationTargetException,
-            InterruptedException, IOException {
+                    InterruptedException, IOException {
 
         String projectName = FilenameUtils
                 .removeExtension(selectedProjectRecord.getProjectName());
@@ -791,10 +805,42 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
             @SuppressWarnings("rawtypes")
             List filesToImport = FileSystemStructureProvider.INSTANCE
                     .getChildren(importSource.getParentFile());
+            File configDirectory = new File(String.valueOf(importSource
+                    .getParentFile().toString() + IPath.SEPARATOR
+                    + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR));
+            if (!configDirectory.exists()) {
+                configDirectory.mkdir();
+            }
+            filesToImport.add(configDirectory);
+            try {
+                for (int fileCount = 0; fileCount < filesToImport
+                        .size(); fileCount++) {
+                    File folder = new File(
+                            filesToImport.get(fileCount).toString());
+                    File[] listOfFiles = folder.listFiles();
+                    if (listOfFiles != null) {
+                        for (File listOfFile : listOfFiles) {
+                            if (listOfFile.isFile()) {
+                                String extensionName = FilenameUtils
+                                        .getExtension(listOfFile.getName());
+                                if (extensionName.equalsIgnoreCase("xdc")) {
+                                    FileUtils.copyDirectory(folder,
+                                            configDirectory);
+                                }
+                            }
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             ImportOperation operation = new ImportOperation(
                     project.getFullPath(), importSource.getParentFile(),
                     FileSystemStructureProvider.INSTANCE, overwriteQuery,
                     filesToImport);
+
             operation.setContext(getShell());
 
             operation.setOverwriteResources(true); // need to overwrite

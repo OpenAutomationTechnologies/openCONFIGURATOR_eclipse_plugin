@@ -739,6 +739,28 @@ public class ProjectJDomOperation {
     }
 
     /**
+     * Updates the configuration path of CN in project XML file.
+     *
+     * @param document Project file instance.
+     */
+    public static void updateCNPathTOXDC(Document document) {
+        String xpath = "//oc:NetworkConfiguration";
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            String nodeCollectionXpath = xpath + "/oc:NodeCollection";
+            String cnXpath = nodeCollectionXpath + "/oc:CN";//
+            if (JDomUtil.isXpathPresent(document, cnXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                System.err.println("CN XPath is Present....");
+                JDomUtil.updateXDCAttribute(document, cnXpath,
+                        OPENCONFIGURATOR_NAMESPACE);
+            } else {
+                System.err.println("The Cn Xpath not present..");
+            }
+        }
+    }
+
+    /**
      * Update modified time values in project file.
      *
      * @param document Project file instance.
@@ -752,6 +774,35 @@ public class ProjectJDomOperation {
                 new Attribute(attributeName, attributeValue));
     }
 
+    /**
+     * Update the configuration file path of MN node
+     *
+     * @param document Project file instance.
+     */
+    public static void updateMNPathTOXDC(Document document) {
+        String xpath = "//oc:NetworkConfiguration";
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            String nodeCollectionXpath = xpath + "/oc:NodeCollection";
+            String cnXpath = nodeCollectionXpath + "/oc:MN";//
+            if (JDomUtil.isXpathPresent(document, cnXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                JDomUtil.updateXDCAttribute(document, cnXpath,
+                        OPENCONFIGURATOR_NAMESPACE);
+            } else {
+                System.err.println("The Cn Xpath not present..");
+            }
+        }
+    }
+
+    /**
+     * Updates the attribute value of Module
+     *
+     * @param document Project file instance
+     * @param module Instance of Module
+     * @param attributeName Name of attribute to be updated.
+     * @param attributeValue Value for the attribute update.
+     */
     public static void updateModuleAttributeValue(Document document,
             Module module, String attributeName, String attributeValue) {
         JDomUtil.updateAttribute(document, module.getXpath(),
@@ -810,6 +861,28 @@ public class ProjectJDomOperation {
             }
         } else {
             System.err.println("Project Configuration Xpath not present.");
+        }
+    }
+
+    /**
+     * Updates the configuration file of RMN in project XML file
+     *
+     * @param document Project file instance.
+     */
+    public static void updateRMNPathTOXDC(Document document) {
+        String xpath = "//oc:NetworkConfiguration";
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            String nodeCollectionXpath = xpath + "/oc:NodeCollection";
+            String cnXpath = nodeCollectionXpath + "/oc:RMN";//
+            if (JDomUtil.isXpathPresent(document, cnXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                System.err.println("CN XPath is Present....");
+                JDomUtil.updateXDCAttribute(document, cnXpath,
+                        OPENCONFIGURATOR_NAMESPACE);
+            } else {
+                System.err.println("The Cn Xpath not present..");
+            }
         }
     }
 

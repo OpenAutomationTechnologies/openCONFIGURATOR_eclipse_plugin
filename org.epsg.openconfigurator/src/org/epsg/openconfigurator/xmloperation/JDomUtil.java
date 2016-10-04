@@ -37,6 +37,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.input.BOMInputStream;
@@ -339,6 +341,21 @@ public class JDomUtil {
     }
 
     /**
+     * Check the availability of given xpath element from the XDD/XDC file.
+     *
+     * @param document XDD/XDC file instance
+     * @param xpath
+     * @param namespace
+     * @return <code>True</code> if element is present, <code>False</code> false
+     *         otherwise.
+     */
+    public static boolean isXpathPresent(Document document,
+            XPathExpression<Element> xpathExpr) {
+        List<Element> elements = xpathExpr.evaluate(document);
+        return (elements.size() > 0);
+    }
+
+    /**
      * Removes the attributes found on the result of the Xpath from the
      * document.
      *
@@ -463,6 +480,43 @@ public class JDomUtil {
                     + newAttribute.getValue());
         } else {
             System.err.println(xpathExpr.getExpression() + "Element null");
+        }
+    }
+
+    public static void updateXDCAttribute(Document document,
+            String nodeCollectionXpath, Namespace openconfiguratorNamespace) {
+        XPathExpression<Element> expr = getXPathExpressionElement(
+                nodeCollectionXpath, openconfiguratorNamespace);
+        updateXDCAttribute(document, expr);
+
+    }
+
+    private static void updateXDCAttribute(Document document,
+            XPathExpression<Element> expr) {
+        List<Element> emtList = expr.evaluate(document);
+        System.err.println(
+                "Evaluating complete document...." + expr.evaluate(document));
+        for (Element emt : emtList) {
+
+            if (emt != null) {
+                List<Attribute> attributeList = emt.getAttributes();
+                for (Attribute attrib : attributeList) {
+                    String name = attrib.getName();
+
+                    if (name.equalsIgnoreCase("pathToXDC")) {
+                        String value = attrib.getValue();
+                        System.err.println("Path To XDC...." + value);
+                        Path path = Paths.get(value);
+                        path.getFileName();
+                        attrib.setValue(
+                                "deviceConfiguration/" + path.getFileName());
+                    }
+
+                }
+
+            } else {
+                System.err.println(expr.getExpression() + "Element null");
+            }
         }
     }
 

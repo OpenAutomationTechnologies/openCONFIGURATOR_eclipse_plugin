@@ -1473,7 +1473,7 @@ public final class OpenConfiguratorProjectUtils {
      *
      * @param pdoChannel The channel to be updated.
      * @return The result from the library.
-     * @throws JDOMExceptionErrors with XDC file modifications.
+     * @throws IOExceptionErrors with XDC file modifications.
      * @throws JDOMException Errors with time modifications
      */
     public static Result updatePdoChannelActualValue(
@@ -1525,6 +1525,13 @@ public final class OpenConfiguratorProjectUtils {
         return res;
     }
 
+    /**
+     * Update the source file of project during import operation
+     *
+     * @param projectSystemFile2 Instance of project XML file.
+     * @throws IOExceptionErrors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications
+     */
     public static void updateProjectSourceFile(File projectSystemFile2)
             throws JDOMException, IOException {
         File xmlFile = projectSystemFile2;
@@ -1540,6 +1547,29 @@ public final class OpenConfiguratorProjectUtils {
 
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
 
+    }
+
+    /**
+     * Updates the XDC path of project XML file during import operation
+     *
+     * @param projectSystemFile Instance of project XML file.
+     * @throws IOExceptionErrors with XDC file modifications.
+     * @throws JDOMException Errors with time modifications.
+     */
+    public static void updateProjectXDCSourceFile(File projectSystemFile)
+            throws JDOMException, IOException {
+        File xmlFile = projectSystemFile;
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        ProjectJDomOperation.updateMNPathTOXDC(document);
+
+        ProjectJDomOperation.updateRMNPathTOXDC(document);
+
+        ProjectJDomOperation.updateCNPathTOXDC(document);
+
+        // ProjectJDomOperation.updatePathToXDC(document);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
     }
 
     /**
