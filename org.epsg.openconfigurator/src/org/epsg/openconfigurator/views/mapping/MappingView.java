@@ -2571,7 +2571,7 @@ public class MappingView extends ViewPart {
                     }
                 });
                 formToolkit.adapt(tpdoBtnCheckButton, true, true);
-                tpdoBtnCheckButton.setText("Disable Profile Objects");
+                tpdoBtnCheckButton.setText("Hide Profile Objects");
 
                 tpdoChannelComboViewer
                         .setContentProvider(ArrayContentProvider.getInstance());
@@ -2865,9 +2865,8 @@ public class MappingView extends ViewPart {
                 });
 
                 formToolkit.adapt(rpdoBtnCheckButton, true, true);
-                rpdoBtnCheckButton.setText("Disable Profile Objects");
+                rpdoBtnCheckButton.setText("Hide Profile Objects");
 
-                new Label(composite_5, SWT.NONE);
                 clrbutton.addSelectionListener(
                         rpdoActionsClearBtnSelectionListener);
             }
