@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -49,12 +50,15 @@ import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
+import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
@@ -140,6 +144,8 @@ public class NewModuleWizard extends Wizard {
     @Override
     public boolean performFinish() {
         Object moduleObject = addModulePage.getModulemodelinWizard();
+        Object nodeModel = addModulePage.getNode().getNodeModel();
+        Node node = addModulePage.getNode();
         Path xdcPath = validateXddModulePage.getNodeConfigurationPath();
         int position = addChildmodulePage.getPosition();
         int address = addChildmodulePage.getAddress();
@@ -172,7 +178,31 @@ public class NewModuleWizard extends Wizard {
         }
 
         if (moduleObject instanceof InterfaceList.Interface.Module) {
+
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleObject;
+            if (nodeModel instanceof TCN) {
+                TCN cnModel = (TCN) nodeModel;
+                InterfaceList itfc = cnModel.getInterfaceList();
+
+                if (itfc != null) {
+                    List<InterfaceList.Interface> itf = itfc.getInterface();
+                    for (Interface iit : itf) {
+                        iit.setId(node.getInterface().getInterfaceUId());
+                        iit.getModule().add(module);
+
+                    }
+                } else {
+                    InterfaceList itfcLIst = new InterfaceList();
+                    cnModel.setInterfaceList(itfcLIst);
+                    Interface itfcs = new Interface();
+                    itfcs.setId(node.getInterface().getInterfaceUId());
+                    cnModel.getInterfaceList().getInterface().add(itfcs);
+                    itfcs.getModule().add(module);
+
+                }
+
+            }
+            // module.setInterfaceList(intfcList);
             module.setPathToXDC(xdcPath.toString());
             module.setPosition(BigInteger.valueOf(position));
             module.setEnabled(enabled);

@@ -54,7 +54,6 @@ import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
-import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -688,8 +687,6 @@ public class AddControlledNodeWizardPage extends WizardPage {
         switch (getNodeType()) {
             case CONTROLLED_NODE_LABEL:
                 TCN cnModel = new TCN();
-                InterfaceList obj1 = new InterfaceList();
-                cnModel.setInterfaceList(obj1);
                 cnModel.setName(nodeName.getText());
                 cnModel.setNodeID(
                         Integer.toString(nodeIdSpinner.getSelection()));

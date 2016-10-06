@@ -110,7 +110,6 @@ public class PowerlinkRootNode {
     private Map<Short, Node> nodeCollection = new HashMap<>();
     private OpenCONFIGURATORProject currentProject;
 
-    @SuppressWarnings("rawtypes")
     private ListenerList nodePropertyChangeListeners = new ListenerList(
             ListenerList.IDENTITY);
 

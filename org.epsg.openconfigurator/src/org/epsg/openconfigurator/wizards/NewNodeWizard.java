@@ -51,7 +51,6 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
-import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
@@ -243,9 +242,7 @@ public class NewNodeWizard extends Wizard {
 
         if (nodeObject instanceof TCN) {
             TCN cnModel = (TCN) nodeObject;
-            InterfaceList interfaceList = new InterfaceList();
             cnModel.setPathToXDC(xdcPath.toString());
-            cnModel.setInterfaceList(interfaceList);
 
         } else if (nodeObject instanceof TRMN) {
             TRMN rmnModel = (TRMN) nodeObject;

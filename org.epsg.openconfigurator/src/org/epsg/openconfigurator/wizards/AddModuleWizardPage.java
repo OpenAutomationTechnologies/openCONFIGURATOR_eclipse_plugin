@@ -45,7 +45,6 @@ import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.validation.NodeNameVerifyListener;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
-import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 
 /**
  * Wizard page to add child module to the head node.
@@ -231,14 +230,9 @@ public class AddModuleWizardPage extends WizardPage {
 
     private void updateCnModel() {
         nodeModel = getNode().getNodeModel();
-        if (nodeModel instanceof TCN) {
-            InterfaceList.Interface.Module cnModule = new InterfaceList.Interface.Module();
-            cnModule.setName(moduleName.getText());
-            // cnModule.setPosition(BigInteger.valueOf(position.getSelection()));
-            moduleModel = cnModule;
-        } else {
-            System.err.println("Invalid node model : " + nodeModel);
-        }
+        InterfaceList.Interface.Module cnModule = new InterfaceList.Interface.Module();
+        cnModule.setName(moduleName.getText());
+        moduleModel = cnModule;
 
         if (moduleModel == null) {
             System.err.println("Invalid module model :" + moduleModel);

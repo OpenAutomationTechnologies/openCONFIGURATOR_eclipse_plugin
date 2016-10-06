@@ -1680,15 +1680,20 @@ public class Node {
             org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface interfaceObj) {
         if (nodeModel instanceof TCN) {
             TCN cn = (TCN) nodeModel;
-            cn.setInterfaceList(new InterfaceList());
-            List<org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface> interfaceList = cn
-                    .getInterfaceList().getInterface();
-            for (org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface intfc : interfaceList) {
-                if (interfaceObj != null) {
-                    interfaceObj = intfc;
-                }
-            }
 
+            try {
+                if (cn.getInterfaceList() != null) {
+                    List<org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface> interfaceList = cn
+                            .getInterfaceList().getInterface();
+                    for (org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface intfc : interfaceList) {
+                        if (interfaceObj != null) {
+                            interfaceObj = intfc;
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
     }
