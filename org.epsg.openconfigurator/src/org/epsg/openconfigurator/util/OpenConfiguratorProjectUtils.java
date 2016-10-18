@@ -386,6 +386,13 @@ public final class OpenConfiguratorProjectUtils {
         return strDate;
     }
 
+    public static String getFolderName(File projectSystemFile)
+            throws JDOMException, IOException {
+        File xmlFile = projectSystemFile;
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+        return ProjectJDomOperation.getParent(document);
+    }
+
     /**
      * Finds the settingId in the list of agSettings and returns the
      * TKeyValuePair instance

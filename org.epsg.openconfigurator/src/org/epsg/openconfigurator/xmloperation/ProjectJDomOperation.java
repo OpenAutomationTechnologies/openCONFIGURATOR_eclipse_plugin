@@ -540,6 +540,27 @@ public class ProjectJDomOperation {
     }
 
     /**
+     * Updates the configuration path of CN in project XML file.
+     *
+     * @param document Project file instance.
+     */
+    public static String getParent(Document document) {
+        String xpath = "//oc:NetworkConfiguration";
+        if (JDomUtil.isXpathPresent(document, xpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+            String nodeCollectionXpath = xpath + "/oc:NodeCollection";
+            String cnXpath = nodeCollectionXpath + "/oc:CN";//
+            if (JDomUtil.isXpathPresent(document, cnXpath,
+                    OPENCONFIGURATOR_NAMESPACE)) {
+                System.err.println("CN XPath is Present....");
+                return JDomUtil.getPathName(document, cnXpath,
+                        OPENCONFIGURATOR_NAMESPACE);
+            }
+        }
+        return null;
+    }
+
+    /**
      * Check if object is already forced in the project XML file.
      *
      * @param document The project file instance.

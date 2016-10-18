@@ -620,6 +620,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                     IStatus.OK, "Error while saving the XDC", exception);
 
             throw new CoreException(errorStatus);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

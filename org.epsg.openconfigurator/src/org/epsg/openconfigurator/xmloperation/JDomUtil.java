@@ -268,6 +268,42 @@ public class JDomUtil {
         return parentElement.getChildren().size();
     }
 
+    public static String getPathName(Document document,
+            String nodeCollectionXpath, Namespace openconfiguratorNamespace) {
+        XPathExpression<Element> expr = getXPathExpressionElement(
+                nodeCollectionXpath, openconfiguratorNamespace);
+        return getPathName(document, expr);
+
+    }
+
+    private static String getPathName(Document document,
+            XPathExpression<Element> expr) {
+        List<Element> emtList = expr.evaluate(document);
+        System.err.println(
+                "Evaluating complete document...." + expr.evaluate(document));
+        for (Element emt : emtList) {
+
+            if (emt != null) {
+                List<Attribute> attributeList = emt.getAttributes();
+                for (Attribute attrib : attributeList) {
+                    String name = attrib.getName();
+
+                    if (name.equalsIgnoreCase("pathToXDC")) {
+                        String value = attrib.getValue();
+                        Path path = Paths.get(value);
+                        Path path1 = path.getParent();
+                        return path1.getFileName().toString();
+                    }
+
+                }
+
+            } else {
+                System.err.println(expr.getExpression() + "Element null");
+            }
+        }
+        return null;
+    }
+
     /**
      * Get the XDD/XDC file
      *
@@ -507,6 +543,10 @@ public class JDomUtil {
                         String value = attrib.getValue();
                         System.err.println("Path To XDC...." + value);
                         Path path = Paths.get(value);
+
+                        Path path1 = path.getParent();
+
+                        System.err.println("Parent..." + path1.getFileName());
                         path.getFileName();
                         attrib.setValue(
                                 "deviceConfiguration/" + path.getFileName());

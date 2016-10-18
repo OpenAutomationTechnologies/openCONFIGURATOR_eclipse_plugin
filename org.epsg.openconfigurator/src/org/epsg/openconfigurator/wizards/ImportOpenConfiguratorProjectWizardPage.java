@@ -49,6 +49,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -234,12 +235,30 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
          */
         private boolean validProject = false;
 
+        private String folderName;
+
         public ProjectRecord(File file) {
             projectSystemFile = file;
+            try {
+                folderName = OpenConfiguratorProjectUtils
+                        .getFolderName(projectSystemFile);
+            } catch (JDOMException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
             updateProjectName();
             updateProjectFlags();
             updateProjectSource(projectSystemFile);
+
             updateXDCPath(projectSystemFile);
+
+        }
+
+        public String getFolderName() {
+            if (folderName == null) {
+                return StringUtils.EMPTY;
+            }
+            return folderName;
         }
 
         /**
@@ -812,6 +831,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                 configDirectory.mkdir();
             }
             filesToImport.add(configDirectory);
+
             try {
                 for (int fileCount = 0; fileCount < filesToImport
                         .size(); fileCount++) {
@@ -823,9 +843,13 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                             if (listOfFile.isFile()) {
                                 String extensionName = FilenameUtils
                                         .getExtension(listOfFile.getName());
-                                if (extensionName.equalsIgnoreCase("xdc")) {
-                                    FileUtils.copyDirectory(folder,
-                                            configDirectory);
+                                if (folder.getName()
+                                        .equalsIgnoreCase(selectedProjectRecord
+                                                .getFolderName())) {
+                                    if (extensionName.equalsIgnoreCase("xdc")) {
+                                        FileUtils.copyDirectory(folder,
+                                                configDirectory);
+                                    }
                                 }
                             }
                         }
