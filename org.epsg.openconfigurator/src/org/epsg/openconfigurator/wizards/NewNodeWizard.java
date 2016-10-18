@@ -219,8 +219,9 @@ public class NewNodeWizard extends Wizard {
         try {
             xddModel = XddMarshaller.unmarshallXDDFile(xdcPath.toFile());
         } catch (FileNotFoundException | UnsupportedEncodingException
-                | JAXBException | SAXException
-                | ParserConfigurationException e2) {
+                | JAXBException | SAXException | ParserConfigurationException
+                | NullPointerException e2) {
+
             if ((e2.getMessage() != null) && !e2.getMessage().isEmpty()) {
                 validateXddPage.getErrorStyledText(e2.getMessage());
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
@@ -232,7 +233,15 @@ public class NewNodeWizard extends Wizard {
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         e2.getCause().getMessage(),
                         selectedNodeObj.getNetworkId());
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "The XDD/XDC file is out of sync with the file system.",
+                        "");
+                validateXddPage.getErrorStyledText(
+                        "The XDD/XDC file for '" + addNodePage.getNodeName()
+                                + "' is out of sync with the file system.");
             }
+
             e2.printStackTrace();
             return false;
         } catch (IOException e) {

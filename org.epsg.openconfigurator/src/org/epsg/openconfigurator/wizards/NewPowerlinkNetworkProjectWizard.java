@@ -330,11 +330,26 @@ public class NewPowerlinkNetworkProjectWizard extends Wizard
             xddModel = XddMarshaller.unmarshallXDDFile(xdcPath.toFile());
             validateXddPage.getErrorStyledText("");
         } catch (FileNotFoundException | UnsupportedEncodingException
-                | JAXBException | SAXException
-                | ParserConfigurationException e2) {
-            validateXddPage.getErrorStyledText(e2.getCause().getMessage());
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    e2.getCause().getMessage(), name);
+                | JAXBException | SAXException | ParserConfigurationException
+                | NullPointerException e2) {
+            if ((e2.getMessage() != null) && !e2.getMessage().isEmpty()) {
+                validateXddPage.getErrorStyledText(e2.getMessage());
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        e2.getMessage(), "");
+            } else if ((e2.getCause() != null)
+                    && (e2.getCause().getMessage() != null)
+                    && !e2.getCause().getMessage().isEmpty()) {
+                validateXddPage.getErrorStyledText(e2.getCause().getMessage());
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        e2.getCause().getMessage(), name);
+
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "The XDD/XDC file is out of sync with the file system.",
+                        "");
+                validateXddPage.getErrorStyledText(
+                        "The XDD/XDC file is out of sync with the file system.");
+            }
             e2.printStackTrace();
             return false;
         } catch (IOException e) {
