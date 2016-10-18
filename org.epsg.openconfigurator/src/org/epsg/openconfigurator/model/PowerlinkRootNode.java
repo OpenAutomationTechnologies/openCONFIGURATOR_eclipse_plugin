@@ -789,7 +789,7 @@ public class PowerlinkRootNode {
      * @throws IOException Errors with XDC file modifications.
      * @throws JDOMException Errors with time modifications.
      */
-    public Result persistNodes(IProgressMonitor monitor)
+    public synchronized Result persistNodes(IProgressMonitor monitor)
             throws JDOMException, IOException {
 
         final Iterator<Entry<Short, Node>> entries = nodeCollection.entrySet()

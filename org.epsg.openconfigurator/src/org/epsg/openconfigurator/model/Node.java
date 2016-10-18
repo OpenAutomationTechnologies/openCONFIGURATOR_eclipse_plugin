@@ -1089,7 +1089,10 @@ public class Node {
      *         false in XDD model
      */
     public boolean isPDOSelfReceipt() {
-        return networkmanagement.getGeneralFeatures().isPDOSelfReceipt();
+        if (xddModel != null) {
+            return networkmanagement.getGeneralFeatures().isPDOSelfReceipt();
+        }
+        return false;
     }
 
     /**
