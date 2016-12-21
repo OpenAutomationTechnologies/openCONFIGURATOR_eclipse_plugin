@@ -37,6 +37,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -113,7 +114,9 @@ public class ValidateXddModuleWizardPage extends WizardPage {
     private static final String ERROR_INVALID_MODULAR_CHILD_CN_FILE_MESSAGE = "Cannot import CN or modular head node XDD / XDC as module. \nPlease choose a valid modular child XDD / XDC.";
     private static final String VALID_FILE_MESSAGE = "XDD/XDC schema validation successful for ";
     public static final String DIALOG_TILE = "POWERLINK module";
-
+    private static final String MODULE_POSITION_EXISTS = "Module ID {0} already exists on position {1}.";
+    private static final String ERROR_INVALID_MODULAR_TYPE_XDC = "The XDD/XDC has module type {0} but the interface only supports module type {1}.";
+    private static final String ERROR_INVALID_MODULAR_HEAD_AND_CHILD_ADDRESSING = "The module interface {0} of {1} on node ({2}) does not support module addressing {3}.";
     private static final String[] CONFIGURATION_FILTER_EXTENSIONS = {
             "*.xdc;*.xdd", "*" };
 
@@ -243,8 +246,23 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 String moduleTypeVal = StringUtils.EMPTY;
                 String moduleId = getModuleInterface().getChildID();
                 int position = 0;
-
-                // BigInteger modulePosition = getModuleInterface().getP
+                // Checks the interface addressing with module addressing and
+                // returns false in case of position and manual
+                if (String
+                        .valueOf(headNodeInetrfaceObject.getModuleAddressing())
+                        .equalsIgnoreCase("position")) {
+                    if (String
+                            .valueOf(getModuleInterface().getModuleAddressing())
+                            .equalsIgnoreCase("manual")) {
+                        getErrorStyledText(MessageFormat.format(
+                                ERROR_INVALID_MODULAR_HEAD_AND_CHILD_ADDRESSING,
+                                headNodeInetrfaceObject.getInterfaceUId(),
+                                getModuleName(), headNodeInetrfaceObject
+                                        .getNode().getNodeIDWithName(),
+                                "manual"));
+                        return false;
+                    }
+                }
 
                 List<ModuleType> moduleTypeList = getModuleTypeList()
                         .getModuleType();
@@ -298,33 +316,27 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                         }
                     }
                 }
+
+                if (!(moduleTypeText.getText()
+                        .equalsIgnoreCase(moduleInterfaceType))) {
+                    setErrorMessage("Module type already exists.");
+                    getErrorStyledText(MessageFormat.format(
+                            ERROR_INVALID_MODULAR_TYPE_XDC, moduleInterfaceType,
+                            moduleTypeText.getText()));
+                    return false;
+                }
                 if (!validModuleType) {
 
                     if (headNodeInetrfaceObject.isMultipleModules()) {
                         setErrorMessage("Module type already exists.");
-                        getErrorStyledText("The XDD/XDC has module type "
-                                + moduleInterfaceType
-                                + " but the interface only supports module type "
-                                + moduleTypeText.getText() + ".");
+                        getErrorStyledText(MessageFormat.format(
+                                ERROR_INVALID_MODULAR_TYPE_XDC,
+                                moduleInterfaceType, moduleTypeText.getText()));
 
                     } else {
-                        getErrorStyledText("Module ID " + "'" + moduleId + "'"
-                                + " already exists on position " + position
-                                + ".");
-
+                        getErrorStyledText(MessageFormat.format(
+                                MODULE_POSITION_EXISTS, moduleId, position));
                     }
-                    return false;
-                }
-
-                if (moduleTypeText.getText()
-                        .equalsIgnoreCase(moduleInterfaceType)) {
-
-                } else {
-                    setErrorMessage("Module type already exists.");
-                    getErrorStyledText(
-                            "The XDD/XDC has module type " + moduleInterfaceType
-                                    + " but the interface only supports module type "
-                                    + moduleTypeText.getText() + ".");
                     return false;
                 }
 

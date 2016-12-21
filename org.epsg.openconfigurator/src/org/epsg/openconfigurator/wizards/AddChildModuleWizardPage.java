@@ -334,8 +334,16 @@ public class AddChildModuleWizardPage extends WizardPage {
                 Set<Integer> positionSet = interfaceObj.getModuleCollection()
                         .keySet();
                 System.err.println("POsitionSet = " + positionSet);
-                for (Integer position1 : positionSet) {
-                    minimumValue = position1 + 1;
+                for (Integer positionValue : positionSet) {
+                    // Checks the available module position with new position
+                    // given.
+                    if (minimumValue == positionValue) {
+                        minimumValue = positionValue + 1;
+                    }
+                    if (positionSet.contains(minimumValue)) {
+                        minimumValue = minimumValue + 1;
+                    }
+
                 }
                 Collection<Module> moduleCollection = interfaceObj
                         .getModuleCollection().values();
@@ -350,7 +358,6 @@ public class AddChildModuleWizardPage extends WizardPage {
                 for (Integer addres : addressList) {
                     if (minimumAddress == addres) {
                         minimumAddress = addres + 1;
-
                     }
                     if (addressList.contains(minimumAddress)) {
                         minimumAddress = minimumAddress + 1;

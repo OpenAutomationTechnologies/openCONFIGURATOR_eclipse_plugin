@@ -49,6 +49,7 @@ import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
+import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingHead;
 
 /**
@@ -76,6 +77,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
     private Module module;
     private TModuleAddressingHead moduleAddressing;
     private InterfaceList.Interface.Module moduleObjModel;
+    private TModuleAddressingChild childModuleAddressing;
 
     /**
      * Constructor to define the module properties from XDD model.
@@ -421,13 +423,15 @@ public class ModulePropertySource extends AbstractNodePropertySource
     private boolean isPositionOrAddressEditable() {
         boolean editable = false;
 
-        if (String.valueOf(moduleAddressing).equals("MANUAL")) {
+        if (String.valueOf(moduleAddressing).equalsIgnoreCase("MANUAL")
+                && (String.valueOf(childModuleAddressing)
+                        .equalsIgnoreCase(String.valueOf(moduleAddressing)))) {
             editable = true;
         } else {
             editable = false;
         }
-        return editable;
 
+        return editable;
     }
 
     @Override
@@ -451,6 +455,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
     public void setModuledata(Module moduleObj,
             TModuleAddressingHead moduleAddressing) {
         Object moduleModel = moduleObj.getModelOfModule();
+        childModuleAddressing = moduleObj.getModuleAddressing();
         this.moduleAddressing = moduleAddressing;
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             moduleObjModel = (InterfaceList.Interface.Module) moduleModel;
