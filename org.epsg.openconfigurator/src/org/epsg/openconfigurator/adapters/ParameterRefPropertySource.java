@@ -146,7 +146,8 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     || (access == ParameterAccess.UNDEFINED)) {
                 propertyList.add(actualValueReadOnlyDescriptor);
             } else if ((paramRef.getAllowedValues().getValuesList() != null)
-                    && !paramRef.getAllowedValues().getValuesList().isEmpty()) {
+                    || (!paramRef.getAllowedValues().getValuesList()
+                            .isEmpty())) {
                 propertyList.add(allowedValueDescriptor);
             } else {
                 propertyList.add(actualValueTextDescriptor);
@@ -241,7 +242,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     break;
                 case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID: {
                     String actualValue = paramRef.getActualValue();
-                    if (actualValue != null) {
+                    if (!actualValue.isEmpty()) {
                         for (int i = 0; i < ALLOWED_VALUES.length; i++) {
                             if (ALLOWED_VALUES[i].equals(actualValue)) {
                                 System.err.println(
@@ -252,7 +253,6 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             }
                         }
                     } else {
-
                         String val = ALLOWED_VALUES[0];
                         retObj = Integer.valueOf(0);
                         try {

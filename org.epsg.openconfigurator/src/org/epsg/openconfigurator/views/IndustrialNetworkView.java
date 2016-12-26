@@ -1933,9 +1933,10 @@ public class IndustrialNetworkView extends ViewPart
                 }
                 if (module.validateMoveModuleDownPosition(oldPosition,
                         position)) {
-                    if (String.valueOf(
-                            module.getInterfaceOfModule().getModuleAddressing())
-                            .equals("MANUAL")) {
+                    if (String
+                            .valueOf(module.getInterfaceOfModule()
+                                    .getModuleAddressing())
+                            .equalsIgnoreCase("MANUAL")) {
                         module.swapManualPosition(oldPosition, position);
                     } else {
                         module.swapPosition(oldPosition, position);

@@ -317,14 +317,13 @@ public class Parameter implements IParameter {
      */
     @Override
     public AllowedValues getAllowedValues() {
-        if ((allowedValues == null)) {
+        if ((allowedValues.getValuesList().isEmpty())) {
             if (parameterTemplate != null) {
-
-                if (parameterTemplate.getAllowedValues() != null) {
-                    return new AllowedValues(
-                            parameterTemplate.getAllowedValues());
+                if (getParameterTemplateAllowedValues() != null) {
+                    return getParameterTemplateAllowedValues();
                 }
-
+            } else {
+                System.err.println("Parameter template not available!");
             }
         }
         return allowedValues;
@@ -411,6 +410,16 @@ public class Parameter implements IParameter {
     /*
      * (non-Javadoc)
      *
+     * @see org.epsg.openconfigurator.model.IParameter#getUniqueId()
+     */
+    @Override
+    public String getParameterUniqueId() {
+        return uniqueId;
+    }
+
+    /*
+     * (non-Javadoc)
+     *
      * @see org.epsg.openconfigurator.model.IParameter#getPropertyList()
      */
     @Override
@@ -445,16 +454,6 @@ public class Parameter implements IParameter {
     @Override
     public StructType getStructDataType() {
         return dataType.getStructDataType();
-    }
-
-    /*
-     * (non-Javadoc)
-     *
-     * @see org.epsg.openconfigurator.model.IParameter#getUniqueId()
-     */
-    @Override
-    public String getParameterUniqueId() {
-        return uniqueId;
     }
 
     /*
