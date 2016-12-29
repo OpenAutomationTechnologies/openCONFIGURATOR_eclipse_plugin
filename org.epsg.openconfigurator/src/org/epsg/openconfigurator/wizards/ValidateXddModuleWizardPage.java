@@ -299,8 +299,8 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                                 for (Module mod : moduleCollection) {
                                     moduleTypes = mod.getModuleInterface()
                                             .getType();
-
-                                    if (moduleChildId.contains(moduleId)) {
+                                    if (mod.getChildID()
+                                            .equalsIgnoreCase(moduleId)) {
                                         position = mod.getPosition();
                                         setErrorMessage(
                                                 "Module ID already exists.");
