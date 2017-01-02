@@ -593,11 +593,6 @@ public class PowerlinkRootNode {
                                                             processingModule
                                                                     .getPosition()),
                                                     newModule);
-                                    return new Status(IStatus.ERROR,
-                                            org.epsg.openconfigurator.Activator.PLUGIN_ID,
-                                            OpenConfiguratorLibraryUtils
-                                                    .getErrorMessage(res),
-                                            null);
                                 }
                                 processingNode.getInterface()
                                         .getModuleCollection()

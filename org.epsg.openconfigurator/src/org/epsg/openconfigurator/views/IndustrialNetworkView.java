@@ -2080,6 +2080,10 @@ public class IndustrialNetworkView extends ViewPart
 
                                             moduleValue.setPositions(String
                                                     .valueOf(newPosition));
+                                            OpenConfiguratorProjectUtils
+                                                    .updateModuleConfigurationPath(
+                                                            moduleValue,
+                                                            newPosition);
                                         } else {
                                             Module moduleValue = interfaceObj
                                                     .getModuleCollection()
@@ -2087,6 +2091,10 @@ public class IndustrialNetworkView extends ViewPart
                                             int newPosition = posit - 1;
                                             moduleValue.setPositions(String
                                                     .valueOf(newPosition));
+                                            OpenConfiguratorProjectUtils
+                                                    .updateModuleConfigurationPath(
+                                                            moduleValue,
+                                                            newPosition);
                                             mod.setEnabled(false);
                                         }
                                     } else {
@@ -2102,6 +2110,10 @@ public class IndustrialNetworkView extends ViewPart
 
                                                 moduleValue.setPositions(String
                                                         .valueOf(newPosition));
+                                                OpenConfiguratorProjectUtils
+                                                        .updateModuleConfigurationPath(
+                                                                moduleValue,
+                                                                newPosition);
 
                                             } else {
                                                 System.err.println(
@@ -2119,6 +2131,10 @@ public class IndustrialNetworkView extends ViewPart
                                                                 + newPosition);
                                                 moduleValue.setPositions(String
                                                         .valueOf(newPosition));
+                                                OpenConfiguratorProjectUtils
+                                                        .updateModuleConfigurationPath(
+                                                                moduleValue,
+                                                                newPosition);
                                                 if (mod.isEnabled()) {
                                                     mod.setEnabled(false);
                                                 }
@@ -2164,6 +2180,9 @@ public class IndustrialNetworkView extends ViewPart
 
                             moduleValue
                                     .setPositions(String.valueOf(newPosition));
+                            OpenConfiguratorProjectUtils
+                                    .updateModuleConfigurationPath(moduleValue,
+                                            newPosition);
                             return;
                         }
                         Module moduleValue = interfaceObj.getModuleCollection()
@@ -2172,6 +2191,9 @@ public class IndustrialNetworkView extends ViewPart
                         System.err.println("new posit..... " + newPosition);
 
                         moduleValue.setPositions(String.valueOf(newPosition));
+                        OpenConfiguratorProjectUtils
+                                .updateModuleConfigurationPath(moduleValue,
+                                        newPosition);
                         moduleValue.setEnabled(false);
                     } else {
                         if (nextModuletype != null) {
@@ -2183,6 +2205,9 @@ public class IndustrialNetworkView extends ViewPart
                                 int newPosition = position - 1;
                                 moduleValue.setPositions(
                                         String.valueOf(newPosition));
+                                OpenConfiguratorProjectUtils
+                                        .updateModuleConfigurationPath(
+                                                moduleValue, newPosition);
                                 return;
 
                             }
@@ -2196,6 +2221,9 @@ public class IndustrialNetworkView extends ViewPart
                             System.err.println("new posit..... " + newPosition);
                             moduleValue
                                     .setPositions(String.valueOf(newPosition));
+                            OpenConfiguratorProjectUtils
+                                    .updateModuleConfigurationPath(moduleValue,
+                                            newPosition);
                             if (moduleObj.isEnabled()) {
                                 moduleObj.setEnabled(false);
                             }
