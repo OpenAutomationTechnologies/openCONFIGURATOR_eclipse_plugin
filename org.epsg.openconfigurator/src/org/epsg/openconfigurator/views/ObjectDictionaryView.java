@@ -366,7 +366,9 @@ public class ObjectDictionaryView extends ViewPart
                         if (nodeObj.isEnabled()) {
                             sourcePart = part;
                             setPartName(nodeObj.getNodeIDWithName());
-                            treeViewer.setInput(nodeObj);
+                            if (!nodeObj.hasError()) {
+                                treeViewer.setInput(nodeObj);
+                            }
                         }
                     }
                 } else if (selectedObj instanceof Module) {
@@ -377,7 +379,9 @@ public class ObjectDictionaryView extends ViewPart
                         if (moduleObj.isEnabled()) {
                             sourcePart = part;
                             setPartName(moduleObj.getModuleName());
-                            treeViewer.setInput(moduleObj);
+                            if (!moduleObj.hasError()) {
+                                treeViewer.setInput(moduleObj);
+                            }
                         }
                     }
                 } else {
