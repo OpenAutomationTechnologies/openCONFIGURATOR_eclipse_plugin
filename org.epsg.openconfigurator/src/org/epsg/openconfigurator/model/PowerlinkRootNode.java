@@ -578,7 +578,24 @@ public class PowerlinkRootNode {
                                 Module newModule = new Module(this, projectFile,
                                         module, processingNode, xdd,
                                         processingNode.getInterface());
-
+                                if (String
+                                        .valueOf(processingNode.getInterface()
+                                                .getModuleAddressing())
+                                        .equalsIgnoreCase("manual")) {
+                                    if (String
+                                            .valueOf(newModule
+                                                    .getModuleAddressing())
+                                            .equalsIgnoreCase("position")) {
+                                        int position = newModule.getPosition();
+                                        try {
+                                            newModule.setAddresss(
+                                                    String.valueOf(position));
+                                        } catch (JDOMException e) {
+                                            // TODO Auto-generated catch block
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                }
                                 processingModule = newModule;
 
                                 Result res = OpenConfiguratorLibraryUtils

@@ -67,7 +67,7 @@ public class AddChildModuleWizardPage extends WizardPage {
     private static final String DIALOG_PAGE_NAME = "AddCNModulewizardPage"; //$NON-NLS-1$
     public static final String DIALOG_TILE = "POWERLINK module";
     public static final String DIALOG_DESCRIPTION = "Add a POWERLINK module to the network.";
-
+    public static final String INVALID_ADDRESS_MODULE_ADDRESSING = "Module address already exists and cannot be added. The module with module addressing 'position' should have the same value for position and address.";
     private HeadNodeInterface interfaceObj;
     private Spinner position;
     private Label positionlabel;
@@ -330,6 +330,7 @@ public class AddChildModuleWizardPage extends WizardPage {
                 addressText.setMinimum(minimumValue);
             }
         } else {
+
             if (moduleSize != 0) {
                 Set<Integer> positionSet = interfaceObj.getModuleCollection()
                         .keySet();
@@ -367,7 +368,19 @@ public class AddChildModuleWizardPage extends WizardPage {
                 System.err.println("Minimum address = " + minimumAddress);
                 position.setMinimum(minimumValue);
                 addressText.setMinimum(minimumAddress);
-
+                if (String.valueOf(getModuleInterface().getModuleAddressing())
+                        .equalsIgnoreCase("POSITION")) {
+                    addressText.setEnabled(false);
+                    addressText.setMinimum(minimumValue);
+                    Set<Integer> addressSet = interfaceObj
+                            .getAddressCollection().keySet();
+                    for (Integer address : addressSet) {
+                        if (address.intValue() == minimumValue) {
+                            setErrorMessage(INVALID_ADDRESS_MODULE_ADDRESSING);
+                            return false;
+                        }
+                    }
+                }
                 if ((Integer.valueOf(position.getText()) == 1)
                         || (Integer.valueOf(addressText.getText()) == 1)) {
                     String moduleInterfaceType = getModuleInterface().getType();

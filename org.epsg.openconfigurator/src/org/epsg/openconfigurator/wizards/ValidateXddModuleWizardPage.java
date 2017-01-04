@@ -251,9 +251,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 if (String
                         .valueOf(headNodeInetrfaceObject.getModuleAddressing())
                         .equalsIgnoreCase("position")) {
-                    if (String
-                            .valueOf(getModuleInterface().getModuleAddressing())
-                            .equalsIgnoreCase("manual")) {
+                    if (getChildModuleAddressing().equalsIgnoreCase("manual")) {
                         getErrorStyledText(MessageFormat.format(
                                 ERROR_INVALID_MODULAR_HEAD_AND_CHILD_ADDRESSING,
                                 headNodeInetrfaceObject.getInterfaceUId(),
@@ -460,6 +458,16 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         formToolkit.paintBordersFor(errorinfo);
 
+    }
+
+    /**
+     * @return The addressing value of child module available in XDC.
+     */
+    public String getChildModuleAddressing() {
+        if (getModuleInterface() != null) {
+            return String.valueOf(getModuleInterface().getModuleAddressing());
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
