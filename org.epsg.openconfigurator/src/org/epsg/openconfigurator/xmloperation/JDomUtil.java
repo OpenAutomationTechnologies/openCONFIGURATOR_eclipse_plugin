@@ -291,8 +291,12 @@ public class JDomUtil {
                     if (name.equalsIgnoreCase("pathToXDC")) {
                         String value = attrib.getValue();
                         Path path = Paths.get(value);
-                        Path path1 = path.getParent();
-                        return path1.getFileName().toString();
+                        Path parentPath = path.getParent();
+                        if (parentPath != null) {
+                            if (parentPath.getFileName() != null) {
+                                return parentPath.getFileName().toString();
+                            }
+                        }
                     }
 
                 }
@@ -543,10 +547,6 @@ public class JDomUtil {
                         String value = attrib.getValue();
                         System.err.println("Path To XDC...." + value);
                         Path path = Paths.get(value);
-
-                        Path path1 = path.getParent();
-
-                        System.err.println("Parent..." + path1.getFileName());
                         path.getFileName();
                         attrib.setValue(
                                 "deviceConfiguration/" + path.getFileName());

@@ -133,17 +133,7 @@ public class ValidateXddWizardPage extends WizardPage {
      */
     private Button btnDefault;
 
-    /**
-     * Default controlled node XDD path.
-     */
-    private String defaultCnXDD;
-
     private Group grpConfigurationFile;
-
-    /**
-     * Default managing node XDD path.
-     */
-    private String defaultMnXDD;
 
     /**
      * Custom radio button.
@@ -587,22 +577,12 @@ public class ValidateXddWizardPage extends WizardPage {
 
             String tempXddPath = "";
             Object nodeobj = getNodeModel();
-            if (nodeobj instanceof TCN) {
-                TCN cnmodel = (TCN) nodeobj;
-                tempXddPath = defaultCnXDD;
-                cnmodel.setPathToXDC(tempXddPath);
-                nodeConfigurationPath.removeModifyListener(
-                        nodeConfigurationPathModifyListener);
-            } else if (nodeobj instanceof TRMN) {
+            if (nodeobj instanceof TRMN) {
                 TRMN rmnmodel = (TRMN) nodeobj;
                 tempXddPath = getMnXdcPath();
                 rmnmodel.setPathToXDC(tempXddPath);
                 nodeConfigurationPath.removeModifyListener(
                         nodeConfigurationPathModifyListener);
-            } else if (nodeobj instanceof TMN) {
-                TMN mnmodel = (TMN) nodeobj;
-                tempXddPath = defaultMnXDD;
-                mnmodel.setPathToXDC(tempXddPath);
             } else {
                 System.err.println("Invalid node model.");
             }
