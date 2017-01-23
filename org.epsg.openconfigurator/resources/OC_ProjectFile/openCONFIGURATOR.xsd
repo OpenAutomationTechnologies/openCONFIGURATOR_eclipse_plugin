@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<xs:schema xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://sourceforge.net/projects/openconf/configuration" elementFormDefault="qualified">
+<xs:schema xmlns:oc="http://sourceforge.net/projects/openconf/configuration" xmlns:ppc="http://ethernet-powerlink.org/POWERLINK" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://sourceforge.net/projects/openconf/configuration" elementFormDefault="qualified" version="2.2.0">
 	<xs:import namespace="http://ethernet-powerlink.org/POWERLINK" schemaLocation="../XDD_ImportExport_Config/POWERLINK_Types.xsd"/>
 	<xs:element name="openCONFIGURATORProject" id="openCONFIGURATORProject">
 		<xs:annotation>
@@ -278,6 +278,7 @@
 			<xs:extension base="oc:tAbstractNode">
 				<xs:sequence>
 					<xs:element ref="oc:InterfaceList" minOccurs="0"/>
+					<xs:element ref="oc:FirmwareList" minOccurs="0"/>
 				</xs:sequence>
 				<xs:attribute name="name" type="ppc:tNonEmptyString" use="optional" default="POWERLINK CN"/>
 				<xs:attribute name="nodeID" use="required">
@@ -438,6 +439,7 @@
 												</xs:sequence>
 											</xs:complexType>
 										</xs:element>
+										<xs:element ref="oc:FirmwareList" minOccurs="0"/>
 									</xs:sequence>
 									<xs:attribute name="name" type="ppc:tNonEmptyString" use="required"/>
 									<xs:attribute name="position" type="xs:positiveInteger" use="required"/>
@@ -477,5 +479,64 @@
 			<xs:selector xpath="./oc:Interface"/>
 			<xs:field xpath="@id"/>
 		</xs:unique>
+	</xs:element>
+	<xs:element name="FirmwareList">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="Firmware" minOccurs="1" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="URI" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:anyURI">
+									<xs:minLength value="1"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="vendorId" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:hexBinary">
+									<xs:minLength value="4"/>
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="productNumber" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:hexBinary">
+									<xs:minLength value="4"/>
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="deviceRevision" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:hexBinary">
+									<xs:minLength value="4"/>
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="date" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:hexBinary">
+									<xs:minLength value="4"/>
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="time" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:hexBinary">
+									<xs:minLength value="4"/>
+									<xs:maxLength value="4"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="keepHeader" type="xs:boolean" use="optional" default="false"/>
+						<xs:attribute name="locked" type="xs:boolean" use="optional" default="false"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
 	</xs:element>
 </xs:schema>
