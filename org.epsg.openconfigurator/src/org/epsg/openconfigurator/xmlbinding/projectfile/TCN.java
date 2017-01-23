@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *     &lt;extension base="{http://sourceforge.net/projects/openconf/configuration}tAbstractNode"&gt;
  *       &lt;sequence&gt;
  *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}InterfaceList" minOccurs="0"/&gt;
+ *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}FirmwareList" minOccurs="0"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="name" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" default="POWERLINK CN" /&gt;
  *       &lt;attribute name="nodeID" use="required"&gt;
@@ -59,7 +60,8 @@ import javax.xml.bind.annotation.XmlType;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "tCN", propOrder = {
-    "interfaceList"
+    "interfaceList",
+    "firmwareList"
 })
 public class TCN
     extends TAbstractNode
@@ -67,6 +69,8 @@ public class TCN
 
     @XmlElement(name = "InterfaceList")
     protected InterfaceList interfaceList;
+    @XmlElement(name = "FirmwareList")
+    protected FirmwareList firmwareList;
     @XmlAttribute(name = "name")
     protected String name;
     @XmlAttribute(name = "nodeID", required = true)
@@ -124,6 +128,30 @@ public class TCN
      */
     public void setInterfaceList(InterfaceList value) {
         this.interfaceList = value;
+    }
+
+    /**
+     * Gets the value of the firmwareList property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link FirmwareList }
+     *     
+     */
+    public FirmwareList getFirmwareList() {
+        return firmwareList;
+    }
+
+    /**
+     * Sets the value of the firmwareList property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link FirmwareList }
+     *     
+     */
+    public void setFirmwareList(FirmwareList value) {
+        this.firmwareList = value;
     }
 
     /**

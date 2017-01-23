@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Ethernet POWERLINK - XML Header for Firmware Files - schema -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" version="0.3">
+	<xs:element name="Firmware">
+		<xs:complexType>
+			<xs:attribute name="Ver" type="xs:positiveInteger" use="required">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the firmware version number.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Ven" use="required">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the vendor ID.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="0x[0-9A-Fa-f]{8,8}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Var" type="xs:unsignedInt" use="required">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the firmware revision number. The same value as present in the IdentResponse frame.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Use" use="required" fixed="fw"/>
+			<xs:attribute name="Rem" type="xs:string" use="optional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines remarks.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Mat" use="optional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines order reference in ASCII text. Maximum 18 characters.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:minLength value="0"/>
+						<xs:maxLength value="18"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Len" type="xs:positiveInteger" use="required">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the length of the payload data.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="KeepXmlheader" use="optional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">If true (1), the firmware download includes this XML header.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:byte">
+						<xs:enumeration value="0"/>
+						<xs:enumeration value="1"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Fct" type="xs:string" use="required" fixed="_"/>
+			<xs:attribute name="Dev" type="xs:unsignedInt" use="required">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the product code. The same value as in the IdentResponse frame.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="Date" use="optional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the file creation date.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="[0-3]{1}[1-9]{1}.[0-1]{1}[1-2]{1}.[0-9]{4}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="Chk" use="optional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the checksum of the payload data.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="0x[0-9A-Fa-f]{4,4}"/>
+					</xs:restriction>
+				</xs:simpleType>
+			</xs:attribute>
+			<xs:attribute name="ApplSwTime" use="required" type="xs:unsignedInt">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the application software time as defined in EPSG DS301.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="ApplSwDate" use="required" type="xs:unsignedInt">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the application software date as defined in EPSG DS301.</xs:documentation>
+				</xs:annotation>
+			</xs:attribute>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
