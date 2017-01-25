@@ -108,6 +108,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.views.mapping.MappingView;
+import org.epsg.openconfigurator.wizards.NewFirmwareWizard;
 import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
@@ -508,6 +509,7 @@ public class IndustrialNetworkView extends ViewPart
     public static final String ADD_NEW_NODE_ERROR_MESSAGE = "Internal error occurred. Please try again later";
     public static final String ADD_NEW_NODE_INVALID_SELECTION_MESSAGE = "Invalid selection";
     public static final String ADD_NEW_NODE_TOOL_TIP_TEXT = "Add a node in the network.";
+    public static final String ADD_FIRMWARE_TOOL_TIP_TEXT = "Add Firmware...";
 
     // Enable/disable action message string.
     // public static final String ENABLE_DISABLE_ACTION_MESSAGE =
@@ -885,6 +887,8 @@ public class IndustrialNetworkView extends ViewPart
      */
     private Action enable;
 
+    private Action addFirmwareFile;
+
     private Action disable;
 
     private Action generateNodeXDC;
@@ -1075,6 +1079,13 @@ public class IndustrialNetworkView extends ViewPart
                     }
                     manager.add(new Separator());
                     manager.add(deleteNode);
+                    manager.add(new Separator());
+                    manager.add(addFirmwareFile);
+                    if (node.getXddFirmwareFile().getFirmwareList() == null) {
+                        addFirmwareFile.setEnabled(false);
+                    } else {
+                        addFirmwareFile.setEnabled(true);
+                    }
                 }
                 // Display list of menu only if the nodes are enabled.
                 if (node.isEnabled()) {
@@ -1125,6 +1136,14 @@ public class IndustrialNetworkView extends ViewPart
                     }
                     manager.add(new Separator());
                     manager.add(deleteNode);
+                    manager.add(new Separator());
+                    manager.add(addFirmwareFile);
+                    if (moduleObj.getXddFirmwareFile()
+                            .getFirmwareList() == null) {
+                        addFirmwareFile.setEnabled(false);
+                    } else {
+                        addFirmwareFile.setEnabled(true);
+                    }
                     if (moduleObj.isEnabled()) {
                         manager.add(new Separator());
                         manager.add(showProperties);
@@ -1671,7 +1690,43 @@ public class IndustrialNetworkView extends ViewPart
 
             }
         };
+        addFirmwareFile = new Action(ADD_FIRMWARE_TOOL_TIP_TEXT) {
+            @Override
+            public void run() {
+                ISelection nodeTreeSelection = viewer.getSelection();
+                if ((nodeTreeSelection != null)
+                        && (nodeTreeSelection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
+                    Object selectedObject = strucSelection.getFirstElement();
+                    if (selectedObject instanceof Node) {
+                        Node selectedNode = (Node) selectedObject;
+                        NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
+                                rootNode, selectedObject);
+
+                        WizardDialog wd = new WizardDialog(
+                                Display.getDefault().getActiveShell(),
+                                newFirmwareWizard);
+                        wd.setTitle(newFirmwareWizard.getWindowTitle());
+                        wd.open();
+
+                        try {
+                            selectedNode.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                    }
+                }
+            }
+        };
+        addFirmwareFile.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
         disable = new Action(DISABLE_ACTION_MESSAGE) {
+
             @Override
             public void run() {
                 ISelection selection = PlatformUI.getWorkbench()

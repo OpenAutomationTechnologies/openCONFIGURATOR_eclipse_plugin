@@ -104,6 +104,11 @@ public class Module {
 
     }
 
+    /**
+     * XDD instance of firmware.
+     */
+    private FirmwareFile xddFirmwareFile;
+
     private PowerlinkRootNode rootNode;
 
     private Object moduleModel;
@@ -179,7 +184,7 @@ public class Module {
         xpath = "//plk:ApplicationProcess";
 
         objectDictionary = new ObjectDictionary(this, node, xddModel);
-
+        xddFirmwareFile = new FirmwareFile(xddModel);
         if (nodeModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) nodeModel;
             moduleName = module.getName();
@@ -761,6 +766,13 @@ public class Module {
      */
     public IProject getProject() {
         return node.getProject();
+    }
+
+    /**
+     * @return Instance of FirmwareFile.
+     */
+    public FirmwareFile getXddFirmwareFile() {
+        return xddFirmwareFile;
     }
 
     /**
