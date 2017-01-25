@@ -242,6 +242,11 @@ public class Node {
     private final NetworkManagement networkmanagement;
 
     /**
+     * XDD instance of firmware.
+     */
+    private FirmwareFile xddFirmwareFile;
+
+    /**
      * Instance of Module management.
      */
     private final ModuleManagement moduleManagement;
@@ -273,6 +278,7 @@ public class Node {
         moduleManagement = null;
         moduleInterface = null;
         configurationError = "";
+        xddFirmwareFile = null;
     }
 
     /**
@@ -310,6 +316,7 @@ public class Node {
 
             nodeId = Short.decode(cn.getNodeID());
             nodeType = NodeType.CONTROLLED_NODE;
+
         } else if (nodeModel instanceof TRMN) {
             TRMN rmn = (TRMN) nodeModel;
 
@@ -336,12 +343,15 @@ public class Node {
         objectDictionary = new ObjectDictionary(this, xddModel);
         networkmanagement = new NetworkManagement(this, xddModel);
         moduleManagement = new ModuleManagement(this, xddModel);
+        if ((nodeType == NodeType.MODULAR_CHILD_NODE)
+                || (nodeType == NodeType.CONTROLLED_NODE)) {
+            xddFirmwareFile = new FirmwareFile(xddModel);
+        }
         List<Interface> interfaceList = moduleManagement
                 .getInterfacelistOfNode();
         for (Interface interfaces : interfaceList) {
             headNodeInterface = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(headNodeInterface);
-
         }
 
         moduleInterface = new DeviceModularInterface(this,
@@ -349,6 +359,7 @@ public class Node {
 
         if (nodeModel instanceof TCN) {
             TCN cnModel = (TCN) nodeModel;
+
             if (isModularheadNode()) {
                 InterfaceList it = cnModel.getInterfaceList();
                 if (it != null) {
@@ -959,6 +970,13 @@ public class Node {
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID);
         return waitNotActiveValue;
+    }
+
+    /**
+     * @return Instance of FirmwareFile.
+     */
+    public FirmwareFile getXddFirmwareFile() {
+        return xddFirmwareFile;
     }
 
     /**

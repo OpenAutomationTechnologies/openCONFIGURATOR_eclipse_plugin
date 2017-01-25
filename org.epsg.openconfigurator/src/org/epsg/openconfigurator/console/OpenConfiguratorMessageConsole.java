@@ -124,8 +124,15 @@ public class OpenConfiguratorMessageConsole {
                     org.epsg.openconfigurator.Activator.PLUGIN_ID);
             errorMessageConsole = myConsole.newMessageStream();
             errorMessageConsole.setActivateOnWrite(true);
-            errorMessageConsole
-                    .setColor(new Color(Display.getDefault(), 255, 0, 0));
+            Display.getDefault().asyncExec(new Runnable() {
+
+                @Override
+                public void run() {
+                    errorMessageConsole.setColor(
+                            new Color(Display.getDefault(), 255, 0, 0));
+                }
+            });
+
         }
         return errorMessageConsole;
     }
