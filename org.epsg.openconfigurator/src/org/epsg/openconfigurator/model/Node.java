@@ -962,6 +962,23 @@ public class Node {
     }
 
     /**
+     * @return The vendor ID value of node from node XDD/XDC.
+     */
+    public String getVendorIdValue() {
+        String value = StringUtils.EMPTY;
+        if (getObjectDictionary() != null) {
+            if (getObjectDictionary().getObject(0x1018)
+                    .getSubObject((short) 01) != null) {
+                value = getObjectDictionary().getObject(0x1018)
+                        .getSubObject((short) 01).getActualDefaultValue();
+            }
+        } else {
+            System.err.println("Object Dictionary not available.");
+        }
+        return value;
+    }
+
+    /**
      * @return WaitNotActive value of RMN node from object dictionary.
      */
     public String getWaitNotActive() {

@@ -809,6 +809,17 @@ public class Module {
     }
 
     /**
+     * @return The vendor ID value of module from XDD/XDC.
+     */
+    public String getVenIdValue() {
+        String value = StringUtils.EMPTY;
+        if (xddFirmwareFile != null) {
+            value = xddFirmwareFile.getModuleVendorID();
+        }
+        return value;
+    }
+
+    /**
      * @return Instance of FirmwareFile.
      */
     public FirmwareFile getXddFirmwareFile() {

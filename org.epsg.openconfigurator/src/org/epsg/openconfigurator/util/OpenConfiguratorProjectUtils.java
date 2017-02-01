@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.util;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.text.MessageFormat;
@@ -65,6 +66,7 @@ import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.lib.wrapper.StringCollection;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Module;
@@ -74,6 +76,7 @@ import org.epsg.openconfigurator.model.ParameterReference;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
+import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAutoGenerationSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -135,6 +138,40 @@ public final class OpenConfiguratorProjectUtils {
                     .add(support.get(i));
             break;
         }
+    }
+
+    /**
+     * Adds the details of firmware list element into project source file.
+     *
+     * @param firmwareMngr Instance of Firmware manager to retrieve the value of
+     *            firmware.
+     * @param nodeOrModuleObj Instance of Node or Module.
+     * @param firmwareObj Instance of firmware object model.
+     * @throws IOException Error with XDC/XDD file modification.
+     * @throws JDOMException Error with time modifications.
+     */
+    public static void addFirmwareList(FirmwareManager firmwareMngr,
+            Object nodeOrModuleObj, Firmware firmwareObj)
+            throws JDOMException, IOException {
+        String projectXmlLocation = firmwareMngr.getProjectXml().getLocation()
+                .toString();
+        File xmlFile = new File(projectXmlLocation);
+        org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
+
+        ProjectJDomOperation.addFirmwareList(document, nodeOrModuleObj,
+                firmwareMngr, firmwareObj);
+
+        JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+        // Updates generator attributes in project file.
+
+        if (nodeOrModuleObj instanceof Node) {
+            Node node = (Node) nodeOrModuleObj;
+            updateGeneratorInfo(node);
+        } else if (nodeOrModuleObj instanceof Module) {
+            Module module = (Module) nodeOrModuleObj;
+            updateGeneratorInfo(module.getNode());
+        }
+
     }
 
     /**
@@ -453,6 +490,64 @@ public final class OpenConfiguratorProjectUtils {
         }
 
         return now;
+    }
+
+    /**
+     * Imports the firmware file into project path.
+     *
+     * @param firmwareFilePath The path of file to be imported into project.
+     * @param firmwareMngr Instance of Firmware manager.
+     * @throws IOException Errors with XDC file modifications.
+     */
+    public static void importFirmwareFile(Path firmwareFilePath,
+            FirmwareManager firmwareMngr) throws IOException {
+        IProject project = firmwareMngr.getProject();
+        java.nio.file.Path firmwareImportFile = firmwareFilePath;
+        java.nio.file.Path projectRootPath = project.getLocation().toFile()
+                .toPath();
+        String targetImportPath = StringUtils.EMPTY;
+        if (firmwareFilePath != null) {
+            if (firmwareFilePath.getFileName() != null) {
+                File devFirmwareDirectory = new File(String
+                        .valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.DEVICE_FIRMWARE_DIR));
+
+                if (!devFirmwareDirectory.exists()) {
+                    System.err.println("The directory does not exists....");
+                    devFirmwareDirectory.mkdir();
+                }
+
+                targetImportPath = String.valueOf(projectRootPath.toString()
+                        + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_FIRMWARE_DIR
+                        + IPath.SEPARATOR
+                        + String.valueOf(firmwareFilePath.getFileName()));
+
+                System.err.println("Source Directory: " + firmwareFilePath);
+                System.err.println("Target Directory: " + targetImportPath);
+
+                firmwareImportFile = java.nio.file.Files.copy(
+                        new java.io.File(firmwareImportFile.toString())
+                                .toPath(),
+                        new java.io.File(targetImportPath).toPath(),
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                        java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+                java.nio.file.Path pathRelative = projectRootPath
+                        .relativize(Paths.get(targetImportPath));
+
+                String relativePath = pathRelative.toString();
+                relativePath = relativePath.replace('\\', '/');
+
+                firmwareMngr.setUri(relativePath);
+
+            }
+        } else {
+            System.err.println(
+                    "Firmware file not avilable in the specified path.");
+        }
+
     }
 
     /**

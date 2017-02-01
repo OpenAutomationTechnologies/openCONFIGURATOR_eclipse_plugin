@@ -201,8 +201,11 @@ public final class XddMarshaller {
                 }
             }
 
-            int firmwareStrtIndex = firmwareline.lastIndexOf("<");
-            String firmwareHeader = firmwareline.substring(firmwareStrtIndex);
+            int firmwareStrtIndex = firmwareline.indexOf("<");
+            int firmwareEndIndex = firmwareline.indexOf(">");
+            // Receives only the header of firmware file.
+            String firmwareHeader = firmwareline.substring(firmwareStrtIndex,
+                    firmwareEndIndex + 1);
             input = new InputSource(new StringReader(firmwareHeader));
             input.setSystemId(file.toURI().toString());
             return unmarshallFirmware(input);
