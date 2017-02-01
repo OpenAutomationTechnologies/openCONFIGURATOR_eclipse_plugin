@@ -41,7 +41,17 @@ public interface IControlledNodeProperties extends IAbstractNodeProperties {
 
     public static final String CN_TAG = "CN"; //$NON-NLS-1$
     public static final String INTERFACE_LIST_TAG = "InterfaceList"; //$NON-NLS-1$
+    public static final String FIRMWARE_LIST_TAG = "FirmwareList"; //$NON-NLS-1$
     public static final String INTERFACE_TAG = "Interface"; //$NON-NLS-1$
+    public static final String FIRMWARE_TAG = "Firmware"; //$NON-NLS-1$
+    public static final String FIRMWARE_URI = "URI"; //$NON-NLS-1$
+    public static final String FIRMWARE_VENDOR_ID = "vendorId"; //$NON-NLS-1$
+    public static final String FIRMWARE_PRODUCT_NUMBER = "productNumber"; //$NON-NLS-1$
+    public static final String FIRMWARE_DEVICE_REVISION = "deviceRevision"; //$NON-NLS-1$
+    public static final String FIRMWARE_DATE = "date"; //$NON-NLS-1$
+    public static final String FIRMWARE_TIME = "time"; //$NON-NLS-1$
+    public static final String FIRMWARE_KEEP_HEADER = "keepHeader"; //$NON-NLS-1$
+    public static final String FIRMWARE_LOCKED = "locked"; //$NON-NLS-1$
     public static final String INTERFACE_ID = "id"; //$NON-NLS-1$
     public static final String MODULE_TAG = "Module"; //$NON-NLS-1$
     public static final String MODULE_NAME = "name"; //$NON-NLS-1$

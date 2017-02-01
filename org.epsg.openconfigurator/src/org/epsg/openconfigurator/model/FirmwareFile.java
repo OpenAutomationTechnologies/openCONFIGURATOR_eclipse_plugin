@@ -37,6 +37,7 @@ import java.util.List;
 
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.commons.lang3.StringUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.Firmware;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
@@ -45,9 +46,11 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TDeviceFunction;
+import org.epsg.openconfigurator.xmlbinding.xdd.TDeviceIdentity;
 import org.epsg.openconfigurator.xmlbinding.xdd.TFirmwareList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModularChildDeviceFunction;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModularHeadDeviceFunction;
+import org.epsg.openconfigurator.xmlbinding.xdd.TVersion;
 
 /**
  * FirmwareFile class to retrieve the values of firmware list element available
@@ -67,6 +70,12 @@ public class FirmwareFile {
     private List<XMLGregorianCalendar> buildDateList = new ArrayList<>();
 
     private List<Object> firmwareLabelList = new ArrayList<>();
+
+    private String vendorID;
+
+    private String productId;
+
+    private String deviceRevision;
 
     /**
      * Constructor that defines the list of firmware from the XDD model.
@@ -106,6 +115,27 @@ public class FirmwareFile {
     }
 
     /**
+     * @return The value of device revision in the XDD.
+     */
+    public String getModuleDeviceRevision() {
+        return deviceRevision;
+    }
+
+    /**
+     * @return The product number value of modular child node.
+     */
+    public String getModuleProductId() {
+        return productId;
+    }
+
+    /**
+     * @return The vendor ID value of modular child node.
+     */
+    public String getModuleVendorID() {
+        return vendorID;
+    }
+
+    /**
      * @return List of URI from firmware list in XDD.
      */
     public List<String> getUriList() {
@@ -113,7 +143,7 @@ public class FirmwareFile {
     }
 
     /**
-     * Updates the XDD model of module into the node.
+     * Updates the value of firmware list from XDD model.
      *
      * @param xddModel XDD instance.
      */
@@ -186,6 +216,18 @@ public class FirmwareFile {
                         } else {
                             System.err.println(
                                     "The firmware list not available in the XDD.");
+                        }
+                    }
+
+                    TDeviceIdentity deviceIdentity = devProfile
+                            .getDeviceIdentity();
+                    vendorID = deviceIdentity.getVendorID().getValue();
+                    productId = deviceIdentity.getProductID().getValue();
+                    for (TVersion ver : deviceIdentity.getVersion()) {
+                        if (ver.getVersionType().equalsIgnoreCase("HW")) {
+                            deviceRevision = ver.getValue();
+                        } else {
+                            deviceRevision = StringUtils.EMPTY;
                         }
                     }
 

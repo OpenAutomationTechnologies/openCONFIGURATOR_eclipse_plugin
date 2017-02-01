@@ -64,12 +64,41 @@ import org.xml.sax.InputSource;
  */
 public class JDomUtil {
 
+    /**
+     * Adds the forced objects of module in project source file.
+     *
+     * @param document Instance of project source file.
+     * @param forcedTagXpath Xpath expression of forced objects.
+     * @param openconfiguratorNamespace Namespace of the element
+     * @param newObjElement The new element to be added.
+     */
     public static void addModuleForceObjectElement(Document document,
             String forcedTagXpath, Namespace openconfiguratorNamespace,
             Element newObjElement) {
         System.out.println("addNewElement: " + forcedTagXpath);
         addModuleForceObjectElements(document, getXPathExpressionElement(
                 forcedTagXpath, openconfiguratorNamespace), newObjElement);
+
+    }
+
+    /**
+     * Adds the forced objects of module in project source file at specified
+     * index position.
+     *
+     * @param document Instance of project source file.
+     * @param forcedTagXpath Xpath expression of forced objects.
+     * @param openconfiguratorNamespace Namespace of the element
+     * @param newObjElement The new element to be added.
+     * @param index The position in project source file.
+     */
+    public static void addModuleForceObjectElement(Document document,
+            String forcedTagXpath, Namespace openconfiguratorNamespace,
+            Element newObjElement, int index) {
+        System.out.println("addNewElement: " + forcedTagXpath);
+        addModuleForceObjectElements(document,
+                getXPathExpressionElement(forcedTagXpath,
+                        openconfiguratorNamespace),
+                newObjElement, index);
 
     }
 
@@ -85,6 +114,23 @@ public class JDomUtil {
             }
 
             element.addContent(newObjElement);
+
+        }
+
+    }
+
+    private static void addModuleForceObjectElements(Document document,
+            XPathExpression<Element> xPathExpressionElement,
+            Element newObjElement, int index) {
+        List<Element> elementsList = xPathExpressionElement.evaluate(document);
+        System.err.println("Elements list.." + elementsList);
+        for (Element element : elementsList) {
+            newObjElement.setNamespace(element.getNamespace());
+            for (Element newChildElement : newObjElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
+
+            element.addContent(index, newObjElement);
 
         }
 

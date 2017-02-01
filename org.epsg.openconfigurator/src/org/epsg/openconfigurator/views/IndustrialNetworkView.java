@@ -1725,6 +1725,27 @@ public class IndustrialNetworkView extends ViewPart
                         }
 
                         handleRefresh();
+                    } else if (selectedObject instanceof Module) {
+                        Module selectedModule = (Module) selectedObject;
+                        NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
+                                rootNode, selectedObject);
+
+                        WizardDialog wd = new WizardDialog(
+                                Display.getDefault().getActiveShell(),
+                                newFirmwareWizard);
+                        wd.setTitle(newFirmwareWizard.getWindowTitle());
+                        wd.open();
+
+                        try {
+                            selectedModule.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
                     }
                 }
             }

@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 
 import javax.xml.bind.JAXBException;
@@ -391,6 +393,22 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         errorinfo.setForeground(new Color(Display.getDefault(), 255, 0, 0));
         errorinfo.setText(message);
         return errorinfo;
+    }
+
+    /**
+     * Receive nodeConfiguration path.
+     *
+     * @return Path of nodeConfiguration.
+     */
+    public Path getFirmwareConfigurationPath() {
+        return Paths.get(firmwareConfigurationPath.getText());
+    }
+
+    /**
+     * @return The Instance of firmware file model.
+     */
+    public Firmware getFirmwareModel() {
+        return firmwareModel;
     }
 
     /**

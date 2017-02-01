@@ -3407,8 +3407,8 @@ public class OpenConfiguratorLibraryUtils {
     public static Result forceObject(PowerlinkObject plkObject, boolean result,
             long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
-                plkObject.getActualValue(), result, false);
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
+                newObjectIndex, plkObject.getActualValue(), result, false);
         return res;
     }
 
@@ -4915,8 +4915,8 @@ public class OpenConfiguratorLibraryUtils {
     public static Result setModuleObjectActualValue(PowerlinkObject plkObject,
             String value, long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
-                value, plkObject.isObjectForced(), false);
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
+                newObjectIndex, value, plkObject.isObjectForced(), false);
         return res;
     }
 
@@ -5243,8 +5243,8 @@ public class OpenConfiguratorLibraryUtils {
     public static Result validateModuleObjectActualValue(
             PowerlinkObject plkObject, String value, long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
-                value, plkObject.isObjectForced(), true);
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
+                newObjectIndex, value, plkObject.isObjectForced(), true);
         return res;
     }
 
@@ -5257,8 +5257,8 @@ public class OpenConfiguratorLibraryUtils {
      * @return The result from openCONFIGURATOR library.
      */
     public static Result validateModuleSubobjectActualValue(
-            PowerlinkSubobject plkSubObject, String value,
-            long newObjectIndex,int newSubObjectindex) {
+            PowerlinkSubobject plkSubObject, String value, long newObjectIndex,
+            int newSubObjectindex) {
         Result res = OpenConfiguratorCore.GetInstance().SetSubObjectActualValue(
                 plkSubObject.getNetworkId(), plkSubObject.getCNNodeId(),
                 newObjectIndex, (short) newSubObjectindex, value,
@@ -5285,8 +5285,8 @@ public class OpenConfiguratorLibraryUtils {
     private static Result validateObjectActualValue(PowerlinkObject plkObject,
             String actualValue, long newObjectIndex) {
         Result res = OpenConfiguratorCore.GetInstance().SetObjectActualValue(
-                plkObject.getNetworkId(), plkObject.getCNNodeId(), newObjectIndex,
-                actualValue, plkObject.isObjectForced(), true);
+                plkObject.getNetworkId(), plkObject.getCNNodeId(),
+                newObjectIndex, actualValue, plkObject.isObjectForced(), true);
         return res;
     }
 
