@@ -1698,8 +1698,8 @@ public class IndustrialNetworkView extends ViewPart
                         && (nodeTreeSelection instanceof IStructuredSelection)) {
                     IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
                     Object selectedObject = strucSelection.getFirstElement();
-                    if (selectedObject instanceof Node) {
-                        Node selectedNode = (Node) selectedObject;
+                    if ((selectedObject instanceof Node)
+                            || (selectedObject instanceof Module)) {
                         NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
                                 rootNode, selectedObject);
 
@@ -1710,9 +1710,15 @@ public class IndustrialNetworkView extends ViewPart
                         wd.open();
 
                         try {
-                            selectedNode.getProject().refreshLocal(
-                                    IResource.DEPTH_INFINITE,
-                                    new NullProgressMonitor());
+                            if (selectedObject instanceof Node) {
+                                ((Node) selectedObject).getProject()
+                                        .refreshLocal(IResource.DEPTH_INFINITE,
+                                                new NullProgressMonitor());
+                            } else {
+                                ((Module) selectedObject).getProject()
+                                        .refreshLocal(IResource.DEPTH_INFINITE,
+                                                new NullProgressMonitor());
+                            }
                         } catch (CoreException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();
