@@ -57,6 +57,14 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     private static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
             "Firmware files", "All files" };
 
+    private static final String ERROR_XDD_PARAM_VALIDATION = "Firmware parameter validation failed compare to XDD values for file: ";
+    private static final String ERROR_PARAM_VALIDATION_FAILED = "Firmware parameter validation failed";
+
+    private static final int XDD_OBJECT_INDEX_TOCHECK = 0x1018;
+    private static final short XDD_SUBOBJECT_INDEX_VENDORID = 1;
+    private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
+    private static final short XDD_SUBOBJECT_INDEX_REVISIONNO = 3;
+
     /**
      * Control to display the node configuration path.
      */
@@ -123,6 +131,83 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     }
 
     /**
+     * Checks the firmware file header attributes against XDD values.
+     */
+    private boolean CheckWithXddAttributes() {
+        try {
+            // Get the attributes from firmware file header
+            boolean isFirmwareVendorIdEmpty = firmwareModel.getVen().isEmpty();
+            long firmwareVen = 0;
+            if (!isFirmwareVendorIdEmpty) {
+                firmwareVen = Long.decode(firmwareModel.getVen());
+            }
+            long firmwareDev = firmwareModel.getDev();
+            long firmwareVar = firmwareModel.getVar();
+
+            if (nodeOrModuleObj instanceof Node) {
+                // Get the XDD values for controlled node
+                String xddVendorId = node.getObjectDictionary()
+                        .getSubObject(XDD_OBJECT_INDEX_TOCHECK,
+                                XDD_SUBOBJECT_INDEX_VENDORID)
+                        .getActualDefaultValue();
+                String xddProductCode = node.getObjectDictionary()
+                        .getSubObject(XDD_OBJECT_INDEX_TOCHECK,
+                                XDD_SUBOBJECT_INDEX_PRODUCTCODE)
+                        .getActualDefaultValue();
+                String xddRevisionNo = node.getObjectDictionary()
+                        .getSubObject(XDD_OBJECT_INDEX_TOCHECK,
+                                XDD_SUBOBJECT_INDEX_REVISIONNO)
+                        .getActualDefaultValue();
+
+                if ((!xddVendorId.isEmpty()) && (!xddProductCode.isEmpty())
+                        && (!xddRevisionNo.isEmpty())) {
+                    if (isFirmwareVendorIdEmpty) {
+                        // vendor ID shall not be compared if firmware doesn't
+                        // contain the variable 'Var'
+                        if ((Long.decode(xddProductCode) == firmwareDev)
+                                && (Long.decode(
+                                        xddRevisionNo) == firmwareVar)) {
+                            return true;
+                        }
+                    } else {
+                        if ((Long.decode(xddVendorId) == firmwareVen)
+                                && (Long.decode(xddProductCode) == firmwareDev)
+                                && (Long.decode(
+                                        xddRevisionNo) == firmwareVar)) {
+                            return true;
+                        }
+                    }
+                }
+            } else if (nodeOrModuleObj instanceof Module) {
+                // Get the XDD values for controlled node
+                String xddVendorId = module.getVendorId();
+                String xddProductCode = module.getProductId();
+
+                if ((!xddVendorId.isEmpty()) && (!xddProductCode.isEmpty())) {
+                    if (isFirmwareVendorIdEmpty) {
+                        // vendor ID shall not be compared if firmware doesn't
+                        // contain the variable 'Var'
+                        if (Long.decode(xddProductCode) == firmwareDev) {
+                            return true;
+                        }
+                    } else {
+                        if ((Long.decode(xddVendorId) == firmwareVen) && (Long
+                                .decode(xddProductCode) == firmwareDev)) {
+                            return true;
+                        }
+                    }
+                }
+            } else {
+                // Unknown node type
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
      * validates the path of xddFile.
      */
     public boolean checkXddModel() {
@@ -137,17 +222,12 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                         .unmarshallFirmwareFile(firmwareFile);
                 getInfoStyledText(VALID_FILE_MESSAGE);
 
-                System.err.println(
-                        "The value of Chk..." + firmwareModel.getChk());
-
-                if (nodeOrModuleObj instanceof Node) {
-                    System.err.println("The actuakl val.. " + node
-                            .getObjectDictionary().getSubObject(4120, (short) 2)
-                            .getActualDefaultValue());
-
-                    // firmwareModel.get
-                } else if (nodeOrModuleObj instanceof Module) {
-
+                // Check node attribute with XDD
+                if (!CheckWithXddAttributes()) {
+                    setErrorMessage(ERROR_PARAM_VALIDATION_FAILED);
+                    getErrorStyledText(ERROR_XDD_PARAM_VALIDATION
+                            + firmwareConfigurationPath.getText());
+                    return false;
                 }
 
             } else {

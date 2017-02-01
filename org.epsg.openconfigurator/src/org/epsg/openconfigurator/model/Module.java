@@ -762,10 +762,50 @@ public class Module {
     }
 
     /**
+     * @return Product ID of the Module.
+     */
+    public String getProductId() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    return devProfile.getDeviceIdentity().getProductID()
+                            .getValue();
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return Eclipse project associated with the module.
      */
     public IProject getProject() {
         return node.getProject();
+    }
+
+    /**
+     * @return Vendor ID of the Module.
+     */
+    public String getVendorId() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    return devProfile.getDeviceIdentity().getVendorID()
+                            .getValue();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
