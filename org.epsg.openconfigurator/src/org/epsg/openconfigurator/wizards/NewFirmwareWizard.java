@@ -74,10 +74,24 @@ public class NewFirmwareWizard extends Wizard {
         addPage(validateFirmwarePage);
     }
 
+    /**
+     * Actions when finish the wizard
+     */
+    @Override
+    public boolean canFinish() {
+        boolean b = validateFirmwarePage.isPageComplete();
+        System.out.println(b);
+
+        if (!validateFirmwarePage.isPageComplete()) {
+            return false;
+        }
+
+        return true;
+    }
+
     @Override
     public boolean performFinish() {
         // TODO Auto-generated method stub
         return true;
     }
-
 }
