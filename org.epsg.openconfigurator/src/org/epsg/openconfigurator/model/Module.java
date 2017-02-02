@@ -35,7 +35,9 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -138,6 +140,8 @@ public class Module {
     private String xpath;
 
     private HeadNodeInterface interfaceObj;
+
+    private Map<FirmwareManager, Integer> ModuleFirmwareCollection = new HashMap<>();
 
     /**
      * Constructor that defines null values.
@@ -578,6 +582,13 @@ public class Module {
             System.err.println("Module with Invalid XDC.");
         }
         return moduleAddressing;
+    }
+
+    /**
+     * @return List of firmware files added to Module
+     */
+    public Map<FirmwareManager, Integer> getModuleFirmwareCollection() {
+        return ModuleFirmwareCollection;
     }
 
     /**

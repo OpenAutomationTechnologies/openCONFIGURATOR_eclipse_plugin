@@ -31,9 +31,13 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
 
 /**
@@ -55,6 +59,12 @@ public class FirmwareManager {
     private Firmware firmwareObjModel;
 
     private org.epsg.openconfigurator.xmlbinding.firmware.Firmware firmwareXddModel;
+
+    private List<FirmwareList.Firmware> firmwareList = new ArrayList<>();
+
+    private List<Integer> firmwarefileVerList = new ArrayList<>();
+
+    private int firmwarefileVersion;
 
     /**
      * Constructor to initialize firmware variables.
@@ -102,6 +112,9 @@ public class FirmwareManager {
         firmwareObjModel.setKeepHeader(keepHeader);
 
         this.firmwareObjModel = firmwareObjModel;
+        firmwarefileVersion = firmwareXddModel.getVer().intValue();
+        firmwareList.add(firmwareObjModel);
+
     }
 
     /**
@@ -146,6 +159,27 @@ public class FirmwareManager {
             }
         }
         return revNum;
+    }
+
+    /**
+     * @return List of file version available in project file.
+     */
+    public List<Integer> getFirmwarefileVerList() {
+        return firmwarefileVerList;
+    }
+
+    /**
+     * @return Version of firmware file.
+     */
+    public int getFirmwarefileVersion() {
+        return firmwareXddModel.getVer().intValue();
+    }
+
+    /**
+     * @return List of firmware available in project file.
+     */
+    public List<FirmwareList.Firmware> getFirmwareList() {
+        return firmwareList;
     }
 
     /**
@@ -218,7 +252,7 @@ public class FirmwareManager {
 
     /**
      * Sets the path of firmware file attached to node or module.
-     * 
+     *
      * @param relativePath The value of firmware file path.
      */
     public void setUri(String relativePath) {
