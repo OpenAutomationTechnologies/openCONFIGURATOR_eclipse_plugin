@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.text.MessageFormat;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -57,10 +58,9 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     private static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
             "Firmware files", "All files" };
 
-    private static final String ERROR_XDD_VALIDATION_FAILED = "Firmware attributes validation failed comparing to XDD";
-    private static final String ERROR_PARAM_VEN_MISMATCH = "Firmware Vendor ID mismatch";
-    private static final String ERROR_PARAM_DEV_MISMATCH = "Firmware Product Code mismatch";
-    private static final String ERROR_PARAM_VAR_MISMATCH = "Firmware HW Version mismatch";
+    private static final String ERROR_PRAM_VALIDATION_FAILED_HEADER = "{0} doesnt match.";
+    private static final String ERROR_PRAM_VALIDATION_FAILED_DETAIL = "Firmware file {0} with {1} {2} doesnt match with XDD value {3}";
+    private static final String ERROR_XDD_PARAM_NOTFOUND = "Validation parameters missing from XDD";
 
     private static final int XDD_OBJECT_INDEX_TOCHECK = 0x1018;
     private static final short XDD_SUBOBJECT_INDEX_VENDORID = 1;
@@ -171,17 +171,39 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                                 if (Long.decode(xddVendorId) == firmwareVen) {
                                     return true;
                                 }
-                                getErrorStyledText(ERROR_PARAM_VEN_MISMATCH);
+                                setErrorMessage(MessageFormat.format(
+                                        ERROR_PRAM_VALIDATION_FAILED_HEADER,
+                                        "Vendor ID"));
+                                getErrorStyledText(MessageFormat.format(
+                                        ERROR_PRAM_VALIDATION_FAILED_DETAIL,
+                                        firmwareConfigurationPath.getText(),
+                                        "Vendor ID", firmwareModel.getVen(),
+                                        xddVendorId));
                                 return false;
                             }
                             return true;
                         }
-                        getErrorStyledText(ERROR_PARAM_VAR_MISMATCH);
+                        setErrorMessage(MessageFormat.format(
+                                ERROR_PRAM_VALIDATION_FAILED_HEADER,
+                                "Revision Number"));
+                        getErrorStyledText(MessageFormat.format(
+                                ERROR_PRAM_VALIDATION_FAILED_DETAIL,
+                                firmwareConfigurationPath.getText(),
+                                "Revision Number", firmwareVar,
+                                Long.decode(xddRevisionNo)));
                         return false;
                     }
-                    getErrorStyledText(ERROR_PARAM_DEV_MISMATCH);
+                    setErrorMessage(MessageFormat.format(
+                            ERROR_PRAM_VALIDATION_FAILED_HEADER,
+                            "Product Code"));
+                    getErrorStyledText(MessageFormat.format(
+                            ERROR_PRAM_VALIDATION_FAILED_DETAIL,
+                            firmwareConfigurationPath.getText(), "Product Code",
+                            firmwareDev, Long.decode(xddProductCode)));
                     return false;
                 }
+                getErrorStyledText(ERROR_XDD_PARAM_NOTFOUND);
+                return false;
             } else if (nodeOrModuleObj instanceof Module) {
                 // Get the XDD values for module
                 String xddVendorId = module.getVendorId();
@@ -195,14 +217,29 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                             if (Long.decode(xddVendorId) == firmwareVen) {
                                 return true;
                             }
-                            getErrorStyledText(ERROR_PARAM_VEN_MISMATCH);
+                            setErrorMessage(MessageFormat.format(
+                                    ERROR_PRAM_VALIDATION_FAILED_HEADER,
+                                    "Vendor ID"));
+                            getErrorStyledText(MessageFormat.format(
+                                    ERROR_PRAM_VALIDATION_FAILED_DETAIL,
+                                    firmwareConfigurationPath.getText(),
+                                    "Vendor ID", firmwareModel.getVen(),
+                                    xddVendorId));
                             return false;
                         }
                         return true;
                     }
-                    getErrorStyledText(ERROR_PARAM_DEV_MISMATCH);
+                    setErrorMessage(MessageFormat.format(
+                            ERROR_PRAM_VALIDATION_FAILED_HEADER,
+                            "Product Code"));
+                    getErrorStyledText(MessageFormat.format(
+                            ERROR_PRAM_VALIDATION_FAILED_DETAIL,
+                            firmwareConfigurationPath.getText(), "Product Code",
+                            firmwareDev, Long.decode(xddProductCode)));
                     return false;
                 }
+                getErrorStyledText(ERROR_XDD_PARAM_NOTFOUND);
+                return false;
             } else {
                 // Unknown node type
             }
@@ -230,15 +267,14 @@ public class ValidateFirmwareWizardPage extends WizardPage {
 
                 // Check node attribute with XDD
                 if (!CheckWithXddAttributes()) {
-                    setErrorMessage(ERROR_XDD_VALIDATION_FAILED);
                     return false;
                 }
 
             } else {
                 setErrorMessage(ERROR_CHOOSE_VALID_PATH_MESSAGE
                         + firmwareConfigurationPath.getText());
-                // getErrorStyledText(ERROR_CHOOSE_VALID_PATH_MESSAGE
-                // + firmwareConfigurationPath.getText());
+
+                return false;
             }
 
         } catch (FileNotFoundException | JAXBException | SAXException
@@ -253,11 +289,14 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                     && !e.getCause().getMessage().isEmpty()) {
                 getErrorStyledText(" - " + e.getCause().getMessage());
             }
+
             e.printStackTrace();
+
             return false;
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+
+            return false;
         }
 
         return true;
