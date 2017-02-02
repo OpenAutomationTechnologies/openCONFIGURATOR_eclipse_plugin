@@ -35,6 +35,7 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -260,6 +261,8 @@ public class Node {
      * Instance of head node interface.
      */
     private HeadNodeInterface headNodeInterface;
+
+    private Map<FirmwareManager, Integer> nodeFirmwareCollection = new HashMap<>();
 
     /**
      * Constructor to initialize the node variables.
@@ -765,6 +768,13 @@ public class Node {
      */
     public NetworkManagement getNetworkManagement() {
         return networkmanagement;
+    }
+
+    /**
+     * @return List of firmware files added to Node
+     */
+    public Map<FirmwareManager, Integer> getNodeFirmwareCollection() {
+        return nodeFirmwareCollection;
     }
 
     /**

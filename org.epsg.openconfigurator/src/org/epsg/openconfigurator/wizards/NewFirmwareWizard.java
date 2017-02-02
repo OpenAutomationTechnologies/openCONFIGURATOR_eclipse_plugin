@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
@@ -50,6 +51,7 @@ import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.jdom2.JDOMException;
 
@@ -131,6 +133,18 @@ public class NewFirmwareWizard extends Wizard {
         return null;
     }
 
+    private Object getObjModel(Object obj) {
+        if (obj instanceof Node) {
+            Node node = (Node) obj;
+            return node.getNodeModel();
+        }
+        if (obj instanceof Module) {
+            Module module = (Module) obj;
+            return module.getModelOfModule();
+        }
+        return null;
+    }
+
     @Override
     public boolean canFinish() {
         boolean b = validateFirmwarePage.isPageComplete();
@@ -148,8 +162,33 @@ public class NewFirmwareWizard extends Wizard {
         Path firmwareFilePath = validateFirmwarePage
                 .getFirmwareConfigurationPath();
         Result res = new Result();
-        FirmwareList firmwareList = new FirmwareList();
+
+        Object objModel = getObjModel(nodeOrModuleObj);
         Firmware firmware = new Firmware();
+        if (objModel instanceof TCN) {
+            TCN cn = (TCN) objModel;
+            FirmwareList firmwareList = cn.getFirmwareList();
+
+            if (firmwareList != null) {
+                firmwareList.getFirmware().add(firmware);
+            } else {
+                FirmwareList fwList = new FirmwareList();
+                cn.setFirmwareList(fwList);
+                fwList.getFirmware().add(firmware);
+            }
+        } else if (objModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module mod = (InterfaceList.Interface.Module) objModel;
+            FirmwareList firmwareList = mod.getFirmwareList();
+
+            if (firmwareList != null) {
+                firmwareList.getFirmware().add(firmware);
+            } else {
+                FirmwareList fwList = new FirmwareList();
+                mod.setFirmwareList(fwList);
+                fwList.getFirmware().add(firmware);
+            }
+        }
+
         firmware.setURI(firmwareFilePath.toString());
 
         firmwareObj = firmware;
@@ -213,6 +252,33 @@ public class NewFirmwareWizard extends Wizard {
             System.err.println(
                     "The node assignment value is not updated in the project file.");
             e1.printStackTrace();
+        }
+
+        if (nodeOrModuleObj instanceof Node) {
+            Node cnNode = (Node) nodeOrModuleObj;
+            cnNode.getNodeFirmwareCollection().put(firmwareMngr,
+                    firmwareMngr.getFirmwarefileVersion());
+            for (int version : cnNode.getNodeFirmwareCollection().values()) {
+                if (firmwareMngr.getFirmwarefileVersion() < version) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add lowest version firmware file", null,
+                            "The firmware file version '"
+                                    + firmwareMngr.getFirmwarefileVersion()
+                                    + "' is lower than the available firmware files. "
+                                    + "Do you wish to continue? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return false;
+                    }
+
+                }
+            }
+        } else if (nodeOrModuleObj instanceof Module) {
+            Module cnModule = (Module) nodeOrModuleObj;
+            cnModule.getModuleFirmwareCollection().put(firmwareMngr,
+                    firmwareMngr.getFirmwarefileVersion());
         }
 
         try {
