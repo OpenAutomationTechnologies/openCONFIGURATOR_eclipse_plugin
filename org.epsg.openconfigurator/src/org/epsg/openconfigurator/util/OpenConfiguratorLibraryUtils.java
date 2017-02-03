@@ -4160,7 +4160,9 @@ public class OpenConfiguratorLibraryUtils {
                 String dataTypeS = DatatypeConverter
                         .printHexBinary(dataTypeRaw);
                 int dataType_num = Integer.parseInt(dataTypeS, 16);
-                plkDataType = PlkDataType.swigToEnum(dataType_num);
+                // Replaced the swig conversion
+                plkDataType = getObjectType(dataType_num);
+                // plkDataType = PlkDataType.swigToEnum(dataType_num);
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
             }
@@ -4208,6 +4210,100 @@ public class OpenConfiguratorLibraryUtils {
         // }
 
         return res;
+    }
+
+    public static PlkDataType getObjectType(int dataType_num) {
+        PlkDataType plkDataType = PlkDataType.UNDEFINED;
+        switch (dataType_num) {
+            case 1:
+                plkDataType = PlkDataType.BOOLEAN;
+                break;
+            case 2:
+                plkDataType = PlkDataType.INTEGER8;
+                break;
+            case 3:
+                plkDataType = PlkDataType.INTEGER16;
+                break;
+            case 4:
+                plkDataType = PlkDataType.INTEGER32;
+                break;
+            case 5:
+                plkDataType = PlkDataType.UNSIGNED8;
+                break;
+            case 6:
+                plkDataType = PlkDataType.UNSIGNED16;
+                break;
+            case 7:
+                plkDataType = PlkDataType.UNSIGNED32;
+                break;
+            case 8:
+                plkDataType = PlkDataType.REAL32;
+                break;
+            case 9:
+                plkDataType = PlkDataType.VISIBLE_STRING;
+                break;
+            case 10:
+                plkDataType = PlkDataType.OCTET_STRING;
+                break;
+            case 11:
+                plkDataType = PlkDataType.UNICODE_STRING;
+                break;
+            case 12:
+                plkDataType = PlkDataType.TIME_OF_DAY;
+                break;
+            case 13:
+                plkDataType = PlkDataType.TIME_DIFF;
+                break;
+            case 15:
+                plkDataType = PlkDataType.Domain;
+                break;
+            case 16:
+                plkDataType = PlkDataType.INTEGER24;
+                break;
+            case 17:
+                plkDataType = PlkDataType.REAL64;
+                break;
+            case 18:
+                plkDataType = PlkDataType.INTEGER40;
+                break;
+            case 19:
+                plkDataType = PlkDataType.INTEGER48;
+                break;
+            case 20:
+                plkDataType = PlkDataType.INTEGER56;
+                break;
+            case 21:
+                plkDataType = PlkDataType.INTEGER64;
+                break;
+            case 22:
+                plkDataType = PlkDataType.UNSIGNED24;
+                break;
+            case 24:
+                plkDataType = PlkDataType.UNSIGNED40;
+                break;
+            case 25:
+                plkDataType = PlkDataType.UNSIGNED48;
+                break;
+            case 26:
+                plkDataType = PlkDataType.UNSIGNED56;
+                break;
+            case 27:
+                plkDataType = PlkDataType.UNSIGNED64;
+                break;
+            case 1025:
+                plkDataType = PlkDataType.MAC_ADDRESS;
+                break;
+            case 1026:
+                plkDataType = PlkDataType.IP_ADDRESS;
+                break;
+            case 1027:
+                plkDataType = PlkDataType.NETTIME;
+                break;
+            default:
+                break;
+
+        }
+        return plkDataType;
     }
 
     /**
