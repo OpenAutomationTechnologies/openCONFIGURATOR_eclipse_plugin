@@ -65,6 +65,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     private static final String ERROR_PRAM_VALIDATION_FAILED_DETAIL = "Firmware file {0} with {1} {2} does not match with XDD value {3}.";
     private static final String ERROR_XDD_PARAM_NOTFOUND = "Validation parameters missing from XDD.";
 
+    // Values of XDD object attributes.
     private static final int XDD_OBJECT_INDEX_TOCHECK = 0x1018;
     private static final short XDD_SUBOBJECT_INDEX_VENDORID = 1;
     private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
@@ -136,21 +137,27 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     /**
      * Checks the firmware file header attributes against XDD values.
      */
-    private boolean CheckWithXddAttributes() {
+    private boolean checkWithXddAttributes() {
         try {
             // Get the attributes from firmware file header
             if (firmwareModel != null) {
-                boolean isFirmwareVendorIdEmpty = firmwareModel.getVen()
-                        .isEmpty();
+                boolean isFirmwareVendorIdEmpty = true;
                 long firmwareVen = 0;
+
+                if (firmwareModel.getVen() != null) {
+                    isFirmwareVendorIdEmpty = firmwareModel.getVen().isEmpty();
+                }
+
                 if (!isFirmwareVendorIdEmpty) {
                     firmwareVen = Long.decode(firmwareModel.getVen());
                 }
+
                 long firmwareDev = firmwareModel.getDev();
                 long firmwareVar = firmwareModel.getVar();
 
                 if (nodeOrModuleObj instanceof Node) {
                     // Get the XDD values for controlled node
+                    node = (Node) nodeOrModuleObj;
                     String xddVendorId = node.getObjectDictionary()
                             .getSubObject(XDD_OBJECT_INDEX_TOCHECK,
                                     XDD_SUBOBJECT_INDEX_VENDORID)
@@ -212,6 +219,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                     return false;
                 } else if (nodeOrModuleObj instanceof Module) {
                     // Get the XDD values for module
+                    module = (Module) nodeOrModuleObj;
                     String xddVendorId = module.getVendorId();
                     String xddProductCode = module.getProductId();
 
@@ -273,7 +281,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                 firmwareModel = XddMarshaller
                         .unmarshallFirmwareFile(firmwareFile);
                 // Check node attribute with XDD
-                if (!CheckWithXddAttributes()) {
+                if (!checkWithXddAttributes()) {
                     return false;
                 }
                 getInfoStyledText(VALID_FILE_MESSAGE);

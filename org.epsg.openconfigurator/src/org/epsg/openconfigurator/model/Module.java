@@ -791,7 +791,7 @@ public class Module {
             }
         }
 
-        return null;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -818,7 +818,7 @@ public class Module {
             }
         }
 
-        return null;
+        return StringUtils.EMPTY;
     }
 
     /**
