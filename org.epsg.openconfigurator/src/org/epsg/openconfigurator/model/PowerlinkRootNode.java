@@ -80,6 +80,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -106,7 +107,11 @@ public class PowerlinkRootNode {
 
     private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid.\n XDC Path: {1}";
     private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
+    private static final String FIRMWARE_FILE_NOT_FOUND_ERROR = "Firmware file {0} for the node {1} does not exists in the project.\n Firmware file Path: {2} ";
+    private static final String FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR = "Firmware file {0} for the module {1} does not exists in the project.\n Firmware file Path: {2} ";
     private static final String INVALID_MODULE_XDC_ERROR = " The XDD/XDC file of module {0} is not available for the node {1}.";
+    private static final String INVALID_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the node {1}.";
+    private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
     private Map<Short, Node> nodeCollection = new HashMap<>();
     private OpenCONFIGURATORProject currentProject;
 
@@ -375,6 +380,7 @@ public class PowerlinkRootNode {
         Node processingNode = new Node();
         // ProcessingModule is used within the try block.
         Module processingModule = new Module();
+        FirmwareManager processingFirmware = new FirmwareManager();
 
         try {
             // MN section
@@ -521,6 +527,79 @@ public class PowerlinkRootNode {
                 nodeCollection.put(Short.valueOf(processingNode.getCnNodeId()),
                         processingNode);
                 monitor.worked(1);
+                if (cnNode.getFirmwareList() != null) {
+                    Iterator<FirmwareList.Firmware> firmwareIterator = cnNode
+                            .getFirmwareList().getFirmware().iterator();
+                    while (firmwareIterator.hasNext()) {
+                        if (monitor.isCanceled()) {
+                            return new Status(IStatus.OK,
+                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                    "Cancelled", null);
+                        }
+                        FirmwareList.Firmware firmware = firmwareIterator
+                                .next();
+                        monitor.subTask("Import Firmware file:");
+
+                        String decodedFirmwarePath = URLDecoder
+                                .decode(firmware.getURI(), "UTF-8");
+
+                        File cnFirmwareFile = new File(
+                                projectFile.getProject().getLocation()
+                                        + File.separator + decodedFirmwarePath);
+
+                        processingFirmware = new FirmwareManager(processingNode,
+                                null, firmware);
+
+                        try {
+
+                            org.epsg.openconfigurator.xmlbinding.firmware.Firmware firmwareHeader = XddMarshaller
+                                    .unmarshallFirmwareFile(cnFirmwareFile);
+
+                            FirmwareManager firmwareManager = new FirmwareManager(
+                                    processingNode, firmwareHeader, firmware);
+                            processingFirmware = firmwareManager;
+
+                            processingNode.getNodeFirmwareCollection()
+                                    .put(processingFirmware, processingFirmware
+                                            .getFirmwarefileVersion());
+                        } catch (JAXBException | SAXException
+                                | ParserConfigurationException
+                                | FileNotFoundException
+                                | UnsupportedEncodingException
+                                | NullPointerException e) {
+                            if (e instanceof FileNotFoundException) {
+                                String errorMessage = MessageFormat.format(
+                                        FIRMWARE_FILE_NOT_FOUND_ERROR,
+                                        cnFirmwareFile.getName(),
+                                        processingNode.getNodeIDWithName(),
+                                        firmware.getURI());
+                                processingModule.setError(errorMessage);
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(errorMessage,
+                                                processingNode.getProject()
+                                                        .getName());
+                            } else if (e instanceof NullPointerException) {
+                                String errorMessage = MessageFormat.format(
+                                        INVALID_FIRMWARE_FILE_ERROR,
+                                        cnFirmwareFile.getName(),
+                                        processingNode.getNodeIDWithName());
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(errorMessage,
+                                                processingNode.getProject()
+                                                        .getName());
+                            } else {
+                                String errorMessage = e.getCause().getMessage()
+                                        + " for the firmware file of node '"
+                                        + processingNode.getNodeIDWithName()
+                                        + "'.";
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(errorMessage,
+                                                processingNode.getProject()
+                                                        .getName());
+                            }
+                        }
+                    }
+                }
 
                 if (cnNode.getInterfaceList() != null) {
                     System.err.println(
@@ -627,6 +706,104 @@ public class PowerlinkRootNode {
                                                 String.valueOf(processingModule
                                                         .getModuleName()),
                                                 newModule);
+                                if (module.getFirmwareList() != null) {
+                                    Iterator<FirmwareList.Firmware> firmwareIterator = module
+                                            .getFirmwareList().getFirmware()
+                                            .iterator();
+                                    while (firmwareIterator.hasNext()) {
+                                        if (monitor.isCanceled()) {
+                                            return new Status(IStatus.OK,
+                                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                                    "Cancelled", null);
+                                        }
+                                        FirmwareList.Firmware firmware = firmwareIterator
+                                                .next();
+                                        monitor.subTask(
+                                                "Import Firmware file:");
+
+                                        String decodedFirmwarePath = URLDecoder
+                                                .decode(firmware.getURI(),
+                                                        "UTF-8");
+
+                                        File moduleFirmwareFile = new File(
+                                                projectFile.getProject()
+                                                        .getLocation()
+                                                        + File.separator
+                                                        + decodedFirmwarePath);
+
+                                        processingFirmware = new FirmwareManager(
+                                                processingModule, null,
+                                                firmware);
+
+                                        try {
+
+                                            org.epsg.openconfigurator.xmlbinding.firmware.Firmware firmwareHeader = XddMarshaller
+                                                    .unmarshallFirmwareFile(
+                                                            moduleFirmwareFile);
+
+                                            FirmwareManager firmwareManager = new FirmwareManager(
+                                                    processingModule,
+                                                    firmwareHeader, firmware);
+                                            processingFirmware = firmwareManager;
+
+                                            processingModule
+                                                    .getModuleFirmwareCollection()
+                                                    .put(processingFirmware,
+                                                            processingFirmware
+                                                                    .getFirmwarefileVersion());
+                                        } catch (JAXBException | SAXException
+                                                | ParserConfigurationException
+                                                | FileNotFoundException
+                                                | UnsupportedEncodingException
+                                                | NullPointerException e) {
+                                            if (e instanceof FileNotFoundException) {
+                                                String errorMessage = MessageFormat
+                                                        .format(FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR,
+                                                                moduleFirmwareFile
+                                                                        .getName(),
+                                                                processingModule
+                                                                        .getModuleName(),
+                                                                firmware.getURI());
+                                                OpenConfiguratorMessageConsole
+                                                        .getInstance()
+                                                        .printErrorMessage(
+                                                                errorMessage,
+                                                                processingNode
+                                                                        .getProject()
+                                                                        .getName());
+                                            } else if (e instanceof NullPointerException) {
+                                                String errorMessage = MessageFormat
+                                                        .format(INVALID_MODULE_FIRMWARE_FILE_ERROR,
+                                                                moduleFirmwareFile
+                                                                        .getName(),
+                                                                processingModule
+                                                                        .getModuleName());
+                                                OpenConfiguratorMessageConsole
+                                                        .getInstance()
+                                                        .printErrorMessage(
+                                                                errorMessage,
+                                                                processingNode
+                                                                        .getProject()
+                                                                        .getName());
+                                            } else {
+                                                String errorMessage = e
+                                                        .getCause().getMessage()
+                                                        + " for the firmware file of module '"
+                                                        + processingModule
+                                                                .getModuleName()
+                                                        + "'.";
+                                                OpenConfiguratorMessageConsole
+                                                        .getInstance()
+                                                        .printErrorMessage(
+                                                                errorMessage,
+                                                                processingNode
+                                                                        .getProject()
+                                                                        .getName());
+                                            }
+                                        }
+                                    }
+                                }
+
                             } catch (JAXBException | SAXException
                                     | ParserConfigurationException
                                     | FileNotFoundException

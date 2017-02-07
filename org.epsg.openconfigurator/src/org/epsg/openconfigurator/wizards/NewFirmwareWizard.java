@@ -49,6 +49,7 @@ import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
@@ -121,6 +122,18 @@ public class NewFirmwareWizard extends Wizard {
         addPage(validateFirmwarePage);
     }
 
+    @Override
+    public boolean canFinish() {
+        boolean b = validateFirmwarePage.isPageComplete();
+        System.out.println(b);
+
+        if (!validateFirmwarePage.isPageComplete()) {
+            return false;
+        }
+
+        return true;
+    }
+
     private Node getNode(Object obj) {
         if (obj instanceof Node) {
             Node node = (Node) obj;
@@ -143,18 +156,6 @@ public class NewFirmwareWizard extends Wizard {
             return module.getModelOfModule();
         }
         return null;
-    }
-
-    @Override
-    public boolean canFinish() {
-        boolean b = validateFirmwarePage.isPageComplete();
-        System.out.println(b);
-
-        if (!validateFirmwarePage.isPageComplete()) {
-            return false;
-        }
-
-        return true;
     }
 
     @Override
@@ -203,7 +204,11 @@ public class NewFirmwareWizard extends Wizard {
                     firmwareMngr);
         } catch (IOException e) {
             System.err.println("The firmware file import is not successfull.");
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    "File is out of sync with the file system.",
+                    getNode(nodeOrModuleObj).getProject().getName());
             e.printStackTrace();
+            return false;
         }
 
         try {
