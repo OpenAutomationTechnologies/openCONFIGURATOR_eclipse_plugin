@@ -66,6 +66,10 @@ public class FirmwareManager {
 
     private int firmwarefileVersion;
 
+    public FirmwareManager() {
+        // TODO Auto-generated constructor stub
+    }
+
     /**
      * Constructor to initialize firmware variables.
      *
@@ -88,32 +92,37 @@ public class FirmwareManager {
             project = module.getProject();
             projectXml = module.getNode().getProjectXml();
         }
-        this.firmwareXddModel = firmwareXddModel;
 
-        byte[] devRev = String.valueOf(firmwareXddModel.getVar()).getBytes();
-        firmwareObjModel.setDeviceRevision(devRev);
+        if (firmwareXddModel != null) {
+            this.firmwareXddModel = firmwareXddModel;
 
-        byte[] prodNum = String.valueOf(firmwareXddModel.getDev()).getBytes();
-        firmwareObjModel.setProductNumber(prodNum);
+            byte[] devRev = String.valueOf(firmwareXddModel.getVar())
+                    .getBytes();
+            firmwareObjModel.setDeviceRevision(devRev);
 
-        byte[] applDate = String.valueOf(firmwareXddModel.getApplSwDate())
-                .getBytes();
-        firmwareObjModel.setDate(applDate);
+            byte[] prodNum = String.valueOf(firmwareXddModel.getDev())
+                    .getBytes();
+            firmwareObjModel.setProductNumber(prodNum);
 
-        byte[] applTime = String.valueOf(firmwareXddModel.getApplSwTime())
-                .getBytes();
-        firmwareObjModel.setTime(applTime);
+            byte[] applDate = String.valueOf(firmwareXddModel.getApplSwDate())
+                    .getBytes();
+            firmwareObjModel.setDate(applDate);
 
-        // TODO: To be updated in the future version
-        firmwareObjModel.setLocked(false);
+            byte[] applTime = String.valueOf(firmwareXddModel.getApplSwTime())
+                    .getBytes();
+            firmwareObjModel.setTime(applTime);
 
-        boolean keepHeader = Boolean
-                .valueOf(String.valueOf(firmwareXddModel.getKeepXmlheader()));
-        firmwareObjModel.setKeepHeader(keepHeader);
+            // TODO: To be updated in the future version
+            firmwareObjModel.setLocked(false);
 
-        this.firmwareObjModel = firmwareObjModel;
-        firmwarefileVersion = firmwareXddModel.getVer().intValue();
-        firmwareList.add(firmwareObjModel);
+            boolean keepHeader = Boolean.valueOf(
+                    String.valueOf(firmwareXddModel.getKeepXmlheader()));
+            firmwareObjModel.setKeepHeader(keepHeader);
+
+            this.firmwareObjModel = firmwareObjModel;
+            firmwarefileVersion = firmwareXddModel.getVer().intValue();
+            firmwareList.add(firmwareObjModel);
+        }
 
     }
 

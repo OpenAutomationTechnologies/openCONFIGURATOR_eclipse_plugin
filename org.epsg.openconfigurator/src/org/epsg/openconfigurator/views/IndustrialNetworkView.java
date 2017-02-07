@@ -1063,6 +1063,8 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                 } else if (nodeObjectModel instanceof TCN) {
                     if (node.isEnabled()) {
+                        manager.add(addFirmwareFile);
+                        manager.add(new Separator());
                         manager.add(disable);
                     } else {
                         manager.add(enable);
@@ -1080,12 +1082,6 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                     manager.add(deleteNode);
                     manager.add(new Separator());
-                    manager.add(addFirmwareFile);
-                    if (node.getXddFirmwareFile().getFirmwareList() == null) {
-                        addFirmwareFile.setEnabled(false);
-                    } else {
-                        addFirmwareFile.setEnabled(true);
-                    }
                 }
                 // Display list of menu only if the nodes are enabled.
                 if (node.isEnabled()) {
@@ -1112,6 +1108,8 @@ public class IndustrialNetworkView extends ViewPart
 
                     if (node.isEnabled()) {
                         if (moduleObj.isEnabled()) {
+                            manager.add(addFirmwareFile);
+                            manager.add(new Separator());
                             manager.add(disable);
                         } else {
                             manager.add(enable);
@@ -1137,13 +1135,6 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                     manager.add(deleteNode);
                     manager.add(new Separator());
-                    manager.add(addFirmwareFile);
-                    if (moduleObj.getXddFirmwareFile()
-                            .getFirmwareList() == null) {
-                        addFirmwareFile.setEnabled(false);
-                    } else {
-                        addFirmwareFile.setEnabled(true);
-                    }
                     if (moduleObj.isEnabled()) {
                         manager.add(new Separator());
                         manager.add(showProperties);

@@ -147,9 +147,10 @@ public final class XddMarshaller {
         if (XddMarshaller.firmwareSchema != null) {
             unmarshaller.setSchema(XddMarshaller.firmwareSchema);
         }
-        final Firmware xddFile = (Firmware) unmarshaller.unmarshal(source);
 
-        return xddFile;
+        final Firmware firmwareFile = (Firmware) unmarshaller.unmarshal(source);
+
+        return firmwareFile;
     }
 
     /**
@@ -183,6 +184,7 @@ public final class XddMarshaller {
      * @throws ParserConfigurationException
      * @throws IOException
      */
+    @SuppressWarnings("finally")
     public static Firmware unmarshallFirmwareFile(final File file)
             throws JAXBException, SAXException, ParserConfigurationException,
             IOException {
@@ -208,8 +210,11 @@ public final class XddMarshaller {
                     firmwareEndIndex + 1);
             input = new InputSource(new StringReader(firmwareHeader));
             input.setSystemId(file.toURI().toString());
-            return unmarshallFirmware(input);
+            // return unmarshallFirmware(input);
         } catch (RuntimeException e) {
+            if (bufferedRdr != null) {
+                bufferedRdr.close();
+            }
             throw e;
         } catch (Exception e) {
             if (bufferedRdr != null) {
@@ -220,10 +225,8 @@ public final class XddMarshaller {
             if (bufferedRdr != null) {
                 bufferedRdr.close();
             }
+            return unmarshallFirmware(input);
         }
-
-        return unmarshallFirmware(input);
-
     }
 
     private static ISO15745ProfileContainer unmarshallXDD(
