@@ -82,13 +82,11 @@ public class FirmwareManager {
             Firmware firmwareObjModel) {
 
         if (nodeOrModule instanceof Node) {
-            Node node = (Node) nodeOrModule;
-            this.node = node;
+            node = (Node) nodeOrModule;
             project = node.getProject();
             projectXml = node.getProjectXml();
         } else if (nodeOrModule instanceof Module) {
-            Module module = (Module) nodeOrModule;
-            this.module = module;
+            module = (Module) nodeOrModule;
             project = module.getProject();
             projectXml = module.getNode().getProjectXml();
         }
@@ -122,6 +120,8 @@ public class FirmwareManager {
             this.firmwareObjModel = firmwareObjModel;
             firmwarefileVersion = firmwareXddModel.getVer().intValue();
             firmwareList.add(firmwareObjModel);
+        } else {
+            System.err.println("The firmware XDD model is empty!");
         }
 
     }

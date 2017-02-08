@@ -2,6 +2,7 @@
 package org.epsg.openconfigurator.xmlbinding.firmware;
 
 import java.math.BigInteger;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -9,12 +10,14 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
 
-
 /**
- * <p>Java class for anonymous complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
+ * Java class for anonymous complex type.
+ *
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
+ *
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
@@ -69,8 +72,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "")
@@ -114,200 +117,54 @@ public class Firmware {
     protected long applSwDate;
 
     /**
-     * Gets the value of the ver property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
+     * Gets the value of the applSwDate property.
+     *
      */
-    public BigInteger getVer() {
-        return ver;
+    public long getApplSwDate() {
+        return applSwDate;
     }
 
     /**
-     * Sets the value of the ver property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
+     * Gets the value of the applSwTime property.
+     *
      */
-    public void setVer(BigInteger value) {
-        this.ver = value;
+    public long getApplSwTime() {
+        return applSwTime;
     }
 
     /**
-     * Gets the value of the ven property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * Gets the value of the chk property.
+     *
+     * @return possible object is {@link String }
+     *
      */
-    public String getVen() {
-        return ven;
+    public String getChk() {
+        return chk;
     }
 
     /**
-     * Sets the value of the ven property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * Gets the value of the date property.
+     *
+     * @return possible object is {@link String }
+     *
      */
-    public void setVen(String value) {
-        this.ven = value;
+    public String getDate() {
+        return date;
     }
 
     /**
-     * Gets the value of the var property.
-     * 
+     * Gets the value of the dev property.
+     *
      */
-    public long getVar() {
-        return var;
-    }
-
-    /**
-     * Sets the value of the var property.
-     * 
-     */
-    public void setVar(long value) {
-        this.var = value;
-    }
-
-    /**
-     * Gets the value of the use property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getUse() {
-        if (use == null) {
-            return "fw";
-        } else {
-            return use;
-        }
-    }
-
-    /**
-     * Sets the value of the use property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setUse(String value) {
-        this.use = value;
-    }
-
-    /**
-     * Gets the value of the rem property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getRem() {
-        return rem;
-    }
-
-    /**
-     * Sets the value of the rem property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setRem(String value) {
-        this.rem = value;
-    }
-
-    /**
-     * Gets the value of the mat property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
-     */
-    public String getMat() {
-        return mat;
-    }
-
-    /**
-     * Sets the value of the mat property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
-     */
-    public void setMat(String value) {
-        this.mat = value;
-    }
-
-    /**
-     * Gets the value of the len property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link BigInteger }
-     *     
-     */
-    public BigInteger getLen() {
-        return len;
-    }
-
-    /**
-     * Sets the value of the len property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link BigInteger }
-     *     
-     */
-    public void setLen(BigInteger value) {
-        this.len = value;
-    }
-
-    /**
-     * Gets the value of the keepXmlheader property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Byte }
-     *     
-     */
-    public Byte getKeepXmlheader() {
-        return keepXmlheader;
-    }
-
-    /**
-     * Sets the value of the keepXmlheader property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Byte }
-     *     
-     */
-    public void setKeepXmlheader(Byte value) {
-        this.keepXmlheader = value;
+    public long getDev() {
+        return dev;
     }
 
     /**
      * Gets the value of the fct property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     *
+     * @return possible object is {@link String }
+     *
      */
     public String getFct() {
         if (fct == null) {
@@ -318,111 +175,217 @@ public class Firmware {
     }
 
     /**
-     * Sets the value of the fct property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * Gets the value of the keepXmlheader property.
+     *
+     * @return possible object is {@link Byte }
+     *
      */
-    public void setFct(String value) {
-        this.fct = value;
+    public Byte getKeepXmlheader() {
+        return keepXmlheader;
     }
 
     /**
-     * Gets the value of the dev property.
-     * 
+     * Gets the value of the len property.
+     *
+     * @return possible object is {@link BigInteger }
+     *
      */
-    public long getDev() {
-        return dev;
+    public BigInteger getLen() {
+        return len;
     }
 
     /**
-     * Sets the value of the dev property.
-     * 
+     * Gets the value of the mat property.
+     *
+     * @return possible object is {@link String }
+     *
      */
-    public void setDev(long value) {
-        this.dev = value;
+    public String getMat() {
+        return mat;
     }
 
     /**
-     * Gets the value of the date property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * Gets the value of the rem property.
+     *
+     * @return possible object is {@link String }
+     *
      */
-    public String getDate() {
-        return date;
+    public String getRem() {
+        return rem;
     }
 
     /**
-     * Sets the value of the date property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * Gets the value of the use property.
+     *
+     * @return possible object is {@link String }
+     *
      */
-    public void setDate(String value) {
-        this.date = value;
+    public String getUse() {
+        if (use == null) {
+            return "fw";
+        } else {
+            return use;
+        }
     }
 
     /**
-     * Gets the value of the chk property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link String }
-     *     
+     * Gets the value of the var property.
+     *
      */
-    public String getChk() {
-        return chk;
+    public long getVar() {
+        return var;
     }
 
     /**
-     * Sets the value of the chk property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link String }
-     *     
+     * Gets the value of the ven property.
+     *
+     * @return possible object is {@link String }
+     *
      */
-    public void setChk(String value) {
-        this.chk = value;
+    public String getVen() {
+        return ven;
     }
 
     /**
-     * Gets the value of the applSwTime property.
-     * 
+     * Gets the value of the ver property.
+     *
+     * @return possible object is {@link BigInteger }
+     *
      */
-    public long getApplSwTime() {
-        return applSwTime;
-    }
-
-    /**
-     * Sets the value of the applSwTime property.
-     * 
-     */
-    public void setApplSwTime(long value) {
-        this.applSwTime = value;
-    }
-
-    /**
-     * Gets the value of the applSwDate property.
-     * 
-     */
-    public long getApplSwDate() {
-        return applSwDate;
+    public BigInteger getVer() {
+        return ver;
     }
 
     /**
      * Sets the value of the applSwDate property.
-     * 
+     *
      */
     public void setApplSwDate(long value) {
-        this.applSwDate = value;
+        applSwDate = value;
+    }
+
+    /**
+     * Sets the value of the applSwTime property.
+     *
+     */
+    public void setApplSwTime(long value) {
+        applSwTime = value;
+    }
+
+    /**
+     * Sets the value of the chk property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setChk(String value) {
+        chk = value;
+    }
+
+    /**
+     * Sets the value of the date property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setDate(String value) {
+        date = value;
+    }
+
+    /**
+     * Sets the value of the dev property.
+     *
+     */
+    public void setDev(long value) {
+        dev = value;
+    }
+
+    /**
+     * Sets the value of the fct property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setFct(String value) {
+        fct = value;
+    }
+
+    /**
+     * Sets the value of the keepXmlheader property.
+     *
+     * @param value allowed object is {@link Byte }
+     *
+     */
+    public void setKeepXmlheader(Byte value) {
+        keepXmlheader = value;
+    }
+
+    /**
+     * Sets the value of the len property.
+     *
+     * @param value allowed object is {@link BigInteger }
+     *
+     */
+    public void setLen(BigInteger value) {
+        len = value;
+    }
+
+    /**
+     * Sets the value of the mat property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setMat(String value) {
+        mat = value;
+    }
+
+    /**
+     * Sets the value of the rem property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setRem(String value) {
+        rem = value;
+    }
+
+    /**
+     * Sets the value of the use property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setUse(String value) {
+        use = value;
+    }
+
+    /**
+     * Sets the value of the var property.
+     *
+     */
+    public void setVar(long value) {
+        var = value;
+    }
+
+    /**
+     * Sets the value of the ven property.
+     *
+     * @param value allowed object is {@link String }
+     *
+     */
+    public void setVen(String value) {
+        ven = value;
+    }
+
+    /**
+     * Sets the value of the ver property.
+     *
+     * @param value allowed object is {@link BigInteger }
+     *
+     */
+    public void setVer(BigInteger value) {
+        ver = value;
     }
 
 }

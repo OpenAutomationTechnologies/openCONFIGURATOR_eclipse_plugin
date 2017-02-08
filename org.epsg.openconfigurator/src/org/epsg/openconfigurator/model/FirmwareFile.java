@@ -194,7 +194,7 @@ public class FirmwareFile {
                             }
                         } else {
                             System.err.println(
-                                    "The firmware list not available in the XDD.");
+                                    "The firmware list not available in the XDD of node.");
                         }
                     }
                 } else if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularChild) {
@@ -215,7 +215,7 @@ public class FirmwareFile {
                             }
                         } else {
                             System.err.println(
-                                    "The firmware list not available in the XDD.");
+                                    "The firmware list not available in the XDD of module.");
                         }
                     }
 

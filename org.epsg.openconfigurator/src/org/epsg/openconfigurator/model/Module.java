@@ -188,7 +188,9 @@ public class Module {
         xpath = "//plk:ApplicationProcess";
 
         objectDictionary = new ObjectDictionary(this, node, xddModel);
-        xddFirmwareFile = new FirmwareFile(xddModel);
+        if (xddModel != null) {
+            xddFirmwareFile = new FirmwareFile(xddModel);
+        }
         if (nodeModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) nodeModel;
             moduleName = module.getName();
