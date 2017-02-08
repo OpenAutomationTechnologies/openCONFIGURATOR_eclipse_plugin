@@ -66,6 +66,30 @@ public class NewFirmwareWizard extends Wizard {
 
     private static final String WINDOW_TITLE = "POWERLINK firmware wizard";
 
+    private static Node getNode(Object obj) {
+        if (obj instanceof Node) {
+            Node node = (Node) obj;
+            return node;
+        }
+        if (obj instanceof Module) {
+            Module module = (Module) obj;
+            return module.getNode();
+        }
+        return null;
+    }
+
+    private static Object getObjModel(Object obj) {
+        if (obj instanceof Node) {
+            Node node = (Node) obj;
+            return node.getNodeModel();
+        }
+        if (obj instanceof Module) {
+            Module module = (Module) obj;
+            return module.getModelOfModule();
+        }
+        return null;
+    }
+
     /**
      * Add validateFirmwareWizardPage
      */
@@ -82,7 +106,9 @@ public class NewFirmwareWizard extends Wizard {
 
     private Object nodeOrModuleObj;
 
-    public NewFirmwareWizard(PowerlinkRootNode nodeList, Object selectedObj) {
+    public NewFirmwareWizard(
+            @SuppressWarnings("unused") PowerlinkRootNode nodeList,
+            Object selectedObj) {
         if (selectedObj == null) {
             System.err.println("Invalid node selection");
         }
@@ -90,8 +116,7 @@ public class NewFirmwareWizard extends Wizard {
         Object nodeModel = null;
         Object moduleModel = null;
         if (selectedObj instanceof Node) {
-            Node node = (Node) selectedObj;
-            selectedNodeObj = node;
+            selectedNodeObj = (Node) selectedObj;
             if (selectedNodeObj != null) {
                 nodeModel = selectedNodeObj.getNodeModel();
             }
@@ -99,13 +124,12 @@ public class NewFirmwareWizard extends Wizard {
                 System.err.println("The NodeModel is empty!");
             }
         } else if (selectedObj instanceof Module) {
-            Module module = (Module) selectedObj;
-            selectedModuleObj = module;
+            selectedModuleObj = (Module) selectedObj;
             if (selectedModuleObj != null) {
                 moduleModel = selectedModuleObj.getModelOfModule();
             }
             if (moduleModel == null) {
-                System.err.println("The NodeModel is empty!");
+                System.err.println("The Module Model is empty!");
             }
         }
 
@@ -124,38 +148,14 @@ public class NewFirmwareWizard extends Wizard {
 
     @Override
     public boolean canFinish() {
-        boolean b = validateFirmwarePage.isPageComplete();
-        System.out.println(b);
+        @SuppressWarnings("unused")
+        boolean isPageComplete = validateFirmwarePage.isPageComplete();
 
         if (!validateFirmwarePage.isPageComplete()) {
             return false;
         }
 
         return true;
-    }
-
-    private Node getNode(Object obj) {
-        if (obj instanceof Node) {
-            Node node = (Node) obj;
-            return node;
-        }
-        if (obj instanceof Module) {
-            Module module = (Module) obj;
-            return module.getNode();
-        }
-        return null;
-    }
-
-    private Object getObjModel(Object obj) {
-        if (obj instanceof Node) {
-            Node node = (Node) obj;
-            return node.getNodeModel();
-        }
-        if (obj instanceof Module) {
-            Module module = (Module) obj;
-            return module.getModelOfModule();
-        }
-        return null;
     }
 
     @Override
@@ -198,6 +198,51 @@ public class NewFirmwareWizard extends Wizard {
 
         byte[] venId = String.valueOf(firmwareMngr.getVendorId()).getBytes();
         firmware.setVendorId(venId);
+
+        if (nodeOrModuleObj instanceof Node) {
+            Node cnNode = (Node) nodeOrModuleObj;
+            cnNode.getNodeFirmwareCollection().put(firmwareMngr,
+                    firmwareMngr.getFirmwarefileVersion());
+            for (int version : cnNode.getNodeFirmwareCollection().values()) {
+                if (firmwareMngr.getFirmwarefileVersion() < version) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add lowest version firmware file", null,
+                            "The firmware file version '"
+                                    + firmwareMngr.getFirmwarefileVersion()
+                                    + "' is lower than the available firmware files. "
+                                    + "Do you wish to continue? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return false;
+                    }
+
+                }
+            }
+        } else if (nodeOrModuleObj instanceof Module) {
+            Module cnModule = (Module) nodeOrModuleObj;
+            cnModule.getModuleFirmwareCollection().put(firmwareMngr,
+                    firmwareMngr.getFirmwarefileVersion());
+            for (int version : cnModule.getModuleFirmwareCollection()
+                    .values()) {
+                if (firmwareMngr.getFirmwarefileVersion() < version) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add lowest version firmware file", null,
+                            "The firmware file version '"
+                                    + firmwareMngr.getFirmwarefileVersion()
+                                    + "' is lower than the available firmware files. "
+                                    + "Do you wish to continue? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return false;
+                    }
+
+                }
+            }
+        }
 
         try {
             OpenConfiguratorProjectUtils.importFirmwareFile(firmwareFilePath,
@@ -257,33 +302,6 @@ public class NewFirmwareWizard extends Wizard {
             System.err.println(
                     "The node assignment value is not updated in the project file.");
             e1.printStackTrace();
-        }
-
-        if (nodeOrModuleObj instanceof Node) {
-            Node cnNode = (Node) nodeOrModuleObj;
-            cnNode.getNodeFirmwareCollection().put(firmwareMngr,
-                    firmwareMngr.getFirmwarefileVersion());
-            for (int version : cnNode.getNodeFirmwareCollection().values()) {
-                if (firmwareMngr.getFirmwarefileVersion() < version) {
-                    MessageDialog dialog = new MessageDialog(null,
-                            "Add lowest version firmware file", null,
-                            "The firmware file version '"
-                                    + firmwareMngr.getFirmwarefileVersion()
-                                    + "' is lower than the available firmware files. "
-                                    + "Do you wish to continue? ",
-                            MessageDialog.WARNING, new String[] { "Yes", "No" },
-                            1);
-                    int result = dialog.open();
-                    if (result != 0) {
-                        return false;
-                    }
-
-                }
-            }
-        } else if (nodeOrModuleObj instanceof Module) {
-            Module cnModule = (Module) nodeOrModuleObj;
-            cnModule.getModuleFirmwareCollection().put(firmwareMngr,
-                    firmwareMngr.getFirmwarefileVersion());
         }
 
         try {

@@ -570,12 +570,16 @@ public class ProjectJDomOperation {
             }
             if (node.isModularheadNode()) {
                 int index = getChildIndexbelowNode(document, node);
-                index = index - 1;
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, forcedTagXpath,
                         OPENCONFIGURATOR_NAMESPACE, newObjElement, index);
             } else {
                 int index = getChildIndexbelowNode(document, node);
-                index = index - 1;
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, forcedTagXpath,
                         OPENCONFIGURATOR_NAMESPACE, newObjElement, index);
             }
@@ -600,13 +604,17 @@ public class ProjectJDomOperation {
             newElement.setContent(newObjElement);
             if (node.isModularheadNode()) {
                 int index = getChildIndexbelowNode(document, node);
-                index = index - 1;
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, node.getXpath(),
                         OPENCONFIGURATOR_NAMESPACE, newElement, index);
             } else {
                 int index = getChildIndexbelowNode(document, node);
                 System.err.println("The Child index..." + index);
-                index = index - 1;
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, node.getXpath(),
                         OPENCONFIGURATOR_NAMESPACE, newElement, index);
             }

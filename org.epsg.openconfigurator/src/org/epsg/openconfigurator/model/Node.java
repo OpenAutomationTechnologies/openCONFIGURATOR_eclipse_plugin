@@ -82,6 +82,10 @@ public class Node {
         UNDEFINED, CONTROLLED_NODE, MANAGING_NODE, REDUNDANT_MANAGING_NODE, MODULAR_CHILD_NODE
     }
 
+    private static final int XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK = 0x1018;
+
+    private static final short XDD_VENDOR_ID_SUBOBJECT_INDEX = 1;
+
     /**
      * Returns the attribute name linked with the node assignment value.
      *
@@ -261,7 +265,6 @@ public class Node {
      * Instance of head node interface.
      */
     private HeadNodeInterface headNodeInterface;
-
     private Map<FirmwareManager, Integer> nodeFirmwareCollection = new HashMap<>();
 
     /**
@@ -977,10 +980,13 @@ public class Node {
     public String getVendorIdValue() {
         String value = StringUtils.EMPTY;
         if (getObjectDictionary() != null) {
-            if (getObjectDictionary().getObject(0x1018)
-                    .getSubObject((short) 01) != null) {
-                value = getObjectDictionary().getObject(0x1018)
-                        .getSubObject((short) 01).getActualDefaultValue();
+            if (getObjectDictionary()
+                    .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                    .getSubObject(XDD_VENDOR_ID_SUBOBJECT_INDEX) != null) {
+                value = getObjectDictionary()
+                        .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                        .getSubObject(XDD_VENDOR_ID_SUBOBJECT_INDEX)
+                        .getActualDefaultValue();
             }
         } else {
             System.err.println("Object Dictionary not available.");

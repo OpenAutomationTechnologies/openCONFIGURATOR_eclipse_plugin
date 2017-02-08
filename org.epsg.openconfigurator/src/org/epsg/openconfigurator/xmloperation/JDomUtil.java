@@ -42,6 +42,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -337,10 +338,12 @@ public class JDomUtil {
                     if (name.equalsIgnoreCase("pathToXDC")) {
                         String value = attrib.getValue();
                         Path path = Paths.get(value);
-                        Path parentPath = path.getParent();
-                        if (parentPath != null) {
-                            if (parentPath.getFileName() != null) {
-                                return parentPath.getFileName().toString();
+                        if (path != null) {
+                            Path parentPath = path.getParent();
+                            if (parentPath != null) {
+                                if (parentPath.getFileName() != null) {
+                                    return parentPath.getFileName().toString();
+                                }
                             }
                         }
                     }
@@ -351,7 +354,7 @@ public class JDomUtil {
                 System.err.println(expr.getExpression() + "Element null");
             }
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     /**

@@ -59,7 +59,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     private static final String[] FIRMWARE_FILTER_EXTENSIONS = { "*.fw" };
 
     private static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
-            "Firmware files", "All files" };
+            "Firmware files" };
 
     private static final String ERROR_PRAM_VALIDATION_FAILED_HEADER = "{0} does not match.";
     private static final String ERROR_PRAM_VALIDATION_FAILED_DETAIL = "Firmware file {0} with {1} {2} does not match with XDD value {3}.";
@@ -97,8 +97,6 @@ public class ValidateFirmwareWizardPage extends WizardPage {
 
     private Node node;
 
-    boolean retVal = false;
-
     // Node configuration path listener
     private ModifyListener nodeConfigurationPathModifyListener = new ModifyListener() {
         @Override
@@ -126,11 +124,9 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         super(DIALOG_PAGE_NAME);
         nodeOrModuleObj = obj;
         if (obj instanceof Node) {
-            Node node = (Node) obj;
-            this.node = node;
+            node = (Node) obj;
         } else if (obj instanceof Module) {
-            Module module = (Module) obj;
-            this.module = module;
+            module = (Module) obj;
         }
 
         setTitle(DIALOG_PAGE_LABEL);
@@ -272,7 +268,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
             File firmwareFile = new File(firmwareConfigurationPath.getText());
             fileName = firmwareFile.getName();
             boolean fileExists = firmwareFile.exists();
-            // if file exists
+
             if (fileExists) {
                 firmwareModel = XddMarshaller
                         .unmarshallFirmwareFile(firmwareFile);
@@ -431,6 +427,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     }
 
     private boolean isFirmwareConfigurationValid(final String firmwarePath) {
+        boolean retVal = false;
         if ((firmwarePath == null) || (firmwarePath.isEmpty())) {
             return retVal;
         }

@@ -3,6 +3,7 @@ package org.epsg.openconfigurator.xmlbinding.projectfile;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
@@ -12,12 +13,14 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-
 /**
- * <p>Java class for anonymous complex type.
- * 
- * <p>The following schema fragment specifies the expected content contained within this class.
- * 
+ * <p>
+ * Java class for anonymous complex type.
+ *
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
+ *
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
@@ -85,54 +88,22 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- * 
- * 
+ *
+ *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "", propOrder = {
-    "firmware"
-})
+@XmlType(name = "", propOrder = { "firmware" })
 @XmlRootElement(name = "FirmwareList")
 public class FirmwareList {
 
-    @XmlElement(name = "Firmware", required = true)
-    protected List<FirmwareList.Firmware> firmware;
-
     /**
-     * Gets the value of the firmware property.
-     * 
      * <p>
-     * This accessor method returns a reference to the live list,
-     * not a snapshot. Therefore any modification you make to the
-     * returned list will be present inside the JAXB object.
-     * This is why there is not a <CODE>set</CODE> method for the firmware property.
-     * 
+     * Java class for anonymous complex type.
+     *
      * <p>
-     * For example, to add a new item, do as follows:
-     * <pre>
-     *    getFirmware().add(newItem);
-     * </pre>
-     * 
-     * 
-     * <p>
-     * Objects of the following type(s) are allowed in the list
-     * {@link FirmwareList.Firmware }
-     * 
-     * 
-     */
-    public List<FirmwareList.Firmware> getFirmware() {
-        if (firmware == null) {
-            firmware = new ArrayList<FirmwareList.Firmware>();
-        }
-        return this.firmware;
-    }
-
-
-    /**
-     * <p>Java class for anonymous complex type.
-     * 
-     * <p>The following schema fragment specifies the expected content contained within this class.
-     * 
+     * The following schema fragment specifies the expected content contained
+     * within this class.
+     *
      * <pre>
      * &lt;complexType&gt;
      *   &lt;complexContent&gt;
@@ -190,8 +161,8 @@ public class FirmwareList {
      *   &lt;/complexContent&gt;
      * &lt;/complexType&gt;
      * </pre>
-     * 
-     * 
+     *
+     *
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "")
@@ -220,156 +191,70 @@ public class FirmwareList {
         protected Boolean locked;
 
         /**
-         * Gets the value of the uri property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public String getURI() {
-            return uri;
-        }
-
-        /**
-         * Sets the value of the uri property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setURI(String value) {
-            this.uri = value;
-        }
-
-        /**
-         * Gets the value of the vendorId property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public byte[] getVendorId() {
-            return vendorId;
-        }
-
-        /**
-         * Sets the value of the vendorId property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setVendorId(byte[] value) {
-            this.vendorId = value;
-        }
-
-        /**
-         * Gets the value of the productNumber property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public byte[] getProductNumber() {
-            return productNumber;
-        }
-
-        /**
-         * Sets the value of the productNumber property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setProductNumber(byte[] value) {
-            this.productNumber = value;
-        }
-
-        /**
-         * Gets the value of the deviceRevision property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
-         */
-        public byte[] getDeviceRevision() {
-            return deviceRevision;
-        }
-
-        /**
-         * Sets the value of the deviceRevision property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
-         */
-        public void setDeviceRevision(byte[] value) {
-            this.deviceRevision = value;
-        }
-
-        /**
          * Gets the value of the date property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is {@link String }
+         *
          */
         public byte[] getDate() {
             return date;
         }
 
         /**
-         * Sets the value of the date property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         * Gets the value of the deviceRevision property.
+         *
+         * @return possible object is {@link String }
+         *
          */
-        public void setDate(byte[] value) {
-            this.date = value;
+        public byte[] getDeviceRevision() {
+            return deviceRevision;
+        }
+
+        /**
+         * Gets the value of the productNumber property.
+         *
+         * @return possible object is {@link String }
+         *
+         */
+        public byte[] getProductNumber() {
+            return productNumber;
         }
 
         /**
          * Gets the value of the time property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link String }
-         *     
+         *
+         * @return possible object is {@link String }
+         *
          */
         public byte[] getTime() {
             return time;
         }
 
         /**
-         * Sets the value of the time property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link String }
-         *     
+         * Gets the value of the uri property.
+         *
+         * @return possible object is {@link String }
+         *
          */
-        public void setTime(byte[] value) {
-            this.time = value;
+        public String getURI() {
+            return uri;
+        }
+
+        /**
+         * Gets the value of the vendorId property.
+         *
+         * @return possible object is {@link String }
+         *
+         */
+        public byte[] getVendorId() {
+            return vendorId;
         }
 
         /**
          * Gets the value of the keepHeader property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link Boolean }
-         *     
+         *
+         * @return possible object is {@link Boolean }
+         *
          */
         public boolean isKeepHeader() {
             if (keepHeader == null) {
@@ -380,24 +265,10 @@ public class FirmwareList {
         }
 
         /**
-         * Sets the value of the keepHeader property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link Boolean }
-         *     
-         */
-        public void setKeepHeader(Boolean value) {
-            this.keepHeader = value;
-        }
-
-        /**
          * Gets the value of the locked property.
-         * 
-         * @return
-         *     possible object is
-         *     {@link Boolean }
-         *     
+         *
+         * @return possible object is {@link Boolean }
+         *
          */
         public boolean isLocked() {
             if (locked == null) {
@@ -408,17 +279,118 @@ public class FirmwareList {
         }
 
         /**
-         * Sets the value of the locked property.
-         * 
-         * @param value
-         *     allowed object is
-         *     {@link Boolean }
-         *     
+         * Sets the value of the date property.
+         *
+         * @param value allowed object is {@link String }
+         *
          */
-        public void setLocked(Boolean value) {
-            this.locked = value;
+        public void setDate(byte[] value) {
+            date = value;
         }
 
+        /**
+         * Sets the value of the deviceRevision property.
+         *
+         * @param value allowed object is {@link String }
+         *
+         */
+        public void setDeviceRevision(byte[] value) {
+            deviceRevision = value;
+        }
+
+        /**
+         * Sets the value of the keepHeader property.
+         *
+         * @param value allowed object is {@link Boolean }
+         *
+         */
+        public void setKeepHeader(Boolean value) {
+            keepHeader = value;
+        }
+
+        /**
+         * Sets the value of the locked property.
+         *
+         * @param value allowed object is {@link Boolean }
+         *
+         */
+        public void setLocked(Boolean value) {
+            locked = value;
+        }
+
+        /**
+         * Sets the value of the productNumber property.
+         *
+         * @param value allowed object is {@link String }
+         *
+         */
+        public void setProductNumber(byte[] value) {
+            productNumber = value;
+        }
+
+        /**
+         * Sets the value of the time property.
+         *
+         * @param value allowed object is {@link String }
+         *
+         */
+        public void setTime(byte[] value) {
+            time = value;
+        }
+
+        /**
+         * Sets the value of the uri property.
+         *
+         * @param value allowed object is {@link String }
+         *
+         */
+        public void setURI(String value) {
+            uri = value;
+        }
+
+        /**
+         * Sets the value of the vendorId property.
+         *
+         * @param value allowed object is {@link String }
+         *
+         */
+        public void setVendorId(byte[] value) {
+            vendorId = value;
+        }
+
+    }
+
+    @XmlElement(name = "Firmware", required = true)
+    protected List<FirmwareList.Firmware> firmware;
+
+    /**
+     * Gets the value of the firmware property.
+     *
+     * <p>
+     * This accessor method returns a reference to the live list, not a
+     * snapshot. Therefore any modification you make to the returned list will
+     * be present inside the JAXB object. This is why there is not a
+     * <CODE>set</CODE> method for the firmware property.
+     *
+     * <p>
+     * For example, to add a new item, do as follows:
+     *
+     * <pre>
+     * getFirmware().add(newItem);
+     * </pre>
+     *
+     *
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link FirmwareList.Firmware }
+     *
+     *
+     */
+    public List<FirmwareList.Firmware> getFirmware() {
+        if (firmware == null) {
+            firmware = new ArrayList<>();
+        }
+        return firmware;
     }
 
 }
