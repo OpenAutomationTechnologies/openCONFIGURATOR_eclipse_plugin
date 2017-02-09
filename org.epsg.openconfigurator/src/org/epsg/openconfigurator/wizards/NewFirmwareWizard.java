@@ -32,6 +32,7 @@
 package org.epsg.openconfigurator.wizards;
 
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Path;
 
 import org.eclipse.core.resources.IResource;
@@ -163,7 +164,7 @@ public class NewFirmwareWizard extends Wizard {
         Path firmwareFilePath = validateFirmwarePage
                 .getFirmwareConfigurationPath();
         Result res = new Result();
-
+        Charset charset = Charset.forName("UTF-8");
         Object objModel = getObjModel(nodeOrModuleObj);
         Firmware firmware = new Firmware();
         if (objModel instanceof TCN) {
@@ -196,7 +197,8 @@ public class NewFirmwareWizard extends Wizard {
         FirmwareManager firmwareMngr = new FirmwareManager(nodeOrModuleObj,
                 validateFirmwarePage.getFirmwareModel(), firmwareObj);
 
-        byte[] venId = String.valueOf(firmwareMngr.getVendorId()).getBytes();
+        byte[] venId = String.valueOf(firmwareMngr.getVendorId())
+                .getBytes(charset);
         firmware.setVendorId(venId);
 
         if (nodeOrModuleObj instanceof Node) {

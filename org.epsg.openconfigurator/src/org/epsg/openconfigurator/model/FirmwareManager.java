@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -93,21 +94,22 @@ public class FirmwareManager {
 
         if (firmwareXddModel != null) {
             this.firmwareXddModel = firmwareXddModel;
-
-            byte[] devRev = String.valueOf(firmwareXddModel.getVar())
-                    .getBytes();
+            Charset charset = Charset.forName("UTF-8");
+            byte[] devRev;
+            devRev = String.valueOf(firmwareXddModel.getVar())
+                    .getBytes(charset);
             firmwareObjModel.setDeviceRevision(devRev);
 
             byte[] prodNum = String.valueOf(firmwareXddModel.getDev())
-                    .getBytes();
+                    .getBytes(charset);
             firmwareObjModel.setProductNumber(prodNum);
 
             byte[] applDate = String.valueOf(firmwareXddModel.getApplSwDate())
-                    .getBytes();
+                    .getBytes(charset);
             firmwareObjModel.setDate(applDate);
 
             byte[] applTime = String.valueOf(firmwareXddModel.getApplSwTime())
-                    .getBytes();
+                    .getBytes(charset);
             firmwareObjModel.setTime(applTime);
 
             // TODO: To be updated in the future version
