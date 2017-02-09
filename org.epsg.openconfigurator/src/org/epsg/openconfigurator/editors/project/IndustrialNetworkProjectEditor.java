@@ -35,6 +35,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -643,9 +644,9 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * @param input Input content of openCONFIGURATOR type
      */
     public void reloadFromSourceText(final String input) {
-
+        Charset charset = Charset.forName("UTF-8");
         try {
-            InputStream is = new ByteArrayInputStream(input.getBytes());
+            InputStream is = new ByteArrayInputStream(input.getBytes(charset));
             currentProject = OpenConfiguratorProjectMarshaller
                     .unmarshallOpenConfiguratorProject(is);
 

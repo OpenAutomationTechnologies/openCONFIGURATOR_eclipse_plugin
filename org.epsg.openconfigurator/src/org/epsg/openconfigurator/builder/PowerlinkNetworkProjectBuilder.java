@@ -176,6 +176,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         String piDataOutput[] = new String[1];
         Result res = OpenConfiguratorCore.GetInstance()
                 .BuildCProcessImage(networkId, nodeId, piDataOutput);
+        Charset charset = Charset.forName("UTF-8");
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
@@ -192,7 +193,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             if (!Files.exists(targetPath)) {
                 Files.createDirectory(targetPath);
             }
-            Files.write(targetFilePath, piDataOutput[0].getBytes());
+            Files.write(targetFilePath, piDataOutput[0].getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -218,6 +219,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private static boolean buildCSharpProcessImage(String networkId,
             short nodeId, java.nio.file.Path targetPath) throws CoreException {
         String piDataOutput[] = new String[1];
+        Charset charset = Charset.forName("UTF-8");
         Result res = OpenConfiguratorCore.GetInstance()
                 .BuildNETProcessImage(networkId, nodeId, piDataOutput);
         if (!res.IsSuccessful()) {
@@ -236,7 +238,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             if (!Files.exists(targetPath)) {
                 Files.createDirectory(targetPath);
             }
-            Files.write(targetFilePath, piDataOutput[0].getBytes());
+            Files.write(targetFilePath, piDataOutput[0].getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -379,7 +381,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     private static boolean createMnobdHexTxt(java.nio.file.Path outputFolder,
             ByteBuffer buffer) throws CoreException {
-
+        Charset charset = Charset.forName("UTF-8");
         StringBuilder sb = new StringBuilder();
         byte[] txtArray = buffer.array();
         short lineBreakCount = 0;
@@ -404,7 +406,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 .resolve(MN_OBD_CHAR_TXT);
 
         try {
-            Files.write(targetFilePath, sb.toString().getBytes());
+            Files.write(targetFilePath, sb.toString().getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -426,11 +428,11 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     private static boolean createMnobdTxt(java.nio.file.Path outputFolder,
             final String configuration) throws CoreException {
-
+        Charset charset = Charset.forName("UTF-8");
         java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_TXT);
 
         try {
-            Files.write(targetFilePath, configuration.getBytes());
+            Files.write(targetFilePath, configuration.getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
