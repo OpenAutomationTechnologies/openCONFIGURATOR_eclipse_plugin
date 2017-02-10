@@ -174,36 +174,24 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                     if ((!xddVendorId.isEmpty()) && (!xddProductCode.isEmpty())
                             && (!xddRevisionNo.isEmpty())) {
                         if (Long.decode(xddProductCode) == firmwareDev) {
-                            if (Long.decode(xddRevisionNo) == firmwareVar) {
-                                if (!isFirmwareVendorIdEmpty) {
-                                    // vendor ID shall not be compared if
-                                    // firmware
-                                    // doesn't contain the variable 'Var'
-                                    if (Long.decode(
-                                            xddVendorId) == firmwareVen) {
-                                        return true;
-                                    }
-                                    setErrorMessage(MessageFormat.format(
-                                            ERROR_PRAM_VALIDATION_FAILED_HEADER,
-                                            "Vendor ID"));
-                                    getErrorStyledText(MessageFormat.format(
-                                            ERROR_PRAM_VALIDATION_FAILED_DETAIL,
-                                            "'" + fileName + "'", "vendor ID",
-                                            "'" + firmwareModel.getVen() + "'",
-                                            "'" + xddVendorId + "'"));
-                                    return false;
+                            if (!isFirmwareVendorIdEmpty) {
+                                // vendor ID shall not be compared if
+                                // firmware
+                                // doesn't contain the variable 'Var'
+                                if (Long.decode(xddVendorId) == firmwareVen) {
+                                    return true;
                                 }
-                                return true;
+                                setErrorMessage(MessageFormat.format(
+                                        ERROR_PRAM_VALIDATION_FAILED_HEADER,
+                                        "Vendor ID"));
+                                getErrorStyledText(MessageFormat.format(
+                                        ERROR_PRAM_VALIDATION_FAILED_DETAIL,
+                                        "'" + fileName + "'", "vendor ID",
+                                        "'" + firmwareModel.getVen() + "'",
+                                        "'" + xddVendorId + "'"));
+                                return false;
                             }
-                            setErrorMessage(MessageFormat.format(
-                                    ERROR_PRAM_VALIDATION_FAILED_HEADER,
-                                    "Revision Number"));
-                            getErrorStyledText(MessageFormat.format(
-                                    ERROR_PRAM_VALIDATION_FAILED_DETAIL,
-                                    "'" + fileName + "'", "revision number",
-                                    "'" + firmwareVar + "'",
-                                    "'" + Long.decode(xddRevisionNo) + "'"));
-                            return false;
+                            return true;
                         }
                         setErrorMessage(MessageFormat.format(
                                 ERROR_PRAM_VALIDATION_FAILED_HEADER,
