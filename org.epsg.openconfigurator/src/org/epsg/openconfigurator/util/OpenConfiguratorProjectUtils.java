@@ -200,6 +200,78 @@ public final class OpenConfiguratorProjectUtils {
     }
 
     /**
+     * Copies the firmware files based on the latest version and hardware
+     * variant of firmware
+     *
+     * @param firmwareMngr Instance of Firmware manager
+     * @throws IOException Error with XDC/XDD file modification.
+     */
+    public static void copyFirmwareFiles(FirmwareManager firmwareMngr)
+            throws IOException {
+        java.nio.file.Path projectRootPath = firmwareMngr.getProject()
+                .getLocation().toFile().toPath();
+        String path = projectRootPath.toString() + IPath.SEPARATOR
+                + firmwareMngr.getFirmwareConfigPath();
+        java.nio.file.Path firmwareFile = new File(path).toPath();
+        String fileExtension = StringUtils.EMPTY;
+        if (firmwareFile != null) {
+            if ((firmwareFile.getFileName() != null)) {
+                String newFirmwareName = firmwareMngr.getNewFirmwareFileName();
+
+                fileExtension = FilenameUtils
+                        .removeExtension(firmwareFile.getFileName().toString());
+
+                fileExtension = newFirmwareName
+                        + IPowerlinkProjectSupport.FIRMWARE_EXTENSION;
+                String targetConfigurationPath = projectRootPath.toString()
+                        + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
+                        + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY
+                        + IPath.SEPARATOR + fileExtension;
+                String targetDirectoryPath = projectRootPath.toString()
+                        + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR;
+
+                java.nio.file.Files.createDirectories(
+                        Paths.get(targetDirectoryPath + IPath.SEPARATOR
+                                + IPowerlinkProjectSupport.FIRMWARE_EXTENSION));
+
+                java.nio.file.Files.copy(firmwareFile,
+                        new java.io.File(targetConfigurationPath).toPath(),
+                        java.nio.file.StandardCopyOption.COPY_ATTRIBUTES,
+                        java.nio.file.StandardCopyOption.REPLACE_EXISTING,
+                        java.nio.file.LinkOption.NOFOLLOW_LINKS);
+
+                java.nio.file.Path pathRelative = projectRootPath
+                        .relativize(Paths.get(targetConfigurationPath));
+
+                File unModifiedfile = new File(
+                        projectRootPath + "/" + firmwareFile);
+                System.err.println("Unmodified file path ==="
+                        + unModifiedfile.getAbsolutePath());
+
+                File updatedfile = new File(
+                        projectRootPath + "/" + pathRelative);
+                System.err.println("updatedfile file path ==="
+                        + updatedfile.getAbsolutePath());
+
+                if (unModifiedfile.renameTo(updatedfile)) {
+                    System.out.println("The file has been renamed!");
+                } else {
+                    System.err.println("File rename is not successfull.");
+                }
+
+                String relativePath = pathRelative.toString();
+                relativePath = relativePath.replace('\\', '/');
+
+            }
+
+        }
+
+    }
+
+    /**
      * Removes the node from the node collection provided and from the project
      * XML file.
      *

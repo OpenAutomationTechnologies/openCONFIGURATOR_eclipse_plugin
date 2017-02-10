@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.builder;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.ByteBuffer;
@@ -42,12 +43,15 @@ import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -61,10 +65,14 @@ import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.lib.wrapper.ByteCollection;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.Module;
+import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 
 /**
  * Builder implementation for POWERLINK project.
@@ -88,6 +96,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     public static final String XAP_H = "xap.h"; //$NON-NLS-1$
     public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
     public static final String PROCESSIMAGE_CS = "ProcessImage.cs"; //$NON-NLS-1$
+    public static final String FIRMWARE_INFO = "fw.info"; //$NON-NLS-1$
 
     private static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
             MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
@@ -483,6 +492,12 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         return projectEditors;
     }
 
+    private Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+
+    private Map<String, Integer> nodeVersionVariantList = new HashMap<>();
+
+    private Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
+
     /*
      * (non-Javadoc)
      *
@@ -507,6 +522,13 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         // Prevents build if no change has occurred in the project.
         rememberLastBuiltState();
         return new IProject[0];
+    }
+
+    private void buildFirmwareInfoFile(java.nio.file.Path targetPath)
+            throws CoreException {
+        updateFirmwareDevRevList();
+        copyFirmwareFile();
+        generateFirmwareInfoFile(targetPath);
     }
 
     /**
@@ -560,6 +582,32 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         }
         System.out.println(
                 "Project:" + getProject().getName() + " Clean successful");
+    }
+
+    private void copyFirmwareFile() {
+        java.nio.file.Path projectRootPath = getProject().getLocation().toFile()
+                .toPath();
+        File firmwareDirectory = new File(
+                String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
+                        + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY));
+        if (firmwareDirectory.exists()) {
+            for (File fwFile : firmwareDirectory.listFiles()) {
+                fwFile.delete();
+            }
+        }
+        for (FirmwareManager firmwareMngr : nodeDevRevisionList.values()) {
+            try {
+                OpenConfiguratorProjectUtils.copyFirmwareFiles(firmwareMngr);
+                generateFirmwareInfoFile(projectRootPath);
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (CoreException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
 
     private void displayErrorMessage(final String message) {
@@ -700,6 +748,94 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             displayInfoMessage(UPDATING_NODE_CONFIGURATION__COMPLETED_MESSAGE);
             System.out
                     .println("Build completed in " + totalTimeInSeconds + "s");
+
+            buildFirmwareInfoFile(targetPath);
+
+        }
+
+    }
+
+    private void generateFirmwareInfoFile(java.nio.file.Path outputpath)
+            throws CoreException {
+        String outputFirmwareInfo = StringUtils.EMPTY;
+        Charset charset = Charset.forName("UTF-8");
+        java.nio.file.Path targetFilePath = outputpath.resolve(FIRMWARE_INFO);
+
+        for (FirmwareManager fwMngr : nodeDevRevisionList.values()) {
+
+            outputFirmwareInfo += fwMngr.getNodeId() + "\t"
+                    + fwMngr.getVendorId() + "\t" + fwMngr.getProductNumber()
+                    + "\t" + fwMngr.getdevRevNumber() + "\t"
+                    + fwMngr.getApplSwDate() + "\t" + fwMngr.getApplSwTime()
+                    + "\t" + fwMngr.getLocked() + "\t"
+                    + fwMngr.getNewFirmwareFileName()
+                    + IPowerlinkProjectSupport.FIRMWARE_EXTENSION + "\n";
+        }
+        try {
+            Files.write(targetFilePath, outputFirmwareInfo.getBytes(charset));
+        } catch (IOException e) {
+            e.printStackTrace();
+            IStatus errorStatus = new Status(IStatus.ERROR,
+                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
+                            + targetFilePath.toString() + " is not accessible.",
+                    e);
+            throw new CoreException(errorStatus);
+        }
+
+    }
+
+    /**
+     * @return The status of firmware file generation.
+     */
+    public void updateFirmwareDevRevList() {
+        List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
+        for (final IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
+            ArrayList<Node> cnNodes = pjtEditor.getPowerlinkRootNode()
+                    .getCnNodeList();
+            List<String> nodeRevList = new ArrayList<>();
+            for (Node cnNode : cnNodes) {
+                if (cnNode.getNodeFirmwareCollection() != null) {
+                    for (FirmwareManager fwManager : cnNode
+                            .getNodeFirmwareCollection().keySet()) {
+                        String fwManagerVersion = String
+                                .valueOf(fwManager.getFirmwarefileVersion());
+                        nodeDevRevisionList.put(fwManager.getdevRevNumber(),
+                                fwManager);
+
+                        if (nodeDevRevisionList != null) {
+                            for (FirmwareManager fwMan : nodeDevRevisionList
+                                    .values()) {
+                                if (fwMan.getFirmwarefileVersion() < fwManager
+                                        .getFirmwarefileVersion()) {
+                                    nodeDevRevisionList.put(
+                                            fwManager.getdevRevNumber(),
+                                            fwManager);
+                                }
+                            }
+                        }
+
+                        nodeRevList.add(fwManager.getdevRevNumber());
+                    }
+                } else {
+                    System.err.println("Firmware list not available for node!");
+                }
+                if (cnNode.getInterface() != null) {
+                    for (Module module : cnNode.getInterface()
+                            .getModuleCollection().values()) {
+                        for (FirmwareManager fwManager : module
+                                .getModuleFirmwareCollection().keySet()) {
+                            moduleDevRevisionList.put(
+                                    fwManager.getdevRevNumber(), fwManager);
+                        }
+                    }
+                }
+            }
+            System.err.println("Dev Revision list.." + nodeRevList);
+        }
+        System.err.println("Dev Revision list.." + nodeDevRevisionList);
+        for (FirmwareManager fwt : nodeDevRevisionList.values()) {
+            System.err.println(
+                    "file Revision list.." + fwt.getFirmwarefileVersion());
         }
     }
 }

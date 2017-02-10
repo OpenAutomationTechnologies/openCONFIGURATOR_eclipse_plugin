@@ -67,6 +67,8 @@ public class FirmwareManager {
 
     private int firmwarefileVersion;
 
+    private Object nodeOrModuleObject;
+
     public FirmwareManager() {
         // TODO Auto-generated constructor stub
     }
@@ -81,7 +83,7 @@ public class FirmwareManager {
     public FirmwareManager(Object nodeOrModule,
             org.epsg.openconfigurator.xmlbinding.firmware.Firmware firmwareXddModel,
             Firmware firmwareObjModel) {
-
+        nodeOrModuleObject = nodeOrModule;
         if (nodeOrModule instanceof Node) {
             node = (Node) nodeOrModule;
             project = node.getProject();
@@ -173,6 +175,13 @@ public class FirmwareManager {
     }
 
     /**
+     * @return The configuration file path of firmware.
+     */
+    public String getFirmwareConfigPath() {
+        return firmwareObjModel.getURI();
+    }
+
+    /**
      * @return List of file version available in project file.
      */
     public List<Integer> getFirmwarefileVerList() {
@@ -194,6 +203,20 @@ public class FirmwareManager {
     }
 
     /**
+     * @return Locked value of firmware manager
+     */
+    public String getLocked() {
+        String lockedFirmware = "00";
+
+        if (firmwareObjModel.isLocked()) {
+            lockedFirmware = "01";
+            return lockedFirmware;
+        }
+
+        return lockedFirmware;
+    }
+
+    /**
      * @return The instance of Module.
      */
     public Module getModule() {
@@ -201,10 +224,35 @@ public class FirmwareManager {
     }
 
     /**
+     * @return The new name of firmware file based on naming convention
+     */
+    public String getNewFirmwareFileName() {
+        String newFirmwareName = StringUtils.EMPTY;
+        newFirmwareName = getVendorId() + "_" + getProductNumber() + "_"
+                + getdevRevNumber();
+        return newFirmwareName;
+    }
+
+    /**
      * @return The instance of Node.
      */
     public Node getNode() {
         return node;
+    }
+
+    /**
+     * @return The nodeId value of node and module.
+     */
+    public String getNodeId() {
+        String nodeId = StringUtils.EMPTY;
+        if (nodeOrModuleObject instanceof Node) {
+            Node node = (Node) nodeOrModuleObject;
+            nodeId = node.getNodeIdString();
+        } else if (nodeOrModuleObject instanceof Module) {
+            Module module = (Module) nodeOrModuleObject;
+            nodeId = module.getNode().getNodeIdString();
+        }
+        return nodeId;
     }
 
     /**
@@ -259,6 +307,14 @@ public class FirmwareManager {
             vendorId = "0" + vendorId;
         }
         return vendorId;
+    }
+
+    /**
+     * @return <code>True</code> if XML header value is true, <code>False</code>
+     *         otherwise
+     */
+    public boolean isKeepXmlHeader() {
+        return firmwareObjModel.isKeepHeader();
     }
 
     /**
