@@ -31,7 +31,11 @@
 
 package org.epsg.openconfigurator.util;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -246,24 +250,18 @@ public final class OpenConfiguratorProjectUtils {
                 java.nio.file.Path pathRelative = projectRootPath
                         .relativize(Paths.get(targetConfigurationPath));
 
-                File unModifiedfile = new File(
-                        projectRootPath + "/" + firmwareFile);
-                System.err.println("Unmodified file path ==="
-                        + unModifiedfile.getAbsolutePath());
-
-                File updatedfile = new File(
+                File updatedFirmwareFile = new File(
                         projectRootPath + "/" + pathRelative);
-                System.err.println("updatedfile file path ==="
-                        + updatedfile.getAbsolutePath());
-
-                if (unModifiedfile.renameTo(updatedfile)) {
-                    System.out.println("The file has been renamed!");
-                } else {
-                    System.err.println("File rename is not successfull.");
-                }
+                System.out.println("updatedfile file path ==="
+                        + updatedFirmwareFile.getAbsolutePath());
 
                 String relativePath = pathRelative.toString();
                 relativePath = relativePath.replace('\\', '/');
+
+                if (!firmwareMngr.isKeepXmlHeader()) {
+                    OpenConfiguratorProjectUtils
+                            .removeXmlheader(updatedFirmwareFile);
+                }
 
             }
 
@@ -1000,6 +998,63 @@ public final class OpenConfiguratorProjectUtils {
         ProjectJDomOperation.removeIDEConfigurationSettings(document);
 
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
+    }
+
+    private static File removeXmlheader(File updatedFirmwareFile)
+            throws IOException {
+        BufferedReader bufferedRdr = null;
+        BufferedWriter bufferedWriter = null;
+        FileWriter fileWriter = null;
+        try {
+            bufferedRdr = new BufferedReader(
+                    new FileReader(updatedFirmwareFile));
+            String firmwareHeaderLines = StringUtils.EMPTY;
+            String firmwareline = StringUtils.EMPTY;
+            while ((firmwareHeaderLines = bufferedRdr.readLine()) != null) {
+                firmwareline += firmwareHeaderLines + "\n";
+            }
+            int firmwareEndIndex = firmwareline.indexOf(">");
+            // Removes the header of firmware file.
+            firmwareline = firmwareline.substring(firmwareEndIndex + 1);
+            fileWriter = new FileWriter(updatedFirmwareFile);
+            bufferedWriter = new BufferedWriter(fileWriter);
+            bufferedWriter.write(firmwareline);
+
+        } catch (RuntimeException e) {
+            if (bufferedRdr != null) {
+                bufferedRdr.close();
+            }
+            if (bufferedWriter != null) {
+                bufferedWriter.close();
+            }
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+            throw e;
+        } catch (Exception e) {
+            if (bufferedRdr != null) {
+                bufferedRdr.close();
+            }
+            if (bufferedWriter != null) {
+                bufferedWriter.close();
+            }
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+            e.printStackTrace();
+        } finally {
+            if (bufferedRdr != null) {
+                bufferedRdr.close();
+            }
+            if (bufferedWriter != null) {
+                bufferedWriter.close();
+            }
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+
+        }
+        return updatedFirmwareFile;
     }
 
     /**
