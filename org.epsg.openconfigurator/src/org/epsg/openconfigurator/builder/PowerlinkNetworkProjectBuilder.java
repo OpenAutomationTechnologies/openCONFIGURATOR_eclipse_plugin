@@ -492,11 +492,11 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         return projectEditors;
     }
 
-    private Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+    private String TAB_SPACE = "\t";
 
-    private Map<String, Integer> nodeVersionVariantList = new HashMap<>();
+    private String NEW_LINE = "\n";
 
-    private Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
+    private List<FirmwareManager> fwList = new ArrayList<>();
 
     /*
      * (non-Javadoc)
@@ -528,7 +528,11 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             throws CoreException {
         updateFirmwareDevRevList();
         copyFirmwareFile();
-        generateFirmwareInfoFile(targetPath);
+        try {
+            generateFirmwareInfoFile(targetPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -587,24 +591,30 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private void copyFirmwareFile() {
         java.nio.file.Path projectRootPath = getProject().getLocation().toFile()
                 .toPath();
+        File outputInfoFile = new File(String.valueOf(projectRootPath.toString()
+                + IPath.SEPARATOR + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
+                + IPath.SEPARATOR + "fw.info"));
+        if (outputInfoFile.exists()) {
+            outputInfoFile.delete();
+        } else {
+            System.err.println("File does not exists!!");
+        }
+
         File firmwareDirectory = new File(
                 String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
                         + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY));
+
         if (firmwareDirectory.exists()) {
             for (File fwFile : firmwareDirectory.listFiles()) {
                 fwFile.delete();
             }
         }
-        for (FirmwareManager firmwareMngr : nodeDevRevisionList.values()) {
+        for (FirmwareManager firmwareMngr : fwList) {
             try {
                 OpenConfiguratorProjectUtils.copyFirmwareFiles(firmwareMngr);
-                generateFirmwareInfoFile(projectRootPath);
             } catch (IOException e) {
-                e.printStackTrace();
-            } catch (CoreException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -756,20 +766,24 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     }
 
     private void generateFirmwareInfoFile(java.nio.file.Path outputpath)
-            throws CoreException {
+            throws CoreException, IOException {
         String outputFirmwareInfo = StringUtils.EMPTY;
         Charset charset = Charset.forName("UTF-8");
         java.nio.file.Path targetFilePath = outputpath.resolve(FIRMWARE_INFO);
 
-        for (FirmwareManager fwMngr : nodeDevRevisionList.values()) {
+        for (FirmwareManager fwMngr : fwList) {
+            String nodeId = fwMngr.getNodeId();
+            if (Integer.valueOf(nodeId) < 9) {
+                nodeId = "0" + nodeId;
+            }
 
-            outputFirmwareInfo += fwMngr.getNodeId() + "\t"
-                    + fwMngr.getVendorId() + "\t" + fwMngr.getProductNumber()
-                    + "\t" + fwMngr.getdevRevNumber() + "\t"
-                    + fwMngr.getApplSwDate() + "\t" + fwMngr.getApplSwTime()
-                    + "\t" + fwMngr.getLocked() + "\t"
-                    + fwMngr.getNewFirmwareFileName()
-                    + IPowerlinkProjectSupport.FIRMWARE_EXTENSION + "\n";
+            outputFirmwareInfo += nodeId + TAB_SPACE + fwMngr.getVendorId()
+                    + TAB_SPACE + fwMngr.getProductNumber() + TAB_SPACE
+                    + fwMngr.getdevRevNumber() + TAB_SPACE
+                    + fwMngr.getApplSwDate() + TAB_SPACE
+                    + fwMngr.getApplSwTime() + TAB_SPACE + fwMngr.getLocked()
+                    + TAB_SPACE + fwMngr.getNewFirmwareFileName()
+                    + IPowerlinkProjectSupport.FIRMWARE_EXTENSION + NEW_LINE;
         }
         try {
             Files.write(targetFilePath, outputFirmwareInfo.getBytes(charset));
@@ -789,27 +803,34 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     public void updateFirmwareDevRevList() {
         List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
+        if (fwList != null) {
+            fwList.clear();
+        }
         for (final IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
             ArrayList<Node> cnNodes = pjtEditor.getPowerlinkRootNode()
                     .getCnNodeList();
             List<String> nodeRevList = new ArrayList<>();
             for (Node cnNode : cnNodes) {
+                Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+                Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
                 if (cnNode.getNodeFirmwareCollection() != null) {
                     for (FirmwareManager fwManager : cnNode
                             .getNodeFirmwareCollection().keySet()) {
-                        String fwManagerVersion = String
-                                .valueOf(fwManager.getFirmwarefileVersion());
                         nodeDevRevisionList.put(fwManager.getdevRevNumber(),
                                 fwManager);
 
                         if (nodeDevRevisionList != null) {
                             for (FirmwareManager fwMan : nodeDevRevisionList
                                     .values()) {
-                                if (fwMan.getFirmwarefileVersion() < fwManager
-                                        .getFirmwarefileVersion()) {
-                                    nodeDevRevisionList.put(
-                                            fwManager.getdevRevNumber(),
-                                            fwManager);
+                                if (fwMan.getNodeId()
+                                        .equals(cnNode.getCnNodeId())) {
+                                    if (fwMan
+                                            .getFirmwarefileVersion() < fwManager
+                                                    .getFirmwarefileVersion()) {
+                                        nodeDevRevisionList.put(
+                                                fwManager.getdevRevNumber(),
+                                                fwManager);
+                                    }
                                 }
                             }
                         }
@@ -826,16 +847,25 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                                 .getModuleFirmwareCollection().keySet()) {
                             moduleDevRevisionList.put(
                                     fwManager.getdevRevNumber(), fwManager);
+                            if (moduleDevRevisionList != null) {
+                                for (FirmwareManager fwMan : moduleDevRevisionList
+                                        .values()) {
+                                    if (fwMan
+                                            .getFirmwarefileVersion() < fwManager
+                                                    .getFirmwarefileVersion()) {
+                                        moduleDevRevisionList.put(
+                                                fwManager.getdevRevNumber(),
+                                                fwManager);
+                                    }
+                                }
+                            }
                         }
                     }
                 }
+                fwList.addAll(nodeDevRevisionList.values());
+                fwList.addAll(moduleDevRevisionList.values());
             }
-            System.err.println("Dev Revision list.." + nodeRevList);
-        }
-        System.err.println("Dev Revision list.." + nodeDevRevisionList);
-        for (FirmwareManager fwt : nodeDevRevisionList.values()) {
-            System.err.println(
-                    "file Revision list.." + fwt.getFirmwarefileVersion());
+
         }
     }
 }
