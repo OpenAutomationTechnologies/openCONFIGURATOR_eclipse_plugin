@@ -185,7 +185,7 @@ public final class XddMarshaller {
      * @throws IOException
      */
     @SuppressWarnings("finally")
-    public static Firmware unmarshallFirmwareFile(final File file)
+    public static synchronized Firmware unmarshallFirmwareFile(final File file)
             throws JAXBException, SAXException, ParserConfigurationException,
             IOException {
 

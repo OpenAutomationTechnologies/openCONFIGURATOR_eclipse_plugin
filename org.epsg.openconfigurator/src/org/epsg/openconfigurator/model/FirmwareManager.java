@@ -118,7 +118,7 @@ public class FirmwareManager {
             firmwareObjModel.setLocked(false);
 
             boolean keepHeader = Boolean.valueOf(
-                    String.valueOf(firmwareXddModel.getKeepXmlheader()));
+                    String.valueOf(firmwareXddModel.getKeepXmlHeader()));
             firmwareObjModel.setKeepHeader(keepHeader);
 
             this.firmwareObjModel = firmwareObjModel;
