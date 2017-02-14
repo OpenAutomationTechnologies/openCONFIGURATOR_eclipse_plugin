@@ -54,22 +54,38 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     private static final String IMPORT_FIRMWARE_FILE_DIALOG_LABEL = "Import firmware file for node/module.";
     private static final String ERROR_CHOOSE_VALID_FILE_MESSAGE = "Choose a valid firmware file.";
     private static final String ERROR_CHOOSE_VALID_PATH_MESSAGE = "Firmware file does not exist in the path: ";
-    private static final String VALID_FILE_MESSAGE = "Firmware schema validation successful.";
+    private static final String VALID_FILE_MESSAGE = "Firmware file is valid for the device {0}.";
 
     private static final String[] FIRMWARE_FILTER_EXTENSIONS = { "*.fw" };
 
     private static final String[] CONFIGURATION_FILTER_NAMES_EXTENSIONS = {
-            "Firmware files" };
+            "Firmware files (*.fw)" };
 
     private static final String ERROR_PRAM_VALIDATION_FAILED_HEADER = "{0} does not match.";
-    private static final String ERROR_PRAM_VALIDATION_FAILED_DETAIL = "Firmware file {0} with {1} {2} does not match with XDD value {3}.";
+    private static final String ERROR_PRAM_VALIDATION_FAILED_DETAIL_NODE = "Firmware file {0} with {1} {2} does not match with the {1} {4} value {3} of XDD/XDC.";
+    private static final String ERROR_PRAM_VALIDATION_FAILED_DETAIL_MODULE = "Firmware file {0} with {1} {2} does not match with the {1} value {3} of XDD/XDC.";
     private static final String ERROR_XDD_PARAM_NOTFOUND = "Validation parameters missing from XDD.";
+
+    private static final String VENDOR_ID = "vendor ID";
+    private static final String PRODUCT_CODE = "product code";
 
     // Values of XDD object attributes.
     private static final int XDD_OBJECT_INDEX_TOCHECK = 0x1018;
     private static final short XDD_SUBOBJECT_INDEX_VENDORID = 1;
     private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
     private static final short XDD_SUBOBJECT_INDEX_REVISIONNO = 3;
+
+    private static String getDeviceName(Object nodeOrModuleObj) {
+        String deviceName = StringUtils.EMPTY;
+        if (nodeOrModuleObj instanceof Node) {
+            Node node = (Node) nodeOrModuleObj;
+            deviceName = node.getNodeIDWithName();
+        } else if (nodeOrModuleObj instanceof Module) {
+            Module module = (Module) nodeOrModuleObj;
+            deviceName = module.getModuleName();
+        }
+        return deviceName;
+    }
 
     /**
      * Control to display the node configuration path.
@@ -87,6 +103,11 @@ public class ValidateFirmwareWizardPage extends WizardPage {
      * Browse XDD/XDC button.
      */
     private Button btnBrowse;
+
+    /**
+     * Default radio button.
+     */
+    private Button btnfirmware;
 
     private Group grpFirmwareFile;
 
@@ -185,10 +206,11 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                                         ERROR_PRAM_VALIDATION_FAILED_HEADER,
                                         "Vendor ID"));
                                 getErrorStyledText(MessageFormat.format(
-                                        ERROR_PRAM_VALIDATION_FAILED_DETAIL,
-                                        "'" + fileName + "'", "vendor ID",
+                                        ERROR_PRAM_VALIDATION_FAILED_DETAIL_NODE,
+                                        "'" + fileName + "'", VENDOR_ID,
                                         "'" + firmwareModel.getVen() + "'",
-                                        "'" + xddVendorId + "'"));
+                                        "'" + xddVendorId + "'",
+                                        "(0x1018/01)"));
                                 return false;
                             }
                             return true;
@@ -197,10 +219,11 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                                 ERROR_PRAM_VALIDATION_FAILED_HEADER,
                                 "Product Code"));
                         getErrorStyledText(MessageFormat.format(
-                                ERROR_PRAM_VALIDATION_FAILED_DETAIL,
-                                "'" + fileName + "'", "product Code",
+                                ERROR_PRAM_VALIDATION_FAILED_DETAIL_NODE,
+                                "'" + fileName + "'", PRODUCT_CODE,
                                 "'" + firmwareDev + "'",
-                                "'" + Long.decode(xddProductCode) + "'"));
+                                "'" + Long.decode(xddProductCode) + "'",
+                                "(0x1018/02)"));
                         return false;
                     }
                     getErrorStyledText(ERROR_XDD_PARAM_NOTFOUND);
@@ -224,8 +247,8 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                                         ERROR_PRAM_VALIDATION_FAILED_HEADER,
                                         "Vendor ID"));
                                 getErrorStyledText(MessageFormat.format(
-                                        ERROR_PRAM_VALIDATION_FAILED_DETAIL,
-                                        "'" + fileName + "'", "vendor ID",
+                                        ERROR_PRAM_VALIDATION_FAILED_DETAIL_MODULE,
+                                        "'" + fileName + "'", VENDOR_ID,
                                         "'" + firmwareModel.getVen() + "'",
                                         "'" + xddVendorId + "'"));
                                 return false;
@@ -236,8 +259,8 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                                 ERROR_PRAM_VALIDATION_FAILED_HEADER,
                                 "Product Code"));
                         getErrorStyledText(MessageFormat.format(
-                                ERROR_PRAM_VALIDATION_FAILED_DETAIL,
-                                "'" + fileName + "'", "product Code",
+                                ERROR_PRAM_VALIDATION_FAILED_DETAIL_MODULE,
+                                "'" + fileName + "'", PRODUCT_CODE,
                                 "'" + firmwareDev + "'",
                                 "'" + Long.decode(xddProductCode) + "'"));
                         return false;
@@ -272,7 +295,9 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                 if (!checkWithXddAttributes()) {
                     return false;
                 }
-                getInfoStyledText(VALID_FILE_MESSAGE);
+                String validFileMssg = MessageFormat.format(VALID_FILE_MESSAGE,
+                        "'" + getDeviceName(nodeOrModuleObj) + "'");
+                getInfoStyledText(validFileMssg);
 
             } else {
                 setErrorMessage(ERROR_CHOOSE_VALID_PATH_MESSAGE
@@ -334,16 +359,19 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         gd_grpConfigurationFile.widthHint = 558;
         grpFirmwareFile.setLayoutData(gd_grpConfigurationFile);
         grpFirmwareFile.setText(FIRMWARE_FILE_LABEL);
-        grpFirmwareFile.setLayout(new GridLayout(4, false));
+        grpFirmwareFile.setLayout(new GridLayout(3, false));
 
-        Label lblFile = new Label(grpFirmwareFile, SWT.NONE);
-
-        formToolkit.adapt(lblFile, true, true);
-        lblFile.setText("File: ");
+        btnfirmware = new Button(grpFirmwareFile, SWT.RADIO);
+        btnfirmware.setText(DEFAULT_CONFIGURATION_LABEL);
+        btnfirmware.setSelection(true);
+        new Label(grpFirmwareFile, SWT.NONE);
+        new Label(grpFirmwareFile, SWT.NONE);
 
         firmwareConfigurationPath = new Text(grpFirmwareFile, SWT.BORDER);
-        firmwareConfigurationPath.setLayoutData(
-                new GridData(SWT.FILL, SWT.FILL, true, false, 2, 1));
+        GridData gd_firmwareConfigurationPath = new GridData(SWT.FILL, SWT.FILL,
+                true, false, 2, 1);
+        gd_firmwareConfigurationPath.widthHint = 436;
+        firmwareConfigurationPath.setLayoutData(gd_firmwareConfigurationPath);
         firmwareConfigurationPath
                 .setToolTipText(firmwareConfigurationPath.getText());
         firmwareConfigurationPath
@@ -378,11 +406,13 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                 }
             }
         });
+
         TextViewer textViewer = new TextViewer(headerFrame,
                 SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
         errorinfo = textViewer.getTextWidget();
-        errorinfo.setLayoutData(
-                new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        GridData gd_errorinfo = new GridData(SWT.FILL, SWT.FILL, true, true, 1,
+                1);
+        errorinfo.setLayoutData(gd_errorinfo);
         formToolkit.paintBordersFor(errorinfo);
     }
 
