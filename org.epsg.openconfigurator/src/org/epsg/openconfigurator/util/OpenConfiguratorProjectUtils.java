@@ -239,7 +239,7 @@ public final class OpenConfiguratorProjectUtils {
 
                 java.nio.file.Files.createDirectories(
                         Paths.get(targetDirectoryPath + IPath.SEPARATOR
-                                + IPowerlinkProjectSupport.FIRMWARE_EXTENSION));
+                                + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY));
 
                 java.nio.file.Files.copy(firmwareFile,
                         new java.io.File(targetConfigurationPath).toPath(),
