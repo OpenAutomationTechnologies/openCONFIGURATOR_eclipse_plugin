@@ -7,15 +7,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 
+
 /**
  * A concrete type for a POWERLINK CN.
  *
- * <p>
- * Java class for tCN complex type.
+ * <p>Java class for tCN complex type.
  *
- * <p>
- * The following schema fragment specifies the expected content contained within
- * this class.
+ * <p>The following schema fragment specifies the expected content contained within this class.
  *
  * <pre>
  * &lt;complexType name="tCN"&gt;
@@ -61,8 +59,13 @@ import javax.xml.bind.annotation.XmlType;
  *
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "tCN", propOrder = { "interfaceList", "firmwareList" })
-public class TCN extends TAbstractNode {
+@XmlType(name = "tCN", propOrder = {
+    "interfaceList",
+    "firmwareList"
+})
+public class TCN
+    extends TAbstractNode
+{
 
     @XmlElement(name = "InterfaceList")
     protected InterfaceList interfaceList;
@@ -104,33 +107,11 @@ public class TCN extends TAbstractNode {
     protected Boolean enabled;
 
     /**
-     * Gets the value of the firmwareList property.
-     *
-     * @return possible object is {@link FirmwareList }
-     *
-     */
-    public FirmwareList getFirmwareList() {
-        return firmwareList;
-    }
-
-    /**
-     * Gets the value of the forcedMultiplexedCycle property.
-     *
-     * @return possible object is {@link Integer }
-     *
-     */
-    public int getForcedMultiplexedCycle() {
-        if (forcedMultiplexedCycle == null) {
-            return 0;
-        } else {
-            return forcedMultiplexedCycle;
-        }
-    }
-
-    /**
      * Gets the value of the interfaceList property.
      *
-     * @return possible object is {@link InterfaceList }
+     * @return
+     *     possible object is
+     *     {@link InterfaceList }
      *
      */
     public InterfaceList getInterfaceList() {
@@ -138,9 +119,47 @@ public class TCN extends TAbstractNode {
     }
 
     /**
+     * Sets the value of the interfaceList property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link InterfaceList }
+     *
+     */
+    public void setInterfaceList(InterfaceList value) {
+        this.interfaceList = value;
+    }
+
+    /**
+     * Gets the value of the firmwareList property.
+     *
+     * @return
+     *     possible object is
+     *     {@link FirmwareList }
+     *
+     */
+    public FirmwareList getFirmwareList() {
+        return firmwareList;
+    }
+
+    /**
+     * Sets the value of the firmwareList property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link FirmwareList }
+     *
+     */
+    public void setFirmwareList(FirmwareList value) {
+        this.firmwareList = value;
+    }
+
+    /**
      * Gets the value of the name property.
      *
-     * @return possible object is {@link String }
+     * @return
+     *     possible object is
+     *     {@link String }
      *
      */
     public String getName() {
@@ -152,9 +171,23 @@ public class TCN extends TAbstractNode {
     }
 
     /**
+     * Sets the value of the name property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setName(String value) {
+        this.name = value;
+    }
+
+    /**
      * Gets the value of the nodeID property.
      *
-     * @return possible object is {@link String }
+     * @return
+     *     possible object is
+     *     {@link String }
      *
      */
     public String getNodeID() {
@@ -162,9 +195,23 @@ public class TCN extends TAbstractNode {
     }
 
     /**
+     * Sets the value of the nodeID property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *
+     */
+    public void setNodeID(String value) {
+        this.nodeID = value;
+    }
+
+    /**
      * Gets the value of the pathToXDC property.
      *
-     * @return possible object is {@link String }
+     * @return
+     *     possible object is
+     *     {@link String }
      *
      */
     public String getPathToXDC() {
@@ -172,79 +219,23 @@ public class TCN extends TAbstractNode {
     }
 
     /**
-     * Gets the value of the autoAppSwUpdateAllowed property.
+     * Sets the value of the pathToXDC property.
      *
-     * @return possible object is {@link Boolean }
-     *
-     */
-    public boolean isAutoAppSwUpdateAllowed() {
-        if (autoAppSwUpdateAllowed == null) {
-            return false;
-        } else {
-            return autoAppSwUpdateAllowed;
-        }
-    }
-
-    /**
-     * Gets the value of the autostartNode property.
-     *
-     * @return possible object is {@link Boolean }
+     * @param value
+     *     allowed object is
+     *     {@link String }
      *
      */
-    public boolean isAutostartNode() {
-        if (autostartNode == null) {
-            return true;
-        } else {
-            return autostartNode;
-        }
-    }
-
-    /**
-     * Gets the value of the enabled property.
-     *
-     * @return possible object is {@link Boolean }
-     *
-     */
-    public boolean isEnabled() {
-        if (enabled == null) {
-            return true;
-        } else {
-            return enabled;
-        }
-    }
-
-    /**
-     * Gets the value of the isChained property.
-     *
-     * @return possible object is {@link Boolean }
-     *
-     */
-    public boolean isIsChained() {
-        if (isChained == null) {
-            return false;
-        } else {
-            return isChained;
-        }
-    }
-
-    /**
-     * Gets the value of the isMandatory property.
-     *
-     * @return possible object is {@link Boolean }
-     *
-     */
-    public boolean isIsMandatory() {
-        if (isMandatory == null) {
-            return false;
-        } else {
-            return isMandatory;
-        }
+    public void setPathToXDC(String value) {
+        this.pathToXDC = value;
     }
 
     /**
      * Gets the value of the isMultiplexed property.
      *
-     * @return possible object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
     public boolean isIsMultiplexed() {
@@ -256,9 +247,135 @@ public class TCN extends TAbstractNode {
     }
 
     /**
+     * Sets the value of the isMultiplexed property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setIsMultiplexed(Boolean value) {
+        this.isMultiplexed = value;
+    }
+
+    /**
+     * Gets the value of the forcedMultiplexedCycle property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Integer }
+     *
+     */
+    public int getForcedMultiplexedCycle() {
+        if (forcedMultiplexedCycle == null) {
+            return  0;
+        } else {
+            return forcedMultiplexedCycle;
+        }
+    }
+
+    /**
+     * Sets the value of the forcedMultiplexedCycle property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Integer }
+     *
+     */
+    public void setForcedMultiplexedCycle(Integer value) {
+        this.forcedMultiplexedCycle = value;
+    }
+
+    /**
+     * Gets the value of the isChained property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isIsChained() {
+        if (isChained == null) {
+            return false;
+        } else {
+            return isChained;
+        }
+    }
+
+    /**
+     * Sets the value of the isChained property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setIsChained(Boolean value) {
+        this.isChained = value;
+    }
+
+    /**
+     * Gets the value of the isMandatory property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isIsMandatory() {
+        if (isMandatory == null) {
+            return false;
+        } else {
+            return isMandatory;
+        }
+    }
+
+    /**
+     * Sets the value of the isMandatory property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setIsMandatory(Boolean value) {
+        this.isMandatory = value;
+    }
+
+    /**
+     * Gets the value of the autostartNode property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isAutostartNode() {
+        if (autostartNode == null) {
+            return true;
+        } else {
+            return autostartNode;
+        }
+    }
+
+    /**
+     * Sets the value of the autostartNode property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setAutostartNode(Boolean value) {
+        this.autostartNode = value;
+    }
+
+    /**
      * Gets the value of the resetInOperational property.
      *
-     * @return possible object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
     public boolean isResetInOperational() {
@@ -270,9 +387,23 @@ public class TCN extends TAbstractNode {
     }
 
     /**
+     * Sets the value of the resetInOperational property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setResetInOperational(Boolean value) {
+        this.resetInOperational = value;
+    }
+
+    /**
      * Gets the value of the verifyAppSwVersion property.
      *
-     * @return possible object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
     public boolean isVerifyAppSwVersion() {
@@ -284,9 +415,51 @@ public class TCN extends TAbstractNode {
     }
 
     /**
+     * Sets the value of the verifyAppSwVersion property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setVerifyAppSwVersion(Boolean value) {
+        this.verifyAppSwVersion = value;
+    }
+
+    /**
+     * Gets the value of the autoAppSwUpdateAllowed property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isAutoAppSwUpdateAllowed() {
+        if (autoAppSwUpdateAllowed == null) {
+            return false;
+        } else {
+            return autoAppSwUpdateAllowed;
+        }
+    }
+
+    /**
+     * Sets the value of the autoAppSwUpdateAllowed property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setAutoAppSwUpdateAllowed(Boolean value) {
+        this.autoAppSwUpdateAllowed = value;
+    }
+
+    /**
      * Gets the value of the verifyDeviceType property.
      *
-     * @return possible object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
     public boolean isVerifyDeviceType() {
@@ -298,51 +471,23 @@ public class TCN extends TAbstractNode {
     }
 
     /**
-     * Gets the value of the verifyProductCode property.
+     * Sets the value of the verifyDeviceType property.
      *
-     * @return possible object is {@link Boolean }
-     *
-     */
-    public boolean isVerifyProductCode() {
-        if (verifyProductCode == null) {
-            return false;
-        } else {
-            return verifyProductCode;
-        }
-    }
-
-    /**
-     * Gets the value of the verifyRevisionNumber property.
-     *
-     * @return possible object is {@link Boolean }
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
      *
      */
-    public boolean isVerifyRevisionNumber() {
-        if (verifyRevisionNumber == null) {
-            return false;
-        } else {
-            return verifyRevisionNumber;
-        }
-    }
-
-    /**
-     * Gets the value of the verifySerialNumber property.
-     *
-     * @return possible object is {@link Boolean }
-     *
-     */
-    public boolean isVerifySerialNumber() {
-        if (verifySerialNumber == null) {
-            return false;
-        } else {
-            return verifySerialNumber;
-        }
+    public void setVerifyDeviceType(Boolean value) {
+        this.verifyDeviceType = value;
     }
 
     /**
      * Gets the value of the verifyVendorId property.
      *
-     * @return possible object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
     public boolean isVerifyVendorId() {
@@ -354,193 +499,127 @@ public class TCN extends TAbstractNode {
     }
 
     /**
-     * Sets the value of the autoAppSwUpdateAllowed property.
+     * Sets the value of the verifyVendorId property.
      *
-     * @param value allowed object is {@link Boolean }
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
      *
      */
-    public void setAutoAppSwUpdateAllowed(Boolean value) {
-        autoAppSwUpdateAllowed = value;
+    public void setVerifyVendorId(Boolean value) {
+        this.verifyVendorId = value;
     }
 
     /**
-     * Sets the value of the autostartNode property.
+     * Gets the value of the verifyRevisionNumber property.
      *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setAutostartNode(Boolean value) {
-        autostartNode = value;
-    }
-
-    /**
-     * Sets the value of the enabled property.
-     * 
-     * @param value allowed object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
-    public void setEnabled(Boolean value) {
-        enabled = value;
-    }
-
-    /**
-     * Sets the value of the firmwareList property.
-     *
-     * @param value allowed object is {@link FirmwareList }
-     *
-     */
-    public void setFirmwareList(FirmwareList value) {
-        firmwareList = value;
-    }
-
-    /**
-     * Sets the value of the forcedMultiplexedCycle property.
-     *
-     * @param value allowed object is {@link Integer }
-     *
-     */
-    public void setForcedMultiplexedCycle(Integer value) {
-        forcedMultiplexedCycle = value;
-    }
-
-    /**
-     * Sets the value of the interfaceList property.
-     *
-     * @param value allowed object is {@link InterfaceList }
-     *
-     */
-    public void setInterfaceList(InterfaceList value) {
-        interfaceList = value;
-    }
-
-    /**
-     * Sets the value of the isChained property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setIsChained(Boolean value) {
-        isChained = value;
-    }
-
-    /**
-     * Sets the value of the isMandatory property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setIsMandatory(Boolean value) {
-        isMandatory = value;
-    }
-
-    /**
-     * Sets the value of the isMultiplexed property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setIsMultiplexed(Boolean value) {
-        isMultiplexed = value;
-    }
-
-    /**
-     * Sets the value of the name property.
-     *
-     * @param value allowed object is {@link String }
-     *
-     */
-    public void setName(String value) {
-        name = value;
-    }
-
-    /**
-     * Sets the value of the nodeID property.
-     *
-     * @param value allowed object is {@link String }
-     *
-     */
-    public void setNodeID(String value) {
-        nodeID = value;
-    }
-
-    /**
-     * Sets the value of the pathToXDC property.
-     *
-     * @param value allowed object is {@link String }
-     *
-     */
-    public void setPathToXDC(String value) {
-        pathToXDC = value;
-    }
-
-    /**
-     * Sets the value of the resetInOperational property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setResetInOperational(Boolean value) {
-        resetInOperational = value;
-    }
-
-    /**
-     * Sets the value of the verifyAppSwVersion property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setVerifyAppSwVersion(Boolean value) {
-        verifyAppSwVersion = value;
-    }
-
-    /**
-     * Sets the value of the verifyDeviceType property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setVerifyDeviceType(Boolean value) {
-        verifyDeviceType = value;
-    }
-
-    /**
-     * Sets the value of the verifyProductCode property.
-     *
-     * @param value allowed object is {@link Boolean }
-     *
-     */
-    public void setVerifyProductCode(Boolean value) {
-        verifyProductCode = value;
+    public boolean isVerifyRevisionNumber() {
+        if (verifyRevisionNumber == null) {
+            return false;
+        } else {
+            return verifyRevisionNumber;
+        }
     }
 
     /**
      * Sets the value of the verifyRevisionNumber property.
      *
-     * @param value allowed object is {@link Boolean }
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
      *
      */
     public void setVerifyRevisionNumber(Boolean value) {
-        verifyRevisionNumber = value;
+        this.verifyRevisionNumber = value;
+    }
+
+    /**
+     * Gets the value of the verifyProductCode property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isVerifyProductCode() {
+        if (verifyProductCode == null) {
+            return false;
+        } else {
+            return verifyProductCode;
+        }
+    }
+
+    /**
+     * Sets the value of the verifyProductCode property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setVerifyProductCode(Boolean value) {
+        this.verifyProductCode = value;
+    }
+
+    /**
+     * Gets the value of the verifySerialNumber property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *
+     */
+    public boolean isVerifySerialNumber() {
+        if (verifySerialNumber == null) {
+            return false;
+        } else {
+            return verifySerialNumber;
+        }
     }
 
     /**
      * Sets the value of the verifySerialNumber property.
      *
-     * @param value allowed object is {@link Boolean }
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
      *
      */
     public void setVerifySerialNumber(Boolean value) {
-        verifySerialNumber = value;
+        this.verifySerialNumber = value;
     }
 
     /**
-     * Sets the value of the verifyVendorId property.
+     * Gets the value of the enabled property.
      *
-     * @param value allowed object is {@link Boolean }
+     * @return
+     *     possible object is
+     *     {@link Boolean }
      *
      */
-    public void setVerifyVendorId(Boolean value) {
-        verifyVendorId = value;
+    public boolean isEnabled() {
+        if (enabled == null) {
+            return true;
+        } else {
+            return enabled;
+        }
+    }
+
+    /**
+     * Sets the value of the enabled property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *
+     */
+    public void setEnabled(Boolean value) {
+        this.enabled = value;
     }
 
 }

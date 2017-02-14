@@ -8,7 +8,7 @@
 					<xs:documentation xml:lang="en">Defines the firmware version number.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="Ven" use="required">
+			<xs:attribute name="Ven" use="optional">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Defines the vendor ID.</xs:documentation>
 				</xs:annotation>
@@ -45,7 +45,7 @@
 					<xs:documentation xml:lang="en">Defines the length of the payload data.</xs:documentation>
 				</xs:annotation>
 			</xs:attribute>
-			<xs:attribute name="KeepXmlheader" use="optional">
+			<xs:attribute name="KeepXmlHeader" use="optional">
 				<xs:annotation>
 					<xs:documentation xml:lang="en">If true (1), the firmware download includes this XML header.</xs:documentation>
 				</xs:annotation>
@@ -68,7 +68,7 @@
 				</xs:annotation>
 				<xs:simpleType>
 					<xs:restriction base="xs:string">
-						<xs:pattern value="[0-3]{1}[1-9]{1}.[0-1]{1}[1-2]{1}.[0-9]{4}"/>
+						<xs:pattern value="[0-3]{1}[1-9]{1}\.[0-1]{1}[1-9]{1}\.[0-9]{4}"/>
 					</xs:restriction>
 				</xs:simpleType>
 			</xs:attribute>
@@ -91,6 +91,16 @@
 				<xs:annotation>
 					<xs:documentation xml:lang="en">Defines the application software date as defined in EPSG DS301.</xs:documentation>
 				</xs:annotation>
+			</xs:attribute>
+			<xs:attribute name="BootOffsHi" use="optional">
+				<xs:annotation>
+					<xs:documentation xml:lang="en">Defines the offset where the boot image starts.</xs:documentation>
+				</xs:annotation>
+				<xs:simpleType>
+					<xs:restriction base="xs:string">
+						<xs:pattern value="0x[0-9A-Fa-f]{8,8}"/>
+					</xs:restriction>
+				</xs:simpleType>
 			</xs:attribute>
 		</xs:complexType>
 	</xs:element>
