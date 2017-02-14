@@ -591,11 +591,15 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private void copyFirmwareFile() {
         java.nio.file.Path projectRootPath = getProject().getLocation().toFile()
                 .toPath();
-        File outputInfoFile = new File(String.valueOf(projectRootPath.toString()
-                + IPath.SEPARATOR + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
-                + IPath.SEPARATOR + "fw.info"));
+        File outputInfoFile = new File(
+                String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR));
         if (outputInfoFile.exists()) {
-            outputInfoFile.delete();
+            for (File fwInfoFile : outputInfoFile.listFiles()) {
+                if (fwInfoFile.getName().equalsIgnoreCase("fw.info")) {
+                    fwInfoFile.delete();
+                }
+            }
         } else {
             System.err.println("File does not exists!!");
         }
@@ -769,31 +773,38 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             throws CoreException, IOException {
         String outputFirmwareInfo = StringUtils.EMPTY;
         Charset charset = Charset.forName("UTF-8");
-        java.nio.file.Path targetFilePath = outputpath.resolve(FIRMWARE_INFO);
+        if (!fwList.isEmpty()) {
+            java.nio.file.Path targetFilePath = outputpath
+                    .resolve(FIRMWARE_INFO);
 
-        for (FirmwareManager fwMngr : fwList) {
-            String nodeId = fwMngr.getNodeId();
-            if (Integer.valueOf(nodeId) < 9) {
-                nodeId = "0" + nodeId;
+            for (FirmwareManager fwMngr : fwList) {
+                String nodeId = fwMngr.getNodeId();
+                if (Integer.valueOf(nodeId) < 9) {
+                    nodeId = "0" + nodeId;
+                }
+
+                outputFirmwareInfo += nodeId + TAB_SPACE + fwMngr.getVendorId()
+                        + TAB_SPACE + fwMngr.getProductNumber() + TAB_SPACE
+                        + fwMngr.getdevRevNumber() + TAB_SPACE
+                        + fwMngr.getApplSwDate() + TAB_SPACE
+                        + fwMngr.getApplSwTime() + TAB_SPACE
+                        + fwMngr.getLocked() + TAB_SPACE
+                        + fwMngr.getNewFirmwareFileName()
+                        + IPowerlinkProjectSupport.FIRMWARE_EXTENSION
+                        + NEW_LINE;
             }
-
-            outputFirmwareInfo += nodeId + TAB_SPACE + fwMngr.getVendorId()
-                    + TAB_SPACE + fwMngr.getProductNumber() + TAB_SPACE
-                    + fwMngr.getdevRevNumber() + TAB_SPACE
-                    + fwMngr.getApplSwDate() + TAB_SPACE
-                    + fwMngr.getApplSwTime() + TAB_SPACE + fwMngr.getLocked()
-                    + TAB_SPACE + fwMngr.getNewFirmwareFileName()
-                    + IPowerlinkProjectSupport.FIRMWARE_EXTENSION + NEW_LINE;
-        }
-        try {
-            Files.write(targetFilePath, outputFirmwareInfo.getBytes(charset));
-        } catch (IOException e) {
-            e.printStackTrace();
-            IStatus errorStatus = new Status(IStatus.ERROR,
-                    Activator.PLUGIN_ID, IStatus.OK, "Output file:"
-                            + targetFilePath.toString() + " is not accessible.",
-                    e);
-            throw new CoreException(errorStatus);
+            try {
+                Files.write(targetFilePath,
+                        outputFirmwareInfo.getBytes(charset));
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        e);
+                throw new CoreException(errorStatus);
+            }
         }
 
     }
