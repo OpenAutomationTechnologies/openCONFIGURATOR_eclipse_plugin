@@ -3713,6 +3713,17 @@ public class MappingView extends ViewPart {
                     targetNodeIdList.add(tempNode);
                 }
             }
+
+            List<Node> tempRmnNodeList = rootNode.getRmnNodeList();
+            for (Node tempNode : tempRmnNodeList) {
+                if (nodeObj == tempNode) {
+                    if (tempNode.isPDOSelfReceipt()) {
+                        targetNodeIdList.add(selfReceiptNode);
+                    }
+                } else {
+                    targetNodeIdList.add(tempNode);
+                }
+            }
         }
     }
 }
