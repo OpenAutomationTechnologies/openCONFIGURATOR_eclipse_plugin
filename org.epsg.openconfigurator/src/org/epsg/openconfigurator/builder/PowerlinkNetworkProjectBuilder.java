@@ -496,6 +496,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
     private String NEW_LINE = "\n";
 
+    private int MINIMUM_SINGLE_DIGIT_NODE_ID = 9;
+
     private List<FirmwareManager> fwList = new ArrayList<>();
 
     /*
@@ -596,7 +598,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR));
         if (outputInfoFile.exists()) {
             for (File fwInfoFile : outputInfoFile.listFiles()) {
-                if (fwInfoFile.getName().equalsIgnoreCase("fw.info")) {
+                if (fwInfoFile.getName().equalsIgnoreCase(FIRMWARE_INFO)) {
                     fwInfoFile.delete();
                 }
             }
@@ -608,7 +610,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
                         + IPath.SEPARATOR
-                        + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY));
+                        + IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY));
 
         if (firmwareDirectory.exists()) {
             for (File fwFile : firmwareDirectory.listFiles()) {
@@ -779,7 +781,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             for (FirmwareManager fwMngr : fwList) {
                 String nodeId = fwMngr.getNodeId();
-                if (Integer.valueOf(nodeId) < 9) {
+                if (Integer.valueOf(nodeId) < MINIMUM_SINGLE_DIGIT_NODE_ID) {
                     nodeId = "0" + nodeId;
                 }
 
@@ -820,7 +822,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         for (final IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
             ArrayList<Node> cnNodes = pjtEditor.getPowerlinkRootNode()
                     .getCnNodeList();
-            List<String> nodeRevList = new ArrayList<>();
+
             for (Node cnNode : cnNodes) {
                 Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
                 Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
@@ -830,7 +832,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         nodeDevRevisionList.put(fwManager.getdevRevNumber(),
                                 fwManager);
 
-                        if (nodeDevRevisionList != null) {
+                        if (!nodeDevRevisionList.isEmpty()) {
                             for (FirmwareManager fwMan : nodeDevRevisionList
                                     .values()) {
                                 if (fwMan.getNodeId()
@@ -846,7 +848,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                             }
                         }
 
-                        nodeRevList.add(fwManager.getdevRevNumber());
                     }
                 } else {
                     System.err.println("Firmware list not available for node!");
@@ -858,7 +859,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                                 .getModuleFirmwareCollection().keySet()) {
                             moduleDevRevisionList.put(
                                     fwManager.getdevRevNumber(), fwManager);
-                            if (moduleDevRevisionList != null) {
+                            if (!moduleDevRevisionList.isEmpty()) {
                                 for (FirmwareManager fwMan : moduleDevRevisionList
                                         .values()) {
                                     if (fwMan
@@ -873,8 +874,10 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         }
                     }
                 }
-                fwList.addAll(nodeDevRevisionList.values());
-                fwList.addAll(moduleDevRevisionList.values());
+                if (fwList != null) {
+                    fwList.addAll(nodeDevRevisionList.values());
+                    fwList.addAll(moduleDevRevisionList.values());
+                }
             }
 
         }

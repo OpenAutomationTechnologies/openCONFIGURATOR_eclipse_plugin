@@ -49,6 +49,14 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
  */
 public class FirmwareManager {
 
+    public static final String FIRMWARE_LOCKED_VALUE = "00";
+
+    public static final String FIRMWARE_UNLOCKED_VALUE = "01";
+
+    public static final String FIRMWARE_KEEP_XML_HEADER_VALUE = "01";
+
+    public static final String FIRMWARE_KEEP_XML_HEADER_VALUE_WITHOUT_ZERO = "1";
+
     private Node node;
 
     private Module module;
@@ -66,7 +74,6 @@ public class FirmwareManager {
     private List<Integer> firmwarefileVerList = new ArrayList<>();
 
     private int firmwarefileVersion;
-
     private Object nodeOrModuleObject;
 
     public FirmwareManager() {
@@ -117,9 +124,16 @@ public class FirmwareManager {
             // TODO: To be updated in the future version
             firmwareObjModel.setLocked(false);
 
-            boolean keepHeader = Boolean.valueOf(
-                    String.valueOf(firmwareXddModel.getKeepXmlHeader()));
-            firmwareObjModel.setKeepHeader(keepHeader);
+            String keepHeader = String
+                    .valueOf(firmwareXddModel.getKeepXmlHeader());
+            if (keepHeader.equalsIgnoreCase(
+                    FIRMWARE_KEEP_XML_HEADER_VALUE_WITHOUT_ZERO)
+                    || (keepHeader.equalsIgnoreCase(
+                            FIRMWARE_KEEP_XML_HEADER_VALUE))) {
+                firmwareObjModel.setKeepHeader(true);
+            } else {
+                firmwareObjModel.setKeepHeader(false);
+            }
 
             this.firmwareObjModel = firmwareObjModel;
             firmwarefileVersion = firmwareXddModel.getVer().intValue();
@@ -206,11 +220,10 @@ public class FirmwareManager {
      * @return Locked value of firmware manager
      */
     public String getLocked() {
-        String lockedFirmware = "00";
+        String lockedFirmware = FIRMWARE_LOCKED_VALUE;
 
         if (firmwareObjModel.isLocked()) {
-            lockedFirmware = "01";
-            return lockedFirmware;
+            lockedFirmware = FIRMWARE_UNLOCKED_VALUE;
         }
 
         return lockedFirmware;

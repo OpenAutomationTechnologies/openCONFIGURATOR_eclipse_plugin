@@ -44,7 +44,7 @@ public interface IPowerlinkProjectSupport {
     public static final String DEVICE_CONFIGURATION_DIR = "deviceConfiguration";
     public static final String DEVICE_FIRMWARE_DIR = "deviceFirmware";
     public static final String DEFAULT_OUTPUT_DIR = "output";
-    public static final String FIRMWARE__OUTPUT_DIRECTORY = "fw";
+    public static final String FIRMWARE_OUTPUT_DIRECTORY = "fw";
 
     public static final String UTF8_ENCODING = "UTF-8";
 
