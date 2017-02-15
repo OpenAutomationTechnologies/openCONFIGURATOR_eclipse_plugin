@@ -842,8 +842,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         if (!nodeDevRevisionList.isEmpty()) {
                             for (FirmwareManager fwMan : nodeDevRevisionList
                                     .values()) {
-                                if (fwMan.getNodeId()
-                                        .equals(cnNode.getCnNodeId())) {
+                                if (fwMan.getNodeId().equalsIgnoreCase(
+                                        String.valueOf(cnNode.getCnNodeId()))) {
                                     if (fwMan
                                             .getFirmwarefileVersion() < fwManager
                                                     .getFirmwarefileVersion()) {
