@@ -217,29 +217,36 @@ public final class OpenConfiguratorProjectUtils {
         String path = projectRootPath.toString() + IPath.SEPARATOR
                 + firmwareMngr.getFirmwareConfigPath();
         java.nio.file.Path firmwareFile = new File(path).toPath();
-        String fileExtension = StringUtils.EMPTY;
+        String newFirmwareFileName = StringUtils.EMPTY;
         if (firmwareFile != null) {
             if ((firmwareFile.getFileName() != null)) {
                 String newFirmwareName = firmwareMngr.getNewFirmwareFileName();
 
-                fileExtension = FilenameUtils
-                        .removeExtension(firmwareFile.getFileName().toString());
-
-                fileExtension = newFirmwareName
+                newFirmwareFileName = newFirmwareName
                         + IPowerlinkProjectSupport.FIRMWARE_EXTENSION;
+
                 String targetConfigurationPath = projectRootPath.toString()
                         + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
                         + IPath.SEPARATOR
-                        + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY
-                        + IPath.SEPARATOR + fileExtension;
+                        + IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY
+                        + IPath.SEPARATOR + newFirmwareFileName;
                 String targetDirectoryPath = projectRootPath.toString()
                         + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR;
 
-                java.nio.file.Files.createDirectories(
-                        Paths.get(targetDirectoryPath + IPath.SEPARATOR
-                                + IPowerlinkProjectSupport.FIRMWARE__OUTPUT_DIRECTORY));
+                String firmwareDirPath = targetDirectoryPath + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY;
+
+                File firmwareOutputDir = new File(firmwareDirPath);
+
+                if (!firmwareOutputDir.exists()) {
+                    java.nio.file.Files
+                            .createDirectories(Paths.get(firmwareDirPath));
+                } else {
+                    System.out
+                            .println("Fw directory available in the project.");
+                }
 
                 java.nio.file.Files.copy(firmwareFile,
                         new java.io.File(targetConfigurationPath).toPath(),
@@ -250,17 +257,22 @@ public final class OpenConfiguratorProjectUtils {
                 java.nio.file.Path pathRelative = projectRootPath
                         .relativize(Paths.get(targetConfigurationPath));
 
-                File updatedFirmwareFile = new File(
-                        projectRootPath + "/" + pathRelative);
+                String outputFirmware = projectRootPath.toString()
+                        + IPath.SEPARATOR + pathRelative;
+
+                File updatedFirmwareFile = new File(outputFirmware);
                 System.out.println("updatedfile file path ==="
                         + updatedFirmwareFile.getAbsolutePath());
 
-                String relativePath = pathRelative.toString();
-                relativePath = relativePath.replace('\\', '/');
-
                 if (!firmwareMngr.isKeepXmlHeader()) {
-                    OpenConfiguratorProjectUtils
-                            .removeXmlheader(updatedFirmwareFile);
+                    if (OpenConfiguratorProjectUtils
+                            .removeXmlheader(updatedFirmwareFile)) {
+                        System.out.println(
+                                "XML header value of firmware file is removed successfully.");
+                    } else {
+                        System.err.println(
+                                "Removing XML header from firmware file not successfull.");
+                    }
                 }
 
             }
@@ -999,11 +1011,12 @@ public final class OpenConfiguratorProjectUtils {
         JDomUtil.writeToProjectXmlDocument(document, xmlFile);
     }
 
-    private static File removeXmlheader(File updatedFirmwareFile)
+    private static boolean removeXmlheader(File updatedFirmwareFile)
             throws IOException {
         BufferedReader bufferedRdr = null;
         BufferedWriter bufferedWriter = null;
         FileWriter fileWriter = null;
+        boolean isFirmwareFileUpdate = false;
         try {
             bufferedRdr = new BufferedReader(
                     new FileReader(updatedFirmwareFile));
@@ -1018,7 +1031,7 @@ public final class OpenConfiguratorProjectUtils {
             fileWriter = new FileWriter(updatedFirmwareFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(firmwareline);
-
+            isFirmwareFileUpdate = true;
         } catch (RuntimeException e) {
             if (bufferedRdr != null) {
                 bufferedRdr.close();
@@ -1053,7 +1066,7 @@ public final class OpenConfiguratorProjectUtils {
             }
 
         }
-        return updatedFirmwareFile;
+        return isFirmwareFileUpdate;
     }
 
     /**
