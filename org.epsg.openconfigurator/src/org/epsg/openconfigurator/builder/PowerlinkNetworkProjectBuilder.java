@@ -41,6 +41,7 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -784,14 +785,20 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 if (Integer.valueOf(nodeId) < MINIMUM_SINGLE_DIGIT_NODE_ID) {
                     nodeId = "0" + nodeId;
                 }
+                String newFirmwareFileName = fwMngr.getNewFirmwareFileName();
+                String targetFwPath = IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY
+                        + IPath.SEPARATOR + newFirmwareFileName;
+                java.nio.file.Path pathRelative = Paths.get(targetFwPath);
+
+                String firmwareRelativePath = pathRelative.toString();
+                firmwareRelativePath = firmwareRelativePath.replace('\\', '/');
 
                 outputFirmwareInfo += nodeId + TAB_SPACE + fwMngr.getVendorId()
                         + TAB_SPACE + fwMngr.getProductNumber() + TAB_SPACE
                         + fwMngr.getdevRevNumber() + TAB_SPACE
                         + fwMngr.getApplSwDate() + TAB_SPACE
                         + fwMngr.getApplSwTime() + TAB_SPACE
-                        + fwMngr.getLocked() + TAB_SPACE
-                        + fwMngr.getNewFirmwareFileName()
+                        + fwMngr.getLocked() + TAB_SPACE + firmwareRelativePath
                         + IPowerlinkProjectSupport.FIRMWARE_EXTENSION
                         + NEW_LINE;
             }
