@@ -1779,16 +1779,22 @@ public class Node {
             if (object != null) {
 
                 if (!isSubObject) {
-                    object.setActualValue(actualValue, false);
-                    XddJdomOperation.updateActualValue(document, object,
-                            actualValue);
+                    if (!object.getActualDefaultValue()
+                            .equalsIgnoreCase(actualValue)) {
+                        object.setActualValue(actualValue, false);
+                        XddJdomOperation.updateActualValue(document, object,
+                                actualValue);
+                    }
                 } else {
                     PowerlinkSubobject subObj = object
                             .getSubObject((short) subObjectIdShort);
                     if (subObj != null) {
-                        subObj.setActualValue(actualValue, false);
-                        XddJdomOperation.updateActualValue(document, subObj,
-                                actualValue);
+                        if (!subObj.getActualDefaultValue()
+                                .equalsIgnoreCase(actualValue)) {
+                            subObj.setActualValue(actualValue, false);
+                            XddJdomOperation.updateActualValue(document, subObj,
+                                    actualValue);
+                        }
                     } else {
                         System.err.println("SubObject 0x"
                                 + String.format("%04X", objectIdLong) + "/0x"
