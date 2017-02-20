@@ -229,7 +229,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         });
         configurationDescriptor
                 .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
-
+        firmwareConfigurationDescriptor
+                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeTypeDescriptor.setValidator(new ICellEditorValidator() {
             @Override
             public String isValid(Object value) {
@@ -356,6 +357,10 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 propertyList.add(configurationDescriptor);
             }
 
+            if (!cnNode.getNodeFirmwareCollection().isEmpty()) {
+                propertyList.add(firmwareConfigurationDescriptor);
+            }
+
             propertyList.add(nodeTypeDescriptor);
             // ForcedMultiplexedCycle is not supported by POWERLINK stack
             // propertyList.add(forcedMultiplexedCycle);
@@ -421,6 +426,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         retObj = tcn.getPathToXDC();
+                        break;
+                    case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT:
+                        retObj = cnNode.getFirmwarefilePathList();
                         break;
                     case IAbstractNodeProperties.NODE_ERROR_OBJECT:
                         retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;
@@ -774,6 +782,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                 nodeIDvalue);
                         break;
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
+                        System.err.println(objectId + " made editable");
+                        break;
+                    case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT:
                         System.err.println(objectId + " made editable");
                         break;
                     case IControlledNodeProperties.CN_NODE_TYPE_OBJECT: {

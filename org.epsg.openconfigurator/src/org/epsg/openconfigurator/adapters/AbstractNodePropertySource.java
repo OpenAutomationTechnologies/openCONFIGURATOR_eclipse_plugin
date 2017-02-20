@@ -51,6 +51,7 @@ public abstract class AbstractNodePropertySource {
     public static final String NODE_ID_LABEL = "Node ID";
     public static final String NODE_ERROR_LABEL = "Error";
     private static final String NODE_CONFIG_LABEL = "Configuration File";
+    private static final String FIRMWARE_CONFIG_LABEL = "Firmware File";
     private static final String NODE_IS_ASYNC_ONLY_LABEL = "Is Async Only";
     private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Is Type1 Router";
     private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Is Type2 Router";
@@ -89,6 +90,9 @@ public abstract class AbstractNodePropertySource {
             IAbstractNodeProperties.NODE_CONIFG_OBJECT, NODE_CONFIG_LABEL);
     protected PropertyDescriptor nodeErrorDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_ERROR_OBJECT, NODE_ERROR_LABEL);
+    protected PropertyDescriptor firmwareConfigurationDescriptor = new PropertyDescriptor(
+            IAbstractNodeProperties.FIRMWARE_FILE_OBJECT,
+            FIRMWARE_CONFIG_LABEL);
 
     protected PropertyDescriptor interfaceUniqueIdDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.INTERFACE_UNIQUEID_OBJECT,

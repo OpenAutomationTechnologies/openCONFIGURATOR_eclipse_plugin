@@ -594,6 +594,43 @@ public class Module {
     }
 
     /**
+     * @return The valid firmware file for module from the project file.
+     */
+    public String getModuleFirmwareFileList() {
+        List<FirmwareManager> fwList = new ArrayList<>();
+        if (fwList != null) {
+            fwList.clear();
+        }
+
+        Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
+
+        for (FirmwareManager fwManager : getModuleFirmwareCollection()
+                .keySet()) {
+            moduleDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
+            if (!moduleDevRevisionList.isEmpty()) {
+                for (FirmwareManager fwMan : moduleDevRevisionList.values()) {
+                    if (fwMan.getFirmwarefileVersion() < fwManager
+                            .getFirmwarefileVersion()) {
+                        moduleDevRevisionList.put(fwManager.getdevRevNumber(),
+                                fwManager);
+                    }
+                }
+            }
+        }
+
+        if (fwList != null) {
+            fwList.addAll(moduleDevRevisionList.values());
+        }
+        String filePathFwMngr = StringUtils.EMPTY;
+        if (fwList != null) {
+            for (FirmwareManager fwMngr : fwList) {
+                filePathFwMngr += fwMngr.getUri() + " ;";
+            }
+        }
+        return filePathFwMngr;
+    }
+
+    /**
      * @return The module interface in module.
      */
     public TModuleInterface getModuleInterface() {

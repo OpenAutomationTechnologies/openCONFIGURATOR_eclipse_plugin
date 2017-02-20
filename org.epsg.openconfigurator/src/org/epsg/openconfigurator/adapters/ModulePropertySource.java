@@ -163,6 +163,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
             return;
         }
 
+        if (!module.getModuleFirmwareCollection().isEmpty()) {
+            propertyList.add(firmwareConfigurationDescriptor);
+        }
+
         propertyList.add(moduleNameDescriptor);
         if (isPositionOrAddressEditable()) {
             propertyList.add(moduleAddressTextDescriptor);
@@ -222,6 +226,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         retObj = moduleObjModel.getPathToXDC();
                         break;
 
+                    }
+                    case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT: {
+                        retObj = module.getModuleFirmwareFileList();
+                        break;
                     }
                     case IAbstractNodeProperties.MODULE_TYPE_READONLY_OBJECT: {
                         retObj = module.getModuleInterface().getType();
