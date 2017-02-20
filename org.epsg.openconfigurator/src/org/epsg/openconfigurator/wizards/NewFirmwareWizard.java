@@ -35,10 +35,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
@@ -48,7 +49,6 @@ import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
-import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
@@ -341,22 +341,40 @@ public class NewFirmwareWizard extends Wizard {
      */
     private boolean validateFmwareFileName(Path firmwareFilePath) {
         String fileName = firmwareFilePath.getFileName().toString();
-        if (getNode(nodeOrModuleObj) != null) {
-            java.nio.file.Path projectRootPath = getNode(nodeOrModuleObj)
-                    .getProject().getLocation().toFile().toPath();
-            File firmwareDirectory = new File(
-                    String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
-                            + IPowerlinkProjectSupport.DEVICE_FIRMWARE_DIR));
-            if (firmwareDirectory.exists()) {
-                for (File fwFile : firmwareDirectory.listFiles()) {
-                    System.err.println(
-                            "The firmware file names.." + fwFile.getName());
-                    System.err.println("The firm names.." + fileName);
-                    if (fwFile.getName().equalsIgnoreCase(fileName)) {
-                        return true;
+        if (nodeOrModuleObj != null) {
+
+            List<String> firmwareFileList = new ArrayList<>();
+
+            if (nodeOrModuleObj instanceof Node) {
+                Node node = (Node) nodeOrModuleObj;
+                if (!node.getNodeFirmwareCollection().isEmpty()) {
+                    for (FirmwareManager fwMngr : node
+                            .getNodeFirmwareCollection().keySet()) {
+                        if (fwMngr.getUri() != null) {
+                            File firmwareDirectory = new File(fwMngr.getUri());
+                            firmwareFileList.add(firmwareDirectory.getName());
+                        }
+                    }
+                }
+            } else if (nodeOrModuleObj instanceof Module) {
+                Module module = (Module) nodeOrModuleObj;
+                if (!module.getModuleFirmwareCollection().isEmpty()) {
+                    for (FirmwareManager fwMngr : module
+                            .getModuleFirmwareCollection().keySet()) {
+                        if (fwMngr.getUri() != null) {
+                            File firmwareDirectory = new File(fwMngr.getUri());
+                            firmwareFileList.add(firmwareDirectory.getName());
+                        }
                     }
                 }
             }
+
+            for (String fwFile : firmwareFileList) {
+                if (fwFile.equalsIgnoreCase(fileName)) {
+                    return true;
+                }
+            }
+
         }
         return false;
     }
