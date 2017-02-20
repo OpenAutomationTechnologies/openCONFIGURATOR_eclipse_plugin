@@ -614,6 +614,49 @@ public class Node {
     }
 
     /**
+     * @return The valid firmware file for node from the project file.
+     */
+    public String getFirmwarefilePathList() {
+        List<FirmwareManager> fwList = new ArrayList<>();
+        if (fwList != null) {
+            fwList.clear();
+        }
+        Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+        if (getNodeFirmwareCollection() != null) {
+            for (FirmwareManager fwManager : getNodeFirmwareCollection()
+                    .keySet()) {
+                nodeDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
+                if (!nodeDevRevisionList.isEmpty()) {
+                    for (FirmwareManager fwMan : nodeDevRevisionList.values()) {
+                        if (fwMan.getNodeId().equalsIgnoreCase(
+                                String.valueOf(getCnNodeId()))) {
+                            if (fwMan.getFirmwarefileVersion() < fwManager
+                                    .getFirmwarefileVersion()) {
+                                nodeDevRevisionList.put(
+                                        fwManager.getdevRevNumber(), fwManager);
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else {
+            System.err.println("Firmware list not available for node!");
+        }
+        if (fwList != null) {
+            fwList.addAll(nodeDevRevisionList.values());
+        }
+        String filePathFwMngr = StringUtils.EMPTY;
+        if (fwList != null) {
+            for (FirmwareManager fwMngr : fwList) {
+                filePathFwMngr += fwMngr.getUri() + " ;";
+            }
+        }
+        return filePathFwMngr;
+
+    }
+
+    /**
      * @return The list of forced objects in a string format.
      */
     public String getForcedObjectsString() {

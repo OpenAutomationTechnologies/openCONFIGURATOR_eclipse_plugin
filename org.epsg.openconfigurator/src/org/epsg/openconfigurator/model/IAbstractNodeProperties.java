@@ -47,6 +47,7 @@ public interface IAbstractNodeProperties {
     public static final String NODE_ID_READONLY_OBJECT = "node.NodeId.ReadOnly"; //$NON-NLS-1$
     public static final String NODE_ID_EDITABLE_OBJECT = "node.NodeId.Editable"; //$NON-NLS-1$
     public static final String NODE_ERROR_OBJECT = "node.NodeId.Error"; //$NON-NLS-1$
+    public static final String FIRMWARE_FILE_OBJECT = "node.NodeId.Firmware"; //$NON-NLS-1$
 
     public static final String INTERFACE_UNIQUEID_OBJECT = "node.Interface.UniqueID"; //$NON-NLS-1$
     public static final String INTERFACE_TYPE_OBJECT = "node.Interface.Type"; //$NON-NLS-1$
