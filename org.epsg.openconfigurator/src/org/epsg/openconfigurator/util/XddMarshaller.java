@@ -185,7 +185,7 @@ public final class XddMarshaller {
      * @throws IOException
      */
     @SuppressWarnings("finally")
-    public static synchronized Firmware unmarshallFirmwareFile(final File file)
+    public static Firmware unmarshallFirmwareFile(final File file)
             throws JAXBException, SAXException, ParserConfigurationException,
             IOException {
 
@@ -193,13 +193,15 @@ public final class XddMarshaller {
         BufferedReader bufferedRdr = null;
 
         try {
+
             bufferedRdr = new BufferedReader(new FileReader(file));
-            String firmwareHeaderLines = StringUtils.EMPTY;
             String firmwareline = StringUtils.EMPTY;
-            while ((firmwareHeaderLines = bufferedRdr.readLine()) != null) {
-                firmwareline += firmwareHeaderLines;
-                if (firmwareHeaderLines.endsWith("/>")) {
-                    break; // breaks the loop if firmware header is closed
+            int linesInFile = 3;
+            for (int count = 0; count < linesInFile; count++) {
+                firmwareline += bufferedRdr.readLine();
+                if (firmwareline.contains("/>")) {
+                    linesInFile = count;
+                    break;// breaks the loop if firmware header is closed
                 }
             }
 
