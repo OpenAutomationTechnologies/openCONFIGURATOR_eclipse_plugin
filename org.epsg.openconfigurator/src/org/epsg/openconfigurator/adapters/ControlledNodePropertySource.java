@@ -50,6 +50,7 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
 import org.epsg.openconfigurator.model.INetworkProperties;
@@ -428,7 +429,16 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         retObj = tcn.getPathToXDC();
                         break;
                     case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT:
-                        retObj = cnNode.getFirmwarefilePathList();
+                        String filePathOfFwMngr = StringUtils.EMPTY;
+                        if (cnNode.getValidFirmwareList() != null) {
+                            for (FirmwareManager fwMngr : cnNode
+                                    .getValidFirmwareList()) {
+                                if (fwMngr.getUri() != null) {
+                                    filePathOfFwMngr += fwMngr.getUri()
+                                            .concat(" ;");                                }
+                            }
+                        }
+                        retObj = filePathOfFwMngr;
                         break;
                     case IAbstractNodeProperties.NODE_ERROR_OBJECT:
                         retObj = IAbstractNodeProperties.NODE_ERROR_DESCRIPTION;

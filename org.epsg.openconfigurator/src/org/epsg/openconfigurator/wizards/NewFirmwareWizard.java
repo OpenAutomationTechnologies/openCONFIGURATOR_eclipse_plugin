@@ -43,12 +43,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
-import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
-import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
-import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.FirmwareManager;
-import org.epsg.openconfigurator.model.IControlledNodeProperties;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
@@ -58,7 +54,6 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
-import org.jdom2.JDOMException;
 
 /**
  * Wizard page to add new firmware.
@@ -273,52 +268,13 @@ public class NewFirmwareWizard extends Wizard {
             return false;
         }
 
-        try {
-            OpenConfiguratorProjectUtils.addFirmwareList(firmwareMngr,
-                    nodeOrModuleObj, firmwareObj);
-        } catch (JDOMException | IOException e) {
-            System.err.println(
-                    "The project file update of firmware element fails.");
-            e.printStackTrace();
-        }
-        Node node = getNode(nodeOrModuleObj);
-        res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
-                node.getNetworkId(), node.getCnNodeId(),
-                NodeAssignment.NMT_NODEASSIGN_SWUPDATE);
-
-        if (!res.IsSuccessful()) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printLibraryErrorMessage(res);
-        }
-
-        res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
-                node.getNetworkId(), node.getCnNodeId(),
-                NodeAssignment.NMT_NODEASSIGN_SWVERSIONCHECK);
-        if (!res.IsSuccessful()) {
-            OpenConfiguratorMessageConsole.getInstance()
-                    .printLibraryErrorMessage(res);
-        }
-
-        Object nodeModelObj = node.getNodeModel();
-        if (nodeModelObj != null) {
-            if (nodeModelObj instanceof TCN) {
-                TCN cn = (TCN) nodeModelObj;
-                cn.setAutoAppSwUpdateAllowed(true);
-                cn.setVerifyAppSwVersion(true);
-            }
-        }
-
-        try {
-            OpenConfiguratorProjectUtils.updateNodeAttributeValue(node,
-                    IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT,
-                    "true");
-            OpenConfiguratorProjectUtils.updateNodeAttributeValue(node,
-                    IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT,
-                    "true");
-        } catch (JDOMException | IOException e1) {
-            System.err.println(
-                    "The node assignment value is not updated in the project file.");
-            e1.printStackTrace();
+        if (firmwareMngr.updateFirmwareInProjectFile(firmwareMngr,
+                nodeOrModuleObj, firmwareObj)) {
+            System.out.println(
+                    "Firmware file successfully updated in project file.");
+        } else {
+            System.err
+                    .println("Firmware file failed to update in project file.");
         }
 
         try {

@@ -596,7 +596,7 @@ public class Module {
     /**
      * @return The valid firmware file for module from the project file.
      */
-    public String getModuleFirmwareFileList() {
+    public List<FirmwareManager> getModuleFirmwareFileList() {
         List<FirmwareManager> fwList = new ArrayList<>();
         if (fwList != null) {
             fwList.clear();
@@ -621,13 +621,8 @@ public class Module {
         if (fwList != null) {
             fwList.addAll(moduleDevRevisionList.values());
         }
-        String filePathFwMngr = StringUtils.EMPTY;
-        if (fwList != null) {
-            for (FirmwareManager fwMngr : fwList) {
-                filePathFwMngr += fwMngr.getUri() + " ;";
-            }
-        }
-        return filePathFwMngr;
+
+        return fwList;
     }
 
     /**

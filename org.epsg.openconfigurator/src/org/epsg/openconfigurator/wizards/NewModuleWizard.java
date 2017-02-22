@@ -48,6 +48,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
@@ -109,6 +110,66 @@ public class NewModuleWizard extends Wizard {
             addChildmodulePage = new AddChildModuleWizardPage(selectedNodeObj);
         }
         rootNode = nodeList;
+    }
+
+    private boolean addAvailableFirmware(Module newModule) {
+        if (rootNode != null) {
+            if (!rootNode.getModuleList().isEmpty()) {
+                for (Module module : rootNode.getModuleList()) {
+                    if (module.getVenIdValue()
+                            .equalsIgnoreCase(newModule.getVenIdValue())) {
+                        if (module.getProductId()
+                                .equalsIgnoreCase(newModule.getProductId())) {
+                            if (!module.getModuleFirmwareFileList().isEmpty()) {
+                                for (FirmwareManager fwMngr : module
+                                        .getModuleFirmwareFileList()) {
+                                    MessageDialog dialog = new MessageDialog(
+                                            null, "Add firmware file", null,
+                                            "The project contains firmware file for Module '"
+                                                    + newModule.getModuleName()
+                                                    + "'. "
+                                                    + "\nDo you wish to add the firmware file? ",
+                                            MessageDialog.WARNING,
+                                            new String[] { "Yes", "No" }, 1);
+                                    int result = dialog.open();
+                                    if (result != 0) {
+                                        return true;
+                                    }
+                                    if (!newModule.getModuleFirmwareCollection()
+                                            .isEmpty()) {
+                                        for (FirmwareManager firmware : newModule
+                                                .getModuleFirmwareCollection()
+                                                .keySet()) {
+                                            if (!(firmware.getUri()
+                                                    .equalsIgnoreCase(
+                                                            fwMngr.getUri()))) {
+                                                newModule
+                                                        .getModuleFirmwareCollection()
+                                                        .put(fwMngr, fwMngr
+                                                                .getFirmwarefileVersion());
+                                                fwMngr.updateFirmwareInProjectFile(
+                                                        fwMngr, newModule,
+                                                        fwMngr.getFirmwareObjModel());
+                                            }
+                                        }
+                                    } else {
+                                        newModule.getModuleFirmwareCollection()
+                                                .put(fwMngr, fwMngr
+                                                        .getFirmwarefileVersion());
+                                        fwMngr.updateFirmwareInProjectFile(
+                                                fwMngr, newModule,
+                                                fwMngr.getFirmwareObjModel());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -274,6 +335,10 @@ public class NewModuleWizard extends Wizard {
         } catch (CoreException e) {
             System.err.println("unable to refresh the resource due to "
                     + e.getCause().getMessage());
+        }
+
+        if (addAvailableFirmware(newModule)) {
+            return true;
         }
 
         return true;
