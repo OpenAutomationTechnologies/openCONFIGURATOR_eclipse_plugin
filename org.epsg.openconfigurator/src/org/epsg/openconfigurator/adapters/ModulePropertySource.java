@@ -46,6 +46,7 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
@@ -228,7 +229,16 @@ public class ModulePropertySource extends AbstractNodePropertySource
 
                     }
                     case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT: {
-                        retObj = module.getModuleFirmwareFileList();
+                        String filePathFwMngr = StringUtils.EMPTY;
+                        if (module.getModuleFirmwareFileList() != null) {
+                            for (FirmwareManager fwMngr : module
+                                    .getModuleFirmwareFileList()) {
+                                if (fwMngr.getUri() != null) {
+                                    filePathFwMngr += fwMngr.getUri() + " ;";
+                                }
+                            }
+                        }
+                        retObj = filePathFwMngr;
                         break;
                     }
                     case IAbstractNodeProperties.MODULE_TYPE_READONLY_OBJECT: {

@@ -45,6 +45,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
@@ -117,6 +118,66 @@ public class NewNodeWizard extends Wizard {
         setWindowTitle(WINDOW_TITLE);
         addNodePage = new AddControlledNodeWizardPage(nodeCollectionModel);
         validateXddPage = new ValidateXddWizardPage();
+    }
+
+    private boolean addNodeFirmwareFile(Node newNode) {
+        if (nodeList != null) {
+            if (!nodeList.getCnNodeList().isEmpty()) {
+                for (Node cnNode : nodeList.getCnNodeList()) {
+                    if (cnNode.getVendorIdValue()
+                            .equalsIgnoreCase(newNode.getVendorIdValue())) {
+                        if (cnNode.getProductCodeValue().equalsIgnoreCase(
+                                newNode.getProductCodeValue())) {
+                            if (!cnNode.getValidFirmwareList().isEmpty()) {
+                                for (FirmwareManager fwMngr : cnNode
+                                        .getValidFirmwareList()) {
+                                    MessageDialog dialog = new MessageDialog(
+                                            null, "Add firmware file", null,
+                                            "The project contains firmware file for Node '"
+                                                    + newNode
+                                                            .getNodeIDWithName()
+                                                    + "'."
+                                                    + " \nDo you wish to add the firmware file? ",
+                                            MessageDialog.WARNING,
+                                            new String[] { "Yes", "No" }, 1);
+                                    int result = dialog.open();
+                                    if (result != 0) {
+                                        return true;
+                                    }
+                                    if (!newNode.getNodeFirmwareCollection()
+                                            .isEmpty()) {
+                                        for (FirmwareManager firmware : newNode
+                                                .getNodeFirmwareCollection()
+                                                .keySet()) {
+                                            if (!(firmware.getUri()
+                                                    .equalsIgnoreCase(
+                                                            fwMngr.getUri()))) {
+                                                newNode.getNodeFirmwareCollection()
+                                                        .put(fwMngr, fwMngr
+                                                                .getFirmwarefileVersion());
+                                                fwMngr.updateFirmwareInProjectFile(
+                                                        fwMngr, newNode,
+                                                        fwMngr.getFirmwareObjModel());
+                                            }
+                                        }
+                                    } else {
+                                        newNode.getNodeFirmwareCollection().put(
+                                                fwMngr,
+                                                fwMngr.getFirmwarefileVersion());
+                                        fwMngr.updateFirmwareInProjectFile(
+                                                fwMngr, newNode,
+                                                fwMngr.getFirmwareObjModel());
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -371,8 +432,11 @@ public class NewNodeWizard extends Wizard {
             newNode.addStationTypeofNode(addNodePage.getStationTypeChanged());
 
         } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+
+        if (addNodeFirmwareFile(newNode)) {
+            return true;
         }
 
         return true;

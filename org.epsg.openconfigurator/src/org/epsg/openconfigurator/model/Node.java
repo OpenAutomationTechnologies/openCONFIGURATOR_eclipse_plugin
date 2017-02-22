@@ -87,6 +87,7 @@ public class Node {
     private static final int XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK = 0x1018;
 
     private static final short XDD_VENDOR_ID_SUBOBJECT_INDEX = 1;
+    private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
 
     /**
      * Returns the attribute name linked with the node assignment value.
@@ -618,7 +619,7 @@ public class Node {
     /**
      * @return The valid firmware file for node from the project file.
      */
-    public String getFirmwarefilePathList() {
+    public List<FirmwareManager> getValidFirmwareList() {
         List<FirmwareManager> fwList = new ArrayList<>();
         if (fwList != null) {
             fwList.clear();
@@ -648,14 +649,7 @@ public class Node {
         if (fwList != null) {
             fwList.addAll(nodeDevRevisionList.values());
         }
-        String filePathFwMngr = StringUtils.EMPTY;
-        if (fwList != null) {
-            for (FirmwareManager fwMngr : fwList) {
-                filePathFwMngr += fwMngr.getUri() + " ;";
-            }
-        }
-        return filePathFwMngr;
-
+        return fwList;
     }
 
     /**
@@ -988,6 +982,26 @@ public class Node {
         }
 
         return 0;
+    }
+
+    /**
+     * @return The product code value of node from node XDD/XDC.
+     */
+    public String getProductCodeValue() {
+        String value = StringUtils.EMPTY;
+        if (getObjectDictionary() != null) {
+            if (getObjectDictionary()
+                    .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                    .getSubObject(XDD_SUBOBJECT_INDEX_PRODUCTCODE) != null) {
+                value = getObjectDictionary()
+                        .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                        .getSubObject(XDD_SUBOBJECT_INDEX_PRODUCTCODE)
+                        .getActualDefaultValue();
+            }
+        } else {
+            System.err.println("Object Dictionary not available.");
+        }
+        return value;
     }
 
     /**

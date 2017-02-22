@@ -291,6 +291,31 @@ public class PowerlinkRootNode {
     }
 
     /**
+     * @return The list of module available in the project
+     */
+    public ArrayList<Module> getModuleList() {
+        ArrayList<Module> returnModuleList = new ArrayList<>();
+        Collection<Node> nodeList = nodeCollection.values();
+
+        for (Node node : nodeList) {
+            Object nodeModel = node.getNodeModel();
+            if (nodeModel instanceof TCN) {
+                if (node.getInterface() != null) {
+                    for (Module module : node.getInterface()
+                            .getModuleCollection().values()) {
+                        Object moduleModel = module.getModelOfModule();
+                        if (moduleModel instanceof InterfaceList.Interface.Module) {
+                            returnModuleList.add(module);
+                        }
+                    }
+                }
+
+            }
+        }
+        return returnModuleList;
+    }
+
+    /**
      * @return The number of nodes available.
      */
     public int getNodeCount() {

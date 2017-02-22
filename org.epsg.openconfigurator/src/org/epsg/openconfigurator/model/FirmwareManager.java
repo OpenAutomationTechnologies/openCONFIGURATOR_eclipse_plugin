@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.model;
 
+import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
@@ -38,8 +39,15 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
+import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
+import org.jdom2.JDOMException;
 
 /**
  * Wrapper class for the firmware file attached to node or module.
@@ -217,6 +225,13 @@ public class FirmwareManager {
     }
 
     /**
+     * @return The object model of firmware file.
+     */
+    public Firmware getFirmwareObjModel() {
+        return firmwareObjModel;
+    }
+
+    /**
      * @return Locked value of firmware manager
      */
     public String getLocked() {
@@ -251,6 +266,21 @@ public class FirmwareManager {
      */
     public Node getNode() {
         return node;
+    }
+
+    /**
+     * @return The instance of Node.
+     */
+    public Node getNode(Object nodeOrModuleObject) {
+        if (nodeOrModuleObject instanceof Node) {
+            Node node = (Node) nodeOrModuleObject;
+            return node;
+        }
+        if (nodeOrModuleObject instanceof Module) {
+            Module module = (Module) nodeOrModuleObject;
+            return module.getNode();
+        }
+        return null;
     }
 
     /**
@@ -337,6 +367,72 @@ public class FirmwareManager {
      */
     public void setUri(String relativePath) {
         firmwareObjModel.setURI(relativePath);
+    }
+
+    /**
+     * Updates the imported firmware file into project file and update the node
+     * assignment value for node and module.
+     *
+     * @param firmwareMngr Instance of Firmware Manager
+     * @param nodeOrModuleObj Instance of Node or Module
+     * @param firmwareObj Object model of firmware
+     */
+    public boolean updateFirmwareInProjectFile(FirmwareManager firmwareMngr,
+            Object nodeOrModuleObj, Firmware firmwareObj) {
+        Result res = new Result();
+        try {
+            OpenConfiguratorProjectUtils.addFirmwareList(firmwareMngr,
+                    nodeOrModuleObj, firmwareObj);
+        } catch (JDOMException | IOException e) {
+            System.err.println(
+                    "The project file update of firmware element fails.");
+            e.printStackTrace();
+            return false;
+        }
+
+        if (getNode(nodeOrModuleObject) != null) {
+            Node node = getNode(nodeOrModuleObject);
+            res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
+                    node.getNetworkId(), node.getCnNodeId(),
+                    NodeAssignment.NMT_NODEASSIGN_SWUPDATE);
+
+            if (!res.IsSuccessful()) {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+            }
+
+            res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
+                    node.getNetworkId(), node.getCnNodeId(),
+                    NodeAssignment.NMT_NODEASSIGN_SWVERSIONCHECK);
+            if (!res.IsSuccessful()) {
+                OpenConfiguratorMessageConsole.getInstance()
+                        .printLibraryErrorMessage(res);
+            }
+
+            Object nodeModelObj = node.getNodeModel();
+            if (nodeModelObj != null) {
+                if (nodeModelObj instanceof TCN) {
+                    TCN cn = (TCN) nodeModelObj;
+                    cn.setAutoAppSwUpdateAllowed(true);
+                    cn.setVerifyAppSwVersion(true);
+                }
+            }
+
+            try {
+                OpenConfiguratorProjectUtils.updateNodeAttributeValue(node,
+                        IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_OBJECT,
+                        "true");
+                OpenConfiguratorProjectUtils.updateNodeAttributeValue(node,
+                        IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT,
+                        "true");
+            } catch (JDOMException | IOException e1) {
+                System.err.println(
+                        "The node assignment value is not updated in the project file.");
+                e1.printStackTrace();
+                return false;
+            }
+        }
+        return true;
     }
 
 }
