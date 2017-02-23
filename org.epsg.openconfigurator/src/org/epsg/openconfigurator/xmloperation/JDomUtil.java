@@ -341,8 +341,9 @@ public class JDomUtil {
                         if (path != null) {
                             Path parentPath = path.getParent();
                             if (parentPath != null) {
-                                if (parentPath.getFileName() != null) {
-                                    return parentPath.getFileName().toString();
+                                Path fileName = parentPath.getFileName();
+                                if (fileName != null) {
+                                    return fileName.toString();
                                 }
                             }
                         }
@@ -621,8 +622,15 @@ public class JDomUtil {
         XMLOutputter xmlOutput = new XMLOutputter();
         // display nice
         xmlOutput.setFormat(Format.getPrettyFormat());
-        FileWriter fileWriter = new FileWriter(xmlFile);
-        xmlOutput.output(document, fileWriter);
-        fileWriter.close();
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(xmlFile);
+            xmlOutput.output(document, fileWriter);
+            fileWriter.close();
+        } finally {
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+        }
     }
 }

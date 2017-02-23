@@ -617,42 +617,6 @@ public class Node {
     }
 
     /**
-     * @return The valid firmware file for node from the project file.
-     */
-    public List<FirmwareManager> getValidFirmwareList() {
-        List<FirmwareManager> fwList = new ArrayList<>();
-        if (fwList != null) {
-            fwList.clear();
-        }
-        Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
-        if (getNodeFirmwareCollection() != null) {
-            for (FirmwareManager fwManager : getNodeFirmwareCollection()
-                    .keySet()) {
-                nodeDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
-                if (!nodeDevRevisionList.isEmpty()) {
-                    for (FirmwareManager fwMan : nodeDevRevisionList.values()) {
-                        if (fwMan.getNodeId().equalsIgnoreCase(
-                                String.valueOf(getCnNodeId()))) {
-                            if (fwMan.getFirmwarefileVersion() < fwManager
-                                    .getFirmwarefileVersion()) {
-                                nodeDevRevisionList.put(
-                                        fwManager.getdevRevNumber(), fwManager);
-                            }
-                        }
-                    }
-                }
-
-            }
-        } else {
-            System.err.println("Firmware list not available for node!");
-        }
-        if (fwList != null) {
-            fwList.addAll(nodeDevRevisionList.values());
-        }
-        return fwList;
-    }
-
-    /**
      * @return The list of forced objects in a string format.
      */
     public String getForcedObjectsString() {
@@ -1031,6 +995,39 @@ public class Node {
                 IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
                 IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID);
         return priorityValue;
+    }
+
+    /**
+     * @return The valid firmware file for node from the project file.
+     */
+    public List<FirmwareManager> getValidFirmwareList() {
+        List<FirmwareManager> fwList = new ArrayList<>();
+        fwList.clear();
+
+        Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+        if (getNodeFirmwareCollection() != null) {
+            for (FirmwareManager fwManager : getNodeFirmwareCollection()
+                    .keySet()) {
+                nodeDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
+                if (!nodeDevRevisionList.isEmpty()) {
+                    for (FirmwareManager fwMan : nodeDevRevisionList.values()) {
+                        if (fwMan.getNodeId().equalsIgnoreCase(
+                                String.valueOf(getCnNodeId()))) {
+                            if (fwMan.getFirmwarefileVersion() < fwManager
+                                    .getFirmwarefileVersion()) {
+                                nodeDevRevisionList.put(
+                                        fwManager.getdevRevNumber(), fwManager);
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else {
+            System.err.println("Firmware list not available for node!");
+        }
+        fwList.addAll(nodeDevRevisionList.values());
+        return fwList;
     }
 
     /**

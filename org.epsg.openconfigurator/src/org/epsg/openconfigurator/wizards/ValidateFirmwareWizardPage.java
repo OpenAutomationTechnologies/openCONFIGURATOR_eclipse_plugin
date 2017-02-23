@@ -174,7 +174,6 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                 }
 
                 long firmwareDev = firmwareModel.getDev();
-                long firmwareVar = firmwareModel.getVar();
 
                 if (nodeOrModuleObj instanceof Node) {
                     // Get the XDD values for controlled node
