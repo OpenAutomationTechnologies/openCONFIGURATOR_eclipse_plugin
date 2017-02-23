@@ -212,10 +212,6 @@ public class ProjectJDomOperation {
             nodeOrModuleXpath = module.getXpath();
         }
 
-        String firmwareTagXpath = firmwareListTagXpath + "/oc:"
-                + IControlledNodeProperties.FIRMWARE_TAG + "[@URI='"
-                + firmwareMngr.getUri() + "']";
-
         Element firmwareElement = new Element(
                 IControlledNodeProperties.FIRMWARE_TAG);
         List<Attribute> attribList = firmwareElement.getAttributes();

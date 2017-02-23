@@ -234,9 +234,5 @@ public class AddModuleWizardPage extends WizardPage {
         cnModule.setName(moduleName.getText());
         moduleModel = cnModule;
 
-        if (moduleModel == null) {
-            System.err.println("Invalid module model :" + moduleModel);
-        }
-
     }
 }

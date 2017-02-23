@@ -530,8 +530,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private void buildFirmwareInfoFile(java.nio.file.Path targetPath)
             throws CoreException {
         updateFirmwareDevRevList();
-        copyFirmwareFile();
+
         try {
+            copyFirmwareFile();
             generateFirmwareInfoFile(targetPath);
         } catch (IOException e) {
             e.printStackTrace();
@@ -591,16 +592,27 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 "Project:" + getProject().getName() + " Clean successful");
     }
 
-    private void copyFirmwareFile() {
+    private boolean copyFirmwareFile() {
         java.nio.file.Path projectRootPath = getProject().getLocation().toFile()
                 .toPath();
+        boolean deleted = false;
         File outputInfoFile = new File(
                 String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
                         + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR));
         if (outputInfoFile.exists()) {
-            for (File fwInfoFile : outputInfoFile.listFiles()) {
-                if (fwInfoFile.getName().equalsIgnoreCase(FIRMWARE_INFO)) {
-                    fwInfoFile.delete();
+            File[] listOfInfoFiles = outputInfoFile.listFiles();
+            if (listOfInfoFiles != null) {
+                for (File fwInfoFile : listOfInfoFiles) {
+                    if (fwInfoFile.getName().equalsIgnoreCase(FIRMWARE_INFO)) {
+                        deleted = fwInfoFile.delete();
+                        if (deleted) {
+                            System.out.println("File deleted.");
+                        } else {
+                            System.err
+                                    .println("File not deleted successfully.");
+                            return false;
+                        }
+                    }
                 }
             }
         } else {
@@ -614,8 +626,13 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                         + IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY));
 
         if (firmwareDirectory.exists()) {
-            for (File fwFile : firmwareDirectory.listFiles()) {
-                fwFile.delete();
+            File[] listOfFiles = firmwareDirectory.listFiles();
+            if (listOfFiles != null) {
+                for (File fwFile : listOfFiles) {
+                    if (fwFile != null) {
+                        deleted = fwFile.delete();
+                    }
+                }
             }
         }
         for (FirmwareManager firmwareMngr : fwList) {
@@ -625,6 +642,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 e.printStackTrace();
             }
         }
+        return deleted;
     }
 
     private void displayErrorMessage(final String message) {
@@ -782,7 +800,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             for (FirmwareManager fwMngr : fwList) {
                 String nodeId = fwMngr.getNodeId();
-                if (Integer.valueOf(nodeId) < MINIMUM_SINGLE_DIGIT_NODE_ID) {
+                if (Integer.parseInt(nodeId) <= MINIMUM_SINGLE_DIGIT_NODE_ID) {
                     nodeId = "0" + nodeId;
                 }
                 String newFirmwareFileName = fwMngr.getNewFirmwareFileName();

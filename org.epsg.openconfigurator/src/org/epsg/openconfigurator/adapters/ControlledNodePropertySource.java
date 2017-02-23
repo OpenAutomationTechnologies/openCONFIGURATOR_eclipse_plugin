@@ -430,12 +430,13 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT:
                         String filePathOfFwMngr = StringUtils.EMPTY;
-                        if (cnNode.getValidFirmwareList() != null) {
+                        if (!cnNode.getValidFirmwareList().isEmpty()) {
                             for (FirmwareManager fwMngr : cnNode
                                     .getValidFirmwareList()) {
                                 if (fwMngr.getUri() != null) {
                                     filePathOfFwMngr += fwMngr.getUri()
-                                            .concat(" ;");                                }
+                                        .concat(" ;");
+                                }
                             }
                         }
                         retObj = filePathOfFwMngr;

@@ -141,7 +141,7 @@ public class Module {
 
     private HeadNodeInterface interfaceObj;
 
-    private Map<FirmwareManager, Integer> ModuleFirmwareCollection = new HashMap<>();
+    private Map<FirmwareManager, Integer> moduleFirmwareCollection = new HashMap<>();
 
     /**
      * Constructor that defines null values.
@@ -590,7 +590,7 @@ public class Module {
      * @return List of firmware files added to Module
      */
     public Map<FirmwareManager, Integer> getModuleFirmwareCollection() {
-        return ModuleFirmwareCollection;
+        return moduleFirmwareCollection;
     }
 
     /**
@@ -598,9 +598,8 @@ public class Module {
      */
     public List<FirmwareManager> getModuleFirmwareFileList() {
         List<FirmwareManager> fwList = new ArrayList<>();
-        if (fwList != null) {
-            fwList.clear();
-        }
+
+        fwList.clear();
 
         Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
 
@@ -618,9 +617,7 @@ public class Module {
             }
         }
 
-        if (fwList != null) {
-            fwList.addAll(moduleDevRevisionList.values());
-        }
+        fwList.addAll(moduleDevRevisionList.values());
 
         return fwList;
     }

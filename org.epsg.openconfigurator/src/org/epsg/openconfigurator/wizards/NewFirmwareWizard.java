@@ -38,12 +38,12 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
-import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
@@ -161,15 +161,14 @@ public class NewFirmwareWizard extends Wizard {
     public boolean performFinish() {
         Path firmwareFilePath = validateFirmwarePage
                 .getFirmwareConfigurationPath();
-        Result res = new Result();
         Charset charset = Charset.forName("UTF-8");
         Object objModel = getObjModel(nodeOrModuleObj);
-
+        Path firmwareFileName = firmwareFilePath.getFileName();
         if (validateFmwareFileName(firmwareFilePath)) {
             MessageDialog dialog = new MessageDialog(null,
                     "Firmware file exists", null,
                     "The firmware file with name '"
-                            + firmwareFilePath.getFileName().toString()
+                            + firmwareFileName.toString()
                             + "' already exists in the project. \nPlease rename the file and try again.",
                     MessageDialog.ERROR, new String[] { "OK" }, 0);
             dialog.open();
@@ -296,7 +295,11 @@ public class NewFirmwareWizard extends Wizard {
      *         otherwise.
      */
     private boolean validateFmwareFileName(Path firmwareFilePath) {
-        String fileName = firmwareFilePath.getFileName().toString();
+        Path nameOfFirmwareFile = firmwareFilePath.getFileName();
+        String fileName = StringUtils.EMPTY;
+        if (nameOfFirmwareFile != null) {
+            fileName = nameOfFirmwareFile.toString();
+        }
         if (nodeOrModuleObj != null) {
 
             List<String> firmwareFileList = new ArrayList<>();
@@ -326,8 +329,10 @@ public class NewFirmwareWizard extends Wizard {
             }
 
             for (String fwFile : firmwareFileList) {
-                if (fwFile.equalsIgnoreCase(fileName)) {
-                    return true;
+                if (!fileName.isEmpty()) {
+                    if (fwFile.equalsIgnoreCase(fileName)) {
+                        return true;
+                    }
                 }
             }
 

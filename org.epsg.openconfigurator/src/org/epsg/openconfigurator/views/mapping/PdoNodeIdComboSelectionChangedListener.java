@@ -111,7 +111,7 @@ import org.jdom2.JDOMException;
                             // Redundant null check is made to prevent the
                             // project from any
                             // unexpected failure.
-                            if (node.getNodeIdString() != null) {
+                            if (!node.getNodeIdString().isEmpty()) {
                                 Result res = OpenConfiguratorLibraryUtils
                                         .setSubObjectActualValue(subObj,
                                                 node.getNodeIdString());
@@ -122,7 +122,7 @@ import org.jdom2.JDOMException;
                             }
                         }
                         try {
-                            if (node.getNodeIdString() != null) {
+                            if (!node.getNodeIdString().isEmpty()) {
                                 if (subObj != null) {
                                     subObj.setActualValue(
                                             node.getNodeIdString(), true);

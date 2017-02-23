@@ -1207,7 +1207,7 @@ public class XddJdomOperation {
                     .getParameterGroupOrParameterRef();
             // Redundant null check is made to prevent the project from any
             // unexpected failure.
-            if (parameterGroupReferenceList != null) {
+            if (!parameterGroupReferenceList.isEmpty()) {
                 for (Object parameterGroupReference : parameterGroupReferenceList) {
                     if (parameterGroupReference instanceof TParameterGroup) {
                         TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
@@ -1261,7 +1261,7 @@ public class XddJdomOperation {
                     .getParameterGroupOrParameterRef();
             // Redundant null check is made to prevent the project from any
             // unexpected failure.
-            if (parameterGroupReferenceList != null) {
+            if (!parameterGroupReferenceList.isEmpty()) {
                 for (Object parameterGroupReference : parameterGroupReferenceList) {
                     if (parameterGroupReference instanceof TParameterGroup) {
                         TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
@@ -1584,7 +1584,7 @@ public class XddJdomOperation {
                 + uniqueId + "']";
         // Redundant null check is made to prevent the project from any
         // unexpected failure.
-        if (parameterGroupReferenceList != null) {
+        if (!parameterGroupReferenceList.isEmpty()) {
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
@@ -1664,7 +1664,7 @@ public class XddJdomOperation {
                 .getParameterGroupOrParameterRef();
         String paramGrpXpath = xpath + "/plk:parameterGroup[@uniqueID='"
                 + uniqueId + "']";
-        if (parameterGroupReferenceList != null) {
+        if (!parameterGroupReferenceList.isEmpty()) {
             // Redundant null check is made to prevent the project from any
             // unexpected failure.
             for (Object parameterGroupReference : parameterGroupReferenceList) {

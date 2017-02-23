@@ -230,11 +230,12 @@ public class ModulePropertySource extends AbstractNodePropertySource
                     }
                     case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT: {
                         String filePathFwMngr = StringUtils.EMPTY;
-                        if (module.getModuleFirmwareFileList() != null) {
+                        if (!module.getModuleFirmwareFileList().isEmpty()) {
                             for (FirmwareManager fwMngr : module
                                     .getModuleFirmwareFileList()) {
                                 if (fwMngr.getUri() != null) {
-                                    filePathFwMngr += fwMngr.getUri() + " ;";
+                                    filePathFwMngr += fwMngr.getUri()
+                                            .concat(" ;");
                                 }
                             }
                         }

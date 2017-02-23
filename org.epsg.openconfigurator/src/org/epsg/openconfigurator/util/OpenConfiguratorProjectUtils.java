@@ -596,7 +596,13 @@ public final class OpenConfiguratorProjectUtils {
 
                 if (!devFirmwareDirectory.exists()) {
                     System.err.println("The directory does not exists....");
-                    devFirmwareDirectory.mkdir();
+                    boolean createDirectory = devFirmwareDirectory.mkdir();
+                    if (createDirectory) {
+                        System.out.println("Directory created.");
+                    } else {
+                        System.out
+                                .println("Directory not created successfully.");
+                    }
                 }
 
                 targetImportPath = String.valueOf(projectRootPath.toString()
@@ -608,7 +614,7 @@ public final class OpenConfiguratorProjectUtils {
                 System.err.println("Source Directory: " + firmwareFilePath);
                 System.err.println("Target Directory: " + targetImportPath);
 
-                firmwareImportFile = java.nio.file.Files.copy(
+                java.nio.file.Files.copy(
                         new java.io.File(firmwareImportFile.toString())
                                 .toPath(),
                         new java.io.File(targetImportPath).toPath(),
@@ -644,11 +650,13 @@ public final class OpenConfiguratorProjectUtils {
                 newModule.getModulePathToXdc()).toPath();
         java.nio.file.Path projectRootPath = newModule.getProject()
                 .getLocation().toFile().toPath();
+
         String extensionXdd = StringUtils.EMPTY;
         if (moduleImportFile != null) {
-            if ((moduleImportFile.getFileName() != null)) {
-                extensionXdd = FilenameUtils.removeExtension(
-                        moduleImportFile.getFileName().toString());
+            java.nio.file.Path moduleFileName = moduleImportFile.getFileName();
+            if ((moduleFileName != null)) {
+                extensionXdd = FilenameUtils
+                        .removeExtension(moduleFileName.toString());
 
                 extensionXdd += "_" + newModule.getPosition()
                         + IPowerlinkProjectSupport.XDC_EXTENSION;
@@ -703,9 +711,9 @@ public final class OpenConfiguratorProjectUtils {
      * @param newNode The node XDC to be imported.
      * @throws Error with XDC/XDD file modification.
      */
-    public static void importNodeConfigurationFile(Node newNode)
+    public static boolean importNodeConfigurationFile(Node newNode)
             throws IOException {
-
+        boolean isNodeConfigurationFileImport = false;
         java.nio.file.Path nodeImportFile = new File(newNode.getPathToXDC())
                 .toPath();
         java.nio.file.Path projectRootPath = newNode.getProject().getLocation()
@@ -718,7 +726,14 @@ public final class OpenConfiguratorProjectUtils {
                                 + IPowerlinkProjectSupport.DEVICE_IMPORT_DIR));
                 if (!importDirectory.exists()) {
                     System.err.println("The directory does not exists....");
-                    importDirectory.mkdir();
+                    boolean createDirectory = importDirectory.mkdir();
+                    if (createDirectory) {
+                        System.out.println("Directory created.");
+                    } else {
+                        System.err
+                                .println("Directory not created successfully.");
+                        return false;
+                    }
                 }
 
                 File configDirectory = new File(String.valueOf(projectRootPath
@@ -726,7 +741,14 @@ public final class OpenConfiguratorProjectUtils {
                         + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR));
                 if (!configDirectory.exists()) {
                     System.err.println("The directory does not exists....");
-                    configDirectory.mkdir();
+                    isNodeConfigurationFileImport = configDirectory.mkdir();
+                    if (isNodeConfigurationFileImport) {
+                        System.out.println("Directory created.");
+                    } else {
+                        System.err
+                                .println("Directory not created successfully.");
+                        return false;
+                    }
                 }
 
                 File outputDirectory = new File(String
@@ -734,7 +756,14 @@ public final class OpenConfiguratorProjectUtils {
                                 + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR));
                 if (!outputDirectory.exists()) {
                     System.err.println("The directory does not exists....");
-                    outputDirectory.mkdir();
+                    isNodeConfigurationFileImport = outputDirectory.mkdir();
+                    if (isNodeConfigurationFileImport) {
+                        System.out.println("Directory created.");
+                    } else {
+                        System.err
+                                .println("Directory not created successfully.");
+                        return false;
+                    }
                 }
 
                 targetImportPath = String
@@ -790,6 +819,7 @@ public final class OpenConfiguratorProjectUtils {
                 }
             }
         }
+        return isNodeConfigurationFileImport;
     }
 
     private static void importNodeXDCFile(Node node) throws IOException {
@@ -809,7 +839,7 @@ public final class OpenConfiguratorProjectUtils {
                 // Copy the Node configuration to deviceImport dir
                 // The declared local variable performs copy operation and will
                 // not be used anywhere.
-                nodeImportFile = java.nio.file.Files.copy(
+                java.nio.file.Files.copy(
                         new java.io.File(nodeImportFile.toString()).toPath(),
                         new java.io.File(targetImportPath).toPath(),
                         java.nio.file.StandardCopyOption.REPLACE_EXISTING,
@@ -1024,7 +1054,7 @@ public final class OpenConfiguratorProjectUtils {
             String firmwareHeaderLines = StringUtils.EMPTY;
             String firmwareline = StringUtils.EMPTY;
             while ((firmwareHeaderLines = bufferedRdr.readLine()) != null) {
-                firmwareline += firmwareHeaderLines + "\n";
+                firmwareline += firmwareHeaderLines.concat("\n");
             }
             int firmwareEndIndex = firmwareline.indexOf(">");
             // Removes the header of firmware file.
@@ -1032,6 +1062,7 @@ public final class OpenConfiguratorProjectUtils {
             fileWriter = new FileWriter(updatedFirmwareFile);
             bufferedWriter = new BufferedWriter(fileWriter);
             bufferedWriter.write(firmwareline);
+            bufferedWriter.close();
             isFirmwareFileUpdate = true;
         } catch (RuntimeException e) {
             if (bufferedRdr != null) {
@@ -1045,12 +1076,13 @@ public final class OpenConfiguratorProjectUtils {
             }
             throw e;
         } catch (Exception e) {
-            if (bufferedRdr != null) {
-                bufferedRdr.close();
-            }
             if (bufferedWriter != null) {
                 bufferedWriter.close();
             }
+            if (bufferedRdr != null) {
+                bufferedRdr.close();
+            }
+
             if (fileWriter != null) {
                 fileWriter.close();
             }

@@ -935,7 +935,7 @@ public class MappingView extends ViewPart {
                                     if (mapParamObj.getId() == 1) {
                                         try {
                                             tpdoEnabledEntriesCount = Integer
-                                                    .valueOf(
+                                                    .parseInt(
                                                             tpdoEnabledMappingEntriesText
                                                                     .getText()
                                                                     .trim());
@@ -947,7 +947,7 @@ public class MappingView extends ViewPart {
                                     if (mapParamObj.getId() == 1) {
                                         try {
                                             rpdoEnabledEntriesCount = Integer
-                                                    .valueOf(
+                                                    .parseInt(
                                                             rpdoEnabledMappingEntriesText
                                                                     .getText()
                                                                     .trim());
@@ -961,7 +961,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -971,7 +971,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -991,7 +991,7 @@ public class MappingView extends ViewPart {
                             ex.printStackTrace();
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1001,7 +1001,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1015,7 +1015,7 @@ public class MappingView extends ViewPart {
                         if (objectIdValue == 0) {
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1025,7 +1025,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1087,7 +1087,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             tpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             tpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1109,7 +1109,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             rpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             rpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1159,7 +1159,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             tpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             tpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1181,7 +1181,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             rpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             rpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1219,7 +1219,7 @@ public class MappingView extends ViewPart {
                         if (mappableObject == null) {
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1229,7 +1229,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1248,7 +1248,7 @@ public class MappingView extends ViewPart {
                             ex.printStackTrace();
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1258,7 +1258,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1276,7 +1276,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         tpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         tpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1288,7 +1288,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         rpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         rpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1306,7 +1306,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 rpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 rpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1323,7 +1323,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 tpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 tpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1345,7 +1345,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         tpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         tpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1363,7 +1363,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 rpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 rpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1380,7 +1380,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 tpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 tpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1406,7 +1406,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         tpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         tpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1425,7 +1425,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         rpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         rpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -3030,12 +3030,12 @@ public class MappingView extends ViewPart {
         try {
             switch (pdoType) {
                 case TPDO:
-                    tpdoEnabledEntriesCount = Integer.valueOf(
+                    tpdoEnabledEntriesCount = Integer.parseInt(
                             tpdoEnabledMappingEntriesText.getText().trim());
                     return tpdoEnabledEntriesCount;
 
                 case RPDO:
-                    rpdoEnabledEntriesCount = Integer.valueOf(
+                    rpdoEnabledEntriesCount = Integer.parseInt(
                             rpdoEnabledMappingEntriesText.getText().trim());
                     return rpdoEnabledEntriesCount;
 
@@ -3679,16 +3679,6 @@ public class MappingView extends ViewPart {
         } else {
             System.err.println("Invalid pdo type" + pdoChannel.getPdoType());
         }
-    }
-
-    private void updatePdoTable(RpdoChannel rpdoChannel) {
-        rpdoTableViewer.setInput(rpdoChannel.getMappingParam());
-        resizeTable(rpdoTableViewer, new int[] { 4, 5 });
-    }
-
-    private void updatePdoTable(TpdoChannel tpdoChannel) {
-        tpdoTableViewer.setInput(tpdoChannel.getMappingParam());
-        resizeTable(tpdoTableViewer, new int[] { 4, 5 });
     }
 
     /**
