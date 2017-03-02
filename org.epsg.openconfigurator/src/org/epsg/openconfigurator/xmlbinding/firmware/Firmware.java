@@ -52,7 +52,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="Date"&gt;
  *         &lt;simpleType&gt;
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *             &lt;pattern value="[0-3]{1}[1-9]{1}\.[0-1]{1}[1-9]{1}\.[0-9]{4}"/&gt;
+ *             &lt;pattern value="[0-3]{1}[1-9]{1}\.[0-1]{1}[0-9]{1}\.[0-9]{4}"/&gt;
  *           &lt;/restriction&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
