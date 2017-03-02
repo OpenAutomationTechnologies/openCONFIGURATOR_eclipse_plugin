@@ -644,15 +644,12 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                 Module mod = headNodeInetrfaceObject.getModuleCollection()
                         .get(position2);
                 String modType = getInterface().getInterfaceType();
-                System.err.println(
-                        "Value Set . . " + mod.getModuleInterface().getType());
                 if (mod.isEnabled()) {
                     modType = mod.getModuleType();
                     moduleTypeText.setText(modType);
                     break;
                 }
                 moduleTypeText.setText(modType);
-
             }
 
         }
