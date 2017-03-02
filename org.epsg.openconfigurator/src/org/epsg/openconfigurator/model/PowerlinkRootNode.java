@@ -672,6 +672,13 @@ public class PowerlinkRootNode {
                                         .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 processingModule);
+                                if (processingModule.hasError()) {
+                                    processingNode.getInterface()
+                                            .getModuleNameCollection()
+                                            .put(String.valueOf(processingModule
+                                                    .getModuleName()),
+                                                    processingModule);
+                                }
                             }
                             monitor.worked(1);
 
