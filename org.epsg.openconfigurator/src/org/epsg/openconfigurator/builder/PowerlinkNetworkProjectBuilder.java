@@ -797,7 +797,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         if (!fwList.isEmpty()) {
             java.nio.file.Path targetFilePath = outputpath
                     .resolve(FIRMWARE_INFO);
-
             for (FirmwareManager fwMngr : fwList) {
                 String nodeId = fwMngr.getNodeId();
                 if (Integer.parseInt(nodeId) <= MINIMUM_SINGLE_DIGIT_NODE_ID) {
@@ -887,21 +886,27 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                             if (!moduleDevRevisionList.isEmpty()) {
                                 for (FirmwareManager fwMan : moduleDevRevisionList
                                         .values()) {
-                                    if (fwMan
-                                            .getFirmwarefileVersion() < fwManager
-                                                    .getFirmwarefileVersion()) {
-                                        moduleDevRevisionList.put(
-                                                fwManager.getdevRevNumber(),
-                                                fwManager);
+                                    if (fwMan.getModule()
+                                            .getPosition() == module
+                                                    .getPosition()) {
+                                        if (fwMan
+                                                .getFirmwarefileVersion() < fwManager
+                                                        .getFirmwarefileVersion()) {
+                                            moduleDevRevisionList.put(
+                                                    fwManager.getdevRevNumber(),
+                                                    fwManager);
+                                        }
                                     }
                                 }
                             }
                         }
+                        System.err.println("Module devi list.."
+                                + moduleDevRevisionList.values());
+                        fwList.addAll(moduleDevRevisionList.values());
                     }
                 }
                 if (fwList != null) {
                     fwList.addAll(nodeDevRevisionList.values());
-                    fwList.addAll(moduleDevRevisionList.values());
                 }
             }
 

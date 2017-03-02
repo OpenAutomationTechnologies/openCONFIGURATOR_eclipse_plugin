@@ -159,6 +159,7 @@ public class NewNodeWizard extends Wizard {
                                                         fwMngr, newNode,
                                                         fwMngr.getFirmwareObjModel());
                                             }
+                                            return true;
                                         }
                                     } else {
                                         newNode.getNodeFirmwareCollection().put(
@@ -167,6 +168,7 @@ public class NewNodeWizard extends Wizard {
                                         fwMngr.updateFirmwareInProjectFile(
                                                 fwMngr, newNode,
                                                 fwMngr.getFirmwareObjModel());
+                                        return true;
                                     }
                                 }
                             }
