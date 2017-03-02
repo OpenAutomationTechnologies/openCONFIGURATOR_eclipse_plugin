@@ -75,8 +75,8 @@ import org.jdom2.JDOMException;
  */
 public class Module {
 
-    public static final String MOVE_MODULE_ERROR = "Module cannot be moved because '{0}' with module type '{1}' does not match '{2}' module type '{3}'.";
-    public static final String MOVE_MODULE_INTERFACE_ERROR = "Module cannot be moved because '{0}' with interface type '{1}' does not match '{2}' module type '{3}'.";
+    public static final String MOVE_MODULE_ERROR = "Module cannot be moved because {0} with module type {1} does not match {2} module type {3}.";
+    public static final String MOVE_MODULE_INTERFACE_ERROR = "Module cannot be moved because {0} with interface type {1} does not match {2} module type {3}.";
 
     private static void removeForcedObject(ForcedObjects forcedObjTag,
             org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
