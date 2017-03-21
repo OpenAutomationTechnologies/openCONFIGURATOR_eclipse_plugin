@@ -520,7 +520,9 @@ public class IndustrialNetworkView extends ViewPart
 
     // Object dictionary action message strings.
     public static final String SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE = "Show Object Dictionary";
+    public static final String SHOW_PARAMETER_ACTION_MESSAGE = "Show Parameter View";
     public static final String SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE = "Error openning Object Dictionary";
+    public static final String SHOW_PARAMETER_ERROR_MESSAGE = "Error openning Parameter";
 
     // Mapping view action message strings.
     public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
@@ -872,6 +874,12 @@ public class IndustrialNetworkView extends ViewPart
      * Show object dictionary.
      */
     private Action showObjectDictionary;
+
+    /**
+     * Show parameter view
+     */
+    private Action showParameter;
+
     /**
      * Show Properties action.
      */
@@ -1078,6 +1086,7 @@ public class IndustrialNetworkView extends ViewPart
                         manager.add(new Separator());
                         manager.add(showPdoMapping);
                         manager.add(showObjectDictionary);
+                        manager.add(showParameter);
                     }
                     manager.add(new Separator());
                     manager.add(deleteNode);
@@ -1127,6 +1136,7 @@ public class IndustrialNetworkView extends ViewPart
                             }
                             manager.add(new Separator());
                             manager.add(showObjectDictionary);
+                            manager.add(showParameter);
 
                         }
                         manager.add(new Separator());
@@ -1156,6 +1166,7 @@ public class IndustrialNetworkView extends ViewPart
         manager.add(refreshAction);
         manager.add(showPdoMapping);
         manager.add(showObjectDictionary);
+        manager.add(showParameter);
         manager.add(showProperties);
     }
 
@@ -1864,6 +1875,26 @@ public class IndustrialNetworkView extends ViewPart
                 .setImageDescriptor(org.epsg.openconfigurator.Activator
                         .getImageDescriptor(IPluginImages.OBD_ICON));
 
+        showParameter = new Action(SHOW_PARAMETER_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+                try {
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(ParameterView.ID);
+                    viewer.setSelection(viewer.getSelection());
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage(SHOW_PARAMETER_ERROR_MESSAGE);
+                }
+            }
+        };
+        showParameter.setToolTipText(SHOW_PARAMETER_ACTION_MESSAGE);
+        showParameter.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_PARAMETER_REFERENCE_ICON));
+
         showPdoMapping = new Action(SHOW_MAPING_VIEW_ACTION_MESSAGE) {
 
             @Override
@@ -1872,6 +1903,7 @@ public class IndustrialNetworkView extends ViewPart
                 try {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().showView(MappingView.ID);
+
                     viewer.setSelection(viewer.getSelection());
                 } catch (PartInitException e) {
                     e.printStackTrace();

@@ -1,9 +1,9 @@
 /*******************************************************************************
-* @file   ObjectDictionaryView.java
+ * @file   ParameterView.java
  *
- * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
+ * @author Sree Hari Vignesh, Kalycito Infotech Private Limited.
  *
- * @copyright (c) 2015, Kalycito Infotech Private Limited
+ * @copyright (c) 2017, Kalycito Infotech Private Limited
  *                    All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,15 +33,14 @@ package org.epsg.openconfigurator.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
-import org.eclipse.jface.action.IAction;
 import org.eclipse.jface.action.IMenuListener;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.MenuManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.DecoratingLabelProvider;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -52,11 +51,9 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPageLayout;
@@ -70,37 +67,64 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
+import org.epsg.openconfigurator.model.DataTypeChoiceType;
+import org.epsg.openconfigurator.model.LabelDescription;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.ParameterGroup;
 import org.epsg.openconfigurator.model.ParameterReference;
-import org.epsg.openconfigurator.model.PowerlinkObject;
-import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.model.VarDecleration;
 import org.epsg.openconfigurator.resources.IPluginImages;
-import org.epsg.openconfigurator.util.IPowerlinkConstants;
-import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 
 /**
- * View to list the objects and subobjects of a node.
+ * Parameter view handle the parameter configuration operations for the nodes
+ * and modules selected from the {@link IndustrialNetworkView} view.
  *
- * @author Ramakrishnan P
+ * @see IndustrialNetworkView
+ * @author Sree Hari Vignesh
  *
  */
-public class ObjectDictionaryView extends ViewPart
-        implements IPropertyListener {
+public class ParameterView extends ViewPart implements IPropertyListener {
 
     /**
      * Class to bind zero objects with the tree view.
      *
-     * @author Ramakrishnan P
+     * @author Sree Hari
      *
      */
-    private class EmptyObjectDictionary {
+    private class EmptyParameter {
         @Override
         public String toString() {
-            return "Object dictionary not available.";
+            return "Parameters not available.";
+        }
+    }
+
+    /**
+     * PatternFilter class to always show parameters after filtering based on
+     * the input text.
+     *
+     */
+    // It is not required to be a static inner class.
+    private class ParameterFilter extends PatternFilter {
+
+        @Override
+        public Object[] filter(Viewer viewer, Object parent,
+                Object[] elements) {
+            ArrayList<Object> objList = new ArrayList<>();
+
+            // Display sub-object after filtering of objects.
+            if (parent instanceof ParameterGroup) {
+                ParameterGroup paramGroup = (ParameterGroup) parent;
+                List<ParameterReference> prmGrp = paramGroup
+                        .getParameterRefList();
+                objList.addAll(prmGrp);
+            } else {
+                Collections.addAll(objList,
+                        super.filter(viewer, parent, elements));
+            }
+
+            return objList.toArray();
         }
     }
 
@@ -108,7 +132,7 @@ public class ObjectDictionaryView extends ViewPart
      * Part listener to listen to the changes of the source part.
      *
      * @see IndustrialNetworkView
-     * @author Ramakrishnan P
+     * @author Sree Hari
      *
      */
     private class PartListener implements IPartListener {
@@ -145,40 +169,13 @@ public class ObjectDictionaryView extends ViewPart
     }
 
     /**
-     * PatternFilter class to always show sub objects after filtering of
-     * objects.
-     */
-    // It is not required to be a static inner class.
-    private class PowerlinkObjectPatternFilter extends PatternFilter {
-
-        @Override
-        public Object[] filter(Viewer viewer, Object parent,
-                Object[] elements) {
-            ArrayList<Object> objList = new ArrayList<>();
-
-            // Display sub-object after filtering of objects.
-            if (parent instanceof PowerlinkObject) {
-                PowerlinkObject plkobj = (PowerlinkObject) parent;
-                List<PowerlinkSubobject> plksub = plkobj.getSubObjects();
-                objList.addAll(plksub);
-            } else {
-                Collections.addAll(objList,
-                        super.filter(viewer, parent, elements));
-            }
-
-            return objList.toArray();
-        }
-    }
-
-    /**
-     * Label provider for the objects and sub-objects.
+     * Label provider for the Parameter group and parameter reference
      *
-     * @author Ramakrishnan P
+     * @author Sree Hari
      *
      */
     private class TreeLabelProvider extends LabelProvider {
-        Image objectIcon;
-        Image subObjectIcon;
+
         Image parameterIcon;
         Image parameterGroupIcon;
         Image parameterReferenceIcon;
@@ -186,12 +183,6 @@ public class ObjectDictionaryView extends ViewPart
 
         // It is not required to be a static inner class.
         TreeLabelProvider() {
-            objectIcon = org.epsg.openconfigurator.Activator
-                    .getImageDescriptor(IPluginImages.OBD_OBJECT_ICON)
-                    .createImage();
-            subObjectIcon = org.epsg.openconfigurator.Activator
-                    .getImageDescriptor(IPluginImages.OBD_SUB_OBJECT_ICON)
-                    .createImage();
             parameterGroupIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(IPluginImages.OBD_PARAMETER_GROUP_ICON)
                     .createImage();
@@ -210,8 +201,6 @@ public class ObjectDictionaryView extends ViewPart
 
         @Override
         public void dispose() {
-            objectIcon.dispose();
-            subObjectIcon.dispose();
             parameterGroupIcon.dispose();
             parameterReferenceIcon.dispose();
             parameterIcon.dispose();
@@ -220,12 +209,7 @@ public class ObjectDictionaryView extends ViewPart
 
         @Override
         public Image getImage(Object element) {
-
-            if (element instanceof PowerlinkObject) {
-                return objectIcon;
-            } else if (element instanceof PowerlinkSubobject) {
-                return subObjectIcon;
-            } else if (element instanceof EmptyObjectDictionary) {
+            if (element instanceof EmptyParameter) {
                 // No image is needed for empty contents.
                 return null;
             } else if (element instanceof ParameterGroup) {
@@ -247,26 +231,34 @@ public class ObjectDictionaryView extends ViewPart
 
         @Override
         public String getText(Object element) {
-            if (element instanceof PowerlinkObject) {
-                PowerlinkObject object = (PowerlinkObject) element;
-                if (object.isModuleObject()) {
-                    long objectIndex = OpenConfiguratorLibraryUtils
-                            .getModuleObjectsIndex(object.getModule(),
-                                    object.getId());
-                    if (objectIndex != 0) {
-                        return object.getNameWithId(objectIndex);
-                    }
+            if (element instanceof Parameter) {
+                Parameter param = (Parameter) element;
+                LabelDescription labelDesc = param.getLabelDescription();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
                 }
-                return ((PowerlinkObject) element).getNameWithId();
-            } else if (element instanceof PowerlinkSubobject) {
-                PowerlinkSubobject subObject = (PowerlinkSubobject) element;
-                if (subObject.isModule()) {
-                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                            .getModuleObjectsSubIndex(subObject.getModule(),
-                                    subObject, subObject.getObject().getId());
-                    return subObject.getNameWithId(subObjectIndex);
+            } else if (element instanceof ParameterReference) {
+                ParameterReference paramRef = (ParameterReference) element;
+                LabelDescription labelDesc = paramRef.getLabelDescription();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
                 }
-                return ((PowerlinkSubobject) element).getNameWithId();
+            } else if (element instanceof VarDecleration) {
+                VarDecleration varDecl = (VarDecleration) element;
+                if (varDecl.getName() != null) {
+                    return varDecl.getName();
+                }
+                LabelDescription labelDesc = varDecl.getLabelDescription();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
+                }
+            } else if (element instanceof ParameterGroup) {
+                ParameterGroup pgmGrp = (ParameterGroup) element;
+                LabelDescription labelDesc = pgmGrp.getLabel();
+                if (labelDesc != null) {
+                    return labelDesc.getText();
+                }
+                return pgmGrp.getUniqueId();
             } else if (element instanceof String) {
                 return "Parameters not available.";
             }
@@ -274,17 +266,42 @@ public class ObjectDictionaryView extends ViewPart
         }
     }
 
-    public static final String ID = "org.epsg.openconfigurator.views.ObjectDictionaryView"; //$NON-NLS-1$
+    public static final String ID = "org.epsg.openconfigurator.views.ParameterView"; //$NON-NLS-1$
 
-    public static final String OBJECT_DICTIONARY_VIEW_TITLE = "Object Dictionary";
+    public static final String PARAMETER_VIEW_TITLE = "Parameter";
 
-    // Object dictionary filters title
-    public static final String HIDE_NON_MAPPABLE_OBJECTS = "Hide Non Mappable Objects";
+    public static final String PARAMETER_PROPERTIES = "Properties";
 
-    public static final String HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS = "Hide Communication Profile Area Objects(0x1000-0x1FFF)";
-    public static final String HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS = "Hide Standardised Device Profile Area Objects(0x6000-0x9FFF)";
-    public static final String HIDE_NON_FORCED_OBJECTS = "Hide NonForced Objects";
-    public static final String OBJECT_PROPERTIES = "Properties";
+    private Action propertiesAction;
+
+    private Action refreshAction;
+
+    /**
+     * Label provider.
+     */
+    private ILabelProvider labelProvider = new TreeLabelProvider();
+    private boolean nodeSelection = false;
+
+    private boolean moduleSelection = false;
+
+    /**
+     * The corresponding node instance for which the Parameter corresponds to.
+     */
+    private Node nodeObj;
+    private Module moduleObj;
+    /**
+     * Source workbench part.
+     */
+    private IWorkbenchPart sourcePart;
+    /**
+     * Listener instance to listen to the changes in the source part.
+     */
+    private PartListener partListener = new PartListener();
+
+    /**
+     * Parameter tree viewer.
+     */
+    private TreeViewer treeViewer;
 
     /**
      * Selection listener to update the objects and sub-objects in the Object
@@ -295,13 +312,13 @@ public class ObjectDictionaryView extends ViewPart
         public void selectionChanged(IWorkbenchPart part,
                 ISelection selection) {
 
-            setPartName(OBJECT_DICTIONARY_VIEW_TITLE);
+            setPartName(PARAMETER_VIEW_TITLE);
 
             if (treeViewer == null) {
                 return;
             }
 
-            treeViewer.setInput(new EmptyObjectDictionary());
+            treeViewer.setInput(new EmptyParameter());
 
             if (sourcePart != null) {
                 sourcePart.getSite().getPage().removePartListener(partListener);
@@ -358,6 +375,7 @@ public class ObjectDictionaryView extends ViewPart
 
             if (sourcePart != null) {
                 sourcePart.getSite().getPage().addPartListener(partListener);
+                treeViewer.expandAll();
             }
         }
     };
@@ -366,7 +384,7 @@ public class ObjectDictionaryView extends ViewPart
      * Content provider to list the object, sub-objects in an hierarchical
      * order.
      */
-    private ITreeContentProvider objectDictionaryContentProvider = new ITreeContentProvider() {
+    private ITreeContentProvider parameterContentProvider = new ITreeContentProvider() {
 
         @Override
         public void dispose() {
@@ -375,9 +393,31 @@ public class ObjectDictionaryView extends ViewPart
         @Override
         public Object[] getChildren(Object parentElement) {
 
-            if (parentElement instanceof PowerlinkObject) {
-                PowerlinkObject objItem = (PowerlinkObject) parentElement;
-                return objItem.getSubObjects().toArray();
+            if (parentElement instanceof ParameterReference) {
+                // Do nothing.
+                // TODO: Implement for future enhancement.
+            } else if (parentElement instanceof Parameter) {
+                Parameter param = (Parameter) parentElement;
+                if (param.getDataTypeChoice() == DataTypeChoiceType.STRUCT) {
+                    List<VarDecleration> varDeclList = param.getStructDataType()
+                            .getVariables();
+                    for (VarDecleration var : varDeclList) {
+                        System.err.println("Name:" + var.getName());
+                    }
+                    return varDeclList.toArray();
+                } else if (param
+                        .getDataTypeChoice() == DataTypeChoiceType.SIMPLE) {
+                    // Ignore; This does not have any child variables.
+                    // TODO: Implement for future enhancement.
+                } else {
+                    System.err
+                            .println("Unhandled " + param.getDataTypeChoice());
+                }
+            } else if (parentElement instanceof ParameterGroup) {
+                ParameterGroup paramGrp = (ParameterGroup) parentElement;
+                return paramGrp.getVisibleObjects().toArray();
+            } else {
+                System.err.println("GetChildren" + parentElement);
             }
             return new Object[0];
         }
@@ -387,18 +427,123 @@ public class ObjectDictionaryView extends ViewPart
 
             if (inputElement instanceof Node) {
                 Node nodeObj = (Node) inputElement;
-                List<PowerlinkObject> objectsList = nodeObj
-                        .getObjectDictionary().getObjectsList();
+                LinkedHashSet<Object> visibleObjectsList = new LinkedHashSet<>();
+                List<ParameterGroup> paramGrupList = nodeObj
+                        .getObjectDictionary().getParameterGroupList();
+                for (ParameterGroup pgmGrp : paramGrupList) {
+                    System.err
+                            .println("--------> " + pgmGrp.getLabel().getText()
+                                    + " m:" + pgmGrp.isConditionsMet() + " v:"
+                                    + pgmGrp.isGroupLevelVisible());
 
-                return objectsList.toArray();
+                    if (pgmGrp.isConditionsMet()) {
+                        if ((pgmGrp.isGroupLevelVisible())
+                                && (pgmGrp.isConfigParameter())) {
+                            visibleObjectsList.add(pgmGrp);
+                        } else if (pgmGrp.isConfigParameter()) {
+                            List<ParameterReference> prmRefList = pgmGrp
+                                    .getParameterRefList();
+                            for (ParameterReference prmRef : prmRefList) {
+                                if (prmRef.isVisible()) {
+                                    visibleObjectsList.add(prmRef);
+                                }
+                            }
+
+                            List<ParameterGroup> prmGrpList = pgmGrp
+                                    .getParameterGroupList();
+                            for (int count = 1; count < prmGrpList
+                                    .size(); count++) {
+                                for (ParameterGroup prmGrp : prmGrpList) {
+                                    if (prmGrp.isGroupLevelVisible()
+                                            && prmGrp.isConfigParameter()) {
+                                        visibleObjectsList.add(prmGrp);
+                                    } else if (prmGrp.isConfigParameter()) {
+                                        List<ParameterReference> pgmRefList = prmGrp
+                                                .getParameterRefList();
+                                        for (ParameterReference prmRef : pgmRefList) {
+                                            if (prmRef.isVisible()) {
+                                                visibleObjectsList.add(prmRef);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            System.err.println(
+                                    "No parameter groups can be configured ");
+                        }
+
+                    } else {
+                        System.err.println(
+                                "parameter group cannot be displayed due to false condition set");
+                    }
+                }
+                if (visibleObjectsList.size() == 0) {
+                    visibleObjectsList.add("");
+                }
+                return visibleObjectsList.toArray();
+
             } else if (inputElement instanceof Module) {
                 Module moduleObj = (Module) inputElement;
-                List<PowerlinkObject> objectsList = moduleObj
-                        .getObjectDictionary().getObjectsList();
-                return objectsList.toArray();
+                LinkedHashSet<Object> visibleObjectsList = new LinkedHashSet<>();
+                List<ParameterGroup> paramGrupList = moduleObj
+                        .getObjectDictionary().getParameterGroupList();
+                for (ParameterGroup pgmGrp : paramGrupList) {
+                    System.err.println(
+                            "Module --------> " + pgmGrp.getLabel().getText()
+                                    + " m:" + pgmGrp.isConditionsMet() + " v:"
+                                    + pgmGrp.isGroupLevelVisible());
+
+                    if (pgmGrp.isConditionsMet()) {
+                        if ((pgmGrp.isGroupLevelVisible())
+                                && (pgmGrp.isConfigParameter())) {
+                            visibleObjectsList.add(pgmGrp);
+                        } else if (pgmGrp.isConfigParameter()) {
+                            List<ParameterReference> prmRefList = pgmGrp
+                                    .getParameterRefList();
+                            for (ParameterReference prmRef : prmRefList) {
+                                if (prmRef.isVisible()) {
+                                    visibleObjectsList.add(prmRef);
+                                }
+                            }
+
+                            List<ParameterGroup> prmGrpList = pgmGrp
+                                    .getParameterGroupList();
+                            for (int count = 1; count < prmGrpList
+                                    .size(); count++) {
+                                for (ParameterGroup prmGrp : prmGrpList) {
+                                    if (prmGrp.isGroupLevelVisible()
+                                            && prmGrp.isConfigParameter()) {
+                                        visibleObjectsList.add(prmGrp);
+                                    } else if (prmGrp.isConfigParameter()) {
+                                        List<ParameterReference> pgmRefList = prmGrp
+                                                .getParameterRefList();
+                                        for (ParameterReference prmRef : pgmRefList) {
+                                            if (prmRef.isVisible()) {
+                                                visibleObjectsList.add(prmRef);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        } else {
+                            System.err.println(
+                                    "No parameter groups can be configured ");
+                        }
+
+                    } else {
+                        System.err.println(
+                                "parameter group cannot be displayed due to false condition set");
+                    }
+                }
+                if (visibleObjectsList.size() == 0) {
+                    visibleObjectsList.add("");
+                }
+                return visibleObjectsList.toArray();
+
             }
 
-            return new Object[] { new EmptyObjectDictionary() };
+            return new Object[] { new EmptyParameter() };
         }
 
         @Override
@@ -409,9 +554,22 @@ public class ObjectDictionaryView extends ViewPart
 
         @Override
         public boolean hasChildren(Object element) {
-            if (element instanceof PowerlinkObject) {
-                PowerlinkObject objItem = (PowerlinkObject) element;
-                return ((objItem.getSubObjects().size() > 0) ? true : false);
+            if (element instanceof Parameter) {
+                Parameter param = (Parameter) element;
+                switch (param.getDataTypeChoice()) {
+                    case STRUCT:
+                        System.err.println("hasChildren Parameter "
+                                + param.getDataTypeChoice() + " size:"
+                                + param.getStructDataType().getVariables()
+                                        .size());
+                        return ((param.getStructDataType().getVariables()
+                                .size() > 0) ? true : false);
+                    default:
+                        break;
+                }
+            } else if (element instanceof ParameterGroup) {
+                ParameterGroup paramGrp = (ParameterGroup) element;
+                return paramGrp.hasVisibleObjects();
             }
             return false;
         }
@@ -421,49 +579,6 @@ public class ObjectDictionaryView extends ViewPart
                 Object newInput) {
         }
     };
-
-    private boolean communicationProfileObjectsVisible = true;
-    private boolean standardisedDeviceProfileObjectsVisible = true;
-    private boolean nonMappableObjectsVisible = true;
-    private boolean forcedObjectsVisible = true;
-
-    private boolean nodeSelection = false;
-    private boolean moduleSelection = false;
-
-    private Action hideCommunicationProfileObjects;
-    private Action hideStandardisedDeviceProfileObjects;
-    private Action hideNonMappableObjects;
-    private Action hideNonForcedObjects;
-    private Action propertiesAction;
-    private Action refreshAction;
-
-    /**
-     * Object dictionary tree viewer.
-     */
-    private TreeViewer treeViewer;
-
-    /**
-     * Label provider.
-     */
-    private ILabelProvider labelProvider = new TreeLabelProvider();
-
-    /**
-     * The corresponding node instance for which the object dictionary
-     * corresponds to.
-     */
-    private Node nodeObj;
-
-    private Module moduleObj;
-
-    /**
-     * Source workbench part.
-     */
-    private IWorkbenchPart sourcePart;
-
-    /**
-     * Listener instance to listen to the changes in the source part.
-     */
-    private PartListener partListener = new PartListener();
 
     private void contributeToActionBars() {
         IActionBars bars = getViewSite().getActionBars();
@@ -479,97 +594,28 @@ public class ObjectDictionaryView extends ViewPart
         refreshAction = new Action("Refresh") {
             @Override
             public void run() {
-                treeViewer.refresh();
                 if (moduleSelection) {
                     treeViewer.setInput(moduleObj);
                 }
                 if (nodeSelection) {
                     treeViewer.setInput(nodeObj);
+                } else {
+                    treeViewer.refresh();
+                    if (moduleSelection) {
+                        treeViewer.setInput(moduleObj);
+                    }
+                    if (nodeSelection) {
+                        treeViewer.setInput(nodeObj);
+                    }
                 }
-
             }
         };
         refreshAction.setToolTipText("Refresh");
         refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.REFRESH_ICON));
 
-        hideNonMappableObjects = new Action(HIDE_NON_MAPPABLE_OBJECTS,
-                IAction.AS_CHECK_BOX) {
-            @Override
-            public void run() {
-                if (hideNonMappableObjects.isChecked()) {
-                    nonMappableObjectsVisible = false;
-                } else {
-                    nonMappableObjectsVisible = true;
-                }
-                treeViewer.refresh();
-            }
-        };
-        hideNonMappableObjects.setToolTipText(HIDE_NON_MAPPABLE_OBJECTS);
-        hideNonMappableObjects.setImageDescriptor(
-                org.epsg.openconfigurator.Activator.getImageDescriptor(
-                        IPluginImages.OBD_HIDE_NON_MAPPABLE_ICON));
-        hideNonMappableObjects.setChecked(false);
+        propertiesAction = new Action(PARAMETER_PROPERTIES) {
 
-        hideCommunicationProfileObjects = new Action(
-                HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS, IAction.AS_CHECK_BOX) {
-            @Override
-            public void run() {
-                if (hideCommunicationProfileObjects.isChecked()) {
-                    communicationProfileObjectsVisible = false;
-                } else {
-                    communicationProfileObjectsVisible = true;
-                }
-                treeViewer.refresh();
-            }
-        };
-        hideCommunicationProfileObjects
-                .setToolTipText(HIDE_COMMUNICATION_PROFILE_AREA_OBJECTS);
-        hideCommunicationProfileObjects.setImageDescriptor(
-                org.epsg.openconfigurator.Activator.getImageDescriptor(
-                        IPluginImages.OBD_HIDE_COMMUNICATION_DEVICE_PROFILE_ICON));
-        hideCommunicationProfileObjects.setChecked(false);
-
-        hideStandardisedDeviceProfileObjects = new Action(
-                HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS,
-                IAction.AS_CHECK_BOX) {
-            @Override
-            public void run() {
-                if (hideStandardisedDeviceProfileObjects.isChecked()) {
-                    standardisedDeviceProfileObjectsVisible = false;
-                } else {
-                    standardisedDeviceProfileObjectsVisible = true;
-                }
-                treeViewer.refresh();
-            }
-        };
-        hideStandardisedDeviceProfileObjects
-                .setToolTipText(HIDE_STANDARDISED_DEVICE_PROFILE_AREA_OBJECTS);
-        hideStandardisedDeviceProfileObjects.setImageDescriptor(
-                org.epsg.openconfigurator.Activator.getImageDescriptor(
-                        IPluginImages.OBD_HIDE_STANDARDISED_DEVICE_PROFILE_ICON));
-        hideStandardisedDeviceProfileObjects.setChecked(false);
-
-        hideNonForcedObjects = new Action(HIDE_NON_FORCED_OBJECTS,
-                IAction.AS_CHECK_BOX) {
-
-            @Override
-            public void run() {
-                if (hideNonForcedObjects.isChecked()) {
-                    forcedObjectsVisible = false;
-                } else {
-                    forcedObjectsVisible = true;
-                }
-                treeViewer.refresh();
-            }
-        };
-        hideNonForcedObjects.setToolTipText(HIDE_NON_FORCED_OBJECTS);
-        hideNonForcedObjects.setImageDescriptor(
-                org.epsg.openconfigurator.Activator.getImageDescriptor(
-                        IPluginImages.OBD_HIDE_NON_FORCED_ICON));
-        hideNonForcedObjects.setChecked(false);
-
-        propertiesAction = new Action(OBJECT_PROPERTIES) {
             @Override
             public void run() {
                 super.run();
@@ -583,6 +629,7 @@ public class ObjectDictionaryView extends ViewPart
 
                 }
             }
+
         };
         propertiesAction.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.PROPERTIES_ICON));
@@ -602,15 +649,10 @@ public class ObjectDictionaryView extends ViewPart
         viewer.getControl().setMenu(menu);
     }
 
-    /**
-     * Create contents of the object dictionary view part.
-     *
-     * @param parent
-     */
     @Override
     public void createPartControl(Composite parent) {
 
-        PatternFilter filter = new PowerlinkObjectPatternFilter();
+        PatternFilter filter = new ParameterFilter();
         // PatternFilter filter = new PatternFilter();
         filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
@@ -618,7 +660,7 @@ public class ObjectDictionaryView extends ViewPart
 
         treeViewer = tree.getViewer();
 
-        treeViewer.setContentProvider(objectDictionaryContentProvider);
+        treeViewer.setContentProvider(parameterContentProvider);
         treeViewer.setLabelProvider(new DecoratingLabelProvider(labelProvider,
                 PlatformUI.getWorkbench().getDecoratorManager()
                         .getLabelDecorator()));
@@ -634,74 +676,7 @@ public class ObjectDictionaryView extends ViewPart
         getViewSite().getPage().addSelectionListener(IndustrialNetworkView.ID,
                 listener);
         getViewSite().setSelectionProvider(treeViewer);
-        treeViewer.addFilter(new ViewerFilter() {
 
-            @Override
-            public boolean select(Viewer viewer, Object parentElement,
-                    Object element) {
-
-                if (element instanceof PowerlinkObject) {
-                    PowerlinkObject obj = (PowerlinkObject) element;
-                    if (!communicationProfileObjectsVisible) {
-                        if ((obj.getId() >= IPowerlinkConstants.COMMUNICATION_PROFILE_START_INDEX)
-                                && (obj.getId() < IPowerlinkConstants.MANUFACTURER_PROFILE_START_INDEX)) {
-                            return false;
-                        }
-
-                    }
-
-                    if (!standardisedDeviceProfileObjectsVisible) {
-                        if ((obj.getId() >= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_START_INDEX)
-                                && (obj.getId() <= IPowerlinkConstants.STANDARDISED_DEVICE_PROFILE_END_INDEX)) {
-                            return false;
-                        }
-                    }
-
-                    if (!nonMappableObjectsVisible) {
-                        if (!obj.isTpdoMappable() && !obj.isRpdoMappable()
-                                && !obj.hasTpdoMappableSubObjects()
-                                && !obj.hasRpdoMappableSubObjects()) {
-                            return false;
-                        }
-                    }
-                    if (!forcedObjectsVisible) {
-                        if (obj.isModuleObject()) {
-                            long newObjectIndex = OpenConfiguratorLibraryUtils
-                                    .getModuleObjectsIndex(obj.getModule(),
-                                            obj.getId());
-
-                            if (!obj.isModuleObjectForced(newObjectIndex)) {
-                                return false;
-                            }
-                        } else {
-                            if (!obj.isObjectForced()) {
-                                return false;
-                            }
-                        }
-                    }
-                } else if (element instanceof PowerlinkSubobject) {
-                    PowerlinkSubobject subObj = (PowerlinkSubobject) element;
-                    if (!nonMappableObjectsVisible) {
-                        if (!subObj.isTpdoMappable()
-                                && !subObj.isRpdoMappable()) {
-                            return false;
-                        }
-                    }
-                }
-                return true;
-            }
-        });
-    }
-
-    @Override
-    public void dispose() {
-        super.dispose();
-        if (sourcePart != null) {
-            sourcePart.getSite().getPage().removePartListener(partListener);
-        }
-
-        getViewSite().getPage()
-                .removeSelectionListener(IndustrialNetworkView.ID, listener);
     }
 
     protected void fillContextMenu(IMenuManager contextMenu) {
@@ -710,30 +685,7 @@ public class ObjectDictionaryView extends ViewPart
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
-        manager.removeAll();
         manager.add(refreshAction);
-        manager.add(new Separator());
-        manager.add(hideNonMappableObjects);
-        manager.add(hideCommunicationProfileObjects);
-        manager.add(hideStandardisedDeviceProfileObjects);
-        manager.add(hideNonForcedObjects);
-    }
-
-    public Control getControl() {
-        if (treeViewer == null) {
-            return null;
-        }
-        return treeViewer.getControl();
-    }
-
-    public void handleRefresh() {
-
-        if (moduleSelection) {
-            treeViewer.setInput(moduleObj);
-            treeViewer.expandAll();
-        } else {
-            treeViewer.setInput(nodeObj);
-        }
     }
 
     /**
@@ -750,16 +702,17 @@ public class ObjectDictionaryView extends ViewPart
 
     @Override
     public void propertyChanged(Object source, int propId) {
-        if (moduleSelection) {
-            treeViewer.setInput(moduleObj);
-        } else {
-            treeViewer.setInput(nodeObj);
-        }
+
+        // treeViewer.setInput(moduleObj);
+
+        treeViewer.setInput(nodeObj);
+
     }
 
     @Override
     public void setFocus() {
         treeViewer.getControl().setFocus();
+
     }
 
 }
