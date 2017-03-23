@@ -146,7 +146,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     || (access == ParameterAccess.UNDEFINED)) {
                 propertyList.add(actualValueReadOnlyDescriptor);
             } else if ((paramRef.getAllowedValues().getValuesList() != null)
-                    || (!paramRef.getAllowedValues().getValuesList()
+                    && (!paramRef.getAllowedValues().getValuesList()
                             .isEmpty())) {
                 propertyList.add(allowedValueDescriptor);
             } else {
@@ -258,7 +258,6 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                         try {
                             paramRef.setActualValue(val);
                         } catch (JDOMException | IOException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
 
