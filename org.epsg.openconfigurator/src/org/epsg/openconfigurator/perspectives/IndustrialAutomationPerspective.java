@@ -37,6 +37,8 @@ import org.eclipse.ui.IPerspectiveFactory;
 import org.eclipse.ui.console.IConsoleConstants;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.views.ObjectDictionaryView;
+import org.epsg.openconfigurator.views.ParameterView;
+import org.epsg.openconfigurator.views.ProcessImageView;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 
 /**
@@ -77,14 +79,15 @@ public class IndustrialAutomationPerspective implements IPerspectiveFactory {
         bottomRight.addView(IPageLayout.ID_PROBLEM_VIEW);
         bottomRight.addView(IPageLayout.ID_PROGRESS_VIEW);
 
-
         IFolderLayout centralEditorArea = factory.createFolder(
                 "centralEditorArea", IPageLayout.LEFT, 0.50f, editorArea); // NON-NLS-1
         centralEditorArea.addPlaceholder(MappingView.ID);
+        centralEditorArea.addPlaceholder(ProcessImageView.ID);
 
         IFolderLayout topRight = factory.createFolder("topRight", // NON-NLS-1
                 IPageLayout.RIGHT, 0.75f, editorArea);
         topRight.addPlaceholder(ObjectDictionaryView.ID);
+        topRight.addView(ParameterView.ID);
     }
 
     private void addViewShortcuts() {
@@ -96,6 +99,8 @@ public class IndustrialAutomationPerspective implements IPerspectiveFactory {
         factory.addShowViewShortcut(IndustrialNetworkView.ID);
         factory.addShowViewShortcut(ObjectDictionaryView.ID);
         factory.addShowViewShortcut(MappingView.ID);
+        factory.addShowViewShortcut(ParameterView.ID);
+        factory.addShowViewShortcut(ProcessImageView.ID);
     }
 
     @Override

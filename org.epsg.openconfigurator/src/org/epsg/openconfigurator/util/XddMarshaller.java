@@ -60,6 +60,7 @@ import org.apache.commons.io.input.BOMInputStream;
 import org.apache.commons.lang3.StringUtils;
 import org.epsg.openconfigurator.resources.IOpenConfiguratorResource;
 import org.epsg.openconfigurator.xmlbinding.firmware.Firmware;
+import org.epsg.openconfigurator.xmlbinding.xap.ApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -74,16 +75,20 @@ import org.xml.sax.XMLReader;
 public final class XddMarshaller {
     private static Schema xddSchema;
     private static Schema firmwareSchema;
+    private static Schema xapSchema;
 
     private static final String XDD_SCHEMA_NOT_FOUND = "openCONFIGURATOR project XML schema not found.";
     private static final String XDD_SCHEMA_INVALID = "openCONFIGURATOR project XML schema has errors.";
+    private static final String XAP_SCHEMA_INVALID = "XAP XML schema has errors.";
 
     static {
         XddMarshaller.xddSchema = null;
         XddMarshaller.firmwareSchema = null;
+        XddMarshaller.xapSchema = null;
 
         String xddSchemaPath = null;
         String firmwareSchemaPath = null;
+        String xapSchemaPath = null;
 
         try {
             xddSchemaPath = org.epsg.openconfigurator.Activator
@@ -105,6 +110,16 @@ public final class XddMarshaller {
                     XddMarshaller.XDD_SCHEMA_NOT_FOUND, exception);
         }
 
+        try {
+            xapSchemaPath = org.epsg.openconfigurator.Activator
+                    .getAbsolutePath(IOpenConfiguratorResource.XAP_SCHEMA);
+        } catch (IOException exception) {
+            exception.printStackTrace();
+
+            PluginErrorDialogUtils.displayErrorMessageDialog(
+                    XddMarshaller.XAP_SCHEMA_INVALID, exception);
+        }
+
         if (xddSchemaPath != null) {
             try {
                 File xddSchemaFile = new File(xddSchemaPath);
@@ -116,6 +131,20 @@ public final class XddMarshaller {
                 e.printStackTrace();
                 PluginErrorDialogUtils.displayErrorMessageDialog(
                         XddMarshaller.XDD_SCHEMA_INVALID, e);
+            }
+        }
+
+        if (xapSchemaPath != null) {
+            try {
+                File xapSchemaFile = new File(firmwareSchemaPath);
+                SchemaFactory schemaFactory = SchemaFactory
+                        .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+                XddMarshaller.firmwareSchema = schemaFactory
+                        .newSchema(xapSchemaFile);
+            } catch (SAXException e) {
+                e.printStackTrace();
+                PluginErrorDialogUtils.displayErrorMessageDialog(
+                        XddMarshaller.XAP_SCHEMA_INVALID, e);
             }
         }
 
@@ -132,6 +161,7 @@ public final class XddMarshaller {
                         XddMarshaller.XDD_SCHEMA_INVALID, e);
             }
         }
+
     }
 
     private static Firmware unmarshallFirmware(final InputSource inputSource)
@@ -229,6 +259,90 @@ public final class XddMarshaller {
             }
             return unmarshallFirmware(input);
         }
+    }
+
+    private static ApplicationProcess unmarshallXap(
+            final InputSource inputSource)
+            throws JAXBException, SAXException, ParserConfigurationException {
+        final JAXBContext jc = JAXBContext
+                .newInstance(ApplicationProcess.class);
+        final SAXParserFactory spf = SAXParserFactory.newInstance();
+        spf.setXIncludeAware(true);
+        spf.setNamespaceAware(true);
+        final XMLReader xr = spf.newSAXParser().getXMLReader();
+        final SAXSource source = new SAXSource(xr, inputSource);
+
+        final Unmarshaller unmarshaller = jc.createUnmarshaller();
+        if (XddMarshaller.xapSchema != null) {
+            unmarshaller.setSchema(XddMarshaller.xapSchema);
+        }
+
+        final ApplicationProcess xapFile = (ApplicationProcess) unmarshaller
+                .unmarshal(source);
+
+        return xapFile;
+    }
+
+    /**
+     * Un-marshalls the contents of the input stream into the
+     * {@link ApplicationProcess} instance
+     *
+     * @param file The XAP file input stream.
+     *
+     * @return The XAP instance.
+     *
+     * @throws JAXBException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws FileNotFoundException
+     */
+    public static ApplicationProcess unmarshallXap(final InputStream file)
+            throws JAXBException, SAXException, ParserConfigurationException,
+            FileNotFoundException {
+        final InputSource input = new InputSource(file);
+        return unmarshallXap(input);
+    }
+
+    /**
+     * Un-marshalls the contents of the input stream into the
+     * {@link ApplicationProcess} instance
+     *
+     * @param file The XAP file.
+     * @return The Application process instance.
+     * @throws JAXBException
+     * @throws SAXException
+     * @throws ParserConfigurationException
+     * @throws IOException
+     */
+    @SuppressWarnings("finally")
+    public static ApplicationProcess unmarshallXapFile(final File file)
+            throws JAXBException, SAXException, ParserConfigurationException,
+            IOException {
+
+        BOMInputStream bomIn = null;
+        Reader reader = null;
+        InputSource input = null;
+
+        try {
+            bomIn = new BOMInputStream(new FileInputStream(file), false);
+            reader = new InputStreamReader(bomIn);
+            input = new InputSource(reader);
+            input.setSystemId(file.toURI().toString());
+            return unmarshallXap(input);
+        } catch (RuntimeException e) {
+            throw e;
+        } catch (Exception e) {
+            if (bomIn != null) {
+                bomIn.close();
+            }
+            e.printStackTrace();
+        } finally {
+            if (bomIn != null) {
+                bomIn.close();
+            }
+        }
+
+        return unmarshallXap(input);
     }
 
     private static ISO15745ProfileContainer unmarshallXDD(

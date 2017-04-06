@@ -70,6 +70,11 @@ public interface IPluginImages {
     public final static String ARROW_UP_ICON = "icons/arrow_up.gif";
     public final static String CLEAR_ICON = "icons/clear.gif";
 
+    // Process Image View icons
+    public final static String IN_CHANNEL_ICON = "icons/in_channel.gif";
+    public final static String OUT_CHANNEL_ICON = "icons/out_channel.gif";
+    public final static String IO_MAP_ICON = "icons/IoMap.gif";
+
     // Object dictionary view icons
     public final static String OBD_OBJECT_ICON = "icons/object.gif";
     public final static String OBD_SUB_OBJECT_ICON = "icons/subobject.gif";

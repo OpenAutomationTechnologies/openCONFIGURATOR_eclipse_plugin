@@ -1,9 +1,9 @@
 /*******************************************************************************
- * @file   IOpenConfiguratorResource.java
+ * @file   ProcessImageChannel.java
  *
- * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
+ * @author Sree hari Vignesh, Kalycito Infotech Private Limited.
  *
- * @copyright (c) 2015, Kalycito Infotech Private Limited
+ * @copyright (c) 2017, Kalycito Infotech Private Limited
  *                    All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,56 +29,82 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *******************************************************************************/
 
-package org.epsg.openconfigurator.resources;
+package org.epsg.openconfigurator.model;
+
+import org.epsg.openconfigurator.xmlbinding.xap.Channel;
+import org.epsg.openconfigurator.xmlbinding.xap.ProcessImage;
 
 /**
- * An interface to list all the resources available in the openCONFIGURATOR
- * plugin.
+ * Wrapper class for the channels in the XAP file
  *
- * @author Ramakrishnan P
+ * @author Sree Hari
  *
  */
-public interface IOpenConfiguratorResource {
+public class ProcessImageChannel {
+
+    private ProcessImage processImage;
+    private Channel channel;
+    private String channelType;
+    private byte channelSize;
+    private String processImageType;
+    private String channelName;
 
     /**
-     * Log file path in the workspace.
+     * Constructor to initialize channel attribute values of XAP file
+     *
+     * @param processImage Instance of ProcessImage
+     * @param channel Instance of Channel
      */
-    public static final String LIBRARY_LOG_FILE_PATH = "/.metadata/.plugins/"
-            + org.epsg.openconfigurator.Activator.PLUGIN_ID + "/"
-            + org.epsg.openconfigurator.Activator.PLUGIN_ID + ".0.log";
+    public ProcessImageChannel(ProcessImage processImage, Channel channel) {
+        this.processImage = processImage;
+        this.channel = channel;
+        channelType = channel.getDataType().value();
+        channelSize = channel.getDataSize();
+        processImageType = processImage.getType().value();
+        channelName = channel.getName();
+
+    }
 
     /**
-     * Logging configuration file for BOOST.Log.
+     * @return Channel instance of XAP file
      */
-    public static final String BOOST_LOG_CONFIGURATION = "resources/boost_log_settings.ini"; //$NON-NLS-1$
+    public Channel getChannel() {
+        return channel;
+    }
 
     /**
-     * openCONFIGURATOR project schema.
+     * @return Name of the channel
      */
-    public static final String PROJECT_SCHEMA = "resources/OC_ProjectFile/openCONFIGURATOR.xsd"; //$NON-NLS-1$
+    public String getChannelName() {
+        return channelName;
+    }
 
     /**
-     * XDD schema.
+     * @return Size of the channel
      */
-    public static final String XDD_SCHEMA = "resources/xddschema/Powerlink_Main.xsd"; //$NON-NLS-1$
+    public byte getChannelSize() {
+        return channelSize;
+    }
 
     /**
-     * Firmware schema.
+     * @return Type of the channel
      */
-    public static final String FIRMWARE_SCHEMA = "resources/firmwareschema/fw_schema.xsd"; //$NON-NLS-1$
+    public String getChannelType() {
+        return channelType;
+    }
 
     /**
-     * Xap schema.
+     * @return Instance of processImage
      */
-    public static final String XAP_SCHEMA = "resources/xapSchema/xap_schema.xsd"; //$NON-NLS-1$
+    public ProcessImage getProcessImage() {
+        return processImage;
+    }
 
     /**
-     * Default MN XDD.
+     * @return The type of process image (input or output)
      */
-    public static final String DEFAULT_MN_XDD = "resources/00000000_POWERLINK_CiA302-4_MN.xdd"; //$NON-NLS-1$
+    public String getProcessImageType() {
+        return processImageType;
+    }
 
-    /**
-     * Default CN XDD.
-     */
-    public static final String DEFAULT_CN_XDD = "resources/00000000_POWERLINK_CiA401_CN.xdd"; //$NON-NLS-1$
 }

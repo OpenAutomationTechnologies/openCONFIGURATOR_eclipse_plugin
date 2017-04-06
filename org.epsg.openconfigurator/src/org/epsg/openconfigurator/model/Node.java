@@ -89,6 +89,8 @@ public class Node {
     private static final short XDD_VENDOR_ID_SUBOBJECT_INDEX = 1;
     private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
 
+    public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
+
     /**
      * Returns the attribute name linked with the node assignment value.
      *
@@ -173,6 +175,8 @@ public class Node {
         }
     }
 
+    private ProcessImage processImage;
+
     /**
      * Node instance from the openCONFIGURATOR project. Example: The Object is
      * one of TNetworkConfiguration(only for MN), TCN, TRMN.
@@ -254,6 +258,8 @@ public class Node {
      */
     private FirmwareFile xddFirmwareFile;
 
+    private OpenCONFIGURATORProject currentProject;
+
     /**
      * Instance of Module management.
      */
@@ -263,11 +269,11 @@ public class Node {
      * Instance of DeviceModularinterface.
      */
     private final DeviceModularInterface moduleInterface;
-
     /**
      * Instance of head node interface.
      */
     private HeadNodeInterface headNodeInterface;
+
     private Map<FirmwareManager, Integer> nodeFirmwareCollection = new HashMap<>();
 
     /**
@@ -288,6 +294,7 @@ public class Node {
         moduleInterface = null;
         configurationError = "";
         xddFirmwareFile = null;
+        currentProject = null;
     }
 
     /**
@@ -377,6 +384,7 @@ public class Node {
                 }
             }
         }
+
     }
 
     public void addStationTypeofNode(int stationTypeChanged)
@@ -807,6 +815,22 @@ public class Node {
     }
 
     /**
+     * Gets the name of node based on the ID
+     *
+     * @param nodeId The ID of node
+     * @return Name of Node
+     */
+    public String getNodeName(String nodeId) {
+        List<Node> nodeList = rootNode.getNodeLists(rootNode);
+        for (Node node : nodeList) {
+            if (node.getNodeIdString().equalsIgnoreCase(nodeId)) {
+                return node.getNodeIDWithName();
+            }
+        }
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return The node type.
      */
     public NodeType getNodeType() {
@@ -946,6 +970,13 @@ public class Node {
         }
 
         return 0;
+    }
+
+    /**
+     * @return Instance of ProcessImage
+     */
+    public ProcessImage getProcessImage() {
+        return processImage;
     }
 
     /**
@@ -1720,6 +1751,18 @@ public class Node {
         getObjectDictionary().setActualValue(
                 INetworkProperties.PRESCALER_OBJECT_ID,
                 INetworkProperties.PRESCALER_SUBOBJECT_ID, value.toString());
+    }
+
+    /**
+     * Provides the instance of processImage class
+     * 
+     * @param processImage Instance of ProcessImage
+     */
+    public void setProcessImage(ProcessImage processImage) {
+
+        if (processImage != null) {
+            this.processImage = processImage;
+        }
     }
 
     /**

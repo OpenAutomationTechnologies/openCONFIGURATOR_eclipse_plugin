@@ -44,6 +44,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -102,24 +105,29 @@ import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
+import org.epsg.openconfigurator.model.ProcessImage;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.wizards.NewFirmwareWizard;
 import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
+import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration.PathSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xap.ApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList.Interface;
 import org.jdom2.JDOMException;
+import org.xml.sax.SAXException;
 
 /**
  * Industrial network view to list all the nodes available in the project.
@@ -524,6 +532,10 @@ public class IndustrialNetworkView extends ViewPart
     public static final String SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE = "Error openning Object Dictionary";
     public static final String SHOW_PARAMETER_ERROR_MESSAGE = "Error openning Parameter";
 
+    // Process Image action message strings.
+    public static final String SHOW_IO_MAP_ACTION_MESSAGE = "Show I/O Mapping";
+    public static final String SHOW_PROCESS_IMAGE_ERROR_MESSAGE = "Error openning Process Image";
+
     // Mapping view action message strings.
     public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
     public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error openning MappingView";
@@ -866,6 +878,11 @@ public class IndustrialNetworkView extends ViewPart
      */
     private Action addNewNode;
 
+    /**
+     * IO mapping View
+     */
+    private Action showIoMapView;
+
     private Job exportNodeXDC;
 
     private Action addNewModule;
@@ -927,6 +944,13 @@ public class IndustrialNetworkView extends ViewPart
     private Action sortNode;
 
     /**
+     * Instance of Xap file
+     */
+    private ProcessImage processImage;
+
+    private OpenCONFIGURATORProject currentProject;
+
+    /**
      * Call back to handle the selection changed events.
      */
     private ISelectionChangedListener viewerSelectionChangedListener = new ISelectionChangedListener() {
@@ -973,6 +997,8 @@ public class IndustrialNetworkView extends ViewPart
             });
         }
     };
+
+    private ApplicationProcess xapFile;
 
     /**
      * The constructor.
@@ -1068,6 +1094,45 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                     manager.add(showPdoMapping);
                     manager.add(showObjectDictionary);
+                    currentProject = rootNode.getOpenConfiguratorProject();
+                    System.err.println("currentProject...." + currentProject);
+                    if (currentProject != null) {
+                        Path outputpath = getProjectOutputPath(node);
+                        final java.nio.file.Path targetPath;
+
+                        if (outputpath.isLocal()) {
+                            targetPath = FileSystems.getDefault().getPath(
+                                    node.getProject().getLocation().toString(),
+                                    outputpath.getPath());
+                        } else {
+                            targetPath = FileSystems.getDefault()
+                                    .getPath(outputpath.getPath());
+                        }
+                        File outputFile = new File(targetPath.toString());
+
+                        if (outputFile.exists()) {
+                            File[] fileList = outputFile.listFiles();
+                            for (File file : fileList) {
+                                if (file.getName()
+                                        .equalsIgnoreCase("xap.xml")) {
+                                    try {
+                                        xapFile = XddMarshaller
+                                                .unmarshallXapFile(file);
+                                    } catch (JAXBException | SAXException
+                                            | ParserConfigurationException
+                                            | IOException e) {
+                                        e.printStackTrace();
+                                    }
+                                    processImage = new ProcessImage(node,
+                                            xapFile);
+                                    node.setProcessImage(processImage);
+                                    manager.add(showIoMapView);
+                                }
+                            }
+                        }
+
+                    }
+
                     manager.add(new Separator());
                 } else if (nodeObjectModel instanceof TCN) {
                     if (node.isEnabled()) {
@@ -1852,6 +1917,25 @@ public class IndustrialNetworkView extends ViewPart
         disable.setToolTipText(ENABLE_ACTION_MESSAGE);
         disable.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
+
+        showIoMapView = new Action(SHOW_IO_MAP_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+                try {
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(ProcessImageView.ID);
+                    viewer.setSelection(viewer.getSelection());
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage(SHOW_PROCESS_IMAGE_ERROR_MESSAGE);
+                }
+            }
+        };
+        showIoMapView.setToolTipText(SHOW_IO_MAP_ACTION_MESSAGE);
+        showIoMapView.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.IO_MAP_ICON));
 
         showObjectDictionary = new Action(
                 SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE) {
