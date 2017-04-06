@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.builder;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.DirectoryNotEmptyException;
@@ -71,9 +72,12 @@ import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.jdom2.JDOMException;
 
 /**
  * Builder implementation for POWERLINK project.
@@ -697,6 +701,27 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 continue;
             }
 
+            PowerlinkRootNode rootnode = pjtEditor.getPowerlinkRootNode();
+            boolean isRmnAvailable = false;
+            boolean isFirmwareAvailable = false;
+            if (!rootnode.getRmnNodeList().isEmpty()) {
+                isRmnAvailable = true;
+            }
+
+            for (Node node : rootnode.getCnNodeList()) {
+                if (!node.getNodeFirmwareCollection().isEmpty()) {
+                    isFirmwareAvailable = true;
+                }
+            }
+
+            Node mnNode = rootnode.getMN();
+
+            BigInteger objectId = new BigInteger("1F80", 16);
+            PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
+                    .getObject(objectId.longValue());
+
+            updateMnObject(swVersionObj, isRmnAvailable, isFirmwareAvailable);
+
             System.out.println("Build Started: Project: " + networkId);
             // Displays Info message in console.
             displayInfoMessage(
@@ -908,8 +933,45 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 if (fwList != null) {
                     fwList.addAll(nodeDevRevisionList.values());
                 }
+
             }
 
+        }
+    }
+
+    private void updateMnObject(PowerlinkObject swVersionObj,
+            boolean isRmnAvailable, boolean isFirmwareAvailable) {
+
+        if (isFirmwareAvailable && isRmnAvailable) {
+            try {
+                swVersionObj.setActualValue("19456", true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "19456");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (isFirmwareAvailable) {
+            try {
+                swVersionObj.setActualValue("3072", true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "3072");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (isRmnAvailable) {
+            try {
+                swVersionObj.setActualValue("18432", true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "18432");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

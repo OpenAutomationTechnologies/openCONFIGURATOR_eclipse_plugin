@@ -389,9 +389,8 @@ public class FirmwareManager {
             e.printStackTrace();
             return false;
         }
-
-        if (getNode(nodeOrModuleObject) != null) {
-            Node node = getNode(nodeOrModuleObject);
+        if (getNode(nodeOrModuleObj) != null) {
+            Node node = getNode(nodeOrModuleObj);
             res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
                     node.getNetworkId(), node.getCnNodeId(),
                     NodeAssignment.NMT_NODEASSIGN_SWUPDATE);
