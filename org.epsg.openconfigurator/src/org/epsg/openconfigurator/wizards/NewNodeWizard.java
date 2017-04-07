@@ -36,7 +36,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -121,6 +124,7 @@ public class NewNodeWizard extends Wizard {
     }
 
     private boolean addNodeFirmwareFile(Node newNode) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
         if (nodeList != null) {
             if (!nodeList.getCnNodeList().isEmpty()) {
                 for (Node cnNode : nodeList.getCnNodeList()) {
@@ -129,50 +133,44 @@ public class NewNodeWizard extends Wizard {
                         if (cnNode.getProductCodeValue().equalsIgnoreCase(
                                 newNode.getProductCodeValue())) {
                             if (!cnNode.getValidFirmwareList().isEmpty()) {
+
+                                System.err.println(
+                                        "The firmware collection values.."
+                                                + cnNode.getValidFirmwareList());
                                 for (FirmwareManager fwMngr : cnNode
                                         .getValidFirmwareList()) {
-                                    MessageDialog dialog = new MessageDialog(
-                                            null, "Add firmware file", null,
-                                            "The project contains firmware file for Node '"
-                                                    + newNode
-                                                            .getNodeIDWithName()
-                                                    + "'."
-                                                    + " \nDo you wish to add the firmware file? ",
-                                            MessageDialog.WARNING,
-                                            new String[] { "Yes", "No" }, 1);
-                                    int result = dialog.open();
-                                    if (result != 0) {
-                                        return true;
-                                    }
-                                    if (!newNode.getNodeFirmwareCollection()
-                                            .isEmpty()) {
-                                        for (FirmwareManager firmware : newNode
-                                                .getNodeFirmwareCollection()
-                                                .keySet()) {
-                                            if (!(firmware.getUri()
-                                                    .equalsIgnoreCase(
-                                                            fwMngr.getUri()))) {
-                                                newNode.getNodeFirmwareCollection()
-                                                        .put(fwMngr, fwMngr
-                                                                .getFirmwarefileVersion());
-                                                fwMngr.updateFirmwareInProjectFile(
-                                                        fwMngr, newNode,
-                                                        fwMngr.getFirmwareObjModel());
-                                            }
-                                            return true;
-                                        }
-                                    } else {
-                                        newNode.getNodeFirmwareCollection().put(
-                                                fwMngr,
-                                                fwMngr.getFirmwarefileVersion());
-                                        fwMngr.updateFirmwareInProjectFile(
-                                                fwMngr, newNode,
-                                                fwMngr.getFirmwareObjModel());
-                                        return true;
-                                    }
+                                    validFwList.add(fwMngr);
+
                                 }
                             }
                         }
+                    }
+
+                }
+
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Node '"
+                                    + newNode.getNodeIDWithName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+                        newNode.getNodeFirmwareCollection().put(fw,
+                                fw.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(fw, newNode,
+                                fw.getFirmwareObjModel());
                     }
 
                 }

@@ -36,7 +36,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -113,6 +116,7 @@ public class NewModuleWizard extends Wizard {
     }
 
     private boolean addAvailableFirmware(Module newModule) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
         if (rootNode != null) {
             if (!rootNode.getModuleList().isEmpty()) {
                 for (Module module : rootNode.getModuleList()) {
@@ -123,49 +127,40 @@ public class NewModuleWizard extends Wizard {
                             if (!module.getModuleFirmwareFileList().isEmpty()) {
                                 for (FirmwareManager fwMngr : module
                                         .getModuleFirmwareFileList()) {
-                                    MessageDialog dialog = new MessageDialog(
-                                            null, "Add firmware file", null,
-                                            "The project contains firmware file for Module '"
-                                                    + newModule.getModuleName()
-                                                    + "'. "
-                                                    + "\nDo you wish to add the firmware file? ",
-                                            MessageDialog.WARNING,
-                                            new String[] { "Yes", "No" }, 1);
-                                    int result = dialog.open();
-                                    if (result != 0) {
-                                        return true;
-                                    }
-                                    if (!newModule.getModuleFirmwareCollection()
-                                            .isEmpty()) {
-                                        for (FirmwareManager firmware : newModule
-                                                .getModuleFirmwareCollection()
-                                                .keySet()) {
-                                            if (!(firmware.getUri()
-                                                    .equalsIgnoreCase(
-                                                            fwMngr.getUri()))) {
-                                                newModule
-                                                        .getModuleFirmwareCollection()
-                                                        .put(fwMngr, fwMngr
-                                                                .getFirmwarefileVersion());
-                                                fwMngr.updateFirmwareInProjectFile(
-                                                        fwMngr, newModule,
-                                                        fwMngr.getFirmwareObjModel());
-                                            }
-                                        }
-                                    } else {
-                                        newModule.getModuleFirmwareCollection()
-                                                .put(fwMngr, fwMngr
-                                                        .getFirmwarefileVersion());
-                                        fwMngr.updateFirmwareInProjectFile(
-                                                fwMngr, newModule,
-                                                fwMngr.getFirmwareObjModel());
-                                    }
+                                    validFwList.add(fwMngr);
                                 }
                             }
                         }
                     }
 
                 }
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Module '"
+                                    + newModule.getModuleName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+                        newModule.getModuleFirmwareCollection().put(fw,
+                                fw.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(fw, newModule,
+                                fw.getFirmwareObjModel());
+                    }
+
+                }
+
                 return true;
             }
         }
