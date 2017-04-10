@@ -1850,6 +1850,32 @@ public class MappingView extends ViewPart {
 
                     // Set null as input to the view, when the node is disabled.
                     displayMappingView(nodeObj);
+
+                    // Set Overview page
+                    frmNewForm.setText("Node Overview" + " - "
+                            + nodeObj.getNodeIDWithName());
+                    txt_no_tpdo.setText(tpdoChannelSize.getText());
+                    txt_no_rpdo.setText(rpdoChannelSize.getText());
+                    Object nodeModel = nodeObj.getNodeModel();
+                    if (nodeModel instanceof TCN) {
+                        lblPresTimeout.setText("PRes Timeout (µs) :");
+
+                        txt_no_cyctime.setText(String
+                                .valueOf(nodeObj.getPresTimeoutvalue() / 1000));
+                    } else {
+                        lblPresTimeout.setText("Cycle Time (µs) :");
+
+                        txt_no_cyctime.setText(
+                                String.valueOf(nodeObj.getCycleTime()));
+                    }
+
+                    // txt_no_foi.setText(nodeObj.getForcedObjectsString()
+                    // .substring(nodeObj.getForcedObjectsString()
+                    // .indexOf(';') + 1));
+                    // txt_no_fsoi.setText(nodeObj.getForcedObjectsString());
+                    // txt_no_venId.setText(nodeObj.getVendorIdValue());
+                    // txt_no_proId.setText(nodeObj.getProductCodeValue());
+
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
                     nodeObj = module.getNode();
@@ -2073,6 +2099,26 @@ public class MappingView extends ViewPart {
             }
         }
     };
+    private Text txt_no_tpdo;
+    private Text txt_no_rpdo;
+    private Text txt_no_cyctime;
+    private Label lblPresTimeout;
+    private Text txt_no_Id;
+
+    private ScrolledForm frmNewForm;
+    private Text text;
+    private Text text_1;
+    private Text text_2;
+    private Text text_3;
+    private Text text_4;
+    private Text text_5;
+    private Text text_6;
+    private Text text_7;
+    private Text text_8;
+    private Text text_9;
+    private Text text_10;
+    private Text text_13;
+    private Text text_11;
 
     public MappingView() {
         TObject emptyObj = new TObject();
@@ -2191,7 +2237,426 @@ public class MappingView extends ViewPart {
         composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
 
         final TabFolder tabFolder = new TabFolder(composite_2, SWT.NONE);
+
+        TabItem tbtmNodeOverview = new TabItem(tabFolder, SWT.NONE);
+        tbtmNodeOverview.setText("Node Overview");
+        Composite composite_1 = new Composite(tabFolder, SWT.NONE);
+        tbtmNodeOverview.setControl(composite_1);
+
+        frmNewForm = formToolkit.createScrolledForm(composite_1);
+        frmNewForm.setBounds(10, 10, 545, 450);
+
+        formToolkit.paintBordersFor(frmNewForm);
+
+        Section sctnNewSection_1 = formToolkit
+                .createSection(frmNewForm.getBody(), ExpandableComposite.TWISTIE
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
+        sctnNewSection_1.setBounds(285, 0, 260, 150);
+
+        formToolkit.paintBordersFor(sctnNewSection_1);
+        sctnNewSection_1.setText("General Information");
+        sctnNewSection_1.setExpanded(true);
+        sctnNewSection_1.setLayoutData(
+                new GridData(SWT.FILL, SWT.FILL, true, true, 1, 6));
+        sctnNewSection_1.setRedraw(true);
+
+        Composite composite_te = formToolkit.createComposite(sctnNewSection_1,
+                SWT.NONE);
+        formToolkit.paintBordersFor(composite_te);
+        composite_te.setLayout(new FillLayout(SWT.HORIZONTAL));
+        composite_te
+                .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        Composite composite_6 = new Composite(sctnNewSection_1, SWT.NONE);
+        formToolkit.adapt(composite_6);
+        formToolkit.paintBordersFor(composite_6);
+        sctnNewSection_1.setClient(composite_6);
+        composite_6.setLayout(new GridLayout(6, false));
+
+        Label lblTpdoSize = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(lblTpdoSize, true, true);
+        lblTpdoSize.setText("TPDO Size (Bytes):");
+        lblTpdoSize.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+
+        txt_no_tpdo = new Text(composite_6, SWT.BORDER);
+        GridData gd_txt_no_tpdo = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 2, 1);
+        gd_txt_no_tpdo.widthHint = 120;
+        txt_no_tpdo.setLayoutData(gd_txt_no_tpdo);
+        txt_no_tpdo.setEnabled(false);
+        formToolkit.adapt(txt_no_tpdo, true, true);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label lblRpdoSize = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(lblRpdoSize, true, true);
+        lblRpdoSize.setText("RPDO Size (Bytes):");
+        lblRpdoSize.setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+
+        txt_no_rpdo = new Text(composite_6, SWT.BORDER);
+        GridData gd_txt_no_rpdo = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 2, 1);
+        gd_txt_no_rpdo.widthHint = 121;
+        txt_no_rpdo.setLayoutData(gd_txt_no_rpdo);
+        txt_no_rpdo.setEnabled(false);
+        formToolkit.adapt(txt_no_rpdo, true, true);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        lblPresTimeout = new Label(composite_6, SWT.NONE);
+        lblPresTimeout.setText("PRes Timeout (μs):");
+        lblPresTimeout.setForeground(SWTResourceManager.getColor(25, 76, 127));
+        formToolkit.adapt(lblPresTimeout, true, true);
+
+        txt_no_cyctime = new Text(composite_6, SWT.BORDER);
+        GridData gd_txt_no_cyctime = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 2, 1);
+        gd_txt_no_cyctime.widthHint = 120;
+        txt_no_cyctime.setLayoutData(gd_txt_no_cyctime);
+        txt_no_cyctime.setEnabled(false);
+        formToolkit.adapt(txt_no_cyctime, true, true);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label lblNodeType_1 = new Label(composite_6, SWT.NONE);
+        lblNodeType_1.setText("Node Type");
+        lblNodeType_1.setForeground(SWTResourceManager.getColor(25, 76, 127));
+        formToolkit.adapt(lblNodeType_1, true, true);
+
+        ComboViewer comboViewer = new ComboViewer(composite_6, SWT.READ_ONLY);
+        Combo combo_1 = comboViewer.getCombo();
+        combo_1.setVisibleItemCount(10);
+        combo_1.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+        formToolkit.paintBordersFor(combo_1);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label label = new Label(composite_6, SWT.NONE);
+        label.setLayoutData(
+                new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 2));
+        formToolkit.adapt(label, true, true);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label lblNewLabel_2 = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(lblNewLabel_2, true, true);
+
+        lblPrestimeout = new Label(composite_6, SWT.NONE);
+        lblPrestimeout.setText("");
+
+        formToolkit.adapt(lblPrestimeout, true, true);
+
+        lblPrestimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label lblNewLabel_5 = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(lblNewLabel_5, true, true);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label lblNewLabel_6 = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(lblNewLabel_6, true, true);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label label_1 = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(label_1, true, true);
+
+        Label lblNodeType = formToolkit.createLabel(composite_6, "Node Type : ",
+                SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+        new Label(composite_6, SWT.NONE);
+
+        Label label_2 = new Label(composite_6, SWT.NONE);
+        formToolkit.adapt(label_2, true, true);
+        new Label(composite_6, SWT.NONE);
+
+        Section sctnNetworkConfiguration = formToolkit.createSection(
+                frmNewForm.getBody(),
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        sctnNetworkConfiguration.setBounds(0, 221, 257, 228);
+        formToolkit.paintBordersFor(sctnNetworkConfiguration);
+        sctnNetworkConfiguration.setText("Advance Information");
+        sctnNetworkConfiguration.setExpanded(true);
+
+        Composite composite_9 = new Composite(sctnNetworkConfiguration,
+                SWT.NONE);
+        sctnNetworkConfiguration.setClient(composite_9);
+        formToolkit.adapt(composite_9);
+        formToolkit.paintBordersFor(composite_9);
+        composite_9.setLayout(new GridLayout(2, false));
+
+        Label lblForcedObjectIndex = new Label(composite_9, SWT.NONE);
+        lblForcedObjectIndex.setText("Forced object index:");
+        formToolkit.adapt(lblForcedObjectIndex, true, true);
+
+        Label label_7 = new Label(composite_9, SWT.NONE);
+        label_7.setText("                              ");
+        formToolkit.adapt(label_7, true, true);
+
+        org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(
+                composite_9, SWT.BORDER);
+        GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2,
+                1);
+        gd_list.heightHint = 66;
+        gd_list.widthHint = 230;
+        list.setLayoutData(gd_list);
+        formToolkit.adapt(list, true, true);
+
+        Label lblForcedSubobjectIndex = new Label(composite_9, SWT.NONE);
+        lblForcedSubobjectIndex.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        lblForcedSubobjectIndex.setText("Forced Sub-Object Index:");
+        formToolkit.adapt(lblForcedSubobjectIndex, true, true);
+        new Label(composite_9, SWT.NONE);
+
+        org.eclipse.swt.widgets.List list_1 = new org.eclipse.swt.widgets.List(
+                composite_9, SWT.BORDER);
+        GridData gd_list_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2,
+                1);
+        gd_list_1.heightHint = 73;
+        gd_list_1.widthHint = 231;
+        list_1.setLayoutData(gd_list_1);
+        formToolkit.adapt(list_1, true, true);
+
+        Section sctnAdvancedConfiguration = formToolkit.createSection(
+                frmNewForm.getBody(),
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        sctnAdvancedConfiguration.setBounds(0, 0, 260, 213);
+        formToolkit.paintBordersFor(sctnAdvancedConfiguration);
+        sctnAdvancedConfiguration.setText("Vendor / Product Information");
+        sctnAdvancedConfiguration.setExpanded(true);
+
+        Composite composite_10 = new Composite(sctnAdvancedConfiguration,
+                SWT.NONE);
+        formToolkit.adapt(composite_10);
+        formToolkit.paintBordersFor(composite_10);
+        sctnAdvancedConfiguration.setClient(composite_10);
+        composite_10.setLayout(new GridLayout(2, false));
+
+        Label lblVendorName = new Label(composite_10, SWT.NONE);
+        lblVendorName
+                .setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+        lblVendorName.setText("Vendor Name:");
+        formToolkit.adapt(lblVendorName, true, true);
+
+        text = new Text(composite_10, SWT.BORDER);
+        text.setEnabled(false);
+        text.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text, true, true);
+
+        Label lblVendorId = new Label(composite_10, SWT.NONE);
+        lblVendorId.setText("Vendor ID:");
+        formToolkit.adapt(lblVendorId, true, true);
+
+        text_2 = new Text(composite_10, SWT.BORDER);
+        text_2.setEnabled(false);
+        text_2.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_2, true, true);
+
+        Label lblProductName = new Label(composite_10, SWT.NONE);
+        lblProductName.setText("Product Name:");
+        formToolkit.adapt(lblProductName, true, true);
+
+        text_3 = new Text(composite_10, SWT.BORDER);
+        text_3.setEnabled(false);
+        text_3.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_3, true, true);
+
+        Label lblProductId = new Label(composite_10, SWT.NONE);
+        lblProductId.setText("Product ID:");
+        formToolkit.adapt(lblProductId, true, true);
+
+        text_1 = new Text(composite_10, SWT.BORDER);
+        text_1.setEnabled(false);
+        text_1.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_1, true, true);
+
+        Label lblHardwareVersion = new Label(composite_10, SWT.NONE);
+        lblHardwareVersion.setText("Hardware Version:");
+        formToolkit.adapt(lblHardwareVersion, true, true);
+
+        text_4 = new Text(composite_10, SWT.BORDER);
+        text_4.setEnabled(false);
+        text_4.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_4, true, true);
+
+        Label lblSoftwareVersion = new Label(composite_10, SWT.NONE);
+        lblSoftwareVersion.setText("Software Version:");
+        formToolkit.adapt(lblSoftwareVersion, true, true);
+
+        text_5 = new Text(composite_10, SWT.BORDER);
+        text_5.setEnabled(false);
+        text_5.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_5, true, true);
+
+        Label lblFirmwareVersion = new Label(composite_10, SWT.NONE);
+        lblFirmwareVersion.setText("Firmware Version:");
+        formToolkit.adapt(lblFirmwareVersion, true, true);
+
+        text_6 = new Text(composite_10, SWT.BORDER);
+        text_6.setEnabled(false);
+        text_6.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_6, true, true);
+
+        Section sctnGeneralFeatures = formToolkit.createSection(
+                frmNewForm.getBody(),
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+        sctnGeneralFeatures.setBounds(285, 156, 260, 174);
+        formToolkit.paintBordersFor(sctnGeneralFeatures);
+        sctnGeneralFeatures.setText("General Features");
+        sctnGeneralFeatures.setExpanded(true);
+
+        Composite composite_11 = new Composite(sctnGeneralFeatures, SWT.NONE);
+        sctnGeneralFeatures.setClient(composite_11);
+        formToolkit.adapt(composite_11);
+        formToolkit.paintBordersFor(composite_11);
+        composite_11.setLayout(new GridLayout(2, false));
+
+        Label lblNmtboottimenotactives = new Label(composite_11, SWT.NONE);
+        lblNmtboottimenotactives.setText("NMTBootTimeNotActive (μs):");
+        lblNmtboottimenotactives
+                .setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
+        formToolkit.adapt(lblNmtboottimenotactives, true, true);
+
+        text_7 = new Text(composite_11, SWT.BORDER);
+        text_7.setEnabled(false);
+        text_7.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_7, true, true);
+
+        Label lblNmtcycletimemaxs = new Label(composite_11, SWT.NONE);
+        lblNmtcycletimemaxs.setText("NMTCycleTimeMax (μs):");
+        formToolkit.adapt(lblNmtcycletimemaxs, true, true);
+
+        text_8 = new Text(composite_11, SWT.BORDER);
+        text_8.setEnabled(false);
+        text_8.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_8, true, true);
+
+        Label lblNmtcycletimemins = new Label(composite_11, SWT.NONE);
+        lblNmtcycletimemins.setText("NMTCycleTimeMin (μs):");
+        formToolkit.adapt(lblNmtcycletimemins, true, true);
+
+        text_9 = new Text(composite_11, SWT.BORDER);
+        text_9.setEnabled(false);
+        text_9.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_9, true, true);
+
+        Label lblNmterrorentries = new Label(composite_11, SWT.NONE);
+        lblNmterrorentries.setText("NMTErrorEntries (2-13):");
+        formToolkit.adapt(lblNmterrorentries, true, true);
+
+        text_10 = new Text(composite_11, SWT.BORDER);
+        text_10.setEnabled(false);
+        text_10.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_10, true, true);
+
+        Button btnCheckButton = new Button(composite_11, SWT.CHECK);
+        formToolkit.adapt(btnCheckButton, true, true);
+        btnCheckButton.setText("IP Support");
+        new Label(composite_11, SWT.NONE);
+
+        Button btnNmlIpSupport = new Button(composite_11, SWT.CHECK);
+        btnNmlIpSupport.setText("NML IP Support");
+        formToolkit.adapt(btnNmlIpSupport, true, true);
+        new Label(composite_11, SWT.NONE);
+
+        Section sctnCnFeatures = formToolkit.createSection(frmNewForm.getBody(),
+                Section.DESCRIPTION | ExpandableComposite.TWISTIE
+                        | ExpandableComposite.TITLE_BAR);
+        sctnCnFeatures.setBounds(285, 336, 260, 114);
+        sctnCnFeatures.setRedraw(true);
+        formToolkit.paintBordersFor(sctnCnFeatures);
+        sctnCnFeatures.setText("CN Features");
+        sctnCnFeatures.setExpanded(true);
+
+        Composite composite_13 = new Composite(sctnCnFeatures, SWT.NONE);
+        sctnCnFeatures.setClient(composite_13);
+        formToolkit.adapt(composite_13);
+        formToolkit.paintBordersFor(composite_13);
+        composite_13.setLayout(new GridLayout(2, false));
+
+        Button btnDllcn = new Button(composite_13, SWT.CHECK);
+        GridData gd_btnDllcn = new GridData(SWT.LEFT, SWT.CENTER, false, false,
+                2, 1);
+        gd_btnDllcn.widthHint = 170;
+        btnDllcn.setLayoutData(gd_btnDllcn);
+        formToolkit.adapt(btnDllcn, true, true);
+        btnDllcn.setText("DLL CN Feature Multiplex");
+
+        Button btnDllCnPres = new Button(composite_13, SWT.CHECK);
+        GridData gd_btnDllCnPres = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 2, 1);
+        gd_btnDllCnPres.widthHint = 161;
+        btnDllCnPres.setLayoutData(gd_btnDllCnPres);
+        formToolkit.adapt(btnDllCnPres, true, true);
+        btnDllCnPres.setText("DLL CN PRes Chaining");
+
+        Label lblNmtcnsocprecns = new Label(composite_13, SWT.NONE);
+        formToolkit.adapt(lblNmtcnsocprecns, true, true);
+        lblNmtcnsocprecns.setText("NMTCNSoC2PReq (ns):");
+
+        text_11 = new Text(composite_13, SWT.BORDER);
+        text_11.setEnabled(false);
+        text_11.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(text_11, true, true);
+
+        Composite composite_12 = new Composite(composite_1, SWT.NONE);
+
+        Label label_4 = new Label(composite_12, SWT.NONE);
+        label_4.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+        label_4.setText("NMTCycleTimeMax (μs):");
+        formToolkit.adapt(label_4, true, true);
         {
+
             tbtmPdoConfiguration = new TabItem(tabFolder, SWT.NONE);
             tbtmPdoConfiguration.setText(PDO_CONFIGURATION_TAB_TITLE);
             {
