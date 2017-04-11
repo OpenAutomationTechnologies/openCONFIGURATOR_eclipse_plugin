@@ -1765,8 +1765,7 @@ public class IndustrialNetworkView extends ViewPart
                         && (nodeTreeSelection instanceof IStructuredSelection)) {
                     IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
                     Object selectedObject = strucSelection.getFirstElement();
-                    if ((selectedObject instanceof Node)
-                            || (selectedObject instanceof Module)) {
+                    if ((selectedObject instanceof Node)) {
                         NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
                                 rootNode, selectedObject);
 
@@ -1794,14 +1793,31 @@ public class IndustrialNetworkView extends ViewPart
                         handleRefresh();
                     } else if (selectedObject instanceof Module) {
                         Module selectedModule = (Module) selectedObject;
-                        NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
-                                rootNode, selectedObject);
+                        System.err.println(
+                                "The can firmware be added .." + selectedModule
+                                        .canFirmwareAdded(selectedModule));
+                        if (!selectedModule.canFirmwareAdded(selectedModule)) {
+                            showErrorMessage("The module '"
+                                    + selectedModule.getModuleName()
+                                    + "' connected to the interface '"
+                                    + selectedModule.getInterfaceOfModule()
+                                            .getInterfaceUId()
+                                    + "' of node '"
+                                    + selectedModule.getNode()
+                                            .getNodeIDWithName()
+                                    + "' does not support firmware.");
 
-                        WizardDialog wd = new WizardDialog(
-                                Display.getDefault().getActiveShell(),
-                                newFirmwareWizard);
-                        wd.setTitle(newFirmwareWizard.getWindowTitle());
-                        wd.open();
+                        } else {
+
+                            NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
+                                    rootNode, selectedObject);
+
+                            WizardDialog wd = new WizardDialog(
+                                    Display.getDefault().getActiveShell(),
+                                    newFirmwareWizard);
+                            wd.setTitle(newFirmwareWizard.getWindowTitle());
+                            wd.open();
+                        }
 
                         try {
                             selectedModule.getProject().refreshLocal(

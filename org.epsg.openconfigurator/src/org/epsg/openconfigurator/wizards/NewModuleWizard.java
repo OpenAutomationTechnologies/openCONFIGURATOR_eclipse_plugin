@@ -332,8 +332,10 @@ public class NewModuleWizard extends Wizard {
                     + e.getCause().getMessage());
         }
 
-        if (addAvailableFirmware(newModule)) {
-            return true;
+        if (newModule.canFirmwareAdded(newModule)) {
+            if (addAvailableFirmware(newModule)) {
+                return true;
+            }
         }
 
         return true;

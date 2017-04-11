@@ -200,6 +200,84 @@ public class Module {
     }
 
     /**
+     * Validates the firmware manager support to module
+     * 
+     * @param nodeOrModuleObj2 Object instance of module
+     * @return <code>true</code> if firmware can be added , <code>false</code>
+     *         otherwise.
+     */
+    public boolean canFirmwareAdded(Object nodeOrModuleObj2) {
+        boolean canFirmwareAdded = false;
+        if (nodeOrModuleObj2 instanceof Module) {
+            Module module = (Module) nodeOrModuleObj2;
+            Node modularHeadNode = module.getNode();
+            PowerlinkObject obj = modularHeadNode.getObjectDictionary()
+                    .getObject(8066);
+            if (obj != null) {
+                String defaultVal = obj.getActualDefaultValue();
+                if (defaultVal != StringUtils.EMPTY) {
+                    canFirmwareAdded = isModuleFirmwareBitSet(defaultVal);
+                }
+                if (canFirmwareAdded) {
+                    PowerlinkObject identListObj = modularHeadNode
+                            .getObjectDictionary().getObject(4135);
+                    if (identListObj != null) {
+                        PowerlinkSubobject identListSubobj = identListObj
+                                .getSubObject((short) 01);
+                        if (identListSubobj != null) {
+                            String identListVal = identListSubobj
+                                    .getActualDefaultValue();
+                            if (identListVal.contains("0x")) {
+                                identListVal = identListVal.substring(2);
+                            }
+                            PowerlinkObject identObj = modularHeadNode
+                                    .getObjectDictionary().getObject(
+                                            Integer.parseInt(identListVal, 16));
+                            if (identObj != null) {
+                                PowerlinkObject dowmnloadChildObj = modularHeadNode
+                                        .getObjectDictionary().getObject(8021);
+                                if (dowmnloadChildObj != null) {
+                                    PowerlinkSubobject dowmnloadChildSubObj = dowmnloadChildObj
+                                            .getSubObject((short) 01);
+                                    if (dowmnloadChildSubObj != null) {
+                                        String downloadChildVal = dowmnloadChildSubObj
+                                                .getActualDefaultValue();
+                                        if (downloadChildVal.contains("0x")) {
+                                            downloadChildVal = downloadChildVal
+                                                    .substring(2);
+                                        }
+                                        PowerlinkObject childObj = modularHeadNode
+                                                .getObjectDictionary()
+                                                .getObject(Integer.parseInt(
+                                                        identListVal, 16));
+                                        if (childObj != null) {
+                                            return true;
+                                        }
+
+                                    } else {
+                                        return false;
+                                    }
+                                } else {
+                                    return false;
+                                }
+                            } else {
+                                return false;
+                            }
+
+                        } else {
+                            return false;
+                        }
+                    } else {
+                        return false;
+                    }
+                }
+
+            }
+        }
+        return false;
+    }
+
+    /**
      * Get error message on validating the module type while moving the modules.
      *
      * @param oldPosition The current position of the module to be moved.
@@ -897,6 +975,18 @@ public class Module {
         return node.getProject();
     }
 
+    private String getValueofModularBit(String reverse) {
+        String[] arrayString = reverse.split("");
+        int arrayCount = arrayString.length;
+        System.err.println("The array count .." + arrayCount);
+        System.err.println("The array String .." + reverse);
+        if (arrayCount <= 21) {
+            return "0";
+        }
+        return arrayString[21];
+
+    }
+
     /**
      * @return Vendor ID of the Module.
      */
@@ -1025,6 +1115,24 @@ public class Module {
             enabled = module.isEnabled();
         }
         return enabled;
+    }
+
+    private boolean isModuleFirmwareBitSet(String defaultVal) {
+        if (defaultVal.contains("0x")) {
+            defaultVal = defaultVal.substring(2);
+            String binValue = new BigInteger(defaultVal, 16).toString(2);
+            String reverse = new StringBuffer(binValue).reverse().toString();
+            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
+                return true;
+            }
+        } else {
+            String binValue = new BigInteger(defaultVal, 16).toString(2);
+            String reverse = new StringBuffer(binValue).reverse().toString();
+            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isObjectIdForced(long newObjectIndex) {
