@@ -167,10 +167,14 @@ public class NewNodeWizard extends Wizard {
                     }
 
                     for (FirmwareManager fw : firmwarelist.values()) {
-                        newNode.getNodeFirmwareCollection().put(fw,
-                                fw.getFirmwarefileVersion());
-                        fw.updateFirmwareInProjectFile(fw, newNode,
+
+                        FirmwareManager firmwareMngr = new FirmwareManager(
+                                newNode, fw.getFirmwareXddModel(),
                                 fw.getFirmwareObjModel());
+                        newNode.getNodeFirmwareCollection().put(firmwareMngr,
+                                firmwareMngr.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(firmwareMngr, newNode,
+                                firmwareMngr.getFirmwareObjModel());
                     }
 
                 }

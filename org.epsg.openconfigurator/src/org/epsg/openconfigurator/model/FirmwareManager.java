@@ -231,6 +231,10 @@ public class FirmwareManager {
         return firmwareObjModel;
     }
 
+    public org.epsg.openconfigurator.xmlbinding.firmware.Firmware getFirmwareXddModel() {
+        return firmwareXddModel;
+    }
+
     /**
      * @return Locked value of firmware manager
      */

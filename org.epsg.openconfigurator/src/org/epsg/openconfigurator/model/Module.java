@@ -201,7 +201,7 @@ public class Module {
 
     /**
      * Validates the firmware manager support to module
-     * 
+     *
      * @param nodeOrModuleObj2 Object instance of module
      * @return <code>true</code> if firmware can be added , <code>false</code>
      *         otherwise.
@@ -255,23 +255,77 @@ public class Module {
                                         }
 
                                     } else {
+                                        OpenConfiguratorMessageConsole
+                                                .getInstance()
+                                                .printErrorMessage(
+                                                        "The object '0x1F55/0x01' does not exists in the node '"
+                                                                + modularHeadNode
+                                                                        .getNodeIDWithName()
+                                                                + "'. ",
+                                                        node.getProject()
+                                                                .getName());
                                         return false;
                                     }
                                 } else {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage(
+                                                    "The object '0x1F55' does not exists in the node '"
+                                                            + modularHeadNode
+                                                                    .getNodeIDWithName()
+                                                            + "'. ",
+                                                    node.getProject()
+                                                            .getName());
                                     return false;
                                 }
                             } else {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(
+                                                "The object '0x" + identListVal
+                                                        + "' does not exists in the node '"
+                                                        + modularHeadNode
+                                                                .getNodeIDWithName()
+                                                        + "'. ",
+                                                node.getProject().getName());
                                 return false;
                             }
 
                         } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            "The sub-object '0x1027/0x01' does not exists in the node '"
+                                                    + modularHeadNode
+                                                            .getNodeIDWithName()
+                                                    + "'. ",
+                                            node.getProject().getName());
                             return false;
                         }
                     } else {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(
+                                        "The object '0x1027' does not exists in the node '"
+                                                + modularHeadNode
+                                                        .getNodeIDWithName()
+                                                + "'. ",
+                                        node.getProject().getName());
                         return false;
                     }
+                } else {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "The object '0x1F82' with value '"
+                                            + defaultVal
+                                            + "' does not support firmware update for the node '"
+                                            + modularHeadNode
+                                                    .getNodeIDWithName()
+                                            + "'. ",
+                                    node.getProject().getName());
                 }
 
+            } else {
+                OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                        "The object '0x1F82' does not exists in the node '"
+                                + modularHeadNode.getNodeIDWithName() + "'. ",
+                        node.getProject().getName());
             }
         }
         return false;
