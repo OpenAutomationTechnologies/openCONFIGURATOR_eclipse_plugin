@@ -1192,6 +1192,9 @@ public class Node {
         return StringUtils.EMPTY;
     }
 
+    /**
+     * @return The Hardware, Software or Firmware version values.
+     */
     public String getVersionValue(String versionType) {
         if (xddModel != null) {
             List<ISO15745Profile> profiles = xddModel.getISO15745Profile();

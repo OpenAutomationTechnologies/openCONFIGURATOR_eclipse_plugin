@@ -67,6 +67,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModula
 import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
+import org.epsg.openconfigurator.xmlbinding.xdd.TVersion;
 import org.jdom2.JDOMException;
 
 /**
@@ -824,6 +825,26 @@ public class Module {
     }
 
     /**
+     * @return The product Name of module.
+     */
+    public String getProductName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    return devProfile.getDeviceIdentity().getProductName()
+                            .getValue();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return Eclipse project associated with the module.
      */
     public IProject getProject() {
@@ -851,6 +872,25 @@ public class Module {
     }
 
     /**
+     * @return The vendor Name of module.
+     */
+    public String getVendorName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    return devProfile.getDeviceIdentity().getVendorName()
+                            .getValue();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return The vendor ID value of module from XDD/XDC.
      */
     public String getVenIdValue() {
@@ -859,6 +899,31 @@ public class Module {
             value = xddFirmwareFile.getModuleVendorID();
         }
         return value;
+    }
+
+    /**
+     * @return The Hardware, Software or Firmware version values.
+     */
+    public String getVersionValue(String versionType) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    for (TVersion ver : devProfile.getDeviceIdentity()
+                            .getVersion()) {
+                        if (ver.getVersionType()
+                                .equalsIgnoreCase(versionType)) {
+                            return ver.getValue();
+                        }
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
     }
 
     /**
