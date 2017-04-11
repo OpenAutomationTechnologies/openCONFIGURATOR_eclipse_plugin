@@ -120,6 +120,8 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
@@ -1852,8 +1854,6 @@ public class MappingView extends ViewPart {
                     displayMappingView(nodeObj);
 
                     // Set Overview page
-                    frmNewForm.setText("Node Overview" + " - "
-                            + nodeObj.getNodeIDWithName());
                     txt_no_tpdo.setText(tpdoChannelSize.getText());
                     txt_no_rpdo.setText(rpdoChannelSize.getText());
                     Object nodeModel = nodeObj.getNodeModel();
@@ -1862,6 +1862,7 @@ public class MappingView extends ViewPart {
 
                         txt_no_cyctime.setText(String
                                 .valueOf(nodeObj.getPresTimeoutvalue() / 1000));
+
                     } else {
                         lblPresTimeout.setText("Cycle Time (µs) :");
 
@@ -1869,12 +1870,43 @@ public class MappingView extends ViewPart {
                                 String.valueOf(nodeObj.getCycleTime()));
                     }
 
-                    // txt_no_foi.setText(nodeObj.getForcedObjectsString()
-                    // .substring(nodeObj.getForcedObjectsString()
-                    // .indexOf(';') + 1));
-                    // txt_no_fsoi.setText(nodeObj.getForcedObjectsString());
-                    // txt_no_venId.setText(nodeObj.getVendorIdValue());
-                    // txt_no_proId.setText(nodeObj.getProductCodeValue());
+                    txt_no_vendorname.setText(nodeObj.getVendorName());
+                    txt_no_vendorid.setText(nodeObj.getVendorIdValue());
+                    txt_no_productname.setText(nodeObj.getProductName());
+                    txt_no_productid.setText(nodeObj.getProductCodeValue());
+                    txt_no_hwversion.setText(nodeObj.getVersionValue("HW"));
+                    txt_no_swversion.setText(nodeObj.getVersionValue("SW"));
+                    txt_no_fwversion.setText(nodeObj.getVersionValue("FW"));
+
+                    lst_no_foi.removeAll();
+                    lst_no_fosi.removeAll();
+                    lst_no_foi.add(nodeObj.getForcedObjectsString().substring(
+                            nodeObj.getForcedObjectsString().indexOf(';') + 1));
+                    lst_no_fosi.add(nodeObj.getForcedObjectsString());
+
+                    txt_no_nodetype
+                            .setText(nodeObj.getPlkOperationMode().name());
+
+                    TGeneralFeatures genFeatures = nodeObj.getGeneralFeatures();
+                    txt_no_nmtbtna.setText(String
+                            .valueOf(genFeatures.getNMTBootTimeNotActive()));
+                    txt_no_nmtctmax.setText(
+                            String.valueOf(genFeatures.getNMTCycleTimeMax()));
+                    txt_no_nmtctmin.setText(
+                            String.valueOf(genFeatures.getNMTCycleTimeMin()));
+                    txt_no_nmtee.setText(
+                            String.valueOf(genFeatures.getNMTErrorEntries()));
+                    btn_no_ipsup.setSelection(genFeatures.isNWLIPSupport());
+                    btn_no_nmlipsup
+                            .setSelection(genFeatures.isNWLICMPSupport());
+
+                    TCNFeatures cnFeatures = nodeObj.getCnFeatures();
+                    btn_no_dllcnfm
+                            .setSelection(cnFeatures.isDLLCNFeatureMultiplex());
+                    btn_no_dllcnpresc
+                            .setSelection(cnFeatures.isDLLCNPResChaining());
+                    txt_no_nmtcs2pres.setText(
+                            String.valueOf(cnFeatures.getNMTCNSoC2PReq()));
 
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
@@ -2103,22 +2135,34 @@ public class MappingView extends ViewPart {
     private Text txt_no_rpdo;
     private Text txt_no_cyctime;
     private Label lblPresTimeout;
-    private Text txt_no_Id;
 
     private ScrolledForm frmNewForm;
-    private Text text;
-    private Text text_1;
-    private Text text_2;
-    private Text text_3;
-    private Text text_4;
-    private Text text_5;
-    private Text text_6;
-    private Text text_7;
-    private Text text_8;
-    private Text text_9;
-    private Text text_10;
-    private Text text_13;
-    private Text text_11;
+
+    private Text txt_no_vendorname;
+    private Text txt_no_productid;
+    private Text txt_no_vendorid;
+    private Text txt_no_productname;
+    private Text txt_no_hwversion;
+    private Text txt_no_swversion;
+    private Text txt_no_fwversion;
+
+    private Text txt_no_nmtbtna;
+    private Text txt_no_nmtctmax;
+    private Text txt_no_nmtctmin;
+    private Text txt_no_nmtee;
+    private Button btn_no_ipsup;
+    private Button btn_no_nmlipsup;
+
+    private Button btn_no_dllcnfm;
+    private Button btn_no_dllcnpresc;
+    private Text txt_no_nmtcs2pres;
+
+    private org.eclipse.swt.widgets.List lst_no_foi;
+    private org.eclipse.swt.widgets.List lst_no_fosi;
+    private Text txt_no_nodetype;
+
+    private Section sctnCnFeatures;
+    private Section sctnGeneralFeatures;
 
     public MappingView() {
         TObject emptyObj = new TObject();
@@ -2191,6 +2235,10 @@ public class MappingView extends ViewPart {
                     rpdoTblclmnActualValue.setWidth(140);
                     handlePdoTableResize(PdoType.RPDO,
                             showAdvancedview.isChecked());
+
+                    sctnCnFeatures.setVisible(true);
+                    sctnGeneralFeatures.setVisible(true);
+
                 } else {
                     tpdoSummaryClmnMappingVersion.setWidth(0);
                     tpdoSummaryClmnMappingVersion.setResizable(false);
@@ -2207,6 +2255,9 @@ public class MappingView extends ViewPart {
                     rpdoTblclmnActualValue.setResizable(false);
                     handlePdoTableResize(PdoType.RPDO,
                             showAdvancedview.isChecked());
+
+                    sctnCnFeatures.setVisible(false);
+                    sctnGeneralFeatures.setVisible(false);
                 }
             }
         };
@@ -2326,12 +2377,11 @@ public class MappingView extends ViewPart {
         lblNodeType_1.setForeground(SWTResourceManager.getColor(25, 76, 127));
         formToolkit.adapt(lblNodeType_1, true, true);
 
-        ComboViewer comboViewer = new ComboViewer(composite_6, SWT.READ_ONLY);
-        Combo combo_1 = comboViewer.getCombo();
-        combo_1.setVisibleItemCount(10);
-        combo_1.setLayoutData(
+        txt_no_nodetype = new Text(composite_6, SWT.BORDER);
+        txt_no_nodetype.setEnabled(false);
+        txt_no_nodetype.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-        formToolkit.paintBordersFor(combo_1);
+        formToolkit.adapt(txt_no_nodetype, true, true);
         new Label(composite_6, SWT.NONE);
         new Label(composite_6, SWT.NONE);
 
@@ -2429,14 +2479,13 @@ public class MappingView extends ViewPart {
         label_7.setText("                              ");
         formToolkit.adapt(label_7, true, true);
 
-        org.eclipse.swt.widgets.List list = new org.eclipse.swt.widgets.List(
-                composite_9, SWT.BORDER);
-        GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2,
-                1);
-        gd_list.heightHint = 66;
-        gd_list.widthHint = 230;
-        list.setLayoutData(gd_list);
-        formToolkit.adapt(list, true, true);
+        lst_no_foi = new org.eclipse.swt.widgets.List(composite_9, SWT.BORDER);
+        GridData gd_lst_no_foi = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 2, 1);
+        gd_lst_no_foi.heightHint = 66;
+        gd_lst_no_foi.widthHint = 230;
+        lst_no_foi.setLayoutData(gd_lst_no_foi);
+        formToolkit.adapt(lst_no_foi, true, true);
 
         Label lblForcedSubobjectIndex = new Label(composite_9, SWT.NONE);
         lblForcedSubobjectIndex.setLayoutData(
@@ -2445,14 +2494,13 @@ public class MappingView extends ViewPart {
         formToolkit.adapt(lblForcedSubobjectIndex, true, true);
         new Label(composite_9, SWT.NONE);
 
-        org.eclipse.swt.widgets.List list_1 = new org.eclipse.swt.widgets.List(
-                composite_9, SWT.BORDER);
-        GridData gd_list_1 = new GridData(SWT.LEFT, SWT.CENTER, false, false, 2,
-                1);
-        gd_list_1.heightHint = 73;
-        gd_list_1.widthHint = 231;
-        list_1.setLayoutData(gd_list_1);
-        formToolkit.adapt(list_1, true, true);
+        lst_no_fosi = new org.eclipse.swt.widgets.List(composite_9, SWT.BORDER);
+        GridData gd_lst_no_fosi = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 2, 1);
+        gd_lst_no_fosi.heightHint = 73;
+        gd_lst_no_fosi.widthHint = 231;
+        lst_no_fosi.setLayoutData(gd_lst_no_fosi);
+        formToolkit.adapt(lst_no_fosi, true, true);
 
         Section sctnAdvancedConfiguration = formToolkit.createSection(
                 frmNewForm.getBody(),
@@ -2475,79 +2523,79 @@ public class MappingView extends ViewPart {
         lblVendorName.setText("Vendor Name:");
         formToolkit.adapt(lblVendorName, true, true);
 
-        text = new Text(composite_10, SWT.BORDER);
-        text.setEnabled(false);
-        text.setLayoutData(
+        txt_no_vendorname = new Text(composite_10, SWT.BORDER);
+        txt_no_vendorname.setEnabled(false);
+        txt_no_vendorname.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text, true, true);
+        formToolkit.adapt(txt_no_vendorname, true, true);
 
         Label lblVendorId = new Label(composite_10, SWT.NONE);
         lblVendorId.setText("Vendor ID:");
         formToolkit.adapt(lblVendorId, true, true);
 
-        text_2 = new Text(composite_10, SWT.BORDER);
-        text_2.setEnabled(false);
-        text_2.setLayoutData(
+        txt_no_vendorid = new Text(composite_10, SWT.BORDER);
+        txt_no_vendorid.setEnabled(false);
+        txt_no_vendorid.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_2, true, true);
+        formToolkit.adapt(txt_no_vendorid, true, true);
 
         Label lblProductName = new Label(composite_10, SWT.NONE);
         lblProductName.setText("Product Name:");
         formToolkit.adapt(lblProductName, true, true);
 
-        text_3 = new Text(composite_10, SWT.BORDER);
-        text_3.setEnabled(false);
-        text_3.setLayoutData(
+        txt_no_productname = new Text(composite_10, SWT.BORDER);
+        txt_no_productname.setEnabled(false);
+        txt_no_productname.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_3, true, true);
+        formToolkit.adapt(txt_no_productname, true, true);
 
         Label lblProductId = new Label(composite_10, SWT.NONE);
         lblProductId.setText("Product ID:");
         formToolkit.adapt(lblProductId, true, true);
 
-        text_1 = new Text(composite_10, SWT.BORDER);
-        text_1.setEnabled(false);
-        text_1.setLayoutData(
+        txt_no_productid = new Text(composite_10, SWT.BORDER);
+        txt_no_productid.setEnabled(false);
+        txt_no_productid.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_1, true, true);
+        formToolkit.adapt(txt_no_productid, true, true);
 
         Label lblHardwareVersion = new Label(composite_10, SWT.NONE);
         lblHardwareVersion.setText("Hardware Version:");
         formToolkit.adapt(lblHardwareVersion, true, true);
 
-        text_4 = new Text(composite_10, SWT.BORDER);
-        text_4.setEnabled(false);
-        text_4.setLayoutData(
+        txt_no_hwversion = new Text(composite_10, SWT.BORDER);
+        txt_no_hwversion.setEnabled(false);
+        txt_no_hwversion.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_4, true, true);
+        formToolkit.adapt(txt_no_hwversion, true, true);
 
         Label lblSoftwareVersion = new Label(composite_10, SWT.NONE);
         lblSoftwareVersion.setText("Software Version:");
         formToolkit.adapt(lblSoftwareVersion, true, true);
 
-        text_5 = new Text(composite_10, SWT.BORDER);
-        text_5.setEnabled(false);
-        text_5.setLayoutData(
+        txt_no_swversion = new Text(composite_10, SWT.BORDER);
+        txt_no_swversion.setEnabled(false);
+        txt_no_swversion.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_5, true, true);
+        formToolkit.adapt(txt_no_swversion, true, true);
 
         Label lblFirmwareVersion = new Label(composite_10, SWT.NONE);
         lblFirmwareVersion.setText("Firmware Version:");
         formToolkit.adapt(lblFirmwareVersion, true, true);
 
-        text_6 = new Text(composite_10, SWT.BORDER);
-        text_6.setEnabled(false);
-        text_6.setLayoutData(
+        txt_no_fwversion = new Text(composite_10, SWT.BORDER);
+        txt_no_fwversion.setEnabled(false);
+        txt_no_fwversion.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_6, true, true);
+        formToolkit.adapt(txt_no_fwversion, true, true);
 
-        Section sctnGeneralFeatures = formToolkit.createSection(
-                frmNewForm.getBody(),
+        sctnGeneralFeatures = formToolkit.createSection(frmNewForm.getBody(),
                 ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
         sctnGeneralFeatures.setBounds(285, 156, 260, 174);
         formToolkit.paintBordersFor(sctnGeneralFeatures);
         sctnGeneralFeatures.setText("General Features");
         sctnGeneralFeatures.setExpanded(true);
+        sctnGeneralFeatures.setVisible(false);
 
         Composite composite_11 = new Composite(sctnGeneralFeatures, SWT.NONE);
         sctnGeneralFeatures.setClient(composite_11);
@@ -2561,53 +2609,53 @@ public class MappingView extends ViewPart {
                 .setForeground(SWTResourceManager.getColor(SWT.COLOR_BLACK));
         formToolkit.adapt(lblNmtboottimenotactives, true, true);
 
-        text_7 = new Text(composite_11, SWT.BORDER);
-        text_7.setEnabled(false);
-        text_7.setLayoutData(
+        txt_no_nmtbtna = new Text(composite_11, SWT.BORDER);
+        txt_no_nmtbtna.setEnabled(false);
+        txt_no_nmtbtna.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_7, true, true);
+        formToolkit.adapt(txt_no_nmtbtna, true, true);
 
         Label lblNmtcycletimemaxs = new Label(composite_11, SWT.NONE);
         lblNmtcycletimemaxs.setText("NMTCycleTimeMax (μs):");
         formToolkit.adapt(lblNmtcycletimemaxs, true, true);
 
-        text_8 = new Text(composite_11, SWT.BORDER);
-        text_8.setEnabled(false);
-        text_8.setLayoutData(
+        txt_no_nmtctmax = new Text(composite_11, SWT.BORDER);
+        txt_no_nmtctmax.setEnabled(false);
+        txt_no_nmtctmax.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_8, true, true);
+        formToolkit.adapt(txt_no_nmtctmax, true, true);
 
         Label lblNmtcycletimemins = new Label(composite_11, SWT.NONE);
         lblNmtcycletimemins.setText("NMTCycleTimeMin (μs):");
         formToolkit.adapt(lblNmtcycletimemins, true, true);
 
-        text_9 = new Text(composite_11, SWT.BORDER);
-        text_9.setEnabled(false);
-        text_9.setLayoutData(
+        txt_no_nmtctmin = new Text(composite_11, SWT.BORDER);
+        txt_no_nmtctmin.setEnabled(false);
+        txt_no_nmtctmin.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_9, true, true);
+        formToolkit.adapt(txt_no_nmtctmin, true, true);
 
         Label lblNmterrorentries = new Label(composite_11, SWT.NONE);
         lblNmterrorentries.setText("NMTErrorEntries (2-13):");
         formToolkit.adapt(lblNmterrorentries, true, true);
 
-        text_10 = new Text(composite_11, SWT.BORDER);
-        text_10.setEnabled(false);
-        text_10.setLayoutData(
+        txt_no_nmtee = new Text(composite_11, SWT.BORDER);
+        txt_no_nmtee.setEnabled(false);
+        txt_no_nmtee.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_10, true, true);
+        formToolkit.adapt(txt_no_nmtee, true, true);
 
-        Button btnCheckButton = new Button(composite_11, SWT.CHECK);
-        formToolkit.adapt(btnCheckButton, true, true);
-        btnCheckButton.setText("IP Support");
+        btn_no_ipsup = new Button(composite_11, SWT.CHECK);
+        formToolkit.adapt(btn_no_ipsup, true, true);
+        btn_no_ipsup.setText("IP Support");
         new Label(composite_11, SWT.NONE);
 
-        Button btnNmlIpSupport = new Button(composite_11, SWT.CHECK);
-        btnNmlIpSupport.setText("NML IP Support");
-        formToolkit.adapt(btnNmlIpSupport, true, true);
+        btn_no_nmlipsup = new Button(composite_11, SWT.CHECK);
+        btn_no_nmlipsup.setText("NML IP Support");
+        formToolkit.adapt(btn_no_nmlipsup, true, true);
         new Label(composite_11, SWT.NONE);
 
-        Section sctnCnFeatures = formToolkit.createSection(frmNewForm.getBody(),
+        sctnCnFeatures = formToolkit.createSection(frmNewForm.getBody(),
                 Section.DESCRIPTION | ExpandableComposite.TWISTIE
                         | ExpandableComposite.TITLE_BAR);
         sctnCnFeatures.setBounds(285, 336, 260, 114);
@@ -2615,6 +2663,7 @@ public class MappingView extends ViewPart {
         formToolkit.paintBordersFor(sctnCnFeatures);
         sctnCnFeatures.setText("CN Features");
         sctnCnFeatures.setExpanded(true);
+        sctnCnFeatures.setVisible(false);
 
         Composite composite_13 = new Composite(sctnCnFeatures, SWT.NONE);
         sctnCnFeatures.setClient(composite_13);
@@ -2622,31 +2671,31 @@ public class MappingView extends ViewPart {
         formToolkit.paintBordersFor(composite_13);
         composite_13.setLayout(new GridLayout(2, false));
 
-        Button btnDllcn = new Button(composite_13, SWT.CHECK);
-        GridData gd_btnDllcn = new GridData(SWT.LEFT, SWT.CENTER, false, false,
-                2, 1);
-        gd_btnDllcn.widthHint = 170;
-        btnDllcn.setLayoutData(gd_btnDllcn);
-        formToolkit.adapt(btnDllcn, true, true);
-        btnDllcn.setText("DLL CN Feature Multiplex");
-
-        Button btnDllCnPres = new Button(composite_13, SWT.CHECK);
-        GridData gd_btnDllCnPres = new GridData(SWT.LEFT, SWT.CENTER, false,
+        btn_no_dllcnfm = new Button(composite_13, SWT.CHECK);
+        GridData gd_btn_no_dllcnfm = new GridData(SWT.LEFT, SWT.CENTER, false,
                 false, 2, 1);
-        gd_btnDllCnPres.widthHint = 161;
-        btnDllCnPres.setLayoutData(gd_btnDllCnPres);
-        formToolkit.adapt(btnDllCnPres, true, true);
-        btnDllCnPres.setText("DLL CN PRes Chaining");
+        gd_btn_no_dllcnfm.widthHint = 170;
+        btn_no_dllcnfm.setLayoutData(gd_btn_no_dllcnfm);
+        formToolkit.adapt(btn_no_dllcnfm, true, true);
+        btn_no_dllcnfm.setText("DLL CN Feature Multiplex");
+
+        btn_no_dllcnpresc = new Button(composite_13, SWT.CHECK);
+        GridData gd_btn_no_dllcnpresc = new GridData(SWT.LEFT, SWT.CENTER,
+                false, false, 2, 1);
+        gd_btn_no_dllcnpresc.widthHint = 161;
+        btn_no_dllcnpresc.setLayoutData(gd_btn_no_dllcnpresc);
+        formToolkit.adapt(btn_no_dllcnpresc, true, true);
+        btn_no_dllcnpresc.setText("DLL CN PRes Chaining");
 
         Label lblNmtcnsocprecns = new Label(composite_13, SWT.NONE);
         formToolkit.adapt(lblNmtcnsocprecns, true, true);
         lblNmtcnsocprecns.setText("NMTCNSoC2PReq (ns):");
 
-        text_11 = new Text(composite_13, SWT.BORDER);
-        text_11.setEnabled(false);
-        text_11.setLayoutData(
+        txt_no_nmtcs2pres = new Text(composite_13, SWT.BORDER);
+        txt_no_nmtcs2pres.setEnabled(false);
+        txt_no_nmtcs2pres.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(text_11, true, true);
+        formToolkit.adapt(txt_no_nmtcs2pres, true, true);
 
         Composite composite_12 = new Composite(composite_1, SWT.NONE);
 

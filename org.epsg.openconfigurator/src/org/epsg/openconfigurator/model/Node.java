@@ -59,8 +59,17 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
+import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TVersion;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
 
@@ -595,6 +604,31 @@ public class Node {
     }
 
     /**
+     * @return The CN features.
+     */
+
+    public TCNFeatures getCnFeatures() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlink) {
+                    ProfileBodyCommunicationNetworkPowerlink devProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBody;
+                    return devProfile.getNetworkManagement().getCNFeatures();
+                }
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularHead devProfile = (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBody;
+                    return devProfile.getNetworkManagement().getCNFeatures();
+
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return The node ID.
      */
     public short getCnNodeId() {
@@ -660,6 +694,32 @@ public class Node {
             }
         }
         return objectText;
+    }
+
+    /**
+     * @return The general features.
+     */
+
+    public TGeneralFeatures getGeneralFeatures() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlink) {
+                    ProfileBodyCommunicationNetworkPowerlink devProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBody;
+                    return devProfile.getNetworkManagement()
+                            .getGeneralFeatures();
+                }
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularHead devProfile = (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBody;
+                    return devProfile.getNetworkManagement()
+                            .getGeneralFeatures();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -1000,6 +1060,32 @@ public class Node {
     }
 
     /**
+     * @return The product Name of node.
+     */
+    public String getProductName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
+                    return devProfile.getDeviceIdentity().getProductName()
+                            .getValue();
+                }
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
+                    return devProfile.getDeviceIdentity().getProductName()
+                            .getValue();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return Eclipse project associated with the node.
      */
     public IProject getProject() {
@@ -1079,6 +1165,64 @@ public class Node {
             System.err.println("Object Dictionary not available.");
         }
         return value;
+    }
+
+    /**
+     * @return The vendor Name of node.
+     */
+    public String getVendorName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
+                    return devProfile.getDeviceIdentity().getVendorName()
+                            .getValue();
+                }
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
+                    return devProfile.getDeviceIdentity().getVendorName()
+                            .getValue();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    public String getVersionValue(String versionType) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
+                    for (TVersion ver : devProfile.getDeviceIdentity()
+                            .getVersion()) {
+                        if (ver.getVersionType()
+                                .equalsIgnoreCase(versionType)) {
+                            return ver.getValue();
+                        }
+                    }
+                }
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
+                    for (TVersion ver : devProfile.getDeviceIdentity()
+                            .getVersion()) {
+                        if (ver.getVersionType()
+                                .equalsIgnoreCase(versionType)) {
+                            return ver.getValue();
+                        }
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
     }
 
     /**
