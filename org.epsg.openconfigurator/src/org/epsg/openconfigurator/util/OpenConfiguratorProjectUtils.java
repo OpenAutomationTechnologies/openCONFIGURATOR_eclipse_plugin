@@ -54,6 +54,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -203,6 +204,77 @@ public final class OpenConfiguratorProjectUtils {
         updateGeneratorInfo(node);
     }
 
+    public static boolean copyConfigurationFile(Node selectedNode, int nodeId,
+            Node newNode) throws IOException {
+        boolean isNodeConfigurationFileImport = false;
+        java.nio.file.Path nodeXdcFile = new File(
+                selectedNode.getAbsolutePathToXdc()).toPath();
+        java.nio.file.Path projectRootPath = selectedNode.getProject()
+                .getLocation().toFile().toPath();
+        String targetImportPath = StringUtils.EMPTY;
+        if (nodeXdcFile != null) {
+            if ((nodeXdcFile.getFileName() != null)) {
+                File configDirectory = new File(String.valueOf(projectRootPath
+                        .toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR));
+                if (!configDirectory.exists()) {
+                    System.err.println("The directory does not exists....");
+                    isNodeConfigurationFileImport = configDirectory.mkdir();
+                    if (isNodeConfigurationFileImport) {
+                        System.out.println("Directory created.");
+                    } else {
+                        System.err
+                                .println("Directory not created successfully.");
+                        return false;
+                    }
+                }
+
+                // Rename the XDD to XDC and copy the deviceImport MN XDD to
+                // deviceConfiguration dir
+                String extensionXdd = StringUtils.EMPTY;
+                if (nodeXdcFile != null) {
+                    if ((nodeXdcFile.getFileName() != null)) {
+                        extensionXdd = FilenameUtils.removeExtension(
+                                String.valueOf(nodeXdcFile.getFileName()));
+
+                        int indeXOfNodeId = extensionXdd.lastIndexOf("_");
+                        extensionXdd = extensionXdd.substring(0, indeXOfNodeId);
+                        System.err
+                                .println("The extension XDD,,," + extensionXdd);
+                        // Append node ID and the 'XDC' extension to the
+                        // configuration
+                        // file.
+                        extensionXdd += "_" + nodeId
+                                + IPowerlinkProjectSupport.XDC_EXTENSION;
+
+                        targetImportPath = String.valueOf(
+                                projectRootPath.toString() + IPath.SEPARATOR
+                                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                                        + IPath.SEPARATOR + extensionXdd);
+                        System.err.println(
+                                "Source path.." + nodeXdcFile.toString());
+                        System.err.println("Target path.." + targetImportPath);
+                        File targetFile = new File(targetImportPath);
+                        FileUtils.copyFile((nodeXdcFile.toFile()), targetFile);
+
+                        // Set the relative path to the CN object
+                        java.nio.file.Path pathRelative = projectRootPath
+                                .relativize(Paths.get(targetImportPath));
+
+                        String relativePath = pathRelative.toString();
+                        relativePath = relativePath.replace('\\', '/');
+
+                        newNode.setPathToXDC(relativePath);
+
+                    }
+
+                }
+            }
+        }
+        return isNodeConfigurationFileImport;
+
+    }
+
     /**
      * Copies the firmware files based on the latest version and hardware
      * variant of firmware
@@ -278,6 +350,41 @@ public final class OpenConfiguratorProjectUtils {
             }
 
         }
+
+    }
+
+    public static void copyModuleConfigurationFile(Module selectedModule,
+            Module newModule) throws IOException {
+        boolean isModuleConfigurationFileImport = false;
+        File srcDir = new File(selectedModule.getNode().getAbsolutePathToXdc());
+        java.nio.file.Path nodeXdcFile = new File(
+                selectedModule.getNode().getAbsolutePathToXdc()).toPath();
+        java.nio.file.Path projectRootPath = newModule.getProject()
+                .getLocation().toFile().toPath();
+        String targetImportPath = StringUtils.EMPTY;
+
+        String extensionXdd = StringUtils.EMPTY;
+        if (nodeXdcFile != null) {
+            if ((nodeXdcFile.getFileName() != null)) {
+                extensionXdd = FilenameUtils.removeExtension(
+                        String.valueOf(nodeXdcFile.getFileName()));
+            }
+        }
+
+        File srcDirectory = new File(
+                String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                        + IPath.SEPARATOR + extensionXdd));
+
+        String newDirectory = extensionXdd + "_"
+                + newModule.getNode().getCnNodeId();
+
+        File destDirectory = new File(
+                String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                        + IPath.SEPARATOR + newDirectory));
+
+        FileUtils.copyDirectory(srcDirectory, destDirectory);
 
     }
 
@@ -647,6 +754,7 @@ public final class OpenConfiguratorProjectUtils {
             throws IOException {
         java.nio.file.Path moduleImportFile = new File(
                 newModule.getModulePathToXdc()).toPath();
+        System.err.println("IOnitial module XDc path.." + moduleImportFile);
         java.nio.file.Path projectRootPath = newModule.getProject()
                 .getLocation().toFile().toPath();
 
@@ -673,6 +781,8 @@ public final class OpenConfiguratorProjectUtils {
                                 + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
                                 + IPath.SEPARATOR + nodeName + IPath.SEPARATOR
                                 + extensionXdd;
+                        System.err.println("Target Configuration path.."
+                                + targetConfigurationPath);
                         String targetDirectoryPath = projectRootPath.toString()
                                 + IPath.SEPARATOR
                                 + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR;

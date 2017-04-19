@@ -45,13 +45,20 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
+import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
@@ -59,6 +66,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObje
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
@@ -100,6 +108,15 @@ public class Node {
     private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
 
     public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
+
+    private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
+
+    private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
+
+    private static final String FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR = "Firmware file {0} for the module {1} does not exists in the project.\n Firmware file Path: {2} ";
+    private static final String INVALID_MODULE_XDC_ERROR = " The XDD/XDC file of module {0} is not available for the node {1}.";
+
+    private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
 
     /**
      * Returns the attribute name linked with the node assignment value.
@@ -274,11 +291,11 @@ public class Node {
      * Instance of Module management.
      */
     private final ModuleManagement moduleManagement;
-
     /**
      * Instance of DeviceModularinterface.
      */
     private final DeviceModularInterface moduleInterface;
+
     /**
      * Instance of head node interface.
      */
@@ -456,6 +473,136 @@ public class Node {
             // Updates the generator attributes in project file.
             OpenConfiguratorProjectUtils.updateGeneratorInfo(this);
         }
+    }
+
+    public void copyNode(int nodeId)
+            throws JDOMException, InterruptedException, IOException {
+        copyXdcFile(this, nodeId);
+    }
+
+    private void copyXdcFile(Node selectednode, int nodeId)
+            throws JDOMException, InterruptedException, IOException {
+        System.err.println("The node XDC path before.."
+                + selectednode.getAbsolutePathToXdc());
+
+        TCN cnModel = new TCN();
+        cnModel.setName(selectednode.getName());
+        cnModel.setNodeID(String.valueOf(nodeId));
+
+        Node newNode = new Node(rootNode, projectXml, cnModel, xddModel);
+        try {
+            OpenConfiguratorProjectUtils.copyConfigurationFile(selectednode,
+                    nodeId, newNode);
+
+        } catch (IOException e1) {
+
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    e1.getCause().getMessage(), getProject().getName());
+            e1.printStackTrace();
+        }
+
+        TNodeCollection nodeCollection = null;
+        Object nodeCollectionModel = rootNode.getMN().getNodeModel();
+        if (nodeCollectionModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration netConfig = (TNetworkConfiguration) nodeCollectionModel;
+            nodeCollection = netConfig.getNodeCollection();
+        }
+
+        if (getProfileBody(
+                xddModel) instanceof ProfileBodyDevicePowerlinkModularHead) {
+            Result res = OpenConfiguratorLibraryUtils
+                    .addModularHeadNode(newNode);
+            System.err.println("Modular CN...");
+            if (res.IsSuccessful()) {
+
+                try {
+                    rootNode.addNode(nodeCollection, newNode);
+
+                } catch (IOException | JDOMException e) {
+                    if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, e.getMessage(), "");
+                    } else if ((e.getCause() != null)
+                            && (e.getCause().getMessage() != null)
+                            && !e.getCause().getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                                newNode.getProject().getName());
+                    }
+                }
+                if (!selectednode.getInterface().getModuleCollection()
+                        .isEmpty()) {
+                    for (Module module : selectednode.getInterface()
+                            .getModuleCollection().values()) {
+                        updateModuleNode(module, newNode);
+                    }
+
+                }
+
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        res);
+
+                // Try removing the node.
+                // FIXME: do we need this?
+                res = OpenConfiguratorLibraryUtils.removeNode(newNode);
+                if (!res.IsSuccessful()) {
+                    if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                        // Show or print error message.
+                        System.err.println(
+                                "ERROR occured while removin the node. "
+                                        + OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(res));
+                    }
+                }
+            }
+
+        } else {
+            System.err.println("Normal CN...");
+            Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
+            if (res.IsSuccessful()) {
+
+                try {
+                    rootNode.addNode(nodeCollection, newNode);
+
+                } catch (IOException | JDOMException e) {
+                    if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, e.getMessage(), "");
+                    } else if ((e.getCause() != null)
+                            && (e.getCause().getMessage() != null)
+                            && !e.getCause().getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                                newNode.getProject().getName());
+                    }
+                }
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        res);
+
+                // Try removing the node.
+                // FIXME: do we need this?
+                res = OpenConfiguratorLibraryUtils.removeNode(newNode);
+                if (!res.IsSuccessful()) {
+                    if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                        // Show or print error message.
+                        System.err.println(
+                                "ERROR occured while removin the node. "
+                                        + OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(res));
+                    }
+                }
+            }
+        }
+        try {
+            getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
+        }
+
     }
 
     /**
@@ -1072,6 +1219,21 @@ public class Node {
             System.err.println("Object Dictionary not available.");
         }
         return value;
+    }
+
+    public ProfileBodyDataType getProfileBody(
+            ISO15745ProfileContainer xddModel) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBodyDatatype = profile
+                        .getProfileBody();
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    return profileBodyDatatype;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -2009,6 +2171,104 @@ public class Node {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+    }
+
+    private void updateModuleNode(Module selectedModule, Node newNode)
+            throws IOException {
+        Object moduleObject = selectedModule.getModelOfModule();
+        if (moduleObject instanceof InterfaceList.Interface.Module) {
+
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleObject;
+            if (newNode.getNodeModel() instanceof TCN) {
+                TCN cnModel = (TCN) newNode.getNodeModel();
+                InterfaceList itfc = cnModel.getInterfaceList();
+
+                if (itfc != null) {
+                    List<InterfaceList.Interface> itf = itfc.getInterface();
+                    for (org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface iit : itf) {
+                        iit.setId(newNode.getInterface().getInterfaceUId());
+                        iit.getModule().add(module);
+
+                    }
+                } else {
+                    InterfaceList itfcLIst = new InterfaceList();
+                    cnModel.setInterfaceList(itfcLIst);
+                    InterfaceList.Interface itfcs = new InterfaceList.Interface();
+                    itfcs.setId(newNode.getInterface().getInterfaceUId());
+                    cnModel.getInterfaceList().getInterface().add(itfcs);
+                    itfcs.getModule().add(module);
+
+                }
+
+            }
+
+        } else {
+            System.err.println("Invalid Module model");
+        }
+        HeadNodeInterface selectedNodeObj = newNode.getInterface();
+
+        Module newModule = new Module(rootNode,
+                selectedNodeObj.getNode().getProjectXml(), moduleObject,
+                selectedNodeObj.getNode(),
+                selectedModule.getISO15745ProfileContainer(), selectedNodeObj);
+
+        try {
+            OpenConfiguratorProjectUtils
+                    .copyModuleConfigurationFile(selectedModule, newModule);
+        } catch (IOException e1) {
+
+            e1.printStackTrace();
+        }
+
+        Result res = OpenConfiguratorLibraryUtils.addModule(newModule);
+        if (res.IsSuccessful()) {
+            selectedNodeObj.getModuleCollection()
+                    .put(Integer.valueOf(newModule.getPosition()), newModule);
+
+            selectedNodeObj.getAddressCollection()
+                    .put(Integer.valueOf(newModule.getAddress()), newModule);
+
+            selectedNodeObj.getModuleNameCollection()
+                    .put(newModule.getModuleName(), newModule);
+
+            System.err.println("Module collection values ... "
+                    + selectedNodeObj.getModuleCollection().values());
+
+            try {
+                OpenConfiguratorProjectUtils.addModuleNode(
+                        selectedNodeObj.getNode(), selectedNodeObj, newModule);
+            } catch (JDOMException | IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+        } else {
+            System.err.println("ERROR occured while adding the module. "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR, res);
+
+            // Try removing the node.
+            // FIXME: do we need this?
+            res = OpenConfiguratorLibraryUtils.removeModule(newModule);
+            if (!res.IsSuccessful()) {
+                if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                    // Show or print error message.
+                    System.err
+                            .println("ERROR occured while removin the module. "
+                                    + OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res));
+                }
+            }
+        }
+
+        try {
+            selectedNodeObj.getNode().getProject().refreshLocal(
+                    IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
         }
 
     }

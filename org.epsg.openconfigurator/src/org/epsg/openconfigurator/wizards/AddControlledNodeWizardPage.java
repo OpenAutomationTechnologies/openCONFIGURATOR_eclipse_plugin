@@ -322,6 +322,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
         });
     }
 
+    public String getCnNodeId() {
+        return nodeIdSpinner.getText();
+    }
+
     /**
      * @return Returns the next available CN node ID.
      */
@@ -681,6 +685,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
             System.err.println("Number format exception");
         }
         return retVal;
+    }
+
+    public void resetWizard() {
+        nodeTypeCombo.setEnabled(false);
     }
 
     private void updateCnModel() {

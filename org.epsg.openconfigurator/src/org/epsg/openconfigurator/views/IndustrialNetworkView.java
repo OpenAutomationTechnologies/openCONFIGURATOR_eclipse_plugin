@@ -113,6 +113,7 @@ import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.views.mapping.MappingView;
+import org.epsg.openconfigurator.wizards.CopyNodeWizard;
 import org.epsg.openconfigurator.wizards.NewFirmwareWizard;
 import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
@@ -879,6 +880,11 @@ public class IndustrialNetworkView extends ViewPart
     private Action addNewNode;
 
     /**
+     * Action to copy the node of POWERLINK project
+     */
+    private Action copyNode;
+
+    /**
      * IO mapping View
      */
     private Action showIoMapView;
@@ -1152,6 +1158,8 @@ public class IndustrialNetworkView extends ViewPart
                         manager.add(showPdoMapping);
                         manager.add(showObjectDictionary);
                         manager.add(showParameter);
+                        manager.add(new Separator());
+                        manager.add(copyNode);
                     }
                     manager.add(new Separator());
                     manager.add(deleteNode);
@@ -1928,6 +1936,67 @@ public class IndustrialNetworkView extends ViewPart
         disable.setToolTipText(ENABLE_ACTION_MESSAGE);
         disable.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
+
+        copyNode = new Action("Copy Node") {
+            @Override
+            public void run() {
+                super.run();
+
+                // String test1 = JOptionPane
+                // .showInputDialog("Enter the node ID: ");
+                //
+                // int nodeId = Integer.parseInt(test1);
+
+                ISelection nodeTreeSelection = viewer.getSelection();
+                if ((nodeTreeSelection != null)
+                        && (nodeTreeSelection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
+                    Object selectedObject = strucSelection.getFirstElement();
+                    if ((selectedObject instanceof Node)) {
+                        Node node = (Node) selectedObject;
+                        CopyNodeWizard copyNodeWizard = new CopyNodeWizard(
+                                rootNode, (Node) selectedObject);
+                        if (!copyNodeWizard.hasErrors()) {
+                            WizardDialog wd = new WizardDialog(
+                                    Display.getDefault().getActiveShell(),
+                                    copyNodeWizard);
+                            wd.setTitle(copyNodeWizard.getWindowTitle());
+                            wd.open();
+                        } else {
+                            showMessage(ADD_NEW_NODE_ERROR_MESSAGE);
+                        }
+
+                        try {
+                            node.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                        int nodeId = Integer
+                                .valueOf(copyNodeWizard.getNodeId());
+                        try {
+                            node.copyNode(nodeId);
+                        } catch (JDOMException | InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                    }
+                }
+
+            }
+        };
+        copyNode.setToolTipText("Copy Node");
+        copyNode.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.CN_ICON));
 
         showIoMapView = new Action(SHOW_IO_MAP_ACTION_MESSAGE) {
             @Override
