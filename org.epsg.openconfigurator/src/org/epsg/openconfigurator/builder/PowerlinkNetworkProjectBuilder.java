@@ -505,6 +505,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
     private List<FirmwareManager> fwList = new ArrayList<>();
 
+    private Map<String, List<FirmwareManager>> fwMapList = new HashMap<>();
+
     /*
      * (non-Javadoc)
      *
@@ -531,9 +533,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         return new IProject[0];
     }
 
-    private void buildFirmwareInfoFile(java.nio.file.Path targetPath)
-            throws CoreException {
-        updateFirmwareDevRevList();
+    private void buildFirmwareInfoFile(java.nio.file.Path targetPath,
+            IndustrialNetworkProjectEditor pjctEditor) throws CoreException {
+        updateFirmwareDevRevList(pjctEditor);
 
         try {
             copyFirmwareFile();
@@ -714,14 +716,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 }
             }
 
-            Node mnNode = rootnode.getMN();
-
-            BigInteger objectId = new BigInteger("1F80", 16);
-            PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
-                    .getObject(objectId.longValue());
-
-            updateMnObject(swVersionObj, isRmnAvailable, isFirmwareAvailable);
-
             System.out.println("Build Started: Project: " + networkId);
             // Displays Info message in console.
             displayInfoMessage(
@@ -758,6 +752,14 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 }
 
             });
+
+            Node mnNode = rootnode.getMN();
+
+            BigInteger objectId = new BigInteger("1F80", 16);
+            PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
+                    .getObject(objectId.longValue());
+
+            updateMnObject(swVersionObj, isRmnAvailable, isFirmwareAvailable);
             boolean buildCdcSuccess = buildConciseDeviceConfiguration(networkId,
                     targetPath, monitor);
             if (buildCdcSuccess) {
@@ -809,7 +811,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             System.out
                     .println("Build completed in " + totalTimeInSeconds + "s");
 
-            buildFirmwareInfoFile(targetPath);
+            buildFirmwareInfoFile(targetPath, pjtEditor);
+            fwList.clear();
+            System.err.println("The firmware list..." + fwList);
 
         }
 
@@ -820,13 +824,23 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         String outputFirmwareInfo = StringUtils.EMPTY;
         Charset charset = Charset.forName("UTF-8");
         if (!fwList.isEmpty()) {
+            System.err.println("Firmware list..." + fwList.size());
             java.nio.file.Path targetFilePath = outputpath
                     .resolve(FIRMWARE_INFO);
             for (FirmwareManager fwMngr : fwList) {
-                String nodeId = fwMngr.getNodeId();
-                if (Integer.parseInt(nodeId) <= MINIMUM_SINGLE_DIGIT_NODE_ID) {
+                String nodeIdString = fwMngr.getNodeId();
+                int hexadecNodeVal = Integer.valueOf(nodeIdString);
+
+                String nodeId = Integer.toHexString(hexadecNodeVal);
+                System.err.println(
+                        "The hexa decimal value of node id.." + nodeId);
+                if (Integer.parseInt(
+                        nodeIdString) <= MINIMUM_SINGLE_DIGIT_NODE_ID) {
                     nodeId = "0" + nodeId;
+                } else if (hexadecNodeVal < 15) {
+                    nodeId = "0" + nodeId.toUpperCase();
                 }
+
                 String newFirmwareFileName = fwMngr.getNewFirmwareFileName();
                 String targetFwPath = IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY
                         + IPath.SEPARATOR + newFirmwareFileName;
@@ -863,80 +877,74 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     /**
      * @return The status of firmware file generation.
      */
-    public void updateFirmwareDevRevList() {
-        List<IndustrialNetworkProjectEditor> projectEditors = getOpenProjectEditors();
+    public void updateFirmwareDevRevList(
+            IndustrialNetworkProjectEditor pjtEditor) {
         if (fwList != null) {
             fwList.clear();
         }
-        for (final IndustrialNetworkProjectEditor pjtEditor : projectEditors) {
-            ArrayList<Node> cnNodes = pjtEditor.getPowerlinkRootNode()
-                    .getCnNodeList();
+        ArrayList<Node> cnNodes = pjtEditor.getPowerlinkRootNode()
+                .getCnNodeList();
+        for (Node cnNode : cnNodes) {
+            Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+            Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
+            if (cnNode.getNodeFirmwareCollection() != null) {
+                for (FirmwareManager fwManager : cnNode
+                        .getNodeFirmwareCollection().keySet()) {
+                    nodeDevRevisionList.put(fwManager.getdevRevNumber(),
+                            fwManager);
 
-            for (Node cnNode : cnNodes) {
-                Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
-                Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
-                if (cnNode.getNodeFirmwareCollection() != null) {
-                    for (FirmwareManager fwManager : cnNode
-                            .getNodeFirmwareCollection().keySet()) {
-                        nodeDevRevisionList.put(fwManager.getdevRevNumber(),
+                    if (!nodeDevRevisionList.isEmpty()) {
+                        for (FirmwareManager fwMan : nodeDevRevisionList
+                                .values()) {
+                            if (fwMan.getNodeId().equalsIgnoreCase(
+                                    String.valueOf(cnNode.getCnNodeId()))) {
+                                if (fwMan.getFirmwarefileVersion() < fwManager
+                                        .getFirmwarefileVersion()) {
+                                    nodeDevRevisionList.put(
+                                            fwManager.getdevRevNumber(),
+                                            fwManager);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            } else {
+                System.err.println("Firmware list not available for node!");
+            }
+            if (cnNode.getInterface() != null) {
+                for (Module module : cnNode.getInterface().getModuleCollection()
+                        .values()) {
+                    for (FirmwareManager fwManager : module
+                            .getModuleFirmwareCollection().keySet()) {
+                        moduleDevRevisionList.put(fwManager.getdevRevNumber(),
                                 fwManager);
-
-                        if (!nodeDevRevisionList.isEmpty()) {
-                            for (FirmwareManager fwMan : nodeDevRevisionList
+                        if (!moduleDevRevisionList.isEmpty()) {
+                            for (FirmwareManager fwMan : moduleDevRevisionList
                                     .values()) {
-                                if (fwMan.getNodeId().equalsIgnoreCase(
-                                        String.valueOf(cnNode.getCnNodeId()))) {
+                                if (fwMan.getModule().getPosition() == module
+                                        .getPosition()) {
                                     if (fwMan
                                             .getFirmwarefileVersion() < fwManager
                                                     .getFirmwarefileVersion()) {
-                                        nodeDevRevisionList.put(
+                                        moduleDevRevisionList.put(
                                                 fwManager.getdevRevNumber(),
                                                 fwManager);
                                     }
                                 }
                             }
                         }
-
                     }
-                } else {
-                    System.err.println("Firmware list not available for node!");
+                    System.err.println("Module devi list.."
+                            + moduleDevRevisionList.values());
+                    fwList.addAll(moduleDevRevisionList.values());
                 }
-                if (cnNode.getInterface() != null) {
-                    for (Module module : cnNode.getInterface()
-                            .getModuleCollection().values()) {
-                        for (FirmwareManager fwManager : module
-                                .getModuleFirmwareCollection().keySet()) {
-                            moduleDevRevisionList.put(
-                                    fwManager.getdevRevNumber(), fwManager);
-                            if (!moduleDevRevisionList.isEmpty()) {
-                                for (FirmwareManager fwMan : moduleDevRevisionList
-                                        .values()) {
-                                    if (fwMan.getModule()
-                                            .getPosition() == module
-                                                    .getPosition()) {
-                                        if (fwMan
-                                                .getFirmwarefileVersion() < fwManager
-                                                        .getFirmwarefileVersion()) {
-                                            moduleDevRevisionList.put(
-                                                    fwManager.getdevRevNumber(),
-                                                    fwManager);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        System.err.println("Module devi list.."
-                                + moduleDevRevisionList.values());
-                        fwList.addAll(moduleDevRevisionList.values());
-                    }
-                }
-                if (fwList != null) {
-                    fwList.addAll(nodeDevRevisionList.values());
-                }
-
             }
-
+            if (fwList != null) {
+                fwList.addAll(nodeDevRevisionList.values());
+            }
         }
+
     }
 
     private void updateMnObject(PowerlinkObject swVersionObj,
