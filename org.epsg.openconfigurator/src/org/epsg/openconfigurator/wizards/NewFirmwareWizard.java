@@ -65,6 +65,14 @@ public class NewFirmwareWizard extends Wizard {
 
     private static final String WINDOW_TITLE = "POWERLINK firmware wizard";
 
+    private static Module getModule(Object obj) {
+        if (obj instanceof Module) {
+            Module module = (Module) obj;
+            return module;
+        }
+        return null;
+    }
+
     private static Node getNode(Object obj) {
         if (obj instanceof Node) {
             Node node = (Node) obj;
@@ -161,7 +169,7 @@ public class NewFirmwareWizard extends Wizard {
     public boolean performFinish() {
         Path firmwareFilePath = validateFirmwarePage
                 .getFirmwareConfigurationPath();
-        Charset charset = Charset.forName("UTF-8");
+
         Object objModel = getObjModel(nodeOrModuleObj);
         Path firmwareFileName = firmwareFilePath.getFileName();
         if (validateFmwareFileName(firmwareFilePath)) {
@@ -175,6 +183,74 @@ public class NewFirmwareWizard extends Wizard {
             return false;
         }
 
+        if (updateFirmwareFile(firmwareFilePath, objModel,
+                getNode(nodeOrModuleObj))) {
+            String nodeId = getNode(nodeOrModuleObj).getNodeIdString();
+            int modulePos = 0;
+            if (getModule(nodeOrModuleObj) != null) {
+                modulePos = getModule(nodeOrModuleObj).getPosition();
+            }
+            PowerlinkRootNode rootNode = getNode(nodeOrModuleObj)
+                    .getPowerlinkRootNode();
+            List<Node> cnNodeList = rootNode.getCnNodeList();
+            for (Node node : cnNodeList) {
+                List<String> nodeFirmwareFileNameList = new ArrayList<>();
+                if (!node.getNodeFirmwareCollection().isEmpty()) {
+                    nodeFirmwareFileNameList = node
+                            .getNodeFirmwareFileNameList();
+                }
+                Object nodeObj = node.getNodeModel();
+                System.err.println("The XDD check.."
+                        + validateFirmwarePage.checkWithXddAttributes(nodeObj));
+                if (!nodeId.equalsIgnoreCase(node.getNodeIdString())) {
+                    if (!validateFirmwarePage.checkWithXddAttributes(nodeObj)) {
+                        String newNodeFirmwareFileName = firmwareFilePath
+                                .getFileName().toString();
+                        if (!nodeFirmwareFileNameList
+                                .contains(newNodeFirmwareFileName)) {
+                            updateFirmwareFile(firmwareFilePath, nodeObj, node);
+                        }
+                    }
+                }
+                if (node.getInterface() != null) {
+                    if (!node.getInterface().getModuleCollection().isEmpty()) {
+                        for (Module module : node.getInterface()
+                                .getModuleCollection().values()) {
+                            List<String> firmwareFileNameList = new ArrayList<>();
+                            if (!module.getModuleFirmwareCollection()
+                                    .isEmpty()) {
+                                firmwareFileNameList = module
+                                        .getModuleFirmwareFileNameList();
+                            }
+                            int position = module.getPosition();
+                            Object moduleObj = module.getModelOfModule();
+                            if (position != modulePos) {
+                                if (!validateFirmwarePage
+                                        .checkWithXddAttributes(moduleObj)) {
+                                    if (module.canFirmwareAdded(moduleObj)) {
+                                        String newFirmwareFileName = firmwareFilePath
+                                                .getFileName().toString();
+                                        if (!firmwareFileNameList.contains(
+                                                newFirmwareFileName)) {
+                                            updateFirmwareFile(firmwareFilePath,
+                                                    nodeObj, module);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public boolean updateFirmwareFile(Path firmwareFilePath, Object objModel,
+            Object nodeOrModule) {
+        Charset charset = Charset.forName("UTF-8");
         Firmware firmware = new Firmware();
         if (objModel instanceof TCN) {
             TCN cn = (TCN) objModel;
@@ -203,15 +279,15 @@ public class NewFirmwareWizard extends Wizard {
         firmware.setURI(firmwareFilePath.toString());
 
         firmwareObj = firmware;
-        FirmwareManager firmwareMngr = new FirmwareManager(nodeOrModuleObj,
+        FirmwareManager firmwareMngr = new FirmwareManager(nodeOrModule,
                 validateFirmwarePage.getFirmwareModel(), firmwareObj);
 
         byte[] venId = String.valueOf(firmwareMngr.getVendorId())
                 .getBytes(charset);
         firmware.setVendorId(venId);
 
-        if (nodeOrModuleObj instanceof Node) {
-            Node cnNode = (Node) nodeOrModuleObj;
+        if (nodeOrModule instanceof Node) {
+            Node cnNode = (Node) nodeOrModule;
             cnNode.getNodeFirmwareCollection().put(firmwareMngr,
                     firmwareMngr.getFirmwarefileVersion());
             for (int version : cnNode.getNodeFirmwareCollection().values()) {
@@ -262,13 +338,13 @@ public class NewFirmwareWizard extends Wizard {
             System.err.println("The firmware file import is not successfull.");
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                     "File is out of sync with the file system.",
-                    getNode(nodeOrModuleObj).getProject().getName());
+                    getNode(objModel).getProject().getName());
             e.printStackTrace();
             return false;
         }
 
-        if (firmwareMngr.updateFirmwareInProjectFile(firmwareMngr,
-                nodeOrModuleObj, firmwareObj)) {
+        if (firmwareMngr.updateFirmwareInProjectFile(firmwareMngr, nodeOrModule,
+                firmwareObj)) {
             System.out.println(
                     "Firmware file successfully updated in project file.");
         } else {

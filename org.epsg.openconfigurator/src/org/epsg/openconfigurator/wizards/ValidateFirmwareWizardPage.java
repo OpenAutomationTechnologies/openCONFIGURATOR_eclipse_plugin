@@ -158,7 +158,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
     /**
      * Checks the firmware file header attributes against XDD values.
      */
-    private boolean checkWithXddAttributes() {
+    public boolean checkWithXddAttributes(Object nodeOrModuleObj) {
         try {
             // Get the attributes from firmware file header
             if (firmwareModel != null) {
@@ -291,7 +291,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
                 firmwareModel = XddMarshaller
                         .unmarshallFirmwareFile(firmwareFile);
                 // Check node attribute with XDD
-                if (!checkWithXddAttributes()) {
+                if (!checkWithXddAttributes(nodeOrModuleObj)) {
                     return false;
                 }
                 String validFileMssg = MessageFormat.format(VALID_FILE_MESSAGE,
