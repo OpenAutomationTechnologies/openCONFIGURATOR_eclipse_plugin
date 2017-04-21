@@ -41,6 +41,7 @@ import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -849,6 +850,20 @@ public class Node {
      */
     public Map<FirmwareManager, Integer> getNodeFirmwareCollection() {
         return nodeFirmwareCollection;
+    }
+
+    public List<String> getNodeFirmwareFileNameList() {
+        List<String> fwList = new ArrayList<>();
+
+        fwList.clear();
+
+        for (FirmwareManager fwManager : getNodeFirmwareCollection().keySet()) {
+            String filename = FilenameUtils
+                    .getName(fwManager.getFirmwareConfigPath());
+            fwList.add(filename);
+
+        }
+        return fwList;
     }
 
     /**
@@ -1902,7 +1917,7 @@ public class Node {
 
     /**
      * Provides the instance of processImage class
-     * 
+     *
      * @param processImage Instance of ProcessImage
      */
     public void setProcessImage(ProcessImage processImage) {

@@ -119,6 +119,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
+import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
@@ -1605,6 +1606,23 @@ public class MappingView extends ViewPart {
     private static Node nodeObj;
 
     /**
+     * Form size
+     */
+    private static final int FORM_BODY_MARGIN_TOP = 12;
+
+    private static final int FORM_BODY_MARGIN_BOTTOM = 12;
+
+    private static final int FORM_BODY_MARGIN_LEFT = 6;
+
+    private static final int FORM_BODY_MARGIN_RIGHT = 6;
+
+    private static final int FORM_BODY_HORIZONTAL_SPACING = 20;
+
+    private static final int FORM_BODY_VERTICAL_SPACING = 17;
+
+    private static final int FORM_BODY_NUMBER_OF_COLUMNS = 2;
+
+    /**
      * Resize table based on columns content width.
      *
      * @param tblViewer The viewer which holds the SWT table.
@@ -1731,7 +1749,6 @@ public class MappingView extends ViewPart {
             }
         }
     };
-
     /**
      * Selection listener to display up,down,clear action buttons to move or
      * clear TPDO objects or Sub-Objects
@@ -1772,7 +1789,6 @@ public class MappingView extends ViewPart {
             }
         }
     };
-
     /**
      * Selection listener to update the objects and sub-objects in the mapping
      * view.
@@ -1855,6 +1871,8 @@ public class MappingView extends ViewPart {
                     displayMappingView(nodeObj);
 
                     // Set Overview page
+                    // frmNewForm.setText("Node Overview" + " - "
+                    // + nodeObj.getNodeIDWithName());
                     txt_no_tpdo.setText(tpdoChannelSize.getText());
                     txt_no_rpdo.setText(rpdoChannelSize.getText());
                     Object nodeModel = nodeObj.getNodeModel();
@@ -2009,7 +2027,6 @@ public class MappingView extends ViewPart {
             }
         }
     };
-
     /**
      * Source workbench part.
      */
@@ -2023,13 +2040,11 @@ public class MappingView extends ViewPart {
      * TPDO page controls
      */
     private TabItem tbtmTpdo;
-
     private ComboViewer tpdoChannelComboViewer;
     private ComboViewer sndtoNodecomboviewer;
     private TableViewer tpdoTableViewer;
     private TableViewerColumn tpdoMappingObjectColumn;
     private TableViewerColumn tpdoActionsColumn;
-
     private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
     private Composite tpdoPageFooter;
     private Button btnTpdoChannelMapAvailableObjects;
@@ -2037,16 +2052,21 @@ public class MappingView extends ViewPart {
     private Text tpdoEnabledMappingEntriesText;
     private Text tpdoChannelSize;
     private TableEditor tpdoTableActionsEditor;
+
     private Composite tpdoActionsbuttonGroup;
     private Button tpdoActionsUpButton;
     private Button tpdoActionsDownButton;
+
     private TableColumn tpdoTblclmnActualValue;
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
+
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
     private ModifyListener tpdoEnabledMappingEntriesTextModifyListener;
 
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
+
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
+
     private SelectionListener tpdoActionsClearBtnSelectionListener;
 
     private SelectionListener tpdoActionsDownBtnSelectionListener;
@@ -2054,7 +2074,6 @@ public class MappingView extends ViewPart {
 
     private Button tpdoBtnCheckButton;
     public boolean tpdoProfileObjectSelection = false;
-
     private int tpdoEnabledEntriesCount;
 
     private int count = 0;
@@ -2063,62 +2082,60 @@ public class MappingView extends ViewPart {
      * RPDO page controls
      */
     private TabItem tbtmRpdo;
-
     private ComboViewer rpdoChannelComboViewer;
     private ComboViewer receiveFromNodecomboviewer;
-
     private TableViewer rpdoTableViewer;
     private TableViewerColumn rpdoMappingObjectColumn;
     private TableViewerColumn rpdoActionsColumn;
-
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
 
     private Composite rpdoPageFooter;
+
     private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
+
     private Text rpdoEnabledMappingEntriesText;
+
     private Text rpdoChannelSize;
+
     private TableEditor rpdoTableActionsEditor;
+
     private Composite rpdoActionsbuttonGroup;
 
     private Button rpdoActionsUpButton;
-
     private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
-
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
 
     private ISelectionChangedListener rpdoNodeComboSelectionChangeListener;
-
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
 
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
 
     private SelectionListener rpdoClearAllMappingBtnSelectionListener;
+
     private SelectionListener rpdoActionsClearBtnSelectionListener;
+
     private SelectionListener rpdoActionsDownBtnSelectionListener;
     private SelectionListener rpdoActionsUpBtnSelectionListener;
-
     private Button rpdoBtnCheckButton;
+
     public boolean rpdoProfileObjectSelection = false;
-
     private int rpdoEnabledEntriesCount;
-
     /**
      * Common GUI controls
      */
     private Action showAdvancedview;
 
     private final Image clearImage;
-
     private final Image upArrowImage;
+
     private final Image downArrowImage;
     private final Image warningImage;
-
     private final Image errorImage;
     private final Image signedYesImage;
-    private final Image signedDisableImage;
 
+    private final Image signedDisableImage;
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
     /**
@@ -2130,17 +2147,17 @@ public class MappingView extends ViewPart {
     private TableColumn tpdoSummaryClmnMappingVersion;
     private boolean tpdoSummaryOnlyShowChannelsWithData = false;
     private TableViewer rpdoSummaryTableViewer;
-
     private TableColumn rpdoSummaryClmnMappingVersion;
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
     /**
      * Common application model data
      */
     private final Node emptyNode;
-
     private final Node selfReceiptNode;
     private final PowerlinkObject emptyObject;
+
     private final ArrayList<Node> targetNodeIdList = new ArrayList<>();
+
     /**
      * VerifyListener to update the number of available Mapping object entries
      */
@@ -2188,7 +2205,6 @@ public class MappingView extends ViewPart {
     private Text txt_no_rpdo;
     private Text txt_no_cyctime;
     private Label lblPresTimeout;
-
     private ScrolledForm frmNewForm;
 
     private Text txt_no_vendorname;
@@ -2485,9 +2501,7 @@ public class MappingView extends ViewPart {
 
         Label label_1 = new Label(composite_6, SWT.NONE);
         formToolkit.adapt(label_1, true, true);
-
-        Label lblNodeType = formToolkit.createLabel(composite_6, "Node Type : ",
-                SWT.NONE);
+        new Label(composite_6, SWT.NONE);
         new Label(composite_6, SWT.NONE);
         new Label(composite_6, SWT.NONE);
         new Label(composite_6, SWT.NONE);
@@ -2501,6 +2515,7 @@ public class MappingView extends ViewPart {
 
         Label label_2 = new Label(composite_6, SWT.NONE);
         formToolkit.adapt(label_2, true, true);
+        new Label(composite_6, SWT.NONE);
         new Label(composite_6, SWT.NONE);
 
         Section sctnNetworkConfiguration = formToolkit.createSection(
@@ -2523,7 +2538,7 @@ public class MappingView extends ViewPart {
         formToolkit.adapt(lblForcedObjectIndex, true, true);
 
         Label label_7 = new Label(composite_9, SWT.NONE);
-        label_7.setText("                              ");
+        label_7.setText(" ");
         formToolkit.adapt(label_7, true, true);
 
         lst_no_foi = new org.eclipse.swt.widgets.List(composite_9, SWT.BORDER);
@@ -2556,6 +2571,9 @@ public class MappingView extends ViewPart {
         formToolkit.paintBordersFor(sctnAdvancedConfiguration);
         sctnAdvancedConfiguration.setText("Vendor / Product Information");
         sctnAdvancedConfiguration.setExpanded(true);
+        sctnAdvancedConfiguration.setLayoutData(
+                new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+        sctnAdvancedConfiguration.setRedraw(true);
 
         Composite composite_10 = new Composite(sctnAdvancedConfiguration,
                 SWT.NONE);
@@ -2636,6 +2654,7 @@ public class MappingView extends ViewPart {
 
         sctnGeneralFeatures = formToolkit.createSection(frmNewForm.getBody(),
                 ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+
         sctnGeneralFeatures.setBounds(285, 156, 260, 174);
         formToolkit.paintBordersFor(sctnGeneralFeatures);
         sctnGeneralFeatures.setText("General Features");
@@ -2645,7 +2664,7 @@ public class MappingView extends ViewPart {
         Composite composite_11 = new Composite(sctnGeneralFeatures, SWT.NONE);
         sctnGeneralFeatures.setClient(composite_11);
         formToolkit.adapt(composite_11);
-        formToolkit.paintBordersFor(composite_11);
+        formToolkit.paintBordersFor(sctnGeneralFeatures);
         composite_11.setLayout(new GridLayout(2, false));
 
         Label lblNmtboottimenotactives = new Label(composite_11, SWT.NONE);
@@ -2704,6 +2723,10 @@ public class MappingView extends ViewPart {
                 Section.DESCRIPTION | ExpandableComposite.TWISTIE
                         | ExpandableComposite.TITLE_BAR);
         sctnCnFeatures.setBounds(285, 336, 260, 114);
+        GridData gd_sctnCnFeatures = new GridData(SWT.FILL, SWT.FILL, true,
+                true, 1, 1);
+        gd_sctnCnFeatures.widthHint = 341;
+        sctnGeneralFeatures.setLayoutData(gd_sctnCnFeatures);
         sctnCnFeatures.setRedraw(true);
         formToolkit.paintBordersFor(sctnCnFeatures);
         sctnCnFeatures.setText("CN Features");
@@ -2713,7 +2736,7 @@ public class MappingView extends ViewPart {
         Composite composite_13 = new Composite(sctnCnFeatures, SWT.NONE);
         sctnCnFeatures.setClient(composite_13);
         formToolkit.adapt(composite_13);
-        formToolkit.paintBordersFor(composite_13);
+        formToolkit.paintBordersFor(sctnCnFeatures);
         composite_13.setLayout(new GridLayout(2, false));
 
         btn_no_dllcnfm = new Button(composite_13, SWT.CHECK);

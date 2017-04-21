@@ -43,6 +43,7 @@ import java.util.TreeSet;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -481,6 +482,33 @@ public class Module {
         return configurationError;
     }
 
+    public String getForcedObjectsString() {
+        String objectText = StringUtils.EMPTY;
+        ForcedObjects forcedObjTag = null;
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module net = (InterfaceList.Interface.Module) moduleModel;
+            forcedObjTag = net.getForcedObjects();
+        }
+
+        if (forcedObjTag != null) {
+            List<org.epsg.openconfigurator.xmlbinding.projectfile.Object> forcedObjList = forcedObjTag
+                    .getObject();
+            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object obj : forcedObjList) {
+                objectText = objectText.concat("0x");
+
+                objectText = objectText.concat(
+                        DatatypeConverter.printHexBinary(obj.getIndex()));
+                if (obj.getSubindex() != null) {
+                    objectText = objectText.concat("/0x");
+                    objectText = objectText.concat(DatatypeConverter
+                            .printHexBinary(obj.getSubindex()));
+                }
+                objectText = objectText.concat(";");
+            }
+        }
+        return objectText;
+    }
+
     /**
      * @return The Xpath of interface list in poroject file.
      */
@@ -620,6 +648,24 @@ public class Module {
 
         fwList.addAll(moduleDevRevisionList.values());
 
+        return fwList;
+    }
+
+    /**
+     * @return The valid firmware file name for module from the project file.
+     */
+    public List<String> getModuleFirmwareFileNameList() {
+        List<String> fwList = new ArrayList<>();
+
+        fwList.clear();
+
+        for (FirmwareManager fwManager : getModuleFirmwareCollection()
+                .keySet()) {
+            String filename = FilenameUtils
+                    .getName(fwManager.getFirmwareConfigPath());
+            fwList.add(filename);
+
+        }
         return fwList;
     }
 
