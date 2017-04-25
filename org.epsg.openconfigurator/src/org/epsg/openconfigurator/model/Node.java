@@ -414,6 +414,119 @@ public class Node {
 
     }
 
+    private boolean addAvailableFirmware(Module newModule) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
+        if (rootNode != null) {
+            if (!rootNode.getModuleList().isEmpty()) {
+                for (Module module : rootNode.getModuleList()) {
+                    if (module.getVenIdValue()
+                            .equalsIgnoreCase(newModule.getVenIdValue())) {
+                        if (module.getProductId()
+                                .equalsIgnoreCase(newModule.getProductId())) {
+                            if (!module.getModuleFirmwareFileList().isEmpty()) {
+                                for (FirmwareManager fwMngr : module
+                                        .getModuleFirmwareFileList()) {
+                                    validFwList.add(fwMngr);
+                                }
+                            }
+                        }
+                    }
+
+                }
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Module '"
+                                    + newModule.getModuleName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+                        newModule.getModuleFirmwareCollection().put(fw,
+                                fw.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(fw, newModule,
+                                fw.getFirmwareObjModel());
+                    }
+
+                }
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean addNodeFirmwareFile(Node newNode) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
+        if (rootNode != null) {
+            if (!rootNode.getCnNodeList().isEmpty()) {
+                for (Node cnNode : rootNode.getCnNodeList()) {
+                    if (cnNode.getVendorIdValue()
+                            .equalsIgnoreCase(newNode.getVendorIdValue())) {
+                        if (cnNode.getProductCodeValue().equalsIgnoreCase(
+                                newNode.getProductCodeValue())) {
+                            if (!cnNode.getValidFirmwareList().isEmpty()) {
+
+                                System.err.println(
+                                        "The firmware collection values.."
+                                                + cnNode.getValidFirmwareList());
+                                for (FirmwareManager fwMngr : cnNode
+                                        .getValidFirmwareList()) {
+                                    validFwList.add(fwMngr);
+
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Node '"
+                                    + newNode.getNodeIDWithName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+
+                        FirmwareManager firmwareMngr = new FirmwareManager(
+                                newNode, fw.getFirmwareXddModel(),
+                                fw.getFirmwareObjModel());
+                        newNode.getNodeFirmwareCollection().put(firmwareMngr,
+                                firmwareMngr.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(firmwareMngr, newNode,
+                                firmwareMngr.getFirmwareObjModel());
+                    }
+
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void addStationTypeofNode(int stationTypeChanged)
             throws JDOMException, IOException {
         Result res = new Result();
@@ -475,18 +588,19 @@ public class Node {
         }
     }
 
-    public void copyNode(int nodeId)
+    public void copyNode(int nodeId, int stationType, String name)
             throws JDOMException, InterruptedException, IOException {
-        copyXdcFile(this, nodeId);
+        copyXdcFile(this, nodeId, stationType, name);
     }
 
-    private void copyXdcFile(Node selectednode, int nodeId)
+    private void copyXdcFile(Node selectednode, int nodeId, int stationType,
+            String name)
             throws JDOMException, InterruptedException, IOException {
         System.err.println("The node XDC path before.."
                 + selectednode.getAbsolutePathToXdc());
 
         TCN cnModel = new TCN();
-        cnModel.setName(selectednode.getName());
+        cnModel.setName(name);
         cnModel.setNodeID(String.valueOf(nodeId));
 
         Node newNode = new Node(rootNode, projectXml, cnModel, xddModel);
@@ -595,6 +709,19 @@ public class Node {
                 }
             }
         }
+
+        try {
+
+            newNode.addStationTypeofNode(stationType);
+
+        } catch (JDOMException | IOException e) {
+            e.printStackTrace();
+        }
+
+        if (addNodeFirmwareFile(newNode)) {
+            System.out.println("Firmware File added.");
+        }
+
         try {
             getProject().refreshLocal(IResource.DEPTH_INFINITE,
                     new NullProgressMonitor());
@@ -1221,21 +1348,6 @@ public class Node {
         return value;
     }
 
-    public ProfileBodyDataType getProfileBody(
-            ISO15745ProfileContainer xddModel) {
-        if (xddModel != null) {
-            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
-            for (ISO15745Profile profile : profiles) {
-                ProfileBodyDataType profileBodyDatatype = profile
-                        .getProfileBody();
-                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
-                    return profileBodyDatatype;
-                }
-            }
-        }
-        return null;
-    }
-
     /**
      * @return The product Name of node.
      */
@@ -1260,6 +1372,21 @@ public class Node {
         }
 
         return StringUtils.EMPTY;
+    }
+
+    public ProfileBodyDataType getProfileBody(
+            ISO15745ProfileContainer xddModel) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBodyDatatype = profile
+                        .getProfileBody();
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    return profileBodyDatatype;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -2260,6 +2387,13 @@ public class Node {
                                     + OpenConfiguratorLibraryUtils
                                             .getErrorMessage(res));
                 }
+            }
+        }
+
+        if (newModule.canFirmwareAdded(newModule)) {
+            if (addAvailableFirmware(newModule)) {
+                System.out.println(
+                        "Firmware file for module added successfully.");
             }
         }
 

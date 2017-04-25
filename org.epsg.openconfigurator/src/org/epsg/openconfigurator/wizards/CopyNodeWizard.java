@@ -158,6 +158,16 @@ public class CopyNodeWizard extends Wizard {
         return nodeId;
     }
 
+    public String getNodeName() {
+        String nodeName = StringUtils.EMPTY;
+        Object nodeModel = addNodePage.getNode();
+        if (nodeModel instanceof TCN) {
+            TCN cn = (TCN) nodeModel;
+            nodeName = cn.getName();
+        }
+        return nodeName;
+    }
+
     public ProfileBodyDataType getProfileBody(
             ISO15745ProfileContainer xddModel) {
         if (xddModel != null) {
@@ -171,6 +181,10 @@ public class CopyNodeWizard extends Wizard {
             }
         }
         return null;
+    }
+
+    public String getStationTypeChanged() {
+        return addNodePage.getStationType();
     }
 
     private boolean handleStationTypeChanged(int selectionIndex, Node cnNode) {

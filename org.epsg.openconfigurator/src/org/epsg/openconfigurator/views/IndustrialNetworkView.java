@@ -967,6 +967,8 @@ public class IndustrialNetworkView extends ViewPart
         }
     };
 
+    private Node nodeToBeCopied = null;
+
     /**
      * Keyboard bindings.
      */
@@ -984,8 +986,73 @@ public class IndustrialNetworkView extends ViewPart
                 }
             } else if (e.keyCode == SWT.F5) {
                 handleRefresh();
+            } else if (((e.stateMask & SWT.CTRL) == SWT.CTRL)
+                    && (e.keyCode == 'c')) {
+                IStructuredSelection selection = (IStructuredSelection) viewer
+                        .getSelection();
+                Object selectedObject = selection.getFirstElement();
+                if (selectedObject instanceof Node) {
+                    Node node = (Node) selectedObject;
+                    int nodeId = Integer.valueOf(node.getNodeIdString());
+                    if (nodeId <= 240) {
+                        nodeToBeCopied = node;
+                    } else {
+                        nodeToBeCopied = null;
+                    }
+                } else if (selectedObject instanceof Module) {
+                    nodeToBeCopied = null;
+                } else if (selectedObject instanceof HeadNodeInterface) {
+                    nodeToBeCopied = null;
+                }
+            } else if (((e.stateMask & SWT.CTRL) == SWT.CTRL)
+                    && (e.keyCode == 'v')) {
+                if (nodeToBeCopied == null) {
+                    return;
+                }
+                CopyNodeWizard copyNodeWizard = new CopyNodeWizard(rootNode,
+                        nodeToBeCopied);
+                if (!copyNodeWizard.hasErrors()) {
+                    WizardDialog wd = new WizardDialog(
+                            Display.getDefault().getActiveShell(),
+                            copyNodeWizard);
+                    wd.setTitle(copyNodeWizard.getWindowTitle());
+                    wd.open();
+                } else {
+                    showMessage(ADD_NEW_NODE_ERROR_MESSAGE);
+                }
+
+                try {
+                    nodeToBeCopied.getProject().refreshLocal(
+                            IResource.DEPTH_INFINITE,
+                            new NullProgressMonitor());
+                } catch (CoreException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                }
+
+                handleRefresh();
+                int nodeId = Integer.valueOf(copyNodeWizard.getNodeId());
+                String name = copyNodeWizard.getNodeName();
+                // String staionType = copyNodeWizard
+                // .getStationTypeChanged();
+                int stationTypeChanged = 0;
+                try {
+                    nodeToBeCopied.copyNode(nodeId, stationTypeChanged, name);
+
+                } catch (JDOMException | InterruptedException exce) {
+                    // TODO Auto-generated catch block
+                    exce.printStackTrace();
+                } catch (IOException exc) {
+                    // TODO Auto-generated catch block
+                    exc.printStackTrace();
+                }
+
+                handleRefresh();
+
             }
+
         }
+
     };
 
     private LinkWithEditorPartListener linkWithEditorPartListener = new LinkWithEditorPartListener(
@@ -1978,8 +2045,14 @@ public class IndustrialNetworkView extends ViewPart
                         handleRefresh();
                         int nodeId = Integer
                                 .valueOf(copyNodeWizard.getNodeId());
+
+                        String name = copyNodeWizard.getNodeName();
+                        // String staionType = copyNodeWizard
+                        // .getStationTypeChanged();
+                        int stationTypeChanged = 0;
                         try {
-                            node.copyNode(nodeId);
+                            node.copyNode(nodeId, stationTypeChanged, name);
+
                         } catch (JDOMException | InterruptedException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();

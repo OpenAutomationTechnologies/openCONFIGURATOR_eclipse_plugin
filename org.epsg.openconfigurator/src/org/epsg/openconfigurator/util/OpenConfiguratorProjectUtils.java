@@ -359,6 +359,9 @@ public final class OpenConfiguratorProjectUtils {
         File srcDir = new File(selectedModule.getNode().getAbsolutePathToXdc());
         java.nio.file.Path nodeXdcFile = new File(
                 selectedModule.getNode().getAbsolutePathToXdc()).toPath();
+        java.nio.file.Path moduleXdcFile = new File(
+                selectedModule.getAbsolutePathToXdc()).toPath();
+        String moduleXdcFileName = moduleXdcFile.getFileName().toString();
         java.nio.file.Path projectRootPath = newModule.getProject()
                 .getLocation().toFile().toPath();
         String targetImportPath = StringUtils.EMPTY;
@@ -376,6 +379,9 @@ public final class OpenConfiguratorProjectUtils {
                         + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
                         + IPath.SEPARATOR + extensionXdd));
 
+        int lastIndex = extensionXdd.lastIndexOf("_");
+        extensionXdd = extensionXdd.substring(1, lastIndex);
+
         String newDirectory = extensionXdd + "_"
                 + newModule.getNode().getCnNodeId();
 
@@ -385,6 +391,20 @@ public final class OpenConfiguratorProjectUtils {
                         + IPath.SEPARATOR + newDirectory));
 
         FileUtils.copyDirectory(srcDirectory, destDirectory);
+
+        String targetConfigurationPath = String
+                .valueOf(projectRootPath.toString()) + IPath.SEPARATOR
+                + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR
+                + IPath.SEPARATOR + newDirectory + IPath.SEPARATOR
+                + moduleXdcFileName;
+
+        java.nio.file.Path pathRelative = projectRootPath
+                .relativize(Paths.get(targetConfigurationPath));
+        System.err.println("Target pathmmm.." + targetConfigurationPath);
+        String relativePath = pathRelative.toString();
+        relativePath = relativePath.replace('\\', '/');
+
+        newModule.setPathToXDC(relativePath);
 
     }
 
