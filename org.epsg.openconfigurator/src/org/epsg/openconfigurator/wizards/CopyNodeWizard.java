@@ -1,6 +1,36 @@
+/*******************************************************************************
+ * @file   CopyNodeWizard.java
+ *
+ * @author Sree hari Vignesh, Kalycito Infotech Private Limited.
+ *
+ * @copyright (c) 2017, Kalycito Infotech Private Limited
+ *                    All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions are met:
+ *   * Redistributions of source code must retain the above copyright
+ *     notice, this list of conditions and the following disclaimer.
+ *   * Redistributions in binary form must reproduce the above copyright
+ *     notice, this list of conditions and the following disclaimer in the
+ *     documentation and/or other materials provided with the distribution.
+ *   * Neither the name of the copyright holders nor the
+ *     names of its contributors may be used to endorse or promote products
+ *     derived from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+ * DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *******************************************************************************/
+
 package org.epsg.openconfigurator.wizards;
 
-import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +42,6 @@ import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
-import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
@@ -21,6 +50,12 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 
+/**
+ * Wizard dialog to copy the POWERLINK controlled node
+ *
+ * @author Sree hari
+ *
+ */
 public class CopyNodeWizard extends Wizard {
     private static final String WINDOW_TITLE = "POWERLINK node wizard";
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
@@ -35,6 +70,8 @@ public class CopyNodeWizard extends Wizard {
      */
     private final AddControlledNodeWizardPage addNodePage;
 
+    private String stationType;
+
     /**
      * Selected node object. The new node will be added below this node.
      */
@@ -42,6 +79,13 @@ public class CopyNodeWizard extends Wizard {
     private PowerlinkRootNode nodeList;
     private TNodeCollection nodeCollectionModel;
 
+    /**
+     * Constructor to initialize the node model with respect to the selected
+     * node object
+     *
+     * @param nodeList Instance of POWERLINK root node
+     * @param selectedNodeObj The node object to be copied
+     */
     public CopyNodeWizard(PowerlinkRootNode nodeList, Node selectedNodeObj) {
         if (selectedNodeObj == null) {
             System.err.println("Invalid node selection");
@@ -67,6 +111,8 @@ public class CopyNodeWizard extends Wizard {
         // addNodePage.resetWizard();
     }
 
+    // Adds firmware to the node based on the valid firmware files available in
+    // the project
     private boolean addNodeFirmwareFile(Node newNode) {
         List<FirmwareManager> validFwList = new ArrayList<>();
         if (nodeList != null) {
@@ -148,6 +194,9 @@ public class CopyNodeWizard extends Wizard {
 
     }
 
+    /**
+     * @return The value of node ID entered in the wizard page
+     */
     public String getNodeId() {
         String nodeId = StringUtils.EMPTY;
         Object nodeModel = addNodePage.getNode();
@@ -158,6 +207,9 @@ public class CopyNodeWizard extends Wizard {
         return nodeId;
     }
 
+    /**
+     * @return The name of the node entered in the wizard page
+     */
     public String getNodeName() {
         String nodeName = StringUtils.EMPTY;
         Object nodeModel = addNodePage.getNode();
@@ -168,6 +220,12 @@ public class CopyNodeWizard extends Wizard {
         return nodeName;
     }
 
+    /**
+     * Gets the XDD profile based on the ISO15745ProfileContainer
+     *
+     * @param xddModel XDD instance
+     * @return The profile type of XDD model
+     */
     public ProfileBodyDataType getProfileBody(
             ISO15745ProfileContainer xddModel) {
         if (xddModel != null) {
@@ -183,47 +241,28 @@ public class CopyNodeWizard extends Wizard {
         return null;
     }
 
-    public String getStationTypeChanged() {
-        return addNodePage.getStationType();
+    /**
+     * @return The value of POWERLINK operational mode entered in the wizard
+     *         page
+     */
+    public String getStationType() {
+        return stationType;
     }
 
-    private boolean handleStationTypeChanged(int selectionIndex, Node cnNode) {
-
-        int val = ((Integer) selectionIndex).intValue();
-        if (val == 1) {
-            // Checks the value of PresChaining from the XDD
-            // model of MN and CN.
-
-            boolean cnPresChaining = cnNode.getNetworkManagement()
-                    .getCnFeaturesOfNode().isDLLCNPResChaining();
-            if (!cnPresChaining) {
-                // do not allow
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        MessageFormat.format(CNPRES_CHAINING_ERROR_MESSAGE,
-                                cnNode.getNodeIDWithName()),
-                        cnNode.getProject().getName());
-                getContainer().showPage(addNodePage);
-                return false;
-            }
-
-            List<Node> rmnNodes = cnNode.getPowerlinkRootNode()
-                    .getRmnNodeList();
-            if (rmnNodes.size() > 0) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        CHAINED_STATION_ERROR_MESSAGE,
-                        cnNode.getProject().getName());
-                getContainer().showPage(addNodePage);
-                return false;
-            }
-        } else if (val == 2) {
-            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                    MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR,
-                    cnNode.getProject().getName());
-            getContainer().showPage(addNodePage);
-            return false;
+    /**
+     * Receives the index of station type selected in the combo box widget of
+     * wizard page
+     *
+     * @param stationType The text available in the station type combo box
+     *            widget
+     * @return The selection index of combo box
+     */
+    public int getStationTypeIndex(String stationType) {
+        int stationTypeChanged = 0;
+        if (stationType.equalsIgnoreCase("chained")) {
+            stationTypeChanged = 1;
         }
-        return true;
-
+        return stationTypeChanged;
     }
 
     /**
@@ -243,6 +282,7 @@ public class CopyNodeWizard extends Wizard {
     public boolean performFinish() {
 
         Object nodeObject = addNodePage.getNode();
+        stationType = addNodePage.getStationType();
 
         return true;
     }

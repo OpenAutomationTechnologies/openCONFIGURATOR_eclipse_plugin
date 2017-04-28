@@ -336,6 +336,10 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         // TODO Auto-generated method stub
     }
 
+    public OpenCONFIGURATORProject getCurrentProject() {
+        return currentProject;
+    }
+
     /**
      * @return the document instance
      */

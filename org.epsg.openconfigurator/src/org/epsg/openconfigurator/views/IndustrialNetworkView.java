@@ -1033,9 +1033,8 @@ public class IndustrialNetworkView extends ViewPart
                 handleRefresh();
                 int nodeId = Integer.valueOf(copyNodeWizard.getNodeId());
                 String name = copyNodeWizard.getNodeName();
-                // String staionType = copyNodeWizard
-                // .getStationTypeChanged();
-                int stationTypeChanged = 0;
+                int stationTypeChanged = copyNodeWizard
+                        .getStationTypeIndex(copyNodeWizard.getStationType());
                 try {
                     nodeToBeCopied.copyNode(nodeId, stationTypeChanged, name);
 
@@ -2047,9 +2046,9 @@ public class IndustrialNetworkView extends ViewPart
                                 .valueOf(copyNodeWizard.getNodeId());
 
                         String name = copyNodeWizard.getNodeName();
-                        // String staionType = copyNodeWizard
-                        // .getStationTypeChanged();
-                        int stationTypeChanged = 0;
+                        int stationTypeChanged = copyNodeWizard
+                        .getStationTypeIndex(copyNodeWizard.getStationType());
+
                         try {
                             node.copyNode(nodeId, stationTypeChanged, name);
 
