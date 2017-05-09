@@ -721,14 +721,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 }
             }
 
-            Node mnNode = rootnode.getMN();
-
-            BigInteger objectId = new BigInteger("1F80", 16);
-            PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
-                    .getObject(objectId.longValue());
-
-            updateMnObject(swVersionObj, isRmnAvailable, isFirmwareAvailable);
-
             System.out.println("Build Started: Project: " + networkId);
             // Displays Info message in console.
             displayInfoMessage(
@@ -796,6 +788,14 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 }
 
             });
+
+            Node mnNode = rootnode.getMN();
+
+            BigInteger objectId = new BigInteger("1F80", 16);
+            PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
+                    .getObject(objectId.longValue());
+
+            updateMnObject(swVersionObj, isRmnAvailable, isFirmwareAvailable);
 
             boolean buildCdcSuccess = buildConciseDeviceConfiguration(networkId,
                     textPath, binaryPath, charPath, monitor);

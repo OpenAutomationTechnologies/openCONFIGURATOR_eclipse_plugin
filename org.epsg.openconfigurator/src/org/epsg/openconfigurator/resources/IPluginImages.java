@@ -69,6 +69,7 @@ public interface IPluginImages {
     public final static String ARROW_DOWN_ICON = "icons/arrow_down.gif";
     public final static String ARROW_UP_ICON = "icons/arrow_up.gif";
     public final static String CLEAR_ICON = "icons/clear.gif";
+    public final static String EPSG_IMAGE = "icons/epsg.png";
 
     // Process Image View icons
     public final static String IN_CHANNEL_ICON = "icons/in_channel.gif";

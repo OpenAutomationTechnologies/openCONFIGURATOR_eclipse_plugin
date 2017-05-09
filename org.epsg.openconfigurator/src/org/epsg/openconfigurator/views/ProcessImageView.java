@@ -273,7 +273,7 @@ public class ProcessImageView extends ViewPart {
                 sourcePart = null;
             }
 
-            tableViewer.setInput(null);
+            // tableViewer.setInput(null);
 
             // change the viewer input since the workbench selection has
             // changed.
@@ -292,7 +292,12 @@ public class ProcessImageView extends ViewPart {
 
                 if (selectedObj instanceof Node) {
                     nodeObj = (Node) selectedObj;
-                    tableViewer.setInput(nodeObj);
+                    Object nodeModel = nodeObj.getNodeModel();
+                    if (nodeModel instanceof TNetworkConfiguration) {
+                        tableViewer.setInput(nodeObj);
+                    } else {
+                        tableViewer.setInput(null);
+                    }
 
                 }
             }
@@ -302,6 +307,7 @@ public class ProcessImageView extends ViewPart {
             }
         }
     };
+
     private Action showAdvancedview;
 
     private TableColumn channelNameColumn;
