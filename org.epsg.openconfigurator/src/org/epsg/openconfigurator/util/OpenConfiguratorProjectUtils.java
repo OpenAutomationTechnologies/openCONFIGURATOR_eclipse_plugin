@@ -106,8 +106,10 @@ import org.jdom2.JDOMException;
  */
 public final class OpenConfiguratorProjectUtils {
 
+    public static final String PATH_SETTINGS_ALL_PATH_ID = "all"; ////$NON-NLS-1$
     public static final String PATH_SETTINGS_DEFAULT_PATH_ID = "defaultOutputPath"; ////$NON-NLS-1$
-    public static final String PATH_SETTINGS_DEFAUTL_PATH_VALUE = "output"; ////$NON-NLS-1$
+    public static final String PATH_SETTINGS_CUSTOM_PATH_ID = "custom"; //// $NON-NLS-1$
+    public static final String PATH_SETTINGS_DEFAULT_PATH_VALUE = "output"; ////$NON-NLS-1$
 
     public static final String AUTO_GENERATION_SETTINGS_ALL_ID = "all"; ////$NON-NLS-1$
     public static final String AUTO_GENERATION_SETTINGS_NONE_ID = "none"; ////$NON-NLS-1$
@@ -1039,11 +1041,12 @@ public final class OpenConfiguratorProjectUtils {
         TProjectConfiguration.PathSettings pathSettings = new TProjectConfiguration.PathSettings();
         java.util.List<TPath> pathList = pathSettings.getPath();
         TPath path = new TPath();
-        path.setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+        path.setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
         path.setPath(
-                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAUTL_PATH_VALUE);
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
         pathList.add(path);
-        tProjectConfiguration.setPathSettings(pathSettings);
+        // change by Jenifer #1047
+        tProjectConfiguration.setActivePathSetting(pathSettings.toString());
 
         // Auto generation settings
         java.util.List<TAutoGenerationSettings> autoGenerationSettingsList = tProjectConfiguration

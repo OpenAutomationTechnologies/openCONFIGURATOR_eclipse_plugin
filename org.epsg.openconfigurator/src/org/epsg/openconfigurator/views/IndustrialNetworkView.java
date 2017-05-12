@@ -1386,28 +1386,33 @@ public class IndustrialNetworkView extends ViewPart
      * @return Returns the output path settings from the project XML.
      */
     public Path getProjectOutputPath(Node node) {
-        PathSettings pathSett = node.getCurrentProject()
+        List<PathSettings> pathSett = node.getCurrentProject()
                 .getProjectConfiguration().getPathSettings();
-        String activeOutputPathID = pathSett.getActivePath();
-        if (activeOutputPathID == null) {
-            if (!pathSett.getPath().isEmpty()) {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, "defaultOutputPath");
-                if (defaultPath != null) {
-                    return new Path(defaultPath.getPath(), true);
-                }
-            }
-        } else {
-            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
-                    activeOutputPathID);
-            if (defaultPath != null) {
-                if (!defaultPath.getId()
-                        .equalsIgnoreCase("defaultOutputPath")) {
-                    return new Path(defaultPath.getPath(), false);
+        // pathSett = null;
+        for (PathSettings pathSet : pathSett) {
+            pathSet.getActivePath();
+
+            String activeOutputPathID = pathSet.getActivePath();
+            if (activeOutputPathID == null) {
+                if (!pathSet.getPath().isEmpty()) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils
+                            .getTPath(pathSet, "defaultOutputPath");
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
                 }
             } else {
-                System.err.println(
-                        "Unhandled error occurred. activeOutputPath not found");
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSet, activeOutputPathID);
+                if (defaultPath != null) {
+                    if (!defaultPath.getId()
+                            .equalsIgnoreCase("defaultOutputPath")) {
+                        return new Path(defaultPath.getPath(), false);
+                    }
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. activeOutputPath not found");
+                }
             }
         }
         return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
@@ -2047,7 +2052,8 @@ public class IndustrialNetworkView extends ViewPart
 
                         String name = copyNodeWizard.getNodeName();
                         int stationTypeChanged = copyNodeWizard
-                        .getStationTypeIndex(copyNodeWizard.getStationType());
+                                .getStationTypeIndex(
+                                        copyNodeWizard.getStationType());
 
                         try {
                             node.copyNode(nodeId, stationTypeChanged, name);

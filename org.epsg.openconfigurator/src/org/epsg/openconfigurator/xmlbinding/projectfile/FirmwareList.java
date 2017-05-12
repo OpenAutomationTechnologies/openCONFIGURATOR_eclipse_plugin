@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * <p>Java class for anonymous complex type.
- *
+ * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * 
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
@@ -85,8 +85,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -100,25 +100,25 @@ public class FirmwareList {
 
     /**
      * Gets the value of the firmware property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the firmware property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getFirmware().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link FirmwareList.Firmware }
-     *
-     *
+     * 
+     * 
      */
     public List<FirmwareList.Firmware> getFirmware() {
         if (firmware == null) {
@@ -130,9 +130,9 @@ public class FirmwareList {
 
     /**
      * <p>Java class for anonymous complex type.
-     *
+     * 
      * <p>The following schema fragment specifies the expected content contained within this class.
-     *
+     * 
      * <pre>
      * &lt;complexType&gt;
      *   &lt;complexContent&gt;
@@ -190,8 +190,8 @@ public class FirmwareList {
      *   &lt;/complexContent&gt;
      * &lt;/complexType&gt;
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "")
@@ -221,11 +221,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the uri property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getURI() {
             return uri;
@@ -233,11 +233,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the uri property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setURI(String value) {
             this.uri = value;
@@ -245,11 +245,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the vendorId property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public byte[] getVendorId() {
             return vendorId;
@@ -257,11 +257,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the vendorId property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setVendorId(byte[] value) {
             this.vendorId = value;
@@ -269,11 +269,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the productNumber property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public byte[] getProductNumber() {
             return productNumber;
@@ -281,11 +281,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the productNumber property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setProductNumber(byte[] value) {
             this.productNumber = value;
@@ -293,11 +293,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the deviceRevision property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public byte[] getDeviceRevision() {
             return deviceRevision;
@@ -305,11 +305,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the deviceRevision property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setDeviceRevision(byte[] value) {
             this.deviceRevision = value;
@@ -317,11 +317,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the date property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public byte[] getDate() {
             return date;
@@ -329,11 +329,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the date property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setDate(byte[] value) {
             this.date = value;
@@ -341,11 +341,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the time property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public byte[] getTime() {
             return time;
@@ -353,11 +353,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the time property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setTime(byte[] value) {
             this.time = value;
@@ -365,11 +365,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the keepHeader property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public boolean isKeepHeader() {
             if (keepHeader == null) {
@@ -381,11 +381,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the keepHeader property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setKeepHeader(Boolean value) {
             this.keepHeader = value;
@@ -393,11 +393,11 @@ public class FirmwareList {
 
         /**
          * Gets the value of the locked property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link Boolean }
-         *
+         *     
          */
         public boolean isLocked() {
             if (locked == null) {
@@ -409,11 +409,11 @@ public class FirmwareList {
 
         /**
          * Sets the value of the locked property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link Boolean }
-         *
+         *     
          */
         public void setLocked(Boolean value) {
             this.locked = value;

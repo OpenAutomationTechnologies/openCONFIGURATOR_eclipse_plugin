@@ -22,13 +22,14 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="PathSettings" minOccurs="0"&gt;
+ *         &lt;element name="PathSettings" maxOccurs="unbounded" minOccurs="0"&gt;
  *           &lt;complexType&gt;
  *             &lt;complexContent&gt;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *                 &lt;sequence&gt;
  *                   &lt;element name="Path" type="{http://sourceforge.net/projects/openconf/configuration}tPath" maxOccurs="unbounded"/&gt;
  *                 &lt;/sequence&gt;
+ *                 &lt;attribute name="id" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *                 &lt;attribute name="activePath" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -37,6 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="AutoGenerationSettings" type="{http://sourceforge.net/projects/openconf/configuration}tAutoGenerationSettings" maxOccurs="unbounded"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="activeAutoGenerationSetting" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+ *       &lt;attribute name="activePathSetting" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -52,34 +54,41 @@ import javax.xml.bind.annotation.XmlType;
 public class TProjectConfiguration {
 
     @XmlElement(name = "PathSettings")
-    protected TProjectConfiguration.PathSettings pathSettings;
+    protected List<TProjectConfiguration.PathSettings> pathSettings;
     @XmlElement(name = "AutoGenerationSettings", required = true)
     protected List<TAutoGenerationSettings> autoGenerationSettings;
     @XmlAttribute(name = "activeAutoGenerationSetting", required = true)
     protected String activeAutoGenerationSetting;
+    @XmlAttribute(name = "activePathSetting")
+    protected String activePathSetting;
 
     /**
      * Gets the value of the pathSettings property.
      * 
-     * @return
-     *     possible object is
-     *     {@link TProjectConfiguration.PathSettings }
-     *     
-     */
-    public TProjectConfiguration.PathSettings getPathSettings() {
-        return pathSettings;
-    }
-
-    /**
-     * Sets the value of the pathSettings property.
+     * <p>
+     * This accessor method returns a reference to the live list,
+     * not a snapshot. Therefore any modification you make to the
+     * returned list will be present inside the JAXB object.
+     * This is why there is not a <CODE>set</CODE> method for the pathSettings property.
      * 
-     * @param value
-     *     allowed object is
-     *     {@link TProjectConfiguration.PathSettings }
-     *     
+     * <p>
+     * For example, to add a new item, do as follows:
+     * <pre>
+     *    getPathSettings().add(newItem);
+     * </pre>
+     * 
+     * 
+     * <p>
+     * Objects of the following type(s) are allowed in the list
+     * {@link TProjectConfiguration.PathSettings }
+     * 
+     * 
      */
-    public void setPathSettings(TProjectConfiguration.PathSettings value) {
-        this.pathSettings = value;
+    public List<TProjectConfiguration.PathSettings> getPathSettings() {
+        if (pathSettings == null) {
+            pathSettings = new ArrayList<TProjectConfiguration.PathSettings>();
+        }
+        return this.pathSettings;
     }
 
     /**
@@ -135,6 +144,30 @@ public class TProjectConfiguration {
         this.activeAutoGenerationSetting = value;
     }
 
+    /**
+     * Gets the value of the activePathSetting property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link String }
+     *     
+     */
+    public String getActivePathSetting() {
+        return activePathSetting;
+    }
+
+    /**
+     * Sets the value of the activePathSetting property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link String }
+     *     
+     */
+    public void setActivePathSetting(String value) {
+        this.activePathSetting = value;
+    }
+
 
     /**
      * <p>Java class for anonymous complex type.
@@ -148,6 +181,7 @@ public class TProjectConfiguration {
      *       &lt;sequence&gt;
      *         &lt;element name="Path" type="{http://sourceforge.net/projects/openconf/configuration}tPath" maxOccurs="unbounded"/&gt;
      *       &lt;/sequence&gt;
+     *       &lt;attribute name="id" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *       &lt;attribute name="activePath" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
@@ -164,6 +198,8 @@ public class TProjectConfiguration {
 
         @XmlElement(name = "Path", required = true)
         protected List<TPath> path;
+        @XmlAttribute(name = "id")
+        protected String id;
         @XmlAttribute(name = "activePath")
         protected String activePath;
 
@@ -194,6 +230,30 @@ public class TProjectConfiguration {
                 path = new ArrayList<TPath>();
             }
             return this.path;
+        }
+
+        /**
+         * Gets the value of the id property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getId() {
+            return id;
+        }
+
+        /**
+         * Sets the value of the id property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setId(String value) {
+            this.id = value;
         }
 
         /**

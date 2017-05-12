@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * <p>Java class for anonymous complex type.
- *
+ * 
  * <p>The following schema fragment specifies the expected content contained within this class.
- *
+ * 
  * <pre>
  * &lt;complexType&gt;
  *   &lt;complexContent&gt;
@@ -73,8 +73,8 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
  * </pre>
- *
- *
+ * 
+ * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
@@ -88,25 +88,25 @@ public class InterfaceList {
 
     /**
      * Gets the value of the interface property.
-     *
+     * 
      * <p>
      * This accessor method returns a reference to the live list,
      * not a snapshot. Therefore any modification you make to the
      * returned list will be present inside the JAXB object.
      * This is why there is not a <CODE>set</CODE> method for the interface property.
-     *
+     * 
      * <p>
      * For example, to add a new item, do as follows:
      * <pre>
      *    getInterface().add(newItem);
      * </pre>
-     *
-     *
+     * 
+     * 
      * <p>
      * Objects of the following type(s) are allowed in the list
      * {@link InterfaceList.Interface }
-     *
-     *
+     * 
+     * 
      */
     public List<InterfaceList.Interface> getInterface() {
         if (_interface == null) {
@@ -118,9 +118,9 @@ public class InterfaceList {
 
     /**
      * <p>Java class for anonymous complex type.
-     *
+     * 
      * <p>The following schema fragment specifies the expected content contained within this class.
-     *
+     * 
      * <pre>
      * &lt;complexType&gt;
      *   &lt;complexContent&gt;
@@ -166,8 +166,8 @@ public class InterfaceList {
      *   &lt;/complexContent&gt;
      * &lt;/complexType&gt;
      * </pre>
-     *
-     *
+     * 
+     * 
      */
     @XmlAccessorType(XmlAccessType.FIELD)
     @XmlType(name = "", propOrder = {
@@ -182,25 +182,25 @@ public class InterfaceList {
 
         /**
          * Gets the value of the module property.
-         *
+         * 
          * <p>
          * This accessor method returns a reference to the live list,
          * not a snapshot. Therefore any modification you make to the
          * returned list will be present inside the JAXB object.
          * This is why there is not a <CODE>set</CODE> method for the module property.
-         *
+         * 
          * <p>
          * For example, to add a new item, do as follows:
          * <pre>
          *    getModule().add(newItem);
          * </pre>
-         *
-         *
+         * 
+         * 
          * <p>
          * Objects of the following type(s) are allowed in the list
          * {@link InterfaceList.Interface.Module }
-         *
-         *
+         * 
+         * 
          */
         public List<InterfaceList.Interface.Module> getModule() {
             if (module == null) {
@@ -211,11 +211,11 @@ public class InterfaceList {
 
         /**
          * Gets the value of the id property.
-         *
+         * 
          * @return
          *     possible object is
          *     {@link String }
-         *
+         *     
          */
         public String getId() {
             return id;
@@ -223,11 +223,11 @@ public class InterfaceList {
 
         /**
          * Sets the value of the id property.
-         *
+         * 
          * @param value
          *     allowed object is
          *     {@link String }
-         *
+         *     
          */
         public void setId(String value) {
             this.id = value;
@@ -236,9 +236,9 @@ public class InterfaceList {
 
         /**
          * <p>Java class for anonymous complex type.
-         *
+         * 
          * <p>The following schema fragment specifies the expected content contained within this class.
-         *
+         * 
          * <pre>
          * &lt;complexType&gt;
          *   &lt;complexContent&gt;
@@ -273,8 +273,8 @@ public class InterfaceList {
          *   &lt;/complexContent&gt;
          * &lt;/complexType&gt;
          * </pre>
-         *
-         *
+         * 
+         * 
          */
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
@@ -305,11 +305,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the interfaceList property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link InterfaceList }
-             *
+             *     
              */
             public InterfaceList getInterfaceList() {
                 return interfaceList;
@@ -317,11 +317,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the interfaceList property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link InterfaceList }
-             *
+             *     
              */
             public void setInterfaceList(InterfaceList value) {
                 this.interfaceList = value;
@@ -329,11 +329,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the forcedObjects property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link InterfaceList.Interface.Module.ForcedObjects }
-             *
+             *     
              */
             public InterfaceList.Interface.Module.ForcedObjects getForcedObjects() {
                 return forcedObjects;
@@ -341,11 +341,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the forcedObjects property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link InterfaceList.Interface.Module.ForcedObjects }
-             *
+             *     
              */
             public void setForcedObjects(InterfaceList.Interface.Module.ForcedObjects value) {
                 this.forcedObjects = value;
@@ -353,11 +353,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the firmwareList property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link FirmwareList }
-             *
+             *     
              */
             public FirmwareList getFirmwareList() {
                 return firmwareList;
@@ -365,11 +365,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the firmwareList property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link FirmwareList }
-             *
+             *     
              */
             public void setFirmwareList(FirmwareList value) {
                 this.firmwareList = value;
@@ -377,11 +377,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the name property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link String }
-             *
+             *     
              */
             public String getName() {
                 return name;
@@ -389,11 +389,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the name property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link String }
-             *
+             *     
              */
             public void setName(String value) {
                 this.name = value;
@@ -401,11 +401,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the position property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link BigInteger }
-             *
+             *     
              */
             public BigInteger getPosition() {
                 return position;
@@ -413,11 +413,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the position property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link BigInteger }
-             *
+             *     
              */
             public void setPosition(BigInteger value) {
                 this.position = value;
@@ -425,11 +425,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the address property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link BigInteger }
-             *
+             *     
              */
             public BigInteger getAddress() {
                 return address;
@@ -437,11 +437,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the address property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link BigInteger }
-             *
+             *     
              */
             public void setAddress(BigInteger value) {
                 this.address = value;
@@ -449,11 +449,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the pathToXDC property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link String }
-             *
+             *     
              */
             public String getPathToXDC() {
                 return pathToXDC;
@@ -461,11 +461,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the pathToXDC property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link String }
-             *
+             *     
              */
             public void setPathToXDC(String value) {
                 this.pathToXDC = value;
@@ -473,11 +473,11 @@ public class InterfaceList {
 
             /**
              * Gets the value of the enabled property.
-             *
+             * 
              * @return
              *     possible object is
              *     {@link Boolean }
-             *
+             *     
              */
             public boolean isEnabled() {
                 if (enabled == null) {
@@ -489,11 +489,11 @@ public class InterfaceList {
 
             /**
              * Sets the value of the enabled property.
-             *
+             * 
              * @param value
              *     allowed object is
              *     {@link Boolean }
-             *
+             *     
              */
             public void setEnabled(Boolean value) {
                 this.enabled = value;
@@ -502,9 +502,9 @@ public class InterfaceList {
 
             /**
              * <p>Java class for anonymous complex type.
-             *
+             * 
              * <p>The following schema fragment specifies the expected content contained within this class.
-             *
+             * 
              * <pre>
              * &lt;complexType&gt;
              *   &lt;complexContent&gt;
@@ -516,8 +516,8 @@ public class InterfaceList {
              *   &lt;/complexContent&gt;
              * &lt;/complexType&gt;
              * </pre>
-             *
-             *
+             * 
+             * 
              */
             @XmlAccessorType(XmlAccessType.FIELD)
             @XmlType(name = "", propOrder = {
@@ -530,25 +530,25 @@ public class InterfaceList {
 
                 /**
                  * Gets the value of the object property.
-                 *
+                 * 
                  * <p>
                  * This accessor method returns a reference to the live list,
                  * not a snapshot. Therefore any modification you make to the
                  * returned list will be present inside the JAXB object.
                  * This is why there is not a <CODE>set</CODE> method for the object property.
-                 *
+                 * 
                  * <p>
                  * For example, to add a new item, do as follows:
                  * <pre>
                  *    getObject().add(newItem);
                  * </pre>
-                 *
-                 *
+                 * 
+                 * 
                  * <p>
                  * Objects of the following type(s) are allowed in the list
                  * {@link Object }
-                 *
-                 *
+                 * 
+                 * 
                  */
                 public List<Object> getObject() {
                     if (object == null) {

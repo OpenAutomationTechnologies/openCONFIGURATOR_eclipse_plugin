@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.nio.charset.Charset;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -411,8 +412,12 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * @return Returns the output path settings from the project XML.
      */
     public Path getProjectOutputPath() {
-        PathSettings pathSett = currentProject.getProjectConfiguration()
-                .getPathSettings();
+        List<PathSettings> pathSettList = currentProject
+                .getProjectConfiguration().getPathSettings();
+        PathSettings pathSett = null;
+        for (PathSettings setPath : pathSettList) {
+            pathSett = setPath;
+        }
         String activeOutputPathID = pathSett.getActivePath();
         if (activeOutputPathID == null) {
             if (!pathSett.getPath().isEmpty()) {
