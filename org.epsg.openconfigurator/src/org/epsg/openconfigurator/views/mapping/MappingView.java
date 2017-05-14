@@ -1901,6 +1901,7 @@ public class MappingView extends ViewPart {
                             .addVerifyListener(enabledEntriesVerifyListener);
                     rpdoEnabledMappingEntriesText.setEnabled(false);
                     rpdoChannelSize.setText(StringUtils.EMPTY);
+
                     return;
                 }
 
@@ -1970,8 +1971,8 @@ public class MappingView extends ViewPart {
                         addListenersToMnControls();
                         handleGeneralInfoForMn(nodeObj);
                     } else if (nodeObjModel instanceof TRMN) {
-                        addListenersToMnControls();
-                        handleGeneralInfoForMn(nodeObj);
+                        addListenersToRmnControls();
+                        handleGeneralInfoForRmn(nodeObj);
                     } else if (nodeObjModel instanceof TMN) {
                         addListenersToMnControls();
                         handleGeneralInfoForMn(nodeObj);
@@ -2041,6 +2042,53 @@ public class MappingView extends ViewPart {
                             String.valueOf(nodeObj.getPresTimeoutvalue()));
 
                     return;
+                } else if (selectedObj instanceof HeadNodeInterface) {
+                    HeadNodeInterface headintf = (HeadNodeInterface) selectedObj;
+                    nodeObj = headintf.getNode();
+                    Object nodeObjModel = nodeObj.getNodeModel();
+
+                    int nodeIdVal = Integer.valueOf(nodeObj.getNodeIdString());
+                    if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        nodeTypeCombo.setItems("Yes", "No");
+                        if (nodeObj
+                                .getNodeModel() instanceof TNetworkConfiguration) {
+                            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                                    .getNodeModel();
+                            TMN mn = net.getNodeCollection().getMN();
+                            if (mn.isTransmitsPRes()) {
+
+                                nodeTypeCombo.select(0);
+                            } else {
+                                nodeTypeCombo.select(1);
+                            }
+                        }
+                    } else {
+                        nodeTypeCombo.setItems("Normal", "Chained");
+                        if (nodeObj
+                                .getPlkOperationMode() == PlkOperationMode.CHAINED) {
+                            nodeTypeCombo.select(1);
+                            ;
+                        } else {
+                            nodeTypeCombo.select(0);
+                        }
+                    }
+
+                    if (nodeObjModel instanceof TCN) {
+                        addListenersToCnControls();
+                        // nodeId.removeModifyListener(nodeIDModifyListener);
+                        handleGeneralInfoForCn(nodeObj);
+                    }
+
+                    txt_no_nodename.setText(nodeObj.getName());
+
+                    lst_no_foi.removeAll();
+                    String[] forcedObjs = nodeObj.getForcedObjectsString()
+                            .split("\\;");
+                    for (String forcedObj : forcedObjs) {
+
+                        lst_no_foi.add(forcedObj);
+                    }
+
                 } else {
                     System.err.println(
                             "Other than node is selected!" + selectedObj);
@@ -2051,6 +2099,7 @@ public class MappingView extends ViewPart {
                 sourcePart.getSite().getPage().addPartListener(partListener);
             }
         }
+
     };
 
     /**
@@ -2069,27 +2118,27 @@ public class MappingView extends ViewPart {
     private TabItem tbtmTpdo;
 
     private ComboViewer tpdoChannelComboViewer;
-    private ComboViewer sndtoNodecomboviewer;
 
+    private ComboViewer sndtoNodecomboviewer;
     private TableViewer tpdoTableViewer;
+
     private TableViewerColumn tpdoMappingObjectColumn;
     private TableViewerColumn tpdoActionsColumn;
-
     private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
 
     private Composite tpdoPageFooter;
+
     private Button btnTpdoChannelMapAvailableObjects;
     private Button btnTpdoChannelClearSelectedRows;
     private Text tpdoEnabledMappingEntriesText;
     private Text tpdoChannelSize;
     private TableEditor tpdoTableActionsEditor;
     private Composite tpdoActionsbuttonGroup;
-
     private Button tpdoActionsUpButton;
 
     private Button tpdoActionsDownButton;
-    private TableColumn tpdoTblclmnActualValue;
 
+    private TableColumn tpdoTblclmnActualValue;
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
 
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
@@ -2099,13 +2148,13 @@ public class MappingView extends ViewPart {
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
 
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
+
     private SelectionListener tpdoActionsClearBtnSelectionListener;
     private SelectionListener tpdoActionsDownBtnSelectionListener;
     private SelectionListener tpdoActionsUpBtnSelectionListener;
-
     private Button tpdoBtnCheckButton;
-    public boolean tpdoProfileObjectSelection = false;
 
+    public boolean tpdoProfileObjectSelection = false;
     private int tpdoEnabledEntriesCount;
 
     private int count = 0;
@@ -2116,27 +2165,28 @@ public class MappingView extends ViewPart {
     private TabItem tbtmRpdo;
 
     private ComboViewer rpdoChannelComboViewer;
+
     private ComboViewer receiveFromNodecomboviewer;
     private TableViewer rpdoTableViewer;
-
     private TableViewerColumn rpdoMappingObjectColumn;
+
     private TableViewerColumn rpdoActionsColumn;
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
-
     private Composite rpdoPageFooter;
-    private Button btnRpdoChannelMapAvailableObjects;
 
+    private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
+
     private Text rpdoEnabledMappingEntriesText;
     private Text rpdoChannelSize;
     private TableEditor rpdoTableActionsEditor;
     private Composite rpdoActionsbuttonGroup;
-
     private Button rpdoActionsUpButton;
+
     private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
-
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
+
     private ISelectionChangedListener rpdoNodeComboSelectionChangeListener;
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
@@ -2145,7 +2195,6 @@ public class MappingView extends ViewPart {
     private SelectionListener rpdoActionsDownBtnSelectionListener;
     private SelectionListener rpdoActionsUpBtnSelectionListener;
     private Button rpdoBtnCheckButton;
-
     public boolean rpdoProfileObjectSelection = false;
 
     private int rpdoEnabledEntriesCount;
@@ -2154,6 +2203,7 @@ public class MappingView extends ViewPart {
      * Common GUI controls
      */
     private Action showAdvancedview;
+
     private final Image clearImage;
     private final Image upArrowImage;
     private final Image downArrowImage;
@@ -2168,7 +2218,6 @@ public class MappingView extends ViewPart {
      * Summary Page
      */
     private TabItem tbtmPdoConfiguration;
-
     private TableViewer tpdoSummaryTableViewer;
 
     private TableColumn tpdoSummaryClmnMappingVersion;
@@ -2178,6 +2227,7 @@ public class MappingView extends ViewPart {
     private TableViewer rpdoSummaryTableViewer;
 
     private TableColumn rpdoSummaryClmnMappingVersion;
+
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
     /**
      * Common application model data
@@ -2235,7 +2285,6 @@ public class MappingView extends ViewPart {
     private Text lossOfSocTolText;
     private Text asyncMtuText;
     private Text asyncTimeOutTxt;
-
     private Text preScalerText;
 
     private Text productNameText;
@@ -2296,9 +2345,10 @@ public class MappingView extends ViewPart {
             if (e.widget instanceof Text) {
                 Text nodeNameText = (Text) e.widget;
 
-                String nodeName = txt_no_nodename.getText();
-                System.err.println("Node name Selected");
-                newNodeName = handleSetNodeName(nodeName);
+                String nodeName = nodeObj.getName();
+                System.err.println("Node name Selected" + nodeName);
+                newNodeName = handleSetNodeName(txt_no_nodename.getText());
+                System.err.println("Node name new Selected" + newNodeName);
                 if ((newNodeName != StringUtils.EMPTY)) {
                     if ((!newNodeName.equalsIgnoreCase(nodeName))) {
                         Result res = OpenConfiguratorCore.GetInstance()
@@ -2503,9 +2553,10 @@ public class MappingView extends ViewPart {
         public void modifyText(ModifyEvent e) {
             if (e.widget instanceof Text) {
                 Text presTimeOutText = (Text) e.widget;
+                long presTimeoutInMsVal = nodeObj.getPresTimeoutvalue() / 1000;
 
-                String prestimeout = txt_no_PResTimeOut.getText();
-                newPresTime = handlePresTimeout(prestimeout);
+                String prestimeout = String.valueOf(presTimeoutInMsVal);
+                newPresTime = handlePresTimeout(txt_no_PResTimeOut.getText());
                 if ((newPresTime != StringUtils.EMPTY)) {
                     if (!newPresTime.equalsIgnoreCase(prestimeout)) {
                         long presTimeoutInNs = Long.decode(newPresTime)
@@ -2544,9 +2595,12 @@ public class MappingView extends ViewPart {
         public void modifyText(ModifyEvent e) {
             if (e.widget instanceof Text) {
                 Text lossofSocText = (Text) e.widget;
+                long value = Long.valueOf(nodeObj.getLossOfSocTolerance());
+                long valueInUs = value / 1000;
 
-                String lossOfSoc = lossOfSocTolText.getText();
-                newLossOfSoc = handleLossOfSoCTolerance(lossOfSoc);
+                String lossOfSoc = String.valueOf(valueInUs);
+                newLossOfSoc = handleLossOfSoCTolerance(
+                        lossOfSocTolText.getText());
                 System.err.println("Loss of Soc..." + newLossOfSoc);
                 if ((newLossOfSoc != StringUtils.EMPTY)) {
                     if (!newLossOfSoc.equalsIgnoreCase(lossOfSoc)) {
@@ -2586,8 +2640,8 @@ public class MappingView extends ViewPart {
             if (e.widget instanceof Text) {
                 Text asyncMtuText1 = (Text) e.widget;
 
-                String asyncMtu = asyncMtuText.getText();
-                newAsyncMtu = handleAsyncMtu(asyncMtu);
+                String asyncMtu = nodeObj.getAsyncMtu();
+                newAsyncMtu = handleAsyncMtu(asyncMtuText.getText());
                 if ((newAsyncMtu != StringUtils.EMPTY)) {
                     if (!newAsyncMtu.equalsIgnoreCase(asyncMtu)) {
                         Integer asyncMtuValue = Integer.decode(newAsyncMtu);
@@ -2621,8 +2675,9 @@ public class MappingView extends ViewPart {
             if (e.widget instanceof Text) {
                 Text asyncTimeoutText = (Text) e.widget;
 
-                String asyncTime = asyncTimeOutTxt.getText();
-                newAsynctimeOut = handleAsyncSlotTimeout(asyncTime);
+                String asyncTime = nodeObj.getAsyncSlotTimeout();
+                newAsynctimeOut = handleAsyncSlotTimeout(
+                        asyncTimeOutTxt.getText());
                 if ((newAsynctimeOut != StringUtils.EMPTY)) {
                     if (newAsynctimeOut.equalsIgnoreCase(asyncTime)) {
                         Result res = OpenConfiguratorCore.GetInstance()
@@ -2658,8 +2713,8 @@ public class MappingView extends ViewPart {
             if (e.widget instanceof Text) {
                 Text preScalerText1 = (Text) e.widget;
 
-                String preScaler = preScalerText.getText();
-                newPreScaler = handlePreScalerValue(preScaler);
+                String preScaler = nodeObj.getPrescaler();
+                newPreScaler = handlePreScalerValue(preScalerText.getText());
                 if ((newPreScaler != StringUtils.EMPTY)) {
                     if (!newPreScaler.equalsIgnoreCase(preScaler)) {
                         Integer preScalarVal = Integer.decode(newPreScaler);
@@ -2693,11 +2748,10 @@ public class MappingView extends ViewPart {
             if (e.widget instanceof Text) {
                 Text cycletimetext = (Text) e.widget;
 
-                // String cycleTime = cycletimetext.getText();
+                String cycleTime = nodeObj.getCycleTime();
                 newCycleTime = handleCycleTime(txt_no_PResTimeOut.getText());
                 if ((newCycleTime != StringUtils.EMPTY)) {
-                    if (!newCycleTime
-                            .equalsIgnoreCase(txt_no_PResTimeOut.getText())) {
+                    if (!newCycleTime.equalsIgnoreCase(cycleTime)) {
                         Long cycleTimeValue = Long.decode(newCycleTime);
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetCycleTime(nodeObj.getNetworkId(),
@@ -2715,7 +2769,7 @@ public class MappingView extends ViewPart {
                         }
                     }
                 } else {
-                    txt_no_PResTimeOut.setText(nodeObj.getCycleTime());
+                    // txt_no_PResTimeOut.setText(nodeObj.getCycleTime());
                 }
             }
         }
@@ -2780,8 +2834,7 @@ public class MappingView extends ViewPart {
         preScalerText.removeModifyListener(prescalerModifyListener);
 
         txt_no_nodename.addModifyListener(nodeNameModifyListener);
-        txt_no_nodename
-                .addSelectionListener(rpdoActionsClearBtnSelectionListener);
+
         nodeId.setEnabled(true);
         nodeId.addModifyListener(nodeIDModifyListener);
 
@@ -2806,6 +2859,10 @@ public class MappingView extends ViewPart {
         asyncTimeOutTxt.addModifyListener(asyncTimeoutModifyListener);
         preScalerText.addModifyListener(prescalerModifyListener);
 
+    }
+
+    private void addListenersToRmnControls() {
+        nodeId.addModifyListener(nodeIDModifyListener);
     }
 
     private void contributeToActionBars() {
@@ -4578,9 +4635,9 @@ public class MappingView extends ViewPart {
         if (value instanceof String) {
             cycleTime = (String) value;
             if (cycleTime.isEmpty()) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
-                        nodeObj.getNetworkId());
+                // PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                // ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
+                // nodeObj.getNetworkId());
                 return StringUtils.EMPTY;
 
             }
@@ -4624,7 +4681,10 @@ public class MappingView extends ViewPart {
 
     private void handleGeneralInfoForCn(Node nodeObj) {
         System.err.println("CN selected");
-
+        txt_no_PResTimeOut.setVisible(true);
+        nodeTypeCombo.setVisible(true);
+        lblNodeType.setVisible(true);
+        lblPResTimeout.setVisible(true);
         nodeId.setEnabled(true);
         nodeId.setText(String.valueOf(nodeObj.getCnNodeId()));
 
@@ -4667,7 +4727,10 @@ public class MappingView extends ViewPart {
     }
 
     private void handleGeneralInfoForMn(Node nodeObj) {
-
+        txt_no_PResTimeOut.setVisible(true);
+        nodeTypeCombo.setVisible(true);
+        lblNodeType.setVisible(true);
+        lblPResTimeout.setVisible(true);
         nodeId.setEnabled(false);
         nodeId.setText(String.valueOf(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
         txt_no_PResTimeOut.setText(nodeObj.getCycleTime());
@@ -4721,6 +4784,38 @@ public class MappingView extends ViewPart {
         preScalerText.setText(nodeObj.getPrescaler());
         preScalerText.setEditable(true);
 
+    }
+
+    private void handleGeneralInfoForRmn(Node nodeObj2) {
+        nodeId.setEnabled(true);
+        txt_no_PResTimeOut.setVisible(false);
+        nodeTypeCombo.setVisible(false);
+        lblNodeType.setVisible(false);
+        lblPResTimeout.setVisible(false);
+
+        nodeId.setText(String.valueOf(nodeObj2.getCnNodeId()));
+
+        productNameLabel.setVisible(false);
+        productIdLabel.setVisible(false);
+        vendorNamelabel.setVisible(false);
+        vendorIdLabel.setVisible(false);
+        productNameText.setVisible(false);
+        productIdText.setVisible(false);
+        vendorNameText.setVisible(false);
+        vendorIdtext.setVisible(false);
+
+        lblLossOfSoc.setText("Product Name:");
+        lossOfSocTolText.setText(nodeObj.getProductName());
+        lossOfSocTolText.setEditable(false);
+        lblAsymcMtu.setText("Product ID:");
+        asyncMtuText.setText(nodeObj.getProductCodeValue());
+        asyncMtuText.setEditable(false);
+        lblAsyncTimeOut.setText("Vendor Name:");
+        asyncTimeOutTxt.setText(nodeObj.getVendorName());
+        asyncTimeOutTxt.setEditable(false);
+        lblPrescaler.setText("Vendor ID:");
+        preScalerText.setText(nodeObj.getVendorIdValue());
+        preScalerText.setEditable(false);
     }
 
     /**
