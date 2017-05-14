@@ -1169,7 +1169,7 @@ public class IndustrialNetworkView extends ViewPart
                     currentProject = rootNode.getOpenConfiguratorProject();
                     System.err.println("currentProject...." + currentProject);
                     if (currentProject != null) {
-                        Path outputpath = getProjectOutputPath(node);
+                        Path outputpath = getProjectOutputPath(node, false);
                         final java.nio.file.Path targetPath;
 
                         if (outputpath.isLocal()) {
@@ -1340,7 +1340,7 @@ public class IndustrialNetworkView extends ViewPart
                             File xdcFile = new File(
                                     node.getAbsolutePathToXdc());
 
-                            Path outputpath = getProjectOutputPath(node);
+                            Path outputpath = getProjectOutputPath(node, true);
 
                             final java.nio.file.Path targetPath;
 
@@ -1385,25 +1385,137 @@ public class IndustrialNetworkView extends ViewPart
     /**
      * @return Returns the output path settings from the project XML.
      */
-    public Path getProjectOutputPath(Node node) {
-        List<PathSettings> pathSett = node.getCurrentProject()
-                .getProjectConfiguration().getPathSettings();
-        // pathSett = null;
-        for (PathSettings pathSet : pathSett) {
-            pathSet.getActivePath();
+    public Path getProjectOutputPath(Node node, boolean generateXdc) {
 
-            String activeOutputPathID = pathSet.getActivePath();
+        if (generateXdc) {
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        String activeSetting = OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID;
+        if (node.getCurrentProject().getProjectConfiguration()
+                .getActivePathSetting() != null) {
+            activeSetting = node.getCurrentProject().getProjectConfiguration()
+                    .getActivePathSetting();
+        }
+
+        if (activeSetting.equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+            List<PathSettings> pathSettList = node.getCurrentProject()
+                    .getProjectConfiguration().getPathSettings();
+            String activepathSetting = OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID;
+            PathSettings pathSett = null;
+            for (PathSettings setPath : pathSettList) {
+                if (setPath.getId() != null) {
+                    if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
+                        pathSett = setPath;
+                        break;
+                    }
+                } else {
+                    pathSett = setPath;
+                }
+            }
+
+            List<TPath> pathList = pathSett.getPath();
+            TPath pathConfig = null;
+            for (TPath path : pathList) {
+                if (path.isActive()) {
+                    pathConfig = path;
+                }
+            }
+
+            if (pathConfig == null) {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, "defaultOutputPath");
+                if (defaultPath != null) {
+                    return new Path(defaultPath.getPath(), true);
+                }
+            }
+
+            if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, "defaultOutputPath");
+                if (defaultPath != null) {
+                    return new Path(defaultPath.getPath(), true);
+                }
+            }
+
+            String activeOutputPathID = pathConfig.getId();
+            System.err.println("Active output path .." + activeOutputPathID);
             if (activeOutputPathID == null) {
-                if (!pathSet.getPath().isEmpty()) {
+                if (!pathSett.getPath().isEmpty()) {
                     TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSet, "defaultOutputPath");
+                            .getTPath(pathSett, "defaultOutputPath");
                     if (defaultPath != null) {
                         return new Path(defaultPath.getPath(), true);
                     }
                 }
             } else {
                 TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSet, activeOutputPathID);
+                        .getTPath(pathSett, activeOutputPathID);
+                if (defaultPath != null) {
+                    if (!defaultPath.getId()
+                            .equalsIgnoreCase("defaultOutputPath")) {
+                        return new Path(defaultPath.getPath(), false);
+                    }
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. activeOutputPath not found");
+                }
+            }
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        List<PathSettings> pathSettList = currentProject
+                .getProjectConfiguration().getPathSettings();
+        String activepathSetting = currentProject.getProjectConfiguration()
+                .getActivePathSetting();
+        PathSettings pathSett = null;
+        for (PathSettings setPath : pathSettList) {
+            if (setPath.getId() != null) {
+                if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
+                    pathSett = setPath;
+                    break;
+                }
+            } else {
+                pathSett = setPath;
+            }
+        }
+        System.err.println("Active path ..." + activepathSetting);
+
+        if (pathSett == null) {
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        List<TPath> pathList = pathSett.getPath();
+        TPath pathConfig = null;
+        for (TPath path : pathList) {
+            System.err.println("path path ..." + path.getId());
+            if (path.getId().equalsIgnoreCase("XML_PROCESS_IMAGE")) {
+                pathConfig = path;
+            }
+        }
+
+        if (pathConfig == null) {
+            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
+                    "defaultOutputPath");
+            if (defaultPath != null) {
+                return new Path(defaultPath.getPath(), true);
+            }
+        }
+
+        if (pathConfig != null) {
+            String activeOutputPathID = pathConfig.getId();
+            if (activeOutputPathID == null) {
+                if (!pathSett.getPath().isEmpty()) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils
+                            .getTPath(pathSett, "defaultOutputPath");
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
+                }
+            } else {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, activeOutputPathID);
                 if (defaultPath != null) {
                     if (!defaultPath.getId()
                             .equalsIgnoreCase("defaultOutputPath")) {
@@ -1416,6 +1528,7 @@ public class IndustrialNetworkView extends ViewPart
             }
         }
         return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+
     }
 
     private void handleEnableDisable(IStructuredSelection selection) {

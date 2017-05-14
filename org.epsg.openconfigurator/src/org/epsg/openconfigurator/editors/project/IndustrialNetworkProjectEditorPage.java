@@ -34,6 +34,7 @@ package org.epsg.openconfigurator.editors.project;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -522,6 +523,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                 IndustrialNetworkProjectEditorPage.this.setDirty(true);
                 IndustrialNetworkProjectEditorPage.this
+                        .updateActivePathSetting();
+                IndustrialNetworkProjectEditorPage.this
                         .reloadPathSettingsTable();
             } else if (e.widget == editPathSettingsButton) {
                 if (pathDropDown.getText().equalsIgnoreCase(
@@ -615,7 +618,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     }
 
                     AddEditCustomTPathDialog addEditPathDialog = new AddEditCustomTPathDialog(
-                            form.getShell(), pathSettings, path);
+                            form.getShell(), pathSettings, path, true);
                     if (addEditPathDialog.open() == Window.OK) {
                         TPath newSetting = addEditPathDialog.getData();
 
@@ -641,6 +644,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     }
                 }
             } else if (e.widget == addPathSettingsButton) {
+                System.err.println("Add path setting..");
                 if (pathDropDown.getText().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
                     // Open the Add dialog box for All path
@@ -682,6 +686,15 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                                     pathSet.getPath().add(newSetting);
                                 }
+                            } else {
+                                pathSet.setId(
+                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+                                if (newSetting.isActive() == true) {
+                                    for (TPath eachPath : pathSet.getPath()) {
+                                        eachPath.setActive(false);
+                                    }
+                                }
+                                pathSet.getPath().add(newSetting);
                             }
                         }
 
@@ -696,8 +709,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     List<PathSettings> pathSettingsList = currentProject
                             .getProjectConfiguration().getPathSettings();
                     if (pathSettingsList.size() < 5) {
+
                         // If number of paths not exceeds 5
                         PathSettings pathSettings = new PathSettings();
+                        pathSettings.setId(
+                                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                        boolean isCustomAvailable = false;
 
                         for (PathSettings setPath : pathSettingsList) {
                             if (setPath != null) {
@@ -705,13 +722,18 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     if (setPath.getId().equalsIgnoreCase(
                                             OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                                         pathSettings = setPath;
+                                        isCustomAvailable = true;
                                     }
                                 }
                             }
                         }
 
+                        if (!isCustomAvailable) {
+                            pathSettingsList.add(pathSettings);
+                        }
+
                         AddEditCustomTPathDialog addEditPathDialog = new AddEditCustomTPathDialog(
-                                form.getShell(), pathSettings, null);
+                                form.getShell(), pathSettings, null, false);
                         if (addEditPathDialog.open() == Window.OK) {
                             TPath newSetting = addEditPathDialog.getData();
 
@@ -720,11 +742,27 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     .getPathSettings();
 
                             for (TProjectConfiguration.PathSettings pathSet : pathList) {
+                                System.err.println(
+                                        "Custom path id.." + pathSet.getId());
                                 if (pathSet.getId() != null) {
                                     if (pathSet.getId().equalsIgnoreCase(
                                             OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                                         pathSet.getPath().add(newSetting);
+                                    } else if (!pathSet.getId()
+                                            .equalsIgnoreCase(
+                                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+                                        PathSettings paths = new PathSettings();
+                                        paths.setId(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                                        paths.getPath().add(newSetting);
+                                        pathList.add(paths);
                                     }
+                                } else {
+                                    PathSettings paths = new PathSettings();
+                                    paths.setId(
+                                            OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                                    paths.getPath().add(newSetting);
+                                    pathList.add(paths);
                                 }
                             }
 
@@ -778,13 +816,17 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                             .getSelectedTPathIndex();
                     List<PathSettings> pathSettingsList = currentProject
                             .getProjectConfiguration().getPathSettings();
-
+                    boolean pathsettingsNotAvailable = false;
                     for (PathSettings setPath : pathSettingsList) {
                         if (setPath != null) {
                             if (setPath.getId() != null) {
                                 if (setPath.getId().equalsIgnoreCase(
                                         OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                                     setPath.getPath().remove(itemToDelete);
+                                    if (setPath.getPath().isEmpty()) {
+                                        pathsettingsNotAvailable = true;
+                                        pathSettingsList.remove(setPath);
+                                    }
                                     break;
                                 }
                             }
@@ -1308,8 +1350,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         pathDropDown.setItems(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID,
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
-        pathDropDown.setText(
-                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+        // pathDropDown.setText(
+        // OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
 
         Label dummyLabel = new Label(clientComposite, SWT.WRAP);
         dummyLabel.setLayoutData(
@@ -1587,24 +1629,63 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     IndustrialNetworkProjectEditorPage.ERROR_INITIALISATION_FAILED);
             return;
         }
-        // List<PathSettings> pathSett =
-        // currentProject.getProjectConfiguration()
-        // .getPathSettings();
-        // PathSettings pathSettings = null;
-        // for (PathSettings setPath : pathSett) {
-        // pathSettings = setPath;
-        // }
-        // pathComboViewer.setInput(pathSettings.getPath());
 
         pathDropDown.setItems(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID,
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
 
-        pathDropDown.setText(
-                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+        List<PathSettings> pathCollection = currentProject
+                .getProjectConfiguration().getPathSettings();
+        System.err.println("The path collection list.." + pathCollection);
+
+        for (PathSettings path : pathCollection) {
+            if (path.getId() == null) {
+                path.setId(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+            }
+        }
+
+        PathSettings pathSettingValue = null;
+        String activePathSetting = StringUtils.EMPTY;
+        if (currentProject.getProjectConfiguration()
+                .getActivePathSetting() != null) {
+            activePathSetting = currentProject.getProjectConfiguration()
+                    .getActivePathSetting();
+        }
+
+        if (activePathSetting.equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+            pathDropDown.setText(
+                    OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+        } else if (activePathSetting.equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+            pathDropDown.setText(
+                    OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+        } else if (activePathSetting == StringUtils.EMPTY) {
+            pathDropDown.setText(
+                    OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+        }
+
+        String pathSettingId = StringUtils.EMPTY;
+
+        for (PathSettings pathSetting : pathCollection) {
+
+            if (pathSetting.getId() != null) {
+                pathSettingId = pathSetting.getId();
+                if (pathSettingId.equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+                    System.err.println("Pth ID is detected..");
+                } else if (pathSettingId.equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+
+                }
+            }
+            pathSettingValue = pathSetting;
+
+        }
 
         reloadAutoGenerationSettingsCombo();
-
+        updateActivePathSetting();
         updateActiveAutoGenerationSetting();
         reloadAutoGenerationSettingsTable();
         reloadPathSettingsTable();
@@ -1785,39 +1866,67 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         List<TProjectConfiguration.PathSettings> pathList = currentProject
                 .getProjectConfiguration().getPathSettings();
 
-        for (TProjectConfiguration.PathSettings PathList : pathList) {
+        for (TProjectConfiguration.PathSettings pathSettingList : pathList) {
+            if (pathSettingList != null) {
+                if (pathSettingList.getId() != null) {
+                    if (pathDropDown.getText().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
 
-            if (pathDropDown.getText().equalsIgnoreCase(
-                    OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
-                if (PathList.getId().equalsIgnoreCase(
-                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
-                    pathSettingsTable.clearAll();
-                    pathSettingsTable.removeAll();
+                        if (pathSettingList.getId().equalsIgnoreCase(
+                                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+                            pathSettingsTable.clearAll();
+                            pathSettingsTable.removeAll();
 
-                    for (TPath setPath : PathList.getPath()) {
-                        TableItem item = new TableItem(pathSettingsTable,
-                                SWT.NONE);
-                        item.setText(0, setPath.getId());
-                        item.setText(1, setPath.getPath().toString());
+                            for (TPath setPath : pathSettingList.getPath()) {
+                                TableItem item = new TableItem(
+                                        pathSettingsTable, SWT.NONE);
+                                item.setText(0, setPath.getId());
+                                item.setText(1, setPath.getPath().toString());
 
-                        if (!setPath.isActive()) {
-                            item.setForeground(Display.getDefault()
-                                    .getSystemColor(SWT.COLOR_DARK_GRAY));
+                                if (!setPath.isActive()) {
+                                    item.setForeground(
+                                            Display.getDefault().getSystemColor(
+                                                    SWT.COLOR_DARK_GRAY));
+                                }
+                            }
+                        }
+
+                    } else if (pathDropDown.getText().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+                        if (pathSettingList.getId().equalsIgnoreCase(
+                                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+                            pathSettingsTable.clearAll();
+                            pathSettingsTable.removeAll();
+
+                            for (TPath setPath : pathSettingList.getPath()) {
+                                TableItem item = new TableItem(
+                                        pathSettingsTable, SWT.NONE);
+                                item.setText(0, setPath.getId());
+                                item.setText(1, setPath.getPath().toString());
+                            }
+                        } else {
+                            pathSettingsTable.clearAll();
+                            pathSettingsTable.removeAll();
                         }
                     }
-                }
-            } else if (pathDropDown.getText().equalsIgnoreCase(
-                    OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
-                if (PathList.getId().equalsIgnoreCase(
-                        OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+                } else {
                     pathSettingsTable.clearAll();
                     pathSettingsTable.removeAll();
 
-                    for (TPath setPath : PathList.getPath()) {
+                    for (TPath setPath : pathSettingList.getPath()) {
                         TableItem item = new TableItem(pathSettingsTable,
                                 SWT.NONE);
                         item.setText(0, setPath.getId());
                         item.setText(1, setPath.getPath().toString());
+
+                        if (pathSettingList.getActivePath() != null) {
+                            if (!setPath.getId().equalsIgnoreCase(
+                                    pathSettingList.getActivePath())) {
+                                item.setForeground(Display.getDefault()
+                                        .getSystemColor(SWT.COLOR_DARK_GRAY));
+                            }
+                        }
+
                     }
                 }
             }
@@ -1827,13 +1936,16 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             pathSettingsTable.getColumn(loopIndex).pack();
         }
 
-        if (pathSettingsTable.getItemCount() <= 0) {
+        int[] selectionIndex = pathSettingsTable.getSelectionIndices();
+        if ((pathSettingsTable.getItemCount() <= 0)
+                || (selectionIndex.length <= 0)) {
             editPathSettingsButton.setEnabled(false);
             deletePathSettingsButton.setEnabled(false);
         } else {
             editPathSettingsButton.setEnabled(true);
             deletePathSettingsButton.setEnabled(true);
         }
+
     }
 
     /**
@@ -1851,6 +1963,13 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 autoGenerationSettingsSelectionAdapter);
         deleteSettingsButton.removeSelectionListener(
                 autoGenerationSettingsSelectionAdapter);
+        addPathSettingsButton
+                .removeSelectionListener(pathSettingsSelectionAdapter);
+        editPathSettingsButton
+                .removeSelectionListener(pathSettingsSelectionAdapter);
+        deletePathSettingsButton
+                .removeSelectionListener(pathSettingsSelectionAdapter);
+        pathDropDown.removeSelectionListener(pathSettingsSelectionAdapter);
         agSettingsTable
                 .removeSelectionListener(autoGenerationSettingsTableAdapter);
     }
@@ -1945,4 +2064,52 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         IndustrialNetworkProjectEditorPage.this
                 .reloadAutoGenerationSettingsTable();
     }
+
+    protected void updateActivePathSetting() {
+        if (pathDropDown.getText().equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+            List<PathSettings> pathSettingsList = currentProject
+                    .getProjectConfiguration().getPathSettings();
+            for (PathSettings setPath : pathSettingsList) {
+                if (setPath.getId() != null) {
+                    if (setPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+                        currentProject.getProjectConfiguration()
+                                .setActivePathSetting(
+                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+                        break;
+                    }
+                } else if (currentProject.getProjectConfiguration()
+                        .getActivePathSetting() != null) {
+                    currentProject.getProjectConfiguration()
+                            .setActivePathSetting(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+                }
+            }
+
+        } else if (pathDropDown.getText().equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+
+            List<PathSettings> pathSettingsList = currentProject
+                    .getProjectConfiguration().getPathSettings();
+            for (PathSettings setPath : pathSettingsList) {
+                if (setPath.getId() != null) {
+                    if (setPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+                        currentProject.getProjectConfiguration()
+                                .setActivePathSetting(
+                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                        break;
+                    }
+                } else if (currentProject.getProjectConfiguration()
+                        .getActivePathSetting() != null) {
+                    currentProject.getProjectConfiguration()
+                            .setActivePathSetting(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+                }
+            }
+        }
+
+    }
+
 }

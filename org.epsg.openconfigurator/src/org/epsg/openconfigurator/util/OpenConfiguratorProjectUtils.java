@@ -673,7 +673,9 @@ public final class OpenConfiguratorProjectUtils {
         List<TPath> pathList = pathSettings.getPath();
         for (TPath path : pathList) {
             if (path.getId().equalsIgnoreCase(id)) {
-                return path;
+                if (path.isActive()) {
+                    return path;
+                }
             }
         }
 
@@ -1039,14 +1041,17 @@ public final class OpenConfiguratorProjectUtils {
 
         // Add default output path
         TProjectConfiguration.PathSettings pathSettings = new TProjectConfiguration.PathSettings();
+        pathSettings
+                .setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
         java.util.List<TPath> pathList = pathSettings.getPath();
         TPath path = new TPath();
         path.setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
         path.setPath(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
         pathList.add(path);
-        // change by Jenifer #1047
-        tProjectConfiguration.setActivePathSetting(pathSettings.toString());
+
+        tProjectConfiguration.setActivePathSetting(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
 
         // Auto generation settings
         java.util.List<TAutoGenerationSettings> autoGenerationSettingsList = tProjectConfiguration

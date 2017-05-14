@@ -111,13 +111,14 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      * path.
      *
      * @param networkId The network ID.
-     * @param outputpath The location to save the output files.
+     * @param textpath The location to save the output files.
      * @param monitor Monitor instance to update the progress activity.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
      * @throws CoreException
      */
     private static boolean buildConciseDeviceConfiguration(
-            final String networkId, java.nio.file.Path outputpath,
+            final String networkId, java.nio.file.Path textpath,
+            java.nio.file.Path binaryPath, java.nio.file.Path charPath,
             final IProgressMonitor monitor) throws CoreException {
         String configurationOutput[] = new String[1];
         ByteCollection cdcByteCollection = new ByteCollection();
@@ -136,20 +137,20 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             throw new CoreException(errorStatus);
         }
         try {
-            if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
-                Files.createDirectory(outputpath);
+            if (!Files.exists(textpath, LinkOption.NOFOLLOW_LINKS)) {
+                Files.createDirectory(textpath);
             }
         } catch (IOException e1) {
             e1.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
-                    "Output path:" + outputpath.toString() + " does not exist.",
+                    "Output path:" + textpath.toString() + " does not exist.",
                     e1);
             throw new CoreException(errorStatus);
         }
 
         // String[1] is always empty.
-        boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
+        boolean retVal = createMnobdTxt(textpath, configurationOutput[0]);
         if (!retVal) {
             return retVal;
         }
@@ -163,12 +164,12 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             // buffer.put((byte) ((value >> 8) & 0xff));
         }
 
-        retVal = createMnobdCdc(outputpath, buffer);
+        retVal = createMnobdCdc(binaryPath, buffer);
         if (!retVal) {
             return retVal;
         }
 
-        retVal = createMnobdHexTxt(outputpath, buffer);
+        retVal = createMnobdHexTxt(charPath, buffer);
         if (!retVal) {
             return retVal;
         }
@@ -268,13 +269,14 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      * Build the ProcessImage descriptions for currently active project.
      *
      * @param networkId The network ID.
-     * @param targetPath The location to save the output files.
+     * @param xmlPath The location to save the output files.
      * @param monitor Monitor instance to update the progress activity.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
      * @throws CoreException
      */
     private static boolean buildProcessImageDescriptions(String networkId,
-            java.nio.file.Path targetPath, IProgressMonitor monitor)
+            java.nio.file.Path xmlPath, java.nio.file.Path cPath,
+            java.nio.file.Path charpSPath, IProgressMonitor monitor)
             throws CoreException {
 
         ByteCollection nodeIdCollection = new ByteCollection();
@@ -294,19 +296,24 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         boolean ret = false;
         for (int i = 0; i < nodeIdCollection.size(); i++) {
             short value = nodeIdCollection.get(i);
-            java.nio.file.Path processImagePath = targetPath;
+            java.nio.file.Path processImagePath = xmlPath;
+            java.nio.file.Path cImagePath = cPath;
+            java.nio.file.Path cSharpImagePath = charpSPath;
             if (value != IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                 // The variable processimagePath does not store any values,
                 // instead it resolves the value received from node collection.
                 processImagePath = processImagePath
                         .resolve(String.valueOf(value));
+                cImagePath = cImagePath.resolve(String.valueOf(value));
+                cSharpImagePath = cSharpImagePath
+                        .resolve(String.valueOf(value));
                 // NOTE: Remove 'continue' to generate the Individual CN's PI
                 // descriptions.
                 continue;
             }
-            ret = buildCProcessImage(networkId, value, processImagePath);
+            ret = buildCProcessImage(networkId, value, cImagePath);
             ret = buildXmlProcessImage(networkId, value, processImagePath);
-            ret = buildCSharpProcessImage(networkId, value, processImagePath);
+            ret = buildCSharpProcessImage(networkId, value, cSharpImagePath);
         }
         return ret;
     }
@@ -731,16 +738,47 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             Path outputpath = pjtEditor.getProjectOutputPath();
 
-            final java.nio.file.Path targetPath;
+            Path configTextPath = pjtEditor.getConfigTextPath("CONFIG_TEXT");
+            Path configBinaryPath = pjtEditor
+                    .getConfigTextPath("CONFIG_BINARY");
+            Path configcharPath = pjtEditor
+                    .getConfigTextPath("CONFIG_CHAR_TEXT");
+            Path configXmlPath = pjtEditor
+                    .getConfigTextPath("XML_PROCESS_IMAGE");
+            Path configCPath = pjtEditor.getConfigTextPath("C_PROCESS_IMAGE");
 
-            if (outputpath.isLocal()) {
-                targetPath = FileSystems.getDefault().getPath(
-                        getProject().getLocation().toString(),
-                        outputpath.getPath());
+            Path cSharpPath = pjtEditor
+                    .getConfigTextPath("CSHARP_PROCESS_IMAGE");
+
+            final java.nio.file.Path targetPath = getTargetPath(outputpath);
+
+            final java.nio.file.Path textPath;
+            final java.nio.file.Path binaryPath;
+
+            final java.nio.file.Path charPath;
+
+            final java.nio.file.Path xmlPath;
+
+            final java.nio.file.Path cPath;
+
+            final java.nio.file.Path cSharpImagePath;
+
+            if (pjtEditor.isCustomPathAvailable()) {
+                textPath = getTargetPath(configTextPath);
+                binaryPath = getTargetPath(configBinaryPath);
+                charPath = getTargetPath(configcharPath);
+                xmlPath = getTargetPath(configXmlPath);
+                cPath = getTargetPath(configCPath);
+                cSharpImagePath = getTargetPath(cSharpPath);
             } else {
-                targetPath = FileSystems.getDefault()
-                        .getPath(outputpath.getPath());
+                textPath = targetPath;
+                binaryPath = targetPath;
+                charPath = targetPath;
+                xmlPath = targetPath;
+                cPath = targetPath;
+                cSharpImagePath = targetPath;
             }
+
             // waits for the XDC file import on initialization of
             // project.
             Display.getDefault().syncExec(new Runnable() {
@@ -760,11 +798,11 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             });
 
             boolean buildCdcSuccess = buildConciseDeviceConfiguration(networkId,
-                    targetPath, monitor);
+                    textPath, binaryPath, charPath, monitor);
             if (buildCdcSuccess) {
 
                 boolean buildPiSuccess = buildProcessImageDescriptions(
-                        networkId, targetPath, monitor);
+                        networkId, xmlPath, cPath, cSharpImagePath, monitor);
                 if (!buildPiSuccess) {
                     // Displays error message in console.
                     displayErrorMessage(MessageFormat
@@ -871,6 +909,18 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             }
         }
 
+    }
+
+    public java.nio.file.Path getTargetPath(Path opPath) {
+        final java.nio.file.Path path;
+
+        if (opPath.isLocal()) {
+            path = FileSystems.getDefault().getPath(
+                    getProject().getLocation().toString(), opPath.getPath());
+        } else {
+            path = FileSystems.getDefault().getPath(opPath.getPath());
+        }
+        return path;
     }
 
     /**

@@ -32,6 +32,8 @@
 package org.epsg.openconfigurator.editors.project;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -99,6 +101,8 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
      */
     private TPath path = new TPath();
 
+    boolean editable = false;
+
     /**
      * Path settings parent model.
      */
@@ -113,12 +117,14 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
      */
     public AddEditCustomTPathDialog(Shell parentShell,
             TProjectConfiguration.PathSettings pathSettingsModel,
-            final TPath path) {
+            final TPath path, boolean edit) {
         super(parentShell);
 
         if (path != null) {
             this.path = path;
         }
+
+        editable = edit;
 
         this.pathSettingsModel = pathSettingsModel;
     }
@@ -187,11 +193,32 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
             txtName = new Combo(container, SWT.READ_ONLY);
             txtName.setLayoutData(
                     new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
-            txtName.add("CONFIG_TEXT");
-            txtName.add("CONFIG_BINARY");
-            txtName.add("CONFIG_CHAR_TEXT");
-            txtName.add("XML_PROCESS_IMAGE");
-            txtName.add("C_PROCESS_IMAGE");
+
+            List<String> idList = new ArrayList<>();
+
+            idList.add("CONFIG_TEXT");
+            idList.add("CONFIG_BINARY");
+            idList.add("CONFIG_CHAR_TEXT");
+            idList.add("XML_PROCESS_IMAGE");
+            idList.add("C_PROCESS_IMAGE");
+            idList.add("CSHARP_PROCESS_IMAGE");
+
+            System.err.println("Id list..path seting .." + pathSettingsModel);
+            for (TPath path : pathSettingsModel.getPath()) {
+                System.err.println("Id list.." + idList);
+                System.err.println("Id path.." + path.getId());
+                if (idList.contains(path.getId())) {
+                    idList.remove(path.getId());
+                }
+            }
+
+            if (!editable) {
+                for (String id : idList) {
+                    txtName.add(id);
+                }
+            } else {
+                txtName.add(path.getId());
+            }
             txtName.select(0);
 
             if ((path.getId() != null)) {
