@@ -1989,10 +1989,11 @@ public class IndustrialNetworkView extends ViewPart
                                 "The can firmware be added .." + selectedModule
                                         .canFirmwareAdded(selectedModule));
                         if (!selectedModule.canFirmwareAdded(selectedModule)) {
-                            showErrorMessage("The node '"
+
+                            showErrorMessage("The modular head node"
                                     + selectedModule.getNode()
                                             .getNodeIDWithName()
-                                    + "' does not support firmware update.");
+                                    + "does not support module firmware update.\nPlease refer to the console for details.");
 
                         } else {
 

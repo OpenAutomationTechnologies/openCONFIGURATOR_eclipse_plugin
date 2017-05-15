@@ -255,10 +255,11 @@ public class Module {
                                         }
 
                                     } else {
+
                                         OpenConfiguratorMessageConsole
                                                 .getInstance()
                                                 .printErrorMessage(
-                                                        "The object '0x1F55/0x01' does not exists in the node '"
+                                                        "To support module firmware update the object '0x1F55/0x01' has to be present on the node '"
                                                                 + modularHeadNode
                                                                         .getNodeIDWithName()
                                                                 + "'. ",
@@ -269,7 +270,7 @@ public class Module {
                                 } else {
                                     OpenConfiguratorMessageConsole.getInstance()
                                             .printErrorMessage(
-                                                    "The object '0x1F55' does not exists in the node '"
+                                                    "To support module firmware update the object '0x1F55' has to be present on the node '"
                                                             + modularHeadNode
                                                                     .getNodeIDWithName()
                                                             + "'. ",
@@ -280,8 +281,9 @@ public class Module {
                             } else {
                                 OpenConfiguratorMessageConsole.getInstance()
                                         .printErrorMessage(
-                                                "The object '0x" + identListVal
-                                                        + "' does not exists in the node '"
+                                                "To support module firmware update the object '0x"
+                                                        + identListVal
+                                                        + "' has to be present on the node '"
                                                         + modularHeadNode
                                                                 .getNodeIDWithName()
                                                         + "'. ",
@@ -292,7 +294,7 @@ public class Module {
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printErrorMessage(
-                                            "The sub-object '0x1027/0x01' does not exists in the node '"
+                                            "To support module firmware update the object '0x1027/0x01' has to be present on the node '"
                                                     + modularHeadNode
                                                             .getNodeIDWithName()
                                                     + "'. ",
@@ -302,7 +304,7 @@ public class Module {
                     } else {
                         OpenConfiguratorMessageConsole.getInstance()
                                 .printErrorMessage(
-                                        "The object '0x1027' does not exists in the node '"
+                                        "To support module firmware update the object '0x1027' has to be present on the node '"
                                                 + modularHeadNode
                                                         .getNodeIDWithName()
                                                 + "'. ",
@@ -312,9 +314,9 @@ public class Module {
                 } else {
                     OpenConfiguratorMessageConsole.getInstance()
                             .printErrorMessage(
-                                    "The object '0x1F82' with value '"
+                                    "To support module firmware update the object '0x1F82' with value '"
                                             + defaultVal
-                                            + "' does not support firmware update for the node '"
+                                            + "' has to be present on the node '"
                                             + modularHeadNode
                                                     .getNodeIDWithName()
                                             + "'. ",
@@ -323,7 +325,7 @@ public class Module {
 
             } else {
                 OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
-                        "The object '0x1F82' does not exists in the node '"
+                        "To support module firmware update the object '0x1F82' has to be present on the node '"
                                 + modularHeadNode.getNodeIDWithName() + "'. ",
                         node.getProject().getName());
             }
