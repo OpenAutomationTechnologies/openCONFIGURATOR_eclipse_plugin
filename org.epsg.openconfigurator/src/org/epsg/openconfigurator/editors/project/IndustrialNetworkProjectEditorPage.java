@@ -651,7 +651,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     List<PathSettings> pathSettingsList = currentProject
                             .getProjectConfiguration().getPathSettings();
                     PathSettings pathSettings = new PathSettings();
-
+                    pathSettings.setId(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
                     for (PathSettings setPath : pathSettingsList) {
                         if (setPath != null) {
                             if (setPath.getId() != null) {

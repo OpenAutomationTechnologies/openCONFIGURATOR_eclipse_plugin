@@ -2033,13 +2033,19 @@ public class MappingView extends ViewPart {
                         lst_no_foi.add(forcedObj);
                     }
 
+                    nodeTypeCombo.setItems("Normal", "Chained");
+                    if (nodeObj
+                            .getPlkOperationMode() == PlkOperationMode.CHAINED) {
+                        nodeTypeCombo.select(1);
+
+                    } else {
+                        nodeTypeCombo.select(0);
+                    }
+
                     addListenersToCnControls();
-                    handleGeneralInfoForCn(nodeObj);
+                    handleGeneralInfoForModule(module);
 
                     txt_no_nodename.setText(nodeObj.getName());
-
-                    txt_no_PResTimeOut.setText(
-                            String.valueOf(nodeObj.getPresTimeoutvalue()));
 
                     return;
                 } else if (selectedObj instanceof HeadNodeInterface) {
@@ -4783,6 +4789,55 @@ public class MappingView extends ViewPart {
         asyncTimeOutTxt.setEditable(true);
         preScalerText.setText(nodeObj.getPrescaler());
         preScalerText.setEditable(true);
+
+    }
+
+    private void handleGeneralInfoForModule(Module moduleObj) {
+
+        Node nodeObj = moduleObj.getNode();
+        System.err.println("CN selected");
+        txt_no_PResTimeOut.setVisible(true);
+        nodeTypeCombo.setVisible(true);
+        lblNodeType.setVisible(true);
+        lblPResTimeout.setVisible(true);
+        nodeId.setEnabled(true);
+        nodeId.setText(String.valueOf(nodeObj.getCnNodeId()));
+
+        long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
+
+        txt_no_PResTimeOut.setText(String.valueOf(presTimeoutInMs));
+        if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
+            System.err.println("The chanined....");
+            nodeTypeCombo.select(1);
+            ;
+        } else {
+            System.err.println("The normal....");
+            nodeTypeCombo.select(0);
+        }
+
+        lblPResTimeout.setText("PRes Timeout (μs):");
+        lblNodeType.setText("Node Type:");
+        productNameLabel.setVisible(false);
+        productIdLabel.setVisible(false);
+        vendorNamelabel.setVisible(false);
+        vendorIdLabel.setVisible(false);
+        productNameText.setVisible(false);
+        productIdText.setVisible(false);
+        vendorNameText.setVisible(false);
+        vendorIdtext.setVisible(false);
+
+        lblLossOfSoc.setText("Product Name:");
+        lossOfSocTolText.setText(moduleObj.getProductName());
+        lossOfSocTolText.setEditable(false);
+        lblAsymcMtu.setText("Product ID:");
+        asyncMtuText.setText(moduleObj.getProductId());
+        asyncMtuText.setEditable(false);
+        lblAsyncTimeOut.setText("Vendor Name:");
+        asyncTimeOutTxt.setText(moduleObj.getVendorName());
+        asyncTimeOutTxt.setEditable(false);
+        lblPrescaler.setText("Vendor ID:");
+        preScalerText.setText(moduleObj.getVendorId());
+        preScalerText.setEditable(false);
 
     }
 

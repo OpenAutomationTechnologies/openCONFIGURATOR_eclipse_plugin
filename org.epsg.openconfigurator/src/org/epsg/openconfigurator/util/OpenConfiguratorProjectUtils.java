@@ -1043,11 +1043,11 @@ public final class OpenConfiguratorProjectUtils {
         List<TProjectConfiguration.PathSettings> pathSettingList = tProjectConfiguration
                 .getPathSettings();
         TProjectConfiguration.PathSettings pathSettings = new TProjectConfiguration.PathSettings();
-        pathSettings.setId(
-                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+        pathSettings
+                .setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
         java.util.List<TPath> pathList = pathSettings.getPath();
         TPath path = new TPath();
-        path.setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
+        path.setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
         path.setPath(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
         pathList.add(path);
