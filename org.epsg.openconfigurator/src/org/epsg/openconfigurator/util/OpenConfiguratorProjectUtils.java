@@ -240,7 +240,7 @@ public final class OpenConfiguratorProjectUtils {
 
                     int indeXOfNodeId = extensionXdd.lastIndexOf("_");
                     extensionXdd = extensionXdd.substring(0, indeXOfNodeId);
-                    System.err.println("The extension XDD,,," + extensionXdd);
+
                     // Append node ID and the 'XDC' extension to the
                     // configuration
                     // file.
@@ -405,7 +405,7 @@ public final class OpenConfiguratorProjectUtils {
 
         java.nio.file.Path pathRelative = projectRootPath
                 .relativize(Paths.get(targetConfigurationPath));
-        System.err.println("Target pathmmm.." + targetConfigurationPath);
+
         String relativePath = pathRelative.toString();
         relativePath = relativePath.replace('\\', '/');
 

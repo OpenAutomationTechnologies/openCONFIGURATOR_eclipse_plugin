@@ -152,6 +152,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final int FORM_BODY_VERTICAL_SPACING = 17;
     private static final int FORM_BODY_NUMBER_OF_COLUMNS = 2;
 
+    private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
+            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
+
     /**
      * Editor dirty flag for this page.
      */
@@ -166,10 +170,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
      * Toolkit for the form editor.
      */
     private FormToolkit toolkit;
-
     private IndustrialNetworkProjectEditor editor;
-    private OpenCONFIGURATORProject currentProject;
 
+    private OpenCONFIGURATORProject currentProject;
     /**
      * Controls for generator tag
      */
@@ -179,8 +182,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private Text generatorCreatedByText;
     private Text generatorCreatedOnText;
     private Text generatorModifiedOnText;
-    private Text generatorModifiedByText;
 
+    private Text generatorModifiedByText;
     /**
      * Controls for project configuration tag
      */
@@ -189,8 +192,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private Button btnModifyAutoGenerationSettings;
     private Button addSettingsButton;
     private Button editSettingsButton;
-    private Button deleteSettingsButton;
 
+    private Button deleteSettingsButton;
     /**
      * Controls for path setting tag
      */
@@ -199,6 +202,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private ComboViewer pathComboViewer;
     private Button addPathSettingsButton;
     private Button editPathSettingsButton;
+
     private Button deletePathSettingsButton;
     // private ComboViewer pathConfigurationComboViewer;
 
@@ -513,6 +517,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             }
         }
     };
+
     /**
      * Handles the selection events for the PathSettings group
      */
@@ -721,7 +726,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     // Open the Add dialog box for Custom path
                     List<PathSettings> pathSettingsList = currentProject
                             .getProjectConfiguration().getPathSettings();
-                    if (pathSettingsList.size() < 5) {
+                    if (pathSettingsList.size() < CUSTOM_CONFIG_PATH.length) {
 
                         // If number of paths not exceeds 5
                         PathSettings pathSettings = new PathSettings();
@@ -1365,9 +1370,11 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         pathDropDown.setLayoutData(
                 new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
         toolkit.adapt(pathDropDown, true, true);
-        pathDropDown.setItems(
+        String[] pathConfigItems = {
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID,
-                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID };
+
+        pathDropDown.setItems(pathConfigItems);
         // pathDropDown.setText(
         // OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
 
@@ -1621,10 +1628,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     IndustrialNetworkProjectEditorPage.ERROR_INITIALISATION_FAILED);
             return;
         }
-
-        pathDropDown.setItems(
+        String[] pathConfigItems = {
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID,
-                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID };
+        pathDropDown.setItems(pathConfigItems);
 
         List<PathSettings> pathCollection = currentProject
                 .getProjectConfiguration().getPathSettings();

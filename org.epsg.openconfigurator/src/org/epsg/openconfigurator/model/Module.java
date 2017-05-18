@@ -82,6 +82,10 @@ public class Module {
     public static final String MOVE_MODULE_ERROR = "Module cannot be moved because {0} with module type {1} does not match {2} module type {3}.";
     public static final String MOVE_MODULE_INTERFACE_ERROR = "Module cannot be moved because {0} with interface type {1} does not match {2} module type {3}.";
 
+    private static final long IDENTLIST_OBJECT_INDEX = 4135;
+
+    private static final long DOWNLOAD_CHILD_OBJECT_INDEX = 8021;
+
     private static void removeForcedObject(ForcedObjects forcedObjTag,
             org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
         org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
@@ -202,14 +206,14 @@ public class Module {
     /**
      * Validates the firmware manager support to module
      *
-     * @param nodeOrModuleObj2 Object instance of module
+     * @param selectedNodeOrModule Object instance of module
      * @return <code>true</code> if firmware can be added , <code>false</code>
      *         otherwise.
      */
-    public boolean canFirmwareAdded(Object nodeOrModuleObj2) {
+    public boolean canFirmwareAdded(Object selectedNodeOrModule) {
         boolean canFirmwareAdded = false;
-        if (nodeOrModuleObj2 instanceof Module) {
-            Module module = (Module) nodeOrModuleObj2;
+        if (selectedNodeOrModule instanceof Module) {
+            Module module = (Module) selectedNodeOrModule;
             Node modularHeadNode = module.getNode();
             PowerlinkObject obj = modularHeadNode.getObjectDictionary()
                     .getObject(8066);
@@ -220,7 +224,8 @@ public class Module {
                 }
                 if (canFirmwareAdded) {
                     PowerlinkObject identListObj = modularHeadNode
-                            .getObjectDictionary().getObject(4135);
+                            .getObjectDictionary()
+                            .getObject(IDENTLIST_OBJECT_INDEX);
                     if (identListObj != null) {
                         PowerlinkSubobject identListSubobj = identListObj
                                 .getSubObject((short) 01);
@@ -235,7 +240,8 @@ public class Module {
                                             Integer.parseInt(identListVal, 16));
                             if (identObj != null) {
                                 PowerlinkObject dowmnloadChildObj = modularHeadNode
-                                        .getObjectDictionary().getObject(8021);
+                                        .getObjectDictionary()
+                                        .getObject(DOWNLOAD_CHILD_OBJECT_INDEX);
                                 if (dowmnloadChildObj != null) {
                                     PowerlinkSubobject dowmnloadChildSubObj = dowmnloadChildObj
                                             .getSubObject((short) 01);

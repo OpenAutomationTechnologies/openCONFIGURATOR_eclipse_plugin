@@ -81,6 +81,10 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
     private final static String LOCATION_FIELD_MESSAGE_MUST_SPEFIFY_PATH = "Must specify a location.";
     private final static String LOCATION_FIELD_MESSAGE_INVALID_PATH = "Choose a valid location for the output files";
 
+    private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
+            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
+
     /**
      * Path name text box.
      */
@@ -197,12 +201,12 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
 
             List<String> idList = new ArrayList<>();
 
-            idList.add("CONFIG_TEXT");
-            idList.add("CONFIG_BINARY");
-            idList.add("CONFIG_CHAR_TEXT");
-            idList.add("XML_PROCESS_IMAGE");
-            idList.add("C_PROCESS_IMAGE");
-            idList.add("CSHARP_PROCESS_IMAGE");
+            idList.add(CUSTOM_CONFIG_PATH[0]);
+            idList.add(CUSTOM_CONFIG_PATH[1]);
+            idList.add(CUSTOM_CONFIG_PATH[2]);
+            idList.add(CUSTOM_CONFIG_PATH[3]);
+            idList.add(CUSTOM_CONFIG_PATH[4]);
+            idList.add(CUSTOM_CONFIG_PATH[5]);
 
             System.err.println("Id list..path seting .." + pathSettingsModel);
             for (TPath path : pathSettingsModel.getPath()) {

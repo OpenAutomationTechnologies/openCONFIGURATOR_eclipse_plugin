@@ -288,11 +288,17 @@ public class ParameterView extends ViewPart implements IPropertyListener {
      * The corresponding node instance for which the Parameter corresponds to.
      */
     private Node nodeObj;
+
+    /**
+     * The corresponding module instance for which the Parameter corresponds to.
+     */
     private Module moduleObj;
+
     /**
      * Source workbench part.
      */
     private IWorkbenchPart sourcePart;
+
     /**
      * Listener instance to listen to the changes in the source part.
      */
@@ -703,9 +709,11 @@ public class ParameterView extends ViewPart implements IPropertyListener {
     @Override
     public void propertyChanged(Object source, int propId) {
 
-        // treeViewer.setInput(moduleObj);
-
-        treeViewer.setInput(nodeObj);
+        if (moduleSelection) {
+            treeViewer.setInput(moduleObj);
+        } else if (nodeSelection) {
+            treeViewer.setInput(nodeObj);
+        }
 
     }
 

@@ -371,7 +371,7 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
 
         if (pathConfig == null) {
             TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
-                    "defaultOutputPath");
+                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
             if (defaultPath != null) {
                 return new Path(defaultPath.getPath(), true);
             }
@@ -381,8 +381,9 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             String activeOutputPathID = pathConfig.getId();
             if (activeOutputPathID == null) {
                 if (!pathSett.getPath().isEmpty()) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSett, "defaultOutputPath");
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
                     if (defaultPath != null) {
                         return new Path(defaultPath.getPath(), true);
                     }
@@ -391,8 +392,8 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 TPath defaultPath = OpenConfiguratorProjectUtils
                         .getTPath(pathSett, activeOutputPathID);
                 if (defaultPath != null) {
-                    if (!defaultPath.getId()
-                            .equalsIgnoreCase("defaultOutputPath")) {
+                    if (!defaultPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
                         return new Path(defaultPath.getPath(), false);
                     }
                 } else {

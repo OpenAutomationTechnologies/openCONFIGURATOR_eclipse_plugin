@@ -83,7 +83,9 @@ public class CopyNodeWizard extends Wizard {
      */
     public CopyNodeWizard(PowerlinkRootNode nodeList, Node selectedNodeObj) {
         if (selectedNodeObj == null) {
-            System.err.println("Invalid node selection");
+            System.err.println("Invalid node selection.");
+        } else {
+            System.out.println("Valid node selection.");
         }
 
         this.selectedNodeObj = selectedNodeObj;

@@ -444,10 +444,12 @@ public class MappingView extends ViewPart {
             System.err.println("Image object element.." + obj);
             if (obj instanceof String) {
                 String objIndex = (String) obj;
-                if (objIndex.contains("/")) {
-                    return subObjectIcon;
+                if (!objIndex.isEmpty()) {
+                    if (objIndex.contains("/")) {
+                        return subObjectIcon;
+                    }
+                    return objectIcon;
                 }
-                return objectIcon;
             }
             return null;
         }
@@ -556,7 +558,7 @@ public class MappingView extends ViewPart {
 
         public PdoActionsClearButtonSelectionListener(
                 ComboViewer channelComboViewer, TableViewer tableViewer) {
-            System.err.println("Node ....................");
+
             this.tableViewer = tableViewer;
             this.channelComboViewer = channelComboViewer;
         }
@@ -1803,6 +1805,16 @@ public class MappingView extends ViewPart {
 
     private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported.";
 
+    private static final int MINIMUM_ASYC_MTU_VALUE = 300;
+
+    private static final int MAXIMUM_ASYC_MTU_VALUE = 1500;
+
+    private static final long MINIMUM_ASYNC_SLOT_TIMEOUT = 250;
+
+    private static final int MINIMUM_PRESCALER_VALUE = 0;
+
+    private static final int MAXIMUM_PRESCALER_VALUE = 1000;
+
     /**
      * Resize table based on columns content width.
      *
@@ -2230,7 +2242,6 @@ public class MappingView extends ViewPart {
         }
 
     };
-
     /**
      * Source workbench part.
      */
@@ -2240,129 +2251,126 @@ public class MappingView extends ViewPart {
      * Listener instance to listen to the changes in the source part.
      */
     private final PartListener partListener = new PartListener();
-
     /**
      * TPDO page controls
      */
     private TabItem tbtmTpdo;
-
     private ComboViewer tpdoChannelComboViewer;
 
     private ComboViewer sndtoNodecomboviewer;
-    private TableViewer tpdoTableViewer;
 
+    private TableViewer tpdoTableViewer;
     private TableViewerColumn tpdoMappingObjectColumn;
     private TableViewerColumn tpdoActionsColumn;
     private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
-
     private Composite tpdoPageFooter;
-
     private Button btnTpdoChannelMapAvailableObjects;
     private Button btnTpdoChannelClearSelectedRows;
+
     private Text tpdoEnabledMappingEntriesText;
+
     private Text tpdoChannelSize;
     private TableEditor tpdoTableActionsEditor;
+
     private Composite tpdoActionsbuttonGroup;
+
     private Button tpdoActionsUpButton;
 
     private Button tpdoActionsDownButton;
 
     private TableColumn tpdoTblclmnActualValue;
+
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
-
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
-
     private ModifyListener tpdoEnabledMappingEntriesTextModifyListener;
-
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
 
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
-
     private SelectionListener tpdoActionsClearBtnSelectionListener;
+
     private SelectionListener tpdoActionsDownBtnSelectionListener;
+
     private SelectionListener tpdoActionsUpBtnSelectionListener;
+
     private Button tpdoBtnCheckButton;
 
     public boolean tpdoProfileObjectSelection = false;
     private int tpdoEnabledEntriesCount;
-
     private int count = 0;
 
     /**
      * RPDO page controls
      */
     private TabItem tbtmRpdo;
-
     private ComboViewer rpdoChannelComboViewer;
-
     private ComboViewer receiveFromNodecomboviewer;
+
     private TableViewer rpdoTableViewer;
     private TableViewerColumn rpdoMappingObjectColumn;
 
     private TableViewerColumn rpdoActionsColumn;
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
     private Composite rpdoPageFooter;
-
     private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
 
     private Text rpdoEnabledMappingEntriesText;
     private Text rpdoChannelSize;
     private TableEditor rpdoTableActionsEditor;
+
     private Composite rpdoActionsbuttonGroup;
     private Button rpdoActionsUpButton;
-
     private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
-
     private ISelectionChangedListener rpdoNodeComboSelectionChangeListener;
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
     private SelectionListener rpdoClearAllMappingBtnSelectionListener;
+
     private SelectionListener rpdoActionsClearBtnSelectionListener;
+
     private SelectionListener rpdoActionsDownBtnSelectionListener;
+
     private SelectionListener rpdoActionsUpBtnSelectionListener;
     private Button rpdoBtnCheckButton;
     public boolean rpdoProfileObjectSelection = false;
-
     private int rpdoEnabledEntriesCount;
-
     /**
      * Common GUI controls
      */
     private Action showAdvancedview;
-
     private final Image clearImage;
     private final Image upArrowImage;
     private final Image downArrowImage;
     private final Image warningImage;
     private final Image epsgImage;
     private final Image errorImage;
+
     private final Image signedYesImage;
+
     private final Image signedDisableImage;
+
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
+
     /**
      * Summary Page
      */
     private TabItem tbtmPdoConfiguration;
+
     private TableViewer tpdoSummaryTableViewer;
-
     private TableColumn tpdoSummaryClmnMappingVersion;
-
     private boolean tpdoSummaryOnlyShowChannelsWithData = false;
-
     private TableViewer rpdoSummaryTableViewer;
-
     private TableColumn rpdoSummaryClmnMappingVersion;
-
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
     /**
      * Common application model data
      */
     private final Node emptyNode;
     private final Node selfReceiptNode;
+
     private final PowerlinkObject emptyObject;
     private final ArrayList<Node> targetNodeIdList = new ArrayList<>();
     /**
@@ -2409,11 +2417,15 @@ public class MappingView extends ViewPart {
         }
     };
     private Text txt_no_nodename;
+
     private Text txt_no_PResTimeOut;
 
     private Text lossOfSocTolText;
+
     private Text asyncMtuText;
+
     private Text asyncTimeOutTxt;
+
     private Text preScalerText;
 
     private Text productNameText;
@@ -3149,10 +3161,10 @@ public class MappingView extends ViewPart {
         gd_lblNodeType.widthHint = 78;
         lblNodeType.setLayoutData(gd_lblNodeType);
         lblNodeType.setText("Transmit PRes:");
-        lblNodeType.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         formToolkit.adapt(lblNodeType, true, true);
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         nodeTypeCombo = new Combo(composite_10, SWT.NONE);
 
@@ -3167,10 +3179,10 @@ public class MappingView extends ViewPart {
         gd_lblPResTimeout.widthHint = 104;
         lblPResTimeout.setLayoutData(gd_lblPResTimeout);
         lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
-        lblPResTimeout.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         formToolkit.adapt(lblPResTimeout, true, true);
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         txt_no_PResTimeOut = new Text(composite_10, SWT.BORDER);
         txt_no_PResTimeOut.setEditable(true);
@@ -4669,14 +4681,14 @@ public class MappingView extends ViewPart {
             }
             try {
                 int asyncMtuValue = Integer.decode((String) value);
-                if ((asyncMtuValue < 300)) {
+                if ((asyncMtuValue < MINIMUM_ASYC_MTU_VALUE)) {
                     PluginErrorDialogUtils.showMessageWindow(
                             MessageDialog.ERROR, INVALID_RANGE_ASYNC_MTU,
                             nodeObj.getNetworkId());
                     return StringUtils.EMPTY;
 
                 }
-                if ((asyncMtuValue > 1500)) {
+                if ((asyncMtuValue > MAXIMUM_ASYC_MTU_VALUE)) {
                     PluginErrorDialogUtils.showMessageWindow(
                             MessageDialog.ERROR, INVALID_RANGE_ASYNC_MTU,
                             nodeObj.getNetworkId());
@@ -4743,7 +4755,7 @@ public class MappingView extends ViewPart {
             }
             try {
                 long resultVal = Long.decode((String) value);
-                if ((resultVal < 250)) {
+                if ((resultVal < MINIMUM_ASYNC_SLOT_TIMEOUT)) {
                     PluginErrorDialogUtils.showMessageWindow(
                             MessageDialog.ERROR,
                             INVALID_RANGE_ASYNC_SLOT_TIMEOUT,
@@ -4887,9 +4899,6 @@ public class MappingView extends ViewPart {
         vendorIdtext.setVisible(false);
 
         lblLossOfSoc.setText("Product Name:");
-        lblLossOfSoc.setLayoutData(
-                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
-
         lossOfSocTolText.setText(nodeObj.getProductName());
         lossOfSocTolText.setEditable(false);
         lblAsymcMtu.setText("Product ID:");
@@ -4911,8 +4920,12 @@ public class MappingView extends ViewPart {
         lblPResTimeout.setVisible(true);
         nodeId.setEnabled(false);
         nodeId.setText(String.valueOf(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
-        Long cycleTime = Long.decode(nodeObj.getCycleTime());
-        txt_no_PResTimeOut.setText(String.valueOf(cycleTime));
+        if (!nodeObj.getCycleTime().isEmpty()) {
+            Long cycleTime = Long.decode(nodeObj.getCycleTime());
+            txt_no_PResTimeOut.setText(String.valueOf(cycleTime));
+        } else {
+            txt_no_PResTimeOut.setText(StringUtils.EMPTY);
+        }
         if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
                     .getNodeModel();
@@ -5221,14 +5234,14 @@ public class MappingView extends ViewPart {
             try {
                 int preScalarVal = Integer.decode((String) value);
 
-                if ((preScalarVal < 0)) {
+                if ((preScalarVal < MINIMUM_PRESCALER_VALUE)) {
                     PluginErrorDialogUtils.showMessageWindow(
                             MessageDialog.ERROR, INVALID_RANGE_PRE_SCALER,
                             nodeObj.getNetworkId());
                     return StringUtils.EMPTY;
 
                 }
-                if ((preScalarVal > 1000)) {
+                if ((preScalarVal > MAXIMUM_PRESCALER_VALUE)) {
                     PluginErrorDialogUtils.showMessageWindow(
                             MessageDialog.ERROR, INVALID_RANGE_PRE_SCALER,
                             nodeObj.getNetworkId());

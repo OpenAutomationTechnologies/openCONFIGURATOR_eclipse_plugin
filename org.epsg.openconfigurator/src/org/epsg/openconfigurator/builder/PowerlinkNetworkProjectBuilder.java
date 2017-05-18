@@ -106,6 +106,18 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
             MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
 
+    private static final String MN_OBJECT_UPDATE_INDEX = "1F80";
+
+    private static final String RMN_FIRMWARE_AVAILABLITY_VALUE = "19456";
+
+    private static final String FIRMWARE_AVAILABLITY_VALUE = "3072";
+
+    private static final String RMN_AVAILABLITY_VALUE = "18432";
+
+    private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
+            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
+
     /**
      * Build the concise device configuration outputs in the specified output
      * path.
@@ -730,17 +742,19 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             Path outputpath = pjtEditor.getProjectOutputPath();
 
-            Path configTextPath = pjtEditor.getConfigTextPath("CONFIG_TEXT");
+            Path configTextPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[0]);
             Path configBinaryPath = pjtEditor
-                    .getConfigTextPath("CONFIG_BINARY");
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[1]);
             Path configcharPath = pjtEditor
-                    .getConfigTextPath("CONFIG_CHAR_TEXT");
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[2]);
             Path configXmlPath = pjtEditor
-                    .getConfigTextPath("XML_PROCESS_IMAGE");
-            Path configCPath = pjtEditor.getConfigTextPath("C_PROCESS_IMAGE");
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[3]);
+            Path configCPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[4]);
 
             Path cSharpPath = pjtEditor
-                    .getConfigTextPath("CSHARP_PROCESS_IMAGE");
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[5]);
 
             final java.nio.file.Path targetPath = getTargetPath(outputpath);
 
@@ -791,7 +805,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             Node mnNode = rootnode.getMN();
 
-            BigInteger objectId = new BigInteger("1F80", 16);
+            BigInteger objectId = new BigInteger(MN_OBJECT_UPDATE_INDEX, 16);
             PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
                     .getObject(objectId.longValue());
 
@@ -953,8 +967,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     if (!nodeDevRevisionList.isEmpty()) {
                         for (FirmwareManager fwMan : nodeDevRevisionList
                                 .values()) {
-                            if (fwMan.getNodeIdofFirmware().equalsIgnoreCase(
-                                    String.valueOf(cnNode.getCnNodeIdValue()))) {
+                            if (fwMan.getNodeIdofFirmware()
+                                    .equalsIgnoreCase(String.valueOf(
+                                            cnNode.getCnNodeIdValue()))) {
                                 if (fwMan.getFirmwarefileVersion() < fwManager
                                         .getFirmwarefileVersion()) {
                                     nodeDevRevisionList.put(
@@ -1009,7 +1024,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
         if (isFirmwareAvailable && isRmnAvailable) {
             try {
-                swVersionObj.setActualValue("19456", true);
+                swVersionObj.setActualValue(RMN_FIRMWARE_AVAILABLITY_VALUE,
+                        true);
                 OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
                         "19456");
             } catch (JDOMException e) {
@@ -1019,7 +1035,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             }
         } else if (isFirmwareAvailable) {
             try {
-                swVersionObj.setActualValue("3072", true);
+                swVersionObj.setActualValue(FIRMWARE_AVAILABLITY_VALUE, true);
                 OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
                         "3072");
             } catch (JDOMException e) {
@@ -1029,7 +1045,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             }
         } else if (isRmnAvailable) {
             try {
-                swVersionObj.setActualValue("18432", true);
+                swVersionObj.setActualValue(RMN_AVAILABLITY_VALUE, true);
                 OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
                         "18432");
             } catch (JDOMException e) {

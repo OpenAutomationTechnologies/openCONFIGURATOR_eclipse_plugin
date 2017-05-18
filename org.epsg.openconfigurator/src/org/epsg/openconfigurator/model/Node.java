@@ -322,6 +322,7 @@ public class Node {
         configurationError = "";
         xddFirmwareFile = null;
         currentProject = null;
+        processImage = null;
     }
 
     /**
@@ -658,8 +659,7 @@ public class Node {
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         res);
 
-                // Try removing the node.
-                // FIXME: do we need this?
+                // Remove the node.
                 res = OpenConfiguratorLibraryUtils.removeNode(newNode);
                 if (!res.IsSuccessful()) {
                     if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
@@ -696,8 +696,7 @@ public class Node {
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         res);
 
-                // Try removing the node.
-                // FIXME: do we need this?
+                // Remove the node.
                 res = OpenConfiguratorLibraryUtils.removeNode(newNode);
                 if (!res.IsSuccessful()) {
                     if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
@@ -2377,7 +2376,6 @@ public class Node {
                 OpenConfiguratorProjectUtils.addModuleNode(
                         selectedNodeObj.getNode(), selectedNodeObj, newModule);
             } catch (JDOMException | IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
 
@@ -2386,8 +2384,7 @@ public class Node {
                     + OpenConfiguratorLibraryUtils.getErrorMessage(res));
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR, res);
 
-            // Try removing the node.
-            // FIXME: do we need this?
+            // Remove the module.
             res = OpenConfiguratorLibraryUtils.removeModule(newModule);
             if (!res.IsSuccessful()) {
                 if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {

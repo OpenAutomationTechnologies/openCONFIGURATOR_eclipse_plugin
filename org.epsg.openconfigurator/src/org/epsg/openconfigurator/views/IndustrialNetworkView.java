@@ -533,15 +533,15 @@ public class IndustrialNetworkView extends ViewPart
     public static final String SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE = "Show Object Dictionary";
     public static final String SHOW_PARAMETER_ACTION_MESSAGE = "Show Parameter View";
     public static final String SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE = "Error openning Object Dictionary";
-    public static final String SHOW_PARAMETER_ERROR_MESSAGE = "Error openning Parameter";
+    public static final String SHOW_PARAMETER_ERROR_MESSAGE = "Error opening Parameter";
 
     // Process Image action message strings.
     public static final String SHOW_IO_MAP_ACTION_MESSAGE = "Show I/O Mapping";
-    public static final String SHOW_PROCESS_IMAGE_ERROR_MESSAGE = "Error openning Process Image";
+    public static final String SHOW_PROCESS_IMAGE_ERROR_MESSAGE = "Error opening Process Image";
 
     // Mapping view action message strings.
     public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
-    public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error openning MappingView";
+    public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error opening Mapping View";
 
     // Properties actions message strings.
     public static final String PROPERTIES_ACTION_MESSAGE = "Properties";
@@ -989,17 +989,19 @@ public class IndustrialNetworkView extends ViewPart
             } else if (e.keyCode == SWT.F5) {
                 handleRefresh();
             } else if (((e.stateMask & SWT.CTRL) == SWT.CTRL)
-                    && (e.keyCode == 'c')) {
+                    && ((e.keyCode == 'c') || (e.keyCode == 'C'))) {
                 IStructuredSelection selection = (IStructuredSelection) viewer
                         .getSelection();
                 Object selectedObject = selection.getFirstElement();
                 if (selectedObject instanceof Node) {
                     Node node = (Node) selectedObject;
                     Integer nodeId = Integer.valueOf(node.getNodeIdString());
-                    if (nodeId <= 240) {
+                    if (nodeId <= IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                         nodeToBeCopied = node;
                     } else {
                         nodeToBeCopied = null;
+                        System.err.println(
+                                "Node selection is not valid for copy operation.");
                     }
                 } else if (selectedObject instanceof Module) {
                     nodeToBeCopied = null;
@@ -1007,7 +1009,7 @@ public class IndustrialNetworkView extends ViewPart
                     nodeToBeCopied = null;
                 }
             } else if (((e.stateMask & SWT.CTRL) == SWT.CTRL)
-                    && (e.keyCode == 'v')) {
+                    && ((e.keyCode == 'v') || (e.keyCode == 'V'))) {
                 if (nodeToBeCopied == null) {
                     return;
                 }
@@ -1429,17 +1431,20 @@ public class IndustrialNetworkView extends ViewPart
             }
 
             if (pathConfig == null) {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, "defaultOutputPath");
+                TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                        pathSett,
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
                 if (defaultPath != null) {
                     return new Path(defaultPath.getPath(), true);
                 }
             }
 
             if (pathConfig != null) {
-                if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSett, "defaultOutputPath");
+                if (pathConfig.getId().equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
                     if (defaultPath != null) {
                         return new Path(defaultPath.getPath(), true);
                     }
@@ -1450,10 +1455,11 @@ public class IndustrialNetworkView extends ViewPart
             if (pathConfig != null) {
                 activeOutputPathID = pathConfig.getId();
             }
-            if (activeOutputPathID == null) {
+            if (activeOutputPathID.isEmpty()) {
                 if (!pathSett.getPath().isEmpty()) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSett, "defaultOutputPath");
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
                     if (defaultPath != null) {
                         return new Path(defaultPath.getPath(), true);
                     }
@@ -1462,8 +1468,8 @@ public class IndustrialNetworkView extends ViewPart
                 TPath defaultPath = OpenConfiguratorProjectUtils
                         .getTPath(pathSett, activeOutputPathID);
                 if (defaultPath != null) {
-                    if (!defaultPath.getId()
-                            .equalsIgnoreCase("defaultOutputPath")) {
+                    if (!defaultPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
                         return new Path(defaultPath.getPath(), false);
                     }
                 } else {
@@ -1516,8 +1522,9 @@ public class IndustrialNetworkView extends ViewPart
             String activeOutputPathID = pathConfig.getId();
             if (activeOutputPathID == null) {
                 if (!pathSett.getPath().isEmpty()) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSett, "defaultOutputPath");
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
                     if (defaultPath != null) {
                         return new Path(defaultPath.getPath(), true);
                     }
@@ -1526,8 +1533,8 @@ public class IndustrialNetworkView extends ViewPart
                 TPath defaultPath = OpenConfiguratorProjectUtils
                         .getTPath(pathSett, activeOutputPathID);
                 if (defaultPath != null) {
-                    if (!defaultPath.getId()
-                            .equalsIgnoreCase("defaultOutputPath")) {
+                    if (!defaultPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
                         return new Path(defaultPath.getPath(), false);
                     }
                 } else {
