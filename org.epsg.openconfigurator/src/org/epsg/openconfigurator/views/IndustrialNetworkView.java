@@ -1990,7 +1990,7 @@ public class IndustrialNetworkView extends ViewPart
                                         .canFirmwareAdded(selectedModule));
                         if (!selectedModule.canFirmwareAdded(selectedModule)) {
 
-                            showErrorMessage("The modular head node"
+                            showErrorMessage("The modular head node "
                                     + selectedModule.getNode()
                                             .getNodeIDWithName()
                                     + "does not support module firmware update.\nPlease refer to the console for details.");
@@ -2127,11 +2127,6 @@ public class IndustrialNetworkView extends ViewPart
             public void run() {
                 super.run();
 
-                // String test1 = JOptionPane
-                // .showInputDialog("Enter the node ID: ");
-                //
-                // int nodeId = Integer.parseInt(test1);
-
                 ISelection nodeTreeSelection = viewer.getSelection();
                 if ((nodeTreeSelection != null)
                         && (nodeTreeSelection instanceof IStructuredSelection)) {
@@ -2156,7 +2151,6 @@ public class IndustrialNetworkView extends ViewPart
                                     IResource.DEPTH_INFINITE,
                                     new NullProgressMonitor());
                         } catch (CoreException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
 
@@ -2188,7 +2182,7 @@ public class IndustrialNetworkView extends ViewPart
         };
         copyNode.setToolTipText("Copy Node");
         copyNode.setImageDescriptor(org.epsg.openconfigurator.Activator
-                .getImageDescriptor(IPluginImages.CN_ICON));
+                .getImageDescriptor(IPluginImages.COPY_NODE_ICON));
 
         showIoMapView = new Action(SHOW_IO_MAP_ACTION_MESSAGE) {
             @Override
