@@ -60,15 +60,19 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -95,10 +99,12 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
@@ -325,6 +331,125 @@ public class MappingView extends ViewPart {
                     System.err.println("Invalid selection type" + selection);
                 }
             }
+        }
+    }
+
+    /**
+     * Content provider to list the forced objects and sub_objects of node and
+     * module.
+     *
+     * @author Sree Hari Vignesh B
+     *
+     */
+    private class ForcedObjectContentProvider implements ITreeContentProvider {
+        Node node;
+        Module module;
+
+        public ForcedObjectContentProvider(Object nodeOrModule) {
+            if (nodeOrModule instanceof Node) {
+                Node node = (Node) nodeOrModule;
+                this.node = node;
+            } else if (nodeOrModule instanceof Module) {
+                Module module = (Module) nodeOrModule;
+                this.module = module;
+            }
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public Object[] getChildren(Object parentElement) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public Object[] getElements(Object inputElement) {
+
+            if (inputElement instanceof Node) {
+                Node node = (Node) inputElement;
+                String[] forcedObjs = node.getForcedObjectsString()
+                        .split("\\;");
+                return forcedObjs;
+            }
+            if (inputElement instanceof Module) {
+                Module module = (Module) inputElement;
+                String[] forcedObjs = module.getForcedObjectsString()
+                        .split("\\;");
+                return forcedObjs;
+            }
+            return new Object[0];
+        }
+
+        @Override
+        public Object getParent(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean hasChildren(Object element) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput,
+                Object newInput) {
+        }
+    }
+
+    /**
+     * Label provider for the forced objects and sub-objects.
+     *
+     * @author Sree Hari Vignesh B
+     *
+     */
+    private class ForcedObjectLabelProvider extends LabelProvider
+            implements IColorProvider {
+
+        Image objectIcon;
+        Image subObjectIcon;
+
+        public ForcedObjectLabelProvider(Object nodeOrModule) {
+
+            objectIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_OBJECT_ICON)
+                    .createImage();
+            subObjectIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_SUB_OBJECT_ICON)
+                    .createImage();
+        }
+
+        @Override
+        public void dispose() {
+            objectIcon.dispose();
+            subObjectIcon.dispose();
+        }
+
+        @Override
+        public Color getBackground(Object element) {
+            return null;
+        }
+
+        @Override
+        public Color getForeground(Object element) {
+            return null;
+        }
+
+        @Override
+        public Image getImage(Object obj) {
+            System.err.println("Image object element.." + obj);
+            if (obj instanceof String) {
+                String objIndex = (String) obj;
+                if (objIndex.contains("/")) {
+                    return subObjectIcon;
+                }
+                return objectIcon;
+            }
+            return null;
         }
     }
 
@@ -1759,7 +1884,6 @@ public class MappingView extends ViewPart {
                 "Mapping View", message, SWT.NONE);
     }
 
-    private org.eclipse.swt.widgets.List lst_no_foi;
     /**
      * Selection listener to display up,down,clear action buttons to move or
      * clear RPDO objects or Sub-Objects
@@ -1841,6 +1965,9 @@ public class MappingView extends ViewPart {
             }
         }
     };
+
+    private Tree lst_no_foi;
+
     /**
      * Selection listener to update the objects and sub-objects in the mapping
      * view.
@@ -1916,18 +2043,15 @@ public class MappingView extends ViewPart {
                 }
 
                 sourcePart = part;
-                nodeTypeCombo.removeModifyListener(nodeTypeModifyListener);
-                nodeTypeCombo.removeModifyListener(transmitPresModifyListener);
-                nodeId.removeModifyListener(nodeIDModifyListener);
-                lossOfSocTolText.removeModifyListener(lossOfSocModifyListener);
-                asyncMtuText.removeModifyListener(asyncMtuModifyListener);
-                asyncTimeOutTxt
-                        .removeModifyListener(asyncTimeoutModifyListener);
-                preScalerText.removeModifyListener(prescalerModifyListener);
-                txt_no_PResTimeOut
-                        .removeModifyListener(cycleTimeModifyListener);
-                txt_no_PResTimeOut
-                        .removeModifyListener(presTimeoutModifyListener);
+                nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
+                nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
+                nodeId.removeKeyListener(nodeIDModifyListener);
+                lossOfSocTolText.removeKeyListener(lossOfSocModifyListener);
+                asyncMtuText.removeKeyListener(asyncMtuModifyListener);
+                asyncTimeOutTxt.removeKeyListener(asyncTimeoutModifyListener);
+                preScalerText.removeKeyListener(prescalerModifyListener);
+                txt_no_PResTimeOut.removeKeyListener(cycleTimeModifyListener);
+                txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
 
                 if (selectedObj instanceof Node) {
                     System.err.println("Single Selection...");
@@ -1940,7 +2064,8 @@ public class MappingView extends ViewPart {
 
                     int nodeIdVal = Integer.valueOf(nodeObj.getNodeIdString());
                     if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        nodeTypeCombo.setItems("Yes", "No");
+                        String[] presItems = { "Yes", "No" };
+                        nodeTypeCombo.setItems(presItems);
                         if (nodeObj
                                 .getNodeModel() instanceof TNetworkConfiguration) {
                             TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
@@ -1954,11 +2079,12 @@ public class MappingView extends ViewPart {
                             }
                         }
                     } else {
-                        nodeTypeCombo.setItems("Normal", "Chained");
+                        String[] noteTypeItems = { "Normal", "Chained" };
+                        nodeTypeCombo.setItems(noteTypeItems);
                         if (nodeObj
                                 .getPlkOperationMode() == PlkOperationMode.CHAINED) {
                             nodeTypeCombo.select(1);
-                            ;
+
                         } else {
                             nodeTypeCombo.select(0);
                         }
@@ -1981,12 +2107,8 @@ public class MappingView extends ViewPart {
                     txt_no_nodename.setText(nodeObj.getName());
 
                     lst_no_foi.removeAll();
-                    String[] forcedObjs = nodeObj.getForcedObjectsString()
-                            .split("\\;");
-                    for (String forcedObj : forcedObjs) {
 
-                        lst_no_foi.add(forcedObj);
-                    }
+                    listViewer.setInput(nodeObj);
 
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
@@ -2026,14 +2148,10 @@ public class MappingView extends ViewPart {
                     rpdoChannelSize.setText(StringUtils.EMPTY);
 
                     lst_no_foi.removeAll();
-                    String[] forcedObjs = module.getForcedObjectsString()
-                            .split("\\;");
-                    for (String forcedObj : forcedObjs) {
+                    listViewer.setInput(module);
 
-                        lst_no_foi.add(forcedObj);
-                    }
-
-                    nodeTypeCombo.setItems("Normal", "Chained");
+                    String[] nodeTypeitems = { "Normal", "Chained" };
+                    nodeTypeCombo.setItems();
                     if (nodeObj
                             .getPlkOperationMode() == PlkOperationMode.CHAINED) {
                         nodeTypeCombo.select(1);
@@ -2088,12 +2206,7 @@ public class MappingView extends ViewPart {
                     txt_no_nodename.setText(nodeObj.getName());
 
                     lst_no_foi.removeAll();
-                    String[] forcedObjs = nodeObj.getForcedObjectsString()
-                            .split("\\;");
-                    for (String forcedObj : forcedObjs) {
-
-                        lst_no_foi.add(forcedObj);
-                    }
+                    listViewer.setInput(nodeObj);
 
                 } else {
                     System.err.println(
@@ -2343,82 +2456,46 @@ public class MappingView extends ViewPart {
 
     private String newCycleTime;
 
-    ModifyListener nodeNameModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter nodeIDModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
 
-            if (e.widget instanceof Text) {
-                Text nodeNameText = (Text) e.widget;
+                newNodeId = handleSetNodeId(nodeId.getText());
+                System.err.println("New node Id..." + newNodeId);
+                if ((newNodeId != StringUtils.EMPTY)) {
+                    System.err.println("New node Id..." + newNodeId);
+                    short nodeIDvalue = Short.valueOf((newNodeId));
 
-                String nodeName = nodeObj.getName();
-                System.err.println("Node name Selected" + nodeName);
-                newNodeName = handleSetNodeName(txt_no_nodename.getText());
-                System.err.println("Node name new Selected" + newNodeName);
-                if ((newNodeName != StringUtils.EMPTY)) {
-                    if ((!newNodeName.equalsIgnoreCase(nodeName))) {
-                        Result res = OpenConfiguratorCore.GetInstance()
-                                .SetNodeName(nodeObj.getNetworkId(),
-                                        nodeObj.getCnNodeId(), newNodeName);
-                        if (!res.IsSuccessful()) {
-                            OpenConfiguratorMessageConsole.getInstance()
-                                    .printLibraryErrorMessage(res);
-                        } else {
-                            try {
-                                nodeObj.setName(newNodeName);
+                    short oldNodeId = nodeObj.getCnNodeId();
+                    try {
+                        nodeObj.getPowerlinkRootNode().setNodeId(oldNodeId,
+                                nodeIDvalue);
 
-                            } catch (JDOMException | IOException ex) {
-                                // TODO Auto-generated catch block
-                                ex.printStackTrace();
-                            }
-
-                        }
+                    } catch (InvocationTargetException | IOException
+                            | JDOMException | InterruptedException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
                     }
                 } else {
-
-                    txt_no_nodename.setText(nodeObj.getName());
+                    // nodeId.setText(nodeObj.getNodeIdString());
                 }
 
             }
-
         }
 
     };
 
-    ModifyListener nodeIDModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter transmitPresModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-
-            newNodeId = handleSetNodeId(nodeId.getText());
-            System.err.println("New node Id..." + newNodeId);
-            if ((newNodeId != StringUtils.EMPTY)) {
-                System.err.println("New node Id..." + newNodeId);
-                short nodeIDvalue = Short.valueOf((newNodeId));
-
-                short oldNodeId = nodeObj.getCnNodeId();
-                try {
-                    nodeObj.getPowerlinkRootNode().setNodeId(oldNodeId,
-                            nodeIDvalue);
-
-                } catch (InvocationTargetException | IOException | JDOMException
-                        | InterruptedException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            } else {
-                // nodeId.setText(nodeObj.getNodeIdString());
-            }
-
-        }
-
-    };
-
-    ModifyListener transmitPresModifyListener = new ModifyListener() {
-
-        @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Combo) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Combo nodeTypeText = (Combo) e.widget;
                 String oldPres = StringUtils.EMPTY;
 
@@ -2471,11 +2548,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener nodeTypeModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter nodeTypeModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Combo) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Combo nodeTypeText = (Combo) e.widget;
 
                 String oldNodetype = StringUtils.EMPTY;
@@ -2553,11 +2632,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener presTimeoutModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter presTimeoutModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Text) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Text presTimeOutText = (Text) e.widget;
                 long presTimeoutInMsVal = nodeObj.getPresTimeoutvalue() / 1000;
 
@@ -2595,11 +2676,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener lossOfSocModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter lossOfSocModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Text) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Text lossofSocText = (Text) e.widget;
                 long value = Long.valueOf(nodeObj.getLossOfSocTolerance());
                 long valueInUs = value / 1000;
@@ -2639,11 +2722,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener asyncMtuModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter asyncMtuModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Text) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Text asyncMtuText1 = (Text) e.widget;
 
                 String asyncMtu = nodeObj.getAsyncMtu();
@@ -2674,11 +2759,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener asyncTimeoutModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter asyncTimeoutModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Text) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Text asyncTimeoutText = (Text) e.widget;
 
                 String asyncTime = nodeObj.getAsyncSlotTimeout();
@@ -2712,11 +2799,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener prescalerModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter prescalerModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Text) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Text preScalerText1 = (Text) e.widget;
 
                 String preScaler = nodeObj.getPrescaler();
@@ -2747,11 +2836,13 @@ public class MappingView extends ViewPart {
 
     };
 
-    ModifyListener cycleTimeModifyListener = new ModifyListener() {
-
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter cycleTimeModifyListener = new KeyAdapter() {
         @Override
-        public void modifyText(ModifyEvent e) {
-            if (e.widget instanceof Text) {
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
                 Text cycletimetext = (Text) e.widget;
 
                 String cycleTime = nodeObj.getCycleTime();
@@ -2783,6 +2874,48 @@ public class MappingView extends ViewPart {
     };
 
     private Text nodeId;
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter nodeNameModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+
+                String nodeName = nodeObj.getName();
+                System.err.println("Node name Selected" + nodeName);
+                newNodeName = handleSetNodeName(txt_no_nodename.getText());
+                System.err.println("Node name new Selected" + newNodeName);
+                if ((newNodeName != StringUtils.EMPTY)) {
+                    if ((!newNodeName.equalsIgnoreCase(nodeName))) {
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetNodeName(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeId(), newNodeName);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        } else {
+                            try {
+                                nodeObj.setName(newNodeName);
+
+                            } catch (JDOMException | IOException ex) {
+                                // TODO Auto-generated catch block
+                                ex.printStackTrace();
+                            }
+
+                        }
+                    }
+                } else {
+
+                    txt_no_nodename.setText(nodeObj.getName());
+                }
+            }
+        }
+
+    };
+
+    private TreeViewer listViewer;
 
     public MappingView() {
         TObject emptyObj = new TObject();
@@ -2828,47 +2961,47 @@ public class MappingView extends ViewPart {
     }
 
     private void addListenersToCnControls() {
-        nodeTypeCombo.removeModifyListener(transmitPresModifyListener);
-        txt_no_PResTimeOut.removeModifyListener(cycleTimeModifyListener);
+        nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
+        txt_no_PResTimeOut.removeKeyListener(cycleTimeModifyListener);
         System.err.println("Cycle time removed...");
-        txt_no_PResTimeOut.addModifyListener(presTimeoutModifyListener);
+        txt_no_PResTimeOut.addKeyListener(presTimeoutModifyListener);
         System.err.println("pres time added...");
 
-        lossOfSocTolText.removeModifyListener(lossOfSocModifyListener);
-        asyncMtuText.removeModifyListener(asyncMtuModifyListener);
-        asyncTimeOutTxt.removeModifyListener(asyncTimeoutModifyListener);
-        preScalerText.removeModifyListener(prescalerModifyListener);
+        lossOfSocTolText.removeKeyListener(lossOfSocModifyListener);
+        asyncMtuText.removeKeyListener(asyncMtuModifyListener);
+        asyncTimeOutTxt.removeKeyListener(asyncTimeoutModifyListener);
+        preScalerText.removeKeyListener(prescalerModifyListener);
 
-        txt_no_nodename.addModifyListener(nodeNameModifyListener);
+        txt_no_nodename.addKeyListener(nodeNameModifyListener);
 
         nodeId.setEnabled(true);
-        nodeId.addModifyListener(nodeIDModifyListener);
+        nodeId.addKeyListener(nodeIDModifyListener);
 
-        nodeTypeCombo.addModifyListener(nodeTypeModifyListener);
+        nodeTypeCombo.addKeyListener(nodeTypeModifyListener);
 
     }
 
     private void addListenersToMnControls() {
-        nodeTypeCombo.removeModifyListener(nodeTypeModifyListener);
-        txt_no_PResTimeOut.removeModifyListener(presTimeoutModifyListener);
+        nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
+        txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
         System.err.println("pres time removed...");
-        txt_no_PResTimeOut.addModifyListener(cycleTimeModifyListener);
+        txt_no_PResTimeOut.addKeyListener(cycleTimeModifyListener);
         System.err.println("Cycle time added...");
-        txt_no_nodename.addModifyListener(nodeNameModifyListener);
-        nodeId.removeModifyListener(nodeIDModifyListener);
+        txt_no_nodename.addKeyListener(nodeNameModifyListener);
+        nodeId.removeKeyListener(nodeIDModifyListener);
         nodeId.setEnabled(false);
 
-        nodeTypeCombo.addModifyListener(transmitPresModifyListener);
+        nodeTypeCombo.addKeyListener(transmitPresModifyListener);
 
-        lossOfSocTolText.addModifyListener(lossOfSocModifyListener);
-        asyncMtuText.addModifyListener(asyncMtuModifyListener);
-        asyncTimeOutTxt.addModifyListener(asyncTimeoutModifyListener);
-        preScalerText.addModifyListener(prescalerModifyListener);
+        lossOfSocTolText.addKeyListener(lossOfSocModifyListener);
+        asyncMtuText.addKeyListener(asyncMtuModifyListener);
+        asyncTimeOutTxt.addKeyListener(asyncTimeoutModifyListener);
+        preScalerText.addKeyListener(prescalerModifyListener);
 
     }
 
     private void addListenersToRmnControls() {
-        nodeId.addModifyListener(nodeIDModifyListener);
+        nodeId.addKeyListener(nodeIDModifyListener);
     }
 
     private void contributeToActionBars() {
@@ -2962,15 +3095,18 @@ public class MappingView extends ViewPart {
         gd_sctnCnFeatures.widthHint = 341;
 
         Section generalInformation = formToolkit.createSection(composite_1,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
         formToolkit.paintBordersFor(generalInformation);
         generalInformation.setText("General Information");
-        generalInformation.setDescription("Basic properties of a node.");
+        generalInformation
+                .setDescription("Provides the basic properties for the node.");
+
         generalInformation.setExpanded(true);
         GridData gd_sctnAdvancedConfiguration = new GridData(SWT.FILL, SWT.FILL,
                 true, true, 1, 1);
         gd_sctnAdvancedConfiguration.heightHint = 141;
-        gd_sctnAdvancedConfiguration.widthHint = 416;
+        gd_sctnAdvancedConfiguration.widthHint = 268;
         generalInformation.setLayoutData(gd_sctnAdvancedConfiguration);
         generalInformation.setRedraw(true);
 
@@ -2987,6 +3123,8 @@ public class MappingView extends ViewPart {
         Label lblNodeName = new Label(composite_10, SWT.NONE);
         lblNodeName.setText("Node Name:");
         formToolkit.adapt(lblNodeName, true, true);
+        lblNodeName.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         txt_no_nodename = new Text(composite_10, SWT.BORDER);
         txt_no_nodename.setEditable(true);
@@ -2997,7 +3135,8 @@ public class MappingView extends ViewPart {
         Label lblNodeId = new Label(composite_10, SWT.NONE);
         lblNodeId.setText("Node ID:");
         formToolkit.adapt(lblNodeId, true, true);
-
+        lblNodeId.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
         nodeId = new Text(composite_10, SWT.BORDER);
         nodeId.setEditable(true);
         nodeId.setLayoutData(
@@ -3005,7 +3144,13 @@ public class MappingView extends ViewPart {
         formToolkit.adapt(nodeId, true, true);
 
         lblNodeType = new Label(composite_10, SWT.NONE);
+        GridData gd_lblNodeType = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 1, 1);
+        gd_lblNodeType.widthHint = 78;
+        lblNodeType.setLayoutData(gd_lblNodeType);
         lblNodeType.setText("Transmit PRes:");
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         formToolkit.adapt(lblNodeType, true, true);
 
@@ -3019,9 +3164,11 @@ public class MappingView extends ViewPart {
         lblPResTimeout = new Label(composite_10, SWT.NONE);
         GridData gd_lblPResTimeout = new GridData(SWT.LEFT, SWT.CENTER, false,
                 false, 1, 1);
-        gd_lblPResTimeout.widthHint = 107;
+        gd_lblPResTimeout.widthHint = 104;
         lblPResTimeout.setLayoutData(gd_lblPResTimeout);
-        lblPResTimeout.setText("Cycle Time (μs):");
+        lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         formToolkit.adapt(lblPResTimeout, true, true);
 
@@ -3040,14 +3187,17 @@ public class MappingView extends ViewPart {
         formToolkit.paintBordersFor(composite_6);
 
         CLabel label = new CLabel(composite_6, SWT.NONE);
-        label.setBounds(50, 0, 268, 73);
+        label.setBounds(48, 0, 225, 143);
         formToolkit.adapt(label);
         formToolkit.paintBordersFor(label);
 
         label.setImage(epsgImage);
 
         Section forcedobjectSection = formToolkit.createSection(composite_1,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
+        forcedobjectSection.setDescription(
+                "Lists the index of forced objects and sub-objects.");
         formToolkit.paintBordersFor(forcedobjectSection);
         forcedobjectSection.setText("Forced Objects");
         forcedobjectSection.setExpanded(true);
@@ -3060,37 +3210,35 @@ public class MappingView extends ViewPart {
 
         Composite composite_101 = formToolkit
                 .createComposite(forcedobjectSection, SWT.WRAP);
-        GridLayout layout_ad = new GridLayout(3, false);
+        GridLayout layout_ad = new GridLayout(2, false);
         layout_ad.marginWidth = 2;
         layout_ad.marginHeight = 2;
         formToolkit.adapt(composite_101);
         formToolkit.paintBordersFor(composite_101);
         forcedobjectSection.setClient(composite_101);
         composite_101.setLayout(layout_ad);
-        new Label(composite_101, SWT.NONE);
+
+        listViewer = new TreeViewer(composite_101, SWT.BORDER | SWT.V_SCROLL);
+        lst_no_foi = listViewer.getTree();
+        GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1,
+                1);
+        gd_list.heightHint = 224;
+        gd_list.widthHint = 269;
+        lst_no_foi.setLayoutData(gd_list);
+        listViewer.setContentProvider(new ForcedObjectContentProvider(nodeObj));
+        listViewer.setLabelProvider(new ForcedObjectLabelProvider(nodeObj));
 
         Label label_7 = new Label(composite_101, SWT.NONE);
         label_7.setText(" ");
         formToolkit.adapt(label_7, true, true);
-        new Label(composite_101, SWT.NONE);
-
-        Label lblForcedObjectIndex = new Label(composite_101, SWT.NONE);
-        lblForcedObjectIndex.setText("Forced object and\nsub-object index:");
-        formToolkit.adapt(lblForcedObjectIndex, true, true);
-
-        lst_no_foi = new org.eclipse.swt.widgets.List(composite_101,
-                SWT.BORDER);
-        GridData gd_lst_no_foi = new GridData(SWT.LEFT, SWT.CENTER, false,
-                false, 2, 1);
-        gd_lst_no_foi.heightHint = 89;
-        gd_lst_no_foi.widthHint = 196;
-        lst_no_foi.setLayoutData(gd_lst_no_foi);
-        formToolkit.adapt(lst_no_foi, true, true);
 
         Section advancedInfoSection = formToolkit.createSection(composite_1,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR);
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
         formToolkit.paintBordersFor(advancedInfoSection);
         advancedInfoSection.setText("Advanced Information");
+        advancedInfoSection.setDescription(
+                "Provides the advanced properties for the node.");
         advancedInfoSection.setExpanded(true);
         GridData gdData_sctnforcedObjConfiguration = new GridData(SWT.FILL,
                 SWT.FILL, true, true, 1, 1);
@@ -3112,20 +3260,24 @@ public class MappingView extends ViewPart {
         lblLossOfSoc = new Label(composite_102, SWT.NONE);
         GridData gd_lblProductName = new GridData(SWT.LEFT, SWT.CENTER, false,
                 false, 1, 1);
-        gd_lblProductName.heightHint = 23;
+        gd_lblProductName.heightHint = 15;
         lblLossOfSoc.setLayoutData(gd_lblProductName);
-        lblLossOfSoc.setText("Loss of SoC tolerance (μs):");
+        lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
         formToolkit.adapt(lblLossOfSoc, true, true);
+        lblLossOfSoc.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         lossOfSocTolText = new Text(composite_102, SWT.BORDER);
         lossOfSocTolText.setEditable(true);
         lossOfSocTolText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
         formToolkit.adapt(lossOfSocTolText, true, true);
 
         lblAsymcMtu = new Label(composite_102, SWT.NONE);
         lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
         formToolkit.adapt(lblAsymcMtu, true, true);
+        lblAsymcMtu.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         asyncMtuText = new Text(composite_102, SWT.BORDER);
         asyncMtuText.setEditable(true);
@@ -3134,8 +3286,10 @@ public class MappingView extends ViewPart {
         formToolkit.adapt(asyncMtuText, true, true);
 
         lblAsyncTimeOut = new Label(composite_102, SWT.NONE);
-        lblAsyncTimeOut.setText("Asynchronous Timeout (ns):");
+        lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
         formToolkit.adapt(lblAsyncTimeOut, true, true);
+        lblAsyncTimeOut.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         asyncTimeOutTxt = new Text(composite_102, SWT.BORDER);
         asyncTimeOutTxt.setEditable(true);
@@ -3146,6 +3300,8 @@ public class MappingView extends ViewPart {
         lblPrescaler = new Label(composite_102, SWT.NONE);
         lblPrescaler.setText("Prescaler:");
         formToolkit.adapt(lblPrescaler, true, true);
+        lblPrescaler.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         preScalerText = new Text(composite_102, SWT.BORDER);
         preScalerText.setEditable(true);
@@ -3156,6 +3312,8 @@ public class MappingView extends ViewPart {
         productNameLabel = new Label(composite_102, SWT.NONE);
         productNameLabel.setText("Product Name:");
         formToolkit.adapt(productNameLabel, true, true);
+        productNameLabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         productNameText = new Text(composite_102, SWT.BORDER);
         productNameText.setEditable(false);
@@ -3167,6 +3325,8 @@ public class MappingView extends ViewPart {
         productIdLabel = new Label(composite_102, SWT.NONE);
         productIdLabel.setText("Product ID:");
         formToolkit.adapt(productIdLabel, true, true);
+        productIdLabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         productIdText = new Text(composite_102, SWT.BORDER);
         productIdText.setEditable(false);
@@ -3178,6 +3338,8 @@ public class MappingView extends ViewPart {
         vendorNamelabel = new Label(composite_102, SWT.NONE);
         vendorNamelabel.setText("Vendor Name:");
         formToolkit.adapt(vendorNamelabel, true, true);
+        vendorNamelabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         vendorNameText = new Text(composite_102, SWT.BORDER);
         vendorNameText.setEditable(false);
@@ -3189,10 +3351,12 @@ public class MappingView extends ViewPart {
         vendorIdLabel = new Label(composite_102, SWT.NONE);
         GridData gd_vendorIdLabel = new GridData(SWT.LEFT, SWT.CENTER, false,
                 false, 1, 1);
-        gd_vendorIdLabel.widthHint = 69;
+        gd_vendorIdLabel.widthHint = 55;
         vendorIdLabel.setLayoutData(gd_vendorIdLabel);
         vendorIdLabel.setText("Vendor ID:");
         formToolkit.adapt(vendorIdLabel, true, true);
+        vendorIdLabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
         vendorIdtext = new Text(composite_102, SWT.BORDER);
         vendorIdtext.setEditable(false);
@@ -4641,9 +4805,9 @@ public class MappingView extends ViewPart {
         if (value instanceof String) {
             cycleTime = (String) value;
             if (cycleTime.isEmpty()) {
-                // PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                // ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
-                // nodeObj.getNetworkId());
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
                 return StringUtils.EMPTY;
 
             }
@@ -4706,8 +4870,13 @@ public class MappingView extends ViewPart {
             nodeTypeCombo.select(0);
         }
 
-        lblPResTimeout.setText("PRes Timeout (μs):");
+        lblPResTimeout.setText("PRes Timeout (" + "\u00B5" + "s):");
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
         lblNodeType.setText("Node Type:");
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
         productNameLabel.setVisible(false);
         productIdLabel.setVisible(false);
         vendorNamelabel.setVisible(false);
@@ -4718,6 +4887,9 @@ public class MappingView extends ViewPart {
         vendorIdtext.setVisible(false);
 
         lblLossOfSoc.setText("Product Name:");
+        lblLossOfSoc.setLayoutData(
+                new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+
         lossOfSocTolText.setText(nodeObj.getProductName());
         lossOfSocTolText.setEditable(false);
         lblAsymcMtu.setText("Product ID:");
@@ -4739,7 +4911,8 @@ public class MappingView extends ViewPart {
         lblPResTimeout.setVisible(true);
         nodeId.setEnabled(false);
         nodeId.setText(String.valueOf(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
-        txt_no_PResTimeOut.setText(nodeObj.getCycleTime());
+        Long cycleTime = Long.decode(nodeObj.getCycleTime());
+        txt_no_PResTimeOut.setText(String.valueOf(cycleTime));
         if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
             TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
                     .getNodeModel();
@@ -4752,12 +4925,16 @@ public class MappingView extends ViewPart {
             }
         }
 
-        lblPResTimeout.setText("Cycle Time (μs):");
+        lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
         lblNodeType.setText("Transmit PRes:");
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
 
-        lblLossOfSoc.setText("Loss of SoC tolerance (μs):");
+        lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
         lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
-        lblAsyncTimeOut.setText("Asynchronous Timeout (ns):");
+        lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
         lblPrescaler.setText("Prescaler:");
 
         productNameLabel.setText("Product Name:");
@@ -4783,11 +4960,14 @@ public class MappingView extends ViewPart {
 
         lossOfSocTolText.setText(String.valueOf(valInUs));
         lossOfSocTolText.setEditable(true);
-        asyncMtuText.setText(nodeObj.getAsyncMtu());
+        Long asyncmtu = Long.decode(nodeObj.getAsyncMtu());
+        asyncMtuText.setText(String.valueOf(asyncmtu));
         asyncMtuText.setEditable(true);
-        asyncTimeOutTxt.setText(nodeObj.getAsyncSlotTimeout());
+        Long asyncTimeOut = Long.decode(nodeObj.getAsyncSlotTimeout());
+        asyncTimeOutTxt.setText(String.valueOf(asyncTimeOut));
         asyncTimeOutTxt.setEditable(true);
-        preScalerText.setText(nodeObj.getPrescaler());
+        Long prescaler = Long.decode(nodeObj.getPrescaler());
+        preScalerText.setText(String.valueOf(prescaler));
         preScalerText.setEditable(true);
 
     }
@@ -4809,14 +4989,15 @@ public class MappingView extends ViewPart {
         if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
             System.err.println("The chanined....");
             nodeTypeCombo.select(1);
-            ;
+
         } else {
             System.err.println("The normal....");
             nodeTypeCombo.select(0);
         }
 
-        lblPResTimeout.setText("PRes Timeout (μs):");
+        lblPResTimeout.setText("PRes Timeout (" + "\u00B5" + "s):");
         lblNodeType.setText("Node Type:");
+
         productNameLabel.setVisible(false);
         productIdLabel.setVisible(false);
         vendorNamelabel.setVisible(false);
