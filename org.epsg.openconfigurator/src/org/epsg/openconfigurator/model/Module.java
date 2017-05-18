@@ -1015,8 +1015,10 @@ public class Module {
 
                 if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
                     ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
-                    return devProfile.getDeviceIdentity().getProductName()
-                            .getValue();
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getProductName()
+                                .getValue();
+                    }
                 }
             }
         }
@@ -1073,8 +1075,10 @@ public class Module {
                 ProfileBodyDataType profileBody = profile.getProfileBody();
                 if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
                     ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
-                    return devProfile.getDeviceIdentity().getVendorName()
-                            .getValue();
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getVendorName()
+                                .getValue();
+                    }
                 }
             }
         }

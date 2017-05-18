@@ -555,7 +555,8 @@ public class Node {
                 plkMode = PlkOperationMode.NORMAL;
             } else if (val == 1) {
                 res = OpenConfiguratorCore.GetInstance()
-                        .SetOperationModeChained(getNetworkId(), getCnNodeIdValue());
+                        .SetOperationModeChained(getNetworkId(),
+                                getCnNodeIdValue());
                 plkMode = PlkOperationMode.CHAINED;
             } else if (val == 2) {
                 res = OpenConfiguratorCore.GetInstance()
@@ -1359,14 +1360,18 @@ public class Node {
 
                 if (profileBody instanceof ProfileBodyDevicePowerlink) {
                     ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
-                    return devProfile.getDeviceIdentity().getProductName()
-                            .getValue();
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getProductName()
+                                .getValue();
+                    }
                 }
 
                 if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
                     ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
-                    return devProfile.getDeviceIdentity().getProductName()
-                            .getValue();
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getProductName()
+                                .getValue();
+                    }
                 }
             }
         }
@@ -1482,13 +1487,17 @@ public class Node {
 
                 if (profileBody instanceof ProfileBodyDevicePowerlink) {
                     ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
-                    return devProfile.getDeviceIdentity().getVendorName()
-                            .getValue();
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getVendorName()
+                                .getValue();
+                    }
                 }
                 if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
                     ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
-                    return devProfile.getDeviceIdentity().getVendorName()
-                            .getValue();
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getVendorName()
+                                .getValue();
+                    }
                 }
             }
         }
@@ -1501,6 +1510,7 @@ public class Node {
      */
     public String getVersionValue(String versionType) {
         if (xddModel != null) {
+            // Get version details if the XDD model is valid
             List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
             for (ISO15745Profile profile : profiles) {
                 ProfileBodyDataType profileBody = profile.getProfileBody();
