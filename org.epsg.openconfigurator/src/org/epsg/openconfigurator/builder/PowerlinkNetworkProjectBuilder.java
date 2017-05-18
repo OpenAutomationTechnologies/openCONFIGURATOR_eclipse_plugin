@@ -422,7 +422,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 sb.append(" "); //$NON-NLS-1$
             }
         }
-
+        sb.append("\n");
         java.nio.file.Path targetFilePath = outputFolder
                 .resolve(MN_OBD_CHAR_TXT);
 
@@ -812,8 +812,16 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     System.err.println("Build output..." + buildPiSuccess);
                     displayInfoMessage(MessageFormat
                             .format(BUILD_COMPLETED_MESSAGE, networkId));
-                    displayInfoMessage("Generated output files at: "
-                            + targetPath.toString());
+                    displayInfoMessage(
+                            "Generated output files at: \n mnobd.txt:  "
+                                    + textPath.toString() + "\n mnobd.cdc:  "
+                                    + binaryPath.toString()
+                                    + "\n mnobd_char.txt:  "
+                                    + charPath.toString() + "\n xap.h:  "
+                                    + cPath.toString() + "\n xap.xml:  "
+                                    + xmlPath.toString()
+                                    + "\n ProcessImage.cs:  "
+                                    + cSharpImagePath.toString());
                 }
 
                 displayInfoMessage(UPDATING_NODE_CONFIGURATION_MESSAGE);
