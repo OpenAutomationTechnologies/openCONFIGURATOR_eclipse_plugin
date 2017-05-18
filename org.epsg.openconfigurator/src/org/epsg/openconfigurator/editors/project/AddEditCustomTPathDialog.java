@@ -1,9 +1,9 @@
 /*******************************************************************************
- * @file   AddEditTPathDialog.java
+ * @file   AddEditCustomTPathDialog.java
  *
- * @author Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
+ * @author Suresh Babu, Kalycito Infotech Private Limited.
  *
- * @copyright (c) 2015, Kalycito Infotech Private Limited
+ * @copyright (c) 2017, Kalycito Infotech Private Limited
  *                    All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -127,6 +127,7 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
         editable = edit;
 
         this.pathSettingsModel = pathSettingsModel;
+
     }
 
     /**
