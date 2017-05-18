@@ -215,7 +215,7 @@ public class Module {
                     .getObject(8066);
             if (obj != null) {
                 String defaultVal = obj.getActualDefaultValue();
-                if (defaultVal != StringUtils.EMPTY) {
+                if (!defaultVal.equalsIgnoreCase(StringUtils.EMPTY)) {
                     canFirmwareAdded = isModuleFirmwareBitSet(defaultVal);
                 }
                 if (canFirmwareAdded) {
@@ -249,7 +249,7 @@ public class Module {
                                         PowerlinkObject childObj = modularHeadNode
                                                 .getObjectDictionary()
                                                 .getObject(Integer.parseInt(
-                                                        identListVal, 16));
+                                                        downloadChildVal, 16));
                                         if (childObj != null) {
                                             return true;
                                         }

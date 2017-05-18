@@ -491,7 +491,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getCnNodeId(),
+                                mnNode.getCnNodeIdValue(),
                                 IManagingNodeProperties.ASND_MAX_NR_OBJECT_ID,
                                 IManagingNodeProperties.ASND_MAX_NR_SUBOBJECT_ID,
                                 String.valueOf(resultVal), false);
@@ -540,7 +540,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getCnNodeId(),
+                                mnNode.getCnNodeIdValue(),
                                 INetworkProperties.ASYNC_MTU_OBJECT_ID,
                                 INetworkProperties.ASYNC_MTU_SUBOBJECT_ID,
                                 String.valueOf(asyncMtuValue), false);
@@ -587,7 +587,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getCnNodeId(),
+                                mnNode.getCnNodeIdValue(),
                                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
                                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
                                 String.valueOf(resultVal), false);
@@ -628,7 +628,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateObjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getCnNodeId(),
+                                mnNode.getCnNodeIdValue(),
                                 INetworkProperties.CYCLE_TIME_OBJECT_ID,
                                 (String) value, false);
                 if (!validateResult.IsSuccessful()) {
@@ -707,7 +707,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getCnNodeId(),
+                                mnNode.getCnNodeIdValue(),
                                 INetworkProperties.MUTLIPLEX_CYCLE_CNT_OBJECT_ID,
                                 INetworkProperties.MUTLIPLEX_CYCLE_CNT_SUBOBJECT_ID,
                                 String.valueOf(multiplxCyclVal), false);
@@ -787,7 +787,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(mnNode.getNetworkId(),
-                                mnNode.getCnNodeId(),
+                                mnNode.getCnNodeIdValue(),
                                 INetworkProperties.PRESCALER_OBJECT_ID,
                                 INetworkProperties.PRESCALER_SUBOBJECT_ID,
                                 String.valueOf(preScalarVal), false);
@@ -826,7 +826,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    mnNode.getNetworkId(), mnNode.getCnNodeId(), nodeName);
+                    mnNode.getNetworkId(), mnNode.getCnNodeIdValue(), nodeName);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -878,7 +878,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                                mnNode.getNetworkId(), mnNode.getCnNodeId(),
+                                mnNode.getNetworkId(), mnNode.getCnNodeIdValue(),
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -900,7 +900,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                                 * 1000;
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetLossOfSocTolerance(mnNode.getNetworkId(),
-                                        mnNode.getCnNodeId(),
+                                        mnNode.getCnNodeIdValue(),
                                         lossOfSocTolerance);
                         if (res.IsSuccessful()) {
                             mnNode.setLossOfSocTolerance(lossOfSocTolerance);
@@ -925,7 +925,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                     case IManagingNodeProperties.MN_ASYNC_TIMEOUT_OBJECT:
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetAsyncSlotTimeout(mnNode.getNetworkId(),
-                                        mnNode.getCnNodeId(),
+                                        mnNode.getCnNodeIdValue(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             mnNode.setAsyncSlotTimeout(
@@ -938,7 +938,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetAsndMaxNr(
-                                mnNode.getNetworkId(), mnNode.getCnNodeId(),
+                                mnNode.getNetworkId(), mnNode.getCnNodeIdValue(),
                                 Short.decode((String) value));
                         if (res.IsSuccessful()) {
                             mnNode.setAsndMaxNumberOfNode(

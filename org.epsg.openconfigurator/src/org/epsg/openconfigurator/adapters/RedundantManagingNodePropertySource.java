@@ -358,7 +358,7 @@ public class RedundantManagingNodePropertySource
                     return ERROR_RMN_ID_RANGE;
                 }
 
-                if (nodeIDvalue == redundantManagingNode.getCnNodeId()) {
+                if (nodeIDvalue == redundantManagingNode.getCnNodeIdValue()) {
                     return null;
                 }
 
@@ -405,7 +405,7 @@ public class RedundantManagingNodePropertySource
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getCnNodeId(),
+                                redundantManagingNode.getCnNodeIdValue(),
                                 IRedundantManagingNodeProperties.RMN_PRIORITY_OBJECT_ID,
                                 IRedundantManagingNodeProperties.RMN_PRIORITY_SUBOBJECT_ID,
                                 String.valueOf(longValue), false);
@@ -449,7 +449,7 @@ public class RedundantManagingNodePropertySource
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
                     redundantManagingNode.getNetworkId(),
-                    redundantManagingNode.getCnNodeId(), nodeName);
+                    redundantManagingNode.getCnNodeIdValue(), nodeName);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -491,7 +491,7 @@ public class RedundantManagingNodePropertySource
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getCnNodeId(),
+                                redundantManagingNode.getCnNodeIdValue(),
                                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
                                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID,
                                 String.valueOf(longValue), false);
@@ -553,7 +553,7 @@ public class RedundantManagingNodePropertySource
                     case IAbstractNodeProperties.NODE_NAME_OBJECT: {
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
                                 redundantManagingNode.getNetworkId(),
-                                redundantManagingNode.getCnNodeId(),
+                                redundantManagingNode.getCnNodeIdValue(),
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -565,7 +565,7 @@ public class RedundantManagingNodePropertySource
                     }
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT: {
                         short nodeIDvalue = Short.valueOf(((String) value));
-                        short oldNodeId = redundantManagingNode.getCnNodeId();
+                        short oldNodeId = redundantManagingNode.getCnNodeIdValue();
                         redundantManagingNode.getPowerlinkRootNode()
                                 .setNodeId(oldNodeId, nodeIDvalue);
                         break;
@@ -577,7 +577,7 @@ public class RedundantManagingNodePropertySource
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetRedundantManagingNodeWaitNotActive(
                                         redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getCnNodeId(),
+                                        redundantManagingNode.getCnNodeIdValue(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             redundantManagingNode.setRmnWaitNotActive(
@@ -592,7 +592,7 @@ public class RedundantManagingNodePropertySource
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetRedundantManagingNodePriority(
                                         redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getCnNodeId(),
+                                        redundantManagingNode.getCnNodeIdValue(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             redundantManagingNode.setRmnPriority(

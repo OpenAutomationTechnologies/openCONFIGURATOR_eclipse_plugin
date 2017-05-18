@@ -827,8 +827,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     }
                 } else if (pathDropDown.getText().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
-                    TPath path = IndustrialNetworkProjectEditorPage.this
-                            .getSelectedTPath();
+
                     int itemToDelete = IndustrialNetworkProjectEditorPage.this
                             .getSelectedTPathIndex();
                     List<PathSettings> pathSettingsList = currentProject
@@ -926,8 +925,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         public void widgetSelected(SelectionEvent e) {
             int[] selectionIndex = pathSettingsTable.getSelectionIndices();
             if (selectionIndex.length > 0) {
-                TableItem item = new TableItem(pathSettingsTable, SWT.NONE);
-                System.err.println("Get text..." + selectionIndex[0]);
 
                 editPathSettingsButton.setEnabled(true);
                 deletePathSettingsButton.setEnabled(true);
@@ -1387,9 +1384,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 SWT.SINGLE | SWT.BORDER | SWT.V_SCROLL | SWT.H_SCROLL
                         | SWT.FULL_SELECTION);
 
-        GridData pst = new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1);
-
-        pst = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 3);
+        GridData pst = new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 3);
         pst.heightHint = 100;
         pathSettingsTable.setLayoutData(pst);
         pathSettingsTable.setHeaderVisible(true);
@@ -1609,30 +1604,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     }
 
     /**
-     * Returns the Path for the given ID.
-     *
-     * @param id Any string ID.
-     *
-     * @return the path or null other wise.
-     */
-    private TPath getTPath(final String id) {
-        List<PathSettings> pathSett = currentProject.getProjectConfiguration()
-                .getPathSettings();
-        PathSettings pathSettings = null;
-        for (PathSettings setPath : pathSett) {
-            pathSettings = setPath;
-        }
-        List<TPath> pathList = pathSettings.getPath();
-        for (TPath path : pathList) {
-            if (path.getId().equalsIgnoreCase(id)) {
-                return path;
-            }
-        }
-
-        return null;
-    }
-
-    /**
      * Initializes the project editor page.
      */
     @Override
@@ -1666,7 +1637,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             }
         }
 
-        PathSettings pathSettingValue = null;
         String activePathSetting = StringUtils.EMPTY;
         if (currentProject.getProjectConfiguration()
                 .getActivePathSetting() != null) {
@@ -1883,7 +1853,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                 TableItem item = new TableItem(
                                         pathSettingsTable, SWT.NONE);
                                 item.setText(0, setPath.getId());
-                                item.setText(1, setPath.getPath().toString());
+                                item.setText(1, setPath.getPath());
 
                                 if (!setPath.isActive()) {
                                     item.setForeground(
@@ -1904,7 +1874,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                 TableItem item = new TableItem(
                                         pathSettingsTable, SWT.NONE);
                                 item.setText(0, setPath.getId());
-                                item.setText(1, setPath.getPath().toString());
+                                item.setText(1, setPath.getPath());
                             }
                         } else {
                             pathSettingsTable.clearAll();
@@ -1929,7 +1899,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         TableItem item = new TableItem(pathSettingsTable,
                                 SWT.NONE);
                         item.setText(0, setPath.getId());
-                        item.setText(1, setPath.getPath().toString());
+                        item.setText(1, setPath.getPath());
 
                         if (pathSettingList.getActivePath() != null) {
                             if (!setPath.getId().equalsIgnoreCase(

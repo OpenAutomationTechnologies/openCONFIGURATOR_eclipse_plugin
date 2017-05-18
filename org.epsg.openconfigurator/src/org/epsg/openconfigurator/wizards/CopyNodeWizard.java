@@ -31,15 +31,10 @@
 
 package org.epsg.openconfigurator.wizards;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
-import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -111,69 +106,6 @@ public class CopyNodeWizard extends Wizard {
         // addNodePage.resetWizard();
     }
 
-    // Adds firmware to the node based on the valid firmware files available in
-    // the project
-    private boolean addNodeFirmwareFile(Node newNode) {
-        List<FirmwareManager> validFwList = new ArrayList<>();
-        if (nodeList != null) {
-            if (!nodeList.getCnNodeList().isEmpty()) {
-                for (Node cnNode : nodeList.getCnNodeList()) {
-                    if (cnNode.getVendorIdValue()
-                            .equalsIgnoreCase(newNode.getVendorIdValue())) {
-                        if (cnNode.getProductCodeValue().equalsIgnoreCase(
-                                newNode.getProductCodeValue())) {
-                            if (!cnNode.getValidFirmwareList().isEmpty()) {
-
-                                System.err.println(
-                                        "The firmware collection values.."
-                                                + cnNode.getValidFirmwareList());
-                                for (FirmwareManager fwMngr : cnNode
-                                        .getValidFirmwareList()) {
-                                    validFwList.add(fwMngr);
-
-                                }
-                            }
-                        }
-                    }
-
-                }
-
-                if (!validFwList.isEmpty()) {
-                    MessageDialog dialog = new MessageDialog(null,
-                            "Add firmware file", null,
-                            "The project contains firmware file for Node '"
-                                    + newNode.getNodeIDWithName() + "'."
-                                    + " \nDo you wish to add the firmware file? ",
-                            MessageDialog.WARNING, new String[] { "Yes", "No" },
-                            1);
-                    int result = dialog.open();
-                    if (result != 0) {
-                        return true;
-                    }
-                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
-                    for (FirmwareManager fwMngr : validFwList) {
-                        firmwarelist.put(fwMngr.getUri(), fwMngr);
-
-                    }
-
-                    for (FirmwareManager fw : firmwarelist.values()) {
-
-                        FirmwareManager firmwareMngr = new FirmwareManager(
-                                newNode, fw.getFirmwareXddModel(),
-                                fw.getFirmwareObjModel());
-                        newNode.getNodeFirmwareCollection().put(firmwareMngr,
-                                firmwareMngr.getFirmwarefileVersion());
-                        fw.updateFirmwareInProjectFile(firmwareMngr, newNode,
-                                firmwareMngr.getFirmwareObjModel());
-                    }
-
-                }
-                return true;
-            }
-        }
-        return false;
-    }
-
     /**
      * Add wizard page
      */
@@ -197,7 +129,7 @@ public class CopyNodeWizard extends Wizard {
     /**
      * @return The value of node ID entered in the wizard page
      */
-    public String getNodeId() {
+    public String getNodeIdCopy() {
         String nodeId = StringUtils.EMPTY;
         Object nodeModel = addNodePage.getNode();
         if (nodeModel instanceof TCN) {
@@ -281,7 +213,6 @@ public class CopyNodeWizard extends Wizard {
     @Override
     public boolean performFinish() {
 
-        Object nodeObject = addNodePage.getNode();
         stationType = addNodePage.getStationType();
 
         return true;

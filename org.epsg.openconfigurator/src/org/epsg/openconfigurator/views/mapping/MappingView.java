@@ -341,7 +341,8 @@ public class MappingView extends ViewPart {
      * @author Sree Hari Vignesh B
      *
      */
-    private class ForcedObjectContentProvider implements ITreeContentProvider {
+    private static class ForcedObjectContentProvider
+            implements ITreeContentProvider {
         Node node;
         Module module;
 
@@ -361,8 +362,7 @@ public class MappingView extends ViewPart {
 
         @Override
         public Object[] getChildren(Object parentElement) {
-            // TODO Auto-generated method stub
-            return null;
+            return new Object[0];
         }
 
         @Override
@@ -407,7 +407,7 @@ public class MappingView extends ViewPart {
      * @author Sree Hari Vignesh B
      *
      */
-    private class ForcedObjectLabelProvider extends LabelProvider
+    private static class ForcedObjectLabelProvider extends LabelProvider
             implements IColorProvider {
 
         Image objectIcon;
@@ -805,7 +805,7 @@ public class MappingView extends ViewPart {
      * @author Ramakrishnan P
      *
      */
-    private class PdoNodeListLabelProvider extends LabelProvider {
+    private static class PdoNodeListLabelProvider extends LabelProvider {
         private PdoType pdoType;
 
         // It is not required to be a static inner class.
@@ -823,23 +823,23 @@ public class MappingView extends ViewPart {
             if (element instanceof Node) {
                 Node node = (Node) element;
                 if (pdoType == PdoType.TPDO) {
-                    if (node.getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getCnNodeId()
-                                + ")";
+                    if (node.getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
+                        return node.getName() + " PRes("
+                                + node.getCnNodeIdValue() + ")";
                     } else if (node
-                            .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getCnNodeId()
-                                + ")";
+                            .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        return node.getName() + " PRes("
+                                + node.getCnNodeIdValue() + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
                 } else if (pdoType == PdoType.RPDO) {
-                    if (node.getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return "MN" + " PReq(" + node.getCnNodeId() + ")";
+                    if (node.getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
+                        return "MN" + " PReq(" + node.getCnNodeIdValue() + ")";
                     } else if (node
-                            .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getCnNodeId()
-                                + ")";
+                            .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        return node.getName() + " PRes("
+                                + node.getCnNodeIdValue() + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
@@ -961,7 +961,7 @@ public class MappingView extends ViewPart {
                         Node targetNode = null;
                         for (Node node : targetNodeIdList) {
 
-                            if (node.getCnNodeId() == targetNodeId) {
+                            if (node.getCnNodeIdValue() == targetNodeId) {
                                 targetNode = node;
                             }
                         }
@@ -970,32 +970,38 @@ public class MappingView extends ViewPart {
 
                             if (pdoType == PdoType.TPDO) {
                                 if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else if (nodeObj == targetNode) {
-                                    return "Self(" + targetNode.getCnNodeId()
+                                    return "Self("
+                                            + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     // TODO Check;
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else {
                                     return targetNode.getNodeIDWithName();
                                 }
                             } else if (pdoType == PdoType.RPDO) {
                                 if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return "MN" + " PReq("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else if (nodeObj == targetNode) {
-                                    return "Self(" + targetNode.getCnNodeId()
+                                    return "Self("
+                                            + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else {
                                     return targetNode.getNodeIDWithName();
                                 }
@@ -2062,7 +2068,8 @@ public class MappingView extends ViewPart {
                     displayMappingView(nodeObj);
                     Object nodeObjModel = nodeObj.getNodeModel();
 
-                    int nodeIdVal = Integer.valueOf(nodeObj.getNodeIdString());
+                    Integer nodeIdVal = Integer
+                            .valueOf(nodeObj.getNodeIdString());
                     if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                         String[] presItems = { "Yes", "No" };
                         nodeTypeCombo.setItems(presItems);
@@ -2151,7 +2158,7 @@ public class MappingView extends ViewPart {
                     listViewer.setInput(module);
 
                     String[] nodeTypeitems = { "Normal", "Chained" };
-                    nodeTypeCombo.setItems();
+                    nodeTypeCombo.setItems(nodeTypeitems);
                     if (nodeObj
                             .getPlkOperationMode() == PlkOperationMode.CHAINED) {
                         nodeTypeCombo.select(1);
@@ -2171,9 +2178,11 @@ public class MappingView extends ViewPart {
                     nodeObj = headintf.getNode();
                     Object nodeObjModel = nodeObj.getNodeModel();
 
-                    int nodeIdVal = Integer.valueOf(nodeObj.getNodeIdString());
+                    Integer nodeIdVal = Integer
+                            .valueOf(nodeObj.getNodeIdString());
                     if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        nodeTypeCombo.setItems("Yes", "No");
+                        String[] presTimes = { "Yes", "No" };
+                        nodeTypeCombo.setItems(presTimes);
                         if (nodeObj
                                 .getNodeModel() instanceof TNetworkConfiguration) {
                             TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
@@ -2187,7 +2196,8 @@ public class MappingView extends ViewPart {
                             }
                         }
                     } else {
-                        nodeTypeCombo.setItems("Normal", "Chained");
+                        String[] nodeTypeItems = { "Normal", "Chained" };
+                        nodeTypeCombo.setItems(nodeTypeItems);
                         if (nodeObj
                                 .getPlkOperationMode() == PlkOperationMode.CHAINED) {
                             nodeTypeCombo.select(1);
@@ -2400,7 +2410,7 @@ public class MappingView extends ViewPart {
     };
     private Text txt_no_nodename;
     private Text txt_no_PResTimeOut;
-    private Text text;
+
     private Text lossOfSocTolText;
     private Text asyncMtuText;
     private Text asyncTimeOutTxt;
@@ -2466,11 +2476,11 @@ public class MappingView extends ViewPart {
 
                 newNodeId = handleSetNodeId(nodeId.getText());
                 System.err.println("New node Id..." + newNodeId);
-                if ((newNodeId != StringUtils.EMPTY)) {
+                if ((!newNodeId.equalsIgnoreCase(StringUtils.EMPTY))) {
                     System.err.println("New node Id..." + newNodeId);
                     short nodeIDvalue = Short.valueOf((newNodeId));
 
-                    short oldNodeId = nodeObj.getCnNodeId();
+                    short oldNodeId = nodeObj.getCnNodeIdValue();
                     try {
                         nodeObj.getPowerlinkRootNode().setNodeId(oldNodeId,
                                 nodeIDvalue);
@@ -2496,7 +2506,6 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Combo nodeTypeText = (Combo) e.widget;
                 String oldPres = StringUtils.EMPTY;
 
                 if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
@@ -2512,7 +2521,7 @@ public class MappingView extends ViewPart {
                 int presIndex = nodeTypeCombo.getSelectionIndex();
                 newTransmitPres = handletransmitPres(String.valueOf(presIndex));
 
-                if ((newTransmitPres != StringUtils.EMPTY)) {
+                if ((!newTransmitPres.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newTransmitPres.equalsIgnoreCase(oldPres)) {
 
                         if (newTransmitPres.equalsIgnoreCase("Yes")) {
@@ -2555,8 +2564,6 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Combo nodeTypeText = (Combo) e.widget;
-
                 String oldNodetype = StringUtils.EMPTY;
                 if (nodeObj.getNodeModel() instanceof TCN) {
                     TCN tcn = (TCN) nodeObj.getNodeModel();
@@ -2571,7 +2578,7 @@ public class MappingView extends ViewPart {
                 newNodType = handleNodeTypeChange(nodeType);
                 System.err.println("old node Type.." + oldNodetype);
                 System.err.println("new node Type.." + newNodType);
-                if ((newNodType != StringUtils.EMPTY)) {
+                if ((!newNodType.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newNodType.equalsIgnoreCase(oldNodetype)) {
                         if (newNodType.equalsIgnoreCase("Normal")) {
                             newNodType = "0";
@@ -2586,13 +2593,13 @@ public class MappingView extends ViewPart {
                         if (val == 0) { // Normal Station.
                             res = OpenConfiguratorCore.GetInstance()
                                     .ResetOperationMode(nodeObj.getNetworkId(),
-                                            nodeObj.getCnNodeId());
+                                            nodeObj.getCnNodeIdValue());
                             plkMode = PlkOperationMode.NORMAL;
                         } else if (val == 1) {
                             res = OpenConfiguratorCore.GetInstance()
                                     .SetOperationModeChained(
                                             nodeObj.getNetworkId(),
-                                            nodeObj.getCnNodeId());
+                                            nodeObj.getCnNodeIdValue());
                             plkMode = PlkOperationMode.CHAINED;
                         }
                         if (plkMode != null) {
@@ -2639,18 +2646,18 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Text presTimeOutText = (Text) e.widget;
                 long presTimeoutInMsVal = nodeObj.getPresTimeoutvalue() / 1000;
 
                 String prestimeout = String.valueOf(presTimeoutInMsVal);
                 newPresTime = handlePresTimeout(txt_no_PResTimeOut.getText());
-                if ((newPresTime != StringUtils.EMPTY)) {
+                if ((!newPresTime.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newPresTime.equalsIgnoreCase(prestimeout)) {
                         long presTimeoutInNs = Long.decode(newPresTime)
                                 .longValue() * 1000;
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetPResTimeOut(nodeObj.getNetworkId(),
-                                        nodeObj.getCnNodeId(), presTimeoutInNs);
+                                        nodeObj.getCnNodeIdValue(),
+                                        presTimeoutInNs);
                         if (res.IsSuccessful()) {
                             try {
                                 nodeObj.setCnPresTimeout(
@@ -2683,21 +2690,20 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Text lossofSocText = (Text) e.widget;
-                long value = Long.valueOf(nodeObj.getLossOfSocTolerance());
+                Long value = Long.valueOf(nodeObj.getLossOfSocTolerance());
                 long valueInUs = value / 1000;
 
                 String lossOfSoc = String.valueOf(valueInUs);
                 newLossOfSoc = handleLossOfSoCTolerance(
                         lossOfSocTolText.getText());
                 System.err.println("Loss of Soc..." + newLossOfSoc);
-                if ((newLossOfSoc != StringUtils.EMPTY)) {
+                if ((!newLossOfSoc.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newLossOfSoc.equalsIgnoreCase(lossOfSoc)) {
                         long lossOfSocTolerance = Long.decode(newLossOfSoc)
                                 * 1000;
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetLossOfSocTolerance(nodeObj.getNetworkId(),
-                                        nodeObj.getCnNodeId(),
+                                        nodeObj.getCnNodeIdValue(),
                                         lossOfSocTolerance);
                         if (res.IsSuccessful()) {
                             try {
@@ -2713,7 +2719,7 @@ public class MappingView extends ViewPart {
                         }
                     }
                 } else {
-                    long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
+                    Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
                     long valInUs = val / 1000;
                     lossOfSocTolText.setText(String.valueOf(valInUs));
                 }
@@ -2729,11 +2735,9 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Text asyncMtuText1 = (Text) e.widget;
-
                 String asyncMtu = nodeObj.getAsyncMtu();
                 newAsyncMtu = handleAsyncMtu(asyncMtuText.getText());
-                if ((newAsyncMtu != StringUtils.EMPTY)) {
+                if ((!newAsyncMtu.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newAsyncMtu.equalsIgnoreCase(asyncMtu)) {
                         Integer asyncMtuValue = Integer.decode(newAsyncMtu);
                         Result res = OpenConfiguratorCore.GetInstance()
@@ -2766,16 +2770,15 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Text asyncTimeoutText = (Text) e.widget;
 
                 String asyncTime = nodeObj.getAsyncSlotTimeout();
                 newAsynctimeOut = handleAsyncSlotTimeout(
                         asyncTimeOutTxt.getText());
-                if ((newAsynctimeOut != StringUtils.EMPTY)) {
+                if ((!newAsynctimeOut.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (newAsynctimeOut.equalsIgnoreCase(asyncTime)) {
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetAsyncSlotTimeout(nodeObj.getNetworkId(),
-                                        nodeObj.getCnNodeId(),
+                                        nodeObj.getCnNodeIdValue(),
                                         Long.decode(newAsynctimeOut));
                         if (res.IsSuccessful()) {
                             try {
@@ -2806,11 +2809,9 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Text preScalerText1 = (Text) e.widget;
-
                 String preScaler = nodeObj.getPrescaler();
                 newPreScaler = handlePreScalerValue(preScalerText.getText());
-                if ((newPreScaler != StringUtils.EMPTY)) {
+                if ((!newPreScaler.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newPreScaler.equalsIgnoreCase(preScaler)) {
                         Integer preScalarVal = Integer.decode(newPreScaler);
                         Result res = OpenConfiguratorCore.GetInstance()
@@ -2843,11 +2844,9 @@ public class MappingView extends ViewPart {
         @Override
         public void keyReleased(final KeyEvent e) {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                Text cycletimetext = (Text) e.widget;
-
                 String cycleTime = nodeObj.getCycleTime();
                 newCycleTime = handleCycleTime(txt_no_PResTimeOut.getText());
-                if ((newCycleTime != StringUtils.EMPTY)) {
+                if ((!newCycleTime.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newCycleTime.equalsIgnoreCase(cycleTime)) {
                         Long cycleTimeValue = Long.decode(newCycleTime);
                         Result res = OpenConfiguratorCore.GetInstance()
@@ -2887,11 +2886,12 @@ public class MappingView extends ViewPart {
                 System.err.println("Node name Selected" + nodeName);
                 newNodeName = handleSetNodeName(txt_no_nodename.getText());
                 System.err.println("Node name new Selected" + newNodeName);
-                if ((newNodeName != StringUtils.EMPTY)) {
+                if ((!newNodeName.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if ((!newNodeName.equalsIgnoreCase(nodeName))) {
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetNodeName(nodeObj.getNetworkId(),
-                                        nodeObj.getCnNodeId(), newNodeName);
+                                        nodeObj.getCnNodeIdValue(),
+                                        newNodeName);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -4698,7 +4698,7 @@ public class MappingView extends ViewPart {
 
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(nodeObj.getNetworkId(),
-                                nodeObj.getCnNodeId(),
+                                nodeObj.getCnNodeIdValue(),
                                 INetworkProperties.ASYNC_MTU_OBJECT_ID,
                                 INetworkProperties.ASYNC_MTU_SUBOBJECT_ID,
                                 String.valueOf(asyncMtuValue), false);
@@ -4766,7 +4766,7 @@ public class MappingView extends ViewPart {
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(nodeObj.getNetworkId(),
-                                nodeObj.getCnNodeId(),
+                                nodeObj.getCnNodeIdValue(),
                                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
                                 IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
                                 String.valueOf(resultVal), false);
@@ -4825,7 +4825,7 @@ public class MappingView extends ViewPart {
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateObjectActualValue(nodeObj.getNetworkId(),
-                                nodeObj.getCnNodeId(),
+                                nodeObj.getCnNodeIdValue(),
                                 INetworkProperties.CYCLE_TIME_OBJECT_ID,
                                 (String) value, false);
                 if (!validateResult.IsSuccessful()) {
@@ -4856,7 +4856,7 @@ public class MappingView extends ViewPart {
         lblNodeType.setVisible(true);
         lblPResTimeout.setVisible(true);
         nodeId.setEnabled(true);
-        nodeId.setText(String.valueOf(nodeObj.getCnNodeId()));
+        nodeId.setText(String.valueOf(nodeObj.getCnNodeIdValue()));
 
         long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
 
@@ -4955,7 +4955,7 @@ public class MappingView extends ViewPart {
         vendorNameText.setVisible(true);
         vendorIdtext.setVisible(true);
 
-        long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
+        Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
         long valInUs = val / 1000;
 
         lossOfSocTolText.setText(String.valueOf(valInUs));
@@ -4981,7 +4981,7 @@ public class MappingView extends ViewPart {
         lblNodeType.setVisible(true);
         lblPResTimeout.setVisible(true);
         nodeId.setEnabled(true);
-        nodeId.setText(String.valueOf(nodeObj.getCnNodeId()));
+        nodeId.setText(String.valueOf(nodeObj.getCnNodeIdValue()));
 
         long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
 
@@ -5029,7 +5029,7 @@ public class MappingView extends ViewPart {
         lblNodeType.setVisible(false);
         lblPResTimeout.setVisible(false);
 
-        nodeId.setText(String.valueOf(nodeObj2.getCnNodeId()));
+        nodeId.setText(String.valueOf(nodeObj2.getCnNodeIdValue()));
 
         productNameLabel.setVisible(false);
         productIdLabel.setVisible(false);
@@ -5250,7 +5250,7 @@ public class MappingView extends ViewPart {
                 }
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateSubobjectActualValue(nodeObj.getNetworkId(),
-                                nodeObj.getCnNodeId(),
+                                nodeObj.getCnNodeIdValue(),
                                 INetworkProperties.PRESCALER_OBJECT_ID,
                                 INetworkProperties.PRESCALER_SUBOBJECT_ID,
                                 String.valueOf(preScalarVal), false);
@@ -5300,7 +5300,7 @@ public class MappingView extends ViewPart {
                     .validateSubobjectActualValue(nodeObj.getNetworkId(),
                             IPowerlinkConstants.MN_DEFAULT_NODE_ID,
                             INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
-                            nodeObj.getCnNodeId(),
+                            nodeObj.getCnNodeIdValue(),
                             String.valueOf(presTimeoutInNs), false);
             if (!validateResult.IsSuccessful()) {
                 PluginErrorDialogUtils.showMessageWindow(
@@ -5355,7 +5355,7 @@ public class MappingView extends ViewPart {
                     }
                 }
 
-                if (nodeIDvalue == nodeObj.getCnNodeId()) {
+                if (nodeIDvalue == nodeObj.getCnNodeIdValue()) {
                     return StringUtils.EMPTY;
                 }
 
@@ -5396,7 +5396,8 @@ public class MappingView extends ViewPart {
             }
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    nodeObj.getNetworkId(), nodeObj.getCnNodeId(), nodeName);
+                    nodeObj.getNetworkId(), nodeObj.getCnNodeIdValue(),
+                    nodeName);
             if (!res.IsSuccessful()) {
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         OpenConfiguratorLibraryUtils.getErrorMessage(res),
@@ -5528,7 +5529,7 @@ public class MappingView extends ViewPart {
         Node targetNode = null;
         for (Node node : targetNodeIdList) {
 
-            if (node.getCnNodeId() == targetNodeId) {
+            if (node.getCnNodeIdValue() == targetNodeId) {
                 targetNode = node;
             }
         }

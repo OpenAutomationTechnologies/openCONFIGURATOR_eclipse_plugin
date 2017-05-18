@@ -176,7 +176,7 @@ public class ObjectDictionaryView extends ViewPart
      * @author Ramakrishnan P
      *
      */
-    private class TreeLabelProvider extends LabelProvider {
+    private static class TreeLabelProvider extends LabelProvider {
         Image objectIcon;
         Image subObjectIcon;
         Image parameterIcon;

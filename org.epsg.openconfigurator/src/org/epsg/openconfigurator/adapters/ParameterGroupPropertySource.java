@@ -108,7 +108,7 @@ public class ParameterGroupPropertySource
             String objectId = (String) id;
             switch (objectId) {
                 case UNIQUE_ID:
-                    retObj = paramGrp.getUniqueId();
+                    retObj = paramGrp.getParamGroupUniqueId();
                     break;
                 case PARAM_NAME_ID:
                     retObj = paramGrp.getLabel().getText();

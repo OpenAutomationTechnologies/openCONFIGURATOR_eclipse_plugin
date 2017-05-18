@@ -139,12 +139,12 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
     @Override
     protected void buttonPressed(int buttonId) {
         if (buttonId == IDialogConstants.OK_ID) {
-            /**
-             * Check for the page is complete or not.
-             */
+
             if (isPageComplete()) {
-                path.setId(txtName.getText().trim());
-                path.setPath(txtLocation.getText());
+                if (path != null) {
+                    path.setId(txtName.getText().trim());
+                    path.setPath(txtLocation.getText());
+                }
                 okPressed();
             }
 

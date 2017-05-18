@@ -148,7 +148,7 @@ public class NewModuleWizard extends Wizard {
                     }
                     Map<String, FirmwareManager> firmwarelist = new HashMap<>();
                     for (FirmwareManager fwMngr : validFwList) {
-                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
 
                     }
 

@@ -41,6 +41,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -509,16 +510,20 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             }
         }
 
-        if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
-            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
-                    "defaultOutputPath");
-            if (defaultPath != null) {
-                return new Path(defaultPath.getPath(), true);
+        if (pathConfig != null) {
+            if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, "defaultOutputPath");
+                if (defaultPath != null) {
+                    return new Path(defaultPath.getPath(), true);
+                }
             }
         }
 
-        String activeOutputPathID = pathConfig.getId();
-        System.err.println("Active output path .." + activeOutputPathID);
+        String activeOutputPathID = StringUtils.EMPTY;
+        if (pathConfig != null) {
+            activeOutputPathID = pathConfig.getId();
+        }
         if (activeOutputPathID == null) {
             if (!pathSett.getPath().isEmpty()) {
                 TPath defaultPath = OpenConfiguratorProjectUtils

@@ -171,76 +171,93 @@ public class NewFirmwareWizard extends Wizard {
                 .getFirmwareConfigurationPath();
 
         Object objModel = getObjModel(nodeOrModuleObj);
-        Path firmwareFileName = firmwareFilePath.getFileName();
-        if (validateFmwareFileName(firmwareFilePath)) {
-            MessageDialog dialog = new MessageDialog(null,
-                    "Firmware file exists", null,
-                    "The firmware file with name '"
-                            + firmwareFileName.toString()
-                            + "' already exists in the project. \nPlease rename the file and try again.",
-                    MessageDialog.ERROR, new String[] { "OK" }, 0);
-            dialog.open();
-            return false;
-        }
-
-        if (updateFirmwareFile(firmwareFilePath, objModel,
-                getNode(nodeOrModuleObj))) {
-            String nodeId = getNode(nodeOrModuleObj).getNodeIdString();
-            int modulePos = 0;
-            if (getModule(nodeOrModuleObj) != null) {
-                modulePos = getModule(nodeOrModuleObj).getPosition();
+        if (firmwareFilePath != null) {
+            Path firmwareFileName = firmwareFilePath.getFileName();
+            if (validateFmwareFileName(firmwareFilePath)) {
+                MessageDialog dialog = new MessageDialog(null,
+                        "Firmware file exists", null,
+                        "The firmware file with name '"
+                                + firmwareFileName.toString()
+                                + "' already exists in the project. \nPlease rename the file and try again.",
+                        MessageDialog.ERROR, new String[] { "OK" }, 0);
+                dialog.open();
+                return false;
             }
-            PowerlinkRootNode rootNode = getNode(nodeOrModuleObj)
-                    .getPowerlinkRootNode();
-            List<Node> cnNodeList = rootNode.getCnNodeList();
-            for (Node node : cnNodeList) {
-                List<String> nodeFirmwareFileNameList = new ArrayList<>();
-                if (!node.getNodeFirmwareCollection().isEmpty()) {
-                    nodeFirmwareFileNameList = node
-                            .getNodeFirmwareFileNameList();
+
+            if (updateFirmwareFile(firmwareFilePath, objModel,
+                    getNode(nodeOrModuleObj))) {
+                String nodeId = getNode(nodeOrModuleObj).getNodeIdString();
+                int modulePos = 0;
+                if (getModule(nodeOrModuleObj) != null) {
+                    modulePos = getModule(nodeOrModuleObj).getPosition();
                 }
-                Object nodeObj = node.getNodeModel();
-                System.err.println("The XDD check.."
-                        + validateFirmwarePage.checkWithXddAttributes(nodeObj));
-                if (!nodeId.equalsIgnoreCase(node.getNodeIdString())) {
-                    if (!validateFirmwarePage.checkWithXddAttributes(nodeObj)) {
-                        String newNodeFirmwareFileName = firmwareFilePath
-                                .getFileName().toString();
-                        if (!nodeFirmwareFileNameList
-                                .contains(newNodeFirmwareFileName)) {
-                            updateFirmwareFile(firmwareFilePath, nodeObj, node);
+                PowerlinkRootNode rootNode = getNode(nodeOrModuleObj)
+                        .getPowerlinkRootNode();
+                List<Node> cnNodeList = rootNode.getCnNodeList();
+                for (Node node : cnNodeList) {
+                    List<String> nodeFirmwareFileNameList = new ArrayList<>();
+                    if (!node.getNodeFirmwareCollection().isEmpty()) {
+                        nodeFirmwareFileNameList = node
+                                .getNodeFirmwareFileNameList();
+                    }
+                    Object nodeObj = node.getNodeModel();
+                    String newNodeFirmwareFileName = StringUtils.EMPTY;
+                    if (firmwareFilePath.getFileName() != null) {
+                        newNodeFirmwareFileName = firmwareFilePath.getFileName()
+                                .toString();
+                    }
+
+                    if (!nodeId.equalsIgnoreCase(node.getNodeIdString())) {
+                        if (!validateFirmwarePage
+                                .checkWithXddAttributes(nodeObj)) {
+                            if (!nodeFirmwareFileNameList
+                                    .contains(newNodeFirmwareFileName)) {
+                                updateFirmwareFile(firmwareFilePath, nodeObj,
+                                        node);
+                            }
                         }
                     }
-                }
-                if (node.getInterface() != null) {
-                    if (!node.getInterface().getModuleCollection().isEmpty()) {
-                        for (Module module : node.getInterface()
-                                .getModuleCollection().values()) {
-                            List<String> firmwareFileNameList = new ArrayList<>();
-                            if (!module.getModuleFirmwareCollection()
-                                    .isEmpty()) {
-                                firmwareFileNameList = module
-                                        .getModuleFirmwareFileNameList();
-                            }
-                            int position = module.getPosition();
-                            Object moduleObj = module.getModelOfModule();
-                            if (position != modulePos) {
-                                if (!validateFirmwarePage
-                                        .checkWithXddAttributes(moduleObj)) {
-                                    if (module.canFirmwareAdded(moduleObj)) {
-                                        String newFirmwareFileName = firmwareFilePath
-                                                .getFileName().toString();
-                                        if (!firmwareFileNameList.contains(
-                                                newFirmwareFileName)) {
-                                            updateFirmwareFile(firmwareFilePath,
-                                                    nodeObj, module);
+                    if (node.getInterface() != null) {
+                        if (!node.getInterface().getModuleCollection()
+                                .isEmpty()) {
+                            for (Module module : node.getInterface()
+                                    .getModuleCollection().values()) {
+                                List<String> firmwareFileNameList = new ArrayList<>();
+                                if (!module.getModuleFirmwareCollection()
+                                        .isEmpty()) {
+                                    firmwareFileNameList = module
+                                            .getModuleFirmwareFileNameList();
+                                }
+                                int position = module.getPosition();
+                                Object moduleObj = module.getModelOfModule();
+                                if (position != modulePos) {
+                                    if (!validateFirmwarePage
+                                            .checkWithXddAttributes(
+                                                    moduleObj)) {
+                                        String newFirmwareFileName = StringUtils.EMPTY;
+
+                                        if (firmwareFilePath
+                                                .getFileName() != null) {
+                                            newFirmwareFileName = firmwareFilePath
+                                                    .getFileName().toString();
+                                        }
+
+                                        if (module
+                                                .canFirmwareAdded(moduleObj)) {
+
+                                            if (!firmwareFileNameList.contains(
+                                                    newFirmwareFileName)) {
+                                                updateFirmwareFile(
+                                                        firmwareFilePath,
+                                                        nodeObj, module);
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
-                    }
 
+                    }
                 }
             }
         }
@@ -385,8 +402,8 @@ public class NewFirmwareWizard extends Wizard {
                 if (!node.getNodeFirmwareCollection().isEmpty()) {
                     for (FirmwareManager fwMngr : node
                             .getNodeFirmwareCollection().keySet()) {
-                        if (fwMngr.getUri() != null) {
-                            File firmwareDirectory = new File(fwMngr.getUri());
+                        if (fwMngr.getFirmwareUri() != null) {
+                            File firmwareDirectory = new File(fwMngr.getFirmwareUri());
                             firmwareFileList.add(firmwareDirectory.getName());
                         }
                     }
@@ -396,8 +413,8 @@ public class NewFirmwareWizard extends Wizard {
                 if (!module.getModuleFirmwareCollection().isEmpty()) {
                     for (FirmwareManager fwMngr : module
                             .getModuleFirmwareCollection().keySet()) {
-                        if (fwMngr.getUri() != null) {
-                            File firmwareDirectory = new File(fwMngr.getUri());
+                        if (fwMngr.getFirmwareUri() != null) {
+                            File firmwareDirectory = new File(fwMngr.getFirmwareUri());
                             firmwareFileList.add(firmwareDirectory.getName());
                         }
                     }

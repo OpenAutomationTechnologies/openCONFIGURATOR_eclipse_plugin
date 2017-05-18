@@ -257,7 +257,7 @@ public class ValidateXddWizardPage extends WizardPage {
                     }
                     case REDUNDANT_MANAGING_NODE: {
                         if (newNode
-                                .getCnNodeId() > IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                .getCnNodeIdValue() > IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                             // This is an RMN
                             if (netWrkMgmt.getGeneralFeatures()
                                     .isDLLFeatureMN()) {

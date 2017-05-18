@@ -290,16 +290,16 @@ public class FirmwareManager {
     /**
      * @return The nodeId value of node and module.
      */
-    public String getNodeId() {
-        String nodeId = StringUtils.EMPTY;
+    public String getNodeIdofFirmware() {
+        String nodeIdValue = StringUtils.EMPTY;
         if (nodeOrModuleObject instanceof Node) {
             Node node = (Node) nodeOrModuleObject;
-            nodeId = node.getNodeIdString();
+            nodeIdValue = node.getNodeIdString();
         } else if (nodeOrModuleObject instanceof Module) {
             Module module = (Module) nodeOrModuleObject;
-            nodeId = module.getNode().getNodeIdString();
+            nodeIdValue = module.getNode().getNodeIdString();
         }
-        return nodeId;
+        return nodeIdValue;
     }
 
     /**
@@ -333,7 +333,7 @@ public class FirmwareManager {
     /**
      * @return The path of firmware file attached to node or module.
      */
-    public String getUri() {
+    public String getFirmwareUri() {
         return firmwareObjModel.getURI();
     }
 
@@ -369,7 +369,7 @@ public class FirmwareManager {
      *
      * @param relativePath The value of firmware file path.
      */
-    public void setUri(String relativePath) {
+    public void setFirmwareUri(String relativePath) {
         firmwareObjModel.setURI(relativePath);
     }
 
@@ -396,7 +396,7 @@ public class FirmwareManager {
         if (getNode(nodeOrModuleObj) != null) {
             Node node = getNode(nodeOrModuleObj);
             res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
-                    node.getNetworkId(), node.getCnNodeId(),
+                    node.getNetworkId(), node.getCnNodeIdValue(),
                     NodeAssignment.NMT_NODEASSIGN_SWUPDATE);
 
             if (!res.IsSuccessful()) {
@@ -405,7 +405,7 @@ public class FirmwareManager {
             }
 
             res = OpenConfiguratorCore.GetInstance().AddNodeAssignment(
-                    node.getNetworkId(), node.getCnNodeId(),
+                    node.getNetworkId(), node.getCnNodeIdValue(),
                     NodeAssignment.NMT_NODEASSIGN_SWVERSIONCHECK);
             if (!res.IsSuccessful()) {
                 OpenConfiguratorMessageConsole.getInstance()

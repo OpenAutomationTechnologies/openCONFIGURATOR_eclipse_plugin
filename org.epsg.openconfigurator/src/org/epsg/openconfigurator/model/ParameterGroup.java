@@ -110,7 +110,7 @@ public class ParameterGroup {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
                     ParameterGroup paramGrpModel = new ParameterGroup(node,
                             objectDictionary, paramGrp);
-                    parameterGroupMap.put(paramGrpModel.getUniqueId(),
+                    parameterGroupMap.put(paramGrpModel.getParamGroupUniqueId(),
                             paramGrpModel);
                 } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
                     TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
@@ -180,7 +180,7 @@ public class ParameterGroup {
     /**
      * @return Unique ID of parameter.
      */
-    public String getUniqueId() {
+    public String getParamGroupUniqueId() {
         return uniqueId;
     }
 

@@ -141,9 +141,11 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
              * Check for the page is complete or not.
              */
             if (isPageComplete()) {
-                path.setId(txtName.getText().trim());
-                path.setPath(txtLocation.getText());
-                path.setActive(btnActive.getSelection());
+                if (path != null) {
+                    path.setId(txtName.getText().trim());
+                    path.setPath(txtLocation.getText());
+                    path.setActive(btnActive.getSelection());
+                }
                 okPressed();
             }
 

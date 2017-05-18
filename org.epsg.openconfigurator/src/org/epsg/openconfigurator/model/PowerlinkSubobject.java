@@ -871,7 +871,7 @@ public class PowerlinkSubobject extends AbstractPowerlinkObject
      */
     @Override
     public short getCNNodeId() {
-        return nodeInstance.getCnNodeId();
+        return nodeInstance.getCnNodeIdValue();
     }
 
     /**

@@ -873,8 +873,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             java.nio.file.Path targetFilePath = outputpath
                     .resolve(FIRMWARE_INFO);
             for (FirmwareManager fwMngr : fwList) {
-                String nodeIdString = fwMngr.getNodeId();
-                int hexadecNodeVal = Integer.valueOf(nodeIdString);
+                String nodeIdString = fwMngr.getNodeIdofFirmware();
+                Integer hexadecNodeVal = Integer.valueOf(nodeIdString);
 
                 String nodeId = Integer.toHexString(hexadecNodeVal);
                 System.err.println(
@@ -953,8 +953,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     if (!nodeDevRevisionList.isEmpty()) {
                         for (FirmwareManager fwMan : nodeDevRevisionList
                                 .values()) {
-                            if (fwMan.getNodeId().equalsIgnoreCase(
-                                    String.valueOf(cnNode.getCnNodeId()))) {
+                            if (fwMan.getNodeIdofFirmware().equalsIgnoreCase(
+                                    String.valueOf(cnNode.getCnNodeIdValue()))) {
                                 if (fwMan.getFirmwarefileVersion() < fwManager
                                         .getFirmwarefileVersion()) {
                                     nodeDevRevisionList.put(

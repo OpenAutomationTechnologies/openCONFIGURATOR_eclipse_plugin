@@ -93,7 +93,7 @@ public class ParameterView extends ViewPart implements IPropertyListener {
      * @author Sree Hari
      *
      */
-    private class EmptyParameter {
+    private static class EmptyParameter {
         @Override
         public String toString() {
             return "Parameters not available.";
@@ -174,7 +174,7 @@ public class ParameterView extends ViewPart implements IPropertyListener {
      * @author Sree Hari
      *
      */
-    private class TreeLabelProvider extends LabelProvider {
+    private static class TreeLabelProvider extends LabelProvider {
 
         Image parameterIcon;
         Image parameterGroupIcon;
@@ -258,7 +258,7 @@ public class ParameterView extends ViewPart implements IPropertyListener {
                 if (labelDesc != null) {
                     return labelDesc.getText();
                 }
-                return pgmGrp.getUniqueId();
+                return pgmGrp.getParamGroupUniqueId();
             } else if (element instanceof String) {
                 return "Parameters not available.";
             }

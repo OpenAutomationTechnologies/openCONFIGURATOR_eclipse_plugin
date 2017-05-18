@@ -173,13 +173,14 @@ public class IndustrialNetworkView extends ViewPart
                 Node nodeSecond = (Node) e2;
 
                 if (nodeSecond
-                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
                 }
                 compare = nodeFirst.getPlkOperationMode()
                         .compareTo(nodeSecond.getPlkOperationMode());
                 if (compare == 0) {
-                    return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
+                    return nodeFirst.getCnNodeIdValue()
+                            - nodeSecond.getCnNodeIdValue();
                 }
 
             } else if ((e1 instanceof Module) && (e2 instanceof Module)) {
@@ -211,10 +212,11 @@ public class IndustrialNetworkView extends ViewPart
                 Node nodeFirst = (Node) e1;
                 Node nodeSecond = (Node) e2;
                 if (nodeSecond
-                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
                 }
-                return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
+                return nodeFirst.getCnNodeIdValue()
+                        - nodeSecond.getCnNodeIdValue();
 
             }
 
@@ -358,7 +360,7 @@ public class IndustrialNetworkView extends ViewPart
      * @author Ramakrishnan P
      *
      */
-    private class ViewLabelProvider extends LabelProvider
+    private static class ViewLabelProvider extends LabelProvider
             implements IColorProvider {
 
         Image mnIcon;
@@ -993,7 +995,7 @@ public class IndustrialNetworkView extends ViewPart
                 Object selectedObject = selection.getFirstElement();
                 if (selectedObject instanceof Node) {
                     Node node = (Node) selectedObject;
-                    int nodeId = Integer.valueOf(node.getNodeIdString());
+                    Integer nodeId = Integer.valueOf(node.getNodeIdString());
                     if (nodeId <= 240) {
                         nodeToBeCopied = node;
                     } else {
@@ -1031,7 +1033,8 @@ public class IndustrialNetworkView extends ViewPart
                 }
 
                 handleRefresh();
-                int nodeId = Integer.valueOf(copyNodeWizard.getNodeId());
+                Integer nodeId = Integer
+                        .valueOf(copyNodeWizard.getNodeIdCopy());
                 String name = copyNodeWizard.getNodeName();
                 int stationTypeChanged = copyNodeWizard
                         .getStationTypeIndex(copyNodeWizard.getStationType());
@@ -1184,21 +1187,23 @@ public class IndustrialNetworkView extends ViewPart
 
                         if (outputFile.exists()) {
                             File[] fileList = outputFile.listFiles();
-                            for (File file : fileList) {
-                                if (file.getName()
-                                        .equalsIgnoreCase("xap.xml")) {
-                                    try {
-                                        xapFile = XddMarshaller
-                                                .unmarshallXapFile(file);
-                                    } catch (JAXBException | SAXException
-                                            | ParserConfigurationException
-                                            | IOException e) {
-                                        e.printStackTrace();
+                            if (fileList != null) {
+                                for (File file : fileList) {
+                                    if (file.getName()
+                                            .equalsIgnoreCase("xap.xml")) {
+                                        try {
+                                            xapFile = XddMarshaller
+                                                    .unmarshallXapFile(file);
+                                        } catch (JAXBException | SAXException
+                                                | ParserConfigurationException
+                                                | IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        processImage = new ProcessImage(node,
+                                                xapFile);
+                                        node.setProcessImage(processImage);
+                                        manager.add(showIoMapView);
                                     }
-                                    processImage = new ProcessImage(node,
-                                            xapFile);
-                                    node.setProcessImage(processImage);
-                                    manager.add(showIoMapView);
                                 }
                             }
                         }
@@ -1431,16 +1436,20 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
 
-            if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, "defaultOutputPath");
-                if (defaultPath != null) {
-                    return new Path(defaultPath.getPath(), true);
+            if (pathConfig != null) {
+                if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils
+                            .getTPath(pathSett, "defaultOutputPath");
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
                 }
             }
 
-            String activeOutputPathID = pathConfig.getId();
-            System.err.println("Active output path .." + activeOutputPathID);
+            String activeOutputPathID = StringUtils.EMPTY;
+            if (pathConfig != null) {
+                activeOutputPathID = pathConfig.getId();
+            }
             if (activeOutputPathID == null) {
                 if (!pathSett.getPath().isEmpty()) {
                     TPath defaultPath = OpenConfiguratorProjectUtils
@@ -1968,17 +1977,10 @@ public class IndustrialNetworkView extends ViewPart
                         wd.open();
 
                         try {
-                            if (selectedObject instanceof Node) {
-                                ((Node) selectedObject).getProject()
-                                        .refreshLocal(IResource.DEPTH_INFINITE,
-                                                new NullProgressMonitor());
-                            } else {
-                                ((Module) selectedObject).getProject()
-                                        .refreshLocal(IResource.DEPTH_INFINITE,
-                                                new NullProgressMonitor());
-                            }
+                            ((Node) selectedObject).getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
                         } catch (CoreException e) {
-                            // TODO Auto-generated catch block
                             e.printStackTrace();
                         }
 
@@ -2155,8 +2157,8 @@ public class IndustrialNetworkView extends ViewPart
                         }
 
                         handleRefresh();
-                        int nodeId = Integer
-                                .valueOf(copyNodeWizard.getNodeId());
+                        Integer nodeId = Integer
+                                .valueOf(copyNodeWizard.getNodeIdCopy());
 
                         String name = copyNodeWizard.getNodeName();
                         int stationTypeChanged = copyNodeWizard

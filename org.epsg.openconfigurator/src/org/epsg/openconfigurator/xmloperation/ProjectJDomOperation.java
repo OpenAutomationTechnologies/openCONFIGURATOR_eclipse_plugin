@@ -217,7 +217,7 @@ public class ProjectJDomOperation {
         List<Attribute> attribList = firmwareElement.getAttributes();
 
         attribList.add(new Attribute(IControlledNodeProperties.FIRMWARE_URI,
-                firmwareMngr.getUri()));
+                firmwareMngr.getFirmwareUri()));
 
         attribList
                 .add(new Attribute(IControlledNodeProperties.FIRMWARE_VENDOR_ID,
@@ -379,7 +379,7 @@ public class ProjectJDomOperation {
         } else if (node.getNodeModel() instanceof TRMN) {
             addRedundantManagingNode(document, (TRMN) node.getNodeModel());
         } else {
-            System.err.println("Unsupported node ID:" + node.getCnNodeId()
+            System.err.println("Unsupported node ID:" + node.getCnNodeIdValue()
                     + " modelType:" + node.getNodeModel());
         }
     }
@@ -673,7 +673,7 @@ public class ProjectJDomOperation {
         } else {
             System.err.println(
                     "No child elements are available for the given Node with ID = "
-                            + node.getCnNodeId());
+                            + node.getCnNodeIdValue());
         }
         return 0;
     }
@@ -880,8 +880,6 @@ public class ProjectJDomOperation {
                 customAutoGenerateElement.setAttribute(customobjAttr);
                 String noneXPath = xpath
                         + "/oc:AutoGenerationSettings[@id='none']";
-                String customXPath = xpath
-                        + "/oc:AutoGenerationSettings[@id='custom']";
                 if (!JDomUtil.isXpathPresent(document, noneXPath,
                         OPENCONFIGURATOR_NAMESPACE)) {
                     JDomUtil.addNewElement(document, xpath,

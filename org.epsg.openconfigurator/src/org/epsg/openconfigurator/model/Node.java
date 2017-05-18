@@ -447,7 +447,7 @@ public class Node {
                     }
                     Map<String, FirmwareManager> firmwarelist = new HashMap<>();
                     for (FirmwareManager fwMngr : validFwList) {
-                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
 
                     }
 
@@ -505,7 +505,7 @@ public class Node {
                     }
                     Map<String, FirmwareManager> firmwarelist = new HashMap<>();
                     for (FirmwareManager fwMngr : validFwList) {
-                        firmwarelist.put(fwMngr.getUri(), fwMngr);
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
 
                     }
 
@@ -551,16 +551,16 @@ public class Node {
             int val = ((Integer) stationTypeChanged).intValue();
             if (val == 0) { // Normal Station.
                 res = OpenConfiguratorCore.GetInstance()
-                        .ResetOperationMode(getNetworkId(), getCnNodeId());
+                        .ResetOperationMode(getNetworkId(), getCnNodeIdValue());
                 plkMode = PlkOperationMode.NORMAL;
             } else if (val == 1) {
                 res = OpenConfiguratorCore.GetInstance()
-                        .SetOperationModeChained(getNetworkId(), getCnNodeId());
+                        .SetOperationModeChained(getNetworkId(), getCnNodeIdValue());
                 plkMode = PlkOperationMode.CHAINED;
             } else if (val == 2) {
                 res = OpenConfiguratorCore.GetInstance()
                         .SetOperationModeMultiplexed(getNetworkId(),
-                                getCnNodeId(),
+                                getCnNodeIdValue(),
                                 (short) tcn.getForcedMultiplexedCycle());
                 plkMode = PlkOperationMode.MULTIPLEXED;
             }
@@ -882,7 +882,7 @@ public class Node {
      * @return The CN features.
      */
 
-    public TCNFeatures getCnFeatures() {
+    public TCNFeatures getCnNodeFeatures() {
         if (xddModel != null) {
             List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
             for (ISO15745Profile profile : profiles) {
@@ -906,7 +906,7 @@ public class Node {
     /**
      * @return The node ID.
      */
-    public short getCnNodeId() {
+    public short getCnNodeIdValue() {
         return nodeId;
     }
 
@@ -1432,8 +1432,8 @@ public class Node {
                 nodeDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
                 if (!nodeDevRevisionList.isEmpty()) {
                     for (FirmwareManager fwMan : nodeDevRevisionList.values()) {
-                        if (fwMan.getNodeId().equalsIgnoreCase(
-                                String.valueOf(getCnNodeId()))) {
+                        if (fwMan.getNodeIdofFirmware().equalsIgnoreCase(
+                                String.valueOf(getCnNodeIdValue()))) {
                             if (fwMan.getFirmwarefileVersion() < fwManager
                                     .getFirmwarefileVersion()) {
                                 nodeDevRevisionList.put(

@@ -113,7 +113,7 @@ public class ProcessImageView extends ViewPart {
         }
     }
 
-    private class processImageContentProvider
+    private class ProcessImageContentProvider
             implements IStructuredContentProvider {
 
         @Override
@@ -154,7 +154,7 @@ public class ProcessImageView extends ViewPart {
                 channelList.add(empty);
                 return channelList.toArray();
             }
-            return null;
+            return new Object[0];
         }
 
         @Override
@@ -175,7 +175,6 @@ public class ProcessImageView extends ViewPart {
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
 
-            String retValue = element.toString();
             if (element instanceof ProcessImageChannel) {
                 ProcessImageChannel channel = (ProcessImageChannel) element;
                 switch (columnIndex) {
@@ -270,7 +269,6 @@ public class ProcessImageView extends ViewPart {
 
             if (sourcePart != null) {
                 sourcePart.getSite().getPage().removePartListener(partListener);
-                sourcePart = null;
             }
 
             // tableViewer.setInput(null);
@@ -392,7 +390,7 @@ public class ProcessImageView extends ViewPart {
         getViewSite().getPage().addSelectionListener(IndustrialNetworkView.ID,
                 listener);
 
-        tableViewer.setContentProvider(new processImageContentProvider());
+        tableViewer.setContentProvider(new ProcessImageContentProvider());
         tableViewer.setLabelProvider(new ProcessImageLabelProvider());
 
         processImageTable.addListener(SWT.Resize, new Listener() {

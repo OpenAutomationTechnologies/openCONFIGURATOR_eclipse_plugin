@@ -433,8 +433,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         if (!cnNode.getValidFirmwareList().isEmpty()) {
                             for (FirmwareManager fwMngr : cnNode
                                     .getValidFirmwareList()) {
-                                if (fwMngr.getUri() != null) {
-                                    filePathOfFwMngr += fwMngr.getUri()
+                                if (fwMngr.getFirmwareUri() != null) {
+                                    filePathOfFwMngr += fwMngr.getFirmwareUri()
                                         .concat(" ;");
                                 }
                             }
@@ -548,7 +548,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         long[] presTimeOutInNs = new long[1];
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .GetPResTimeOut(cnNode.getNetworkId(),
-                                        cnNode.getCnNodeId(), presTimeOutInNs);
+                                        cnNode.getCnNodeIdValue(), presTimeOutInNs);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -661,7 +661,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     .validateSubobjectActualValue(cnNode.getNetworkId(),
                             IPowerlinkConstants.MN_DEFAULT_NODE_ID,
                             INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
-                            cnNode.getCnNodeId(),
+                            cnNode.getCnNodeIdValue(),
                             String.valueOf(presTimeoutInNs), false);
             if (!validateResult.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils
@@ -695,7 +695,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     return INVALID_CN_NODE_ID;
                 }
 
-                if (nodeIDvalue == cnNode.getCnNodeId()) {
+                if (nodeIDvalue == cnNode.getCnNodeIdValue()) {
                     return null;
                 }
 
@@ -728,7 +728,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
 
             Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                    cnNode.getNetworkId(), cnNode.getCnNodeId(), nodeName);
+                    cnNode.getNetworkId(), cnNode.getCnNodeIdValue(), nodeName);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -776,7 +776,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                                cnNode.getNetworkId(), cnNode.getCnNodeId(),
+                                cnNode.getNetworkId(), cnNode.getCnNodeIdValue(),
                                 (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
@@ -788,7 +788,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT:
                         short nodeIDvalue = Short.valueOf(((String) value));
 
-                        short oldNodeId = cnNode.getCnNodeId();
+                        short oldNodeId = cnNode.getCnNodeIdValue();
                         cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
                                 nodeIDvalue);
                         break;
@@ -806,19 +806,19 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                                 res = OpenConfiguratorCore.GetInstance()
                                         .ResetOperationMode(
                                                 cnNode.getNetworkId(),
-                                                cnNode.getCnNodeId());
+                                                cnNode.getCnNodeIdValue());
                                 plkMode = PlkOperationMode.NORMAL;
                             } else if (val == 1) {
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetOperationModeChained(
                                                 cnNode.getNetworkId(),
-                                                cnNode.getCnNodeId());
+                                                cnNode.getCnNodeIdValue());
                                 plkMode = PlkOperationMode.CHAINED;
                             } else if (val == 2) {
                                 res = OpenConfiguratorCore.GetInstance()
                                         .SetOperationModeMultiplexed(
                                                 cnNode.getNetworkId(),
-                                                cnNode.getCnNodeId(),
+                                                cnNode.getCnNodeIdValue(),
                                                 (short) tcn
                                                         .getForcedMultiplexedCycle());
                                 plkMode = PlkOperationMode.MULTIPLEXED;
@@ -1036,7 +1036,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         long presTimeoutInNs = Long.decode((String) value)
                                 .longValue() * 1000;
                         res = OpenConfiguratorCore.GetInstance().SetPResTimeOut(
-                                cnNode.getNetworkId(), cnNode.getCnNodeId(),
+                                cnNode.getNetworkId(), cnNode.getCnNodeIdValue(),
                                 presTimeoutInNs);
                         if (res.IsSuccessful()) {
                             cnNode.setCnPresTimeout(

@@ -476,7 +476,7 @@ public class ObjectDictionary {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
 
-                                parameterGroupMap.put(pg.getUniqueId(), pg);
+                                parameterGroupMap.put(pg.getParamGroupUniqueId(), pg);
                             }
                         }
                     }
@@ -509,7 +509,7 @@ public class ObjectDictionary {
                             for (TParameterGroup grp : paramGroup) {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
-                                parameterGroupMap.put(pg.getUniqueId(), pg);
+                                parameterGroupMap.put(pg.getParamGroupUniqueId(), pg);
                             }
                         }
                     }
@@ -542,7 +542,7 @@ public class ObjectDictionary {
                             for (TParameterGroup grp : paramGroup) {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
-                                parameterGroupMap.put(pg.getUniqueId(), pg);
+                                parameterGroupMap.put(pg.getParamGroupUniqueId(), pg);
                             }
                         }
                     }

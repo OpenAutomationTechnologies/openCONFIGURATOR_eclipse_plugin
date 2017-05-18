@@ -233,8 +233,8 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         if (!module.getModuleFirmwareFileList().isEmpty()) {
                             for (FirmwareManager fwMngr : module
                                     .getModuleFirmwareFileList()) {
-                                if (fwMngr.getUri() != null) {
-                                    filePathFwMngr += fwMngr.getUri()
+                                if (fwMngr.getFirmwareUri() != null) {
+                                    filePathFwMngr += fwMngr.getFirmwareUri()
                                             .concat(" ;");
                                 }
                             }
@@ -293,7 +293,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                             .getInterfaceType();
                     if (!(moduleType.equals(interfaceType))) {
                         return INVALID_POSITION_ERROR_MESSAGE
-                                + module.getNode().getCnNodeId();
+                                + module.getNode().getCnNodeIdValue();
                     }
                 }
 

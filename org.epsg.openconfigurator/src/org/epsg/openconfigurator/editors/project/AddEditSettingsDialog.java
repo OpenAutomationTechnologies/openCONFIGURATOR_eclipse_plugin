@@ -76,7 +76,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
      *
      * @author Ramakrishnan P
      */
-    private class BuilderConfiguration {
+    private static class BuilderConfiguration {
         /**
          * The name of the configuration.
          */
