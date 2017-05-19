@@ -33,6 +33,8 @@ package org.epsg.openconfigurator.xmloperation;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.IControlledNodeProperties;
@@ -41,6 +43,7 @@ import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
+import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList.Firmware;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
@@ -184,6 +187,76 @@ public class ProjectJDomOperation {
                 newElement);
     }
 
+    /**
+     * Adds the firmware list element into project source file.
+     *
+     * @param document Instance of Project XML file.
+     * @param nodeOrModuleObj Instance of Node or Module.
+     * @param firmwareMngr Instance of FirmwareManager.
+     * @param firmwareObj Instance of firmware project model.
+     */
+    public static void addFirmwareList(Document document,
+            Object nodeOrModuleObj, FirmwareManager firmwareMngr,
+            Firmware firmwareObj) {
+        String firmwareListTagXpath = StringUtils.EMPTY;
+        String nodeOrModuleXpath = StringUtils.EMPTY;
+        if (nodeOrModuleObj instanceof Node) {
+            Node node = (Node) nodeOrModuleObj;
+            firmwareListTagXpath = node.getXpath() + "/oc:"
+                    + IControlledNodeProperties.FIRMWARE_LIST_TAG;
+            nodeOrModuleXpath = node.getXpath();
+        } else if (nodeOrModuleObj instanceof Module) {
+            Module module = (Module) nodeOrModuleObj;
+            firmwareListTagXpath = module.getXpath() + "/oc:"
+                    + IControlledNodeProperties.FIRMWARE_LIST_TAG;
+            nodeOrModuleXpath = module.getXpath();
+        }
+
+        Element firmwareElement = new Element(
+                IControlledNodeProperties.FIRMWARE_TAG);
+        List<Attribute> attribList = firmwareElement.getAttributes();
+
+        attribList.add(new Attribute(IControlledNodeProperties.FIRMWARE_URI,
+                firmwareMngr.getFirmwareUri()));
+
+        attribList
+                .add(new Attribute(IControlledNodeProperties.FIRMWARE_VENDOR_ID,
+                        String.valueOf(firmwareMngr.getVendorId())));
+        attribList.add(new Attribute(
+                IControlledNodeProperties.FIRMWARE_DEVICE_REVISION,
+                firmwareMngr.getdevRevNumber()));
+
+        attribList.add(
+                new Attribute(IControlledNodeProperties.FIRMWARE_PRODUCT_NUMBER,
+                        firmwareMngr.getProductNumber()));
+
+        attribList.add(new Attribute(IControlledNodeProperties.FIRMWARE_DATE,
+                firmwareMngr.getApplSwDate()));
+        attribList.add(new Attribute(IControlledNodeProperties.FIRMWARE_TIME,
+                firmwareMngr.getApplSwTime()));
+        attribList.add(
+                new Attribute(IControlledNodeProperties.FIRMWARE_KEEP_HEADER,
+                        String.valueOf(firmwareObj.isKeepHeader())));
+        attribList.add(new Attribute(IControlledNodeProperties.FIRMWARE_LOCKED,
+                String.valueOf(firmwareObj.isLocked())));
+
+        if (JDomUtil.isXpathPresent(document, firmwareListTagXpath,
+                OPENCONFIGURATOR_NAMESPACE)) {
+
+            JDomUtil.addNewElement(document, firmwareListTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE, firmwareElement);
+
+        } else {
+            Element firmwareListElement = new Element(
+                    IControlledNodeProperties.FIRMWARE_LIST_TAG);
+            JDomUtil.addNewElement(document, nodeOrModuleXpath,
+                    OPENCONFIGURATOR_NAMESPACE, firmwareListElement);
+            JDomUtil.addNewElement(document, firmwareListTagXpath,
+                    OPENCONFIGURATOR_NAMESPACE, firmwareElement);
+        }
+
+    }
+
     public static void addInterfaceList(Document document, final Node node,
             HeadNodeInterface interfaceOfNode, Module module) {
 
@@ -276,8 +349,16 @@ public class ProjectJDomOperation {
                     .add(new Attribute(IControlledNodeProperties.MODULE_ENABLED,
                             String.valueOf(module.isEnabled())));
 
-            JDomUtil.addNewElement(document, node.getXpath(),
-                    OPENCONFIGURATOR_NAMESPACE, newElement);
+            int index = getChildIndexbelowNode(document, node);
+            if (index != 0) {
+                index = index - 1;
+                JDomUtil.addNewElement(document, node.getXpath(),
+                        OPENCONFIGURATOR_NAMESPACE, newElement, index);
+            } else {
+                JDomUtil.addNewElement(document, node.getXpath(),
+                        OPENCONFIGURATOR_NAMESPACE, newElement);
+            }
+
             JDomUtil.addNewElement(document, interfaceListTagXpath,
                     OPENCONFIGURATOR_NAMESPACE, newObjElement);
             JDomUtil.addNewElement(document, interfaceXpath,
@@ -298,7 +379,7 @@ public class ProjectJDomOperation {
         } else if (node.getNodeModel() instanceof TRMN) {
             addRedundantManagingNode(document, (TRMN) node.getNodeModel());
         } else {
-            System.err.println("Unsupported node ID:" + node.getCnNodeId()
+            System.err.println("Unsupported node ID:" + node.getCnNodeIdValue()
                     + " modelType:" + node.getNodeModel());
         }
     }
@@ -427,8 +508,17 @@ public class ProjectJDomOperation {
                     IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT);
             newElement.setContent(newObjElement);
 
-            JDomUtil.addModuleForceObjectElement(document, module.getXpath(),
-                    OPENCONFIGURATOR_NAMESPACE, newElement);
+            int index = getChildIndexbelowModule(document, module);
+            if (index != 0) {
+                index = index - 1;
+                JDomUtil.addModuleForceObjectElement(document,
+                        module.getXpath(), OPENCONFIGURATOR_NAMESPACE,
+                        newElement, index);
+            } else {
+                JDomUtil.addModuleForceObjectElement(document,
+                        module.getXpath(), OPENCONFIGURATOR_NAMESPACE,
+                        newElement);
+            }
 
         }
 
@@ -476,12 +566,18 @@ public class ProjectJDomOperation {
             }
             if (node.isModularheadNode()) {
                 int index = getChildIndexbelowNode(document, node);
-                index = index - 1;
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, forcedTagXpath,
                         OPENCONFIGURATOR_NAMESPACE, newObjElement, index);
             } else {
+                int index = getChildIndexbelowNode(document, node);
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, forcedTagXpath,
-                        OPENCONFIGURATOR_NAMESPACE, newObjElement);
+                        OPENCONFIGURATOR_NAMESPACE, newObjElement, index);
             }
         } else {
 
@@ -504,14 +600,54 @@ public class ProjectJDomOperation {
             newElement.setContent(newObjElement);
             if (node.isModularheadNode()) {
                 int index = getChildIndexbelowNode(document, node);
-                index = index - 1;
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, node.getXpath(),
                         OPENCONFIGURATOR_NAMESPACE, newElement, index);
             } else {
+                int index = getChildIndexbelowNode(document, node);
+                System.err.println("The Child index..." + index);
+                if (index != 0) {
+                    index = index - 1;
+                }
                 JDomUtil.addNewElement(document, node.getXpath(),
-                        OPENCONFIGURATOR_NAMESPACE, newElement);
+                        OPENCONFIGURATOR_NAMESPACE, newElement, index);
             }
         }
+    }
+
+    /**
+     * Receives the index of elements below the module in project XML file.
+     *
+     * @param document Instance of project XML document.
+     * @param module Instance of Module.
+     * @return index of forced object position below module.
+     */
+    public static int getChildIndexbelowModule(Document document,
+            Module module) {
+        XPathExpression<Element> xpath = JDomUtil.getXPathExpressionElement(
+                module.getXpath(), OPENCONFIGURATOR_NAMESPACE);
+        List<Element> elementsList = xpath.evaluate(document);
+        Element parentElement = elementsList.get(0);
+        List<Element> childElement = parentElement.getChildren();
+        if (!childElement.isEmpty()) {
+            for (int childCount = 1; childCount <= childElement
+                    .size(); childCount++) {
+                for (Element child : childElement) {
+                    int index = parentElement.indexOf(child);
+                    if (child.getQualifiedName()
+                            .equalsIgnoreCase("FirmwareList")) {
+                        return index;
+                    }
+                }
+            }
+        } else {
+            System.err.println(
+                    "No child elements are available for the given Node with ID = "
+                            + module.getPosition());
+        }
+        return 0;
     }
 
     public static int getChildIndexbelowNode(Document document, Node node) {
@@ -528,13 +664,16 @@ public class ProjectJDomOperation {
                     if (child.getQualifiedName()
                             .equalsIgnoreCase("InterfaceList")) {
                         return index;
+                    } else if (child.getQualifiedName()
+                            .equalsIgnoreCase("FirmwareList")) {
+                        return index;
                     }
                 }
             }
         } else {
             System.err.println(
                     "No child elements are available for the given Node with ID = "
-                            + node.getCnNodeId());
+                            + node.getCnNodeIdValue());
         }
         return 0;
     }
@@ -741,8 +880,6 @@ public class ProjectJDomOperation {
                 customAutoGenerateElement.setAttribute(customobjAttr);
                 String noneXPath = xpath
                         + "/oc:AutoGenerationSettings[@id='none']";
-                String customXPath = xpath
-                        + "/oc:AutoGenerationSettings[@id='custom']";
                 if (!JDomUtil.isXpathPresent(document, noneXPath,
                         OPENCONFIGURATOR_NAMESPACE)) {
                     JDomUtil.addNewElement(document, xpath,

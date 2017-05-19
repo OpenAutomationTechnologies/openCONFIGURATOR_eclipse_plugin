@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+rueckerc, Bernecker+Rainer Industrie Elektronik Ges.m.b.H.
+22-November-2016 09:00
+
+Copyright (c) 2016, Bernecker+Rainer Industrie-Elektronik Ges.m.b.H. (B&R)
+All rights reserved.
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+    * Redistributions of source code must retain the above copyright
+      notice, this list of conditions and the following disclaimer.
+    * Redistributions in binary form must reproduce the above copyright
+      notice, this list of conditions and the following disclaimer in the
+      documentation and/or other materials provided with the distribution.
+    * Neither the name of the copyright holders nor the
+      names of its contributors may be used to endorse or promote products
+      derived from this software without specific prior written permission.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS BE LIABLE FOR ANY
+DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+-->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ppi="http://ethernet-powerlink.org/POWERLINK/PI" targetNamespace="http://ethernet-powerlink.org/POWERLINK/PI">
+	<xs:element name="ApplicationProcess">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ppi:ProcessImage" minOccurs="0" maxOccurs="2"/>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="ProcessImage">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element ref="ppi:Channel" minOccurs="1" maxOccurs="unbounded"/>
+			</xs:sequence>
+			<xs:attribute name="type" type="ppi:tType" use="required"/>
+			<xs:attribute name="size" type="xs:nonNegativeInteger" use="required"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:element name="Channel">
+		<xs:complexType>
+			<xs:attribute name="Name" type="xs:string" use="required"/>
+			<xs:attribute name="dataType" type="ppi:tdataType" use="required"/>
+			<xs:attribute name="dataSize" type="ppi:tdataSize" use="required"/>
+			<xs:attribute name="PIOffset" type="ppi:tPIOffset" use="required"/>
+			<xs:attribute name="BitOffset" type="ppi:tBitOffset" use="optional" default="0x00"/>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="tPIOffset">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="0x[0-9A-Fa-f]{4,4}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tBitOffset">
+		<xs:restriction base="xs:string">
+			<xs:pattern value="0x0[0-7]{1,1}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tdataType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="Integer8"/>
+			<xs:enumeration value="Integer16"/>
+			<xs:enumeration value="Integer32"/>
+			<xs:enumeration value="Integer64"/>
+			<xs:enumeration value="Unsigned8"/>
+			<xs:enumeration value="Unsigned16"/>
+			<xs:enumeration value="Unsigned32"/>
+			<xs:enumeration value="Unsigned64"/>
+			<xs:enumeration value="REAL"/>
+			<xs:enumeration value="LREAL"/>
+			<xs:enumeration value="BITSTRING"/>
+			<xs:enumeration value="BOOL"/>
+			<xs:enumeration value="BYTE"/>
+			<xs:enumeration value="CHAR"/>
+			<xs:enumeration value="WORD"/>
+			<xs:enumeration value="DWORD"/>
+			<xs:enumeration value="LWORD"/>
+			<xs:enumeration value="STRING"/>
+			<xs:enumeration value="WSTRING"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tdataSize">
+		<xs:restriction base="xs:byte">
+			<xs:enumeration value="1"/>
+			<xs:enumeration value="2"/>
+			<xs:enumeration value="3"/>
+			<xs:enumeration value="4"/>
+			<xs:enumeration value="5"/>
+			<xs:enumeration value="6"/>
+			<xs:enumeration value="7"/>
+			<xs:enumeration value="8"/>
+			<xs:enumeration value="16"/>
+			<xs:enumeration value="32"/>
+			<xs:enumeration value="64"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="tType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="input"/>
+			<xs:enumeration value="output"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>

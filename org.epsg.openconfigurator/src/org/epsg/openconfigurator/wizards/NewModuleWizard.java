@@ -36,7 +36,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -48,6 +51,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
@@ -109,6 +113,58 @@ public class NewModuleWizard extends Wizard {
             addChildmodulePage = new AddChildModuleWizardPage(selectedNodeObj);
         }
         rootNode = nodeList;
+    }
+
+    private boolean addAvailableFirmware(Module newModule) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
+        if (rootNode != null) {
+            if (!rootNode.getModuleList().isEmpty()) {
+                for (Module module : rootNode.getModuleList()) {
+                    if (module.getVenIdValue()
+                            .equalsIgnoreCase(newModule.getVenIdValue())) {
+                        if (module.getProductId()
+                                .equalsIgnoreCase(newModule.getProductId())) {
+                            if (!module.getModuleFirmwareFileList().isEmpty()) {
+                                for (FirmwareManager fwMngr : module
+                                        .getModuleFirmwareFileList()) {
+                                    validFwList.add(fwMngr);
+                                }
+                            }
+                        }
+                    }
+
+                }
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Module '"
+                                    + newModule.getModuleName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+                        newModule.getModuleFirmwareCollection().put(fw,
+                                fw.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(fw, newModule,
+                                fw.getFirmwareObjModel());
+                    }
+
+                }
+
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -274,6 +330,12 @@ public class NewModuleWizard extends Wizard {
         } catch (CoreException e) {
             System.err.println("unable to refresh the resource due to "
                     + e.getCause().getMessage());
+        }
+
+        if (newModule.canFirmwareAdded(newModule)) {
+            if (addAvailableFirmware(newModule)) {
+                return true;
+            }
         }
 
         return true;

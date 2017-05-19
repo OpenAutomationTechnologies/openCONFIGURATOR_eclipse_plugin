@@ -87,7 +87,7 @@ public class StructType {
     /**
      * @return Unique ID of struct data type.
      */
-    public String getUniqueId() {
+    public String getStructUniqueId() {
         return uniqueId;
     }
 

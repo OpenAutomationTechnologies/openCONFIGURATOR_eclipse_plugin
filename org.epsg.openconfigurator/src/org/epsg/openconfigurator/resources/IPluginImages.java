@@ -59,6 +59,9 @@ public interface IPluginImages {
     public final static String OVERLAY_CHAINED_NODE_ICON = "icons/chained.gif";
     public final static String ERROR_OVERLAY_NODE_ICON = "icons/error_overlay.gif";
     public final static String EXPORT_NODE_ICON = "icons/export_node.gif";
+    public final static String FIRMWARE_OVERLAY_ICON = "icons/firmware_overlay.gif";
+    public final static String COPY_NODE_ICON = "icons/copy_node.gif";
+
     // Mapping view icons
     public final static String ERROR_ICON = "icons/error.gif";
     public final static String FILTER_ICON = "icons/filter.gif";
@@ -68,6 +71,12 @@ public interface IPluginImages {
     public final static String ARROW_DOWN_ICON = "icons/arrow_down.gif";
     public final static String ARROW_UP_ICON = "icons/arrow_up.gif";
     public final static String CLEAR_ICON = "icons/clear.gif";
+    public final static String EPSG_IMAGE = "icons/epsg.png";
+
+    // Process Image View icons
+    public final static String IN_CHANNEL_ICON = "icons/in_channel.gif";
+    public final static String OUT_CHANNEL_ICON = "icons/out_channel.gif";
+    public final static String IO_MAP_ICON = "icons/IoMap.gif";
 
     // Object dictionary view icons
     public final static String OBD_OBJECT_ICON = "icons/object.gif";

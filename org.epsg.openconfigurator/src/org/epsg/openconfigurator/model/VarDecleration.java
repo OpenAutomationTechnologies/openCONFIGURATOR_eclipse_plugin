@@ -110,7 +110,7 @@ public class VarDecleration {
     /**
      * @return The unique ID value of variables in the var declaration
      */
-    public String getUniqueId() {
+    public String getVarDecUniqueId() {
         return uniqueId;
     }
 }

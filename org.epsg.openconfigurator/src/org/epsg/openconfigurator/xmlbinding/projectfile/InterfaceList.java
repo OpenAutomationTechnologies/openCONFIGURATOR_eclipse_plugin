@@ -45,6 +45,7 @@ import javax.xml.bind.annotation.XmlType;
  *                                 &lt;/complexContent&gt;
  *                               &lt;/complexType&gt;
  *                             &lt;/element&gt;
+ *                             &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}FirmwareList" minOccurs="0"/&gt;
  *                           &lt;/sequence&gt;
  *                           &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *                           &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
@@ -142,6 +143,7 @@ public class InterfaceList {
      *                       &lt;/complexContent&gt;
      *                     &lt;/complexType&gt;
      *                   &lt;/element&gt;
+     *                   &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}FirmwareList" minOccurs="0"/&gt;
      *                 &lt;/sequence&gt;
      *                 &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *                 &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
@@ -254,6 +256,7 @@ public class InterfaceList {
          *             &lt;/complexContent&gt;
          *           &lt;/complexType&gt;
          *         &lt;/element&gt;
+         *         &lt;element ref="{http://sourceforge.net/projects/openconf/configuration}FirmwareList" minOccurs="0"/&gt;
          *       &lt;/sequence&gt;
          *       &lt;attribute name="name" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
          *       &lt;attribute name="position" use="required" type="{http://www.w3.org/2001/XMLSchema}positiveInteger" /&gt;
@@ -276,7 +279,8 @@ public class InterfaceList {
         @XmlAccessorType(XmlAccessType.FIELD)
         @XmlType(name = "", propOrder = {
             "interfaceList",
-            "forcedObjects"
+            "forcedObjects",
+            "firmwareList"
         })
         public static class Module {
 
@@ -284,6 +288,8 @@ public class InterfaceList {
             protected InterfaceList interfaceList;
             @XmlElement(name = "ForcedObjects")
             protected InterfaceList.Interface.Module.ForcedObjects forcedObjects;
+            @XmlElement(name = "FirmwareList")
+            protected FirmwareList firmwareList;
             @XmlAttribute(name = "name", required = true)
             protected String name;
             @XmlAttribute(name = "position", required = true)
@@ -343,6 +349,30 @@ public class InterfaceList {
              */
             public void setForcedObjects(InterfaceList.Interface.Module.ForcedObjects value) {
                 this.forcedObjects = value;
+            }
+
+            /**
+             * Gets the value of the firmwareList property.
+             * 
+             * @return
+             *     possible object is
+             *     {@link FirmwareList }
+             *     
+             */
+            public FirmwareList getFirmwareList() {
+                return firmwareList;
+            }
+
+            /**
+             * Sets the value of the firmwareList property.
+             * 
+             * @param value
+             *     allowed object is
+             *     {@link FirmwareList }
+             *     
+             */
+            public void setFirmwareList(FirmwareList value) {
+                this.firmwareList = value;
             }
 
             /**

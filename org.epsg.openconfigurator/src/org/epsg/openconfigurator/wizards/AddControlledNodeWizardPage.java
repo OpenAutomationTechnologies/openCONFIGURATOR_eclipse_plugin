@@ -217,6 +217,8 @@ public class AddControlledNodeWizardPage extends WizardPage {
      */
     private Object nodeModel = null; // TCN/TRMN
 
+    private int selectionIndex;
+
     /**
      * Create the wizard.
      */
@@ -320,6 +322,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
             }
 
         });
+    }
+
+    public String getCnNodeId() {
+        return nodeIdSpinner.getText();
     }
 
     /**
@@ -462,7 +468,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
     /**
      * @return The name of the node selected.
      */
-    String getNodeName() {
+    public String getNodeName() {
         return nodeName.getText();
     }
 
@@ -473,8 +479,12 @@ public class AddControlledNodeWizardPage extends WizardPage {
         return nodeTypeCombo.getText();
     }
 
+    public String getStationType() {
+        return stationTypeCombo.getText();
+    }
+
     public int getStationTypeChanged() {
-        int selectionIndex = stationTypeCombo.getSelectionIndex();
+        selectionIndex = stationTypeCombo.getSelectionIndex();
         return selectionIndex;
     }
 
@@ -681,6 +691,10 @@ public class AddControlledNodeWizardPage extends WizardPage {
             System.err.println("Number format exception");
         }
         return retVal;
+    }
+
+    public void resetWizard() {
+        nodeTypeCombo.setEnabled(false);
     }
 
     private void updateCnModel() {

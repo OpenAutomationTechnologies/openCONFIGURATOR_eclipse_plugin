@@ -42,6 +42,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import org.apache.commons.io.input.BOMInputStream;
+import org.apache.commons.lang3.StringUtils;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
@@ -64,12 +65,41 @@ import org.xml.sax.InputSource;
  */
 public class JDomUtil {
 
+    /**
+     * Adds the forced objects of module in project source file.
+     *
+     * @param document Instance of project source file.
+     * @param forcedTagXpath Xpath expression of forced objects.
+     * @param openconfiguratorNamespace Namespace of the element
+     * @param newObjElement The new element to be added.
+     */
     public static void addModuleForceObjectElement(Document document,
             String forcedTagXpath, Namespace openconfiguratorNamespace,
             Element newObjElement) {
         System.out.println("addNewElement: " + forcedTagXpath);
         addModuleForceObjectElements(document, getXPathExpressionElement(
                 forcedTagXpath, openconfiguratorNamespace), newObjElement);
+
+    }
+
+    /**
+     * Adds the forced objects of module in project source file at specified
+     * index position.
+     *
+     * @param document Instance of project source file.
+     * @param forcedTagXpath Xpath expression of forced objects.
+     * @param openconfiguratorNamespace Namespace of the element
+     * @param newObjElement The new element to be added.
+     * @param index The position in project source file.
+     */
+    public static void addModuleForceObjectElement(Document document,
+            String forcedTagXpath, Namespace openconfiguratorNamespace,
+            Element newObjElement, int index) {
+        System.out.println("addNewElement: " + forcedTagXpath);
+        addModuleForceObjectElements(document,
+                getXPathExpressionElement(forcedTagXpath,
+                        openconfiguratorNamespace),
+                newObjElement, index);
 
     }
 
@@ -85,6 +115,23 @@ public class JDomUtil {
             }
 
             element.addContent(newObjElement);
+
+        }
+
+    }
+
+    private static void addModuleForceObjectElements(Document document,
+            XPathExpression<Element> xPathExpressionElement,
+            Element newObjElement, int index) {
+        List<Element> elementsList = xPathExpressionElement.evaluate(document);
+        System.err.println("Elements list.." + elementsList);
+        for (Element element : elementsList) {
+            newObjElement.setNamespace(element.getNamespace());
+            for (Element newChildElement : newObjElement.getChildren()) {
+                newChildElement.setNamespace(element.getNamespace());
+            }
+
+            element.addContent(index, newObjElement);
 
         }
 
@@ -291,10 +338,13 @@ public class JDomUtil {
                     if (name.equalsIgnoreCase("pathToXDC")) {
                         String value = attrib.getValue();
                         Path path = Paths.get(value);
-                        Path parentPath = path.getParent();
-                        if (parentPath != null) {
-                            if (parentPath.getFileName() != null) {
-                                return parentPath.getFileName().toString();
+                        if (path != null) {
+                            Path parentPath = path.getParent();
+                            if (parentPath != null) {
+                                Path fileName = parentPath.getFileName();
+                                if (fileName != null) {
+                                    return fileName.toString();
+                                }
                             }
                         }
                     }
@@ -305,7 +355,7 @@ public class JDomUtil {
                 System.err.println(expr.getExpression() + "Element null");
             }
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -572,8 +622,15 @@ public class JDomUtil {
         XMLOutputter xmlOutput = new XMLOutputter();
         // display nice
         xmlOutput.setFormat(Format.getPrettyFormat());
-        FileWriter fileWriter = new FileWriter(xmlFile);
-        xmlOutput.output(document, fileWriter);
-        fileWriter.close();
+        FileWriter fileWriter = null;
+        try {
+            fileWriter = new FileWriter(xmlFile);
+            xmlOutput.output(document, fileWriter);
+            fileWriter.close();
+        } finally {
+            if (fileWriter != null) {
+                fileWriter.close();
+            }
+        }
     }
 }

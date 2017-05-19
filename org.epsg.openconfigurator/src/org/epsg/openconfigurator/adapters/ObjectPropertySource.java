@@ -353,9 +353,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
     protected String handleForceActualValue(Object value) {
         if (plkObject.getActualValue().isEmpty()) {
             return "Set some value in the actual value field.";
-        } else if (plkObject.getActualValue() != null) {
-            // Redundant null check is made to prevent the project from any
-            // unexpected failure.
+        }
+        if (!plkObject.getActualValue().isEmpty()) {
             if (isModuleObject()) {
                 long newObjectIndex = OpenConfiguratorLibraryUtils
                         .getModuleObjectsIndex(plkObject.getModule(),

@@ -63,6 +63,16 @@ public interface IOpenConfiguratorResource {
     public static final String XDD_SCHEMA = "resources/xddschema/Powerlink_Main.xsd"; //$NON-NLS-1$
 
     /**
+     * Firmware schema.
+     */
+    public static final String FIRMWARE_SCHEMA = "resources/firmwareschema/fw_schema.xsd"; //$NON-NLS-1$
+
+    /**
+     * Xap schema.
+     */
+    public static final String XAP_SCHEMA = "resources/xapSchema/xap_schema.xsd"; //$NON-NLS-1$
+
+    /**
      * Default MN XDD.
      */
     public static final String DEFAULT_MN_XDD = "resources/00000000_POWERLINK_CiA302-4_MN.xdd"; //$NON-NLS-1$

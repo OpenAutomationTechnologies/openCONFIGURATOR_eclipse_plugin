@@ -18,7 +18,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="tPath"&gt;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
- *       &lt;attribute name="id" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+ *       &lt;attribute name="id" use="required" type="{http://sourceforge.net/projects/openconf/configuration}tPathType" /&gt;
  *       &lt;attribute name="path" use="required"&gt;
  *         &lt;simpleType&gt;
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyURI"&gt;
@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/restriction&gt;
  *         &lt;/simpleType&gt;
  *       &lt;/attribute&gt;
+ *       &lt;attribute name="active" type="{http://www.w3.org/2001/XMLSchema}boolean" default="true" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -41,6 +42,8 @@ public class TPath {
     protected String id;
     @XmlAttribute(name = "path", required = true)
     protected String path;
+    @XmlAttribute(name = "active")
+    protected Boolean active;
 
     /**
      * Gets the value of the id property.
@@ -88,6 +91,34 @@ public class TPath {
      */
     public void setPath(String value) {
         this.path = value;
+    }
+
+    /**
+     * Gets the value of the active property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public boolean isActive() {
+        if (active == null) {
+            return true;
+        } else {
+            return active;
+        }
+    }
+
+    /**
+     * Sets the value of the active property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setActive(Boolean value) {
+        this.active = value;
     }
 
 }

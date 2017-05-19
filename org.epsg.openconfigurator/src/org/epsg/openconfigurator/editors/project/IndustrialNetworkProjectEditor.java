@@ -35,10 +35,13 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.nio.charset.Charset;
+import java.util.List;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -335,6 +338,77 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         // TODO Auto-generated method stub
     }
 
+    public Path getConfigTextPath(String pathtext) {
+        List<PathSettings> pathSettList = currentProject
+                .getProjectConfiguration().getPathSettings();
+        String activepathSetting = currentProject.getProjectConfiguration()
+                .getActivePathSetting();
+        PathSettings pathSett = null;
+        for (PathSettings setPath : pathSettList) {
+            if (setPath.getId() != null) {
+                if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
+                    pathSett = setPath;
+                    break;
+                }
+            } else {
+                pathSett = setPath;
+            }
+        }
+        System.err.println("Active path ..." + activepathSetting);
+
+        if (pathSett == null) {
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        List<TPath> pathList = pathSett.getPath();
+        TPath pathConfig = null;
+        for (TPath path : pathList) {
+            System.err.println("path path ..." + path.getId());
+            if (path.getId().equalsIgnoreCase(pathtext)) {
+                pathConfig = path;
+            }
+        }
+
+        if (pathConfig == null) {
+            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
+                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+            if (defaultPath != null) {
+                return new Path(defaultPath.getPath(), true);
+            }
+        }
+
+        if (pathConfig != null) {
+            String activeOutputPathID = pathConfig.getId();
+            if (activeOutputPathID == null) {
+                if (!pathSett.getPath().isEmpty()) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
+                }
+            } else {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, activeOutputPathID);
+                if (defaultPath != null) {
+                    if (!defaultPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                        return new Path(defaultPath.getPath(), false);
+                    }
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. activeOutputPath not found");
+                }
+            }
+        }
+        return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+    }
+
+    public OpenCONFIGURATORProject getCurrentProject() {
+        return currentProject;
+    }
+
     /**
      * @return the document instance
      */
@@ -406,9 +480,51 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * @return Returns the output path settings from the project XML.
      */
     public Path getProjectOutputPath() {
-        PathSettings pathSett = currentProject.getProjectConfiguration()
-                .getPathSettings();
-        String activeOutputPathID = pathSett.getActivePath();
+        List<PathSettings> pathSettList = currentProject
+                .getProjectConfiguration().getPathSettings();
+        String activepathSetting = OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID;
+        PathSettings pathSett = null;
+        for (PathSettings setPath : pathSettList) {
+            if (setPath.getId() != null) {
+                if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
+                    pathSett = setPath;
+                    break;
+                }
+            } else {
+                pathSett = setPath;
+            }
+        }
+
+        List<TPath> pathList = pathSett.getPath();
+        TPath pathConfig = null;
+        for (TPath path : pathList) {
+            if (path.isActive()) {
+                pathConfig = path;
+            }
+        }
+
+        if (pathConfig == null) {
+            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
+                    "defaultOutputPath");
+            if (defaultPath != null) {
+                return new Path(defaultPath.getPath(), true);
+            }
+        }
+
+        if (pathConfig != null) {
+            if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, "defaultOutputPath");
+                if (defaultPath != null) {
+                    return new Path(defaultPath.getPath(), true);
+                }
+            }
+        }
+
+        String activeOutputPathID = StringUtils.EMPTY;
+        if (pathConfig != null) {
+            activeOutputPathID = pathConfig.getId();
+        }
         if (activeOutputPathID == null) {
             if (!pathSett.getPath().isEmpty()) {
                 TPath defaultPath = OpenConfiguratorProjectUtils
@@ -562,6 +678,28 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         initSuccessful = true;
     }
 
+    public boolean isCustomPathAvailable() {
+
+        if (currentProject.getProjectConfiguration()
+                .getActivePathSetting() == null) {
+            return false;
+        }
+
+        String activepathSetting = currentProject.getProjectConfiguration()
+                .getActivePathSetting();
+        if (activepathSetting.equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+            return false;
+        }
+
+        if (activepathSetting.equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+            return true;
+        }
+
+        return false;
+    }
+
     /**
      * Returns false as saveAs is not supported for this editor.
      */
@@ -643,9 +781,9 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      * @param input Input content of openCONFIGURATOR type
      */
     public void reloadFromSourceText(final String input) {
-
+        Charset charset = Charset.forName("UTF-8");
         try {
-            InputStream is = new ByteArrayInputStream(input.getBytes());
+            InputStream is = new ByteArrayInputStream(input.getBytes(charset));
             currentProject = OpenConfiguratorProjectMarshaller
                     .unmarshallOpenConfiguratorProject(is);
 

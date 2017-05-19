@@ -35,21 +35,30 @@ import java.io.File;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.dialogs.MessageDialog;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
+import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
@@ -57,9 +66,19 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode.ForcedObje
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TNodeCollection;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDataType;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
+import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
+import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TVersion;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
 
@@ -82,6 +101,22 @@ public class Node {
     }
 
     private static final String EMPTY_OBJ_ACTUAL_VALUE = "0x0000000000000000";
+
+    private static final int XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK = 0x1018;
+
+    private static final short XDD_VENDOR_ID_SUBOBJECT_INDEX = 1;
+    private static final short XDD_SUBOBJECT_INDEX_PRODUCTCODE = 2;
+
+    public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
+
+    private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
+
+    private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
+
+    private static final String FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR = "Firmware file {0} for the module {1} does not exists in the project.\n Firmware file Path: {2} ";
+    private static final String INVALID_MODULE_XDC_ERROR = " The XDD/XDC file of module {0} is not available for the node {1}.";
+
+    private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
 
     /**
      * Returns the attribute name linked with the node assignment value.
@@ -167,6 +202,8 @@ public class Node {
         }
     }
 
+    private ProcessImage processImage;
+
     /**
      * Node instance from the openCONFIGURATOR project. Example: The Object is
      * one of TNetworkConfiguration(only for MN), TCN, TRMN.
@@ -244,10 +281,16 @@ public class Node {
     private final NetworkManagement networkmanagement;
 
     /**
+     * XDD instance of firmware.
+     */
+    private FirmwareFile xddFirmwareFile;
+
+    private OpenCONFIGURATORProject currentProject;
+
+    /**
      * Instance of Module management.
      */
     private final ModuleManagement moduleManagement;
-
     /**
      * Instance of DeviceModularinterface.
      */
@@ -257,6 +300,8 @@ public class Node {
      * Instance of head node interface.
      */
     private HeadNodeInterface headNodeInterface;
+
+    private Map<FirmwareManager, Integer> nodeFirmwareCollection = new HashMap<>();
 
     /**
      * Constructor to initialize the node variables.
@@ -275,6 +320,9 @@ public class Node {
         moduleManagement = null;
         moduleInterface = null;
         configurationError = "";
+        xddFirmwareFile = null;
+        currentProject = null;
+        processImage = null;
     }
 
     /**
@@ -312,6 +360,7 @@ public class Node {
 
             nodeId = Short.decode(cn.getNodeID());
             nodeType = NodeType.CONTROLLED_NODE;
+
         } else if (nodeModel instanceof TRMN) {
             TRMN rmn = (TRMN) nodeModel;
 
@@ -338,12 +387,15 @@ public class Node {
         objectDictionary = new ObjectDictionary(this, xddModel);
         networkmanagement = new NetworkManagement(this, xddModel);
         moduleManagement = new ModuleManagement(this, xddModel);
+        if ((nodeType == NodeType.MODULAR_CHILD_NODE)
+                || (nodeType == NodeType.CONTROLLED_NODE)) {
+            xddFirmwareFile = new FirmwareFile(xddModel);
+        }
         List<Interface> interfaceList = moduleManagement
                 .getInterfacelistOfNode();
         for (Interface interfaces : interfaceList) {
             headNodeInterface = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(headNodeInterface);
-
         }
 
         moduleInterface = new DeviceModularInterface(this,
@@ -351,6 +403,7 @@ public class Node {
 
         if (nodeModel instanceof TCN) {
             TCN cnModel = (TCN) nodeModel;
+
             if (isModularheadNode()) {
                 InterfaceList it = cnModel.getInterfaceList();
                 if (it != null) {
@@ -359,6 +412,120 @@ public class Node {
                 }
             }
         }
+
+    }
+
+    private boolean addAvailableFirmware(Module newModule) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
+        if (rootNode != null) {
+            if (!rootNode.getModuleList().isEmpty()) {
+                for (Module module : rootNode.getModuleList()) {
+                    if (module.getVenIdValue()
+                            .equalsIgnoreCase(newModule.getVenIdValue())) {
+                        if (module.getProductId()
+                                .equalsIgnoreCase(newModule.getProductId())) {
+                            if (!module.getModuleFirmwareFileList().isEmpty()) {
+                                for (FirmwareManager fwMngr : module
+                                        .getModuleFirmwareFileList()) {
+                                    validFwList.add(fwMngr);
+                                }
+                            }
+                        }
+                    }
+
+                }
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Module '"
+                                    + newModule.getModuleName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+                        newModule.getModuleFirmwareCollection().put(fw,
+                                fw.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(fw, newModule,
+                                fw.getFirmwareObjModel());
+                    }
+
+                }
+
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private boolean addNodeFirmwareFile(Node newNode) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
+        if (rootNode != null) {
+            if (!rootNode.getCnNodeList().isEmpty()) {
+                for (Node cnNode : rootNode.getCnNodeList()) {
+                    if (cnNode.getVendorIdValue()
+                            .equalsIgnoreCase(newNode.getVendorIdValue())) {
+                        if (cnNode.getProductCodeValue().equalsIgnoreCase(
+                                newNode.getProductCodeValue())) {
+                            if (!cnNode.getValidFirmwareList().isEmpty()) {
+
+                                System.err.println(
+                                        "The firmware collection values.."
+                                                + cnNode.getValidFirmwareList());
+                                for (FirmwareManager fwMngr : cnNode
+                                        .getValidFirmwareList()) {
+                                    validFwList.add(fwMngr);
+
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Node '"
+                                    + newNode.getNodeIDWithName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+
+                        FirmwareManager firmwareMngr = new FirmwareManager(
+                                newNode, fw.getFirmwareXddModel(),
+                                fw.getFirmwareObjModel());
+                        newNode.getNodeFirmwareCollection().put(firmwareMngr,
+                                firmwareMngr.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(firmwareMngr, newNode,
+                                firmwareMngr.getFirmwareObjModel());
+                    }
+
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addStationTypeofNode(int stationTypeChanged)
@@ -385,16 +552,17 @@ public class Node {
             int val = ((Integer) stationTypeChanged).intValue();
             if (val == 0) { // Normal Station.
                 res = OpenConfiguratorCore.GetInstance()
-                        .ResetOperationMode(getNetworkId(), getCnNodeId());
+                        .ResetOperationMode(getNetworkId(), getCnNodeIdValue());
                 plkMode = PlkOperationMode.NORMAL;
             } else if (val == 1) {
                 res = OpenConfiguratorCore.GetInstance()
-                        .SetOperationModeChained(getNetworkId(), getCnNodeId());
+                        .SetOperationModeChained(getNetworkId(),
+                                getCnNodeIdValue());
                 plkMode = PlkOperationMode.CHAINED;
             } else if (val == 2) {
                 res = OpenConfiguratorCore.GetInstance()
                         .SetOperationModeMultiplexed(getNetworkId(),
-                                getCnNodeId(),
+                                getCnNodeIdValue(),
                                 (short) tcn.getForcedMultiplexedCycle());
                 plkMode = PlkOperationMode.MULTIPLEXED;
             }
@@ -420,6 +588,148 @@ public class Node {
             // Updates the generator attributes in project file.
             OpenConfiguratorProjectUtils.updateGeneratorInfo(this);
         }
+    }
+
+    public void copyNode(int nodeId, int stationType, String name)
+            throws JDOMException, InterruptedException, IOException {
+        copyXdcFile(this, nodeId, stationType, name);
+    }
+
+    private void copyXdcFile(Node selectednode, int nodeId, int stationType,
+            String name)
+            throws JDOMException, InterruptedException, IOException {
+        System.err.println("The node XDC path before.."
+                + selectednode.getAbsolutePathToXdc());
+
+        TCN cnModel = new TCN();
+        cnModel.setName(name);
+        cnModel.setNodeID(String.valueOf(nodeId));
+
+        Node newNode = new Node(rootNode, projectXml, cnModel, xddModel);
+        try {
+            OpenConfiguratorProjectUtils.copyConfigurationFile(selectednode,
+                    nodeId, newNode);
+
+        } catch (IOException e1) {
+
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    e1.getCause().getMessage(), getProject().getName());
+            e1.printStackTrace();
+        }
+
+        TNodeCollection nodeCollection = null;
+        Object nodeCollectionModel = rootNode.getMN().getNodeModel();
+        if (nodeCollectionModel instanceof TNetworkConfiguration) {
+            TNetworkConfiguration netConfig = (TNetworkConfiguration) nodeCollectionModel;
+            nodeCollection = netConfig.getNodeCollection();
+        }
+
+        if (getProfileBody(
+                xddModel) instanceof ProfileBodyDevicePowerlinkModularHead) {
+            Result res = OpenConfiguratorLibraryUtils
+                    .addModularHeadNode(newNode);
+            System.err.println("Modular CN...");
+            if (res.IsSuccessful()) {
+
+                try {
+                    rootNode.addNode(nodeCollection, newNode);
+
+                } catch (IOException | JDOMException e) {
+                    if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, e.getMessage(), "");
+                    } else if ((e.getCause() != null)
+                            && (e.getCause().getMessage() != null)
+                            && !e.getCause().getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                                newNode.getProject().getName());
+                    }
+                }
+                if (!selectednode.getInterface().getModuleCollection()
+                        .isEmpty()) {
+                    for (Module module : selectednode.getInterface()
+                            .getModuleCollection().values()) {
+                        updateModuleNode(module, newNode);
+                    }
+
+                }
+
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        res);
+
+                // Remove the node.
+                res = OpenConfiguratorLibraryUtils.removeNode(newNode);
+                if (!res.IsSuccessful()) {
+                    if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                        // Show or print error message.
+                        System.err.println(
+                                "ERROR occured while removin the node. "
+                                        + OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(res));
+                    }
+                }
+            }
+
+        } else {
+            System.err.println("Normal CN...");
+            Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
+            if (res.IsSuccessful()) {
+
+                try {
+                    rootNode.addNode(nodeCollection, newNode);
+
+                } catch (IOException | JDOMException e) {
+                    if ((e.getMessage() != null) && !e.getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, e.getMessage(), "");
+                    } else if ((e.getCause() != null)
+                            && (e.getCause().getMessage() != null)
+                            && !e.getCause().getMessage().isEmpty()) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, ERROR_WHILE_COPYING_XDD,
+                                newNode.getProject().getName());
+                    }
+                }
+            } else {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        res);
+
+                // Remove the node.
+                res = OpenConfiguratorLibraryUtils.removeNode(newNode);
+                if (!res.IsSuccessful()) {
+                    if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                        // Show or print error message.
+                        System.err.println(
+                                "ERROR occured while removin the node. "
+                                        + OpenConfiguratorLibraryUtils
+                                                .getErrorMessage(res));
+                    }
+                }
+            }
+        }
+
+        try {
+
+            newNode.addStationTypeofNode(stationType);
+
+        } catch (JDOMException | IOException e) {
+            e.printStackTrace();
+        }
+
+        if (addNodeFirmwareFile(newNode)) {
+            System.out.println("Firmware File added.");
+        }
+
+        try {
+            getProject().refreshLocal(IResource.DEPTH_INFINITE,
+                    new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
+        }
+
     }
 
     /**
@@ -569,9 +879,34 @@ public class Node {
     }
 
     /**
+     * @return The CN features.
+     */
+
+    public TCNFeatures getCnNodeFeatures() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlink) {
+                    ProfileBodyCommunicationNetworkPowerlink devProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBody;
+                    return devProfile.getNetworkManagement().getCNFeatures();
+                }
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularHead devProfile = (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBody;
+                    return devProfile.getNetworkManagement().getCNFeatures();
+
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * @return The node ID.
      */
-    public short getCnNodeId() {
+    public short getCnNodeIdValue() {
         return nodeId;
     }
 
@@ -634,6 +969,32 @@ public class Node {
             }
         }
         return objectText;
+    }
+
+    /**
+     * @return The general features.
+     */
+
+    public TGeneralFeatures getGeneralFeatures() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlink) {
+                    ProfileBodyCommunicationNetworkPowerlink devProfile = (ProfileBodyCommunicationNetworkPowerlink) profileBody;
+                    return devProfile.getNetworkManagement()
+                            .getGeneralFeatures();
+                }
+                if (profileBody instanceof ProfileBodyCommunicationNetworkPowerlinkModularHead) {
+                    ProfileBodyCommunicationNetworkPowerlinkModularHead devProfile = (ProfileBodyCommunicationNetworkPowerlinkModularHead) profileBody;
+                    return devProfile.getNetworkManagement()
+                            .getGeneralFeatures();
+                }
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -759,6 +1120,27 @@ public class Node {
     }
 
     /**
+     * @return List of firmware files added to Node
+     */
+    public Map<FirmwareManager, Integer> getNodeFirmwareCollection() {
+        return nodeFirmwareCollection;
+    }
+
+    public List<String> getNodeFirmwareFileNameList() {
+        List<String> fwList = new ArrayList<>();
+
+        fwList.clear();
+
+        for (FirmwareManager fwManager : getNodeFirmwareCollection().keySet()) {
+            String filename = FilenameUtils
+                    .getName(fwManager.getFirmwareConfigPath());
+            fwList.add(filename);
+
+        }
+        return fwList;
+    }
+
+    /**
      * @return The node ID in string format.
      */
     public String getNodeIdString() {
@@ -779,6 +1161,22 @@ public class Node {
      */
     public Object getNodeModel() {
         return nodeModel;
+    }
+
+    /**
+     * Gets the name of node based on the ID
+     *
+     * @param nodeId The ID of node
+     * @return Name of Node
+     */
+    public String getNodeName(String nodeId) {
+        List<Node> nodeList = rootNode.getNodeLists(rootNode);
+        for (Node node : nodeList) {
+            if (node.getNodeIdString().equalsIgnoreCase(nodeId)) {
+                return node.getNodeIDWithName();
+            }
+        }
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -924,6 +1322,78 @@ public class Node {
     }
 
     /**
+     * @return Instance of ProcessImage
+     */
+    public ProcessImage getProcessImage() {
+        return processImage;
+    }
+
+    /**
+     * @return The product code value of node from node XDD/XDC.
+     */
+    public String getProductCodeValue() {
+        String value = StringUtils.EMPTY;
+        if (getObjectDictionary() != null) {
+            if (getObjectDictionary()
+                    .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                    .getSubObject(XDD_SUBOBJECT_INDEX_PRODUCTCODE) != null) {
+                value = getObjectDictionary()
+                        .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                        .getSubObject(XDD_SUBOBJECT_INDEX_PRODUCTCODE)
+                        .getActualDefaultValue();
+            }
+        } else {
+            System.err.println("Object Dictionary not available.");
+        }
+        return value;
+    }
+
+    /**
+     * @return The product Name of node.
+     */
+    public String getProductName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getProductName()
+                                .getValue();
+                    }
+                }
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getProductName()
+                                .getValue();
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    public ProfileBodyDataType getProfileBody(
+            ISO15745ProfileContainer xddModel) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBodyDatatype = profile
+                        .getProfileBody();
+                if (profileBodyDatatype instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    return profileBodyDatatype;
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
      * @return Eclipse project associated with the node.
      */
     public IProject getProject() {
@@ -953,6 +1423,125 @@ public class Node {
     }
 
     /**
+     * @return The valid firmware file for node from the project file.
+     */
+    public List<FirmwareManager> getValidFirmwareList() {
+        List<FirmwareManager> fwList = new ArrayList<>();
+        fwList.clear();
+
+        Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+        if (getNodeFirmwareCollection() != null) {
+            for (FirmwareManager fwManager : getNodeFirmwareCollection()
+                    .keySet()) {
+                nodeDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
+                if (!nodeDevRevisionList.isEmpty()) {
+                    for (FirmwareManager fwMan : nodeDevRevisionList.values()) {
+                        if (fwMan.getNodeIdofFirmware().equalsIgnoreCase(
+                                String.valueOf(getCnNodeIdValue()))) {
+                            if (fwMan.getFirmwarefileVersion() < fwManager
+                                    .getFirmwarefileVersion()) {
+                                nodeDevRevisionList.put(
+                                        fwManager.getdevRevNumber(), fwManager);
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else {
+            System.err.println("Firmware list not available for node!");
+        }
+        fwList.addAll(nodeDevRevisionList.values());
+        return fwList;
+    }
+
+    /**
+     * @return The vendor ID value of node from node XDD/XDC.
+     */
+    public String getVendorIdValue() {
+        String value = StringUtils.EMPTY;
+        if (getObjectDictionary() != null) {
+            if (getObjectDictionary()
+                    .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                    .getSubObject(XDD_VENDOR_ID_SUBOBJECT_INDEX) != null) {
+                value = getObjectDictionary()
+                        .getObject(XDD_VENDOR_ID_OBJECT_INDEX_TOCHECK)
+                        .getSubObject(XDD_VENDOR_ID_SUBOBJECT_INDEX)
+                        .getActualDefaultValue();
+            }
+        } else {
+            System.err.println("Object Dictionary not available.");
+        }
+        return value;
+    }
+
+    /**
+     * @return The vendor Name of node.
+     */
+    public String getVendorName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getVendorName()
+                                .getValue();
+                    }
+                }
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getVendorName()
+                                .getValue();
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * @return The Hardware, Software or Firmware version values.
+     */
+    public String getVersionValue(String versionType) {
+        if (xddModel != null) {
+            // Get version details if the XDD model is valid
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlink) {
+                    ProfileBodyDevicePowerlink devProfile = (ProfileBodyDevicePowerlink) profileBody;
+                    for (TVersion ver : devProfile.getDeviceIdentity()
+                            .getVersion()) {
+                        if (ver.getVersionType()
+                                .equalsIgnoreCase(versionType)) {
+                            return ver.getValue();
+                        }
+                    }
+                }
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularHead) {
+                    ProfileBodyDevicePowerlinkModularHead devProfile = (ProfileBodyDevicePowerlinkModularHead) profileBody;
+                    for (TVersion ver : devProfile.getDeviceIdentity()
+                            .getVersion()) {
+                        if (ver.getVersionType()
+                                .equalsIgnoreCase(versionType)) {
+                            return ver.getValue();
+                        }
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return WaitNotActive value of RMN node from object dictionary.
      */
     public String getWaitNotActive() {
@@ -961,6 +1550,13 @@ public class Node {
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_OBJECT_ID,
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_SUBOBJECT_ID);
         return waitNotActiveValue;
+    }
+
+    /**
+     * @return Instance of FirmwareFile.
+     */
+    public FirmwareFile getXddFirmwareFile() {
+        return xddFirmwareFile;
     }
 
     /**
@@ -1618,6 +2214,18 @@ public class Node {
     }
 
     /**
+     * Provides the instance of processImage class
+     *
+     * @param processImage Instance of ProcessImage
+     */
+    public void setProcessImage(ProcessImage processImage) {
+
+        if (processImage != null) {
+            this.processImage = processImage;
+        }
+    }
+
+    /**
      * Set the priority to an RMN node.
      *
      * @param priority Priority value (no units).
@@ -1699,6 +2307,109 @@ public class Node {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+    }
+
+    private void updateModuleNode(Module selectedModule, Node newNode)
+            throws IOException {
+        Object moduleObject = selectedModule.getModelOfModule();
+        if (moduleObject instanceof InterfaceList.Interface.Module) {
+
+            InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleObject;
+            if (newNode.getNodeModel() instanceof TCN) {
+                TCN cnModel = (TCN) newNode.getNodeModel();
+                InterfaceList itfc = cnModel.getInterfaceList();
+
+                if (itfc != null) {
+                    List<InterfaceList.Interface> itf = itfc.getInterface();
+                    for (org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList.Interface iit : itf) {
+                        iit.setId(newNode.getInterface().getInterfaceUId());
+                        iit.getModule().add(module);
+
+                    }
+                } else {
+                    InterfaceList itfcLIst = new InterfaceList();
+                    cnModel.setInterfaceList(itfcLIst);
+                    InterfaceList.Interface itfcs = new InterfaceList.Interface();
+                    itfcs.setId(newNode.getInterface().getInterfaceUId());
+                    cnModel.getInterfaceList().getInterface().add(itfcs);
+                    itfcs.getModule().add(module);
+
+                }
+
+            }
+
+        } else {
+            System.err.println("Invalid Module model");
+        }
+        HeadNodeInterface selectedNodeObj = newNode.getInterface();
+
+        Module newModule = new Module(rootNode,
+                selectedNodeObj.getNode().getProjectXml(), moduleObject,
+                selectedNodeObj.getNode(),
+                selectedModule.getISO15745ProfileContainer(), selectedNodeObj);
+
+        try {
+            OpenConfiguratorProjectUtils
+                    .copyModuleConfigurationFile(selectedModule, newModule);
+        } catch (IOException e1) {
+
+            e1.printStackTrace();
+        }
+
+        Result res = OpenConfiguratorLibraryUtils.addModule(newModule);
+        if (res.IsSuccessful()) {
+            selectedNodeObj.getModuleCollection()
+                    .put(Integer.valueOf(newModule.getPosition()), newModule);
+
+            selectedNodeObj.getAddressCollection()
+                    .put(Integer.valueOf(newModule.getAddress()), newModule);
+
+            selectedNodeObj.getModuleNameCollection()
+                    .put(newModule.getModuleName(), newModule);
+
+            System.err.println("Module collection values ... "
+                    + selectedNodeObj.getModuleCollection().values());
+
+            try {
+                OpenConfiguratorProjectUtils.addModuleNode(
+                        selectedNodeObj.getNode(), selectedNodeObj, newModule);
+            } catch (JDOMException | IOException e) {
+                e.printStackTrace();
+            }
+
+        } else {
+            System.err.println("ERROR occured while adding the module. "
+                    + OpenConfiguratorLibraryUtils.getErrorMessage(res));
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR, res);
+
+            // Remove the module.
+            res = OpenConfiguratorLibraryUtils.removeModule(newModule);
+            if (!res.IsSuccessful()) {
+                if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
+                    // Show or print error message.
+                    System.err
+                            .println("ERROR occured while removin the module. "
+                                    + OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res));
+                }
+            }
+        }
+
+        if (newModule.canFirmwareAdded(newModule)) {
+            if (addAvailableFirmware(newModule)) {
+                System.out.println(
+                        "Firmware file for module added successfully.");
+            }
+        }
+
+        try {
+            selectedNodeObj.getNode().getProject().refreshLocal(
+                    IResource.DEPTH_INFINITE, new NullProgressMonitor());
+        } catch (CoreException e) {
+            System.err.println("unable to refresh the resource due to "
+                    + e.getCause().getMessage());
         }
 
     }

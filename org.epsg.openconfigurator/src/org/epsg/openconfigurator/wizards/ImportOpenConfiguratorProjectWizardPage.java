@@ -748,7 +748,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      */
     private void createProjectDescription(ProjectRecord selectedProjectRecord,
             IProgressMonitor monitor) throws InvocationTargetException,
-                    InterruptedException, IOException {
+            InterruptedException, IOException {
 
         String projectName = FilenameUtils
                 .removeExtension(selectedProjectRecord.getProjectName());
@@ -828,7 +828,12 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
                     .getParentFile().toString() + IPath.SEPARATOR
                     + IPowerlinkProjectSupport.DEVICE_CONFIGURATION_DIR));
             if (!configDirectory.exists()) {
-                configDirectory.mkdir();
+                boolean createDirectory = configDirectory.mkdir();
+                if (createDirectory) {
+                    System.out.println("Directory created.");
+                } else {
+                    System.err.println("Directory not created successfully.");
+                }
             }
             filesToImport.add(configDirectory);
 

@@ -85,6 +85,13 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
                         IDecoration.BOTTOM_LEFT);
 
             }
+            // Firmware overlay image to node with firmware file.
+            if (!nodeObj.getNodeFirmwareCollection().isEmpty()) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.FIRMWARE_OVERLAY_ICON),
+                        IDecoration.TOP_LEFT);
+            }
         }
         if (element instanceof Module) {
 
@@ -95,6 +102,13 @@ public class NodeLabelDecorator implements ILightweightLabelDecorator {
                                 IPluginImages.ERROR_OVERLAY_NODE_ICON),
                         IDecoration.BOTTOM_LEFT);
 
+            }
+            // Firmware overlay image to module with firmware file.
+            if (!moduleObj.getModuleFirmwareCollection().isEmpty()) {
+                decoration.addOverlay(
+                        org.epsg.openconfigurator.Activator.getImageDescriptor(
+                                IPluginImages.FIRMWARE_OVERLAY_ICON),
+                        IDecoration.TOP_LEFT);
             }
         }
     }

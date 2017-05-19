@@ -6,6 +6,22 @@
 		<view name="POWERLINK Network" icon="icons/window_16.gif" category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.IndustrialNetworkView" id="org.epsg.openconfigurator.views.IndustrialNetworkView"/>
 		<view allowMultiple="false" category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.ObjectDictionaryView" icon="icons/obd.gif" id="org.epsg.openconfigurator.views.ObjectDictionaryView" name="Object Dictionary"/>
 		<view category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.mapping.MappingView" icon="icons/mapping.gif" id="org.epsg.openconfigurator.views.MappingView" name="Mapping View"/>
+	  <view
+        allowMultiple="false"
+        category="org.epsg.openconfigurator.view.category"
+        class="org.epsg.openconfigurator.views.ParameterView"
+        icon="icons/parameter_reference.gif"
+        id="org.epsg.openconfigurator.views.ParameterView"
+        name="Parameter View">
+  </view>
+   <view
+         category="org.epsg.openconfigurator.view.category"
+         class="org.epsg.openconfigurator.views.ProcessImageView"
+         icon="icons/IoMap.gif"
+         id="org.epsg.openconfigurator.views.ProcessImageView"
+         name="I/O Mapping"
+         restorable="true">
+   </view>
 	</extension>
 	<extension point="org.eclipse.ui.perspectives">
 		<perspective class="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective" icon="icons/releng_gears.gif" id="org.epsg.openconfigurator.perspectives.IndustrialAutomationPerspective" name="Industrial Automation"/>

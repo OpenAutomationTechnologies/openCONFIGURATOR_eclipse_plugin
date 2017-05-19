@@ -32,6 +32,8 @@
 package org.epsg.openconfigurator.views.mapping;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -58,14 +60,19 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.custom.TableEditor;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -92,22 +99,29 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IPartListener;
 import org.eclipse.ui.ISelectionListener;
 import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.forms.IFormColors;
 import org.eclipse.ui.forms.widgets.ExpandableComposite;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.ViewPart;
+import org.epsg.openconfigurator.adapters.AbstractNodePropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
+import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.AbstractPowerlinkObject;
 import org.epsg.openconfigurator.model.HeadNodeInterface;
+import org.epsg.openconfigurator.model.IManagingNodeProperties;
+import org.epsg.openconfigurator.model.INetworkProperties;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PdoChannel;
 import org.epsg.openconfigurator.model.PdoType;
+import org.epsg.openconfigurator.model.PlkOperationMode;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
@@ -117,9 +131,12 @@ import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
 import org.epsg.openconfigurator.views.IndustrialNetworkView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
+import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObject;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
@@ -134,6 +151,7 @@ import org.jdom2.JDOMException;
  *
  */
 public class MappingView extends ViewPart {
+
     /**
      * Listener to handle the PDO channel selection change events.
      *
@@ -317,6 +335,127 @@ public class MappingView extends ViewPart {
     }
 
     /**
+     * Content provider to list the forced objects and sub_objects of node and
+     * module.
+     *
+     * @author Sree Hari Vignesh B
+     *
+     */
+    private static class ForcedObjectContentProvider
+            implements ITreeContentProvider {
+        Node node;
+        Module module;
+
+        public ForcedObjectContentProvider(Object nodeOrModule) {
+            if (nodeOrModule instanceof Node) {
+                Node node = (Node) nodeOrModule;
+                this.node = node;
+            } else if (nodeOrModule instanceof Module) {
+                Module module = (Module) nodeOrModule;
+                this.module = module;
+            }
+        }
+
+        @Override
+        public void dispose() {
+        }
+
+        @Override
+        public Object[] getChildren(Object parentElement) {
+            return new Object[0];
+        }
+
+        @Override
+        public Object[] getElements(Object inputElement) {
+
+            if (inputElement instanceof Node) {
+                Node node = (Node) inputElement;
+                String[] forcedObjs = node.getForcedObjectsString()
+                        .split("\\;");
+                return forcedObjs;
+            }
+            if (inputElement instanceof Module) {
+                Module module = (Module) inputElement;
+                String[] forcedObjs = module.getForcedObjectsString()
+                        .split("\\;");
+                return forcedObjs;
+            }
+            return new Object[0];
+        }
+
+        @Override
+        public Object getParent(Object element) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        @Override
+        public boolean hasChildren(Object element) {
+            // TODO Auto-generated method stub
+            return false;
+        }
+
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput,
+                Object newInput) {
+        }
+    }
+
+    /**
+     * Label provider for the forced objects and sub-objects.
+     *
+     * @author Sree Hari Vignesh B
+     *
+     */
+    private static class ForcedObjectLabelProvider extends LabelProvider
+            implements IColorProvider {
+
+        Image objectIcon;
+        Image subObjectIcon;
+
+        public ForcedObjectLabelProvider(Object nodeOrModule) {
+
+            objectIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_OBJECT_ICON)
+                    .createImage();
+            subObjectIcon = org.epsg.openconfigurator.Activator
+                    .getImageDescriptor(IPluginImages.OBD_SUB_OBJECT_ICON)
+                    .createImage();
+        }
+
+        @Override
+        public void dispose() {
+            objectIcon.dispose();
+            subObjectIcon.dispose();
+        }
+
+        @Override
+        public Color getBackground(Object element) {
+            return null;
+        }
+
+        @Override
+        public Color getForeground(Object element) {
+            return null;
+        }
+
+        @Override
+        public Image getImage(Object obj) {
+            System.err.println("Image object element.." + obj);
+            if (obj instanceof String) {
+                String objIndex = (String) obj;
+                if (!objIndex.isEmpty()) {
+                    if (objIndex.contains("/")) {
+                        return subObjectIcon;
+                    }
+                    return objectIcon;
+                }
+            }
+            return null;
+        }
+    }
+
+    /**
      * Listener to handle the map all available objects button selection events.
      *
      * @author Ramakrishnan P
@@ -419,6 +558,7 @@ public class MappingView extends ViewPart {
 
         public PdoActionsClearButtonSelectionListener(
                 ComboViewer channelComboViewer, TableViewer tableViewer) {
+
             this.tableViewer = tableViewer;
             this.channelComboViewer = channelComboViewer;
         }
@@ -427,6 +567,7 @@ public class MappingView extends ViewPart {
         @Override
         public void widgetSelected(SelectionEvent e) {
             ISelection selection = channelComboViewer.getSelection();
+
             if (selection instanceof IStructuredSelection) {
                 IStructuredSelection stSelection = (IStructuredSelection) selection;
                 Object selectedObject = stSelection.getFirstElement();
@@ -666,7 +807,7 @@ public class MappingView extends ViewPart {
      * @author Ramakrishnan P
      *
      */
-    private class PdoNodeListLabelProvider extends LabelProvider {
+    private static class PdoNodeListLabelProvider extends LabelProvider {
         private PdoType pdoType;
 
         // It is not required to be a static inner class.
@@ -684,23 +825,23 @@ public class MappingView extends ViewPart {
             if (element instanceof Node) {
                 Node node = (Node) element;
                 if (pdoType == PdoType.TPDO) {
-                    if (node.getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getCnNodeId()
-                                + ")";
+                    if (node.getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
+                        return node.getName() + " PRes("
+                                + node.getCnNodeIdValue() + ")";
                     } else if (node
-                            .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getCnNodeId()
-                                + ")";
+                            .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        return node.getName() + " PRes("
+                                + node.getCnNodeIdValue() + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
                 } else if (pdoType == PdoType.RPDO) {
-                    if (node.getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return "MN" + " PReq(" + node.getCnNodeId() + ")";
+                    if (node.getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
+                        return "MN" + " PReq(" + node.getCnNodeIdValue() + ")";
                     } else if (node
-                            .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes(" + node.getCnNodeId()
-                                + ")";
+                            .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        return node.getName() + " PRes("
+                                + node.getCnNodeIdValue() + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
@@ -822,7 +963,7 @@ public class MappingView extends ViewPart {
                         Node targetNode = null;
                         for (Node node : targetNodeIdList) {
 
-                            if (node.getCnNodeId() == targetNodeId) {
+                            if (node.getCnNodeIdValue() == targetNodeId) {
                                 targetNode = node;
                             }
                         }
@@ -831,32 +972,38 @@ public class MappingView extends ViewPart {
 
                             if (pdoType == PdoType.TPDO) {
                                 if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else if (nodeObj == targetNode) {
-                                    return "Self(" + targetNode.getCnNodeId()
+                                    return "Self("
+                                            + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     // TODO Check;
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else {
                                     return targetNode.getNodeIDWithName();
                                 }
                             } else if (pdoType == PdoType.RPDO) {
                                 if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.INVALID_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
                                     return "MN" + " PReq("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else if (nodeObj == targetNode) {
-                                    return "Self(" + targetNode.getCnNodeId()
+                                    return "Self("
+                                            + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else if (targetNode
-                                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeId() + ")";
+                                            + targetNode.getCnNodeIdValue()
+                                            + ")";
                                 } else {
                                     return targetNode.getNodeIDWithName();
                                 }
@@ -935,7 +1082,7 @@ public class MappingView extends ViewPart {
                                     if (mapParamObj.getId() == 1) {
                                         try {
                                             tpdoEnabledEntriesCount = Integer
-                                                    .valueOf(
+                                                    .parseInt(
                                                             tpdoEnabledMappingEntriesText
                                                                     .getText()
                                                                     .trim());
@@ -947,7 +1094,7 @@ public class MappingView extends ViewPart {
                                     if (mapParamObj.getId() == 1) {
                                         try {
                                             rpdoEnabledEntriesCount = Integer
-                                                    .valueOf(
+                                                    .parseInt(
                                                             rpdoEnabledMappingEntriesText
                                                                     .getText()
                                                                     .trim());
@@ -961,7 +1108,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -971,7 +1118,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -991,7 +1138,7 @@ public class MappingView extends ViewPart {
                             ex.printStackTrace();
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1001,7 +1148,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1015,7 +1162,7 @@ public class MappingView extends ViewPart {
                         if (objectIdValue == 0) {
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1025,7 +1172,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1087,7 +1234,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             tpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             tpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1109,7 +1256,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             rpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             rpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1159,7 +1306,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             tpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             tpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1181,7 +1328,7 @@ public class MappingView extends ViewPart {
                                                                             .getId() == 1) {
                                                                         try {
                                                                             rpdoEnabledEntriesCount = Integer
-                                                                                    .valueOf(
+                                                                                    .parseInt(
                                                                                             rpdoEnabledMappingEntriesText
                                                                                                     .getText()
                                                                                                     .trim());
@@ -1219,7 +1366,7 @@ public class MappingView extends ViewPart {
                         if (mappableObject == null) {
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1229,7 +1376,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1248,7 +1395,7 @@ public class MappingView extends ViewPart {
                             ex.printStackTrace();
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.valueOf(
+                                    tpdoEnabledEntriesCount = Integer.parseInt(
                                             tpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1258,7 +1405,7 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.valueOf(
+                                    rpdoEnabledEntriesCount = Integer.parseInt(
                                             rpdoEnabledMappingEntriesText
                                                     .getText().trim());
 
@@ -1276,7 +1423,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         tpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         tpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1288,7 +1435,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         rpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         rpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1306,7 +1453,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 rpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 rpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1323,7 +1470,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 tpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 tpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1345,7 +1492,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         tpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         tpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1363,7 +1510,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 rpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 rpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1380,7 +1527,7 @@ public class MappingView extends ViewPart {
                                         if (mapParamObj.getId() == 1) {
                                             try {
                                                 tpdoEnabledEntriesCount = Integer
-                                                        .valueOf(
+                                                        .parseInt(
                                                                 tpdoEnabledMappingEntriesText
                                                                         .getText()
                                                                         .trim());
@@ -1406,7 +1553,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         tpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         tpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1425,7 +1572,7 @@ public class MappingView extends ViewPart {
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         rpdoEnabledEntriesCount = Integer
-                                                .valueOf(
+                                                .parseInt(
                                                         rpdoEnabledMappingEntriesText
                                                                 .getText()
                                                                 .trim());
@@ -1579,27 +1726,94 @@ public class MappingView extends ViewPart {
     public static final String RPDO_TAB_TITLE = "RPDO";
 
     public static final String PDO_CHANNEL_LABEL = "Channel:";
+
     public static final String PDO_ENABLED_MAPPING_ENTRIES = "Enabled Mapping Entries:";
+
     public static final String PDO_SEND_TO_NODE_LABEL = "Send to Node:";
     public static final String PDO_RECEIVE_FROM_NODE_LABEL = "Receive from Node:";
     public static final String PDO_CHANNEL_SIZE_LABEL = "Channel Size (bytes): ";
-
     public static final String MENU_SHOW_ADVANCED_PROPERTIES_LABEL = "Show Advanced Properties";
-
     public static final String PDO_TABLE_COLUMN_STATUS_LABEL = "Status";
+
     public static final String PDO_TABLE_COLUMN_NO_LABEL = "No";
+
     public static final String PDO_TABLE_COLUMN_MAPPED_OBJECT_LABEL = "Mapped Object";
     public static final String PDO_TABLE_COLUMN_SIZE_LABEL = "Size (bytes)";
     public static final String PDO_TABLE_COLUMN_ACTUAL_VALUE_LABEL = "Value";
     public static final String PDO_TABLE_COLUMN_ACTIONS_LABEL = "Actions";
     public static final String PDO_MAPP_ALL_AVAILABLE_OBJECTS_LABEL = "Map all available objects";
     public static final String PDO_CLEAR_ALL_MAPPING_LABEL = "Clear All";
-
     /**
      * The corresponding node instance for which the mapping editor corresponds
      * to.
      */
     private static Node nodeObj;
+    /**
+     * Form size
+     */
+    private static final int FORM_BODY_MARGIN_TOP = 12;
+
+    private static final int FORM_BODY_MARGIN_BOTTOM = 12;
+
+    private static final int FORM_BODY_MARGIN_LEFT = 6;
+
+    private static final int FORM_BODY_MARGIN_RIGHT = 6;
+
+    private static final int FORM_BODY_HORIZONTAL_SPACING = 20;
+
+    private static final int FORM_BODY_VERTICAL_SPACING = 17;
+
+    private static final int FORM_BODY_NUMBER_OF_COLUMNS = 2;
+
+    private static final String ERROR_ASYNC_SLOT_TIMEOUT_CANNOT_BE_EMPTY = "Async. slot timeout cannot be empty.";
+
+    private static final String INVALID_RANGE_ASYNC_SLOT_TIMEOUT = "Invalid range for Async. slot timeout.";
+
+    private static final String ERROR_INVALID_VALUE_ASYNCT_SLOT_TIMEOUT = "Invalid value for Async. slot timeout.";
+
+    private static final String ERROR_ASND_MAX_NR_CANNOT_BE_EMPTY = "ASnd max number cannot be empty.";
+
+    private static final String INVALID_RANGE_ASND_MAX_NR = "Invalid range for ASnd max number.";
+
+    private static final String ERROR_INVALID_VALUE_ASND_MAX_NR = "Invalid value for ASnd max number.";
+    private static final String ERROR_CYCLE_TIME_CANNOT_BE_EMPTY = "Cycle Time cannot be empty.";
+
+    private static final String ERROR_INVALID_VALUE_CYCLE_TIME = "Invalid value for Cycle-time.";
+
+    private static final String ERROR_ASYNC_MTU_CANNOT_BE_EMPTY = "AsyncMtu cannot be empty.";
+
+    private static final String INVALID_RANGE_ASYNC_MTU = "Invalid range for AsyncMtu.";
+
+    private static final String ERROR_INVALID_VALUE_ASYNC_MTU = "Invalid value for AsyncMtu.";
+    private static final String ERROR_MULTIPLEXED_CYCLE_CNT_CANNOT_BE_EMPTY = "Multiplexed Cycle Count cannot be empty.";
+
+    private static final String INVALID_RANGE_MULTIPLEXED_CYCLE_CNT = "Invalid range for Multiplexed Cycle Count.";
+    private static final String ERROR_INVALID_VALUE_MULTIPLEXED_CYCLE_CNT = "Invalid value for Multiplexed Cycle Count.";
+    private static final String ERROR_PRE_SCALER_CANNOT_BE_EMPTY = "PreScaler cannot be empty.";
+    private static final String INVALID_RANGE_PRE_SCALER = "Invalid range for PreScaler.";
+    private static final String ERROR_INVALID_VALUE_PRE_SCALER = "Invalid value for PreScaler.";
+    public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
+    public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value.";
+    public static final String INVALID_RANGE_LOSS_SOC_TOLERANCE = "[{0}] Actual value {1} with datatype UNSIGNED32 does not fit the datatype limits or format.";
+    private static final String ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY = "PRes TimeOut value cannot be empty.";
+
+    private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
+
+    private static final String CNPRES_CHAINING_ERROR_MESSAGE = "The node {0} does not support PRes Chaining operation.";
+
+    private static final String MNPRES_CHAINING_ERROR_MESSAGE = "The MN {0} does not support PRes Chaining operation.";
+
+    private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported.";
+
+    private static final int MINIMUM_ASYC_MTU_VALUE = 300;
+
+    private static final int MAXIMUM_ASYC_MTU_VALUE = 1500;
+
+    private static final long MINIMUM_ASYNC_SLOT_TIMEOUT = 250;
+
+    private static final int MINIMUM_PRESCALER_VALUE = 0;
+
+    private static final int MAXIMUM_PRESCALER_VALUE = 1000;
 
     /**
      * Resize table based on columns content width.
@@ -1770,11 +1984,14 @@ public class MappingView extends ViewPart {
         }
     };
 
+    private Tree lst_no_foi;
+
     /**
      * Selection listener to update the objects and sub-objects in the mapping
      * view.
      */
     private ISelectionListener networkViewPartSelectionListener = new ISelectionListener() {
+
         @Override
         public void selectionChanged(IWorkbenchPart part,
                 ISelection selection) {
@@ -1829,6 +2046,7 @@ public class MappingView extends ViewPart {
                             .addVerifyListener(enabledEntriesVerifyListener);
                     rpdoEnabledMappingEntriesText.setEnabled(false);
                     rpdoChannelSize.setText(StringUtils.EMPTY);
+
                     return;
                 }
 
@@ -1843,6 +2061,16 @@ public class MappingView extends ViewPart {
                 }
 
                 sourcePart = part;
+                nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
+                nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
+                nodeId.removeKeyListener(nodeIDModifyListener);
+                lossOfSocTolText.removeKeyListener(lossOfSocModifyListener);
+                asyncMtuText.removeKeyListener(asyncMtuModifyListener);
+                asyncTimeOutTxt.removeKeyListener(asyncTimeoutModifyListener);
+                preScalerText.removeKeyListener(prescalerModifyListener);
+                txt_no_PResTimeOut.removeKeyListener(cycleTimeModifyListener);
+                txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
+
                 if (selectedObj instanceof Node) {
                     System.err.println("Single Selection...");
                     nodeObj = (Node) selectedObj;
@@ -1850,6 +2078,57 @@ public class MappingView extends ViewPart {
 
                     // Set null as input to the view, when the node is disabled.
                     displayMappingView(nodeObj);
+                    Object nodeObjModel = nodeObj.getNodeModel();
+
+                    Integer nodeIdVal = Integer
+                            .valueOf(nodeObj.getNodeIdString());
+                    if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        String[] presItems = { "Yes", "No" };
+                        nodeTypeCombo.setItems(presItems);
+                        if (nodeObj
+                                .getNodeModel() instanceof TNetworkConfiguration) {
+                            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                                    .getNodeModel();
+                            TMN mn = net.getNodeCollection().getMN();
+                            if (mn.isTransmitsPRes()) {
+
+                                nodeTypeCombo.select(0);
+                            } else {
+                                nodeTypeCombo.select(1);
+                            }
+                        }
+                    } else {
+                        String[] noteTypeItems = { "Normal", "Chained" };
+                        nodeTypeCombo.setItems(noteTypeItems);
+                        if (nodeObj
+                                .getPlkOperationMode() == PlkOperationMode.CHAINED) {
+                            nodeTypeCombo.select(1);
+
+                        } else {
+                            nodeTypeCombo.select(0);
+                        }
+                    }
+
+                    if (nodeObjModel instanceof TCN) {
+                        addListenersToCnControls();
+                        handleGeneralInfoForCn(nodeObj);
+                    } else if (nodeObjModel instanceof TNetworkConfiguration) {
+                        addListenersToMnControls();
+                        handleGeneralInfoForMn(nodeObj);
+                    } else if (nodeObjModel instanceof TRMN) {
+                        addListenersToRmnControls();
+                        handleGeneralInfoForRmn(nodeObj);
+                    } else if (nodeObjModel instanceof TMN) {
+                        addListenersToMnControls();
+                        handleGeneralInfoForMn(nodeObj);
+                    }
+
+                    txt_no_nodename.setText(nodeObj.getName());
+
+                    lst_no_foi.removeAll();
+
+                    listViewer.setInput(nodeObj);
+
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
                     nodeObj = module.getNode();
@@ -1886,7 +2165,71 @@ public class MappingView extends ViewPart {
                             .addVerifyListener(enabledEntriesVerifyListener);
                     rpdoEnabledMappingEntriesText.setEnabled(false);
                     rpdoChannelSize.setText(StringUtils.EMPTY);
+
+                    lst_no_foi.removeAll();
+                    listViewer.setInput(module);
+
+                    String[] nodeTypeitems = { "Normal", "Chained" };
+                    nodeTypeCombo.setItems(nodeTypeitems);
+                    if (nodeObj
+                            .getPlkOperationMode() == PlkOperationMode.CHAINED) {
+                        nodeTypeCombo.select(1);
+
+                    } else {
+                        nodeTypeCombo.select(0);
+                    }
+
+                    addListenersToCnControls();
+                    handleGeneralInfoForModule(module);
+
+                    txt_no_nodename.setText(nodeObj.getName());
+
                     return;
+                } else if (selectedObj instanceof HeadNodeInterface) {
+                    HeadNodeInterface headintf = (HeadNodeInterface) selectedObj;
+                    nodeObj = headintf.getNode();
+                    Object nodeObjModel = nodeObj.getNodeModel();
+
+                    Integer nodeIdVal = Integer
+                            .valueOf(nodeObj.getNodeIdString());
+                    if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        String[] presTimes = { "Yes", "No" };
+                        nodeTypeCombo.setItems(presTimes);
+                        if (nodeObj
+                                .getNodeModel() instanceof TNetworkConfiguration) {
+                            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                                    .getNodeModel();
+                            TMN mn = net.getNodeCollection().getMN();
+                            if (mn.isTransmitsPRes()) {
+
+                                nodeTypeCombo.select(0);
+                            } else {
+                                nodeTypeCombo.select(1);
+                            }
+                        }
+                    } else {
+                        String[] nodeTypeItems = { "Normal", "Chained" };
+                        nodeTypeCombo.setItems(nodeTypeItems);
+                        if (nodeObj
+                                .getPlkOperationMode() == PlkOperationMode.CHAINED) {
+                            nodeTypeCombo.select(1);
+                            ;
+                        } else {
+                            nodeTypeCombo.select(0);
+                        }
+                    }
+
+                    if (nodeObjModel instanceof TCN) {
+                        addListenersToCnControls();
+                        // nodeId.removeModifyListener(nodeIDModifyListener);
+                        handleGeneralInfoForCn(nodeObj);
+                    }
+
+                    txt_no_nodename.setText(nodeObj.getName());
+
+                    lst_no_foi.removeAll();
+                    listViewer.setInput(nodeObj);
+
                 } else {
                     System.err.println(
                             "Other than node is selected!" + selectedObj);
@@ -1897,8 +2240,8 @@ public class MappingView extends ViewPart {
                 sourcePart.getSite().getPage().addPartListener(partListener);
             }
         }
-    };
 
+    };
     /**
      * Source workbench part.
      */
@@ -1912,104 +2255,105 @@ public class MappingView extends ViewPart {
      * TPDO page controls
      */
     private TabItem tbtmTpdo;
-
     private ComboViewer tpdoChannelComboViewer;
+
     private ComboViewer sndtoNodecomboviewer;
+
     private TableViewer tpdoTableViewer;
     private TableViewerColumn tpdoMappingObjectColumn;
     private TableViewerColumn tpdoActionsColumn;
-
     private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
     private Composite tpdoPageFooter;
     private Button btnTpdoChannelMapAvailableObjects;
     private Button btnTpdoChannelClearSelectedRows;
+
     private Text tpdoEnabledMappingEntriesText;
+
     private Text tpdoChannelSize;
     private TableEditor tpdoTableActionsEditor;
+
     private Composite tpdoActionsbuttonGroup;
+
     private Button tpdoActionsUpButton;
+
     private Button tpdoActionsDownButton;
+
     private TableColumn tpdoTblclmnActualValue;
+
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
     private ModifyListener tpdoEnabledMappingEntriesTextModifyListener;
-
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
+
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
     private SelectionListener tpdoActionsClearBtnSelectionListener;
 
     private SelectionListener tpdoActionsDownBtnSelectionListener;
+
     private SelectionListener tpdoActionsUpBtnSelectionListener;
 
     private Button tpdoBtnCheckButton;
+
     public boolean tpdoProfileObjectSelection = false;
-
     private int tpdoEnabledEntriesCount;
-
     private int count = 0;
 
     /**
      * RPDO page controls
      */
     private TabItem tbtmRpdo;
-
     private ComboViewer rpdoChannelComboViewer;
     private ComboViewer receiveFromNodecomboviewer;
 
     private TableViewer rpdoTableViewer;
     private TableViewerColumn rpdoMappingObjectColumn;
+
     private TableViewerColumn rpdoActionsColumn;
-
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
-
     private Composite rpdoPageFooter;
     private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
+
     private Text rpdoEnabledMappingEntriesText;
     private Text rpdoChannelSize;
     private TableEditor rpdoTableActionsEditor;
+
     private Composite rpdoActionsbuttonGroup;
-
     private Button rpdoActionsUpButton;
-
     private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
-
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
-
     private ISelectionChangedListener rpdoNodeComboSelectionChangeListener;
-
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
-
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
-
     private SelectionListener rpdoClearAllMappingBtnSelectionListener;
-    private SelectionListener rpdoActionsClearBtnSelectionListener;
-    private SelectionListener rpdoActionsDownBtnSelectionListener;
-    private SelectionListener rpdoActionsUpBtnSelectionListener;
 
+    private SelectionListener rpdoActionsClearBtnSelectionListener;
+
+    private SelectionListener rpdoActionsDownBtnSelectionListener;
+
+    private SelectionListener rpdoActionsUpBtnSelectionListener;
     private Button rpdoBtnCheckButton;
     public boolean rpdoProfileObjectSelection = false;
-
     private int rpdoEnabledEntriesCount;
-
     /**
      * Common GUI controls
      */
     private Action showAdvancedview;
-
     private final Image clearImage;
-
     private final Image upArrowImage;
     private final Image downArrowImage;
     private final Image warningImage;
-
+    private final Image epsgImage;
     private final Image errorImage;
+
     private final Image signedYesImage;
+
     private final Image signedDisableImage;
 
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
+
     /**
      * Summary Page
      */
@@ -2019,15 +2363,14 @@ public class MappingView extends ViewPart {
     private TableColumn tpdoSummaryClmnMappingVersion;
     private boolean tpdoSummaryOnlyShowChannelsWithData = false;
     private TableViewer rpdoSummaryTableViewer;
-
     private TableColumn rpdoSummaryClmnMappingVersion;
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
     /**
      * Common application model data
      */
     private final Node emptyNode;
-
     private final Node selfReceiptNode;
+
     private final PowerlinkObject emptyObject;
     private final ArrayList<Node> targetNodeIdList = new ArrayList<>();
     /**
@@ -2073,6 +2416,518 @@ public class MappingView extends ViewPart {
             }
         }
     };
+    private Text txt_no_nodename;
+
+    private Text txt_no_PResTimeOut;
+
+    private Text lossOfSocTolText;
+
+    private Text asyncMtuText;
+
+    private Text asyncTimeOutTxt;
+
+    private Text preScalerText;
+
+    private Text productNameText;
+
+    private Text productIdText;
+
+    private Text vendorNameText;
+
+    private Text vendorIdtext;
+
+    private Combo nodeTypeCombo;
+
+    private Label lblNodeType;
+
+    private Label lblPResTimeout;
+
+    private Label lblLossOfSoc;
+
+    private Label lblAsymcMtu;
+
+    private Label lblAsyncTimeOut;
+
+    private Label lblPrescaler;
+
+    private Label productNameLabel;
+
+    private Label productIdLabel;
+
+    private Label vendorNamelabel;
+
+    private Label vendorIdLabel;
+
+    private String newNodeName;
+
+    private String newNodeId;
+
+    private String newNodType;
+
+    private String newTransmitPres;
+
+    private String newPresTime;
+
+    private String newLossOfSoc;
+
+    private String newAsyncMtu;
+
+    private String newAsynctimeOut;
+
+    private String newPreScaler;
+
+    private String newCycleTime;
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter nodeIDModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+
+                newNodeId = handleSetNodeId(nodeId.getText());
+                System.err.println("New node Id..." + newNodeId);
+                if ((!newNodeId.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    System.err.println("New node Id..." + newNodeId);
+                    short nodeIDvalue = Short.valueOf((newNodeId));
+
+                    short oldNodeId = nodeObj.getCnNodeIdValue();
+                    try {
+                        nodeObj.getPowerlinkRootNode().setNodeId(oldNodeId,
+                                nodeIDvalue);
+
+                    } catch (InvocationTargetException | IOException
+                            | JDOMException | InterruptedException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                } else {
+                    // nodeId.setText(nodeObj.getNodeIdString());
+                }
+
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter transmitPresModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                String oldPres = StringUtils.EMPTY;
+
+                if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
+                    TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                            .getNodeModel();
+                    TMN mn = net.getNodeCollection().getMN();
+                    if (mn.isTransmitsPRes()) {
+                        oldPres = "Yes";
+                    } else {
+                        oldPres = "No";
+                    }
+                }
+                int presIndex = nodeTypeCombo.getSelectionIndex();
+                newTransmitPres = handletransmitPres(String.valueOf(presIndex));
+
+                if ((!newTransmitPres.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newTransmitPres.equalsIgnoreCase(oldPres)) {
+
+                        if (newTransmitPres.equalsIgnoreCase("Yes")) {
+                            newTransmitPres = "0";
+                        } else {
+                            newTransmitPres = "1";
+                        }
+                        Integer value = Integer.valueOf(newTransmitPres);
+
+                        boolean result = (value == 0) ? true : false;
+                        if (nodeObj
+                                .getNodeModel() instanceof TNetworkConfiguration) {
+                            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                                    .getNodeModel();
+                            TMN mn = net.getNodeCollection().getMN();
+                            mn.setTransmitsPRes(result);
+                            try {
+                                OpenConfiguratorProjectUtils
+                                        .updateNodeAttributeValue(nodeObj,
+                                                "transmitsPRes",
+                                                String.valueOf(result));
+                            } catch (JDOMException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                            nodeTypeCombo.select(value);
+                        }
+
+                    }
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter nodeTypeModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                String oldNodetype = StringUtils.EMPTY;
+                if (nodeObj.getNodeModel() instanceof TCN) {
+                    TCN tcn = (TCN) nodeObj.getNodeModel();
+                    if (tcn.isIsChained()) {
+                        oldNodetype = "Chained";
+                    } else {
+                        oldNodetype = "Normal";
+                    }
+                }
+
+                int nodeType = nodeTypeCombo.getSelectionIndex();
+                newNodType = handleNodeTypeChange(nodeType);
+                System.err.println("old node Type.." + oldNodetype);
+                System.err.println("new node Type.." + newNodType);
+                if ((!newNodType.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newNodType.equalsIgnoreCase(oldNodetype)) {
+                        if (newNodType.equalsIgnoreCase("Normal")) {
+                            newNodType = "0";
+                        } else {
+                            newNodType = "1";
+                        }
+                        Integer value = Integer.valueOf(newNodType);
+                        PlkOperationMode plkMode = null;
+                        Result res = new Result();
+
+                        int val = value.intValue();
+                        if (val == 0) { // Normal Station.
+                            res = OpenConfiguratorCore.GetInstance()
+                                    .ResetOperationMode(nodeObj.getNetworkId(),
+                                            nodeObj.getCnNodeIdValue());
+                            plkMode = PlkOperationMode.NORMAL;
+                        } else if (val == 1) {
+                            res = OpenConfiguratorCore.GetInstance()
+                                    .SetOperationModeChained(
+                                            nodeObj.getNetworkId(),
+                                            nodeObj.getCnNodeIdValue());
+                            plkMode = PlkOperationMode.CHAINED;
+                        }
+                        if (plkMode != null) {
+                            if (res.IsSuccessful()) {
+                                nodeObj.setPlkOperationMode(plkMode);
+                            } else {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printLibraryErrorMessage(res);
+                            }
+                        } else {
+                            System.err.println(
+                                    "Invalid POWERLINK operation mode");
+                        }
+                        // Node Assignment values will be modified by the
+                        // library. So refresh the project file data.
+                        try {
+                            OpenConfiguratorProjectUtils
+                                    .updateNodeAssignmentValues(nodeObj);
+
+                            // RPDO nodeID will be changed by the library. So
+                            // refresh the node XDD data
+                            OpenConfiguratorProjectUtils
+                                    .persistNodeData(nodeObj);
+
+                            // Updates the generator attributes in project file.
+                            OpenConfiguratorProjectUtils
+                                    .updateGeneratorInfo(nodeObj);
+
+                        } catch (JDOMException | IOException e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter presTimeoutModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                long presTimeoutInMsVal = nodeObj.getPresTimeoutvalue() / 1000;
+
+                String prestimeout = String.valueOf(presTimeoutInMsVal);
+                newPresTime = handlePresTimeout(txt_no_PResTimeOut.getText());
+                if ((!newPresTime.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newPresTime.equalsIgnoreCase(prestimeout)) {
+                        long presTimeoutInNs = Long.decode(newPresTime)
+                                .longValue() * 1000;
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetPResTimeOut(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeIdValue(),
+                                        presTimeoutInNs);
+                        if (res.IsSuccessful()) {
+                            try {
+                                nodeObj.setCnPresTimeout(
+                                        String.valueOf(presTimeoutInNs));
+
+                            } catch (JDOMException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    }
+                } else {
+
+                    long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
+
+                    txt_no_PResTimeOut.setText(String.valueOf(presTimeoutInMs));
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter lossOfSocModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                Long value = Long.valueOf(nodeObj.getLossOfSocTolerance());
+                long valueInUs = value / 1000;
+
+                String lossOfSoc = String.valueOf(valueInUs);
+                newLossOfSoc = handleLossOfSoCTolerance(
+                        lossOfSocTolText.getText());
+                System.err.println("Loss of Soc..." + newLossOfSoc);
+                if ((!newLossOfSoc.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newLossOfSoc.equalsIgnoreCase(lossOfSoc)) {
+                        long lossOfSocTolerance = Long.decode(newLossOfSoc)
+                                * 1000;
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetLossOfSocTolerance(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeIdValue(),
+                                        lossOfSocTolerance);
+                        if (res.IsSuccessful()) {
+                            try {
+                                nodeObj.setLossOfSocTolerance(
+                                        lossOfSocTolerance);
+                            } catch (JDOMException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    }
+                } else {
+                    Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
+                    long valInUs = val / 1000;
+                    lossOfSocTolText.setText(String.valueOf(valInUs));
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter asyncMtuModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                String asyncMtu = nodeObj.getAsyncMtu();
+                newAsyncMtu = handleAsyncMtu(asyncMtuText.getText());
+                if ((!newAsyncMtu.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newAsyncMtu.equalsIgnoreCase(asyncMtu)) {
+                        Integer asyncMtuValue = Integer.decode(newAsyncMtu);
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetAsyncMtu(nodeObj.getNetworkId(),
+                                        asyncMtuValue);
+                        if (res.IsSuccessful()) {
+                            try {
+                                nodeObj.setAsyncMtuOfNode(asyncMtuValue);
+                            } catch (JDOMException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    }
+                } else {
+                    asyncMtuText.setText(nodeObj.getAsyncMtu());
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter asyncTimeoutModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+
+                String asyncTime = nodeObj.getAsyncSlotTimeout();
+                newAsynctimeOut = handleAsyncSlotTimeout(
+                        asyncTimeOutTxt.getText());
+                if ((!newAsynctimeOut.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (newAsynctimeOut.equalsIgnoreCase(asyncTime)) {
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetAsyncSlotTimeout(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeIdValue(),
+                                        Long.decode(newAsynctimeOut));
+                        if (res.IsSuccessful()) {
+                            try {
+                                nodeObj.setAsyncSlotTimeout(
+                                        Long.decode(newAsynctimeOut));
+                            } catch (NumberFormatException | JDOMException
+                                    | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    }
+                } else {
+                    asyncTimeOutTxt.setText(nodeObj.getAsyncSlotTimeout());
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter prescalerModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                String preScaler = nodeObj.getPrescaler();
+                newPreScaler = handlePreScalerValue(preScalerText.getText());
+                if ((!newPreScaler.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newPreScaler.equalsIgnoreCase(preScaler)) {
+                        Integer preScalarVal = Integer.decode(newPreScaler);
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetPrescaler(nodeObj.getNetworkId(),
+                                        preScalarVal);
+                        if (res.IsSuccessful()) {
+                            try {
+                                nodeObj.setPrescaler(preScalarVal);
+                            } catch (JDOMException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    }
+                } else {
+                    preScalerText.setText(nodeObj.getPrescaler());
+                }
+            }
+        }
+
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter cycleTimeModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+                String cycleTime = nodeObj.getCycleTime();
+                newCycleTime = handleCycleTime(txt_no_PResTimeOut.getText());
+                if ((!newCycleTime.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if (!newCycleTime.equalsIgnoreCase(cycleTime)) {
+                        Long cycleTimeValue = Long.decode(newCycleTime);
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetCycleTime(nodeObj.getNetworkId(),
+                                        cycleTimeValue);
+                        if (res.IsSuccessful()) {
+                            try {
+                                nodeObj.setCycleTime(cycleTimeValue);
+                            } catch (JDOMException | IOException e1) {
+                                // TODO Auto-generated catch block
+                                e1.printStackTrace();
+                            }
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    }
+                } else {
+                    // txt_no_PResTimeOut.setText(nodeObj.getCycleTime());
+                }
+            }
+        }
+
+    };
+
+    private Text nodeId;
+
+    /**
+     * Keyboard bindings.
+     */
+    private KeyAdapter nodeNameModifyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(final KeyEvent e) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+
+                String nodeName = nodeObj.getName();
+                System.err.println("Node name Selected" + nodeName);
+                newNodeName = handleSetNodeName(txt_no_nodename.getText());
+                System.err.println("Node name new Selected" + newNodeName);
+                if ((!newNodeName.equalsIgnoreCase(StringUtils.EMPTY))) {
+                    if ((!newNodeName.equalsIgnoreCase(nodeName))) {
+                        Result res = OpenConfiguratorCore.GetInstance()
+                                .SetNodeName(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeIdValue(),
+                                        newNodeName);
+                        if (!res.IsSuccessful()) {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        } else {
+                            try {
+                                nodeObj.setName(newNodeName);
+
+                            } catch (JDOMException | IOException ex) {
+                                // TODO Auto-generated catch block
+                                ex.printStackTrace();
+                            }
+
+                        }
+                    }
+                } else {
+
+                    txt_no_nodename.setText(nodeObj.getName());
+                }
+            }
+        }
+
+    };
+
+    private TreeViewer listViewer;
 
     public MappingView() {
         TObject emptyObj = new TObject();
@@ -2113,6 +2968,52 @@ public class MappingView extends ViewPart {
         signedDisableImage = org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.SIGNED_DISABLE_ICON)
                 .createImage();
+        epsgImage = org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.EPSG_IMAGE).createImage();
+    }
+
+    private void addListenersToCnControls() {
+        nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
+        txt_no_PResTimeOut.removeKeyListener(cycleTimeModifyListener);
+        System.err.println("Cycle time removed...");
+        txt_no_PResTimeOut.addKeyListener(presTimeoutModifyListener);
+        System.err.println("pres time added...");
+
+        lossOfSocTolText.removeKeyListener(lossOfSocModifyListener);
+        asyncMtuText.removeKeyListener(asyncMtuModifyListener);
+        asyncTimeOutTxt.removeKeyListener(asyncTimeoutModifyListener);
+        preScalerText.removeKeyListener(prescalerModifyListener);
+
+        txt_no_nodename.addKeyListener(nodeNameModifyListener);
+
+        nodeId.setEnabled(true);
+        nodeId.addKeyListener(nodeIDModifyListener);
+
+        nodeTypeCombo.addKeyListener(nodeTypeModifyListener);
+
+    }
+
+    private void addListenersToMnControls() {
+        nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
+        txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
+        System.err.println("pres time removed...");
+        txt_no_PResTimeOut.addKeyListener(cycleTimeModifyListener);
+        System.err.println("Cycle time added...");
+        txt_no_nodename.addKeyListener(nodeNameModifyListener);
+        nodeId.removeKeyListener(nodeIDModifyListener);
+        nodeId.setEnabled(false);
+
+        nodeTypeCombo.addKeyListener(transmitPresModifyListener);
+
+        lossOfSocTolText.addKeyListener(lossOfSocModifyListener);
+        asyncMtuText.addKeyListener(asyncMtuModifyListener);
+        asyncTimeOutTxt.addKeyListener(asyncTimeoutModifyListener);
+        preScalerText.addKeyListener(prescalerModifyListener);
+
+    }
+
+    private void addListenersToRmnControls() {
+        nodeId.addKeyListener(nodeIDModifyListener);
     }
 
     private void contributeToActionBars() {
@@ -2145,6 +3046,7 @@ public class MappingView extends ViewPart {
                     rpdoTblclmnActualValue.setWidth(140);
                     handlePdoTableResize(PdoType.RPDO,
                             showAdvancedview.isChecked());
+
                 } else {
                     tpdoSummaryClmnMappingVersion.setWidth(0);
                     tpdoSummaryClmnMappingVersion.setResizable(false);
@@ -2161,6 +3063,7 @@ public class MappingView extends ViewPart {
                     rpdoTblclmnActualValue.setResizable(false);
                     handlePdoTableResize(PdoType.RPDO,
                             showAdvancedview.isChecked());
+
                 }
             }
         };
@@ -2191,7 +3094,291 @@ public class MappingView extends ViewPart {
         composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
 
         final TabFolder tabFolder = new TabFolder(composite_2, SWT.NONE);
+
+        TabItem tbtmNodeOverview = new TabItem(tabFolder, SWT.NONE);
+        tbtmNodeOverview.setText("Node Overview");
+        Composite composite_1 = new Composite(tabFolder, SWT.NONE);
+        composite_1.setLayout(new GridLayout(2, true));
+        composite_1.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
+        composite_1.setRedraw(true);
+        tbtmNodeOverview.setControl(composite_1);
+        GridData gd_sctnCnFeatures = new GridData(SWT.FILL, SWT.FILL, true,
+                true, 1, 1);
+        gd_sctnCnFeatures.widthHint = 341;
+
+        Section generalInformation = formToolkit.createSection(composite_1,
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
+        formToolkit.paintBordersFor(generalInformation);
+        generalInformation.setText("General Information");
+        generalInformation
+                .setDescription("Provides the basic properties for the node.");
+
+        generalInformation.setExpanded(true);
+        GridData gd_sctnAdvancedConfiguration = new GridData(SWT.FILL, SWT.FILL,
+                true, true, 1, 1);
+        gd_sctnAdvancedConfiguration.heightHint = 141;
+        gd_sctnAdvancedConfiguration.widthHint = 268;
+        generalInformation.setLayoutData(gd_sctnAdvancedConfiguration);
+        generalInformation.setRedraw(true);
+
+        Composite composite_10 = formToolkit.createComposite(generalInformation,
+                SWT.WRAP);
+        GridLayout layout_adt = new GridLayout(2, false);
+        layout_adt.marginWidth = 2;
+        layout_adt.marginHeight = 2;
+        formToolkit.adapt(composite_10);
+        formToolkit.paintBordersFor(composite_10);
+        generalInformation.setClient(composite_10);
+        composite_10.setLayout(layout_adt);
+
+        Label lblNodeName = new Label(composite_10, SWT.NONE);
+        lblNodeName.setText("Node Name:");
+        formToolkit.adapt(lblNodeName, true, true);
+        lblNodeName.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        txt_no_nodename = new Text(composite_10, SWT.BORDER);
+        txt_no_nodename.setEditable(true);
+        txt_no_nodename.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(txt_no_nodename, true, true);
+
+        Label lblNodeId = new Label(composite_10, SWT.NONE);
+        lblNodeId.setText("Node ID:");
+        formToolkit.adapt(lblNodeId, true, true);
+        lblNodeId.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+        nodeId = new Text(composite_10, SWT.BORDER);
+        nodeId.setEditable(true);
+        nodeId.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(nodeId, true, true);
+
+        lblNodeType = new Label(composite_10, SWT.NONE);
+        GridData gd_lblNodeType = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 1, 1);
+        gd_lblNodeType.widthHint = 78;
+        lblNodeType.setLayoutData(gd_lblNodeType);
+        lblNodeType.setText("Transmit PRes:");
+
+        formToolkit.adapt(lblNodeType, true, true);
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        nodeTypeCombo = new Combo(composite_10, SWT.NONE);
+
+        nodeTypeCombo.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(nodeTypeCombo);
+        formToolkit.paintBordersFor(nodeTypeCombo);
+
+        lblPResTimeout = new Label(composite_10, SWT.NONE);
+        GridData gd_lblPResTimeout = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 1, 1);
+        gd_lblPResTimeout.widthHint = 104;
+        lblPResTimeout.setLayoutData(gd_lblPResTimeout);
+        lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
+
+        formToolkit.adapt(lblPResTimeout, true, true);
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        txt_no_PResTimeOut = new Text(composite_10, SWT.BORDER);
+        txt_no_PResTimeOut.setEditable(true);
+        txt_no_PResTimeOut.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(txt_no_PResTimeOut, true, true);
+
+        Composite composite_6 = new Composite(composite_1, SWT.NONE);
+        GridData gd_composite_6 = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 1, 1);
+        gd_composite_6.widthHint = 318;
+        composite_6.setLayoutData(gd_composite_6);
+        formToolkit.adapt(composite_6);
+        formToolkit.paintBordersFor(composite_6);
+
+        CLabel label = new CLabel(composite_6, SWT.NONE);
+        label.setBounds(48, 0, 225, 143);
+        formToolkit.adapt(label);
+        formToolkit.paintBordersFor(label);
+
+        label.setImage(epsgImage);
+
+        Section forcedobjectSection = formToolkit.createSection(composite_1,
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
+        forcedobjectSection.setDescription(
+                "Lists the index of forced objects and sub-objects.");
+        formToolkit.paintBordersFor(forcedobjectSection);
+        forcedobjectSection.setText("Forced Objects");
+        forcedobjectSection.setExpanded(true);
+        GridData gdData_sctnAdvancedConfiguration = new GridData(SWT.FILL,
+                SWT.FILL, true, true, 1, 1);
+        gdData_sctnAdvancedConfiguration.heightHint = 222;
+        gdData_sctnAdvancedConfiguration.widthHint = 332;
+        forcedobjectSection.setLayoutData(gdData_sctnAdvancedConfiguration);
+        forcedobjectSection.setRedraw(true);
+
+        Composite composite_101 = formToolkit
+                .createComposite(forcedobjectSection, SWT.WRAP);
+        GridLayout layout_ad = new GridLayout(2, false);
+        layout_ad.marginWidth = 2;
+        layout_ad.marginHeight = 2;
+        formToolkit.adapt(composite_101);
+        formToolkit.paintBordersFor(composite_101);
+        forcedobjectSection.setClient(composite_101);
+        composite_101.setLayout(layout_ad);
+
+        listViewer = new TreeViewer(composite_101, SWT.BORDER | SWT.V_SCROLL);
+        lst_no_foi = listViewer.getTree();
+        GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1,
+                1);
+        gd_list.heightHint = 224;
+        gd_list.widthHint = 269;
+        lst_no_foi.setLayoutData(gd_list);
+        listViewer.setContentProvider(new ForcedObjectContentProvider(nodeObj));
+        listViewer.setLabelProvider(new ForcedObjectLabelProvider(nodeObj));
+
+        Label label_7 = new Label(composite_101, SWT.NONE);
+        label_7.setText(" ");
+        formToolkit.adapt(label_7, true, true);
+
+        Section advancedInfoSection = formToolkit.createSection(composite_1,
+                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
+        formToolkit.paintBordersFor(advancedInfoSection);
+        advancedInfoSection.setText("Advanced Information");
+        advancedInfoSection.setDescription(
+                "Provides the advanced properties for the node.");
+        advancedInfoSection.setExpanded(true);
+        GridData gdData_sctnforcedObjConfiguration = new GridData(SWT.FILL,
+                SWT.FILL, true, true, 1, 1);
+        gdData_sctnforcedObjConfiguration.heightHint = 270;
+        gdData_sctnforcedObjConfiguration.widthHint = 332;
+        advancedInfoSection.setLayoutData(gdData_sctnforcedObjConfiguration);
+        advancedInfoSection.setRedraw(true);
+
+        Composite composite_102 = formToolkit
+                .createComposite(advancedInfoSection, SWT.WRAP);
+        GridLayout layout = new GridLayout(2, false);
+        layout.marginWidth = 2;
+        layout.marginHeight = 2;
+        composite_102.setLayout(layout);
+        formToolkit.adapt(composite_102);
+        formToolkit.paintBordersFor(composite_102);
+        advancedInfoSection.setClient(composite_102);
+
+        lblLossOfSoc = new Label(composite_102, SWT.NONE);
+        GridData gd_lblProductName = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 1, 1);
+        gd_lblProductName.heightHint = 15;
+        lblLossOfSoc.setLayoutData(gd_lblProductName);
+        lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
+        formToolkit.adapt(lblLossOfSoc, true, true);
+        lblLossOfSoc.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        lossOfSocTolText = new Text(composite_102, SWT.BORDER);
+        lossOfSocTolText.setEditable(true);
+        lossOfSocTolText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+        formToolkit.adapt(lossOfSocTolText, true, true);
+
+        lblAsymcMtu = new Label(composite_102, SWT.NONE);
+        lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
+        formToolkit.adapt(lblAsymcMtu, true, true);
+        lblAsymcMtu.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        asyncMtuText = new Text(composite_102, SWT.BORDER);
+        asyncMtuText.setEditable(true);
+        asyncMtuText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(asyncMtuText, true, true);
+
+        lblAsyncTimeOut = new Label(composite_102, SWT.NONE);
+        lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
+        formToolkit.adapt(lblAsyncTimeOut, true, true);
+        lblAsyncTimeOut.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        asyncTimeOutTxt = new Text(composite_102, SWT.BORDER);
+        asyncTimeOutTxt.setEditable(true);
+        asyncTimeOutTxt.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(asyncTimeOutTxt, true, true);
+
+        lblPrescaler = new Label(composite_102, SWT.NONE);
+        lblPrescaler.setText("Prescaler:");
+        formToolkit.adapt(lblPrescaler, true, true);
+        lblPrescaler.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        preScalerText = new Text(composite_102, SWT.BORDER);
+        preScalerText.setEditable(true);
+        preScalerText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(preScalerText, true, true);
+
+        productNameLabel = new Label(composite_102, SWT.NONE);
+        productNameLabel.setText("Product Name:");
+        formToolkit.adapt(productNameLabel, true, true);
+        productNameLabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        productNameText = new Text(composite_102, SWT.BORDER);
+        productNameText.setEditable(false);
+        productNameText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(productNameText, true, true);
+        productNameText.setEditable(false);
+
+        productIdLabel = new Label(composite_102, SWT.NONE);
+        productIdLabel.setText("Product ID:");
+        formToolkit.adapt(productIdLabel, true, true);
+        productIdLabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        productIdText = new Text(composite_102, SWT.BORDER);
+        productIdText.setEditable(false);
+        productIdText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(productIdText, true, true);
+        productIdText.setEditable(false);
+
+        vendorNamelabel = new Label(composite_102, SWT.NONE);
+        vendorNamelabel.setText("Vendor Name:");
+        formToolkit.adapt(vendorNamelabel, true, true);
+        vendorNamelabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        vendorNameText = new Text(composite_102, SWT.BORDER);
+        vendorNameText.setEditable(false);
+        vendorNameText.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(vendorNameText, true, true);
+        vendorNameText.setEditable(false);
+
+        vendorIdLabel = new Label(composite_102, SWT.NONE);
+        GridData gd_vendorIdLabel = new GridData(SWT.LEFT, SWT.CENTER, false,
+                false, 1, 1);
+        gd_vendorIdLabel.widthHint = 55;
+        vendorIdLabel.setLayoutData(gd_vendorIdLabel);
+        vendorIdLabel.setText("Vendor ID:");
+        formToolkit.adapt(vendorIdLabel, true, true);
+        vendorIdLabel.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        vendorIdtext = new Text(composite_102, SWT.BORDER);
+        vendorIdtext.setEditable(false);
+        vendorIdtext.setLayoutData(
+                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+        formToolkit.adapt(vendorIdtext, true, true);
+        vendorIdtext.setEditable(false);
+
         {
+
             tbtmPdoConfiguration = new TabItem(tabFolder, SWT.NONE);
             tbtmPdoConfiguration.setText(PDO_CONFIGURATION_TAB_TITLE);
             {
@@ -2867,6 +4054,35 @@ public class MappingView extends ViewPart {
                 formToolkit.adapt(rpdoBtnCheckButton, true, true);
                 rpdoBtnCheckButton.setText("Hide Profile Objects");
 
+                // Section generalSection =
+                // formToolkit.createSection(composite_4,
+                // ExpandableComposite.TWISTIE
+                // | ExpandableComposite.TITLE_BAR);
+                // generalSection.setBounds(0, 0, 260, 213);
+                // formToolkit.paintBordersFor(generalSection);
+                // generalSection.setText("Vendor / Product Information");
+                // generalSection.setExpanded(true);
+                // generalSection.setLayoutData(
+                // new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
+                // generalSection.setRedraw(true);
+                //
+                // Composite composite_101 = new Composite(generalSection,
+                // SWT.NONE);
+                // formToolkit.adapt(composite_101);
+                // formToolkit.paintBordersFor(composite_101);
+                // sctnAdvancedConfiguration.setClient(composite_101);
+                // composite_101.setLayout(new GridLayout(2, false));
+                //
+                // Label lblVendorNames = new Label(composite_101, SWT.NONE);
+                // lblVendorNames.setText("Vendor Name:");
+                // formToolkit.adapt(lblVendorNames, true, true);
+                //
+                // txt_no_vendorname = new Text(composite_101, SWT.BORDER);
+                // txt_no_vendorname.setEditable(false);
+                // txt_no_vendorname.setLayoutData(
+                // new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+                // formToolkit.adapt(txt_no_vendorname, true, true);
+
                 clrbutton.addSelectionListener(
                         rpdoActionsClearBtnSelectionListener);
             }
@@ -3014,6 +4230,7 @@ public class MappingView extends ViewPart {
         errorImage.dispose();
         signedYesImage.dispose();
         signedDisableImage.dispose();
+        epsgImage.dispose();
     }
 
     /**
@@ -3030,12 +4247,12 @@ public class MappingView extends ViewPart {
         try {
             switch (pdoType) {
                 case TPDO:
-                    tpdoEnabledEntriesCount = Integer.valueOf(
+                    tpdoEnabledEntriesCount = Integer.parseInt(
                             tpdoEnabledMappingEntriesText.getText().trim());
                     return tpdoEnabledEntriesCount;
 
                 case RPDO:
-                    rpdoEnabledEntriesCount = Integer.valueOf(
+                    rpdoEnabledEntriesCount = Integer.parseInt(
                             rpdoEnabledMappingEntriesText.getText().trim());
                     return rpdoEnabledEntriesCount;
 
@@ -3443,6 +4660,534 @@ public class MappingView extends ViewPart {
         return null;
     }
 
+    /**
+     * Handles the Async MTU assignment.
+     *
+     * @param value New value of AsyncMtu
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleAsyncMtu(Object value) {
+        String asyncMtu = StringUtils.EMPTY;
+        if (value instanceof String) {
+            asyncMtu = (String) value;
+            if (asyncMtu.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_ASYNC_MTU_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+            try {
+                int asyncMtuValue = Integer.decode((String) value);
+                if ((asyncMtuValue < MINIMUM_ASYC_MTU_VALUE)) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, INVALID_RANGE_ASYNC_MTU,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                if ((asyncMtuValue > MAXIMUM_ASYC_MTU_VALUE)) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, INVALID_RANGE_ASYNC_MTU,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject asyncMtuSubobj = nodeObj
+                        .getObjectDictionary()
+                        .getSubObject(INetworkProperties.ASYNC_MTU_OBJECT_ID,
+                                INetworkProperties.ASYNC_MTU_SUBOBJECT_ID);
+                if (asyncMtuSubobj == null) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(nodeObj.getNetworkId(),
+                                nodeObj.getCnNodeIdValue(),
+                                INetworkProperties.ASYNC_MTU_OBJECT_ID,
+                                INetworkProperties.ASYNC_MTU_SUBOBJECT_ID,
+                                String.valueOf(asyncMtuValue), false);
+                if (!validateResult.IsSuccessful()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(validateResult),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_INVALID_VALUE_ASYNC_MTU, nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+        } else {
+            System.err.println("ERROR invalid value type");
+        }
+        return asyncMtu;
+    }
+
+    /**
+     * Handles the AsyncSlot timeout assignment.
+     *
+     * @param value New value of AsyncSlot timeout.
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleAsyncSlotTimeout(Object value) {
+        String asyncTimeOut = StringUtils.EMPTY;
+        if (value instanceof String) {
+            asyncTimeOut = (String) value;
+            if (asyncTimeOut.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_ASYNC_SLOT_TIMEOUT_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+            try {
+                long resultVal = Long.decode((String) value);
+                if ((resultVal < MINIMUM_ASYNC_SLOT_TIMEOUT)) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            INVALID_RANGE_ASYNC_SLOT_TIMEOUT,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject asyncslotTimeoutSubobj = nodeObj
+                        .getObjectDictionary().getSubObject(
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID);
+                if (asyncslotTimeoutSubobj == null) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(nodeObj.getNetworkId(),
+                                nodeObj.getCnNodeIdValue(),
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_OBJECT_ID,
+                                IManagingNodeProperties.ASYNC_SLOT_TIMEOUT_SUBOBJECT_ID,
+                                String.valueOf(resultVal), false);
+
+                if (!validateResult.IsSuccessful()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(validateResult),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_INVALID_VALUE_ASYNCT_SLOT_TIMEOUT,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+        }
+
+        return asyncTimeOut;
+    }
+
+    /**
+     * Handles the cycle time modifications.
+     *
+     * @param value New value for Cycle time.
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleCycleTime(Object value) {
+        String cycleTime = StringUtils.EMPTY;
+        if (value instanceof String) {
+            cycleTime = (String) value;
+            if (cycleTime.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+            try {
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkObject cycleTimeObj = nodeObj.getObjectDictionary()
+                        .getObject(INetworkProperties.CYCLE_TIME_OBJECT_ID);
+                if (cycleTimeObj == null) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateObjectActualValue(nodeObj.getNetworkId(),
+                                nodeObj.getCnNodeIdValue(),
+                                INetworkProperties.CYCLE_TIME_OBJECT_ID,
+                                (String) value, false);
+                if (!validateResult.IsSuccessful()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(validateResult),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_INVALID_VALUE_CYCLE_TIME, nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+        } else {
+            System.err.println("ERROR invalid value type");
+        }
+        return cycleTime;
+    }
+
+    private void handleGeneralInfoForCn(Node nodeObj) {
+        System.err.println("CN selected");
+        txt_no_PResTimeOut.setVisible(true);
+        nodeTypeCombo.setVisible(true);
+        lblNodeType.setVisible(true);
+        lblPResTimeout.setVisible(true);
+        nodeId.setEnabled(true);
+        nodeId.setText(String.valueOf(nodeObj.getCnNodeIdValue()));
+
+        long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
+
+        txt_no_PResTimeOut.setText(String.valueOf(presTimeoutInMs));
+        if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
+            System.err.println("The chanined....");
+            nodeTypeCombo.select(1);
+            ;
+        } else {
+            System.err.println("The normal....");
+            nodeTypeCombo.select(0);
+        }
+
+        lblPResTimeout.setText("PRes Timeout (" + "\u00B5" + "s):");
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        lblNodeType.setText("Node Type:");
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+        productNameLabel.setVisible(false);
+        productIdLabel.setVisible(false);
+        vendorNamelabel.setVisible(false);
+        vendorIdLabel.setVisible(false);
+        productNameText.setVisible(false);
+        productIdText.setVisible(false);
+        vendorNameText.setVisible(false);
+        vendorIdtext.setVisible(false);
+
+        lblLossOfSoc.setText("Product Name:");
+        lossOfSocTolText.setText(nodeObj.getProductName());
+        lossOfSocTolText.setEditable(false);
+        lblAsymcMtu.setText("Product ID:");
+        asyncMtuText.setText(nodeObj.getProductCodeValue());
+        asyncMtuText.setEditable(false);
+        lblAsyncTimeOut.setText("Vendor Name:");
+        asyncTimeOutTxt.setText(nodeObj.getVendorName());
+        asyncTimeOutTxt.setEditable(false);
+        lblPrescaler.setText("Vendor ID:");
+        preScalerText.setText(nodeObj.getVendorIdValue());
+        preScalerText.setEditable(false);
+
+    }
+
+    private void handleGeneralInfoForMn(Node nodeObj) {
+        txt_no_PResTimeOut.setVisible(true);
+        nodeTypeCombo.setVisible(true);
+        lblNodeType.setVisible(true);
+        lblPResTimeout.setVisible(true);
+        nodeId.setEnabled(false);
+        nodeId.setText(String.valueOf(IPowerlinkConstants.MN_DEFAULT_NODE_ID));
+        if (!nodeObj.getCycleTime().isEmpty()) {
+            Long cycleTime = Long.decode(nodeObj.getCycleTime());
+            txt_no_PResTimeOut.setText(String.valueOf(cycleTime));
+        } else {
+            txt_no_PResTimeOut.setText(StringUtils.EMPTY);
+        }
+        if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
+            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                    .getNodeModel();
+            TMN mn = net.getNodeCollection().getMN();
+            if (mn.isTransmitsPRes()) {
+
+                nodeTypeCombo.select(0);
+            } else {
+                nodeTypeCombo.select(1);
+            }
+        }
+
+        lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
+        lblNodeType.setText("Transmit PRes:");
+        lblPResTimeout.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+        lblNodeType.setForeground(
+                formToolkit.getColors().getColor(IFormColors.TITLE));
+
+        lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
+        lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
+        lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
+        lblPrescaler.setText("Prescaler:");
+
+        productNameLabel.setText("Product Name:");
+        productNameText.setText(nodeObj.getProductName());
+        productIdLabel.setText("Product ID:");
+        productIdText.setText(nodeObj.getProductCodeValue());
+        vendorNamelabel.setText("Vendor Name:");
+        vendorNameText.setText(nodeObj.getVendorName());
+        vendorIdLabel.setText("Vendor ID:");
+        vendorIdtext.setText(nodeObj.getVendorIdValue());
+
+        productNameLabel.setVisible(true);
+        productIdLabel.setVisible(true);
+        vendorNamelabel.setVisible(true);
+        vendorIdLabel.setVisible(true);
+        productNameText.setVisible(true);
+        productIdText.setVisible(true);
+        vendorNameText.setVisible(true);
+        vendorIdtext.setVisible(true);
+
+        Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
+        long valInUs = val / 1000;
+
+        lossOfSocTolText.setText(String.valueOf(valInUs));
+        lossOfSocTolText.setEditable(true);
+        Long asyncmtu = Long.decode(nodeObj.getAsyncMtu());
+        asyncMtuText.setText(String.valueOf(asyncmtu));
+        asyncMtuText.setEditable(true);
+        Long asyncTimeOut = Long.decode(nodeObj.getAsyncSlotTimeout());
+        asyncTimeOutTxt.setText(String.valueOf(asyncTimeOut));
+        asyncTimeOutTxt.setEditable(true);
+        Long prescaler = Long.decode(nodeObj.getPrescaler());
+        preScalerText.setText(String.valueOf(prescaler));
+        preScalerText.setEditable(true);
+
+    }
+
+    private void handleGeneralInfoForModule(Module moduleObj) {
+
+        Node nodeObj = moduleObj.getNode();
+        System.err.println("CN selected");
+        txt_no_PResTimeOut.setVisible(true);
+        nodeTypeCombo.setVisible(true);
+        lblNodeType.setVisible(true);
+        lblPResTimeout.setVisible(true);
+        nodeId.setEnabled(true);
+        nodeId.setText(String.valueOf(nodeObj.getCnNodeIdValue()));
+
+        long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
+
+        txt_no_PResTimeOut.setText(String.valueOf(presTimeoutInMs));
+        if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
+            System.err.println("The chanined....");
+            nodeTypeCombo.select(1);
+
+        } else {
+            System.err.println("The normal....");
+            nodeTypeCombo.select(0);
+        }
+
+        lblPResTimeout.setText("PRes Timeout (" + "\u00B5" + "s):");
+        lblNodeType.setText("Node Type:");
+
+        productNameLabel.setVisible(false);
+        productIdLabel.setVisible(false);
+        vendorNamelabel.setVisible(false);
+        vendorIdLabel.setVisible(false);
+        productNameText.setVisible(false);
+        productIdText.setVisible(false);
+        vendorNameText.setVisible(false);
+        vendorIdtext.setVisible(false);
+
+        lblLossOfSoc.setText("Product Name:");
+        lossOfSocTolText.setText(moduleObj.getProductName());
+        lossOfSocTolText.setEditable(false);
+        lblAsymcMtu.setText("Product ID:");
+        asyncMtuText.setText(moduleObj.getProductId());
+        asyncMtuText.setEditable(false);
+        lblAsyncTimeOut.setText("Vendor Name:");
+        asyncTimeOutTxt.setText(moduleObj.getVendorName());
+        asyncTimeOutTxt.setEditable(false);
+        lblPrescaler.setText("Vendor ID:");
+        preScalerText.setText(moduleObj.getVendorId());
+        preScalerText.setEditable(false);
+
+    }
+
+    private void handleGeneralInfoForRmn(Node nodeObj2) {
+        nodeId.setEnabled(true);
+        txt_no_PResTimeOut.setVisible(false);
+        nodeTypeCombo.setVisible(false);
+        lblNodeType.setVisible(false);
+        lblPResTimeout.setVisible(false);
+
+        nodeId.setText(String.valueOf(nodeObj2.getCnNodeIdValue()));
+
+        productNameLabel.setVisible(false);
+        productIdLabel.setVisible(false);
+        vendorNamelabel.setVisible(false);
+        vendorIdLabel.setVisible(false);
+        productNameText.setVisible(false);
+        productIdText.setVisible(false);
+        vendorNameText.setVisible(false);
+        vendorIdtext.setVisible(false);
+
+        lblLossOfSoc.setText("Product Name:");
+        lossOfSocTolText.setText(nodeObj.getProductName());
+        lossOfSocTolText.setEditable(false);
+        lblAsymcMtu.setText("Product ID:");
+        asyncMtuText.setText(nodeObj.getProductCodeValue());
+        asyncMtuText.setEditable(false);
+        lblAsyncTimeOut.setText("Vendor Name:");
+        asyncTimeOutTxt.setText(nodeObj.getVendorName());
+        asyncTimeOutTxt.setEditable(false);
+        lblPrescaler.setText("Vendor ID:");
+        preScalerText.setText(nodeObj.getVendorIdValue());
+        preScalerText.setEditable(false);
+    }
+
+    /**
+     * Handles LossofSOCTolerance modifications
+     *
+     * @param value New value for LossOfSoCTolerance
+     */
+    private String handleLossOfSoCTolerance(Object value) {
+        String lossOfSoc = StringUtils.EMPTY;
+        if (value instanceof String) {
+            lossOfSoc = (String) value;
+            if (lossOfSoc.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+            try {
+                long longValue = Long.decode((String) value);
+                // validate the value
+                Long maxValue = 4294967295L;
+                if ((longValue * 1000) > maxValue) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            MessageFormat.format(
+                                    INVALID_RANGE_LOSS_SOC_TOLERANCE,
+                                    nodeObj.getNetworkId(), longValue),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+
+        } else {
+            System.err.println(
+                    "handleLossOfSoCTolerance: Invalid value type:" + value);
+        }
+
+        return lossOfSoc;
+    }
+
+    /**
+     * Handle node type changes.
+     *
+     * @param value The new node type.
+     *
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handleNodeTypeChange(Object value) {
+        String nodeType = StringUtils.EMPTY;
+        if (value instanceof Integer) {
+            int val = ((Integer) value).intValue();
+            nodeType = String.valueOf(val);
+            if (val == 1) {
+                // Checks the value of PresChaining from the XDD
+                // model of MN and CN.
+                Node mnNode = nodeObj.getPowerlinkRootNode().getMN();
+                boolean mnPresChaining = mnNode.getNetworkManagement()
+                        .getMnFeaturesOfNode().isDLLMNPResChaining();
+                if (!mnPresChaining) {
+
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            MessageFormat.format(MNPRES_CHAINING_ERROR_MESSAGE,
+                                    mnNode.getNodeIDWithName()),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+                boolean cnPresChaining = nodeObj.getNetworkManagement()
+                        .getCnFeaturesOfNode().isDLLCNPResChaining();
+                if (!cnPresChaining) {
+                    // do not allow
+
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            MessageFormat.format(CNPRES_CHAINING_ERROR_MESSAGE,
+                                    nodeObj.getNodeIDWithName()),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+
+                List<Node> rmnNodes = nodeObj.getPowerlinkRootNode()
+                        .getRmnNodeList();
+                if (rmnNodes.size() > 0) {
+
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, CHAINED_STATION_ERROR_MESSAGE,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+            } else if (val == 2) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+        } else {
+            System.err.println("Invalid value type");
+        }
+
+        if (nodeType.equalsIgnoreCase("0")) {
+            nodeType = "Normal";
+        } else {
+            nodeType = "Chained";
+        }
+
+        return nodeType;
+    }
+
     private void handlePdoTableResize(PdoType pdoType,
             boolean advancedViewChecked) {
         switch (pdoType) {
@@ -3465,6 +5210,217 @@ public class MappingView extends ViewPart {
             default:
                 break;
         }
+    }
+
+    /**
+     * Handles the Pre-Scaler value changes.
+     *
+     * @param value New value for Pre-Scaler.
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handlePreScalerValue(Object value) {
+        String preScaler = StringUtils.EMPTY;
+        if (value instanceof String) {
+            preScaler = (String) value;
+            if (preScaler.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_PRE_SCALER_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+            try {
+                int preScalarVal = Integer.decode((String) value);
+
+                if ((preScalarVal < MINIMUM_PRESCALER_VALUE)) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, INVALID_RANGE_PRE_SCALER,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                if ((preScalarVal > MAXIMUM_PRESCALER_VALUE)) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, INVALID_RANGE_PRE_SCALER,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                // validate the value with openCONFIGURATOR library.
+                PowerlinkSubobject preScalerSubObj = nodeObj
+                        .getObjectDictionary()
+                        .getSubObject(INetworkProperties.PRESCALER_OBJECT_ID,
+                                INetworkProperties.PRESCALER_SUBOBJECT_ID);
+                if (preScalerSubObj == null) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(nodeObj.getNetworkId(),
+                                nodeObj.getCnNodeIdValue(),
+                                INetworkProperties.PRESCALER_OBJECT_ID,
+                                INetworkProperties.PRESCALER_SUBOBJECT_ID,
+                                String.valueOf(preScalarVal), false);
+                if (!validateResult.IsSuccessful()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(validateResult),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_INVALID_VALUE_PRE_SCALER, nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+        }
+        return preScaler;
+    }
+
+    /**
+     * Handle PRes timeout changes in the properties.
+     *
+     * @param value New value for the PRes timeout.
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means valid, and non-null means invalid, with the result
+     *         being the error message to display to the end user.
+     */
+    protected String handlePresTimeout(Object value) {
+        String presTimeOut = StringUtils.EMPTY;
+        if (value instanceof String) {
+            presTimeOut = (String) value;
+            if (presTimeOut.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+            // validate the value with openCONFIGURATOR library.
+            long presTimeoutInNs = Long.decode((String) value).longValue()
+                    * 1000;
+            Result validateResult = OpenConfiguratorLibraryUtils
+                    .validateSubobjectActualValue(nodeObj.getNetworkId(),
+                            IPowerlinkConstants.MN_DEFAULT_NODE_ID,
+                            INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                            nodeObj.getCnNodeIdValue(),
+                            String.valueOf(presTimeoutInNs), false);
+            if (!validateResult.IsSuccessful()) {
+                PluginErrorDialogUtils.showMessageWindow(
+                        MessageDialog.ERROR, OpenConfiguratorLibraryUtils
+                                .getErrorMessage(validateResult),
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+        } else {
+            System.err
+                    .println("handlePresTimeout: Invalid value type:" + value);
+        }
+
+        return presTimeOut;
+    }
+
+    /**
+     * Handle NodeId changes in properties
+     *
+     * @param id New Id for the Node
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means invalid, and non-null means valid, with the result
+     *         being the error message to display to the end user.
+     */
+    private String handleSetNodeId(Object id) {
+        String nodeId = StringUtils.EMPTY;
+        if (id instanceof String) {
+            nodeId = (String) id;
+            if (nodeId.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "Node ID cannot be empty.", nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+            try {
+                short nodeIDvalue = Short.valueOf(((String) id));
+                if (nodeObj.getNodeModel() instanceof TCN) {
+                    if ((nodeIDvalue == 0)
+                            || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, "Invalid Node ID.",
+                                nodeObj.getNetworkId());
+                        return StringUtils.EMPTY;
+                    }
+                } else if (nodeObj.getNodeModel() instanceof TRMN) {
+                    if ((nodeIDvalue == 0)
+                            || (nodeIDvalue <= IPowerlinkConstants.MN_DEFAULT_NODE_ID)
+                            || ((nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID))) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, "Invalid Node ID.",
+                                nodeObj.getNetworkId());
+                        return StringUtils.EMPTY;
+                    }
+                }
+
+                if (nodeIDvalue == nodeObj.getCnNodeIdValue()) {
+                    return StringUtils.EMPTY;
+                }
+
+                boolean nodeIdAvailable = nodeObj.getPowerlinkRootNode()
+                        .isNodeIdAlreadyAvailable(nodeIDvalue);
+                if (nodeIdAvailable) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            "Node with id " + nodeIDvalue + " already exists.",
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "Invalid Node ID.", nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+        }
+        return nodeId;
+    }
+
+    protected String handleSetNodeName(Object name) {
+        String nodeName = StringUtils.EMPTY;
+        if (name instanceof String) {
+            nodeName = ((String) name);
+            if (nodeName.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "Node name cannot be empty.", nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+
+            // Space as first character is not allowed. ppc:tNonEmptyString
+            if (nodeName.charAt(0) == ' ') {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "Invalid name", nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+
+            Result res = OpenConfiguratorCore.GetInstance().SetNodeName(
+                    nodeObj.getNetworkId(), nodeObj.getCnNodeIdValue(),
+                    nodeName);
+            if (!res.IsSuccessful()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        OpenConfiguratorLibraryUtils.getErrorMessage(res),
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+        } else {
+            System.err.println("handleSetNodeName: Invalid value type:" + name);
+        }
+        return nodeName;
     }
 
     private void handleSummaryTableResize(PdoType pdoType) {
@@ -3513,6 +5469,20 @@ public class MappingView extends ViewPart {
             default:
                 break;
         }
+    }
+
+    private String handletransmitPres(Object value) {
+        String transmitPres = StringUtils.EMPTY;
+        if (value instanceof String) {
+            transmitPres = (String) value;
+
+            if (transmitPres.equalsIgnoreCase("0")) {
+                transmitPres = "Yes";
+            } else {
+                transmitPres = "No";
+            }
+        }
+        return transmitPres;
     }
 
     /**
@@ -3572,7 +5542,7 @@ public class MappingView extends ViewPart {
         Node targetNode = null;
         for (Node node : targetNodeIdList) {
 
-            if (node.getCnNodeId() == targetNodeId) {
+            if (node.getCnNodeIdValue() == targetNodeId) {
                 targetNode = node;
             }
         }
@@ -3681,16 +5651,6 @@ public class MappingView extends ViewPart {
         }
     }
 
-    private void updatePdoTable(RpdoChannel rpdoChannel) {
-        rpdoTableViewer.setInput(rpdoChannel.getMappingParam());
-        resizeTable(rpdoTableViewer, new int[] { 4, 5 });
-    }
-
-    private void updatePdoTable(TpdoChannel tpdoChannel) {
-        tpdoTableViewer.setInput(tpdoChannel.getMappingParam());
-        resizeTable(tpdoTableViewer, new int[] { 4, 5 });
-    }
-
     /**
      * updates the NodeID of Mapping Channels
      */
@@ -3705,6 +5665,17 @@ public class MappingView extends ViewPart {
             targetNodeIdList.add(emptyNode);
             List<Node> tempCnNodeList = rootNode.getCnNodeList();
             for (Node tempNode : tempCnNodeList) {
+                if (nodeObj == tempNode) {
+                    if (tempNode.isPDOSelfReceipt()) {
+                        targetNodeIdList.add(selfReceiptNode);
+                    }
+                } else {
+                    targetNodeIdList.add(tempNode);
+                }
+            }
+
+            List<Node> tempRmnNodeList = rootNode.getRmnNodeList();
+            for (Node tempNode : tempRmnNodeList) {
                 if (nodeObj == tempNode) {
                     if (tempNode.isPDOSelfReceipt()) {
                         targetNodeIdList.add(selfReceiptNode);

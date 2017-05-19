@@ -31,6 +31,21 @@ openCONFIGURATOR Plugin {#page_openconfig_eclipse_plugin}
 
 After installing the maven into the system, perform the following steps in the command terminal to build openCONFIGURATOR plugin,
 
+#### Windows x86
+- Copy the .dll files generated at (.\*/bin/Windows/x86) openCONFIGURATOR core library into openconfigurator-core-plugin/org.epsg.openconfigurator/os/win32/x86
+- Copy the org.epsg.openconfigurator.wrapper file from openCONFIGURATOR core library to openconfigurator-core-plugin/org.epsg.openconfigurator/os
+
+#### Windows x86_64
+- Copy the .dll files generated at (.\*/bin/Windows/x86_64) openCONFIGURATOR core library into openconfigurator-core-plugin/org.epsg.openconfigurator/os/win32/x86_64
+- Copy the org.epsg.openconfigurator.wrapper file from openCONFIGURATOR core library to openconfigurator-core-plugin/org.epsg.openconfigurator/os
+
+#### Linux x86
+- Copy the .so files generated at (.\*/bin/linux/x86) openCONFIGURATOR core library into openconfigurator-core-plugin/org.epsg.openconfigurator/os/linux/x86
+
+#### Linux x86_64
+- Copy the .so files generated at (.\*/bin/linux/x86_64) openCONFIGURATOR core library into openconfigurator-core-plugin/org.epsg.openconfigurator/os/linux/x86_64
+
+
 - Set the path to openCONFIGURATOR plugin code as the working directory.
 - Execute the following command to build the package
         mvn clean compile package

@@ -10,7 +10,7 @@
 *******************************************************************************
 
  File:        ProfileBody_CommunicationNetwork_Powerlink.xsd
- Version:     0.15
+ Version:     0.16
 
  The version number applies to the whole XML schema. So the version number
  of all file must be identical.
@@ -152,6 +152,9 @@ C. Ruecker    | V 0.14     | + Added DNA feature entries
 C. Ruecker    | 15.12.2015 | + Modular Device Support
               | V 0.15     |    * Added abstract types for modular head node
               |            |    * Added abstract types for modular child node
+
+C. Ruecker    | 17.01.2017 | + Add DLLCNLossOfSoCToleranceMax feature
+              | V 0.16     |
               |            |
               |            |
 *******************************************************************************
@@ -553,6 +556,7 @@ C. Ruecker    | 15.12.2015 | + Modular Device Support
 		<xsd:attribute name="NMTCNSetNodeNumberTime" type="xsd:unsignedInt" use="optional" default="0"/>
 		<xsd:attribute name="NMTCNDNA" type="xsd:boolean" use="optional" default="false"/>
 		<xsd:attribute name="NMTCNMaxAInv" type="xsd:unsignedInt" use="optional" default="0"/>
+		<xsd:attribute name="DLLCNLossOfSoCToleranceMax" type="xsd:unsignedInt" use="optional" default="100000"/>
 	</xsd:complexType>
 	<!-- POWERLINK device commissioning (for XDC files) -->
 	<xsd:complexType name="t_deviceCommissioning">

@@ -56,9 +56,6 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 
 /**
  * A dialog to modify the path settings of the project XML.
- *
- * @author Ramakrishnan P
- *
  */
 public final class AddEditTPathDialog extends TitleAreaDialog {
 
@@ -68,6 +65,7 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
     private final static String NAME_LABEL = "Name:";
     private final static String LOCATION_LABEL = "Location:";
     private final static String BROWSE_LABEL = "Browse...";
+    private final static String ACTIVE_LABEL = "Active";
     private final static String BROWSE_LOCATION_TITLE = "Choose the path for the generated output files";
 
     private final static String DIALOG_ADD_TITLE = "Add Location";
@@ -90,6 +88,11 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
      * Path location text box.
      */
     private Text txtLocation;
+
+    /**
+     * Is Path location active check box.
+     */
+    private Button btnActive;
 
     /**
      * Dialog dirty flag.
@@ -134,11 +137,15 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
     @Override
     protected void buttonPressed(int buttonId) {
         if (buttonId == IDialogConstants.OK_ID) {
-            // Check for if the page is complete before sending OK pressed
-            // signal.
+            /**
+             * Check for the page is complete or not.
+             */
             if (isPageComplete()) {
-                path.setId(txtName.getText().trim());
-                path.setPath(txtLocation.getText());
+                if (path != null) {
+                    path.setId(txtName.getText().trim());
+                    path.setPath(txtLocation.getText());
+                    path.setActive(btnActive.getSelection());
+                }
                 okPressed();
             }
 
@@ -274,9 +281,19 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
                 }
             });
 
+            btnActive = new Button(container, SWT.CHECK);
+            btnActive.setText(AddEditTPathDialog.ACTIVE_LABEL);
+            btnActive.setSelection(path.isActive());
+
             return container;
+
         }
         return null;
+
+    }
+
+    public TPath getData() {
+        return path;
     }
 
     /**

@@ -46,6 +46,7 @@ import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.IAbstractNodeProperties;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
@@ -163,6 +164,10 @@ public class ModulePropertySource extends AbstractNodePropertySource
             return;
         }
 
+        if (!module.getModuleFirmwareCollection().isEmpty()) {
+            propertyList.add(firmwareConfigurationDescriptor);
+        }
+
         propertyList.add(moduleNameDescriptor);
         if (isPositionOrAddressEditable()) {
             propertyList.add(moduleAddressTextDescriptor);
@@ -223,6 +228,20 @@ public class ModulePropertySource extends AbstractNodePropertySource
                         break;
 
                     }
+                    case IAbstractNodeProperties.FIRMWARE_FILE_OBJECT: {
+                        String filePathFwMngr = StringUtils.EMPTY;
+                        if (!module.getModuleFirmwareFileList().isEmpty()) {
+                            for (FirmwareManager fwMngr : module
+                                    .getModuleFirmwareFileList()) {
+                                if (fwMngr.getFirmwareUri() != null) {
+                                    filePathFwMngr += fwMngr.getFirmwareUri()
+                                            .concat(" ;");
+                                }
+                            }
+                        }
+                        retObj = filePathFwMngr;
+                        break;
+                    }
                     case IAbstractNodeProperties.MODULE_TYPE_READONLY_OBJECT: {
                         retObj = module.getModuleInterface().getType();
                         break;
@@ -274,7 +293,7 @@ public class ModulePropertySource extends AbstractNodePropertySource
                             .getInterfaceType();
                     if (!(moduleType.equals(interfaceType))) {
                         return INVALID_POSITION_ERROR_MESSAGE
-                                + module.getNode().getCnNodeId();
+                                + module.getNode().getCnNodeIdValue();
                     }
                 }
 

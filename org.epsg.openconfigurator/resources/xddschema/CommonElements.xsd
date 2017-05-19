@@ -10,7 +10,7 @@
 *******************************************************************************
 
  File:        CommonElements.xsd
- Version:     0.15
+ Version:     0.16
 
  The version number applies to the whole XML schema. So the version number
  of all file must be identical.
@@ -32,7 +32,7 @@
 
 *******************************************************************************
 -->
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.ethernet-powerlink.org" targetNamespace="http://www.ethernet-powerlink.org" elementFormDefault="qualified" version="0.16">
 	<!-- Common groups -->
 	<xsd:group name="g_labels">
 		<xsd:sequence>

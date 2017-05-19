@@ -95,8 +95,6 @@ public class AddModuleWizardPage extends WizardPage {
 
     private Text moduleName;
 
-    private Object nodeModel = null;
-
     private Object moduleModel = null;
 
     private NodeNameVerifyListener moduleNameVerifyListener = new NodeNameVerifyListener();
@@ -229,14 +227,10 @@ public class AddModuleWizardPage extends WizardPage {
     }
 
     private void updateCnModel() {
-        nodeModel = getNode().getNodeModel();
+        Object nodeModel = getNode().getNodeModel();
         InterfaceList.Interface.Module cnModule = new InterfaceList.Interface.Module();
         cnModule.setName(moduleName.getText());
         moduleModel = cnModule;
-
-        if (moduleModel == null) {
-            System.err.println("Invalid module model :" + moduleModel);
-        }
 
     }
 }

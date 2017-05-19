@@ -31,8 +31,10 @@
 
 package org.epsg.openconfigurator.builder;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 import java.nio.file.DirectoryNotEmptyException;
@@ -40,14 +42,18 @@ import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.NoSuchFileException;
+import java.nio.file.Paths;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IncrementalProjectBuilder;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -61,10 +67,17 @@ import org.epsg.openconfigurator.editors.project.IndustrialNetworkProjectEditor;
 import org.epsg.openconfigurator.lib.wrapper.ByteCollection;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.IPowerlinkProjectSupport;
+import org.epsg.openconfigurator.model.Module;
+import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
+import org.epsg.openconfigurator.model.PowerlinkObject;
+import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.jdom2.JDOMException;
 
 /**
  * Builder implementation for POWERLINK project.
@@ -88,22 +101,36 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     public static final String XAP_H = "xap.h"; //$NON-NLS-1$
     public static final String XAP_XML = "xap.xml"; //$NON-NLS-1$
     public static final String PROCESSIMAGE_CS = "ProcessImage.cs"; //$NON-NLS-1$
+    public static final String FIRMWARE_INFO = "fw.info"; //$NON-NLS-1$
 
     private static final String[] OUTPUT_FILES = { MN_OBD_TXT, MN_OBD_CDC,
             MN_OBD_CHAR_TXT, XAP_H, XAP_XML, PROCESSIMAGE_CS };
+
+    private static final String MN_OBJECT_UPDATE_INDEX = "1F80";
+
+    private static final String RMN_FIRMWARE_AVAILABLITY_VALUE = "19456";
+
+    private static final String FIRMWARE_AVAILABLITY_VALUE = "3072";
+
+    private static final String RMN_AVAILABLITY_VALUE = "18432";
+
+    private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
+            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
 
     /**
      * Build the concise device configuration outputs in the specified output
      * path.
      *
      * @param networkId The network ID.
-     * @param outputpath The location to save the output files.
+     * @param textpath The location to save the output files.
      * @param monitor Monitor instance to update the progress activity.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
      * @throws CoreException
      */
     private static boolean buildConciseDeviceConfiguration(
-            final String networkId, java.nio.file.Path outputpath,
+            final String networkId, java.nio.file.Path textpath,
+            java.nio.file.Path binaryPath, java.nio.file.Path charPath,
             final IProgressMonitor monitor) throws CoreException {
         String configurationOutput[] = new String[1];
         ByteCollection cdcByteCollection = new ByteCollection();
@@ -122,20 +149,20 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             throw new CoreException(errorStatus);
         }
         try {
-            if (!Files.exists(outputpath, LinkOption.NOFOLLOW_LINKS)) {
-                Files.createDirectory(outputpath);
+            if (!Files.exists(textpath, LinkOption.NOFOLLOW_LINKS)) {
+                Files.createDirectory(textpath);
             }
         } catch (IOException e1) {
             e1.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
-                    "Output path:" + outputpath.toString() + " does not exist.",
+                    "Output path:" + textpath.toString() + " does not exist.",
                     e1);
             throw new CoreException(errorStatus);
         }
 
         // String[1] is always empty.
-        boolean retVal = createMnobdTxt(outputpath, configurationOutput[0]);
+        boolean retVal = createMnobdTxt(textpath, configurationOutput[0]);
         if (!retVal) {
             return retVal;
         }
@@ -149,12 +176,12 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             // buffer.put((byte) ((value >> 8) & 0xff));
         }
 
-        retVal = createMnobdCdc(outputpath, buffer);
+        retVal = createMnobdCdc(binaryPath, buffer);
         if (!retVal) {
             return retVal;
         }
 
-        retVal = createMnobdHexTxt(outputpath, buffer);
+        retVal = createMnobdHexTxt(charPath, buffer);
         if (!retVal) {
             return retVal;
         }
@@ -176,6 +203,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         String piDataOutput[] = new String[1];
         Result res = OpenConfiguratorCore.GetInstance()
                 .BuildCProcessImage(networkId, nodeId, piDataOutput);
+        Charset charset = Charset.forName("UTF-8");
         if (!res.IsSuccessful()) {
             IStatus errorStatus = new Status(IStatus.ERROR, Activator.PLUGIN_ID,
                     IStatus.OK,
@@ -192,7 +220,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             if (!Files.exists(targetPath)) {
                 Files.createDirectory(targetPath);
             }
-            Files.write(targetFilePath, piDataOutput[0].getBytes());
+            Files.write(targetFilePath, piDataOutput[0].getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -218,6 +246,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private static boolean buildCSharpProcessImage(String networkId,
             short nodeId, java.nio.file.Path targetPath) throws CoreException {
         String piDataOutput[] = new String[1];
+        Charset charset = Charset.forName("UTF-8");
         Result res = OpenConfiguratorCore.GetInstance()
                 .BuildNETProcessImage(networkId, nodeId, piDataOutput);
         if (!res.IsSuccessful()) {
@@ -236,7 +265,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             if (!Files.exists(targetPath)) {
                 Files.createDirectory(targetPath);
             }
-            Files.write(targetFilePath, piDataOutput[0].getBytes());
+            Files.write(targetFilePath, piDataOutput[0].getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -252,13 +281,14 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      * Build the ProcessImage descriptions for currently active project.
      *
      * @param networkId The network ID.
-     * @param targetPath The location to save the output files.
+     * @param xmlPath The location to save the output files.
      * @param monitor Monitor instance to update the progress activity.
      * @return <code>True</code> if successful and <code>False</code> otherwise.
      * @throws CoreException
      */
     private static boolean buildProcessImageDescriptions(String networkId,
-            java.nio.file.Path targetPath, IProgressMonitor monitor)
+            java.nio.file.Path xmlPath, java.nio.file.Path cPath,
+            java.nio.file.Path charpSPath, IProgressMonitor monitor)
             throws CoreException {
 
         ByteCollection nodeIdCollection = new ByteCollection();
@@ -278,19 +308,24 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         boolean ret = false;
         for (int i = 0; i < nodeIdCollection.size(); i++) {
             short value = nodeIdCollection.get(i);
-            java.nio.file.Path processImagePath = targetPath;
+            java.nio.file.Path processImagePath = xmlPath;
+            java.nio.file.Path cImagePath = cPath;
+            java.nio.file.Path cSharpImagePath = charpSPath;
             if (value != IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                 // The variable processimagePath does not store any values,
                 // instead it resolves the value received from node collection.
                 processImagePath = processImagePath
                         .resolve(String.valueOf(value));
+                cImagePath = cImagePath.resolve(String.valueOf(value));
+                cSharpImagePath = cSharpImagePath
+                        .resolve(String.valueOf(value));
                 // NOTE: Remove 'continue' to generate the Individual CN's PI
                 // descriptions.
                 continue;
             }
-            ret = buildCProcessImage(networkId, value, processImagePath);
+            ret = buildCProcessImage(networkId, value, cImagePath);
             ret = buildXmlProcessImage(networkId, value, processImagePath);
-            ret = buildCSharpProcessImage(networkId, value, processImagePath);
+            ret = buildCSharpProcessImage(networkId, value, cSharpImagePath);
         }
         return ret;
     }
@@ -379,7 +414,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     private static boolean createMnobdHexTxt(java.nio.file.Path outputFolder,
             ByteBuffer buffer) throws CoreException {
-
+        Charset charset = Charset.forName("UTF-8");
         StringBuilder sb = new StringBuilder();
         byte[] txtArray = buffer.array();
         short lineBreakCount = 0;
@@ -399,12 +434,12 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 sb.append(" "); //$NON-NLS-1$
             }
         }
-
+        sb.append("\n");
         java.nio.file.Path targetFilePath = outputFolder
                 .resolve(MN_OBD_CHAR_TXT);
 
         try {
-            Files.write(targetFilePath, sb.toString().getBytes());
+            Files.write(targetFilePath, sb.toString().getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -426,11 +461,11 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
      */
     private static boolean createMnobdTxt(java.nio.file.Path outputFolder,
             final String configuration) throws CoreException {
-
+        Charset charset = Charset.forName("UTF-8");
         java.nio.file.Path targetFilePath = outputFolder.resolve(MN_OBD_TXT);
 
         try {
-            Files.write(targetFilePath, configuration.getBytes());
+            Files.write(targetFilePath, configuration.getBytes(charset));
         } catch (IOException e) {
             e.printStackTrace();
             IStatus errorStatus = new Status(IStatus.ERROR,
@@ -481,6 +516,14 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         return projectEditors;
     }
 
+    private String TAB_SPACE = "\t";
+
+    private String NEW_LINE = "\n";
+
+    private int MINIMUM_SINGLE_DIGIT_NODE_ID = 9;
+
+    private List<FirmwareManager> fwList = new ArrayList<>();
+
     /*
      * (non-Javadoc)
      *
@@ -505,6 +548,18 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         // Prevents build if no change has occurred in the project.
         rememberLastBuiltState();
         return new IProject[0];
+    }
+
+    private void buildFirmwareInfoFile(java.nio.file.Path targetPath,
+            IndustrialNetworkProjectEditor pjctEditor) throws CoreException {
+        updateFirmwareDevRevList(pjctEditor);
+
+        try {
+            copyFirmwareFile();
+            generateFirmwareInfoFile(targetPath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -560,6 +615,59 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 "Project:" + getProject().getName() + " Clean successful");
     }
 
+    private boolean copyFirmwareFile() {
+        java.nio.file.Path projectRootPath = getProject().getLocation().toFile()
+                .toPath();
+        boolean deleted = false;
+        File outputInfoFile = new File(
+                String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR));
+        if (outputInfoFile.exists()) {
+            File[] listOfInfoFiles = outputInfoFile.listFiles();
+            if (listOfInfoFiles != null) {
+                for (File fwInfoFile : listOfInfoFiles) {
+                    if (fwInfoFile.getName().equalsIgnoreCase(FIRMWARE_INFO)) {
+                        deleted = fwInfoFile.delete();
+                        if (deleted) {
+                            System.out.println("File deleted.");
+                        } else {
+                            System.err
+                                    .println("File not deleted successfully.");
+                            return false;
+                        }
+                    }
+                }
+            }
+        } else {
+            System.err.println("File does not exists!!");
+        }
+
+        File firmwareDirectory = new File(
+                String.valueOf(projectRootPath.toString() + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR
+                        + IPath.SEPARATOR
+                        + IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY));
+
+        if (firmwareDirectory.exists()) {
+            File[] listOfFiles = firmwareDirectory.listFiles();
+            if (listOfFiles != null) {
+                for (File fwFile : listOfFiles) {
+                    if (fwFile != null) {
+                        deleted = fwFile.delete();
+                    }
+                }
+            }
+        }
+        for (FirmwareManager firmwareMngr : fwList) {
+            try {
+                OpenConfiguratorProjectUtils.copyFirmwareFiles(firmwareMngr);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return deleted;
+    }
+
     private void displayErrorMessage(final String message) {
         Display.getDefault().syncExec(new Runnable() {
 
@@ -612,6 +720,19 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 continue;
             }
 
+            PowerlinkRootNode rootnode = pjtEditor.getPowerlinkRootNode();
+            boolean isRmnAvailable = false;
+            boolean isFirmwareAvailable = false;
+            if (!rootnode.getRmnNodeList().isEmpty()) {
+                isRmnAvailable = true;
+            }
+
+            for (Node node : rootnode.getCnNodeList()) {
+                if (!node.getNodeFirmwareCollection().isEmpty()) {
+                    isFirmwareAvailable = true;
+                }
+            }
+
             System.out.println("Build Started: Project: " + networkId);
             // Displays Info message in console.
             displayInfoMessage(
@@ -621,16 +742,49 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             Path outputpath = pjtEditor.getProjectOutputPath();
 
-            final java.nio.file.Path targetPath;
+            Path configTextPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[0]);
+            Path configBinaryPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[1]);
+            Path configcharPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[2]);
+            Path configXmlPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[3]);
+            Path configCPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[4]);
 
-            if (outputpath.isLocal()) {
-                targetPath = FileSystems.getDefault().getPath(
-                        getProject().getLocation().toString(),
-                        outputpath.getPath());
+            Path cSharpPath = pjtEditor
+                    .getConfigTextPath(CUSTOM_CONFIG_PATH[5]);
+
+            final java.nio.file.Path targetPath = getTargetPath(outputpath);
+
+            final java.nio.file.Path textPath;
+            final java.nio.file.Path binaryPath;
+
+            final java.nio.file.Path charPath;
+
+            final java.nio.file.Path xmlPath;
+
+            final java.nio.file.Path cPath;
+
+            final java.nio.file.Path cSharpImagePath;
+
+            if (pjtEditor.isCustomPathAvailable()) {
+                textPath = getTargetPath(configTextPath);
+                binaryPath = getTargetPath(configBinaryPath);
+                charPath = getTargetPath(configcharPath);
+                xmlPath = getTargetPath(configXmlPath);
+                cPath = getTargetPath(configCPath);
+                cSharpImagePath = getTargetPath(cSharpPath);
             } else {
-                targetPath = FileSystems.getDefault()
-                        .getPath(outputpath.getPath());
+                textPath = targetPath;
+                binaryPath = targetPath;
+                charPath = targetPath;
+                xmlPath = targetPath;
+                cPath = targetPath;
+                cSharpImagePath = targetPath;
             }
+
             // waits for the XDC file import on initialization of
             // project.
             Display.getDefault().syncExec(new Runnable() {
@@ -648,12 +802,21 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 }
 
             });
+
+            Node mnNode = rootnode.getMN();
+
+            BigInteger objectId = new BigInteger(MN_OBJECT_UPDATE_INDEX, 16);
+            PowerlinkObject swVersionObj = mnNode.getObjectDictionary()
+                    .getObject(objectId.longValue());
+
+            updateMnObject(swVersionObj, isRmnAvailable, isFirmwareAvailable);
+
             boolean buildCdcSuccess = buildConciseDeviceConfiguration(networkId,
-                    targetPath, monitor);
+                    textPath, binaryPath, charPath, monitor);
             if (buildCdcSuccess) {
 
                 boolean buildPiSuccess = buildProcessImageDescriptions(
-                        networkId, targetPath, monitor);
+                        networkId, xmlPath, cPath, cSharpImagePath, monitor);
                 if (!buildPiSuccess) {
                     // Displays error message in console.
                     displayErrorMessage(MessageFormat
@@ -663,8 +826,16 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     System.err.println("Build output..." + buildPiSuccess);
                     displayInfoMessage(MessageFormat
                             .format(BUILD_COMPLETED_MESSAGE, networkId));
-                    displayInfoMessage("Generated output files at: "
-                            + targetPath.toString());
+                    displayInfoMessage(
+                            "Generated output files at: \n mnobd.txt:  "
+                                    + textPath.toString() + "\n mnobd.cdc:  "
+                                    + binaryPath.toString()
+                                    + "\n mnobd_char.txt:  "
+                                    + charPath.toString() + "\n xap.h:  "
+                                    + cPath.toString() + "\n xap.xml:  "
+                                    + xmlPath.toString()
+                                    + "\n ProcessImage.cs:  "
+                                    + cSharpImagePath.toString());
                 }
 
                 displayInfoMessage(UPDATING_NODE_CONFIGURATION_MESSAGE);
@@ -698,6 +869,190 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             displayInfoMessage(UPDATING_NODE_CONFIGURATION__COMPLETED_MESSAGE);
             System.out
                     .println("Build completed in " + totalTimeInSeconds + "s");
+
+            buildFirmwareInfoFile(targetPath, pjtEditor);
+            fwList.clear();
+            System.err.println("The firmware list..." + fwList);
+
+        }
+
+    }
+
+    private void generateFirmwareInfoFile(java.nio.file.Path outputpath)
+            throws CoreException, IOException {
+        String outputFirmwareInfo = StringUtils.EMPTY;
+        Charset charset = Charset.forName("UTF-8");
+        if (!fwList.isEmpty()) {
+            System.err.println("Firmware list..." + fwList.size());
+            java.nio.file.Path targetFilePath = outputpath
+                    .resolve(FIRMWARE_INFO);
+            for (FirmwareManager fwMngr : fwList) {
+                String nodeIdString = fwMngr.getNodeIdofFirmware();
+                Integer hexadecNodeVal = Integer.valueOf(nodeIdString);
+
+                String nodeId = Integer.toHexString(hexadecNodeVal);
+                System.err.println(
+                        "The hexa decimal value of node id.." + nodeId);
+                if (Integer.parseInt(
+                        nodeIdString) <= MINIMUM_SINGLE_DIGIT_NODE_ID) {
+                    nodeId = "0" + nodeId;
+                } else if (hexadecNodeVal < 15) {
+                    nodeId = "0" + nodeId.toUpperCase();
+                }
+
+                String newFirmwareFileName = fwMngr.getNewFirmwareFileName();
+                String targetFwPath = IPowerlinkProjectSupport.FIRMWARE_OUTPUT_DIRECTORY
+                        + IPath.SEPARATOR + newFirmwareFileName;
+                java.nio.file.Path pathRelative = Paths.get(targetFwPath);
+
+                String firmwareRelativePath = pathRelative.toString();
+                firmwareRelativePath = firmwareRelativePath.replace('\\', '/');
+
+                outputFirmwareInfo += nodeId + TAB_SPACE + fwMngr.getVendorId()
+                        + TAB_SPACE + fwMngr.getProductNumber() + TAB_SPACE
+                        + fwMngr.getdevRevNumber() + TAB_SPACE
+                        + fwMngr.getApplSwDate() + TAB_SPACE
+                        + fwMngr.getApplSwTime() + TAB_SPACE
+                        + fwMngr.getLocked() + TAB_SPACE + firmwareRelativePath
+                        + IPowerlinkProjectSupport.FIRMWARE_EXTENSION
+                        + NEW_LINE;
+            }
+            try {
+                Files.write(targetFilePath,
+                        outputFirmwareInfo.getBytes(charset));
+            } catch (IOException e) {
+                e.printStackTrace();
+                IStatus errorStatus = new Status(IStatus.ERROR,
+                        Activator.PLUGIN_ID, IStatus.OK,
+                        "Output file:" + targetFilePath.toString()
+                                + " is not accessible.",
+                        e);
+                throw new CoreException(errorStatus);
+            }
+        }
+
+    }
+
+    public java.nio.file.Path getTargetPath(Path opPath) {
+        final java.nio.file.Path path;
+
+        if (opPath.isLocal()) {
+            path = FileSystems.getDefault().getPath(
+                    getProject().getLocation().toString(), opPath.getPath());
+        } else {
+            path = FileSystems.getDefault().getPath(opPath.getPath());
+        }
+        return path;
+    }
+
+    /**
+     * @return The status of firmware file generation.
+     */
+    public void updateFirmwareDevRevList(
+            IndustrialNetworkProjectEditor pjtEditor) {
+        if (fwList != null) {
+            fwList.clear();
+        }
+        ArrayList<Node> cnNodes = pjtEditor.getPowerlinkRootNode()
+                .getCnNodeList();
+        for (Node cnNode : cnNodes) {
+            Map<String, FirmwareManager> nodeDevRevisionList = new HashMap<>();
+            Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
+            if (cnNode.getNodeFirmwareCollection() != null) {
+                for (FirmwareManager fwManager : cnNode
+                        .getNodeFirmwareCollection().keySet()) {
+                    nodeDevRevisionList.put(fwManager.getdevRevNumber(),
+                            fwManager);
+
+                    if (!nodeDevRevisionList.isEmpty()) {
+                        for (FirmwareManager fwMan : nodeDevRevisionList
+                                .values()) {
+                            if (fwMan.getNodeIdofFirmware()
+                                    .equalsIgnoreCase(String.valueOf(
+                                            cnNode.getCnNodeIdValue()))) {
+                                if (fwMan.getFirmwarefileVersion() < fwManager
+                                        .getFirmwarefileVersion()) {
+                                    nodeDevRevisionList.put(
+                                            fwManager.getdevRevNumber(),
+                                            fwManager);
+                                }
+                            }
+                        }
+                    }
+
+                }
+            } else {
+                System.err.println("Firmware list not available for node!");
+            }
+            if (cnNode.getInterface() != null) {
+                for (Module module : cnNode.getInterface().getModuleCollection()
+                        .values()) {
+                    for (FirmwareManager fwManager : module
+                            .getModuleFirmwareCollection().keySet()) {
+                        moduleDevRevisionList.put(fwManager.getdevRevNumber(),
+                                fwManager);
+                        if (!moduleDevRevisionList.isEmpty()) {
+                            for (FirmwareManager fwMan : moduleDevRevisionList
+                                    .values()) {
+                                if (fwMan.getModule().getPosition() == module
+                                        .getPosition()) {
+                                    if (fwMan
+                                            .getFirmwarefileVersion() < fwManager
+                                                    .getFirmwarefileVersion()) {
+                                        moduleDevRevisionList.put(
+                                                fwManager.getdevRevNumber(),
+                                                fwManager);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    System.err.println("Module devi list.."
+                            + moduleDevRevisionList.values());
+                    fwList.addAll(moduleDevRevisionList.values());
+                }
+            }
+            if (fwList != null) {
+                fwList.addAll(nodeDevRevisionList.values());
+            }
+        }
+
+    }
+
+    private void updateMnObject(PowerlinkObject swVersionObj,
+            boolean isRmnAvailable, boolean isFirmwareAvailable) {
+
+        if (isFirmwareAvailable && isRmnAvailable) {
+            try {
+                swVersionObj.setActualValue(RMN_FIRMWARE_AVAILABLITY_VALUE,
+                        true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "19456");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (isFirmwareAvailable) {
+            try {
+                swVersionObj.setActualValue(FIRMWARE_AVAILABLITY_VALUE, true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "3072");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (isRmnAvailable) {
+            try {
+                swVersionObj.setActualValue(RMN_AVAILABLITY_VALUE, true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "18432");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 }

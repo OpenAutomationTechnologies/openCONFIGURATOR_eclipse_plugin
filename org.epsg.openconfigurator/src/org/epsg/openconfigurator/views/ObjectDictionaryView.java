@@ -33,7 +33,6 @@ package org.epsg.openconfigurator.views;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedHashSet;
 import java.util.List;
 
 import org.eclipse.jface.action.Action;
@@ -71,8 +70,6 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.dialogs.FilteredTree;
 import org.eclipse.ui.dialogs.PatternFilter;
 import org.eclipse.ui.part.ViewPart;
-import org.epsg.openconfigurator.model.DataTypeChoiceType;
-import org.epsg.openconfigurator.model.LabelDescription;
 import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Parameter;
@@ -103,9 +100,6 @@ public class ObjectDictionaryView extends ViewPart
     private class EmptyObjectDictionary {
         @Override
         public String toString() {
-            if (parametersVisible) {
-                return "Parameters not available.";
-            }
             return "Object dictionary not available.";
         }
     }
@@ -182,7 +176,7 @@ public class ObjectDictionaryView extends ViewPart
      * @author Ramakrishnan P
      *
      */
-    private class TreeLabelProvider extends LabelProvider {
+    private static class TreeLabelProvider extends LabelProvider {
         Image objectIcon;
         Image subObjectIcon;
         Image parameterIcon;
@@ -273,34 +267,6 @@ public class ObjectDictionaryView extends ViewPart
                     return subObject.getNameWithId(subObjectIndex);
                 }
                 return ((PowerlinkSubobject) element).getNameWithId();
-            } else if (element instanceof Parameter) {
-                Parameter param = (Parameter) element;
-                LabelDescription labelDesc = param.getLabelDescription();
-                if (labelDesc != null) {
-                    return labelDesc.getText();
-                }
-            } else if (element instanceof ParameterReference) {
-                ParameterReference paramRef = (ParameterReference) element;
-                LabelDescription labelDesc = paramRef.getLabelDescription();
-                if (labelDesc != null) {
-                    return labelDesc.getText();
-                }
-            } else if (element instanceof VarDecleration) {
-                VarDecleration varDecl = (VarDecleration) element;
-                if (varDecl.getName() != null) {
-                    return varDecl.getName();
-                }
-                LabelDescription labelDesc = varDecl.getLabelDescription();
-                if (labelDesc != null) {
-                    return labelDesc.getText();
-                }
-            } else if (element instanceof ParameterGroup) {
-                ParameterGroup pgmGrp = (ParameterGroup) element;
-                LabelDescription labelDesc = pgmGrp.getLabel();
-                if (labelDesc != null) {
-                    return labelDesc.getText();
-                }
-                return pgmGrp.getUniqueId();
             } else if (element instanceof String) {
                 return "Parameters not available.";
             }
@@ -392,9 +358,6 @@ public class ObjectDictionaryView extends ViewPart
 
             if (sourcePart != null) {
                 sourcePart.getSite().getPage().addPartListener(partListener);
-                if (parametersVisible) {
-                    treeViewer.expandAll();
-                }
             }
         }
     };
@@ -415,31 +378,6 @@ public class ObjectDictionaryView extends ViewPart
             if (parentElement instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) parentElement;
                 return objItem.getSubObjects().toArray();
-            } else if (parentElement instanceof ParameterReference) {
-                // Do nothing.
-                // TODO: Implement for future enhancement.
-            } else if (parentElement instanceof Parameter) {
-                Parameter param = (Parameter) parentElement;
-                if (param.getDataTypeChoice() == DataTypeChoiceType.STRUCT) {
-                    List<VarDecleration> varDeclList = param.getStructDataType()
-                            .getVariables();
-                    for (VarDecleration var : varDeclList) {
-                        System.err.println("Name:" + var.getName());
-                    }
-                    return varDeclList.toArray();
-                } else if (param
-                        .getDataTypeChoice() == DataTypeChoiceType.SIMPLE) {
-                    // Ignore; This does not have any child variables.
-                    // TODO: Implement for future enhancement.
-                } else {
-                    System.err
-                            .println("Unhandled " + param.getDataTypeChoice());
-                }
-            } else if (parentElement instanceof ParameterGroup) {
-                ParameterGroup paramGrp = (ParameterGroup) parentElement;
-                return paramGrp.getVisibleObjects().toArray();
-            } else {
-                System.err.println("GetChildren" + parentElement);
             }
             return new Object[0];
         }
@@ -449,131 +387,12 @@ public class ObjectDictionaryView extends ViewPart
 
             if (inputElement instanceof Node) {
                 Node nodeObj = (Node) inputElement;
-                if (parametersVisible) {
-
-                    LinkedHashSet<Object> visibleObjectsList = new LinkedHashSet<>();
-                    List<ParameterGroup> paramGrupList = nodeObj
-                            .getObjectDictionary().getParameterGroupList();
-                    for (ParameterGroup pgmGrp : paramGrupList) {
-                        System.err.println(
-                                "--------> " + pgmGrp.getLabel().getText()
-                                        + " m:" + pgmGrp.isConditionsMet()
-                                        + " v:" + pgmGrp.isGroupLevelVisible());
-
-                        if (pgmGrp.isConditionsMet()) {
-                            if ((pgmGrp.isGroupLevelVisible())
-                                    && (pgmGrp.isConfigParameter())) {
-                                visibleObjectsList.add(pgmGrp);
-                            } else if (pgmGrp.isConfigParameter()) {
-                                List<ParameterReference> prmRefList = pgmGrp
-                                        .getParameterRefList();
-                                for (ParameterReference prmRef : prmRefList) {
-                                    if (prmRef.isVisible()) {
-                                        visibleObjectsList.add(prmRef);
-                                    }
-                                }
-
-                                List<ParameterGroup> prmGrpList = pgmGrp
-                                        .getParameterGroupList();
-                                for (int count = 1; count < prmGrpList
-                                        .size(); count++) {
-                                    for (ParameterGroup prmGrp : prmGrpList) {
-                                        if (prmGrp.isGroupLevelVisible()
-                                                && prmGrp.isConfigParameter()) {
-                                            visibleObjectsList.add(prmGrp);
-                                        } else if (prmGrp.isConfigParameter()) {
-                                            List<ParameterReference> pgmRefList = prmGrp
-                                                    .getParameterRefList();
-                                            for (ParameterReference prmRef : pgmRefList) {
-                                                if (prmRef.isVisible()) {
-                                                    visibleObjectsList
-                                                            .add(prmRef);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                System.err.println(
-                                        "No parameter groups can be configured ");
-                            }
-
-                        } else {
-                            System.err.println(
-                                    "parameter group cannot be displayed due to false condition set");
-                        }
-                    }
-                    if (visibleObjectsList.size() == 0) {
-                        visibleObjectsList.add("");
-                    }
-                    return visibleObjectsList.toArray();
-
-                }
                 List<PowerlinkObject> objectsList = nodeObj
                         .getObjectDictionary().getObjectsList();
 
                 return objectsList.toArray();
             } else if (inputElement instanceof Module) {
                 Module moduleObj = (Module) inputElement;
-                if (parametersVisible) {
-
-                    LinkedHashSet<Object> visibleObjectsList = new LinkedHashSet<>();
-                    List<ParameterGroup> paramGrupList = moduleObj
-                            .getObjectDictionary().getParameterGroupList();
-                    for (ParameterGroup pgmGrp : paramGrupList) {
-                        System.err.println("Module --------> "
-                                + pgmGrp.getLabel().getText() + " m:"
-                                + pgmGrp.isConditionsMet() + " v:"
-                                + pgmGrp.isGroupLevelVisible());
-
-                        if (pgmGrp.isConditionsMet()) {
-                            if ((pgmGrp.isGroupLevelVisible())
-                                    && (pgmGrp.isConfigParameter())) {
-                                visibleObjectsList.add(pgmGrp);
-                            } else if (pgmGrp.isConfigParameter()) {
-                                List<ParameterReference> prmRefList = pgmGrp
-                                        .getParameterRefList();
-                                for (ParameterReference prmRef : prmRefList) {
-                                    if (prmRef.isVisible()) {
-                                        visibleObjectsList.add(prmRef);
-                                    }
-                                }
-
-                                List<ParameterGroup> prmGrpList = pgmGrp
-                                        .getParameterGroupList();
-                                for (int count = 1; count < prmGrpList
-                                        .size(); count++) {
-                                    for (ParameterGroup prmGrp : prmGrpList) {
-                                        if (prmGrp.isGroupLevelVisible()
-                                                && prmGrp.isConfigParameter()) {
-                                            visibleObjectsList.add(prmGrp);
-                                        } else if (prmGrp.isConfigParameter()) {
-                                            List<ParameterReference> pgmRefList = prmGrp
-                                                    .getParameterRefList();
-                                            for (ParameterReference prmRef : pgmRefList) {
-                                                if (prmRef.isVisible()) {
-                                                    visibleObjectsList
-                                                            .add(prmRef);
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                System.err.println(
-                                        "No parameter groups can be configured ");
-                            }
-
-                        } else {
-                            System.err.println(
-                                    "parameter group cannot be displayed due to false condition set");
-                        }
-                    }
-                    if (visibleObjectsList.size() == 0) {
-                        visibleObjectsList.add("");
-                    }
-                    return visibleObjectsList.toArray();
-                }
                 List<PowerlinkObject> objectsList = moduleObj
                         .getObjectDictionary().getObjectsList();
                 return objectsList.toArray();
@@ -593,22 +412,6 @@ public class ObjectDictionaryView extends ViewPart
             if (element instanceof PowerlinkObject) {
                 PowerlinkObject objItem = (PowerlinkObject) element;
                 return ((objItem.getSubObjects().size() > 0) ? true : false);
-            } else if (element instanceof Parameter) {
-                Parameter param = (Parameter) element;
-                switch (param.getDataTypeChoice()) {
-                    case STRUCT:
-                        System.err.println("hasChildren Parameter "
-                                + param.getDataTypeChoice() + " size:"
-                                + param.getStructDataType().getVariables()
-                                        .size());
-                        return ((param.getStructDataType().getVariables()
-                                .size() > 0) ? true : false);
-                    default:
-                        break;
-                }
-            } else if (element instanceof ParameterGroup) {
-                ParameterGroup paramGrp = (ParameterGroup) element;
-                return paramGrp.hasVisibleObjects();
             }
             return false;
         }
@@ -623,7 +426,6 @@ public class ObjectDictionaryView extends ViewPart
     private boolean standardisedDeviceProfileObjectsVisible = true;
     private boolean nonMappableObjectsVisible = true;
     private boolean forcedObjectsVisible = true;
-    private boolean parametersVisible = false;
 
     private boolean nodeSelection = false;
     private boolean moduleSelection = false;
@@ -633,7 +435,6 @@ public class ObjectDictionaryView extends ViewPart
     private Action hideNonMappableObjects;
     private Action hideNonForcedObjects;
     private Action propertiesAction;
-    private Action toggleParameterView;
     private Action refreshAction;
 
     /**
@@ -678,50 +479,19 @@ public class ObjectDictionaryView extends ViewPart
         refreshAction = new Action("Refresh") {
             @Override
             public void run() {
-                if (parametersVisible) {
-                    if (moduleSelection) {
-                        treeViewer.setInput(moduleObj);
-                    }
-                    if (nodeSelection) {
-                        treeViewer.setInput(nodeObj);
-                    }
-                } else {
-                    treeViewer.refresh();
-                    if (moduleSelection) {
-                        treeViewer.setInput(moduleObj);
-                    }
-                    if (nodeSelection) {
-                        treeViewer.setInput(nodeObj);
-                    }
+                treeViewer.refresh();
+                if (moduleSelection) {
+                    treeViewer.setInput(moduleObj);
                 }
+                if (nodeSelection) {
+                    treeViewer.setInput(nodeObj);
+                }
+
             }
         };
         refreshAction.setToolTipText("Refresh");
         refreshAction.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.REFRESH_ICON));
-
-        toggleParameterView = new Action("Switch to Parameter View",
-                IAction.AS_CHECK_BOX) {
-            @Override
-            public void run() {
-                if (toggleParameterView.isChecked()) {
-                    parametersVisible = true;
-                    toggleParameterView
-                            .setToolTipText("Switch to Object Dictionary View");
-                    contributeToActionBars();
-                } else {
-                    parametersVisible = false;
-                    toggleParameterView
-                            .setToolTipText("Switch to Parameter View");
-                    contributeToActionBars();
-                }
-                treeViewer.refresh();
-            }
-        };
-        toggleParameterView.setToolTipText("Switch to Parameter View");
-        toggleParameterView.setImageDescriptor(
-                org.epsg.openconfigurator.Activator.getImageDescriptor(
-                        IPluginImages.OBD_PARAMETER_GROUP_ICON));
 
         hideNonMappableObjects = new Action(HIDE_NON_MAPPABLE_OBJECTS,
                 IAction.AS_CHECK_BOX) {
@@ -940,20 +710,13 @@ public class ObjectDictionaryView extends ViewPart
     }
 
     private void fillLocalToolBar(IToolBarManager manager) {
-        if (parametersVisible) {
-            manager.removeAll();
-            manager.add(refreshAction);
-            manager.add(toggleParameterView);
-        } else {
-            manager.removeAll();
-            manager.add(refreshAction);
-            manager.add(toggleParameterView);
-            manager.add(new Separator());
-            manager.add(hideNonMappableObjects);
-            manager.add(hideCommunicationProfileObjects);
-            manager.add(hideStandardisedDeviceProfileObjects);
-            manager.add(hideNonForcedObjects);
-        }
+        manager.removeAll();
+        manager.add(refreshAction);
+        manager.add(new Separator());
+        manager.add(hideNonMappableObjects);
+        manager.add(hideCommunicationProfileObjects);
+        manager.add(hideStandardisedDeviceProfileObjects);
+        manager.add(hideNonForcedObjects);
     }
 
     public Control getControl() {
@@ -965,7 +728,7 @@ public class ObjectDictionaryView extends ViewPart
 
     public void handleRefresh() {
 
-        if (parametersVisible) {
+        if (moduleSelection) {
             treeViewer.setInput(moduleObj);
             treeViewer.expandAll();
         } else {
@@ -987,7 +750,7 @@ public class ObjectDictionaryView extends ViewPart
 
     @Override
     public void propertyChanged(Object source, int propId) {
-        if (parametersVisible) {
+        if (moduleSelection) {
             treeViewer.setInput(moduleObj);
         } else {
             treeViewer.setInput(nodeObj);

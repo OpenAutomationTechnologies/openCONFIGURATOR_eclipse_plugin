@@ -268,35 +268,35 @@ public class AddChildModuleWizardPage extends WizardPage {
         if (getModuleInterface() != null) {
             if (getModuleInterface().getMaxPosition() != null) {
                 isMaxPositionValid = Integer
-                        .valueOf(position.getText()) <= getModuleInterface()
+                        .parseInt(position.getText()) <= getModuleInterface()
                                 .getMaxPosition().intValue();
             } else {
                 if (interfaceObj.getMaxModules() != null) {
                     isMaxPositionValid = Integer
-                            .valueOf(position.getText()) <= interfaceObj
+                            .parseInt(position.getText()) <= interfaceObj
                                     .getMaxModules().intValue();
                 }
             }
 
             if (getModuleInterface().getMaxPosition() != null) {
                 isMinPositionValid = Integer
-                        .valueOf(position.getText()) >= minimumValue;
+                        .parseInt(position.getText()) >= minimumValue;
             }
 
             if (getModuleInterface().getMinAddress() != null) {
                 isMinAddressValid = Integer
-                        .valueOf(addressText.getText()) >= getModuleInterface()
+                        .parseInt(addressText.getText()) >= getModuleInterface()
                                 .getMinAddress().intValue();
 
             }
 
             if (getModuleInterface().getMaxAddress() != null) {
                 isMaxaddressValid = Integer
-                        .valueOf(addressText.getText()) <= getModuleInterface()
+                        .parseInt(addressText.getText()) <= getModuleInterface()
                                 .getMaxAddress().intValue();
             } else {
                 isMaxaddressValid = Integer
-                        .valueOf(addressText.getText()) <= interfaceObj
+                        .parseInt(addressText.getText()) <= interfaceObj
                                 .getMaxModules().intValue();
             }
 
@@ -381,8 +381,8 @@ public class AddChildModuleWizardPage extends WizardPage {
                         }
                     }
                 }
-                if ((Integer.valueOf(position.getText()) == 1)
-                        || (Integer.valueOf(addressText.getText()) == 1)) {
+                if ((Integer.parseInt(position.getText()) == 1)
+                        || (Integer.parseInt(addressText.getText()) == 1)) {
                     String moduleInterfaceType = getModuleInterface().getType();
                     List<ModuleType> moduleTypeList = getModuleTypeList()
                             .getModuleType();
@@ -405,7 +405,7 @@ public class AddChildModuleWizardPage extends WizardPage {
                     }
                 }
 
-                int positionValue = Integer.valueOf(position.getText());
+                int positionValue = Integer.parseInt(position.getText());
                 int minPosition = 0;
                 List<Integer> positionToBeChecked = new ArrayList<>();
                 for (Module mod : moduleCollection) {
@@ -466,7 +466,7 @@ public class AddChildModuleWizardPage extends WizardPage {
                 position.setMinimum(minimumValue);
                 addressText.setMinimum(minimumAddress);
 
-                if (Integer.valueOf(position.getText()) == 1) {
+                if (Integer.parseInt(position.getText()) == 1) {
                     String moduleInterfaceType = getModuleInterface().getType();
                     List<ModuleType> moduleTypeList = getModuleTypeList()
                             .getModuleType();

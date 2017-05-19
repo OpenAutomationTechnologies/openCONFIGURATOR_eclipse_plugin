@@ -38,6 +38,14 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link FirmwareList }
+     * 
+     */
+    public FirmwareList createFirmwareList() {
+        return new FirmwareList();
+    }
+
+    /**
      * Create an instance of {@link InterfaceList.Interface }
      * 
      */
@@ -99,6 +107,14 @@ public class ObjectFactory {
      */
     public Object createObject() {
         return new Object();
+    }
+
+    /**
+     * Create an instance of {@link FirmwareList.Firmware }
+     * 
+     */
+    public FirmwareList.Firmware createFirmwareListFirmware() {
+        return new FirmwareList.Firmware();
     }
 
     /**

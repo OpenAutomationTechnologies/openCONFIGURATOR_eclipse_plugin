@@ -36,7 +36,10 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Path;
 import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
@@ -45,6 +48,7 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.wizard.Wizard;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.model.FirmwareManager;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
@@ -117,6 +121,67 @@ public class NewNodeWizard extends Wizard {
         setWindowTitle(WINDOW_TITLE);
         addNodePage = new AddControlledNodeWizardPage(nodeCollectionModel);
         validateXddPage = new ValidateXddWizardPage();
+    }
+
+    private boolean addNodeFirmwareFile(Node newNode) {
+        List<FirmwareManager> validFwList = new ArrayList<>();
+        if (nodeList != null) {
+            if (!nodeList.getCnNodeList().isEmpty()) {
+                for (Node cnNode : nodeList.getCnNodeList()) {
+                    if (cnNode.getVendorIdValue()
+                            .equalsIgnoreCase(newNode.getVendorIdValue())) {
+                        if (cnNode.getProductCodeValue().equalsIgnoreCase(
+                                newNode.getProductCodeValue())) {
+                            if (!cnNode.getValidFirmwareList().isEmpty()) {
+
+                                System.err.println(
+                                        "The firmware collection values.."
+                                                + cnNode.getValidFirmwareList());
+                                for (FirmwareManager fwMngr : cnNode
+                                        .getValidFirmwareList()) {
+                                    validFwList.add(fwMngr);
+
+                                }
+                            }
+                        }
+                    }
+
+                }
+
+                if (!validFwList.isEmpty()) {
+                    MessageDialog dialog = new MessageDialog(null,
+                            "Add firmware file", null,
+                            "The project contains firmware file for Node '"
+                                    + newNode.getNodeIDWithName() + "'."
+                                    + " \nDo you wish to add the firmware file? ",
+                            MessageDialog.WARNING, new String[] { "Yes", "No" },
+                            1);
+                    int result = dialog.open();
+                    if (result != 0) {
+                        return true;
+                    }
+                    Map<String, FirmwareManager> firmwarelist = new HashMap<>();
+                    for (FirmwareManager fwMngr : validFwList) {
+                        firmwarelist.put(fwMngr.getFirmwareUri(), fwMngr);
+
+                    }
+
+                    for (FirmwareManager fw : firmwarelist.values()) {
+
+                        FirmwareManager firmwareMngr = new FirmwareManager(
+                                newNode, fw.getFirmwareXddModel(),
+                                fw.getFirmwareObjModel());
+                        newNode.getNodeFirmwareCollection().put(firmwareMngr,
+                                firmwareMngr.getFirmwarefileVersion());
+                        fw.updateFirmwareInProjectFile(firmwareMngr, newNode,
+                                firmwareMngr.getFirmwareObjModel());
+                    }
+
+                }
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -371,8 +436,11 @@ public class NewNodeWizard extends Wizard {
             newNode.addStationTypeofNode(addNodePage.getStationTypeChanged());
 
         } catch (JDOMException | IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
+        }
+
+        if (addNodeFirmwareFile(newNode)) {
+            return true;
         }
 
         return true;

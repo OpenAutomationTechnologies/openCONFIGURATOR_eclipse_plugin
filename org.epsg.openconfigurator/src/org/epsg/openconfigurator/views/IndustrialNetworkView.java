@@ -44,6 +44,9 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -102,23 +105,30 @@ import org.epsg.openconfigurator.model.Module;
 import org.epsg.openconfigurator.model.Node;
 import org.epsg.openconfigurator.model.Path;
 import org.epsg.openconfigurator.model.PowerlinkRootNode;
+import org.epsg.openconfigurator.model.ProcessImage;
 import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.util.XddMarshaller;
 import org.epsg.openconfigurator.views.mapping.MappingView;
+import org.epsg.openconfigurator.wizards.CopyNodeWizard;
+import org.epsg.openconfigurator.wizards.NewFirmwareWizard;
 import org.epsg.openconfigurator.wizards.NewModuleWizard;
 import org.epsg.openconfigurator.wizards.NewNodeWizard;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
+import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TPath;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration.PathSettings;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
+import org.epsg.openconfigurator.xmlbinding.xap.ApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList.Interface;
 import org.jdom2.JDOMException;
+import org.xml.sax.SAXException;
 
 /**
  * Industrial network view to list all the nodes available in the project.
@@ -163,13 +173,14 @@ public class IndustrialNetworkView extends ViewPart
                 Node nodeSecond = (Node) e2;
 
                 if (nodeSecond
-                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
                 }
                 compare = nodeFirst.getPlkOperationMode()
                         .compareTo(nodeSecond.getPlkOperationMode());
                 if (compare == 0) {
-                    return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
+                    return nodeFirst.getCnNodeIdValue()
+                            - nodeSecond.getCnNodeIdValue();
                 }
 
             } else if ((e1 instanceof Module) && (e2 instanceof Module)) {
@@ -201,10 +212,11 @@ public class IndustrialNetworkView extends ViewPart
                 Node nodeFirst = (Node) e1;
                 Node nodeSecond = (Node) e2;
                 if (nodeSecond
-                        .getCnNodeId() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
                 }
-                return nodeFirst.getCnNodeId() - nodeSecond.getCnNodeId();
+                return nodeFirst.getCnNodeIdValue()
+                        - nodeSecond.getCnNodeIdValue();
 
             }
 
@@ -348,7 +360,7 @@ public class IndustrialNetworkView extends ViewPart
      * @author Ramakrishnan P
      *
      */
-    private class ViewLabelProvider extends LabelProvider
+    private static class ViewLabelProvider extends LabelProvider
             implements IColorProvider {
 
         Image mnIcon;
@@ -508,6 +520,7 @@ public class IndustrialNetworkView extends ViewPart
     public static final String ADD_NEW_NODE_ERROR_MESSAGE = "Internal error occurred. Please try again later";
     public static final String ADD_NEW_NODE_INVALID_SELECTION_MESSAGE = "Invalid selection";
     public static final String ADD_NEW_NODE_TOOL_TIP_TEXT = "Add a node in the network.";
+    public static final String ADD_FIRMWARE_TOOL_TIP_TEXT = "Add Firmware...";
 
     // Enable/disable action message string.
     // public static final String ENABLE_DISABLE_ACTION_MESSAGE =
@@ -518,11 +531,17 @@ public class IndustrialNetworkView extends ViewPart
 
     // Object dictionary action message strings.
     public static final String SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE = "Show Object Dictionary";
+    public static final String SHOW_PARAMETER_ACTION_MESSAGE = "Show Parameter View";
     public static final String SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE = "Error openning Object Dictionary";
+    public static final String SHOW_PARAMETER_ERROR_MESSAGE = "Error opening Parameter";
+
+    // Process Image action message strings.
+    public static final String SHOW_IO_MAP_ACTION_MESSAGE = "Show I/O Mapping";
+    public static final String SHOW_PROCESS_IMAGE_ERROR_MESSAGE = "Error opening Process Image";
 
     // Mapping view action message strings.
     public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
-    public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error openning MappingView";
+    public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error opening Mapping View";
 
     // Properties actions message strings.
     public static final String PROPERTIES_ACTION_MESSAGE = "Properties";
@@ -862,6 +881,16 @@ public class IndustrialNetworkView extends ViewPart
      */
     private Action addNewNode;
 
+    /**
+     * Action to copy the node of POWERLINK project
+     */
+    private Action copyNode;
+
+    /**
+     * IO mapping View
+     */
+    private Action showIoMapView;
+
     private Job exportNodeXDC;
 
     private Action addNewModule;
@@ -870,6 +899,12 @@ public class IndustrialNetworkView extends ViewPart
      * Show object dictionary.
      */
     private Action showObjectDictionary;
+
+    /**
+     * Show parameter view
+     */
+    private Action showParameter;
+
     /**
      * Show Properties action.
      */
@@ -884,6 +919,8 @@ public class IndustrialNetworkView extends ViewPart
      * Enable/Disable node action.
      */
     private Action enable;
+
+    private Action addFirmwareFile;
 
     private Action disable;
 
@@ -915,6 +952,13 @@ public class IndustrialNetworkView extends ViewPart
     private Action sortNode;
 
     /**
+     * Instance of Xap file
+     */
+    private ProcessImage processImage;
+
+    private OpenCONFIGURATORProject currentProject;
+
+    /**
      * Call back to handle the selection changed events.
      */
     private ISelectionChangedListener viewerSelectionChangedListener = new ISelectionChangedListener() {
@@ -924,6 +968,8 @@ public class IndustrialNetworkView extends ViewPart
             contributeToActionBars();
         }
     };
+
+    private Node nodeToBeCopied = null;
 
     /**
      * Keyboard bindings.
@@ -942,8 +988,75 @@ public class IndustrialNetworkView extends ViewPart
                 }
             } else if (e.keyCode == SWT.F5) {
                 handleRefresh();
+            } else if (((e.stateMask & SWT.CTRL) == SWT.CTRL)
+                    && ((e.keyCode == 'c') || (e.keyCode == 'C'))) {
+                IStructuredSelection selection = (IStructuredSelection) viewer
+                        .getSelection();
+                Object selectedObject = selection.getFirstElement();
+                if (selectedObject instanceof Node) {
+                    Node node = (Node) selectedObject;
+                    Integer nodeId = Integer.valueOf(node.getNodeIdString());
+                    if (nodeId <= IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+                        nodeToBeCopied = node;
+                    } else {
+                        nodeToBeCopied = null;
+                        System.err.println(
+                                "Node selection is not valid for copy operation.");
+                    }
+                } else if (selectedObject instanceof Module) {
+                    nodeToBeCopied = null;
+                } else if (selectedObject instanceof HeadNodeInterface) {
+                    nodeToBeCopied = null;
+                }
+            } else if (((e.stateMask & SWT.CTRL) == SWT.CTRL)
+                    && ((e.keyCode == 'v') || (e.keyCode == 'V'))) {
+                if (nodeToBeCopied == null) {
+                    return;
+                }
+                CopyNodeWizard copyNodeWizard = new CopyNodeWizard(rootNode,
+                        nodeToBeCopied);
+                if (!copyNodeWizard.hasErrors()) {
+                    WizardDialog wd = new WizardDialog(
+                            Display.getDefault().getActiveShell(),
+                            copyNodeWizard);
+                    wd.setTitle(copyNodeWizard.getWindowTitle());
+                    wd.open();
+                } else {
+                    showMessage(ADD_NEW_NODE_ERROR_MESSAGE);
+                }
+
+                try {
+                    nodeToBeCopied.getProject().refreshLocal(
+                            IResource.DEPTH_INFINITE,
+                            new NullProgressMonitor());
+                } catch (CoreException ex) {
+                    // TODO Auto-generated catch block
+                    ex.printStackTrace();
+                }
+
+                handleRefresh();
+                Integer nodeId = Integer
+                        .valueOf(copyNodeWizard.getNodeIdCopy());
+                String name = copyNodeWizard.getNodeName();
+                int stationTypeChanged = copyNodeWizard
+                        .getStationTypeIndex(copyNodeWizard.getStationType());
+                try {
+                    nodeToBeCopied.copyNode(nodeId, stationTypeChanged, name);
+
+                } catch (JDOMException | InterruptedException exce) {
+                    // TODO Auto-generated catch block
+                    exce.printStackTrace();
+                } catch (IOException exc) {
+                    // TODO Auto-generated catch block
+                    exc.printStackTrace();
+                }
+
+                handleRefresh();
+
             }
+
         }
+
     };
 
     private LinkWithEditorPartListener linkWithEditorPartListener = new LinkWithEditorPartListener(
@@ -961,6 +1074,8 @@ public class IndustrialNetworkView extends ViewPart
             });
         }
     };
+
+    private ApplicationProcess xapFile;
 
     /**
      * The constructor.
@@ -1056,9 +1171,52 @@ public class IndustrialNetworkView extends ViewPart
                     manager.add(new Separator());
                     manager.add(showPdoMapping);
                     manager.add(showObjectDictionary);
+                    currentProject = rootNode.getOpenConfiguratorProject();
+                    System.err.println("currentProject...." + currentProject);
+                    if (currentProject != null) {
+                        Path outputpath = getProjectOutputPath(node, false);
+                        final java.nio.file.Path targetPath;
+
+                        if (outputpath.isLocal()) {
+                            targetPath = FileSystems.getDefault().getPath(
+                                    node.getProject().getLocation().toString(),
+                                    outputpath.getPath());
+                        } else {
+                            targetPath = FileSystems.getDefault()
+                                    .getPath(outputpath.getPath());
+                        }
+                        File outputFile = new File(targetPath.toString());
+
+                        if (outputFile.exists()) {
+                            File[] fileList = outputFile.listFiles();
+                            if (fileList != null) {
+                                for (File file : fileList) {
+                                    if (file.getName()
+                                            .equalsIgnoreCase("xap.xml")) {
+                                        try {
+                                            xapFile = XddMarshaller
+                                                    .unmarshallXapFile(file);
+                                        } catch (JAXBException | SAXException
+                                                | ParserConfigurationException
+                                                | IOException e) {
+                                            e.printStackTrace();
+                                        }
+                                        processImage = new ProcessImage(node,
+                                                xapFile);
+                                        node.setProcessImage(processImage);
+                                        manager.add(showIoMapView);
+                                    }
+                                }
+                            }
+                        }
+
+                    }
+
                     manager.add(new Separator());
                 } else if (nodeObjectModel instanceof TCN) {
                     if (node.isEnabled()) {
+                        manager.add(addFirmwareFile);
+                        manager.add(new Separator());
                         manager.add(disable);
                     } else {
                         manager.add(enable);
@@ -1072,9 +1230,13 @@ public class IndustrialNetworkView extends ViewPart
                         manager.add(new Separator());
                         manager.add(showPdoMapping);
                         manager.add(showObjectDictionary);
+                        manager.add(showParameter);
+                        manager.add(new Separator());
+                        manager.add(copyNode);
                     }
                     manager.add(new Separator());
                     manager.add(deleteNode);
+                    manager.add(new Separator());
                 }
                 // Display list of menu only if the nodes are enabled.
                 if (node.isEnabled()) {
@@ -1101,6 +1263,8 @@ public class IndustrialNetworkView extends ViewPart
 
                     if (node.isEnabled()) {
                         if (moduleObj.isEnabled()) {
+                            manager.add(addFirmwareFile);
+                            manager.add(new Separator());
                             manager.add(disable);
                         } else {
                             manager.add(enable);
@@ -1118,6 +1282,7 @@ public class IndustrialNetworkView extends ViewPart
                             }
                             manager.add(new Separator());
                             manager.add(showObjectDictionary);
+                            manager.add(showParameter);
 
                         }
                         manager.add(new Separator());
@@ -1125,6 +1290,7 @@ public class IndustrialNetworkView extends ViewPart
                     }
                     manager.add(new Separator());
                     manager.add(deleteNode);
+                    manager.add(new Separator());
                     if (moduleObj.isEnabled()) {
                         manager.add(new Separator());
                         manager.add(showProperties);
@@ -1146,6 +1312,7 @@ public class IndustrialNetworkView extends ViewPart
         manager.add(refreshAction);
         manager.add(showPdoMapping);
         manager.add(showObjectDictionary);
+        manager.add(showParameter);
         manager.add(showProperties);
     }
 
@@ -1180,7 +1347,7 @@ public class IndustrialNetworkView extends ViewPart
                             File xdcFile = new File(
                                     node.getAbsolutePathToXdc());
 
-                            Path outputpath = getProjectOutputPath(node);
+                            Path outputpath = getProjectOutputPath(node, true);
 
                             final java.nio.file.Path targetPath;
 
@@ -1225,32 +1392,159 @@ public class IndustrialNetworkView extends ViewPart
     /**
      * @return Returns the output path settings from the project XML.
      */
-    public Path getProjectOutputPath(Node node) {
-        PathSettings pathSett = node.getCurrentProject()
-                .getProjectConfiguration().getPathSettings();
-        String activeOutputPathID = pathSett.getActivePath();
-        if (activeOutputPathID == null) {
-            if (!pathSett.getPath().isEmpty()) {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, "defaultOutputPath");
+    public Path getProjectOutputPath(Node node, boolean generateXdc) {
+
+        if (generateXdc) {
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        String activeSetting = OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID;
+        if (node.getCurrentProject().getProjectConfiguration()
+                .getActivePathSetting() != null) {
+            activeSetting = node.getCurrentProject().getProjectConfiguration()
+                    .getActivePathSetting();
+        }
+
+        if (activeSetting.equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+            List<PathSettings> pathSettList = node.getCurrentProject()
+                    .getProjectConfiguration().getPathSettings();
+            String activepathSetting = OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID;
+            PathSettings pathSett = null;
+            for (PathSettings setPath : pathSettList) {
+                if (setPath.getId() != null) {
+                    if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
+                        pathSett = setPath;
+                        break;
+                    }
+                } else {
+                    pathSett = setPath;
+                }
+            }
+
+            List<TPath> pathList = pathSett.getPath();
+            TPath pathConfig = null;
+            for (TPath path : pathList) {
+                if (path.isActive()) {
+                    pathConfig = path;
+                }
+            }
+
+            if (pathConfig == null) {
+                TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                        pathSett,
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
                 if (defaultPath != null) {
                     return new Path(defaultPath.getPath(), true);
                 }
             }
-        } else {
-            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
-                    activeOutputPathID);
-            if (defaultPath != null) {
-                if (!defaultPath.getId()
-                        .equalsIgnoreCase("defaultOutputPath")) {
-                    return new Path(defaultPath.getPath(), false);
+
+            if (pathConfig != null) {
+                if (pathConfig.getId().equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
+                }
+            }
+
+            String activeOutputPathID = StringUtils.EMPTY;
+            if (pathConfig != null) {
+                activeOutputPathID = pathConfig.getId();
+            }
+            if (activeOutputPathID.isEmpty()) {
+                if (!pathSett.getPath().isEmpty()) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
                 }
             } else {
-                System.err.println(
-                        "Unhandled error occurred. activeOutputPath not found");
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, activeOutputPathID);
+                if (defaultPath != null) {
+                    if (!defaultPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                        return new Path(defaultPath.getPath(), false);
+                    }
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. activeOutputPath not found");
+                }
+            }
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        List<PathSettings> pathSettList = currentProject
+                .getProjectConfiguration().getPathSettings();
+        String activepathSetting = currentProject.getProjectConfiguration()
+                .getActivePathSetting();
+        PathSettings pathSett = null;
+        for (PathSettings setPath : pathSettList) {
+            if (setPath.getId() != null) {
+                if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
+                    pathSett = setPath;
+                    break;
+                }
+            } else {
+                pathSett = setPath;
+            }
+        }
+        System.err.println("Active path ..." + activepathSetting);
+
+        if (pathSett == null) {
+            return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+        }
+
+        List<TPath> pathList = pathSett.getPath();
+        TPath pathConfig = null;
+        for (TPath path : pathList) {
+            System.err.println("path path ..." + path.getId());
+            if (path.getId().equalsIgnoreCase("XML_PROCESS_IMAGE")) {
+                pathConfig = path;
+            }
+        }
+
+        if (pathConfig == null) {
+            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
+                    "defaultOutputPath");
+            if (defaultPath != null) {
+                return new Path(defaultPath.getPath(), true);
+            }
+        }
+
+        if (pathConfig != null) {
+            String activeOutputPathID = pathConfig.getId();
+            if (activeOutputPathID == null) {
+                if (!pathSett.getPath().isEmpty()) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
+                            pathSett,
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
+                }
+            } else {
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, activeOutputPathID);
+                if (defaultPath != null) {
+                    if (!defaultPath.getId().equalsIgnoreCase(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                        return new Path(defaultPath.getPath(), false);
+                    }
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. activeOutputPath not found");
+                }
             }
         }
         return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+
     }
 
     private void handleEnableDisable(IStructuredSelection selection) {
@@ -1671,7 +1965,75 @@ public class IndustrialNetworkView extends ViewPart
 
             }
         };
+        addFirmwareFile = new Action(ADD_FIRMWARE_TOOL_TIP_TEXT) {
+            @Override
+            public void run() {
+                ISelection nodeTreeSelection = viewer.getSelection();
+                if ((nodeTreeSelection != null)
+                        && (nodeTreeSelection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
+                    Object selectedObject = strucSelection.getFirstElement();
+                    if ((selectedObject instanceof Node)) {
+                        NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
+                                rootNode, selectedObject);
+
+                        WizardDialog wd = new WizardDialog(
+                                Display.getDefault().getActiveShell(),
+                                newFirmwareWizard);
+                        wd.setTitle(newFirmwareWizard.getWindowTitle());
+                        wd.open();
+
+                        try {
+                            ((Node) selectedObject).getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                    } else if (selectedObject instanceof Module) {
+                        Module selectedModule = (Module) selectedObject;
+                        System.err.println(
+                                "The can firmware be added .." + selectedModule
+                                        .canFirmwareAdded(selectedModule));
+                        if (!selectedModule.canFirmwareAdded(selectedModule)) {
+
+                            showErrorMessage("The modular head node "
+                                    + selectedModule.getNode()
+                                            .getNodeIDWithName()
+                                    + "does not support module firmware update.\nPlease refer to the console for details.");
+
+                        } else {
+
+                            NewFirmwareWizard newFirmwareWizard = new NewFirmwareWizard(
+                                    rootNode, selectedObject);
+
+                            WizardDialog wd = new WizardDialog(
+                                    Display.getDefault().getActiveShell(),
+                                    newFirmwareWizard);
+                            wd.setTitle(newFirmwareWizard.getWindowTitle());
+                            wd.open();
+                        }
+
+                        try {
+                            selectedModule.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                    }
+                }
+            }
+        };
+        addFirmwareFile.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(ISharedImages.IMG_OBJ_ADD));
         disable = new Action(DISABLE_ACTION_MESSAGE) {
+
             @Override
             public void run() {
                 ISelection selection = PlatformUI.getWorkbench()
@@ -1769,6 +2131,87 @@ public class IndustrialNetworkView extends ViewPart
         disable.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.DISABLE_NODE_ICON));
 
+        copyNode = new Action("Copy Node") {
+            @Override
+            public void run() {
+                super.run();
+
+                ISelection nodeTreeSelection = viewer.getSelection();
+                if ((nodeTreeSelection != null)
+                        && (nodeTreeSelection instanceof IStructuredSelection)) {
+                    IStructuredSelection strucSelection = (IStructuredSelection) nodeTreeSelection;
+                    Object selectedObject = strucSelection.getFirstElement();
+                    if ((selectedObject instanceof Node)) {
+                        Node node = (Node) selectedObject;
+                        CopyNodeWizard copyNodeWizard = new CopyNodeWizard(
+                                rootNode, (Node) selectedObject);
+                        if (!copyNodeWizard.hasErrors()) {
+                            WizardDialog wd = new WizardDialog(
+                                    Display.getDefault().getActiveShell(),
+                                    copyNodeWizard);
+                            wd.setTitle(copyNodeWizard.getWindowTitle());
+                            wd.open();
+                        } else {
+                            showMessage(ADD_NEW_NODE_ERROR_MESSAGE);
+                        }
+
+                        try {
+                            node.getProject().refreshLocal(
+                                    IResource.DEPTH_INFINITE,
+                                    new NullProgressMonitor());
+                        } catch (CoreException e) {
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                        Integer nodeId = Integer
+                                .valueOf(copyNodeWizard.getNodeIdCopy());
+
+                        String name = copyNodeWizard.getNodeName();
+                        int stationTypeChanged = copyNodeWizard
+                                .getStationTypeIndex(
+                                        copyNodeWizard.getStationType());
+
+                        try {
+                            node.copyNode(nodeId, stationTypeChanged, name);
+
+                        } catch (JDOMException | InterruptedException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+
+                        handleRefresh();
+                    }
+                }
+
+            }
+        };
+        copyNode.setToolTipText("Copy Node");
+        copyNode.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.COPY_NODE_ICON));
+
+        showIoMapView = new Action(SHOW_IO_MAP_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+                try {
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(ProcessImageView.ID);
+                    viewer.setSelection(viewer.getSelection());
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage(SHOW_PROCESS_IMAGE_ERROR_MESSAGE);
+                }
+            }
+        };
+        showIoMapView.setToolTipText(SHOW_IO_MAP_ACTION_MESSAGE);
+        showIoMapView.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.IO_MAP_ICON));
+
         showObjectDictionary = new Action(
                 SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE) {
             @Override
@@ -1791,6 +2234,26 @@ public class IndustrialNetworkView extends ViewPart
                 .setImageDescriptor(org.epsg.openconfigurator.Activator
                         .getImageDescriptor(IPluginImages.OBD_ICON));
 
+        showParameter = new Action(SHOW_PARAMETER_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+                try {
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(ParameterView.ID);
+                    viewer.setSelection(viewer.getSelection());
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage(SHOW_PARAMETER_ERROR_MESSAGE);
+                }
+            }
+        };
+        showParameter.setToolTipText(SHOW_PARAMETER_ACTION_MESSAGE);
+        showParameter.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.OBD_PARAMETER_REFERENCE_ICON));
+
         showPdoMapping = new Action(SHOW_MAPING_VIEW_ACTION_MESSAGE) {
 
             @Override
@@ -1799,6 +2262,7 @@ public class IndustrialNetworkView extends ViewPart
                 try {
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().showView(MappingView.ID);
+
                     viewer.setSelection(viewer.getSelection());
                 } catch (PartInitException e) {
                     e.printStackTrace();

@@ -266,7 +266,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
                         .getModuleType();
                 boolean validModuleType = true;
                 // Verifies the null value from the list.
-                if (moduleTypeList != null) {
+                if (!moduleTypeList.isEmpty()) {
                     for (ModuleType moduleType : moduleTypeList) {
                         if ((moduleTypeText.getText()
                                 .equalsIgnoreCase(moduleType.getType()))

@@ -218,7 +218,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                 break;
                             case STRUCT:
                                 retObj = dtChoice.getStructDataType()
-                                        .getUniqueId();
+                                        .getStructUniqueId();
                                 break;
                             case ARRAY:
                             case UNDEFINED:
@@ -305,7 +305,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             paramRef.getParameterUniqueId());
             Result res = OpenConfiguratorCore.GetInstance()
                     .SetParameterActualValue(paramRef.getNode().getNetworkId(),
-                            paramRef.getNode().getCnNodeId(), newParameterName,
+                            paramRef.getNode().getCnNodeIdValue(), newParameterName,
                             actualvalue);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
@@ -313,7 +313,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
         } else {
             Result res = OpenConfiguratorCore.GetInstance()
                     .SetParameterActualValue(paramRef.getNode().getNetworkId(),
-                            paramRef.getNode().getCnNodeId(),
+                            paramRef.getNode().getCnNodeIdValue(),
                             parameter.getParameterUniqueId(), actualvalue);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
@@ -408,7 +408,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             Result res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getCnNodeId(),
+                                            paramRef.getNode().getCnNodeIdValue(),
                                             newParameterName, defaultValue);
                             if (!res.IsSuccessful()) {
                                 System.err.println(OpenConfiguratorLibraryUtils
@@ -420,7 +420,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             Result res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getCnNodeId(),
+                                            paramRef.getNode().getCnNodeIdValue(),
                                             paramRef.getParameterUniqueId(),
                                             defaultValue);
                             if (!res.IsSuccessful()) {
@@ -500,7 +500,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getCnNodeId(),
+                                            paramRef.getNode().getCnNodeIdValue(),
                                             newParameterName, actualValue);
                             if (!res.IsSuccessful()) {
                                 System.err.println(OpenConfiguratorLibraryUtils
@@ -512,7 +512,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                             res = OpenConfiguratorCore.GetInstance()
                                     .SetParameterActualValue(
                                             paramRef.getNode().getNetworkId(),
-                                            paramRef.getNode().getCnNodeId(),
+                                            paramRef.getNode().getCnNodeIdValue(),
                                             paramRef.getParameterUniqueId(),
                                             actualValue);
                             if (!res.IsSuccessful()) {
@@ -548,7 +548,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                                 paramRef.getNode()
                                                         .getNetworkId(),
                                                 paramRef.getNode()
-                                                        .getCnNodeId(),
+                                                        .getCnNodeIdValue(),
                                                 newParameterName, val);
                                 if (!res.IsSuccessful()) {
                                     System.err.println(
@@ -570,7 +570,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                                 paramRef.getNode()
                                                         .getNetworkId(),
                                                 paramRef.getNode()
-                                                        .getCnNodeId(),
+                                                        .getCnNodeIdValue(),
                                                 paramRef.getParameterUniqueId(),
                                                 val);
                                 if (!res.IsSuccessful()) {

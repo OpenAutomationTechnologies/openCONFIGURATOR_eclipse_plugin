@@ -24,6 +24,7 @@ import javax.xml.bind.annotation.XmlType;
  *       &lt;attribute name="NMTCNSetNodeNumberTime" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="0" /&gt;
  *       &lt;attribute name="NMTCNDNA" type="{http://www.w3.org/2001/XMLSchema}boolean" default="false" /&gt;
  *       &lt;attribute name="NMTCNMaxAInv" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="0" /&gt;
+ *       &lt;attribute name="DLLCNLossOfSoCToleranceMax" type="{http://www.w3.org/2001/XMLSchema}unsignedInt" default="100000" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -53,6 +54,9 @@ public class TCNFeatures {
     @XmlAttribute(name = "NMTCNMaxAInv")
     @XmlSchemaType(name = "unsignedInt")
     protected Long nmtcnMaxAInv;
+    @XmlAttribute(name = "DLLCNLossOfSoCToleranceMax")
+    @XmlSchemaType(name = "unsignedInt")
+    protected Long dllcnLossOfSoCToleranceMax;
 
     /**
      * Gets the value of the dllcnFeatureMultiplex property.
@@ -232,6 +236,34 @@ public class TCNFeatures {
      */
     public void setNMTCNMaxAInv(Long value) {
         this.nmtcnMaxAInv = value;
+    }
+
+    /**
+     * Gets the value of the dllcnLossOfSoCToleranceMax property.
+     *
+     * @return
+     *     possible object is
+     *     {@link Long }
+     *
+     */
+    public long getDLLCNLossOfSoCToleranceMax() {
+        if (dllcnLossOfSoCToleranceMax == null) {
+            return  100000L;
+        } else {
+            return dllcnLossOfSoCToleranceMax;
+        }
+    }
+
+    /**
+     * Sets the value of the dllcnLossOfSoCToleranceMax property.
+     *
+     * @param value
+     *     allowed object is
+     *     {@link Long }
+     *
+     */
+    public void setDLLCNLossOfSoCToleranceMax(Long value) {
+        this.dllcnLossOfSoCToleranceMax = value;
     }
 
 }

@@ -104,19 +104,20 @@ public class ParameterGroup {
                 .getParameterGroupOrParameterRef();
         // Redundant null check is made to prevent the project from any
         // unexpected failure.
-        if (parameterGroupReferenceList != null) {
+        if (!parameterGroupReferenceList.isEmpty()) {
             for (Object parameterGroupReference : parameterGroupReferenceList) {
                 if (parameterGroupReference instanceof TParameterGroup) {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
                     ParameterGroup paramGrpModel = new ParameterGroup(node,
                             objectDictionary, paramGrp);
-                    parameterGroupMap.put(paramGrpModel.getUniqueId(),
+                    parameterGroupMap.put(paramGrpModel.getParamGroupUniqueId(),
                             paramGrpModel);
                 } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
                     TParameterGroup.ParameterRef parameterReferenceModel = (TParameterGroup.ParameterRef) parameterGroupReference;
                     ParameterReference paramRef = new ParameterReference(node,
                             this, objectDictionary, parameterReferenceModel);
-                    parameterRefMap.put(paramRef.getParameterUniqueId(), paramRef);
+                    parameterRefMap.put(paramRef.getParameterUniqueId(),
+                            paramRef);
                 }
             }
         }
@@ -179,7 +180,7 @@ public class ParameterGroup {
     /**
      * @return Unique ID of parameter.
      */
-    public String getUniqueId() {
+    public String getParamGroupUniqueId() {
         return uniqueId;
     }
 

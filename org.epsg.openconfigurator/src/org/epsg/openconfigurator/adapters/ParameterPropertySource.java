@@ -161,7 +161,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
                                 break;
                             case STRUCT:
                                 retObj = dtChoice.getStructDataType()
-                                        .getUniqueId();
+                                        .getStructUniqueId();
                                 break;
                             case ARRAY:
                             case UNDEFINED:
@@ -290,7 +290,7 @@ public class ParameterPropertySource extends AbstractParameterPropertySource
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetParameterActualValue(
                                         param.getNode().getNetworkId(),
-                                        param.getNode().getCnNodeId(),
+                                        param.getNode().getCnNodeIdValue(),
                                         param.getParameterUniqueId(), actualValue);
                         if (!res.IsSuccessful()) {
                             System.err.println(OpenConfiguratorLibraryUtils

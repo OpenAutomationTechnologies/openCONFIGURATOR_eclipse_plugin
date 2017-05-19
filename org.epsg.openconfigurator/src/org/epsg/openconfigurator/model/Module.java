@@ -35,12 +35,15 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -65,6 +68,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModula
 import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleInterface;
+import org.epsg.openconfigurator.xmlbinding.xdd.TVersion;
 import org.jdom2.JDOMException;
 
 /**
@@ -77,6 +81,10 @@ public class Module {
 
     public static final String MOVE_MODULE_ERROR = "Module cannot be moved because {0} with module type {1} does not match {2} module type {3}.";
     public static final String MOVE_MODULE_INTERFACE_ERROR = "Module cannot be moved because {0} with interface type {1} does not match {2} module type {3}.";
+
+    private static final long IDENTLIST_OBJECT_INDEX = 4135;
+
+    private static final long DOWNLOAD_CHILD_OBJECT_INDEX = 8021;
 
     private static void removeForcedObject(ForcedObjects forcedObjTag,
             org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
@@ -103,6 +111,11 @@ public class Module {
         }
 
     }
+
+    /**
+     * XDD instance of firmware.
+     */
+    private FirmwareFile xddFirmwareFile;
 
     private PowerlinkRootNode rootNode;
 
@@ -133,6 +146,8 @@ public class Module {
     private String xpath;
 
     private HeadNodeInterface interfaceObj;
+
+    private Map<FirmwareManager, Integer> moduleFirmwareCollection = new HashMap<>();
 
     /**
      * Constructor that defines null values.
@@ -179,11 +194,149 @@ public class Module {
         xpath = "//plk:ApplicationProcess";
 
         objectDictionary = new ObjectDictionary(this, node, xddModel);
-
+        if (xddModel != null) {
+            xddFirmwareFile = new FirmwareFile(xddModel);
+        }
         if (nodeModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) nodeModel;
             moduleName = module.getName();
         }
+    }
+
+    /**
+     * Validates the firmware manager support to module
+     *
+     * @param selectedNodeOrModule Object instance of module
+     * @return <code>true</code> if firmware can be added , <code>false</code>
+     *         otherwise.
+     */
+    public boolean canFirmwareAdded(Object selectedNodeOrModule) {
+        boolean canFirmwareAdded = false;
+        if (selectedNodeOrModule instanceof Module) {
+            Module module = (Module) selectedNodeOrModule;
+            Node modularHeadNode = module.getNode();
+            PowerlinkObject obj = modularHeadNode.getObjectDictionary()
+                    .getObject(8066);
+            if (obj != null) {
+                String defaultVal = obj.getActualDefaultValue();
+                if (!defaultVal.equalsIgnoreCase(StringUtils.EMPTY)) {
+                    canFirmwareAdded = isModuleFirmwareBitSet(defaultVal);
+                }
+                if (canFirmwareAdded) {
+                    PowerlinkObject identListObj = modularHeadNode
+                            .getObjectDictionary()
+                            .getObject(IDENTLIST_OBJECT_INDEX);
+                    if (identListObj != null) {
+                        PowerlinkSubobject identListSubobj = identListObj
+                                .getSubObject((short) 01);
+                        if (identListSubobj != null) {
+                            String identListVal = identListSubobj
+                                    .getActualDefaultValue();
+                            if (identListVal.contains("0x")) {
+                                identListVal = identListVal.substring(2);
+                            }
+                            PowerlinkObject identObj = modularHeadNode
+                                    .getObjectDictionary().getObject(
+                                            Integer.parseInt(identListVal, 16));
+                            if (identObj != null) {
+                                PowerlinkObject dowmnloadChildObj = modularHeadNode
+                                        .getObjectDictionary()
+                                        .getObject(DOWNLOAD_CHILD_OBJECT_INDEX);
+                                if (dowmnloadChildObj != null) {
+                                    PowerlinkSubobject dowmnloadChildSubObj = dowmnloadChildObj
+                                            .getSubObject((short) 01);
+                                    if (dowmnloadChildSubObj != null) {
+                                        String downloadChildVal = dowmnloadChildSubObj
+                                                .getActualDefaultValue();
+                                        if (downloadChildVal.contains("0x")) {
+                                            downloadChildVal = downloadChildVal
+                                                    .substring(2);
+                                        }
+                                        PowerlinkObject childObj = modularHeadNode
+                                                .getObjectDictionary()
+                                                .getObject(Integer.parseInt(
+                                                        downloadChildVal, 16));
+                                        if (childObj != null) {
+                                            return true;
+                                        }
+
+                                    } else {
+
+                                        OpenConfiguratorMessageConsole
+                                                .getInstance()
+                                                .printErrorMessage(
+                                                        "To support module firmware update the object '0x1F55/0x01' has to be present on the node '"
+                                                                + modularHeadNode
+                                                                        .getNodeIDWithName()
+                                                                + "'. ",
+                                                        node.getProject()
+                                                                .getName());
+                                        return false;
+                                    }
+                                } else {
+                                    OpenConfiguratorMessageConsole.getInstance()
+                                            .printErrorMessage(
+                                                    "To support module firmware update the object '0x1F55' has to be present on the node '"
+                                                            + modularHeadNode
+                                                                    .getNodeIDWithName()
+                                                            + "'. ",
+                                                    node.getProject()
+                                                            .getName());
+                                    return false;
+                                }
+                            } else {
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(
+                                                "To support module firmware update the object '0x"
+                                                        + identListVal
+                                                        + "' has to be present on the node '"
+                                                        + modularHeadNode
+                                                                .getNodeIDWithName()
+                                                        + "'. ",
+                                                node.getProject().getName());
+                                return false;
+                            }
+
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printErrorMessage(
+                                            "To support module firmware update the object '0x1027/0x01' has to be present on the node '"
+                                                    + modularHeadNode
+                                                            .getNodeIDWithName()
+                                                    + "'. ",
+                                            node.getProject().getName());
+                            return false;
+                        }
+                    } else {
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(
+                                        "To support module firmware update the object '0x1027' has to be present on the node '"
+                                                + modularHeadNode
+                                                        .getNodeIDWithName()
+                                                + "'. ",
+                                        node.getProject().getName());
+                        return false;
+                    }
+                } else {
+                    OpenConfiguratorMessageConsole.getInstance()
+                            .printErrorMessage(
+                                    "To support module firmware update the object '0x1F82' with value '"
+                                            + defaultVal
+                                            + "' has to be present on the node '"
+                                            + modularHeadNode
+                                                    .getNodeIDWithName()
+                                            + "'. ",
+                                    node.getProject().getName());
+                }
+
+            } else {
+                OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
+                        "To support module firmware update the object '0x1F82' has to be present on the node '"
+                                + modularHeadNode.getNodeIDWithName() + "'. ",
+                        node.getProject().getName());
+            }
+        }
+        return false;
     }
 
     /**
@@ -469,6 +622,33 @@ public class Module {
         return configurationError;
     }
 
+    public String getForcedObjectsString() {
+        String objectText = StringUtils.EMPTY;
+        ForcedObjects forcedObjTag = null;
+        if (moduleModel instanceof InterfaceList.Interface.Module) {
+            InterfaceList.Interface.Module net = (InterfaceList.Interface.Module) moduleModel;
+            forcedObjTag = net.getForcedObjects();
+        }
+
+        if (forcedObjTag != null) {
+            List<org.epsg.openconfigurator.xmlbinding.projectfile.Object> forcedObjList = forcedObjTag
+                    .getObject();
+            for (org.epsg.openconfigurator.xmlbinding.projectfile.Object obj : forcedObjList) {
+                objectText = objectText.concat("0x");
+
+                objectText = objectText.concat(
+                        DatatypeConverter.printHexBinary(obj.getIndex()));
+                if (obj.getSubindex() != null) {
+                    objectText = objectText.concat("/0x");
+                    objectText = objectText.concat(DatatypeConverter
+                            .printHexBinary(obj.getSubindex()));
+                }
+                objectText = objectText.concat(";");
+            }
+        }
+        return objectText;
+    }
+
     /**
      * @return The Xpath of interface list in poroject file.
      */
@@ -573,6 +753,60 @@ public class Module {
             System.err.println("Module with Invalid XDC.");
         }
         return moduleAddressing;
+    }
+
+    /**
+     * @return List of firmware files added to Module
+     */
+    public Map<FirmwareManager, Integer> getModuleFirmwareCollection() {
+        return moduleFirmwareCollection;
+    }
+
+    /**
+     * @return The valid firmware file for module from the project file.
+     */
+    public List<FirmwareManager> getModuleFirmwareFileList() {
+        List<FirmwareManager> fwList = new ArrayList<>();
+
+        fwList.clear();
+
+        Map<String, FirmwareManager> moduleDevRevisionList = new HashMap<>();
+
+        for (FirmwareManager fwManager : getModuleFirmwareCollection()
+                .keySet()) {
+            moduleDevRevisionList.put(fwManager.getdevRevNumber(), fwManager);
+            if (!moduleDevRevisionList.isEmpty()) {
+                for (FirmwareManager fwMan : moduleDevRevisionList.values()) {
+                    if (fwMan.getFirmwarefileVersion() < fwManager
+                            .getFirmwarefileVersion()) {
+                        moduleDevRevisionList.put(fwManager.getdevRevNumber(),
+                                fwManager);
+                    }
+                }
+            }
+        }
+
+        fwList.addAll(moduleDevRevisionList.values());
+
+        return fwList;
+    }
+
+    /**
+     * @return The valid firmware file name for module from the project file.
+     */
+    public List<String> getModuleFirmwareFileNameList() {
+        List<String> fwList = new ArrayList<>();
+
+        fwList.clear();
+
+        for (FirmwareManager fwManager : getModuleFirmwareCollection()
+                .keySet()) {
+            String filename = FilenameUtils
+                    .getName(fwManager.getFirmwareConfigPath());
+            fwList.add(filename);
+
+        }
+        return fwList;
     }
 
     /**
@@ -757,10 +991,148 @@ public class Module {
     }
 
     /**
+     * @return Product ID of the Module.
+     */
+    public String getProductId() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    return devProfile.getDeviceIdentity().getProductID()
+                            .getValue();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * @return The product Name of module.
+     */
+    public String getProductName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getProductName()
+                                .getValue();
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
      * @return Eclipse project associated with the module.
      */
     public IProject getProject() {
         return node.getProject();
+    }
+
+    private String getValueofModularBit(String reverse) {
+        String[] arrayString = reverse.split("");
+        int arrayCount = arrayString.length;
+        System.err.println("The array count .." + arrayCount);
+        System.err.println("The array String .." + reverse);
+        if (arrayCount <= 21) {
+            return "0";
+        }
+        return arrayString[21];
+
+    }
+
+    /**
+     * @return Vendor ID of the Module.
+     */
+    public String getVendorId() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    return devProfile.getDeviceIdentity().getVendorID()
+                            .getValue();
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * @return The vendor Name of module.
+     */
+    public String getVendorName() {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    if (devProfile.getDeviceIdentity() != null) {
+                        return devProfile.getDeviceIdentity().getVendorName()
+                                .getValue();
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * @return The vendor ID value of module from XDD/XDC.
+     */
+    public String getVenIdValue() {
+        String value = StringUtils.EMPTY;
+        if (xddFirmwareFile != null) {
+            value = xddFirmwareFile.getModuleVendorID();
+        }
+        return value;
+    }
+
+    /**
+     * @return The Hardware, Software or Firmware version values.
+     */
+    public String getVersionValue(String versionType) {
+        if (xddModel != null) {
+            List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
+            for (ISO15745Profile profile : profiles) {
+                ProfileBodyDataType profileBody = profile.getProfileBody();
+
+                if (profileBody instanceof ProfileBodyDevicePowerlinkModularChild) {
+                    ProfileBodyDevicePowerlinkModularChild devProfile = (ProfileBodyDevicePowerlinkModularChild) profileBody;
+                    for (TVersion ver : devProfile.getDeviceIdentity()
+                            .getVersion()) {
+                        if (ver.getVersionType()
+                                .equalsIgnoreCase(versionType)) {
+                            return ver.getValue();
+                        }
+                    }
+                }
+            }
+        }
+
+        return StringUtils.EMPTY;
+    }
+
+    /**
+     * @return Instance of FirmwareFile.
+     */
+    public FirmwareFile getXddFirmwareFile() {
+        return xddFirmwareFile;
     }
 
     /**
@@ -809,6 +1181,24 @@ public class Module {
             enabled = module.isEnabled();
         }
         return enabled;
+    }
+
+    private boolean isModuleFirmwareBitSet(String defaultVal) {
+        if (defaultVal.contains("0x")) {
+            defaultVal = defaultVal.substring(2);
+            String binValue = new BigInteger(defaultVal, 16).toString(2);
+            String reverse = new StringBuffer(binValue).reverse().toString();
+            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
+                return true;
+            }
+        } else {
+            String binValue = new BigInteger(defaultVal, 16).toString(2);
+            String reverse = new StringBuffer(binValue).reverse().toString();
+            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isObjectIdForced(long newObjectIndex) {

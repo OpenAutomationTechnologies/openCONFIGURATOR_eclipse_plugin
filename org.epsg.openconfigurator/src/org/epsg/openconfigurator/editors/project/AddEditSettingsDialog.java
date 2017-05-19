@@ -76,7 +76,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
      *
      * @author Ramakrishnan P
      */
-    private class BuilderConfiguration {
+    private static class BuilderConfiguration {
         /**
          * The name of the configuration.
          */
@@ -437,7 +437,7 @@ public final class AddEditSettingsDialog extends TitleAreaDialog {
             settingsTypeCombo.setText(activeSetting.getName());
         }
 
-        if (activeSetting.getValue() != null) {
+        if (!activeSetting.getValue().isEmpty()) {
             value.setText(activeSetting.getValue());
         }
 

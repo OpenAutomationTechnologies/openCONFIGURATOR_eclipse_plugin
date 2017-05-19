@@ -80,6 +80,7 @@ import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.XddMarshaller;
+import org.epsg.openconfigurator.xmlbinding.projectfile.FirmwareList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
@@ -106,7 +107,11 @@ public class PowerlinkRootNode {
 
     private static final String INVALID_XDC_CONTENTS_ERROR = "Invalid XDD/XDC exists in the project. Node configuration specified for the Node: {0} is invalid.\n XDC Path: {1}";
     private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
+    private static final String FIRMWARE_FILE_NOT_FOUND_ERROR = "Firmware file {0} for the node {1} does not exists in the project.\n Firmware file Path: {2} ";
+    private static final String FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR = "Firmware file {0} for the module {1} does not exists in the project.\n Firmware file Path: {2} ";
     private static final String INVALID_MODULE_XDC_ERROR = " The XDD/XDC file of module {0} is not available for the node {1}.";
+    private static final String INVALID_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the node {1}.";
+    private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
     private Map<Short, Node> nodeCollection = new HashMap<>();
     private OpenCONFIGURATORProject currentProject;
 
@@ -174,7 +179,7 @@ public class PowerlinkRootNode {
             return false;
         }
 
-        nodeCollection.put(Short.valueOf(node.getCnNodeId()), node);
+        nodeCollection.put(Short.valueOf(node.getCnNodeIdValue()), node);
 
         String projectXmlLocation = node.getProjectXml().getLocation()
                 .toString();
@@ -286,6 +291,31 @@ public class PowerlinkRootNode {
     }
 
     /**
+     * @return The list of module available in the project
+     */
+    public ArrayList<Module> getModuleList() {
+        ArrayList<Module> returnModuleList = new ArrayList<>();
+        Collection<Node> nodeList = nodeCollection.values();
+
+        for (Node node : nodeList) {
+            Object nodeModel = node.getNodeModel();
+            if (nodeModel instanceof TCN) {
+                if (node.getInterface() != null) {
+                    for (Module module : node.getInterface()
+                            .getModuleCollection().values()) {
+                        Object moduleModel = module.getModelOfModule();
+                        if (moduleModel instanceof InterfaceList.Interface.Module) {
+                            returnModuleList.add(module);
+                        }
+                    }
+                }
+
+            }
+        }
+        return returnModuleList;
+    }
+
+    /**
      * @return The number of nodes available.
      */
     public int getNodeCount() {
@@ -375,6 +405,7 @@ public class PowerlinkRootNode {
         Node processingNode = new Node();
         // ProcessingModule is used within the try block.
         Module processingModule = new Module();
+        FirmwareManager processingFirmware = new FirmwareManager();
 
         try {
             // MN section
@@ -399,7 +430,7 @@ public class PowerlinkRootNode {
 
                 Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
                 if (res.IsSuccessful()) {
-                    nodeCollection.put(newNode.getCnNodeId(), newNode);
+                    nodeCollection.put(newNode.getCnNodeIdValue(), newNode);
                 } else {
                     return new Status(IStatus.ERROR,
                             org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -462,7 +493,7 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    Short.valueOf(processingNode.getCnNodeId()),
+                                    Short.valueOf(processingNode.getCnNodeIdValue()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -477,7 +508,7 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    Short.valueOf(processingNode.getCnNodeId()),
+                                    Short.valueOf(processingNode.getCnNodeIdValue()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -518,9 +549,82 @@ public class PowerlinkRootNode {
                         processingNode.setError(errorMessage);
                     }
                 }
-                nodeCollection.put(Short.valueOf(processingNode.getCnNodeId()),
+                nodeCollection.put(Short.valueOf(processingNode.getCnNodeIdValue()),
                         processingNode);
                 monitor.worked(1);
+                if (cnNode.getFirmwareList() != null) {
+                    Iterator<FirmwareList.Firmware> firmwareIterator = cnNode
+                            .getFirmwareList().getFirmware().iterator();
+                    while (firmwareIterator.hasNext()) {
+                        if (monitor.isCanceled()) {
+                            return new Status(IStatus.OK,
+                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                    "Cancelled", null);
+                        }
+                        FirmwareList.Firmware firmware = firmwareIterator
+                                .next();
+                        monitor.subTask("Import Firmware file:");
+
+                        String decodedFirmwarePath = URLDecoder
+                                .decode(firmware.getURI(), "UTF-8");
+
+                        File cnFirmwareFile = new File(
+                                projectFile.getProject().getLocation()
+                                        + File.separator + decodedFirmwarePath);
+
+                        processingFirmware = new FirmwareManager(processingNode,
+                                null, firmware);
+
+                        try {
+
+                            org.epsg.openconfigurator.xmlbinding.firmware.Firmware firmwareHeader = XddMarshaller
+                                    .unmarshallFirmwareFile(cnFirmwareFile);
+
+                            FirmwareManager firmwareManager = new FirmwareManager(
+                                    processingNode, firmwareHeader, firmware);
+                            processingFirmware = firmwareManager;
+
+                            processingNode.getNodeFirmwareCollection()
+                                    .put(processingFirmware, processingFirmware
+                                            .getFirmwarefileVersion());
+                        } catch (JAXBException | SAXException
+                                | ParserConfigurationException
+                                | FileNotFoundException
+                                | UnsupportedEncodingException
+                                | NullPointerException e) {
+                            if (e instanceof FileNotFoundException) {
+                                String errorMessage = MessageFormat.format(
+                                        FIRMWARE_FILE_NOT_FOUND_ERROR,
+                                        cnFirmwareFile.getName(),
+                                        processingNode.getNodeIDWithName(),
+                                        firmware.getURI());
+                                processingModule.setError(errorMessage);
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(errorMessage,
+                                                processingNode.getProject()
+                                                        .getName());
+                            } else if (e instanceof NullPointerException) {
+                                String errorMessage = MessageFormat.format(
+                                        INVALID_FIRMWARE_FILE_ERROR,
+                                        cnFirmwareFile.getName(),
+                                        processingNode.getNodeIDWithName());
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(errorMessage,
+                                                processingNode.getProject()
+                                                        .getName());
+                            } else {
+                                String errorMessage = e.getCause().getMessage()
+                                        + " for the firmware file of node '"
+                                        + processingNode.getNodeIDWithName()
+                                        + "'.";
+                                OpenConfiguratorMessageConsole.getInstance()
+                                        .printErrorMessage(errorMessage,
+                                                processingNode.getProject()
+                                                        .getName());
+                            }
+                        }
+                    }
+                }
 
                 if (cnNode.getInterfaceList() != null) {
                     System.err.println(
@@ -627,6 +731,104 @@ public class PowerlinkRootNode {
                                                 String.valueOf(processingModule
                                                         .getModuleName()),
                                                 newModule);
+                                if (module.getFirmwareList() != null) {
+                                    Iterator<FirmwareList.Firmware> firmwareIterator = module
+                                            .getFirmwareList().getFirmware()
+                                            .iterator();
+                                    while (firmwareIterator.hasNext()) {
+                                        if (monitor.isCanceled()) {
+                                            return new Status(IStatus.OK,
+                                                    org.epsg.openconfigurator.Activator.PLUGIN_ID,
+                                                    "Cancelled", null);
+                                        }
+                                        FirmwareList.Firmware firmware = firmwareIterator
+                                                .next();
+                                        monitor.subTask(
+                                                "Import Firmware file:");
+
+                                        String decodedFirmwarePath = URLDecoder
+                                                .decode(firmware.getURI(),
+                                                        "UTF-8");
+
+                                        File moduleFirmwareFile = new File(
+                                                projectFile.getProject()
+                                                        .getLocation()
+                                                        + File.separator
+                                                        + decodedFirmwarePath);
+
+                                        processingFirmware = new FirmwareManager(
+                                                processingModule, null,
+                                                firmware);
+
+                                        try {
+
+                                            org.epsg.openconfigurator.xmlbinding.firmware.Firmware firmwareHeader = XddMarshaller
+                                                    .unmarshallFirmwareFile(
+                                                            moduleFirmwareFile);
+
+                                            FirmwareManager firmwareManager = new FirmwareManager(
+                                                    processingModule,
+                                                    firmwareHeader, firmware);
+                                            processingFirmware = firmwareManager;
+
+                                            processingModule
+                                                    .getModuleFirmwareCollection()
+                                                    .put(processingFirmware,
+                                                            processingFirmware
+                                                                    .getFirmwarefileVersion());
+                                        } catch (JAXBException | SAXException
+                                                | ParserConfigurationException
+                                                | FileNotFoundException
+                                                | UnsupportedEncodingException
+                                                | NullPointerException e) {
+                                            if (e instanceof FileNotFoundException) {
+                                                String errorMessage = MessageFormat
+                                                        .format(FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR,
+                                                                moduleFirmwareFile
+                                                                        .getName(),
+                                                                processingModule
+                                                                        .getModuleName(),
+                                                                firmware.getURI());
+                                                OpenConfiguratorMessageConsole
+                                                        .getInstance()
+                                                        .printErrorMessage(
+                                                                errorMessage,
+                                                                processingNode
+                                                                        .getProject()
+                                                                        .getName());
+                                            } else if (e instanceof NullPointerException) {
+                                                String errorMessage = MessageFormat
+                                                        .format(INVALID_MODULE_FIRMWARE_FILE_ERROR,
+                                                                moduleFirmwareFile
+                                                                        .getName(),
+                                                                processingModule
+                                                                        .getModuleName());
+                                                OpenConfiguratorMessageConsole
+                                                        .getInstance()
+                                                        .printErrorMessage(
+                                                                errorMessage,
+                                                                processingNode
+                                                                        .getProject()
+                                                                        .getName());
+                                            } else {
+                                                String errorMessage = e
+                                                        .getCause().getMessage()
+                                                        + " for the firmware file of module '"
+                                                        + processingModule
+                                                                .getModuleName()
+                                                        + "'.";
+                                                OpenConfiguratorMessageConsole
+                                                        .getInstance()
+                                                        .printErrorMessage(
+                                                                errorMessage,
+                                                                processingNode
+                                                                        .getProject()
+                                                                        .getName());
+                                            }
+                                        }
+                                    }
+                                }
+
                             } catch (JAXBException | SAXException
                                     | ParserConfigurationException
                                     | FileNotFoundException
@@ -723,7 +925,7 @@ public class PowerlinkRootNode {
                     if (!res.IsSuccessful()) {
                         newNode.setError(OpenConfiguratorLibraryUtils
                                 .getErrorMessage(res));
-                        nodeCollection.put(Short.valueOf(newNode.getCnNodeId()),
+                        nodeCollection.put(Short.valueOf(newNode.getCnNodeIdValue()),
                                 newNode);
                         return new Status(IStatus.ERROR,
                                 org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -743,7 +945,7 @@ public class PowerlinkRootNode {
                                     processingNode.getProject().getName());
                     processingNode.setError(errorMessage);
                 }
-                nodeCollection.put(Short.valueOf(processingNode.getCnNodeId()),
+                nodeCollection.put(Short.valueOf(processingNode.getCnNodeIdValue()),
                         processingNode);
                 monitor.worked(1);
             }
@@ -1080,7 +1282,7 @@ public class PowerlinkRootNode {
                     } else {
                         System.err.println(
                                 "Remove from openCONF model failed. Node ID:"
-                                        + node.getCnNodeId() + " modelType:"
+                                        + node.getCnNodeIdValue() + " modelType:"
                                         + nodeObjectModel);
                     }
                 } else {

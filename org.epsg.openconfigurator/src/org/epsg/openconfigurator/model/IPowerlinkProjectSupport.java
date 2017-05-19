@@ -42,7 +42,9 @@ public interface IPowerlinkProjectSupport {
     public static final String DEVICE_IMPORT_DIR = "deviceImport";
     public static final String MODULAR_HEAD_DIR = "ModularHead";
     public static final String DEVICE_CONFIGURATION_DIR = "deviceConfiguration";
+    public static final String DEVICE_FIRMWARE_DIR = "deviceFirmware";
     public static final String DEFAULT_OUTPUT_DIR = "output";
+    public static final String FIRMWARE_OUTPUT_DIRECTORY = "fw";
 
     public static final String UTF8_ENCODING = "UTF-8";
 
@@ -52,5 +54,6 @@ public interface IPowerlinkProjectSupport {
     public static final String DEFAULT_XDC_FILTER_EXTENSION = "*.xdc;*.XDC"; ////$NON-NLS-1$
     public static final String DEFAULT_XDD_FILTER_NAME_EXTENSION = "XML Device Description(*.xdd)"; ////$NON-NLS-1$
     public static final String DEFAULT_XDC_FILTER_NAME_EXTENSION = "XML Device Configuration(*.xdc)"; ////$NON-NLS-1$
+    public static final String FIRMWARE_EXTENSION = ".fw"; ////$NON-NLS-1$
 
 }
