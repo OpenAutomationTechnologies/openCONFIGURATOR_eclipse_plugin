@@ -2,7 +2,7 @@
 <feature
       id="org.epsg.openconfigurator.feature"
       label="Ethernet POWERLINK openCONFIGURATOR"
-      version="2.1.2.qualifier"
+      version="2.2.0.qualifier"
       provider-name="Kalycito Infotech Pvt Ltd. and Bernecker + Rainer Industrie-Elektronik Ges.m.b.H."
       plugin="org.epsg.openconfigurator">
 
@@ -11,13 +11,13 @@
    </description>
 
    <copyright>
-      Copyright (c) 2016 Kalycito Infotech Pvt Ltd.
-Copyright (c) 2016 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
+      Copyright (c) 2017 Kalycito Infotech Pvt Ltd.
+Copyright (c) 2017 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
    </copyright>
 
    <license url="license.html">
-      Copyright (c) 2016 Kalycito Infotech Pvt Ltd.
-Copyright (c) 2016 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
+      Copyright (c) 2017 Kalycito Infotech Pvt Ltd.
+Copyright (c) 2017 Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are met:

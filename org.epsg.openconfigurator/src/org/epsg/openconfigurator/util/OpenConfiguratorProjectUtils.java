@@ -117,7 +117,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static final String GENERATOR_VENDOR = "Kalycito Infotech Private Limited & Bernecker + Rainer Industrie Elektronik Ges.m.b.H."; ////$NON-NLS-1$
     public static final String GENERATOR_TOOL_NAME = "Ethernet POWERLINK openCONFIGURATOR"; ////$NON-NLS-1$
-    public static final String GENERATOR_TOOL_VERSION = "2.1.2"; ////$NON-NLS-1$
+    public static final String GENERATOR_TOOL_VERSION = "2.2.0"; ////$NON-NLS-1$
     public static final String SYSTEM_USER_NAME_ID = "user.name";
     public static final String MODIFIED_ON_ATTRIBUTE = "modifiedOn";
     public static final String TOOL_VERSION_ATTRIBUTE = "toolVersion";
