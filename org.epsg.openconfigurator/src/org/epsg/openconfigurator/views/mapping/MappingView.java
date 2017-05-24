@@ -1072,11 +1072,14 @@ public class MappingView extends ViewPart {
                                 if (Integer.decode(value) == 0) {
                                     if (mapParamObj.getId() == 1) {
                                         try {
-                                            tpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            tpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
+                                            if (!tpdoEnabledMappingEntriesText
+                                                    .getText().isEmpty()) {
+                                                tpdoEnabledEntriesCount = Integer
+                                                        .parseInt(
+                                                                tpdoEnabledMappingEntriesText
+                                                                        .getText()
+                                                                        .trim());
+                                            }
 
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -1084,11 +1087,14 @@ public class MappingView extends ViewPart {
                                     }
                                     if (mapParamObj.getId() == 1) {
                                         try {
-                                            rpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            rpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
+                                            if (!rpdoEnabledMappingEntriesText
+                                                    .getText().isEmpty()) {
+                                                rpdoEnabledEntriesCount = Integer
+                                                        .parseInt(
+                                                                rpdoEnabledMappingEntriesText
+                                                                        .getText()
+                                                                        .trim());
+                                            }
 
                                         } catch (Exception e) {
                                             e.printStackTrace();
@@ -1099,9 +1105,14 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.parseInt(
-                                            tpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!tpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        tpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        tpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1109,9 +1120,14 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.parseInt(
-                                            rpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!rpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        rpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        rpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1129,9 +1145,14 @@ public class MappingView extends ViewPart {
                             ex.printStackTrace();
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.parseInt(
-                                            tpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!tpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        tpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        tpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1140,8 +1161,7 @@ public class MappingView extends ViewPart {
                             if (mapParamObj.getId() == 1) {
                                 try {
                                     if (!rpdoEnabledMappingEntriesText.getText()
-                                            .equalsIgnoreCase(
-                                                    StringUtils.EMPTY)) {
+                                            .isEmpty()) {
                                         rpdoEnabledEntriesCount = Integer
                                                 .parseInt(
                                                         rpdoEnabledMappingEntriesText
@@ -1159,9 +1179,14 @@ public class MappingView extends ViewPart {
                         if (objectIdValue == 0) {
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.parseInt(
-                                            tpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!tpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        tpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        tpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1169,9 +1194,14 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.parseInt(
-                                            rpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!rpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        rpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        rpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1230,11 +1260,15 @@ public class MappingView extends ViewPart {
                                                                     if (mapParamObj
                                                                             .getId() == 1) {
                                                                         try {
-                                                                            tpdoEnabledEntriesCount = Integer
-                                                                                    .parseInt(
-                                                                                            tpdoEnabledMappingEntriesText
-                                                                                                    .getText()
-                                                                                                    .trim());
+                                                                            if (!tpdoEnabledMappingEntriesText
+                                                                                    .getText()
+                                                                                    .isEmpty()) {
+                                                                                tpdoEnabledEntriesCount = Integer
+                                                                                        .parseInt(
+                                                                                                tpdoEnabledMappingEntriesText
+                                                                                                        .getText()
+                                                                                                        .trim());
+                                                                            }
 
                                                                         } catch (Exception e) {
                                                                             e.printStackTrace();
@@ -1252,11 +1286,15 @@ public class MappingView extends ViewPart {
                                                                     if (mapParamObj
                                                                             .getId() == 1) {
                                                                         try {
-                                                                            rpdoEnabledEntriesCount = Integer
-                                                                                    .parseInt(
-                                                                                            rpdoEnabledMappingEntriesText
-                                                                                                    .getText()
-                                                                                                    .trim());
+                                                                            if (!rpdoEnabledMappingEntriesText
+                                                                                    .getText()
+                                                                                    .isEmpty()) {
+                                                                                rpdoEnabledEntriesCount = Integer
+                                                                                        .parseInt(
+                                                                                                rpdoEnabledMappingEntriesText
+                                                                                                        .getText()
+                                                                                                        .trim());
+                                                                            }
 
                                                                         } catch (Exception e) {
                                                                             e.printStackTrace();
@@ -1302,11 +1340,15 @@ public class MappingView extends ViewPart {
                                                                     if (mapParamObj
                                                                             .getId() == 1) {
                                                                         try {
-                                                                            tpdoEnabledEntriesCount = Integer
-                                                                                    .parseInt(
-                                                                                            tpdoEnabledMappingEntriesText
-                                                                                                    .getText()
-                                                                                                    .trim());
+                                                                            if (!tpdoEnabledMappingEntriesText
+                                                                                    .getText()
+                                                                                    .isEmpty()) {
+                                                                                tpdoEnabledEntriesCount = Integer
+                                                                                        .parseInt(
+                                                                                                tpdoEnabledMappingEntriesText
+                                                                                                        .getText()
+                                                                                                        .trim());
+                                                                            }
 
                                                                         } catch (Exception e) {
                                                                             e.printStackTrace();
@@ -1324,11 +1366,15 @@ public class MappingView extends ViewPart {
                                                                     if (mapParamObj
                                                                             .getId() == 1) {
                                                                         try {
-                                                                            rpdoEnabledEntriesCount = Integer
-                                                                                    .parseInt(
-                                                                                            rpdoEnabledMappingEntriesText
-                                                                                                    .getText()
-                                                                                                    .trim());
+                                                                            if (!rpdoEnabledMappingEntriesText
+                                                                                    .getText()
+                                                                                    .isEmpty()) {
+                                                                                rpdoEnabledEntriesCount = Integer
+                                                                                        .parseInt(
+                                                                                                rpdoEnabledMappingEntriesText
+                                                                                                        .getText()
+                                                                                                        .trim());
+                                                                            }
 
                                                                         } catch (Exception e) {
                                                                             e.printStackTrace();
@@ -1363,9 +1409,14 @@ public class MappingView extends ViewPart {
                         if (mappableObject == null) {
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.parseInt(
-                                            tpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!tpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        tpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        tpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1373,9 +1424,14 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.parseInt(
-                                            rpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!rpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        rpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        rpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1392,9 +1448,14 @@ public class MappingView extends ViewPart {
                             ex.printStackTrace();
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    tpdoEnabledEntriesCount = Integer.parseInt(
-                                            tpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!tpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        tpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        tpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1402,9 +1463,14 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.parseInt(
-                                            rpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!rpdoEnabledMappingEntriesText.getText()
+                                            .isEmpty()) {
+                                        rpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        rpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1419,11 +1485,14 @@ public class MappingView extends ViewPart {
                             if (subObjectIdValue != 0) {
                                 if (mapParamObj.getId() == 1) {
                                     try {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -1431,11 +1500,14 @@ public class MappingView extends ViewPart {
                                 }
                                 if (mapParamObj.getId() == 1) {
                                     try {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -1449,11 +1521,14 @@ public class MappingView extends ViewPart {
                                     if (!mappableObject.isRpdoMappable()) {
                                         if (mapParamObj.getId() == 1) {
                                             try {
-                                                rpdoEnabledEntriesCount = Integer
-                                                        .parseInt(
-                                                                rpdoEnabledMappingEntriesText
-                                                                        .getText()
-                                                                        .trim());
+                                                if (!rpdoEnabledMappingEntriesText
+                                                        .getText().isEmpty()) {
+                                                    rpdoEnabledEntriesCount = Integer
+                                                            .parseInt(
+                                                                    rpdoEnabledMappingEntriesText
+                                                                            .getText()
+                                                                            .trim());
+                                                }
 
                                             } catch (Exception e) {
                                                 e.printStackTrace();
@@ -1466,11 +1541,14 @@ public class MappingView extends ViewPart {
                                     if (!mappableObject.isTpdoMappable()) {
                                         if (mapParamObj.getId() == 1) {
                                             try {
-                                                tpdoEnabledEntriesCount = Integer
-                                                        .parseInt(
-                                                                tpdoEnabledMappingEntriesText
-                                                                        .getText()
-                                                                        .trim());
+                                                if (!tpdoEnabledMappingEntriesText
+                                                        .getText().isEmpty()) {
+                                                    tpdoEnabledEntriesCount = Integer
+                                                            .parseInt(
+                                                                    tpdoEnabledMappingEntriesText
+                                                                            .getText()
+                                                                            .trim());
+                                                }
 
                                             } catch (Exception e) {
                                                 e.printStackTrace();
@@ -1488,11 +1566,14 @@ public class MappingView extends ViewPart {
                             if (mappableSubObject == null) {
                                 if (mapParamObj.getId() == 1) {
                                     try {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -1506,11 +1587,14 @@ public class MappingView extends ViewPart {
                                     if (!mappableSubObject.isRpdoMappable()) {
                                         if (mapParamObj.getId() == 1) {
                                             try {
-                                                rpdoEnabledEntriesCount = Integer
-                                                        .parseInt(
-                                                                rpdoEnabledMappingEntriesText
-                                                                        .getText()
-                                                                        .trim());
+                                                if (!rpdoEnabledMappingEntriesText
+                                                        .getText().isEmpty()) {
+                                                    rpdoEnabledEntriesCount = Integer
+                                                            .parseInt(
+                                                                    rpdoEnabledMappingEntriesText
+                                                                            .getText()
+                                                                            .trim());
+                                                }
 
                                             } catch (Exception e) {
                                                 e.printStackTrace();
@@ -1523,11 +1607,14 @@ public class MappingView extends ViewPart {
                                     if (!mappableSubObject.isTpdoMappable()) {
                                         if (mapParamObj.getId() == 1) {
                                             try {
-                                                tpdoEnabledEntriesCount = Integer
-                                                        .parseInt(
-                                                                tpdoEnabledMappingEntriesText
-                                                                        .getText()
-                                                                        .trim());
+                                                if (!tpdoEnabledMappingEntriesText
+                                                        .getText().isEmpty()) {
+                                                    tpdoEnabledEntriesCount = Integer
+                                                            .parseInt(
+                                                                    tpdoEnabledMappingEntriesText
+                                                                            .getText()
+                                                                            .trim());
+                                                }
 
                                             } catch (Exception e) {
                                                 e.printStackTrace();
@@ -1549,11 +1636,14 @@ public class MappingView extends ViewPart {
                                         + mapParamObj.getId());
                                 if (mapParamObj.getId() == 1) {
                                     try {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
                                     } catch (Exception e) {
                                         e.printStackTrace();
                                     }
@@ -1568,11 +1658,14 @@ public class MappingView extends ViewPart {
                             case RPDO:
                                 if (mapParamObj.getId() == 1) {
                                     try {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
 
                                     } catch (Exception e) {
                                         e.printStackTrace();
@@ -4342,13 +4435,17 @@ public class MappingView extends ViewPart {
         try {
             switch (pdoType) {
                 case TPDO:
-                    tpdoEnabledEntriesCount = Integer.parseInt(
-                            tpdoEnabledMappingEntriesText.getText().trim());
+                    if (!tpdoEnabledMappingEntriesText.getText().isEmpty()) {
+                        tpdoEnabledEntriesCount = Integer.parseInt(
+                                tpdoEnabledMappingEntriesText.getText().trim());
+                    }
                     return tpdoEnabledEntriesCount;
 
                 case RPDO:
-                    rpdoEnabledEntriesCount = Integer.parseInt(
-                            rpdoEnabledMappingEntriesText.getText().trim());
+                    if (!rpdoEnabledMappingEntriesText.getText().isEmpty()) {
+                        rpdoEnabledEntriesCount = Integer.parseInt(
+                                rpdoEnabledMappingEntriesText.getText().trim());
+                    }
                     return rpdoEnabledEntriesCount;
 
                 default:
