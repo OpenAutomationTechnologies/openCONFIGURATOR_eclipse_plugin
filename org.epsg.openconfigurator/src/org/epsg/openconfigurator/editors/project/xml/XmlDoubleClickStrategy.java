@@ -47,7 +47,7 @@ public class XmlDoubleClickStrategy implements ITextDoubleClickStrategy {
     /**
      * The text viewer
      */
-    protected ITextViewer fText;
+    protected ITextViewer fText = null;
 
     /**
      * {@inheritDoc}

@@ -323,6 +323,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 // descriptions.
                 continue;
             }
+
             ret = buildCProcessImage(networkId, value, cImagePath);
             ret = buildXmlProcessImage(networkId, value, processImagePath);
             ret = buildCSharpProcessImage(networkId, value, cSharpImagePath);
@@ -516,6 +517,43 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         return projectEditors;
     }
 
+    private static void updateMnObject(PowerlinkObject swVersionObj,
+            boolean isRmnAvailable, boolean isFirmwareAvailable) {
+
+        if (isFirmwareAvailable && isRmnAvailable) {
+            try {
+                swVersionObj.setActualValue(RMN_FIRMWARE_AVAILABLITY_VALUE,
+                        true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "19456");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (isFirmwareAvailable) {
+            try {
+                swVersionObj.setActualValue(FIRMWARE_AVAILABLITY_VALUE, true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "3072");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else if (isRmnAvailable) {
+            try {
+                swVersionObj.setActualValue(RMN_AVAILABLITY_VALUE, true);
+                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
+                        "18432");
+            } catch (JDOMException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     private String TAB_SPACE = "\t";
 
     private String NEW_LINE = "\n";
@@ -554,12 +592,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             IndustrialNetworkProjectEditor pjctEditor) throws CoreException {
         updateFirmwareDevRevList(pjctEditor);
 
-        try {
-            copyFirmwareFile();
-            generateFirmwareInfoFile(targetPath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        copyFirmwareFile();
+        generateFirmwareInfoFile(targetPath);
+
     }
 
     /**
@@ -879,7 +914,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     }
 
     private void generateFirmwareInfoFile(java.nio.file.Path outputpath)
-            throws CoreException, IOException {
+            throws CoreException {
         String outputFirmwareInfo = StringUtils.EMPTY;
         Charset charset = Charset.forName("UTF-8");
         if (!fwList.isEmpty()) {
@@ -1017,42 +1052,5 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             }
         }
 
-    }
-
-    private void updateMnObject(PowerlinkObject swVersionObj,
-            boolean isRmnAvailable, boolean isFirmwareAvailable) {
-
-        if (isFirmwareAvailable && isRmnAvailable) {
-            try {
-                swVersionObj.setActualValue(RMN_FIRMWARE_AVAILABLITY_VALUE,
-                        true);
-                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
-                        "19456");
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (isFirmwareAvailable) {
-            try {
-                swVersionObj.setActualValue(FIRMWARE_AVAILABLITY_VALUE, true);
-                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
-                        "3072");
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else if (isRmnAvailable) {
-            try {
-                swVersionObj.setActualValue(RMN_AVAILABLITY_VALUE, true);
-                OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
-                        "18432");
-            } catch (JDOMException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
     }
 }

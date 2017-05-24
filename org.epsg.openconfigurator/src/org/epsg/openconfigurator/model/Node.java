@@ -111,13 +111,6 @@ public class Node {
 
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
 
-    private static final String XDC_FILE_NOT_FOUND_ERROR = "XDD/XDC file for the node: {0} does not exists in the project.\n XDC Path: {1} ";
-
-    private static final String FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR = "Firmware file {0} for the module {1} does not exists in the project.\n Firmware file Path: {2} ";
-    private static final String INVALID_MODULE_XDC_ERROR = " The XDD/XDC file of module {0} is not available for the node {1}.";
-
-    private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
-
     /**
      * Returns the attribute name linked with the node assignment value.
      *
@@ -211,11 +204,6 @@ public class Node {
     private final Object nodeModel;
 
     /**
-     * Instance of Xdd model.
-     */
-    private TCN tcn;
-
-    /**
      * The memory of the XDC linked to this Node.
      */
     private final ISO15745ProfileContainer xddModel;
@@ -285,8 +273,6 @@ public class Node {
      */
     private FirmwareFile xddFirmwareFile;
 
-    private OpenCONFIGURATORProject currentProject;
-
     /**
      * Instance of Module management.
      */
@@ -321,7 +307,6 @@ public class Node {
         moduleInterface = null;
         configurationError = "";
         xddFirmwareFile = null;
-        currentProject = null;
         processImage = null;
     }
 
@@ -590,14 +575,12 @@ public class Node {
         }
     }
 
-    public void copyNode(int nodeId, int stationType, String name)
-            throws JDOMException, InterruptedException, IOException {
+    public void copyNode(int nodeId, int stationType, String name) {
         copyXdcFile(this, nodeId, stationType, name);
     }
 
     private void copyXdcFile(Node selectednode, int nodeId, int stationType,
-            String name)
-            throws JDOMException, InterruptedException, IOException {
+            String name) {
         System.err.println("The node XDC path before.."
                 + selectednode.getAbsolutePathToXdc());
 
@@ -2128,15 +2111,6 @@ public class Node {
         return updatedInTheModel;
     }
 
-    public void setNodeData() {
-
-        if (getNodeModel() instanceof TCN) {
-            tcn = (TCN) getNodeModel();
-        } else {
-            tcn = null;
-        }
-    }
-
     /**
      * Set the path to the XDC. Example:
      * deviceConfiguration/000000_000Oplk_nodeId.xdc
@@ -2311,8 +2285,7 @@ public class Node {
 
     }
 
-    private void updateModuleNode(Module selectedModule, Node newNode)
-            throws IOException {
+    private void updateModuleNode(Module selectedModule, Node newNode) {
         Object moduleObject = selectedModule.getModelOfModule();
         if (moduleObject instanceof InterfaceList.Interface.Module) {
 

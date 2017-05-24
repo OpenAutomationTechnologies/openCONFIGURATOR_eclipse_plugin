@@ -494,56 +494,57 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 pathSett = setPath;
             }
         }
-
-        List<TPath> pathList = pathSett.getPath();
-        TPath pathConfig = null;
-        for (TPath path : pathList) {
-            if (path.isActive()) {
-                pathConfig = path;
+        if (pathSett != null) {
+            List<TPath> pathList = pathSett.getPath();
+            TPath pathConfig = null;
+            for (TPath path : pathList) {
+                if (path.isActive()) {
+                    pathConfig = path;
+                }
             }
-        }
 
-        if (pathConfig == null) {
-            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
-                    "defaultOutputPath");
-            if (defaultPath != null) {
-                return new Path(defaultPath.getPath(), true);
-            }
-        }
-
-        if (pathConfig != null) {
-            if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
+            if (pathConfig == null) {
                 TPath defaultPath = OpenConfiguratorProjectUtils
                         .getTPath(pathSett, "defaultOutputPath");
                 if (defaultPath != null) {
                     return new Path(defaultPath.getPath(), true);
                 }
             }
-        }
 
-        String activeOutputPathID = StringUtils.EMPTY;
-        if (pathConfig != null) {
-            activeOutputPathID = pathConfig.getId();
-        }
-        if (activeOutputPathID == null) {
-            if (!pathSett.getPath().isEmpty()) {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, "defaultOutputPath");
-                if (defaultPath != null) {
-                    return new Path(defaultPath.getPath(), true);
+            if (pathConfig != null) {
+                if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils
+                            .getTPath(pathSett, "defaultOutputPath");
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
                 }
             }
-        } else {
-            TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(pathSett,
-                    activeOutputPathID);
-            if (defaultPath != null) {
-                if (!defaultPath.getId()
-                        .equalsIgnoreCase("defaultOutputPath")) {
-                    return new Path(defaultPath.getPath(), false);
+
+            String activeOutputPathID = StringUtils.EMPTY;
+            if (pathConfig != null) {
+                activeOutputPathID = pathConfig.getId();
+            }
+            if (activeOutputPathID == null) {
+                if (!pathSett.getPath().isEmpty()) {
+                    TPath defaultPath = OpenConfiguratorProjectUtils
+                            .getTPath(pathSett, "defaultOutputPath");
+                    if (defaultPath != null) {
+                        return new Path(defaultPath.getPath(), true);
+                    }
                 }
             } else {
-                System.err.println(
-                        "Unhandled error occurred. activeOutputPath not found");
+                TPath defaultPath = OpenConfiguratorProjectUtils
+                        .getTPath(pathSett, activeOutputPathID);
+                if (defaultPath != null) {
+                    if (!defaultPath.getId()
+                            .equalsIgnoreCase("defaultOutputPath")) {
+                        return new Path(defaultPath.getPath(), false);
+                    }
+                } else {
+                    System.err.println(
+                            "Unhandled error occurred. activeOutputPath not found");
+                }
             }
         }
         return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);

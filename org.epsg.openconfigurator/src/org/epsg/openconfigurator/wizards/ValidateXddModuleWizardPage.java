@@ -670,8 +670,7 @@ public class ValidateXddModuleWizardPage extends WizardPage {
             setErrorMessage(ERROR_CHOOSE_VALID_FILE_MESSAGE);
             return false;
         }
-        boolean pageComplete = (super.isPageComplete())
-                && nodeConfigurationValid;
+        boolean pageComplete = (super.isPageComplete());
 
         if (checkXddModel()) {
             pageComplete = true;

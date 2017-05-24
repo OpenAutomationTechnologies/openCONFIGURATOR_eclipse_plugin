@@ -82,17 +82,17 @@ public final class AddEditTPathDialog extends TitleAreaDialog {
     /**
      * Path name text box.
      */
-    private Text txtName;
+    private Text txtName = null;
 
     /**
      * Path location text box.
      */
-    private Text txtLocation;
+    private Text txtLocation = null;
 
     /**
      * Is Path location active check box.
      */
-    private Button btnActive;
+    private Button btnActive = null;
 
     /**
      * Dialog dirty flag.

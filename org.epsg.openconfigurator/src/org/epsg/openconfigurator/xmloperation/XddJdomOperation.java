@@ -2358,7 +2358,6 @@ public class XddJdomOperation {
 
     }
 
-    @SuppressWarnings("unused")
     private static void updatePrameterTemplateListInHeadNode(Document document,
             TParameterTemplate parameteratemplateModel) {
 
@@ -2451,7 +2450,7 @@ public class XddJdomOperation {
                     Element minvalueElement = new Element("minValue");
                     List<Attribute> attribValue = minvalueElement
                             .getAttributes();
-                    attribValue.add(new Attribute("value", maxValue));
+                    attribValue.add(new Attribute("value", minValue));
                     JDomUtil.addNewElement(document,
                             allowedModulesXPath + "/plk:range",
                             POWERLINK_XDD_NAMESPACE, minvalueElement);

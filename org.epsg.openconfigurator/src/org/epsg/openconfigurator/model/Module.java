@@ -86,6 +86,36 @@ public class Module {
 
     private static final long DOWNLOAD_CHILD_OBJECT_INDEX = 8021;
 
+    private static String getValueofModularBit(String reverse) {
+        String[] arrayString = reverse.split("");
+        int arrayCount = arrayString.length;
+        System.err.println("The array count .." + arrayCount);
+        System.err.println("The array String .." + reverse);
+        if (arrayCount <= 21) {
+            return "0";
+        }
+        return arrayString[21];
+
+    }
+
+    private static boolean isModuleFirmwareBitSet(String defaultVal) {
+        if (defaultVal.contains("0x")) {
+            defaultVal = defaultVal.substring(2);
+            String binValue = new BigInteger(defaultVal, 16).toString(2);
+            String reverse = new StringBuffer(binValue).reverse().toString();
+            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
+                return true;
+            }
+        } else {
+            String binValue = new BigInteger(defaultVal, 16).toString(2);
+            String reverse = new StringBuffer(binValue).reverse().toString();
+            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private static void removeForcedObject(ForcedObjects forcedObjTag,
             org.epsg.openconfigurator.xmlbinding.projectfile.Object forceObj) {
         org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForcedObjToBeRemoved = null;
@@ -1039,18 +1069,6 @@ public class Module {
         return node.getProject();
     }
 
-    private String getValueofModularBit(String reverse) {
-        String[] arrayString = reverse.split("");
-        int arrayCount = arrayString.length;
-        System.err.println("The array count .." + arrayCount);
-        System.err.println("The array String .." + reverse);
-        if (arrayCount <= 21) {
-            return "0";
-        }
-        return arrayString[21];
-
-    }
-
     /**
      * @return Vendor ID of the Module.
      */
@@ -1181,24 +1199,6 @@ public class Module {
             enabled = module.isEnabled();
         }
         return enabled;
-    }
-
-    private boolean isModuleFirmwareBitSet(String defaultVal) {
-        if (defaultVal.contains("0x")) {
-            defaultVal = defaultVal.substring(2);
-            String binValue = new BigInteger(defaultVal, 16).toString(2);
-            String reverse = new StringBuffer(binValue).reverse().toString();
-            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
-                return true;
-            }
-        } else {
-            String binValue = new BigInteger(defaultVal, 16).toString(2);
-            String reverse = new StringBuffer(binValue).reverse().toString();
-            if (getValueofModularBit(reverse).equalsIgnoreCase("1")) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public boolean isObjectIdForced(long newObjectIndex) {

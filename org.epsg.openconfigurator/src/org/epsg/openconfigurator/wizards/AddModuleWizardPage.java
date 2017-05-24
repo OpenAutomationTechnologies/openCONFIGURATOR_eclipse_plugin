@@ -227,7 +227,6 @@ public class AddModuleWizardPage extends WizardPage {
     }
 
     private void updateCnModel() {
-        Object nodeModel = getNode().getNodeModel();
         InterfaceList.Interface.Module cnModule = new InterfaceList.Interface.Module();
         cnModule.setName(moduleName.getText());
         moduleModel = cnModule;

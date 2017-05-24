@@ -53,12 +53,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModula
  */
 public class CopyNodeWizard extends Wizard {
     private static final String WINDOW_TITLE = "POWERLINK node wizard";
-    private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
     public static final String ERROR_NODE_MODEL = "Invalid node model.";
-
-    private static final String CNPRES_CHAINING_ERROR_MESSAGE = "The node {0} does not support PRes Chaining operation.";
-    private static final String CHAINED_STATION_ERROR_MESSAGE = "POWERLINK network with RMN does not support PRes Chaining operation.";
-    private static final String MULTIPLEXING_OPERATION_NOT_SUPPORTED_ERROR = "Currently Multiplexing operation not supported.";
 
     /**
      * Add new node wizard page.
@@ -71,7 +66,6 @@ public class CopyNodeWizard extends Wizard {
      * Selected node object. The new node will be added below this node.
      */
     private Node selectedNodeObj;
-    private PowerlinkRootNode nodeList;
     private TNodeCollection nodeCollectionModel;
 
     /**
@@ -89,7 +83,6 @@ public class CopyNodeWizard extends Wizard {
         }
 
         this.selectedNodeObj = selectedNodeObj;
-        this.nodeList = nodeList;
         Object nodeModel = null;
         if (this.selectedNodeObj != null) {
             nodeModel = nodeList.getMN().getNodeModel();

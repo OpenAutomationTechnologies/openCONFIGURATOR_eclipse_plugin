@@ -69,7 +69,7 @@ public class PowerlinkNetworkProjectNature implements IProjectNature {
         description.setBuildSpec(newCommands);
     }
 
-    private IProject project;
+    private IProject project = null;
 
     /*
      * (non-Javadoc)

@@ -746,6 +746,7 @@ public final class ImportOpenConfiguratorProjectWizardPage extends WizardPage {
      * @throws InterruptedException
      * @throws IOException
      */
+    @SuppressWarnings("unchecked")
     private void createProjectDescription(ProjectRecord selectedProjectRecord,
             IProgressMonitor monitor) throws InvocationTargetException,
             InterruptedException, IOException {

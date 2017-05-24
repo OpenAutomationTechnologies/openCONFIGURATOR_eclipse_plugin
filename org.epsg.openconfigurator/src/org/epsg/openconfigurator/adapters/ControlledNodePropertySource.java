@@ -434,8 +434,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                             for (FirmwareManager fwMngr : cnNode
                                     .getValidFirmwareList()) {
                                 if (fwMngr.getFirmwareUri() != null) {
-                                    filePathOfFwMngr += fwMngr.getFirmwareUri()
-                                        .concat(" ;");
+                                    filePathOfFwMngr = filePathOfFwMngr
+                                            .concat(fwMngr.getFirmwareUri()
+                                                    .concat(" ;"));
                                 }
                             }
                         }
@@ -548,7 +549,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         long[] presTimeOutInNs = new long[1];
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .GetPResTimeOut(cnNode.getNetworkId(),
-                                        cnNode.getCnNodeIdValue(), presTimeOutInNs);
+                                        cnNode.getCnNodeIdValue(),
+                                        presTimeOutInNs);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -776,8 +778,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                                cnNode.getNetworkId(), cnNode.getCnNodeIdValue(),
-                                (String) value);
+                                cnNode.getNetworkId(),
+                                cnNode.getCnNodeIdValue(), (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -1036,8 +1038,8 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         long presTimeoutInNs = Long.decode((String) value)
                                 .longValue() * 1000;
                         res = OpenConfiguratorCore.GetInstance().SetPResTimeOut(
-                                cnNode.getNetworkId(), cnNode.getCnNodeIdValue(),
-                                presTimeoutInNs);
+                                cnNode.getNetworkId(),
+                                cnNode.getCnNodeIdValue(), presTimeoutInNs);
                         if (res.IsSuccessful()) {
                             cnNode.setCnPresTimeout(
                                     String.valueOf(presTimeoutInNs));

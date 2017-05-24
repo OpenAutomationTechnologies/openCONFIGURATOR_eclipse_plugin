@@ -136,10 +136,10 @@ public final class XddMarshaller {
 
         if (xapSchemaPath != null) {
             try {
-                File xapSchemaFile = new File(firmwareSchemaPath);
+                File xapSchemaFile = new File(xapSchemaPath);
                 SchemaFactory schemaFactory = SchemaFactory
                         .newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-                XddMarshaller.firmwareSchema = schemaFactory
+                XddMarshaller.xapSchema = schemaFactory
                         .newSchema(xapSchemaFile);
             } catch (SAXException e) {
                 e.printStackTrace();
@@ -230,8 +230,7 @@ public final class XddMarshaller {
             for (int count = 0; count < linesInFile; count++) {
                 firmwareline += bufferedRdr.readLine();
                 if (firmwareline.contains("/>")) {
-                    linesInFile = count;
-                    break;// breaks the loop if firmware header is closed
+                    break; // breaks the loop if firmware header is closed
                 }
             }
 
@@ -314,7 +313,6 @@ public final class XddMarshaller {
      * @throws ParserConfigurationException
      * @throws IOException
      */
-    @SuppressWarnings("finally")
     public static ApplicationProcess unmarshallXapFile(final File file)
             throws JAXBException, SAXException, ParserConfigurationException,
             IOException {

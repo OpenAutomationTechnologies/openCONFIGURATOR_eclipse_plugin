@@ -53,7 +53,7 @@ public class ImportPowerlinkNetworkProjectWizard extends Wizard
     /**
      * Import openCONFIGURATOR project page.
      */
-    private ImportOpenConfiguratorProjectWizardPage mainPage;
+    private ImportOpenConfiguratorProjectWizardPage mainPage = null;
 
     /**
      * Constructor.

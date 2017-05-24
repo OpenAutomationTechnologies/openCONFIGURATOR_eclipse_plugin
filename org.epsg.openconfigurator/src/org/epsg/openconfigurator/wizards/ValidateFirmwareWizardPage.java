@@ -30,7 +30,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 import org.epsg.openconfigurator.model.Module;
@@ -85,6 +84,19 @@ public class ValidateFirmwareWizardPage extends WizardPage {
             deviceName = module.getModuleName();
         }
         return deviceName;
+    }
+
+    private static boolean isFirmwareConfigurationValid(
+            final String firmwarePath) {
+        boolean retVal = false;
+        if ((firmwarePath == null) || (firmwarePath.isEmpty())) {
+            return retVal;
+        }
+
+        File file = new File(firmwarePath);
+        retVal = file.isFile();
+
+        return retVal;
     }
 
     /**
@@ -358,13 +370,11 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         gd_grpConfigurationFile.widthHint = 558;
         grpFirmwareFile.setLayoutData(gd_grpConfigurationFile);
         grpFirmwareFile.setText(FIRMWARE_FILE_LABEL);
-        grpFirmwareFile.setLayout(new GridLayout(3, false));
+        grpFirmwareFile.setLayout(new GridLayout(4, false));
 
         btnfirmware = new Button(grpFirmwareFile, SWT.RADIO);
         btnfirmware.setText(DEFAULT_CONFIGURATION_LABEL);
         btnfirmware.setSelection(true);
-        new Label(grpFirmwareFile, SWT.NONE);
-        new Label(grpFirmwareFile, SWT.NONE);
 
         firmwareConfigurationPath = new Text(grpFirmwareFile, SWT.BORDER);
         GridData gd_firmwareConfigurationPath = new GridData(SWT.FILL, SWT.FILL,
@@ -409,9 +419,8 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         TextViewer textViewer = new TextViewer(headerFrame,
                 SWT.BORDER | SWT.WRAP | SWT.READ_ONLY);
         errorinfo = textViewer.getTextWidget();
-        GridData gd_errorinfo = new GridData(SWT.FILL, SWT.FILL, true, true, 1,
-                1);
-        errorinfo.setLayoutData(gd_errorinfo);
+        errorinfo.setLayoutData(
+                new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         formToolkit.paintBordersFor(errorinfo);
     }
 
@@ -451,18 +460,6 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         return errorinfo;
     }
 
-    private boolean isFirmwareConfigurationValid(final String firmwarePath) {
-        boolean retVal = false;
-        if ((firmwarePath == null) || (firmwarePath.isEmpty())) {
-            return retVal;
-        }
-
-        File file = new File(firmwarePath);
-        retVal = file.isFile();
-
-        return retVal;
-    }
-
     /**
      * Checks for error in the page
      *
@@ -490,8 +487,7 @@ public class ValidateFirmwareWizardPage extends WizardPage {
         }
 
         // The value of nodeConfigurationValid is not true in all cases.
-        boolean pageComplete = (super.isPageComplete())
-                && firmwareConfigurationValid;
+        boolean pageComplete = (super.isPageComplete());
 
         if (checkXddModel()) {
             pageComplete = true;

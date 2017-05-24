@@ -857,7 +857,6 @@ public class ProjectJDomOperation {
                 new Attribute(attributeName, attributeValue));
     }
 
-    @SuppressWarnings("unused")
     public static void updateAutoGenerationSettings(Document document) {
         String xpath = "//oc:ProjectConfiguration";
         JDomUtil.updateAttribute(document, xpath, OPENCONFIGURATOR_NAMESPACE,

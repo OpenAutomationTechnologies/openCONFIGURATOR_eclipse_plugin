@@ -119,7 +119,7 @@ public class Activator extends AbstractUIPlugin {
                 path);
     }
 
-    private Tailer tailer;
+    private Tailer tailer = null;
 
     /**
      * The constructor

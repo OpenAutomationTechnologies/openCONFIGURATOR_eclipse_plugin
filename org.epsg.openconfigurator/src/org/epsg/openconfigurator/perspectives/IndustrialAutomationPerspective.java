@@ -47,7 +47,7 @@ import org.epsg.openconfigurator.views.mapping.MappingView;
  */
 public class IndustrialAutomationPerspective implements IPerspectiveFactory {
 
-    private IPageLayout factory;
+    private IPageLayout factory = null;
 
     public IndustrialAutomationPerspective() {
         super();

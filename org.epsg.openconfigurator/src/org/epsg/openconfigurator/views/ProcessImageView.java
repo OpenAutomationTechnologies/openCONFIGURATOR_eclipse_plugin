@@ -233,9 +233,71 @@ public class ProcessImageView extends ViewPart {
     public static final String MENU_SHOW_COMPLETE_CHANNEL_NAME_LABEL = "Show Complete Channel Name";
     public static final String MENU_SHOW_SHORT_CHANNEL_NAME_LABEL = "Show Short Channel Name";
 
+    // Returns the shortest name for the datatypes
+    private static String getIecDataType(String channelType) {
+        switch (channelType) {
+            case "BITSTRING":
+                return "BITSTRING";
+            case "BOOL":
+                return "BOOL";
+            case "BYTE":
+                return "BYTE";
+            case "CHAR":
+                return "CHAR";
+            case "WORD":
+                return "WORD";
+            case "DWORD":
+                return "DWORD";
+            case "LWORD":
+                return "LWORD";
+            case "Integer8":
+                return "SINT";
+            case "Integer16":
+                return "INT";
+            case "Integer32":
+                return "DINT";
+            case "Integer64":
+                return "LINT";
+            case "Unsigned8":
+                return "USINT";
+            case "Unsigned16":
+                return "UINT";
+            case "Unsigned32":
+                return "UDINT";
+            case "Unsigned64":
+                return "ULINT";
+            case "REAL":
+                return "REAL";
+            case "LREAL":
+                return "LREAL";
+            case "STRING":
+                return "STRING";
+            case "WSTRING":
+                return "WSTRING";
+            default:
+                return "UNDEFINED";
+
+        }
+    }
+
+    // Returns the short name of channel based on the given channel.
+    private static String getShortChannelName(String channelName) {
+        String shortChannelName = StringUtils.EMPTY;
+        for (int index = channelName.indexOf(
+                "."); index >= 0; index = channelName.indexOf(".", index + 1)) {
+            shortChannelName = channelName.substring(index);
+            int count = StringUtils.countMatches(shortChannelName, ".");
+            if (count == 2) {
+                return shortChannelName.substring(1);
+            }
+        }
+        return shortChannelName;
+    }
+
     private ProcessImageChannel processImageChannel;
 
     private final Image inChannelImage;
+
     private final Image outChannelImage;
 
     private Node nodeObj;
@@ -426,53 +488,6 @@ public class ProcessImageView extends ViewPart {
         manager.add(showAdvancedview);
     }
 
-    // Returns the shortest name for the datatypes
-    private String getIecDataType(String channelType) {
-        switch (channelType) {
-            case "BITSTRING":
-                return "BITSTRING";
-            case "BOOL":
-                return "BOOL";
-            case "BYTE":
-                return "BYTE";
-            case "CHAR":
-                return "CHAR";
-            case "WORD":
-                return "WORD";
-            case "DWORD":
-                return "DWORD";
-            case "LWORD":
-                return "LWORD";
-            case "Integer8":
-                return "SINT";
-            case "Integer16":
-                return "INT";
-            case "Integer32":
-                return "DINT";
-            case "Integer64":
-                return "LINT";
-            case "Unsigned8":
-                return "USINT";
-            case "Unsigned16":
-                return "UINT";
-            case "Unsigned32":
-                return "UDINT";
-            case "Unsigned64":
-                return "ULINT";
-            case "REAL":
-                return "REAL";
-            case "LREAL":
-                return "LREAL";
-            case "STRING":
-                return "STRING";
-            case "WSTRING":
-                return "WSTRING";
-            default:
-                return "UNDEFINED";
-
-        }
-    }
-
     // Returns the name of node based on the given channel.
     private String getNodeName(String channelname) {
         String nodeName = StringUtils.EMPTY;
@@ -482,20 +497,6 @@ public class ProcessImageView extends ViewPart {
         String nodeId = channelname.substring(nodeIndex + 1, index);
         nodeName = nodeObj.getNodeName(nodeId);
         return nodeName;
-    }
-
-    // Returns the short name of channel based on the given channel.
-    private String getShortChannelName(String channelName) {
-        String shortChannelName = StringUtils.EMPTY;
-        for (int index = channelName.indexOf(
-                "."); index >= 0; index = channelName.indexOf(".", index + 1)) {
-            shortChannelName = channelName.substring(index);
-            int count = StringUtils.countMatches(shortChannelName, ".");
-            if (count == 2) {
-                return shortChannelName.substring(1);
-            }
-        }
-        return shortChannelName;
     }
 
     // Resizes the table based on advanced view selection

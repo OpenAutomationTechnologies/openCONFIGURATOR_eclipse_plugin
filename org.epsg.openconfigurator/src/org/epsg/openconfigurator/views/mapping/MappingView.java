@@ -343,17 +343,8 @@ public class MappingView extends ViewPart {
      */
     private static class ForcedObjectContentProvider
             implements ITreeContentProvider {
-        Node node;
-        Module module;
 
-        public ForcedObjectContentProvider(Object nodeOrModule) {
-            if (nodeOrModule instanceof Node) {
-                Node node = (Node) nodeOrModule;
-                this.node = node;
-            } else if (nodeOrModule instanceof Module) {
-                Module module = (Module) nodeOrModule;
-                this.module = module;
-            }
+        public ForcedObjectContentProvider() {
         }
 
         @Override
@@ -413,7 +404,7 @@ public class MappingView extends ViewPart {
         Image objectIcon;
         Image subObjectIcon;
 
-        public ForcedObjectLabelProvider(Object nodeOrModule) {
+        public ForcedObjectLabelProvider() {
 
             objectIcon = org.epsg.openconfigurator.Activator
                     .getImageDescriptor(IPluginImages.OBD_OBJECT_ICON)
@@ -1148,9 +1139,15 @@ public class MappingView extends ViewPart {
                             }
                             if (mapParamObj.getId() == 1) {
                                 try {
-                                    rpdoEnabledEntriesCount = Integer.parseInt(
-                                            rpdoEnabledMappingEntriesText
-                                                    .getText().trim());
+                                    if (!rpdoEnabledMappingEntriesText.getText()
+                                            .equalsIgnoreCase(
+                                                    StringUtils.EMPTY)) {
+                                        rpdoEnabledEntriesCount = Integer
+                                                .parseInt(
+                                                        rpdoEnabledMappingEntriesText
+                                                                .getText()
+                                                                .trim());
+                                    }
 
                                 } catch (Exception e) {
                                     e.printStackTrace();
@@ -1748,22 +1745,6 @@ public class MappingView extends ViewPart {
      * to.
      */
     private static Node nodeObj;
-    /**
-     * Form size
-     */
-    private static final int FORM_BODY_MARGIN_TOP = 12;
-
-    private static final int FORM_BODY_MARGIN_BOTTOM = 12;
-
-    private static final int FORM_BODY_MARGIN_LEFT = 6;
-
-    private static final int FORM_BODY_MARGIN_RIGHT = 6;
-
-    private static final int FORM_BODY_HORIZONTAL_SPACING = 20;
-
-    private static final int FORM_BODY_VERTICAL_SPACING = 17;
-
-    private static final int FORM_BODY_NUMBER_OF_COLUMNS = 2;
 
     private static final String ERROR_ASYNC_SLOT_TIMEOUT_CANNOT_BE_EMPTY = "Async. slot timeout cannot be empty.";
 
@@ -1771,11 +1752,6 @@ public class MappingView extends ViewPart {
 
     private static final String ERROR_INVALID_VALUE_ASYNCT_SLOT_TIMEOUT = "Invalid value for Async. slot timeout.";
 
-    private static final String ERROR_ASND_MAX_NR_CANNOT_BE_EMPTY = "ASnd max number cannot be empty.";
-
-    private static final String INVALID_RANGE_ASND_MAX_NR = "Invalid range for ASnd max number.";
-
-    private static final String ERROR_INVALID_VALUE_ASND_MAX_NR = "Invalid value for ASnd max number.";
     private static final String ERROR_CYCLE_TIME_CANNOT_BE_EMPTY = "Cycle Time cannot be empty.";
 
     private static final String ERROR_INVALID_VALUE_CYCLE_TIME = "Invalid value for Cycle-time.";
@@ -1785,10 +1761,7 @@ public class MappingView extends ViewPart {
     private static final String INVALID_RANGE_ASYNC_MTU = "Invalid range for AsyncMtu.";
 
     private static final String ERROR_INVALID_VALUE_ASYNC_MTU = "Invalid value for AsyncMtu.";
-    private static final String ERROR_MULTIPLEXED_CYCLE_CNT_CANNOT_BE_EMPTY = "Multiplexed Cycle Count cannot be empty.";
 
-    private static final String INVALID_RANGE_MULTIPLEXED_CYCLE_CNT = "Invalid range for Multiplexed Cycle Count.";
-    private static final String ERROR_INVALID_VALUE_MULTIPLEXED_CYCLE_CNT = "Invalid value for Multiplexed Cycle Count.";
     private static final String ERROR_PRE_SCALER_CANNOT_BE_EMPTY = "PreScaler cannot be empty.";
     private static final String INVALID_RANGE_PRE_SCALER = "Invalid range for PreScaler.";
     private static final String ERROR_INVALID_VALUE_PRE_SCALER = "Invalid value for PreScaler.";
@@ -1814,6 +1787,128 @@ public class MappingView extends ViewPart {
     private static final int MINIMUM_PRESCALER_VALUE = 0;
 
     private static final int MAXIMUM_PRESCALER_VALUE = 1000;
+
+    /**
+     * Handles LossofSOCTolerance modifications
+     *
+     * @param value New value for LossOfSoCTolerance
+     */
+    private static String handleLossOfSoCTolerance(Object value) {
+        String lossOfSoc = StringUtils.EMPTY;
+        if (value instanceof String) {
+            lossOfSoc = (String) value;
+            if (lossOfSoc.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+            try {
+                long longValue = Long.decode((String) value);
+                // validate the value
+                Long maxValue = 4294967295L;
+                if ((longValue * 1000) > maxValue) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            MessageFormat.format(
+                                    INVALID_RANGE_LOSS_SOC_TOLERANCE,
+                                    nodeObj.getNetworkId(), longValue),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+
+            } catch (NumberFormatException e) {
+                e.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE,
+                        nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+
+            }
+
+        } else {
+            System.err.println(
+                    "handleLossOfSoCTolerance: Invalid value type:" + value);
+        }
+
+        return lossOfSoc;
+    }
+
+    /**
+     * Handle NodeId changes in properties
+     *
+     * @param id New Id for the Node
+     * @return Returns a string indicating whether the given value is valid;
+     *         null means invalid, and non-null means valid, with the result
+     *         being the error message to display to the end user.
+     */
+    private static String handleSetNodeId(Object id) {
+        String nodeId = StringUtils.EMPTY;
+        if (id instanceof String) {
+            nodeId = (String) id;
+            if (nodeId.isEmpty()) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "Node ID cannot be empty.", nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+            try {
+                short nodeIDvalue = Short.valueOf(((String) id));
+                if (nodeObj.getNodeModel() instanceof TCN) {
+                    if ((nodeIDvalue == 0)
+                            || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, "Invalid Node ID.",
+                                nodeObj.getNetworkId());
+                        return StringUtils.EMPTY;
+                    }
+                } else if (nodeObj.getNodeModel() instanceof TRMN) {
+                    if ((nodeIDvalue == 0)
+                            || (nodeIDvalue <= IPowerlinkConstants.MN_DEFAULT_NODE_ID)
+                            || ((nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID))) {
+                        PluginErrorDialogUtils.showMessageWindow(
+                                MessageDialog.ERROR, "Invalid Node ID.",
+                                nodeObj.getNetworkId());
+                        return StringUtils.EMPTY;
+                    }
+                }
+
+                if (nodeIDvalue == nodeObj.getCnNodeIdValue()) {
+                    return StringUtils.EMPTY;
+                }
+
+                boolean nodeIdAvailable = nodeObj.getPowerlinkRootNode()
+                        .isNodeIdAlreadyAvailable(nodeIDvalue);
+                if (nodeIdAvailable) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            "Node with id " + nodeIDvalue + " already exists.",
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        "Invalid Node ID.", nodeObj.getNetworkId());
+                return StringUtils.EMPTY;
+            }
+        }
+        return nodeId;
+    }
+
+    private static String handletransmitPres(Object value) {
+        String transmitPres = StringUtils.EMPTY;
+        if (value instanceof String) {
+            transmitPres = (String) value;
+
+            if (transmitPres.equalsIgnoreCase("0")) {
+                transmitPres = "Yes";
+            } else {
+                transmitPres = "No";
+            }
+        }
+        return transmitPres;
+    }
 
     /**
      * Resize table based on columns content width.
@@ -1942,7 +2037,6 @@ public class MappingView extends ViewPart {
             }
         }
     };
-
     /**
      * Selection listener to display up,down,clear action buttons to move or
      * clear TPDO objects or Sub-Objects
@@ -1985,7 +2079,6 @@ public class MappingView extends ViewPart {
     };
 
     private Tree lst_no_foi;
-
     /**
      * Selection listener to update the objects and sub-objects in the mapping
      * view.
@@ -2213,7 +2306,7 @@ public class MappingView extends ViewPart {
                         if (nodeObj
                                 .getPlkOperationMode() == PlkOperationMode.CHAINED) {
                             nodeTypeCombo.select(1);
-                            ;
+
                         } else {
                             nodeTypeCombo.select(0);
                         }
@@ -2251,47 +2344,47 @@ public class MappingView extends ViewPart {
      * Listener instance to listen to the changes in the source part.
      */
     private final PartListener partListener = new PartListener();
+
     /**
      * TPDO page controls
      */
     private TabItem tbtmTpdo;
     private ComboViewer tpdoChannelComboViewer;
-
     private ComboViewer sndtoNodecomboviewer;
-
     private TableViewer tpdoTableViewer;
     private TableViewerColumn tpdoMappingObjectColumn;
     private TableViewerColumn tpdoActionsColumn;
     private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
+
     private Composite tpdoPageFooter;
+
     private Button btnTpdoChannelMapAvailableObjects;
     private Button btnTpdoChannelClearSelectedRows;
 
     private Text tpdoEnabledMappingEntriesText;
 
     private Text tpdoChannelSize;
+
     private TableEditor tpdoTableActionsEditor;
 
     private Composite tpdoActionsbuttonGroup;
 
     private Button tpdoActionsUpButton;
-
     private Button tpdoActionsDownButton;
-
     private TableColumn tpdoTblclmnActualValue;
-
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
+
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
     private ModifyListener tpdoEnabledMappingEntriesTextModifyListener;
+
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
 
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
+
     private SelectionListener tpdoActionsClearBtnSelectionListener;
 
     private SelectionListener tpdoActionsDownBtnSelectionListener;
-
     private SelectionListener tpdoActionsUpBtnSelectionListener;
-
     private Button tpdoBtnCheckButton;
 
     public boolean tpdoProfileObjectSelection = false;
@@ -2303,13 +2396,13 @@ public class MappingView extends ViewPart {
      */
     private TabItem tbtmRpdo;
     private ComboViewer rpdoChannelComboViewer;
-    private ComboViewer receiveFromNodecomboviewer;
 
+    private ComboViewer receiveFromNodecomboviewer;
     private TableViewer rpdoTableViewer;
     private TableViewerColumn rpdoMappingObjectColumn;
-
     private TableViewerColumn rpdoActionsColumn;
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
+
     private Composite rpdoPageFooter;
     private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
@@ -2317,21 +2410,20 @@ public class MappingView extends ViewPart {
     private Text rpdoEnabledMappingEntriesText;
     private Text rpdoChannelSize;
     private TableEditor rpdoTableActionsEditor;
-
     private Composite rpdoActionsbuttonGroup;
     private Button rpdoActionsUpButton;
     private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
     private ISelectionChangedListener rpdoNodeComboSelectionChangeListener;
+
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
+
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
+
     private SelectionListener rpdoClearAllMappingBtnSelectionListener;
-
     private SelectionListener rpdoActionsClearBtnSelectionListener;
-
     private SelectionListener rpdoActionsDownBtnSelectionListener;
-
     private SelectionListener rpdoActionsUpBtnSelectionListener;
     private Button rpdoBtnCheckButton;
     public boolean rpdoProfileObjectSelection = false;
@@ -2343,36 +2435,38 @@ public class MappingView extends ViewPart {
     private final Image clearImage;
     private final Image upArrowImage;
     private final Image downArrowImage;
+
     private final Image warningImage;
+
     private final Image epsgImage;
+
     private final Image errorImage;
 
     private final Image signedYesImage;
 
     private final Image signedDisableImage;
-
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
-
     /**
      * Summary Page
      */
     private TabItem tbtmPdoConfiguration;
-
     private TableViewer tpdoSummaryTableViewer;
     private TableColumn tpdoSummaryClmnMappingVersion;
     private boolean tpdoSummaryOnlyShowChannelsWithData = false;
     private TableViewer rpdoSummaryTableViewer;
     private TableColumn rpdoSummaryClmnMappingVersion;
+
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
     /**
      * Common application model data
      */
     private final Node emptyNode;
     private final Node selfReceiptNode;
-
     private final PowerlinkObject emptyObject;
+
     private final ArrayList<Node> targetNodeIdList = new ArrayList<>();
+
     /**
      * VerifyListener to update the number of available Mapping object entries
      */
@@ -2416,6 +2510,7 @@ public class MappingView extends ViewPart {
             }
         }
     };
+
     private Text txt_no_nodename;
 
     private Text txt_no_PResTimeOut;
@@ -3237,8 +3332,8 @@ public class MappingView extends ViewPart {
         gd_list.heightHint = 224;
         gd_list.widthHint = 269;
         lst_no_foi.setLayoutData(gd_list);
-        listViewer.setContentProvider(new ForcedObjectContentProvider(nodeObj));
-        listViewer.setLabelProvider(new ForcedObjectLabelProvider(nodeObj));
+        listViewer.setContentProvider(new ForcedObjectContentProvider());
+        listViewer.setLabelProvider(new ForcedObjectLabelProvider());
 
         Label label_7 = new Label(composite_101, SWT.NONE);
         label_7.setText(" ");
@@ -4876,7 +4971,7 @@ public class MappingView extends ViewPart {
         if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
             System.err.println("The chanined....");
             nodeTypeCombo.select(1);
-            ;
+
         } else {
             System.err.println("The normal....");
             nodeTypeCombo.select(0);
@@ -5065,53 +5160,6 @@ public class MappingView extends ViewPart {
         lblPrescaler.setText("Vendor ID:");
         preScalerText.setText(nodeObj.getVendorIdValue());
         preScalerText.setEditable(false);
-    }
-
-    /**
-     * Handles LossofSOCTolerance modifications
-     *
-     * @param value New value for LossOfSoCTolerance
-     */
-    private String handleLossOfSoCTolerance(Object value) {
-        String lossOfSoc = StringUtils.EMPTY;
-        if (value instanceof String) {
-            lossOfSoc = (String) value;
-            if (lossOfSoc.isEmpty()) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY,
-                        nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
-
-            }
-            try {
-                long longValue = Long.decode((String) value);
-                // validate the value
-                Long maxValue = 4294967295L;
-                if ((longValue * 1000) > maxValue) {
-                    PluginErrorDialogUtils.showMessageWindow(
-                            MessageDialog.ERROR,
-                            MessageFormat.format(
-                                    INVALID_RANGE_LOSS_SOC_TOLERANCE,
-                                    nodeObj.getNetworkId(), longValue),
-                            nodeObj.getNetworkId());
-                    return StringUtils.EMPTY;
-                }
-
-            } catch (NumberFormatException e) {
-                e.printStackTrace();
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE,
-                        nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
-
-            }
-
-        } else {
-            System.err.println(
-                    "handleLossOfSoCTolerance: Invalid value type:" + value);
-        }
-
-        return lossOfSoc;
     }
 
     /**
@@ -5330,67 +5378,6 @@ public class MappingView extends ViewPart {
         return presTimeOut;
     }
 
-    /**
-     * Handle NodeId changes in properties
-     *
-     * @param id New Id for the Node
-     * @return Returns a string indicating whether the given value is valid;
-     *         null means invalid, and non-null means valid, with the result
-     *         being the error message to display to the end user.
-     */
-    private String handleSetNodeId(Object id) {
-        String nodeId = StringUtils.EMPTY;
-        if (id instanceof String) {
-            nodeId = (String) id;
-            if (nodeId.isEmpty()) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        "Node ID cannot be empty.", nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
-            }
-            try {
-                short nodeIDvalue = Short.valueOf(((String) id));
-                if (nodeObj.getNodeModel() instanceof TCN) {
-                    if ((nodeIDvalue == 0)
-                            || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
-                        PluginErrorDialogUtils.showMessageWindow(
-                                MessageDialog.ERROR, "Invalid Node ID.",
-                                nodeObj.getNetworkId());
-                        return StringUtils.EMPTY;
-                    }
-                } else if (nodeObj.getNodeModel() instanceof TRMN) {
-                    if ((nodeIDvalue == 0)
-                            || (nodeIDvalue <= IPowerlinkConstants.MN_DEFAULT_NODE_ID)
-                            || ((nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID))) {
-                        PluginErrorDialogUtils.showMessageWindow(
-                                MessageDialog.ERROR, "Invalid Node ID.",
-                                nodeObj.getNetworkId());
-                        return StringUtils.EMPTY;
-                    }
-                }
-
-                if (nodeIDvalue == nodeObj.getCnNodeIdValue()) {
-                    return StringUtils.EMPTY;
-                }
-
-                boolean nodeIdAvailable = nodeObj.getPowerlinkRootNode()
-                        .isNodeIdAlreadyAvailable(nodeIDvalue);
-                if (nodeIdAvailable) {
-                    PluginErrorDialogUtils.showMessageWindow(
-                            MessageDialog.ERROR,
-                            "Node with id " + nodeIDvalue + " already exists.",
-                            nodeObj.getNetworkId());
-                    return StringUtils.EMPTY;
-                }
-            } catch (NumberFormatException ex) {
-                ex.printStackTrace();
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        "Invalid Node ID.", nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
-            }
-        }
-        return nodeId;
-    }
-
     protected String handleSetNodeName(Object name) {
         String nodeName = StringUtils.EMPTY;
         if (name instanceof String) {
@@ -5469,20 +5456,6 @@ public class MappingView extends ViewPart {
             default:
                 break;
         }
-    }
-
-    private String handletransmitPres(Object value) {
-        String transmitPres = StringUtils.EMPTY;
-        if (value instanceof String) {
-            transmitPres = (String) value;
-
-            if (transmitPres.equalsIgnoreCase("0")) {
-                transmitPres = "Yes";
-            } else {
-                transmitPres = "No";
-            }
-        }
-        return transmitPres;
     }
 
     /**

@@ -88,12 +88,12 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
     /**
      * Path name text box.
      */
-    private Combo txtName;
+    private Combo txtName = null;
 
     /**
      * Path location text box.
      */
-    private Text txtLocation;
+    private Text txtLocation = null;
 
     /**
      * Dialog dirty flag.

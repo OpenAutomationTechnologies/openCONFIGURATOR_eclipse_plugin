@@ -611,8 +611,7 @@ public class AddControlledNodeWizardPage extends WizardPage {
 
         // The value of nameValid,nodeIdAlreadyAvailable,nodeIdValid is not true
         // for all cases.
-        boolean pageComplete = (super.isPageComplete() && nodeIdValid
-                && !nodeIdAlreadyAvailable && nameValid);
+        boolean pageComplete = (super.isPageComplete());
 
         if (pageComplete) {
             updateCnModel();

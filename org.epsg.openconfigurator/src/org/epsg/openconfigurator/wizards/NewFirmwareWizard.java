@@ -155,8 +155,6 @@ public class NewFirmwareWizard extends Wizard {
 
     @Override
     public boolean canFinish() {
-        @SuppressWarnings("unused")
-        boolean isPageComplete = validateFirmwarePage.isPageComplete();
 
         if (!validateFirmwarePage.isPageComplete()) {
             return false;
@@ -403,7 +401,8 @@ public class NewFirmwareWizard extends Wizard {
                     for (FirmwareManager fwMngr : node
                             .getNodeFirmwareCollection().keySet()) {
                         if (fwMngr.getFirmwareUri() != null) {
-                            File firmwareDirectory = new File(fwMngr.getFirmwareUri());
+                            File firmwareDirectory = new File(
+                                    fwMngr.getFirmwareUri());
                             firmwareFileList.add(firmwareDirectory.getName());
                         }
                     }
@@ -414,7 +413,8 @@ public class NewFirmwareWizard extends Wizard {
                     for (FirmwareManager fwMngr : module
                             .getModuleFirmwareCollection().keySet()) {
                         if (fwMngr.getFirmwareUri() != null) {
-                            File firmwareDirectory = new File(fwMngr.getFirmwareUri());
+                            File firmwareDirectory = new File(
+                                    fwMngr.getFirmwareUri());
                             firmwareFileList.add(firmwareDirectory.getName());
                         }
                     }

@@ -628,8 +628,7 @@ public class ValidateXddWizardPage extends WizardPage {
         }
 
         // The value of nodeConfigurationValid is not true in all cases.
-        boolean pageComplete = (super.isPageComplete())
-                && nodeConfigurationValid;
+        boolean pageComplete = (super.isPageComplete());
 
         if (checkXddModel()) {
             pageComplete = true;

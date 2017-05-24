@@ -1040,16 +1040,8 @@ public class IndustrialNetworkView extends ViewPart
                 String name = copyNodeWizard.getNodeName();
                 int stationTypeChanged = copyNodeWizard
                         .getStationTypeIndex(copyNodeWizard.getStationType());
-                try {
-                    nodeToBeCopied.copyNode(nodeId, stationTypeChanged, name);
 
-                } catch (JDOMException | InterruptedException exce) {
-                    // TODO Auto-generated catch block
-                    exce.printStackTrace();
-                } catch (IOException exc) {
-                    // TODO Auto-generated catch block
-                    exc.printStackTrace();
-                }
+                nodeToBeCopied.copyNode(nodeId, stationTypeChanged, name);
 
                 handleRefresh();
 
@@ -1422,26 +1414,16 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
 
-            List<TPath> pathList = pathSett.getPath();
-            TPath pathConfig = null;
-            for (TPath path : pathList) {
-                if (path.isActive()) {
-                    pathConfig = path;
+            if (pathSett != null) {
+                List<TPath> pathList = pathSett.getPath();
+                TPath pathConfig = null;
+                for (TPath path : pathList) {
+                    if (path.isActive()) {
+                        pathConfig = path;
+                    }
                 }
-            }
 
-            if (pathConfig == null) {
-                TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
-                        pathSett,
-                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
-                if (defaultPath != null) {
-                    return new Path(defaultPath.getPath(), true);
-                }
-            }
-
-            if (pathConfig != null) {
-                if (pathConfig.getId().equalsIgnoreCase(
-                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                if (pathConfig == null) {
                     TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
                             pathSett,
                             OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
@@ -1449,32 +1431,44 @@ public class IndustrialNetworkView extends ViewPart
                         return new Path(defaultPath.getPath(), true);
                     }
                 }
-            }
 
-            String activeOutputPathID = StringUtils.EMPTY;
-            if (pathConfig != null) {
-                activeOutputPathID = pathConfig.getId();
-            }
-            if (activeOutputPathID.isEmpty()) {
-                if (!pathSett.getPath().isEmpty()) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils.getTPath(
-                            pathSett,
-                            OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
-                    if (defaultPath != null) {
-                        return new Path(defaultPath.getPath(), true);
-                    }
-                }
-            } else {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, activeOutputPathID);
-                if (defaultPath != null) {
-                    if (!defaultPath.getId().equalsIgnoreCase(
+                if (pathConfig != null) {
+                    if (pathConfig.getId().equalsIgnoreCase(
                             OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
-                        return new Path(defaultPath.getPath(), false);
+                        TPath defaultPath = OpenConfiguratorProjectUtils
+                                .getTPath(pathSett,
+                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+                        if (defaultPath != null) {
+                            return new Path(defaultPath.getPath(), true);
+                        }
+                    }
+                }
+
+                String activeOutputPathID = StringUtils.EMPTY;
+                if (pathConfig != null) {
+                    activeOutputPathID = pathConfig.getId();
+                }
+                if (activeOutputPathID.isEmpty()) {
+                    if (!pathSett.getPath().isEmpty()) {
+                        TPath defaultPath = OpenConfiguratorProjectUtils
+                                .getTPath(pathSett,
+                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+                        if (defaultPath != null) {
+                            return new Path(defaultPath.getPath(), true);
+                        }
                     }
                 } else {
-                    System.err.println(
-                            "Unhandled error occurred. activeOutputPath not found");
+                    TPath defaultPath = OpenConfiguratorProjectUtils
+                            .getTPath(pathSett, activeOutputPathID);
+                    if (defaultPath != null) {
+                        if (!defaultPath.getId().equalsIgnoreCase(
+                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID)) {
+                            return new Path(defaultPath.getPath(), false);
+                        }
+                    } else {
+                        System.err.println(
+                                "Unhandled error occurred. activeOutputPath not found");
+                    }
                 }
             }
             return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
@@ -2172,16 +2166,7 @@ public class IndustrialNetworkView extends ViewPart
                                 .getStationTypeIndex(
                                         copyNodeWizard.getStationType());
 
-                        try {
-                            node.copyNode(nodeId, stationTypeChanged, name);
-
-                        } catch (JDOMException | InterruptedException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        } catch (IOException e) {
-                            // TODO Auto-generated catch block
-                            e.printStackTrace();
-                        }
+                        node.copyNode(nodeId, stationTypeChanged, name);
 
                         handleRefresh();
                     }

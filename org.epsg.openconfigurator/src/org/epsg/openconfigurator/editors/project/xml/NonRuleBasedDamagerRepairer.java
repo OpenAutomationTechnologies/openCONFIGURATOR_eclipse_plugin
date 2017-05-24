@@ -54,7 +54,7 @@ public class NonRuleBasedDamagerRepairer
         implements IPresentationDamager, IPresentationRepairer {
 
     /** The document this object works on */
-    protected IDocument fDocument;
+    protected IDocument fDocument = null;
 
     /**
      * The default text attribute if non is returned as data by the current

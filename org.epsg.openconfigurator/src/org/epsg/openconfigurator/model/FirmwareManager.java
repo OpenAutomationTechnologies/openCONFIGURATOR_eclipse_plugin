@@ -81,7 +81,6 @@ public class FirmwareManager {
 
     private List<Integer> firmwarefileVerList = new ArrayList<>();
 
-    private int firmwarefileVersion;
     private Object nodeOrModuleObject;
 
     public FirmwareManager() {
@@ -144,7 +143,6 @@ public class FirmwareManager {
             }
 
             this.firmwareObjModel = firmwareObjModel;
-            firmwarefileVersion = firmwareXddModel.getVer().intValue();
             firmwareList.add(firmwareObjModel);
         } else {
             System.err.println("The firmware XDD model is empty!");
@@ -229,6 +227,13 @@ public class FirmwareManager {
      */
     public Firmware getFirmwareObjModel() {
         return firmwareObjModel;
+    }
+
+    /**
+     * @return The path of firmware file attached to node or module.
+     */
+    public String getFirmwareUri() {
+        return firmwareObjModel.getURI();
     }
 
     public org.epsg.openconfigurator.xmlbinding.firmware.Firmware getFirmwareXddModel() {
@@ -328,13 +333,6 @@ public class FirmwareManager {
      */
     public IFile getProjectXml() {
         return projectXml;
-    }
-
-    /**
-     * @return The path of firmware file attached to node or module.
-     */
-    public String getFirmwareUri() {
-        return firmwareObjModel.getURI();
     }
 
     /**

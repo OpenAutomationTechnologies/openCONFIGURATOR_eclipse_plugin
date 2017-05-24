@@ -354,7 +354,7 @@ public final class OpenConfiguratorProjectUtils {
 
     public static void copyModuleConfigurationFile(Module selectedModule,
             Module newModule) throws IOException, NullPointerException {
-        boolean isModuleConfigurationFileImport = false;
+
         java.nio.file.Path nodeXdcFile = new File(
                 selectedModule.getNode().getAbsolutePathToXdc()).toPath();
         java.nio.file.Path moduleXdcFile = new File(
@@ -369,7 +369,6 @@ public final class OpenConfiguratorProjectUtils {
 
         java.nio.file.Path projectRootPath = newModule.getProject()
                 .getLocation().toFile().toPath();
-        String targetImportPath = StringUtils.EMPTY;
 
         String extensionXdd = StringUtils.EMPTY;
         if (nodeXdcFile != null) {
@@ -1197,7 +1196,7 @@ public final class OpenConfiguratorProjectUtils {
             String firmwareHeaderLines = StringUtils.EMPTY;
             String firmwareline = StringUtils.EMPTY;
             while ((firmwareHeaderLines = bufferedRdr.readLine()) != null) {
-                firmwareline += firmwareHeaderLines.concat("\n");
+                firmwareline.concat(firmwareHeaderLines.concat("\n"));
             }
             int firmwareEndIndex = firmwareline.indexOf(">");
             // Removes the header of firmware file.

@@ -138,7 +138,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final String NO_LISTENERS_REGISTERED_ERROR = "New widget has registered but not handled.";
     private static final String ERROR_MESSAGE = "{0} generation of all the works.";
     private static final String ERROR_INITIALISATION_FAILED = "Error initializing the project configuration data";
-    private static final String ERROR_NO_PATH_AVAILABLE = "No path is available to set.";
     private static final String FORM_EDITOR_PAGE_TITLE = "POWERLINK Project";
 
     /**
@@ -837,7 +836,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                             .getSelectedTPathIndex();
                     List<PathSettings> pathSettingsList = currentProject
                             .getProjectConfiguration().getPathSettings();
-                    boolean pathsettingsNotAvailable = false;
                     for (PathSettings setPath : pathSettingsList) {
                         if (setPath != null) {
                             if (setPath.getId() != null) {
@@ -845,7 +843,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                         OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                                     setPath.getPath().remove(itemToDelete);
                                     if (setPath.getPath().isEmpty()) {
-                                        pathsettingsNotAvailable = true;
                                         pathSettingsList.remove(setPath);
                                     }
                                     break;
