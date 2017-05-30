@@ -83,6 +83,9 @@ import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
@@ -398,8 +401,7 @@ public class MappingView extends ViewPart {
      * @author Sree Hari Vignesh B
      *
      */
-    private static class ForcedObjectLabelProvider extends LabelProvider
-            implements IColorProvider {
+    private static class ForcedObjectLabelProvider extends LabelProvider {
 
         Image objectIcon;
         Image subObjectIcon;
@@ -421,18 +423,7 @@ public class MappingView extends ViewPart {
         }
 
         @Override
-        public Color getBackground(Object element) {
-            return null;
-        }
-
-        @Override
-        public Color getForeground(Object element) {
-            return null;
-        }
-
-        @Override
         public Image getImage(Object obj) {
-            System.err.println("Image object element.." + obj);
             if (obj instanceof String) {
                 String objIndex = (String) obj;
                 if (!objIndex.isEmpty()) {
@@ -441,6 +432,18 @@ public class MappingView extends ViewPart {
                     }
                     return objectIcon;
                 }
+            }
+            return null;
+        }
+
+        @Override
+        public String getText(Object element) {
+            if (element instanceof String) {
+                String objIndex = (String) element;
+                if (objIndex.isEmpty()) {
+                    return "No forced objects.";
+                }
+                return objIndex;
             }
             return null;
         }
@@ -3282,290 +3285,303 @@ public class MappingView extends ViewPart {
         composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
 
         final TabFolder tabFolder = new TabFolder(composite_2, SWT.NONE);
-
-        TabItem tbtmNodeOverview = new TabItem(tabFolder, SWT.NONE);
-        tbtmNodeOverview.setText("Node Overview");
-        Composite composite_1 = new Composite(tabFolder, SWT.NONE);
-        composite_1.setLayout(new GridLayout(2, true));
-        composite_1.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        composite_1.setRedraw(true);
-        tbtmNodeOverview.setControl(composite_1);
         GridData gd_sctnCnFeatures = new GridData(SWT.FILL, SWT.FILL, true,
                 true, 1, 1);
         gd_sctnCnFeatures.widthHint = 341;
 
-        Section generalInformation = formToolkit.createSection(composite_1,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
-                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
-        formToolkit.paintBordersFor(generalInformation);
-        generalInformation.setText("General Information");
-        generalInformation
-                .setDescription("Provides the basic properties for the node.");
-
-        generalInformation.setExpanded(true);
-        GridData gd_sctnAdvancedConfiguration = new GridData(SWT.FILL, SWT.FILL,
-                true, true, 1, 1);
-        gd_sctnAdvancedConfiguration.heightHint = 141;
-        gd_sctnAdvancedConfiguration.widthHint = 268;
-        generalInformation.setLayoutData(gd_sctnAdvancedConfiguration);
-        generalInformation.setRedraw(true);
-
-        Composite composite_10 = formToolkit.createComposite(generalInformation,
-                SWT.WRAP);
-        GridLayout layout_adt = new GridLayout(2, false);
-        layout_adt.marginWidth = 2;
-        layout_adt.marginHeight = 2;
-        formToolkit.adapt(composite_10);
-        formToolkit.paintBordersFor(composite_10);
-        generalInformation.setClient(composite_10);
-        composite_10.setLayout(layout_adt);
-
-        Label lblNodeName = new Label(composite_10, SWT.NONE);
-        lblNodeName.setText("Node Name:");
-        formToolkit.adapt(lblNodeName, true, true);
-        lblNodeName.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        txt_no_nodename = new Text(composite_10, SWT.BORDER);
-        txt_no_nodename.setEditable(true);
-        txt_no_nodename.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(txt_no_nodename, true, true);
-
-        Label lblNodeId = new Label(composite_10, SWT.NONE);
-        lblNodeId.setText("Node ID:");
-        formToolkit.adapt(lblNodeId, true, true);
-        lblNodeId.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-        nodeId = new Text(composite_10, SWT.BORDER);
-        nodeId.setEditable(true);
-        nodeId.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(nodeId, true, true);
-
-        lblNodeType = new Label(composite_10, SWT.NONE);
-        GridData gd_lblNodeType = new GridData(SWT.LEFT, SWT.CENTER, false,
-                false, 1, 1);
-        gd_lblNodeType.widthHint = 78;
-        lblNodeType.setLayoutData(gd_lblNodeType);
-        lblNodeType.setText("Transmit PRes:");
-
-        formToolkit.adapt(lblNodeType, true, true);
-        lblNodeType.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        nodeTypeCombo = new Combo(composite_10, SWT.NONE);
-
-        nodeTypeCombo.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(nodeTypeCombo);
-        formToolkit.paintBordersFor(nodeTypeCombo);
-
-        lblPResTimeout = new Label(composite_10, SWT.NONE);
-        GridData gd_lblPResTimeout = new GridData(SWT.LEFT, SWT.CENTER, false,
-                false, 1, 1);
-        gd_lblPResTimeout.widthHint = 104;
-        lblPResTimeout.setLayoutData(gd_lblPResTimeout);
-        lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
-
-        formToolkit.adapt(lblPResTimeout, true, true);
-        lblPResTimeout.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        txt_no_PResTimeOut = new Text(composite_10, SWT.BORDER);
-        txt_no_PResTimeOut.setEditable(true);
-        txt_no_PResTimeOut.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(txt_no_PResTimeOut, true, true);
-
-        Composite composite_6 = new Composite(composite_1, SWT.NONE);
-        GridData gd_composite_6 = new GridData(SWT.LEFT, SWT.CENTER, false,
-                false, 1, 1);
-        gd_composite_6.widthHint = 318;
-        composite_6.setLayoutData(gd_composite_6);
-        formToolkit.adapt(composite_6);
-        formToolkit.paintBordersFor(composite_6);
-
-        CLabel label = new CLabel(composite_6, SWT.NONE);
-        label.setBounds(48, 0, 225, 143);
-        formToolkit.adapt(label);
-        formToolkit.paintBordersFor(label);
-
-        label.setImage(epsgImage);
-
-        Section forcedobjectSection = formToolkit.createSection(composite_1,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
-                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
-        forcedobjectSection.setDescription(
-                "Lists the index of forced objects and sub-objects.");
-        formToolkit.paintBordersFor(forcedobjectSection);
-        forcedobjectSection.setText("Forced Objects");
-        forcedobjectSection.setExpanded(true);
-        GridData gdData_sctnAdvancedConfiguration = new GridData(SWT.FILL,
-                SWT.FILL, true, true, 1, 1);
-        gdData_sctnAdvancedConfiguration.heightHint = 222;
-        gdData_sctnAdvancedConfiguration.widthHint = 332;
-        forcedobjectSection.setLayoutData(gdData_sctnAdvancedConfiguration);
-        forcedobjectSection.setRedraw(true);
-
-        Composite composite_101 = formToolkit
-                .createComposite(forcedobjectSection, SWT.WRAP);
-        GridLayout layout_ad = new GridLayout(2, false);
-        layout_ad.marginWidth = 2;
-        layout_ad.marginHeight = 2;
-        formToolkit.adapt(composite_101);
-        formToolkit.paintBordersFor(composite_101);
-        forcedobjectSection.setClient(composite_101);
-        composite_101.setLayout(layout_ad);
-
-        listViewer = new TreeViewer(composite_101, SWT.BORDER | SWT.V_SCROLL);
-        lst_no_foi = listViewer.getTree();
-        GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, false, false, 1,
-                1);
-        gd_list.heightHint = 224;
-        gd_list.widthHint = 269;
-        lst_no_foi.setLayoutData(gd_list);
-        listViewer.setContentProvider(new ForcedObjectContentProvider());
-        listViewer.setLabelProvider(new ForcedObjectLabelProvider());
-
-        Label label_7 = new Label(composite_101, SWT.NONE);
-        label_7.setText(" ");
-        formToolkit.adapt(label_7, true, true);
-
-        Section advancedInfoSection = formToolkit.createSection(composite_1,
-                ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
-                        | Section.DESCRIPTION | ExpandableComposite.TITLE_BAR);
-        formToolkit.paintBordersFor(advancedInfoSection);
-        advancedInfoSection.setText("Advanced Information");
-        advancedInfoSection.setDescription(
-                "Provides the advanced properties for the node.");
-        advancedInfoSection.setExpanded(true);
-        GridData gdData_sctnforcedObjConfiguration = new GridData(SWT.FILL,
-                SWT.FILL, true, true, 1, 1);
-        gdData_sctnforcedObjConfiguration.heightHint = 270;
-        gdData_sctnforcedObjConfiguration.widthHint = 332;
-        advancedInfoSection.setLayoutData(gdData_sctnforcedObjConfiguration);
-        advancedInfoSection.setRedraw(true);
-
-        Composite composite_102 = formToolkit
-                .createComposite(advancedInfoSection, SWT.WRAP);
-        GridLayout layout = new GridLayout(2, false);
-        layout.marginWidth = 2;
-        layout.marginHeight = 2;
-        composite_102.setLayout(layout);
-        formToolkit.adapt(composite_102);
-        formToolkit.paintBordersFor(composite_102);
-        advancedInfoSection.setClient(composite_102);
-
-        lblLossOfSoc = new Label(composite_102, SWT.NONE);
-        GridData gd_lblProductName = new GridData(SWT.LEFT, SWT.CENTER, false,
-                false, 1, 1);
-        gd_lblProductName.heightHint = 15;
-        lblLossOfSoc.setLayoutData(gd_lblProductName);
-        lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
-        formToolkit.adapt(lblLossOfSoc, true, true);
-        lblLossOfSoc.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        lossOfSocTolText = new Text(composite_102, SWT.BORDER);
-        lossOfSocTolText.setEditable(true);
-        lossOfSocTolText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
-        formToolkit.adapt(lossOfSocTolText, true, true);
-
-        lblAsymcMtu = new Label(composite_102, SWT.NONE);
-        lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
-        formToolkit.adapt(lblAsymcMtu, true, true);
-        lblAsymcMtu.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        asyncMtuText = new Text(composite_102, SWT.BORDER);
-        asyncMtuText.setEditable(true);
-        asyncMtuText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(asyncMtuText, true, true);
-
-        lblAsyncTimeOut = new Label(composite_102, SWT.NONE);
-        lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
-        formToolkit.adapt(lblAsyncTimeOut, true, true);
-        lblAsyncTimeOut.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        asyncTimeOutTxt = new Text(composite_102, SWT.BORDER);
-        asyncTimeOutTxt.setEditable(true);
-        asyncTimeOutTxt.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(asyncTimeOutTxt, true, true);
-
-        lblPrescaler = new Label(composite_102, SWT.NONE);
-        lblPrescaler.setText("Prescaler:");
-        formToolkit.adapt(lblPrescaler, true, true);
-        lblPrescaler.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        preScalerText = new Text(composite_102, SWT.BORDER);
-        preScalerText.setEditable(true);
-        preScalerText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(preScalerText, true, true);
-
-        productNameLabel = new Label(composite_102, SWT.NONE);
-        productNameLabel.setText("Product Name:");
-        formToolkit.adapt(productNameLabel, true, true);
-        productNameLabel.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        productNameText = new Text(composite_102, SWT.BORDER);
-        productNameText.setEditable(false);
-        productNameText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(productNameText, true, true);
-        productNameText.setEditable(false);
-
-        productIdLabel = new Label(composite_102, SWT.NONE);
-        productIdLabel.setText("Product ID:");
-        formToolkit.adapt(productIdLabel, true, true);
-        productIdLabel.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        productIdText = new Text(composite_102, SWT.BORDER);
-        productIdText.setEditable(false);
-        productIdText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(productIdText, true, true);
-        productIdText.setEditable(false);
-
-        vendorNamelabel = new Label(composite_102, SWT.NONE);
-        vendorNamelabel.setText("Vendor Name:");
-        formToolkit.adapt(vendorNamelabel, true, true);
-        vendorNamelabel.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        vendorNameText = new Text(composite_102, SWT.BORDER);
-        vendorNameText.setEditable(false);
-        vendorNameText.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(vendorNameText, true, true);
-        vendorNameText.setEditable(false);
-
-        vendorIdLabel = new Label(composite_102, SWT.NONE);
-        GridData gd_vendorIdLabel = new GridData(SWT.LEFT, SWT.CENTER, false,
-                false, 1, 1);
-        gd_vendorIdLabel.widthHint = 55;
-        vendorIdLabel.setLayoutData(gd_vendorIdLabel);
-        vendorIdLabel.setText("Vendor ID:");
-        formToolkit.adapt(vendorIdLabel, true, true);
-        vendorIdLabel.setForeground(
-                formToolkit.getColors().getColor(IFormColors.TITLE));
-
-        vendorIdtext = new Text(composite_102, SWT.BORDER);
-        vendorIdtext.setEditable(false);
-        vendorIdtext.setLayoutData(
-                new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
-        formToolkit.adapt(vendorIdtext, true, true);
-        vendorIdtext.setEditable(false);
-
         {
+
+            TabItem tabItem = new TabItem(tabFolder, SWT.NONE);
+            tabItem.setText("Node Overview");
+            Composite composite_1 = new Composite(tabFolder, SWT.NONE);
+            tabItem.setControl(composite_1);
+            composite_1.setLayout(new GridLayout(2, true));
+            composite_1.setLayoutData(
+                    new GridData(SWT.FILL, SWT.TOP, true, false));
+            composite_1.setRedraw(true);
+
+            Section generalInformation = formToolkit.createSection(composite_1,
+                    ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                            | Section.DESCRIPTION
+                            | ExpandableComposite.TITLE_BAR);
+            formToolkit.paintBordersFor(generalInformation);
+            generalInformation.setText("General Information");
+            generalInformation.setDescription(
+                    "Provides the basic properties for the node.");
+
+            generalInformation.setExpanded(true);
+            GridData gd_sctnAdvancedConfiguration = new GridData(SWT.FILL,
+                    SWT.FILL, true, true, 1, 1);
+            gd_sctnAdvancedConfiguration.heightHint = 141;
+            gd_sctnAdvancedConfiguration.widthHint = 268;
+            generalInformation.setLayoutData(gd_sctnAdvancedConfiguration);
+            generalInformation.setRedraw(true);
+
+            Composite composite_10 = formToolkit
+                    .createComposite(generalInformation, SWT.WRAP);
+            GridLayout layout_adt = new GridLayout(2, false);
+            layout_adt.marginWidth = 2;
+            layout_adt.marginHeight = 2;
+            formToolkit.adapt(composite_10);
+            formToolkit.paintBordersFor(composite_10);
+            generalInformation.setClient(composite_10);
+            composite_10.setLayout(layout_adt);
+
+            Label lblNodeName = new Label(composite_10, SWT.NONE);
+            lblNodeName.setText("Node Name:");
+            formToolkit.adapt(lblNodeName, true, true);
+            lblNodeName.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            txt_no_nodename = new Text(composite_10, SWT.BORDER);
+            txt_no_nodename.setEditable(true);
+            txt_no_nodename.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(txt_no_nodename, true, true);
+
+            Label lblNodeId = new Label(composite_10, SWT.NONE);
+            lblNodeId.setText("Node ID:");
+            formToolkit.adapt(lblNodeId, true, true);
+            lblNodeId.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+            nodeId = new Text(composite_10, SWT.BORDER);
+            nodeId.setEditable(true);
+            nodeId.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(nodeId, true, true);
+
+            lblNodeType = new Label(composite_10, SWT.NONE);
+            GridData gd_lblNodeType = new GridData(SWT.LEFT, SWT.CENTER, false,
+                    false, 1, 1);
+            gd_lblNodeType.widthHint = 78;
+            lblNodeType.setLayoutData(gd_lblNodeType);
+            lblNodeType.setText("Transmit PRes:");
+
+            formToolkit.adapt(lblNodeType, true, true);
+            lblNodeType.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            nodeTypeCombo = new Combo(composite_10, SWT.NONE);
+
+            nodeTypeCombo.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(nodeTypeCombo);
+            formToolkit.paintBordersFor(nodeTypeCombo);
+
+            lblPResTimeout = new Label(composite_10, SWT.NONE);
+            GridData gd_lblPResTimeout = new GridData(SWT.LEFT, SWT.CENTER,
+                    false, false, 1, 1);
+            gd_lblPResTimeout.widthHint = 104;
+            lblPResTimeout.setLayoutData(gd_lblPResTimeout);
+            lblPResTimeout.setText("Cycle Time (" + "\u00B5" + "s):");
+
+            formToolkit.adapt(lblPResTimeout, true, true);
+            lblPResTimeout.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            txt_no_PResTimeOut = new Text(composite_10, SWT.BORDER);
+            txt_no_PResTimeOut.setEditable(true);
+            txt_no_PResTimeOut.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(txt_no_PResTimeOut, true, true);
+
+            Composite composite_6 = new Composite(composite_1, SWT.NONE);
+            composite_6.setLayout(new FormLayout());
+            GridData gd_composite_6 = new GridData(SWT.LEFT, SWT.CENTER, false,
+                    false, 1, 1);
+            gd_composite_6.heightHint = 134;
+            gd_composite_6.widthHint = 463;
+            composite_6.setLayoutData(gd_composite_6);
+            formToolkit.adapt(composite_6);
+            formToolkit.paintBordersFor(composite_6);
+
+            CLabel label = new CLabel(composite_6, SWT.NONE);
+            FormData fd_label = new FormData();
+            fd_label.top = new FormAttachment(0);
+            fd_label.right = new FormAttachment(100, -59);
+            fd_label.bottom = new FormAttachment(100, -12);
+            fd_label.left = new FormAttachment(0, 98);
+            label.setLayoutData(fd_label);
+            formToolkit.adapt(label);
+            formToolkit.paintBordersFor(label);
+
+            label.setImage(epsgImage);
+
+            Section forcedobjectSection = formToolkit.createSection(composite_1,
+                    ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                            | Section.DESCRIPTION
+                            | ExpandableComposite.TITLE_BAR);
+            forcedobjectSection.setDescription(
+                    "Lists the forced objects and sub-objects.");
+            formToolkit.paintBordersFor(forcedobjectSection);
+            forcedobjectSection.setText("Forced Objects");
+            forcedobjectSection.setExpanded(true);
+            GridData gdData_sctnAdvancedConfiguration = new GridData(SWT.FILL,
+                    SWT.FILL, true, true, 1, 1);
+            gdData_sctnAdvancedConfiguration.heightHint = 222;
+            gdData_sctnAdvancedConfiguration.widthHint = 332;
+            forcedobjectSection.setLayoutData(gdData_sctnAdvancedConfiguration);
+            forcedobjectSection.setRedraw(true);
+
+            Composite composite_101 = formToolkit
+                    .createComposite(forcedobjectSection, SWT.WRAP);
+            GridLayout layout_ad = new GridLayout(2, false);
+            layout_ad.marginWidth = 2;
+            layout_ad.marginHeight = 2;
+            formToolkit.adapt(composite_101);
+            formToolkit.paintBordersFor(composite_101);
+            forcedobjectSection.setClient(composite_101);
+            composite_101.setLayout(layout_ad);
+
+            listViewer = new TreeViewer(composite_101,
+                    SWT.BORDER | SWT.V_SCROLL);
+            lst_no_foi = listViewer.getTree();
+            GridData gd_list = new GridData(SWT.LEFT, SWT.CENTER, false, false,
+                    1, 1);
+            gd_list.heightHint = 180;
+            gd_list.widthHint = 426;
+            lst_no_foi.setLayoutData(gd_list);
+            listViewer.setContentProvider(new ForcedObjectContentProvider());
+            listViewer.setLabelProvider(new ForcedObjectLabelProvider());
+
+            Label label_7 = new Label(composite_101, SWT.NONE);
+            label_7.setText(" ");
+            formToolkit.adapt(label_7, true, true);
+
+            Section advancedInfoSection = formToolkit.createSection(composite_1,
+                    ExpandableComposite.TWISTIE | ExpandableComposite.TITLE_BAR
+                            | Section.DESCRIPTION
+                            | ExpandableComposite.TITLE_BAR);
+            formToolkit.paintBordersFor(advancedInfoSection);
+            advancedInfoSection.setText("Advanced Information");
+            advancedInfoSection.setDescription(
+                    "Provides the advanced properties for the node.");
+            advancedInfoSection.setExpanded(true);
+            GridData gdData_sctnforcedObjConfiguration = new GridData(SWT.FILL,
+                    SWT.FILL, true, true, 1, 1);
+            gdData_sctnforcedObjConfiguration.heightHint = 270;
+            gdData_sctnforcedObjConfiguration.widthHint = 332;
+            advancedInfoSection
+                    .setLayoutData(gdData_sctnforcedObjConfiguration);
+            advancedInfoSection.setRedraw(true);
+
+            Composite composite_102 = formToolkit
+                    .createComposite(advancedInfoSection, SWT.WRAP);
+            GridLayout layout = new GridLayout(2, false);
+            layout.marginWidth = 2;
+            layout.marginHeight = 2;
+            composite_102.setLayout(layout);
+            formToolkit.adapt(composite_102);
+            formToolkit.paintBordersFor(composite_102);
+            advancedInfoSection.setClient(composite_102);
+
+            productNameLabel = new Label(composite_102, SWT.NONE);
+            productNameLabel.setText("Product Name:");
+            formToolkit.adapt(productNameLabel, true, true);
+            productNameLabel.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            productNameText = new Text(composite_102, SWT.BORDER);
+            productNameText.setEditable(false);
+            productNameText.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(productNameText, true, true);
+            productNameText.setEditable(false);
+
+            productIdLabel = new Label(composite_102, SWT.NONE);
+            productIdLabel.setText("Product ID:");
+            formToolkit.adapt(productIdLabel, true, true);
+            productIdLabel.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            productIdText = new Text(composite_102, SWT.BORDER);
+            productIdText.setEditable(false);
+            productIdText.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(productIdText, true, true);
+            productIdText.setEditable(false);
+
+            vendorNamelabel = new Label(composite_102, SWT.NONE);
+            vendorNamelabel.setText("Vendor Name:");
+            formToolkit.adapt(vendorNamelabel, true, true);
+            vendorNamelabel.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            vendorNameText = new Text(composite_102, SWT.BORDER);
+            vendorNameText.setEditable(false);
+            vendorNameText.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(vendorNameText, true, true);
+            vendorNameText.setEditable(false);
+
+            vendorIdLabel = new Label(composite_102, SWT.NONE);
+            GridData gd_vendorIdLabel = new GridData(SWT.LEFT, SWT.CENTER,
+                    false, false, 1, 1);
+            gd_vendorIdLabel.widthHint = 55;
+            vendorIdLabel.setLayoutData(gd_vendorIdLabel);
+            vendorIdLabel.setText("Vendor ID:");
+            formToolkit.adapt(vendorIdLabel, true, true);
+            vendorIdLabel.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            vendorIdtext = new Text(composite_102, SWT.BORDER);
+            vendorIdtext.setEditable(false);
+            vendorIdtext.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(vendorIdtext, true, true);
+            vendorIdtext.setEditable(false);
+
+            lblLossOfSoc = new Label(composite_102, SWT.NONE);
+            GridData gd_lblProductName = new GridData(SWT.LEFT, SWT.CENTER,
+                    false, false, 1, 1);
+            gd_lblProductName.heightHint = 15;
+            lblLossOfSoc.setLayoutData(gd_lblProductName);
+            lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
+            formToolkit.adapt(lblLossOfSoc, true, true);
+            lblLossOfSoc.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            lossOfSocTolText = new Text(composite_102, SWT.BORDER);
+            lossOfSocTolText.setEditable(true);
+            lossOfSocTolText.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
+            formToolkit.adapt(lossOfSocTolText, true, true);
+
+            lblAsymcMtu = new Label(composite_102, SWT.NONE);
+            lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
+            formToolkit.adapt(lblAsymcMtu, true, true);
+            lblAsymcMtu.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            asyncMtuText = new Text(composite_102, SWT.BORDER);
+            asyncMtuText.setEditable(true);
+            asyncMtuText.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(asyncMtuText, true, true);
+
+            lblAsyncTimeOut = new Label(composite_102, SWT.NONE);
+            lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
+            formToolkit.adapt(lblAsyncTimeOut, true, true);
+            lblAsyncTimeOut.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            asyncTimeOutTxt = new Text(composite_102, SWT.BORDER);
+            asyncTimeOutTxt.setEditable(true);
+            asyncTimeOutTxt.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(asyncTimeOutTxt, true, true);
+
+            lblPrescaler = new Label(composite_102, SWT.NONE);
+            lblPrescaler.setText("Prescaler:");
+            formToolkit.adapt(lblPrescaler, true, true);
+            lblPrescaler.setForeground(
+                    formToolkit.getColors().getColor(IFormColors.TITLE));
+
+            preScalerText = new Text(composite_102, SWT.BORDER);
+            preScalerText.setEditable(true);
+            preScalerText.setLayoutData(
+                    new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
+            formToolkit.adapt(preScalerText, true, true);
 
             tbtmPdoConfiguration = new TabItem(tabFolder, SWT.NONE);
             tbtmPdoConfiguration.setText(PDO_CONFIGURATION_TAB_TITLE);
@@ -5081,27 +5097,15 @@ public class MappingView extends ViewPart {
         lblNodeType.setText("Node Type:");
         lblNodeType.setForeground(
                 formToolkit.getColors().getColor(IFormColors.TITLE));
-        productNameLabel.setVisible(false);
-        productIdLabel.setVisible(false);
-        vendorNamelabel.setVisible(false);
-        vendorIdLabel.setVisible(false);
-        productNameText.setVisible(false);
-        productIdText.setVisible(false);
-        vendorNameText.setVisible(false);
-        vendorIdtext.setVisible(false);
 
-        lblLossOfSoc.setText("Product Name:");
-        lossOfSocTolText.setText(nodeObj.getProductName());
-        lossOfSocTolText.setEditable(false);
-        lblAsymcMtu.setText("Product ID:");
-        asyncMtuText.setText(nodeObj.getProductCodeValue());
-        asyncMtuText.setEditable(false);
-        lblAsyncTimeOut.setText("Vendor Name:");
-        asyncTimeOutTxt.setText(nodeObj.getVendorName());
-        asyncTimeOutTxt.setEditable(false);
-        lblPrescaler.setText("Vendor ID:");
-        preScalerText.setText(nodeObj.getVendorIdValue());
-        preScalerText.setEditable(false);
+        lblLossOfSoc.setVisible(false);
+        lossOfSocTolText.setVisible(false);
+        lblAsymcMtu.setVisible(false);
+        asyncMtuText.setVisible(false);
+        lblAsyncTimeOut.setVisible(false);
+        asyncTimeOutTxt.setVisible(false);
+        lblPrescaler.setVisible(false);
+        preScalerText.setVisible(false);
 
     }
 
@@ -5137,11 +5141,6 @@ public class MappingView extends ViewPart {
         lblNodeType.setForeground(
                 formToolkit.getColors().getColor(IFormColors.TITLE));
 
-        lblLossOfSoc.setText("Loss of SoC tolerance (" + "\u00B5" + "s):");
-        lblAsymcMtu.setText("Asynchronous MTU size (Bytes):");
-        lblAsyncTimeOut.setText("Async Slot Timeout (ns):");
-        lblPrescaler.setText("Prescaler:");
-
         productNameLabel.setText("Product Name:");
         productNameText.setText(nodeObj.getProductName());
         productIdLabel.setText("Product ID:");
@@ -5151,14 +5150,14 @@ public class MappingView extends ViewPart {
         vendorIdLabel.setText("Vendor ID:");
         vendorIdtext.setText(nodeObj.getVendorIdValue());
 
-        productNameLabel.setVisible(true);
-        productIdLabel.setVisible(true);
-        vendorNamelabel.setVisible(true);
-        vendorIdLabel.setVisible(true);
-        productNameText.setVisible(true);
-        productIdText.setVisible(true);
-        vendorNameText.setVisible(true);
-        vendorIdtext.setVisible(true);
+        lblLossOfSoc.setVisible(true);
+        lossOfSocTolText.setVisible(true);
+        lblAsymcMtu.setVisible(true);
+        asyncMtuText.setVisible(true);
+        lblAsyncTimeOut.setVisible(true);
+        asyncTimeOutTxt.setVisible(true);
+        lblPrescaler.setVisible(true);
+        preScalerText.setVisible(true);
 
         Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
         long valInUs = val / 1000;
@@ -5203,27 +5202,23 @@ public class MappingView extends ViewPart {
         lblPResTimeout.setText("PRes Timeout (" + "\u00B5" + "s):");
         lblNodeType.setText("Node Type:");
 
-        productNameLabel.setVisible(false);
-        productIdLabel.setVisible(false);
-        vendorNamelabel.setVisible(false);
-        vendorIdLabel.setVisible(false);
-        productNameText.setVisible(false);
-        productIdText.setVisible(false);
-        vendorNameText.setVisible(false);
-        vendorIdtext.setVisible(false);
+        lblLossOfSoc.setVisible(false);
+        lossOfSocTolText.setVisible(false);
+        lblAsymcMtu.setVisible(false);
+        asyncMtuText.setVisible(false);
+        lblAsyncTimeOut.setVisible(false);
+        asyncTimeOutTxt.setVisible(false);
+        lblPrescaler.setVisible(false);
+        preScalerText.setVisible(false);
 
-        lblLossOfSoc.setText("Product Name:");
-        lossOfSocTolText.setText(moduleObj.getProductName());
-        lossOfSocTolText.setEditable(false);
-        lblAsymcMtu.setText("Product ID:");
-        asyncMtuText.setText(moduleObj.getProductId());
-        asyncMtuText.setEditable(false);
-        lblAsyncTimeOut.setText("Vendor Name:");
-        asyncTimeOutTxt.setText(moduleObj.getVendorName());
-        asyncTimeOutTxt.setEditable(false);
-        lblPrescaler.setText("Vendor ID:");
-        preScalerText.setText(moduleObj.getVendorId());
-        preScalerText.setEditable(false);
+        productNameLabel.setText("Product Name:");
+        productNameText.setText(nodeObj.getProductName());
+        productIdLabel.setText("Product ID:");
+        productIdText.setText(nodeObj.getProductCodeValue());
+        vendorNamelabel.setText("Vendor Name:");
+        vendorNameText.setText(nodeObj.getVendorName());
+        vendorIdLabel.setText("Vendor ID:");
+        vendorIdtext.setText(nodeObj.getVendorIdValue());
 
     }
 
@@ -5236,27 +5231,24 @@ public class MappingView extends ViewPart {
 
         nodeId.setText(String.valueOf(nodeObj2.getCnNodeIdValue()));
 
-        productNameLabel.setVisible(false);
-        productIdLabel.setVisible(false);
-        vendorNamelabel.setVisible(false);
-        vendorIdLabel.setVisible(false);
-        productNameText.setVisible(false);
-        productIdText.setVisible(false);
-        vendorNameText.setVisible(false);
-        vendorIdtext.setVisible(false);
+        lblLossOfSoc.setVisible(false);
+        lossOfSocTolText.setVisible(false);
+        lblAsymcMtu.setVisible(false);
+        asyncMtuText.setVisible(false);
+        lblAsyncTimeOut.setVisible(false);
+        asyncTimeOutTxt.setVisible(false);
+        lblPrescaler.setVisible(false);
+        preScalerText.setVisible(false);
 
-        lblLossOfSoc.setText("Product Name:");
-        lossOfSocTolText.setText(nodeObj.getProductName());
-        lossOfSocTolText.setEditable(false);
-        lblAsymcMtu.setText("Product ID:");
-        asyncMtuText.setText(nodeObj.getProductCodeValue());
-        asyncMtuText.setEditable(false);
-        lblAsyncTimeOut.setText("Vendor Name:");
-        asyncTimeOutTxt.setText(nodeObj.getVendorName());
-        asyncTimeOutTxt.setEditable(false);
-        lblPrescaler.setText("Vendor ID:");
-        preScalerText.setText(nodeObj.getVendorIdValue());
-        preScalerText.setEditable(false);
+        productNameLabel.setText("Product Name:");
+        productNameText.setText(nodeObj2.getProductName());
+        productIdLabel.setText("Product ID:");
+        productIdText.setText(nodeObj2.getProductCodeValue());
+        vendorNamelabel.setText("Vendor Name:");
+        vendorNameText.setText(nodeObj2.getVendorName());
+        vendorIdLabel.setText("Vendor ID:");
+        vendorIdtext.setText(nodeObj2.getVendorIdValue());
+
     }
 
     /**

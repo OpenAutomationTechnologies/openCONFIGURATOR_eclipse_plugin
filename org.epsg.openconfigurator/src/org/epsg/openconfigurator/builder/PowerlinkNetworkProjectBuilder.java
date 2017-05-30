@@ -861,16 +861,15 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                     System.err.println("Build output..." + buildPiSuccess);
                     displayInfoMessage(MessageFormat
                             .format(BUILD_COMPLETED_MESSAGE, networkId));
+                    displayInfoMessage("Generated output files at: ");
+                    displayInfoMessage("mnobd.txt:  " + textPath.toString());
+                    displayInfoMessage("mnobd.cdc:  " + binaryPath.toString());
                     displayInfoMessage(
-                            "Generated output files at: \n mnobd.txt:  "
-                                    + textPath.toString() + "\n mnobd.cdc:  "
-                                    + binaryPath.toString()
-                                    + "\n mnobd_char.txt:  "
-                                    + charPath.toString() + "\n xap.h:  "
-                                    + cPath.toString() + "\n xap.xml:  "
-                                    + xmlPath.toString()
-                                    + "\n ProcessImage.cs:  "
-                                    + cSharpImagePath.toString());
+                            "mnobd_char.txt:  " + charPath.toString());
+                    displayInfoMessage("xap.h:  " + cPath.toString());
+                    displayInfoMessage("xap.xml:  " + xmlPath.toString());
+                    displayInfoMessage(
+                            "ProcessImage.cs:  " + cSharpImagePath.toString());
                 }
 
                 displayInfoMessage(UPDATING_NODE_CONFIGURATION_MESSAGE);
