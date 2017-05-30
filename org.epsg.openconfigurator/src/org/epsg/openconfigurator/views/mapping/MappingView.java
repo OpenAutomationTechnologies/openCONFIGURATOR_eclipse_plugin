@@ -441,11 +441,11 @@ public class MappingView extends ViewPart {
             if (element instanceof String) {
                 String objIndex = (String) element;
                 if (objIndex.isEmpty()) {
-                    return "No forced objects.";
+                    return NO_FORCED_OBJECTS;
                 }
                 return objIndex;
             }
-            return null;
+            return StringUtils.EMPTY;
         }
     }
 
@@ -1787,6 +1787,8 @@ public class MappingView extends ViewPart {
             return null;
         }
     }
+
+    private static final String NO_FORCED_OBJECTS = "No forced objects.";
 
     public static final String ID = "org.epsg.openconfigurator.views.MappingView"; // $NON-NLS-0$
 
@@ -3205,6 +3207,7 @@ public class MappingView extends ViewPart {
 
     private void addListenersToRmnControls() {
         nodeId.addKeyListener(nodeIDModifyListener);
+        txt_no_nodename.addKeyListener(nodeNameModifyListener);
     }
 
     private void contributeToActionBars() {
@@ -5164,14 +5167,26 @@ public class MappingView extends ViewPart {
 
         lossOfSocTolText.setText(String.valueOf(valInUs));
         lossOfSocTolText.setEditable(true);
-        Long asyncmtu = Long.decode(nodeObj.getAsyncMtu());
-        asyncMtuText.setText(String.valueOf(asyncmtu));
+        if (nodeObj.getAsyncMtu().isEmpty()) {
+            asyncMtuText.setText(StringUtils.EMPTY);
+        } else {
+            Long asyncmtu = Long.decode(nodeObj.getAsyncMtu());
+            asyncMtuText.setText(String.valueOf(asyncmtu));
+        }
         asyncMtuText.setEditable(true);
-        Long asyncTimeOut = Long.decode(nodeObj.getAsyncSlotTimeout());
-        asyncTimeOutTxt.setText(String.valueOf(asyncTimeOut));
+        if (nodeObj.getAsyncSlotTimeout().isEmpty()) {
+            asyncTimeOutTxt.setText(StringUtils.EMPTY);
+        } else {
+            Long asyncTimeOut = Long.decode(nodeObj.getAsyncSlotTimeout());
+            asyncTimeOutTxt.setText(String.valueOf(asyncTimeOut));
+        }
         asyncTimeOutTxt.setEditable(true);
-        Long prescaler = Long.decode(nodeObj.getPrescaler());
-        preScalerText.setText(String.valueOf(prescaler));
+        if (nodeObj.getPrescaler().isEmpty()) {
+            preScalerText.setText(StringUtils.EMPTY);
+        } else {
+            Long prescaler = Long.decode(nodeObj.getPrescaler());
+            preScalerText.setText(String.valueOf(prescaler));
+        }
         preScalerText.setEditable(true);
 
     }

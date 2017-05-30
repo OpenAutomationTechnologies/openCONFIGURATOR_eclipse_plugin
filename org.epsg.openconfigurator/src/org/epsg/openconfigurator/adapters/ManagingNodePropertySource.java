@@ -417,6 +417,9 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         if (cycleTime.isEmpty()) {
                             return "";
                         }
+                        if (cycleTime.contains("0x")) {
+                            cycleTime = String.valueOf(Long.decode(cycleTime));
+                        }
                         retObj = String.valueOf(cycleTime);
                         break;
                     case INetworkProperties.NET_ASYNC_MTU_OBJECT:
@@ -878,8 +881,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 switch (objectId) {
                     case IAbstractNodeProperties.NODE_NAME_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetNodeName(
-                                mnNode.getNetworkId(), mnNode.getCnNodeIdValue(),
-                                (String) value);
+                                mnNode.getNetworkId(),
+                                mnNode.getCnNodeIdValue(), (String) value);
                         if (!res.IsSuccessful()) {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
@@ -938,7 +941,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     case IManagingNodeProperties.MN_ASND_MAX_NR_OBJECT:
                         res = OpenConfiguratorCore.GetInstance().SetAsndMaxNr(
-                                mnNode.getNetworkId(), mnNode.getCnNodeIdValue(),
+                                mnNode.getNetworkId(),
+                                mnNode.getCnNodeIdValue(),
                                 Short.decode((String) value));
                         if (res.IsSuccessful()) {
                             mnNode.setAsndMaxNumberOfNode(

@@ -446,6 +446,8 @@ public class ParameterView extends ViewPart implements IPropertyListener {
                         if ((pgmGrp.isGroupLevelVisible())
                                 && (pgmGrp.isConfigParameter())) {
                             visibleObjectsList.add(pgmGrp);
+                            System.err.println("Parameter group list.."
+                                    + pgmGrp.getParameterGroupList());
                         } else if (pgmGrp.isConfigParameter()) {
                             List<ParameterReference> prmRefList = pgmGrp
                                     .getParameterRefList();
@@ -460,8 +462,10 @@ public class ParameterView extends ViewPart implements IPropertyListener {
                             for (int count = 1; count < prmGrpList
                                     .size(); count++) {
                                 for (ParameterGroup prmGrp : prmGrpList) {
+
                                     if (prmGrp.isGroupLevelVisible()
                                             && prmGrp.isConfigParameter()) {
+
                                         visibleObjectsList.add(prmGrp);
                                     } else if (prmGrp.isConfigParameter()) {
                                         List<ParameterReference> pgmRefList = prmGrp

@@ -183,7 +183,7 @@ public class NewFirmwareWizard extends Wizard {
             }
 
             if (updateFirmwareFile(firmwareFilePath, objModel,
-                    getNode(nodeOrModuleObj))) {
+                    nodeOrModuleObj)) {
                 String nodeId = getNode(nodeOrModuleObj).getNodeIdString();
                 int modulePos = 0;
                 if (getModule(nodeOrModuleObj) != null) {
@@ -247,7 +247,7 @@ public class NewFirmwareWizard extends Wizard {
                                                     newFirmwareFileName)) {
                                                 updateFirmwareFile(
                                                         firmwareFilePath,
-                                                        nodeObj, module);
+                                                        moduleObj, module);
                                             }
                                         }
                                     }
@@ -267,6 +267,7 @@ public class NewFirmwareWizard extends Wizard {
             Object nodeOrModule) {
         Charset charset = Charset.forName("UTF-8");
         Firmware firmware = new Firmware();
+        System.err.println("Object model of fiermware.." + nodeOrModule);
         if (objModel instanceof TCN) {
             TCN cn = (TCN) objModel;
             FirmwareList firmwareList = cn.getFirmwareList();
@@ -322,7 +323,7 @@ public class NewFirmwareWizard extends Wizard {
 
                 }
             }
-        } else if (nodeOrModuleObj instanceof Module) {
+        } else if (nodeOrModule instanceof Module) {
             Module cnModule = (Module) nodeOrModuleObj;
             cnModule.getModuleFirmwareCollection().put(firmwareMngr,
                     firmwareMngr.getFirmwarefileVersion());
@@ -353,7 +354,7 @@ public class NewFirmwareWizard extends Wizard {
             System.err.println("The firmware file import is not successfull.");
             PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                     "File is out of sync with the file system.",
-                    getNode(objModel).getProject().getName());
+                    getNode(nodeOrModule).getProject().getName());
             e.printStackTrace();
             return false;
         }

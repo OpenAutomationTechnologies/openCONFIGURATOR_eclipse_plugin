@@ -565,7 +565,8 @@ public class RedundantManagingNodePropertySource
                     }
                     case IAbstractNodeProperties.NODE_ID_EDITABLE_OBJECT: {
                         short nodeIDvalue = Short.valueOf(((String) value));
-                        short oldNodeId = redundantManagingNode.getCnNodeIdValue();
+                        short oldNodeId = redundantManagingNode
+                                .getCnNodeIdValue();
                         redundantManagingNode.getPowerlinkRootNode()
                                 .setNodeId(oldNodeId, nodeIDvalue);
                         break;
@@ -577,7 +578,8 @@ public class RedundantManagingNodePropertySource
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetRedundantManagingNodeWaitNotActive(
                                         redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getCnNodeIdValue(),
+                                        redundantManagingNode
+                                                .getCnNodeIdValue(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             redundantManagingNode.setRmnWaitNotActive(
@@ -592,7 +594,8 @@ public class RedundantManagingNodePropertySource
                         res = OpenConfiguratorCore.GetInstance()
                                 .SetRedundantManagingNodePriority(
                                         redundantManagingNode.getNetworkId(),
-                                        redundantManagingNode.getCnNodeIdValue(),
+                                        redundantManagingNode
+                                                .getCnNodeIdValue(),
                                         Long.decode((String) value));
                         if (res.IsSuccessful()) {
                             redundantManagingNode.setRmnPriority(

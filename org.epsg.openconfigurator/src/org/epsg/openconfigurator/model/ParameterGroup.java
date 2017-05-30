@@ -110,6 +110,8 @@ public class ParameterGroup {
                     TParameterGroup paramGrp = (TParameterGroup) parameterGroupReference;
                     ParameterGroup paramGrpModel = new ParameterGroup(node,
                             objectDictionary, paramGrp);
+                    System.err.println("Parameter group.."
+                            + paramGrpModel.getParamGroupUniqueId());
                     parameterGroupMap.put(paramGrpModel.getParamGroupUniqueId(),
                             paramGrpModel);
                 } else if (parameterGroupReference instanceof TParameterGroup.ParameterRef) {
@@ -196,9 +198,13 @@ public class ParameterGroup {
 
         Collection<ParameterGroup> pgmGrpList = getParameterGroupList();
         for (ParameterGroup pgmGrp : pgmGrpList) {
+            System.err.println(
+                    "The parameter group.." + pgmGrp.getParamGroupUniqueId());
             if (pgmGrp.isConditionsMet()) {
                 if ((pgmGrp.isGroupLevelVisible())
                         && (pgmGrp.isConfigParameter())) {
+                    System.err.println("The parameter group.."
+                            + pgmGrp.getParamGroupUniqueId());
                     vSet.add(pgmGrp);
                 } else {
 

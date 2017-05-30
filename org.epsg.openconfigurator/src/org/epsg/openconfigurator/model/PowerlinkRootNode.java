@@ -110,6 +110,7 @@ public class PowerlinkRootNode {
     private static final String FIRMWARE_FILE_NOT_FOUND_ERROR = "Firmware file {0} for the node {1} does not exists in the project.\n Firmware file Path: {2} ";
     private static final String FIRMWARE_FILE_MODULE_NOT_FOUND_ERROR = "Firmware file {0} for the module {1} does not exists in the project.\n Firmware file Path: {2} ";
     private static final String INVALID_MODULE_XDC_ERROR = " The XDD/XDC file of module {0} is not available for the node {1}.";
+    private static final String INVALID_NODE_XDC_ERROR = " The XDD/XDC file of node {0} is not available.";
     private static final String INVALID_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the node {1}.";
     private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
     private Map<Short, Node> nodeCollection = new HashMap<>();
@@ -493,7 +494,8 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    Short.valueOf(processingNode.getCnNodeIdValue()),
+                                    Short.valueOf(
+                                            processingNode.getCnNodeIdValue()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -508,7 +510,8 @@ public class PowerlinkRootNode {
                             newNode.setError(OpenConfiguratorLibraryUtils
                                     .getErrorMessage(res));
                             nodeCollection.put(
-                                    Short.valueOf(processingNode.getCnNodeIdValue()),
+                                    Short.valueOf(
+                                            processingNode.getCnNodeIdValue()),
                                     newNode);
                             return new Status(IStatus.ERROR,
                                     org.epsg.openconfigurator.Activator.PLUGIN_ID,
@@ -549,7 +552,8 @@ public class PowerlinkRootNode {
                         processingNode.setError(errorMessage);
                     }
                 }
-                nodeCollection.put(Short.valueOf(processingNode.getCnNodeIdValue()),
+                nodeCollection.put(
+                        Short.valueOf(processingNode.getCnNodeIdValue()),
                         processingNode);
                 monitor.worked(1);
                 if (cnNode.getFirmwareList() != null) {
@@ -906,6 +910,8 @@ public class PowerlinkRootNode {
                 TRMN rmnNode = rmnIterator.next();
                 monitor.subTask("Import RMN node XDC:" + rmnNode.getName() + "("
                         + rmnNode.getNodeID() + ")");
+                System.err.println("Import RMN node XDC:" + rmnNode.getName()
+                        + "(" + rmnNode.getNodeID() + ")");
                 String decodedXdcPath = URLDecoder
                         .decode(rmnNode.getPathToXDC(), "UTF-8");
                 File rmnXddFile = new File(
@@ -923,29 +929,44 @@ public class PowerlinkRootNode {
 
                     Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
                     if (!res.IsSuccessful()) {
+                        System.err.println("RMN library addition failed..");
                         newNode.setError(OpenConfiguratorLibraryUtils
                                 .getErrorMessage(res));
-                        nodeCollection.put(Short.valueOf(newNode.getCnNodeIdValue()),
+                        nodeCollection.put(
+                                Short.valueOf(newNode.getCnNodeIdValue()),
                                 newNode);
                         return new Status(IStatus.ERROR,
                                 org.epsg.openconfigurator.Activator.PLUGIN_ID,
                                 OpenConfiguratorLibraryUtils
                                         .getErrorMessage(res),
                                 null);
+
                     }
                 } catch (JAXBException | SAXException
                         | ParserConfigurationException | FileNotFoundException
-                        | UnsupportedEncodingException e) {
-                    String errorMessage = e.getCause().getMessage()
-                            + " for the XDD/XDC file of the node " + "'"
-                            + rmnNode.getName() + "(" + rmnNode.getNodeID()
-                            + ")" + "'";
-                    OpenConfiguratorMessageConsole.getInstance()
-                            .printErrorMessage(errorMessage,
-                                    processingNode.getProject().getName());
-                    processingNode.setError(errorMessage);
+                        | UnsupportedEncodingException
+                        | NullPointerException e) {
+                    if (e instanceof NullPointerException) {
+                        String errorMessage = MessageFormat.format(
+                                INVALID_NODE_XDC_ERROR,
+                                processingNode.getNodeIDWithName());
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(errorMessage,
+                                        processingNode.getProject().getName());
+                        processingNode.setError(errorMessage);
+                    } else {
+                        String errorMessage = e.getCause().getMessage()
+                                + " for the XDD/XDC file of the node " + "'"
+                                + rmnNode.getName() + "(" + rmnNode.getNodeID()
+                                + ")" + "'";
+                        OpenConfiguratorMessageConsole.getInstance()
+                                .printErrorMessage(errorMessage,
+                                        processingNode.getProject().getName());
+                        processingNode.setError(errorMessage);
+                    }
                 }
-                nodeCollection.put(Short.valueOf(processingNode.getCnNodeIdValue()),
+                nodeCollection.put(
+                        Short.valueOf(processingNode.getCnNodeIdValue()),
                         processingNode);
                 monitor.worked(1);
             }
@@ -1282,8 +1303,8 @@ public class PowerlinkRootNode {
                     } else {
                         System.err.println(
                                 "Remove from openCONF model failed. Node ID:"
-                                        + node.getCnNodeIdValue() + " modelType:"
-                                        + nodeObjectModel);
+                                        + node.getCnNodeIdValue()
+                                        + " modelType:" + nodeObjectModel);
                     }
                 } else {
                     System.err.println("Node model has been changed");

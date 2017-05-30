@@ -525,7 +525,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 swVersionObj.setActualValue(RMN_FIRMWARE_AVAILABLITY_VALUE,
                         true);
                 OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
-                        "19456");
+                        RMN_FIRMWARE_AVAILABLITY_VALUE);
             } catch (JDOMException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -535,7 +535,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             try {
                 swVersionObj.setActualValue(FIRMWARE_AVAILABLITY_VALUE, true);
                 OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
-                        "3072");
+                        FIRMWARE_AVAILABLITY_VALUE);
             } catch (JDOMException e) {
                 e.printStackTrace();
             } catch (IOException e) {
@@ -545,7 +545,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
             try {
                 swVersionObj.setActualValue(RMN_AVAILABLITY_VALUE, true);
                 OpenConfiguratorLibraryUtils.setObjectActualValue(swVersionObj,
-                        "18432");
+                        RMN_AVAILABLITY_VALUE);
             } catch (JDOMException e) {
                 e.printStackTrace();
             } catch (IOException e) {

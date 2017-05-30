@@ -382,6 +382,7 @@ public class FirmwareManager {
     public boolean updateFirmwareInProjectFile(FirmwareManager firmwareMngr,
             Object nodeOrModuleObj, Firmware firmwareObj) {
         Result res = new Result();
+        System.err.println("The node or module object..." + nodeOrModuleObj);
         try {
             OpenConfiguratorProjectUtils.addFirmwareList(firmwareMngr,
                     nodeOrModuleObj, firmwareObj);

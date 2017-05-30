@@ -407,8 +407,6 @@ public class ValidateXddWizardPage extends WizardPage {
         nodeConfigurationPath.setToolTipText(nodeConfigurationPath.getText());
         nodeConfigurationPath
                 .addModifyListener(nodeConfigurationPathModifyListener);
-        nodeConfigurationPath
-                .addModifyListener(nodeConfigurationPathModifyListener);
 
         btnBrowse = new Button(grpConfigurationFile, SWT.NONE);
         btnBrowse.setLayoutData(

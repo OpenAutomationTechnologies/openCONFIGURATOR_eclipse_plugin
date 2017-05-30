@@ -1154,10 +1154,14 @@ public class IndustrialNetworkView extends ViewPart
                 Object nodeObjectModel = node.getNodeModel();
 
                 if (nodeObjectModel instanceof TRMN) {
-                    manager.add(showPdoMapping);
-                    manager.add(showObjectDictionary);
-                    manager.add(new Separator());
-                    manager.add(deleteNode);
+                    if (node.hasError()) {
+                        manager.add(deleteNode);
+                    } else {
+                        manager.add(showPdoMapping);
+                        manager.add(showObjectDictionary);
+                        manager.add(new Separator());
+                        manager.add(deleteNode);
+                    }
                 } else if (nodeObjectModel instanceof TNetworkConfiguration) {
                     manager.add(addNewNode);
                     manager.add(new Separator());
@@ -1205,35 +1209,40 @@ public class IndustrialNetworkView extends ViewPart
                     }
 
                     manager.add(new Separator());
+                    manager.add(showProperties);
                 } else if (nodeObjectModel instanceof TCN) {
-                    if (node.isEnabled()) {
-                        manager.add(addFirmwareFile);
-                        manager.add(new Separator());
-                        manager.add(disable);
+                    if (node.hasError()) {
+                        manager.add(deleteNode);
                     } else {
-                        manager.add(enable);
-                    }
-                    if (node.isModularheadNode()) {
+                        if (node.isEnabled()) {
+                            manager.add(addFirmwareFile);
+                            manager.add(new Separator());
+                            manager.add(disable);
+                        } else {
+                            manager.add(enable);
+                        }
+                        if (node.isModularheadNode()) {
+                            manager.add(new Separator());
+                            manager.add(generateNodeXDC);
+                        }
+                        // Display list of menu only if the nodes are enabled.
+                        if (node.isEnabled()) {
+                            manager.add(new Separator());
+                            manager.add(showPdoMapping);
+                            manager.add(showObjectDictionary);
+                            manager.add(showParameter);
+                            manager.add(new Separator());
+                            manager.add(copyNode);
+                        }
                         manager.add(new Separator());
-                        manager.add(generateNodeXDC);
+                        manager.add(deleteNode);
+                        manager.add(new Separator());
                     }
                     // Display list of menu only if the nodes are enabled.
                     if (node.isEnabled()) {
                         manager.add(new Separator());
-                        manager.add(showPdoMapping);
-                        manager.add(showObjectDictionary);
-                        manager.add(showParameter);
-                        manager.add(new Separator());
-                        manager.add(copyNode);
+                        manager.add(showProperties);
                     }
-                    manager.add(new Separator());
-                    manager.add(deleteNode);
-                    manager.add(new Separator());
-                }
-                // Display list of menu only if the nodes are enabled.
-                if (node.isEnabled()) {
-                    manager.add(new Separator());
-                    manager.add(showProperties);
                 }
             }
             if (object instanceof HeadNodeInterface) {

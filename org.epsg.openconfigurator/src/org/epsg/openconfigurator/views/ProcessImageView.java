@@ -476,6 +476,9 @@ public class ProcessImageView extends ViewPart {
         inChannelImage.dispose();
         outChannelImage.dispose();
 
+        getViewSite().getPage()
+                .removeSelectionListener(IndustrialNetworkView.ID, listener);
+
     }
 
     /**

@@ -650,7 +650,20 @@ public class AddControlledNodeWizardPage extends WizardPage {
             } else if (nodeTypeCombo.getText()
                     .equalsIgnoreCase(CONTROLLED_NODE_LABEL)) {
                 validatePage.resetCnWizard();
+                if (stationTypeCombo.getText()
+                        .equalsIgnoreCase(STATION_TYPES[1])) {
+                    List<Node> rmnNodes = getNodelist().getRmnNodeList();
 
+                    if (!rmnNodes.isEmpty()) {
+                        setErrorMessage(ERROR_RMN_WITH_CHAINED_STATION);
+                        pageComplete = false;
+                        return pageComplete;
+                    }
+
+                }
+
+            } else {
+                validatePage.resetRmnWizard();
             }
         } else {
             System.err.println("Invalid wizard page.");

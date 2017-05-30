@@ -38,6 +38,7 @@ import java.util.List;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745ProfileContainer;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
@@ -77,42 +78,42 @@ public class ObjectDictionary {
     /**
      * List of Objects available in the node.
      */
-    private final List<PowerlinkObject> objectsList = new ArrayList<PowerlinkObject>();
+    private final List<PowerlinkObject> objectsList = new ArrayList<>();
 
     /**
      * TPDO mappable objects list.
      */
-    private final List<PowerlinkObject> tpdoMappableObjectList = new ArrayList<PowerlinkObject>();
+    private final List<PowerlinkObject> tpdoMappableObjectList = new ArrayList<>();
 
     /**
      * RPDO mappable objects list
      */
-    private final List<PowerlinkObject> rpdoMappableObjectList = new ArrayList<PowerlinkObject>();
+    private final List<PowerlinkObject> rpdoMappableObjectList = new ArrayList<>();
 
     /**
      * TPDO channels list.
      */
-    private final List<TpdoChannel> tpdoChannelsList = new ArrayList<TpdoChannel>();
+    private final List<TpdoChannel> tpdoChannelsList = new ArrayList<>();
 
     /**
      * RPDO channels list.
      */
-    private final List<RpdoChannel> rpdoChannelsList = new ArrayList<RpdoChannel>();
+    private final List<RpdoChannel> rpdoChannelsList = new ArrayList<>();
 
     /**
      * Parameter list.
      */
-    private final List<Parameter> parameterList = new ArrayList<Parameter>();
+    private final List<Parameter> parameterList = new ArrayList<>();
 
     /**
      * Parameter with uniqueID and parameter model.
      */
-    private LinkedHashMap<String, Parameter> parameterListMap = new LinkedHashMap<String, Parameter>();
+    private LinkedHashMap<String, Parameter> parameterListMap = new LinkedHashMap<>();
 
     /**
      * Parameter group with uniqueID and parameter model.
      */
-    private LinkedHashMap<String, ParameterGroup> parameterGroupMap = new LinkedHashMap<String, ParameterGroup>();
+    private LinkedHashMap<String, ParameterGroup> parameterGroupMap = new LinkedHashMap<>();
 
     /**
      * Instance of Module.
@@ -240,7 +241,7 @@ public class ObjectDictionary {
      * @return Parameter group available in the given XDD file.
      */
     public List<ParameterGroup> getParameterGroupList() {
-        List<ParameterGroup> valueList = new ArrayList<ParameterGroup>(
+        List<ParameterGroup> valueList = new ArrayList<>(
                 parameterGroupMap.values());
         return valueList;
     }
@@ -249,8 +250,7 @@ public class ObjectDictionary {
      * @return List of parameters available in the given XDD file.
      */
     public List<Parameter> getParameterList() {
-        List<Parameter> valueList = new ArrayList<Parameter>(
-                parameterListMap.values());
+        List<Parameter> valueList = new ArrayList<>(parameterListMap.values());
         return valueList;
     }
 
@@ -266,7 +266,8 @@ public class ObjectDictionary {
                     List<ParameterReference> prmRefList = cpgrp
                             .getParameterRefList();
                     for (ParameterReference prmRef : prmRefList) {
-                        Parameter param = getParameter(prmRef.getParameterUniqueId());
+                        Parameter param = getParameter(
+                                prmRef.getParameterUniqueId());
                         parameterList.add(param);
                     }
                 }
@@ -368,9 +369,9 @@ public class ObjectDictionary {
     public String getValue(final long objectId, final short subObjectId) {
         PowerlinkSubobject subObject = getSubObject(objectId, subObjectId);
         if (subObject == null) {
-            throw new RuntimeException(
-                    "SubObject 0x" + Long.toHexString(objectId) + "/0x"
-                            + Integer.toHexString(subObjectId) + " not found!");
+            System.err.println("SubObject 0x" + Long.toHexString(objectId)
+                    + "/0x" + Integer.toHexString(subObjectId) + " not found!");
+            return StringUtils.EMPTY;
         }
 
         return subObject.getActualDefaultValue();
@@ -442,8 +443,8 @@ public class ObjectDictionary {
 
         if (xddModel != null) {
 
-            List<PowerlinkObject> commParamObjList = new ArrayList<PowerlinkObject>();
-            List<PowerlinkObject> mapParamObjList = new ArrayList<PowerlinkObject>();
+            List<PowerlinkObject> commParamObjList = new ArrayList<>();
+            List<PowerlinkObject> mapParamObjList = new ArrayList<>();
 
             List<ISO15745Profile> profiles = xddModel.getISO15745Profile();
             for (ISO15745Profile profile : profiles) {
@@ -462,7 +463,8 @@ public class ObjectDictionary {
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
                                 Parameter p = new Parameter(node, param);
-                                parameterListMap.put(p.getParameterUniqueId(), p);
+                                parameterListMap.put(p.getParameterUniqueId(),
+                                        p);
                             }
                         }
 
@@ -476,7 +478,8 @@ public class ObjectDictionary {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
 
-                                parameterGroupMap.put(pg.getParamGroupUniqueId(), pg);
+                                parameterGroupMap
+                                        .put(pg.getParamGroupUniqueId(), pg);
                             }
                         }
                     }
@@ -496,7 +499,8 @@ public class ObjectDictionary {
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
                                 Parameter p = new Parameter(node, param);
-                                parameterListMap.put(p.getParameterUniqueId(), p);
+                                parameterListMap.put(p.getParameterUniqueId(),
+                                        p);
                             }
                         }
 
@@ -509,7 +513,8 @@ public class ObjectDictionary {
                             for (TParameterGroup grp : paramGroup) {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
-                                parameterGroupMap.put(pg.getParamGroupUniqueId(), pg);
+                                parameterGroupMap
+                                        .put(pg.getParamGroupUniqueId(), pg);
                             }
                         }
                     }
@@ -529,7 +534,8 @@ public class ObjectDictionary {
                                     .getParameter();
                             for (TParameterList.Parameter param : parameterModelList) {
                                 Parameter p = new Parameter(node, param);
-                                parameterListMap.put(p.getParameterUniqueId(), p);
+                                parameterListMap.put(p.getParameterUniqueId(),
+                                        p);
                             }
                         }
 
@@ -542,7 +548,8 @@ public class ObjectDictionary {
                             for (TParameterGroup grp : paramGroup) {
                                 ParameterGroup pg = new ParameterGroup(node,
                                         this, grp);
-                                parameterGroupMap.put(pg.getParamGroupUniqueId(), pg);
+                                parameterGroupMap
+                                        .put(pg.getParamGroupUniqueId(), pg);
                             }
                         }
                     }

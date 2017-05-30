@@ -3349,6 +3349,7 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     private static Result createNode(final Node node) {
+        System.err.println("RMN node type..." + node.getNodeType());
         Result libApiRes = OpenConfiguratorCore.GetInstance().CreateNode(
                 node.getNetworkId(), node.getCnNodeIdValue(), node.getName(),
                 (node.getNodeType() == Node.NodeType.REDUNDANT_MANAGING_NODE
