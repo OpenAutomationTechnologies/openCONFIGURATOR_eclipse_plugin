@@ -710,8 +710,6 @@ public class MappingView extends ViewPart {
                                                 pdoChannel, mappingSubObject,
                                                 moduleObjectIndex,
                                                 moduleSubObjectIndex);
-                                System.err.println(
-                                        "Mapping sub-objet of module...");
                                 if (!res.IsSuccessful()) {
                                     showMessage(res);
                                 }
@@ -720,8 +718,6 @@ public class MappingView extends ViewPart {
                                         .mappSubObjectToChannel(pdoChannel,
                                                 mappingSubObject,
                                                 subObjectTobeMapped);
-                                System.err.println(
-                                        "Mapping sub-objet of node...");
                                 if (!res.IsSuccessful()) {
                                     showMessage(res);
                                 }
@@ -750,15 +746,11 @@ public class MappingView extends ViewPart {
                                                     mappingSubObject,
                                                     objectTobeMapped,
                                                     moduleObjectIndex);
-                                    System.err.println(
-                                            "Mapping objet of module...");
                                 } else {
                                     res = OpenConfiguratorLibraryUtils
                                             .mappObjectToChannel(pdoChannel,
                                                     mappingSubObject,
                                                     objectTobeMapped);
-                                    System.err.println(
-                                            "Mapping objet of node...");
                                 }
 
                             }
@@ -929,7 +921,6 @@ public class MappingView extends ViewPart {
         PdoType pdoType;
 
         public PdoSummaryTableLabelProvider(PdoType pdoType) {
-            System.err.println("THe valid value...........");
             this.pdoType = pdoType;
         }
 
@@ -1635,8 +1626,6 @@ public class MappingView extends ViewPart {
                         switch (pdoType) {
 
                             case TPDO:
-                                System.err.println("The IDRaw of object.."
-                                        + mapParamObj.getId());
                                 if (mapParamObj.getId() == 1) {
                                     try {
                                         if (!tpdoEnabledMappingEntriesText
@@ -2263,7 +2252,6 @@ public class MappingView extends ViewPart {
                 txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
 
                 if (selectedObj instanceof Node) {
-                    System.err.println("Single Selection...");
                     nodeObj = (Node) selectedObj;
                     setPartName(nodeObj.getNodeIDWithName());
 
@@ -2680,9 +2668,7 @@ public class MappingView extends ViewPart {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
 
                 newNodeId = handleSetNodeId(nodeId.getText());
-                System.err.println("New node Id..." + newNodeId);
                 if ((!newNodeId.equalsIgnoreCase(StringUtils.EMPTY))) {
-                    System.err.println("New node Id..." + newNodeId);
                     short nodeIDvalue = Short.valueOf((newNodeId));
 
                     short oldNodeId = nodeObj.getCnNodeIdValue();
@@ -2781,8 +2767,6 @@ public class MappingView extends ViewPart {
 
                 int nodeType = nodeTypeCombo.getSelectionIndex();
                 newNodType = handleNodeTypeChange(nodeType);
-                System.err.println("old node Type.." + oldNodetype);
-                System.err.println("new node Type.." + newNodType);
                 if ((!newNodType.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newNodType.equalsIgnoreCase(oldNodetype)) {
                         if (newNodType.equalsIgnoreCase("Normal")) {
@@ -3088,9 +3072,7 @@ public class MappingView extends ViewPart {
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
 
                 String nodeName = nodeObj.getName();
-                System.err.println("Node name Selected" + nodeName);
                 newNodeName = handleSetNodeName(txt_no_nodename.getText());
-                System.err.println("Node name new Selected" + newNodeName);
                 if ((!newNodeName.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if ((!newNodeName.equalsIgnoreCase(nodeName))) {
                         Result res = OpenConfiguratorCore.GetInstance()
@@ -3168,9 +3150,7 @@ public class MappingView extends ViewPart {
     private void addListenersToCnControls() {
         nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
         txt_no_PResTimeOut.removeKeyListener(cycleTimeModifyListener);
-        System.err.println("Cycle time removed...");
         txt_no_PResTimeOut.addKeyListener(presTimeoutModifyListener);
-        System.err.println("pres time added...");
 
         lossOfSocTolText.removeKeyListener(lossOfSocModifyListener);
         asyncMtuText.removeKeyListener(asyncMtuModifyListener);
@@ -3189,9 +3169,8 @@ public class MappingView extends ViewPart {
     private void addListenersToMnControls() {
         nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
         txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
-        System.err.println("pres time removed...");
         txt_no_PResTimeOut.addKeyListener(cycleTimeModifyListener);
-        System.err.println("Cycle time added...");
+
         txt_no_nodename.addKeyListener(nodeNameModifyListener);
         nodeId.removeKeyListener(nodeIDModifyListener);
         nodeId.setEnabled(false);
@@ -5073,7 +5052,6 @@ public class MappingView extends ViewPart {
     }
 
     private void handleGeneralInfoForCn(Node nodeObj) {
-        System.err.println("CN selected");
         txt_no_PResTimeOut.setVisible(true);
         nodeTypeCombo.setVisible(true);
         lblNodeType.setVisible(true);
@@ -5085,11 +5063,9 @@ public class MappingView extends ViewPart {
 
         txt_no_PResTimeOut.setText(String.valueOf(presTimeoutInMs));
         if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
-            System.err.println("The chanined....");
             nodeTypeCombo.select(1);
 
         } else {
-            System.err.println("The normal....");
             nodeTypeCombo.select(0);
         }
 
@@ -5194,7 +5170,6 @@ public class MappingView extends ViewPart {
     private void handleGeneralInfoForModule(Module moduleObj) {
 
         Node nodeObj = moduleObj.getNode();
-        System.err.println("CN selected");
         txt_no_PResTimeOut.setVisible(true);
         nodeTypeCombo.setVisible(true);
         lblNodeType.setVisible(true);
@@ -5206,11 +5181,9 @@ public class MappingView extends ViewPart {
 
         txt_no_PResTimeOut.setText(String.valueOf(presTimeoutInMs));
         if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
-            System.err.println("The chanined....");
             nodeTypeCombo.select(1);
 
         } else {
-            System.err.println("The normal....");
             nodeTypeCombo.select(0);
         }
 

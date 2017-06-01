@@ -267,7 +267,6 @@ public class NewFirmwareWizard extends Wizard {
             Object nodeOrModule) {
         Charset charset = Charset.forName("UTF-8");
         Firmware firmware = new Firmware();
-        System.err.println("Object model of fiermware.." + nodeOrModule);
         if (objModel instanceof TCN) {
             TCN cn = (TCN) objModel;
             FirmwareList firmwareList = cn.getFirmwareList();

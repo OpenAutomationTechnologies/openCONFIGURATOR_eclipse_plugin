@@ -437,8 +437,6 @@ public class ParameterView extends ViewPart implements IPropertyListener {
                         if ((pgmGrp.isGroupLevelVisible())
                                 && (pgmGrp.isConfigParameter())) {
                             visibleObjectsList.add(pgmGrp);
-                            System.err.println("Parameter group list.."
-                                    + pgmGrp.getParameterGroupList());
                         } else if (pgmGrp.isConfigParameter()) {
                             List<ParameterReference> prmRefList = pgmGrp
                                     .getParameterRefList();
@@ -654,13 +652,9 @@ public class ParameterView extends ViewPart implements IPropertyListener {
     public void createPartControl(Composite parent) {
 
         PatternFilter filter = new ParameterFilter();
-        // PatternFilter filter = new PatternFilter();
         filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
-
-        // treeViewer = new TreeViewer(parent,
-        // SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 
         treeViewer = tree.getViewer();
 

@@ -364,7 +364,7 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                             plkSubObject, plkSubObject.getObject().getId());
             Result res = OpenConfiguratorLibraryUtils
                     .validateModuleSubobjectActualValue(plkSubObject,
-                            (String) value, newObjectIndex,newSubObjectIndex);
+                            (String) value, newObjectIndex, newSubObjectIndex);
             if (!res.IsSuccessful()) {
                 return OpenConfiguratorLibraryUtils.getErrorMessage(res);
             }
@@ -397,7 +397,6 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
             int newSubObjectIndex = OpenConfiguratorLibraryUtils
                     .getModuleObjectSubIndex(plkSubObject.getModule(),
                             plkSubObject);
-            System.err.println("The module sub-object.." + newSubObjectIndex);
             Result res = OpenConfiguratorLibraryUtils
                     .validateForceSubObjectActualValue(plkSubObject,
                             newObjectIndex, newSubObjectIndex);
@@ -624,9 +623,6 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                                         .getModuleObjectSubIndex(
                                                 plkSubObject.getModule(),
                                                 plkSubObject);
-                                System.err.println(
-                                        "The Module object Index in properties..."
-                                                + newObjectIndex);
                                 Result res = OpenConfiguratorLibraryUtils
                                         .forceSubObject(plkSubObject, result,
                                                 newObjectIndex,

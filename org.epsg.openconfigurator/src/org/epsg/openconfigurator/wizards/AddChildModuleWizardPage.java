@@ -334,7 +334,6 @@ public class AddChildModuleWizardPage extends WizardPage {
             if (moduleSize != 0) {
                 Set<Integer> positionSet = interfaceObj.getModuleCollection()
                         .keySet();
-                System.err.println("POsitionSet = " + positionSet);
                 for (Integer positionValue : positionSet) {
                     // Checks the available module position with new position
                     // given.
@@ -599,7 +598,6 @@ public class AddChildModuleWizardPage extends WizardPage {
         }
 
         if (!(interfaceObj.hasModules())) {
-            System.err.println("POsition...." + position.getText());
             if ((position.getText()).equalsIgnoreCase("1")) {
                 if (!(position.getMinimum() == 1)) {
                     setErrorMessage("Module cannot be placed at position "

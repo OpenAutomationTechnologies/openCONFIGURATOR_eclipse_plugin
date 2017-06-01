@@ -148,10 +148,9 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
             } else if ((paramRef.getAllowedValues().getValuesList() != null)
                     && (!paramRef.getAllowedValues().getValuesList()
                             .isEmpty())) {
-                System.err.println(
-                        "Parameter reference access.." + paramRef.getAccess());
-                if ((paramRef.getAccess() == null)
-                        || (paramRef.getAccess() == ParameterAccess.CONST)
+                if ((paramRef.getAccess() == null)) {
+                    propertyList.add(actualValueReadOnlyDescriptor);
+                } else if ((paramRef.getAccess() == ParameterAccess.CONST)
                         || (paramRef.getAccess() == ParameterAccess.NO_ACCESS)
                         || (paramRef.getAccess() == ParameterAccess.READ)
                         || (paramRef
@@ -456,7 +455,6 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     break;
             }
         }
-        System.err.println("Reset property value....");
     }
 
     private void setAllowedValues() {
@@ -570,13 +568,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                             OpenConfiguratorLibraryUtils
                                                     .getErrorMessage(res));
                                 } else {
-                                    System.out.println(
-                                            "The selected allowed value = "
-                                                    + val);
                                     paramRef.setActualValue(val);
-                                    System.err.println(
-                                            "The index of given value = "
-                                                    + val.indexOf(val));
                                 }
 
                             } else {
@@ -593,13 +585,7 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                                             OpenConfiguratorLibraryUtils
                                                     .getErrorMessage(res));
                                 } else {
-                                    System.out.println(
-                                            "The selected allowed value = "
-                                                    + val);
                                     paramRef.setActualValue(val);
-                                    System.err.println(
-                                            "The index of given value = "
-                                                    + val.indexOf(val));
                                 }
 
                             }

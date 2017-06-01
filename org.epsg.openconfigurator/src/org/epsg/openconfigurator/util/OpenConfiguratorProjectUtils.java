@@ -433,7 +433,6 @@ public final class OpenConfiguratorProjectUtils {
 
         IProject currentProject = node.getProject();
         if (currentProject == null) {
-            System.err.println("Current project null. returned null");
             return retVal;
         }
 
@@ -781,7 +780,6 @@ public final class OpenConfiguratorProjectUtils {
             throws IOException, NullPointerException {
         java.nio.file.Path moduleImportFile = new File(
                 newModule.getModulePathToXdc()).toPath();
-        System.err.println("IOnitial module XDc path.." + moduleImportFile);
         java.nio.file.Path projectRootPath = newModule.getProject()
                 .getLocation().toFile().toPath();
 
@@ -1196,7 +1194,7 @@ public final class OpenConfiguratorProjectUtils {
             String firmwareHeaderLines = StringUtils.EMPTY;
             String firmwareline = StringUtils.EMPTY;
             while ((firmwareHeaderLines = bufferedRdr.readLine()) != null) {
-                firmwareline.concat(firmwareHeaderLines.concat("\n"));
+                firmwareline += firmwareHeaderLines.concat("\n");
             }
             int firmwareEndIndex = firmwareline.indexOf(">");
             // Removes the header of firmware file.
@@ -1384,8 +1382,6 @@ public final class OpenConfiguratorProjectUtils {
         File xmlFile = new File(projectXmlLocation);
 
         org.jdom2.Document document = JDomUtil.getXmlDocument(xmlFile);
-        System.err.println("The position value == " + attributeValue
-                + " module name.." + module.getModuleName());
         ProjectJDomOperation.updateModuleAttributeValue(document, module,
                 attributeName, attributeValue);
 
@@ -1447,13 +1443,9 @@ public final class OpenConfiguratorProjectUtils {
                                             Paths.get(targetConfigurationPath));
                             File unModifiedfile = new File(
                                     projectRootPath + "/" + moduleImportFile);
-                            System.err.println("Unmodified file path ==="
-                                    + unModifiedfile.getAbsolutePath());
 
                             File updatedfile = new File(
                                     projectRootPath + "/" + pathRelative);
-                            System.err.println("updatedfile file path ==="
-                                    + updatedfile.getAbsolutePath());
 
                             if (unModifiedfile.renameTo(updatedfile)) {
                                 System.out.println("Name of File '"
@@ -1471,8 +1463,6 @@ public final class OpenConfiguratorProjectUtils {
 
                             // Set the relative path to the CN object
                             module.setPathToXDC(relativePath);
-                            System.err.println("The module get Path to XDC.."
-                                    + module.getModulePathToXdc());
                         }
                     }
                 }

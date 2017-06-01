@@ -858,7 +858,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                             .format(BUILD_FAILED_ERROR_MESSAGE, networkId));
                 } else {
                     // Displays Info message in console.
-                    System.err.println("Build output..." + buildPiSuccess);
                     displayInfoMessage(MessageFormat
                             .format(BUILD_COMPLETED_MESSAGE, networkId));
                     displayInfoMessage("Generated output files at: ");
@@ -906,8 +905,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             buildFirmwareInfoFile(targetPath, pjtEditor);
             fwList.clear();
-            System.err.println("The firmware list..." + fwList);
-
         }
 
     }
@@ -917,7 +914,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
         String outputFirmwareInfo = StringUtils.EMPTY;
         Charset charset = Charset.forName("UTF-8");
         if (!fwList.isEmpty()) {
-            System.err.println("Firmware list..." + fwList.size());
             java.nio.file.Path targetFilePath = outputpath
                     .resolve(FIRMWARE_INFO);
             for (FirmwareManager fwMngr : fwList) {
@@ -925,8 +921,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 Integer hexadecNodeVal = Integer.valueOf(nodeIdString);
 
                 String nodeId = Integer.toHexString(hexadecNodeVal);
-                System.err.println(
-                        "The hexa decimal value of node id.." + nodeId);
                 if (Integer.parseInt(
                         nodeIdString) <= MINIMUM_SINGLE_DIGIT_NODE_ID) {
                     nodeId = "0" + nodeId;
@@ -1041,8 +1035,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                             }
                         }
                     }
-                    System.err.println("Module devi list.."
-                            + moduleDevRevisionList.values());
                     fwList.addAll(moduleDevRevisionList.values());
                 }
             }

@@ -332,7 +332,6 @@ public class ModulePropertySource extends AbstractNodePropertySource
     }
 
     private String handleSetModuleAddress(Object value) {
-        System.err.println("Handle address value..");
         if (module != null) {
             if (value instanceof String) {
                 if (((String) value).isEmpty()) {

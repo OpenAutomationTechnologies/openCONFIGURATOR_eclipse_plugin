@@ -759,8 +759,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                     .getPathSettings();
 
                             for (TProjectConfiguration.PathSettings pathSet : pathList) {
-                                System.err.println(
-                                        "Custom path id.." + pathSet.getId());
                                 if (pathSet.getId() != null) {
                                     if (pathSet.getId().equalsIgnoreCase(
                                             OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
@@ -1632,7 +1630,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
         List<PathSettings> pathCollection = currentProject
                 .getProjectConfiguration().getPathSettings();
-        System.err.println("The path collection list.." + pathCollection);
 
         for (PathSettings path : pathCollection) {
             if (path.getId() == null) {
@@ -1928,9 +1925,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             editPathSettingsButton.setEnabled(false);
             deletePathSettingsButton.setEnabled(false);
         } else {
-
-            System.err.println("Get text..." + selectionIndex[0]);
-
             editPathSettingsButton.setEnabled(true);
             deletePathSettingsButton.setEnabled(true);
 

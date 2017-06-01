@@ -1130,7 +1130,6 @@ public class PowerlinkRootNode {
 
         IProject currentProject = module.getProject();
         if (currentProject == null) {
-            System.err.println("Current project null. returned null");
             return retVal;
         }
 
@@ -1197,7 +1196,6 @@ public class PowerlinkRootNode {
                     throw new CoreException(errorStatus);
                 }
 
-                System.err.println("Remove node.... leaving critical section");
             }
         };
 
@@ -1250,19 +1248,15 @@ public class PowerlinkRootNode {
 
         IProject currentProject = node.getProject();
         if (currentProject == null) {
-            System.err.println("Current project null. returned null");
             return retVal;
         }
 
-        System.err.println("Remove node....");
         final WorkspaceModifyOperation wmo = new WorkspaceModifyOperation() {
 
             @Override
             protected void execute(IProgressMonitor monitor)
                     throws CoreException, InvocationTargetException,
                     InterruptedException {
-
-                System.err.println("Remove node.... entered critical section");
 
                 Node mnNode = getMN();
 
@@ -1370,7 +1364,6 @@ public class PowerlinkRootNode {
 
                 }
 
-                System.err.println("Remove node.... leaving critical section");
             }
         };
 
@@ -1447,7 +1440,7 @@ public class PowerlinkRootNode {
                                 .SetNodeId(oldNode.getNetworkId(), oldNodeId,
                                         newNodeId);
                         if (!res.IsSuccessful()) {
-                            System.err.println("RES set Node ID:"
+                            System.err.println("Reset Node ID:"
                                     + OpenConfiguratorLibraryUtils
                                             .getErrorMessage(res));
                         }

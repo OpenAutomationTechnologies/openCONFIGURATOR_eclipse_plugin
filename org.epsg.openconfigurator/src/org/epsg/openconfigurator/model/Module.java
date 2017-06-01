@@ -89,8 +89,6 @@ public class Module {
     private static String getValueofModularBit(String reverse) {
         String[] arrayString = reverse.split("");
         int arrayCount = arrayString.length;
-        System.err.println("The array count .." + arrayCount);
-        System.err.println("The array String .." + reverse);
         if (arrayCount <= 21) {
             return "0";
         }
@@ -551,8 +549,6 @@ public class Module {
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module mod = (InterfaceList.Interface.Module) moduleModel;
             forcedObjTag = mod.getForcedObjects();
-            System.err.println("Force Module Object.." + force);
-            System.err.println("Force Module Object Tag.." + forcedObjTag);
             if (force) {
                 if (forcedObjTag == null) {
                     mod.setForcedObjects(
@@ -576,8 +572,6 @@ public class Module {
             if (forcedObjTag != null) {
                 for (org.epsg.openconfigurator.xmlbinding.projectfile.Object tempForceObj : forcedObjTag
                         .getObject()) {
-                    System.err.println("The forced Object.." + DatatypeConverter
-                            .printHexBinary(tempForceObj.getIndex()));
                     if (java.util.Arrays.equals(tempForceObj.getIndex(),
                             forceObj.getIndex())) {
                         if (forceObj.getSubindex() == null) {
@@ -1283,9 +1277,6 @@ public class Module {
                     }
                 }
             }
-            System.err.println(
-                    "Position to be moved...for new position greater than older..."
-                            + positiontoBeMoved);
             for (Integer positionMove : positiontoBeMoved) {
                 if (getPreviousModulePosition(positionMove) != 0) {
                     int newPositionToBeMoved = getPreviousModulePosition(
@@ -1310,9 +1301,7 @@ public class Module {
                     }
                 }
             }
-            System.err.println(
-                    "Position to be moved..for new position less than older..."
-                            + positiontoBeMoved);
+
             for (Integer positionMove : positiontoBeMoved) {
                 if (getNextModulePosition(positionMove) != 0) {
                     int newPositionToBeMoved = getNextModulePosition(
@@ -1344,7 +1333,7 @@ public class Module {
         OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_ADDRESS_OBJECT, value);
         int oldAddress = getAddress();
-        System.err.println("oldAddress..... .." + oldAddress);
+
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
             Integer address = Integer.valueOf(value);
@@ -1370,15 +1359,11 @@ public class Module {
 
         OpenConfiguratorProjectUtils.swapModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_ADDRESS_OBJECT, value);
-        int oldAddress = getAddress();
-        System.err.println("oldAddress..... .." + oldAddress);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
             Integer address = Integer.valueOf(value);
             module.setAddress(BigInteger.valueOf(address));
             getInterfaceOfModule().getAddressCollection().put(address, this);
-            System.err.println("The address collection: "
-                    + getInterfaceOfModule().getAddressCollection().keySet());
         } else {
             System.err.println("Invalid module model.");
         }
@@ -1523,17 +1508,10 @@ public class Module {
                 .getType();
         String currentToNextModuleType = currentModule.getModuleType();
 
-        System.err.println("PreviousPOsition11......" + previousPosition);
-        System.err.println("NextPOsition13......" + nextPosition);
-
         if (previousPosition != 0) {
             Module previousModule = getInterfaceOfModule().getModuleCollection()
                     .get(previousPosition);
             String previousModuleType = previousModule.getModuleType();
-            System.err.println(
-                    "Previous mOdule type15....." + previousModuleType);
-            System.err.println(
-                    "Next module type16......" + currentToPreviousModuleType);
             if (previousModuleType.equals(currentToPreviousModuleType)) {
                 validPosition = true;
                 if (nextPosition != 0) {
@@ -1541,21 +1519,12 @@ public class Module {
                             .getModuleCollection().get(nextPosition);
                     String nextModuleType = nextModule.getModuleInterface()
                             .getType();
-                    System.err.println("Equals123......");
-                    System.err.println("current module type ......"
-                            + currentToNextModuleType);
-                    System.err.println(
-                            "Next module type ......" + nextModuleType);
                     if ((currentToNextModuleType.equals(nextModuleType))) {
-                        System.err.println("Equals......");
                         validPosition = true;
                     } else {
-                        System.err.println("Equals245......");
-                        System.err.println("Not Equals......");
                         validPosition = false;
                     }
                 }
-                System.err.println("Eneteref into critical section....");
             } else {
                 validPosition = false;
             }
@@ -1567,16 +1536,13 @@ public class Module {
                         .getType();
 
                 if ((currentToNextModuleType.equals(nextModuleType))) {
-                    System.err.println("Equals......");
                     validPosition = true;
                 } else {
-                    System.err.println("Equals245......");
-                    System.err.println("Not Equals......");
                     validPosition = false;
                 }
             }
         }
-        System.err.println("Valid position = " + validPosition);
+
         if (!validPosition) {
             MessageDialog dialog = new MessageDialog(null,
                     "Modify module position", null,
@@ -1586,7 +1552,7 @@ public class Module {
             if (result == 0) {
                 OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
                         IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
-                System.err.println("oldPOsition..... .." + oldPosition);
+
                 if (moduleModel instanceof InterfaceList.Interface.Module) {
                     InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
                     Integer position = Integer.valueOf(value);
@@ -1626,7 +1592,6 @@ public class Module {
         }
         OpenConfiguratorProjectUtils.updateModuleAttributeValue(this,
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
-        System.err.println("oldPOsition..... .." + oldPosition);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
             Integer position = Integer.valueOf(value);
@@ -1670,8 +1635,6 @@ public class Module {
                 IAbstractNodeProperties.MODULE_POSITION_OBJECT, value);
         int oldPosition = getPosition();
         Integer position = Integer.valueOf(value);
-        System.err.println("oldPOsition@#@$..... .." + oldPosition);
-        System.err.println("NewPOsition@$#$..... .." + position);
         if (moduleModel instanceof InterfaceList.Interface.Module) {
             InterfaceList.Interface.Module module = (InterfaceList.Interface.Module) moduleModel;
 
@@ -1854,8 +1817,7 @@ public class Module {
                     .getModuleObjectsIndex(object.getModule(), object.getId());
             String objectId = Long.toHexString(newObjectIndex);
             String objectIndex = DatatypeConverter.printHexBinary(obj);
-            System.err.println("ObjectId..." + objectId + " Object Index..."
-                    + objectIndex);
+
             if (objectId.equalsIgnoreCase(objectIndex)) {
 
                 for (PowerlinkSubobject subObject : object.getSubObjects()) {
@@ -1937,7 +1899,6 @@ public class Module {
         } else {
             validModulePosition = false;
         }
-        System.err.println("Valid Module position.. " + validModulePosition);
         return validModulePosition;
     }
 
@@ -2001,7 +1962,6 @@ public class Module {
         } else {
             validModulePosition = false;
         }
-        System.err.println("Valid Module position.. " + validModulePosition);
         return validModulePosition;
     }
 
@@ -2046,10 +2006,7 @@ public class Module {
             Module previousModule = getInterfaceOfModule().getModuleCollection()
                     .get(previousPosition);
             String previousModuleType = previousModule.getModuleType();
-            System.err.println(
-                    "Previous mOdule type15....." + previousModuleType);
-            System.err.println(
-                    "Next module type16......" + currentToPreviousModuleType);
+
             if (previousModuleType.equals(currentToPreviousModuleType)) {
                 validPosition = true;
                 if (nextPosition != 0) {
@@ -2057,21 +2014,13 @@ public class Module {
                             .getModuleCollection().get(nextPosition);
                     String nextModuleType = nextModule.getModuleInterface()
                             .getType();
-                    System.err.println("Equals123......");
-                    System.err.println("current module type ......"
-                            + currentToNextModuleType);
-                    System.err.println(
-                            "Next module type ......" + nextModuleType);
                     if ((currentToNextModuleType.equals(nextModuleType))) {
-                        System.err.println("Equals......");
                         validPosition = true;
                     } else {
-                        System.err.println("Equals245......");
-                        System.err.println("Not Equals......");
                         validPosition = false;
                     }
                 }
-                System.err.println("Eneteref into critical section....");
+
             } else {
                 validPosition = false;
             }
@@ -2083,11 +2032,8 @@ public class Module {
                         .getType();
 
                 if ((currentToNextModuleType.equals(nextModuleType))) {
-                    System.err.println("Equals......");
                     validPosition = true;
                 } else {
-                    System.err.println("Equals245......");
-                    System.err.println("Not Equals......");
                     validPosition = false;
                 }
             }
@@ -2133,16 +2079,10 @@ public class Module {
                         .get(nextPosition);
                 String nextModuleType = nextModule.getModuleInterface()
                         .getType();
-                System.err.println(
-                        "Previous mOdule type..." + previousModuleType);
-                System.err.println("Next module type ......" + nextModuleType);
                 if (nextModule.isEnabled()) {
                     if ((previousModuleType.equals(nextModuleType))) {
-                        System.err.println("Equals......");
                         return;
                     }
-                    System.err.println("Equals245......");
-                    System.err.println("Not Equals......");
                     nextModule.setEnabled(false);
                 }
             }

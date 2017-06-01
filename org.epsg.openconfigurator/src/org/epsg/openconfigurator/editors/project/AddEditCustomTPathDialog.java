@@ -208,10 +208,7 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
             idList.add(CUSTOM_CONFIG_PATH[4]);
             idList.add(CUSTOM_CONFIG_PATH[5]);
 
-            System.err.println("Id list..path seting .." + pathSettingsModel);
             for (TPath path : pathSettingsModel.getPath()) {
-                System.err.println("Id list.." + idList);
-                System.err.println("Id path.." + path.getId());
                 if (idList.contains(path.getId())) {
                     idList.remove(path.getId());
                 }

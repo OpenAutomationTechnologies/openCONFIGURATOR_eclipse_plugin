@@ -588,8 +588,6 @@ public class IndustrialNetworkView extends ViewPart
         Collections.sort(previousPositionList, Collections.reverseOrder());
         if (previousModulePosition != 0) {
             for (Integer previousPosition : previousPositionList) {
-                System.err.println(
-                        "Previous position!@#$ . ..." + previousPosition);
                 Module previousPositionModule = interfaceObj
                         .getModuleCollection().get(previousPosition);
                 if (previousPositionModule.hasError()) {
@@ -603,14 +601,8 @@ public class IndustrialNetworkView extends ViewPart
                         String previousModuleType = moduleType.getType();
                         String enabledPositionModuleType = enabledPositionModule
                                 .getModuleInterface().getType();
-                        System.err.println("Previous Module Position type ...."
-                                + previousModuleType);
-                        System.err.println("Enabled Module Position type ...."
-                                + enabledPositionModuleType);
                         if (previousModuleType
                                 .equals(enabledPositionModuleType)) {
-                            System.err.println(
-                                    "Previous module equals enabled module.....");
                             enable = true;
                         } else {
                             return false;
@@ -635,7 +627,6 @@ public class IndustrialNetworkView extends ViewPart
         }
 
         for (Integer nextPosition : positionToBeChecked) {
-            System.err.println("Next position @#$#%......." + nextPosition);
             Module nextPositionModule = interfaceObj.getModuleCollection()
                     .get(nextPosition);
             if (nextPositionModule.isEnabled()) {
@@ -646,10 +637,6 @@ public class IndustrialNetworkView extends ViewPart
                         .getModuleType();
                 for (ModuleType moduletype : enabledModuleTypeList) {
                     String enabledModuleType = moduletype.getType();
-                    System.err.println(
-                            "Enabled module type.." + enabledModuleType);
-                    System.err.println("Next position module type.."
-                            + nextPositionModuleType);
                     if (enabledModuleType.equals(nextPositionModuleType)) {
                         enable = true;
 
@@ -662,7 +649,6 @@ public class IndustrialNetworkView extends ViewPart
 
         }
 
-        System.err.println("Enable..............................." + enable);
         return enable;
     }
 
@@ -701,7 +687,6 @@ public class IndustrialNetworkView extends ViewPart
                             .getModuleType();
 
                     for (Integer posit : positionToBeChecked) {
-                        System.err.println("next Module Position.." + posit);
                         Module mod = interfaceObj.getModuleCollection()
                                 .get(posit);
                         if (mod.isEnabled()) {
@@ -711,10 +696,6 @@ public class IndustrialNetworkView extends ViewPart
                             for (ModuleType moduleType : previousModuleTypeList) {
                                 String previousModuleType = moduleType
                                         .getType();
-                                System.err.println("Previous Module type.."
-                                        + previousModuleType);
-                                System.err.println("Next Module type.."
-                                        + nextPositionModuleType);
 
                                 if (previousModuleType.equalsIgnoreCase(
                                         nextPositionModuleType)) {
@@ -732,7 +713,6 @@ public class IndustrialNetworkView extends ViewPart
             String previousModuleType = interfaceObj.getInterfaceType();
 
             for (Integer posit : positionToBeChecked) {
-                System.err.println("next Module Position.." + posit);
                 Module mod = interfaceObj.getModuleCollection().get(posit);
                 if (mod.isEnabled()) {
                     String nextPositionModuleType = mod.getModuleInterface()
@@ -799,8 +779,6 @@ public class IndustrialNetworkView extends ViewPart
                                 .getModuleInterface().getType();
                         if (previousModuleType
                                 .equals(enabledPositionModuleType)) {
-                            System.err.println(
-                                    "Previous module equals enabled module.....");
                             enable = true;
                         } else {
                             return "The Module '"
@@ -2483,7 +2461,6 @@ public class IndustrialNetworkView extends ViewPart
     private void validateModule(Module module)
             throws JDOMException, IOException {
         int removedModulePosition = module.getPosition();
-        System.err.println("removed position...." + removedModulePosition);
         HeadNodeInterface interfaceObj = module.getInterfaceOfModule();
         List<Integer> positionToBeChecked = new ArrayList<>();
         List<Integer> previousPositionList = new ArrayList<>();
@@ -2502,8 +2479,6 @@ public class IndustrialNetworkView extends ViewPart
         Collections.sort(previousPositionList, Collections.reverseOrder());
         if (previousPositionList.size() > 0) {
             for (Integer previousModulePosition : previousPositionList) {
-                System.err.println(
-                        "previous pos........" + previousModulePosition);
                 Module previousPositionModule = interfaceObj
                         .getModuleCollection().get(previousModulePosition);
                 List<ModuleType> previousModuleTypeList = previousPositionModule
@@ -2574,19 +2549,11 @@ public class IndustrialNetworkView extends ViewPart
                                                                 newPosition);
 
                                             } else {
-                                                System.err.println(
-                                                        "Disabled module name.."
-                                                                + mod.getModuleName());
-                                                System.err.println(
-                                                        "posit..... " + posit);
 
                                                 Module moduleValue = interfaceObj
                                                         .getModuleCollection()
                                                         .get(posit);
                                                 int newPosition = posit - 1;
-                                                System.err.println(
-                                                        "new posit..... "
-                                                                + newPosition);
                                                 moduleValue.setPositions(String
                                                         .valueOf(newPosition));
                                                 OpenConfiguratorProjectUtils
@@ -2624,17 +2591,6 @@ public class IndustrialNetworkView extends ViewPart
                             Module moduleValue = interfaceObj
                                     .getModuleCollection().get(position);
                             int newPosition = position - 1;
-                            System.err.println(
-                                    "The module entered critical position....."
-                                            + newPosition + "Name..."
-                                            + moduleValue.getModuleName());
-
-                            System.err.println(
-                                    "The module address entered critical position....."
-                                            + newPosition + "Name..."
-                                            + moduleValue.getModuleName()
-                                            + "Address..."
-                                            + moduleValue.getAddress());
 
                             moduleValue
                                     .setPositions(String.valueOf(newPosition));
@@ -2646,7 +2602,6 @@ public class IndustrialNetworkView extends ViewPart
                         Module moduleValue = interfaceObj.getModuleCollection()
                                 .get(position);
                         int newPosition = position - 1;
-                        System.err.println("new posit..... " + newPosition);
 
                         moduleValue.setPositions(String.valueOf(newPosition));
                         OpenConfiguratorProjectUtils
@@ -2669,14 +2624,10 @@ public class IndustrialNetworkView extends ViewPart
                                 return;
 
                             }
-                            System.err.println("Disabled module name.."
-                                    + moduleObj.getModuleName());
-                            System.err.println("posit..... " + position);
 
                             Module moduleValue = interfaceObj
                                     .getModuleCollection().get(position);
                             int newPosition = position - 1;
-                            System.err.println("new posit..... " + newPosition);
                             moduleValue
                                     .setPositions(String.valueOf(newPosition));
                             OpenConfiguratorProjectUtils

@@ -462,10 +462,6 @@ public class Node {
                         if (cnNode.getProductCodeValue().equalsIgnoreCase(
                                 newNode.getProductCodeValue())) {
                             if (!cnNode.getValidFirmwareList().isEmpty()) {
-
-                                System.err.println(
-                                        "The firmware collection values.."
-                                                + cnNode.getValidFirmwareList());
                                 for (FirmwareManager fwMngr : cnNode
                                         .getValidFirmwareList()) {
                                     validFwList.add(fwMngr);
@@ -581,8 +577,6 @@ public class Node {
 
     private void copyXdcFile(Node selectednode, int nodeId, int stationType,
             String name) {
-        System.err.println("The node XDC path before.."
-                + selectednode.getAbsolutePathToXdc());
 
         TCN cnModel = new TCN();
         cnModel.setName(name);
@@ -611,9 +605,7 @@ public class Node {
                 xddModel) instanceof ProfileBodyDevicePowerlinkModularHead) {
             Result res = OpenConfiguratorLibraryUtils
                     .addModularHeadNode(newNode);
-            System.err.println("Modular CN...");
             if (res.IsSuccessful()) {
-
                 try {
                     rootNode.addNode(nodeCollection, newNode);
 
@@ -656,7 +648,6 @@ public class Node {
             }
 
         } else {
-            System.err.println("Normal CN...");
             Result res = OpenConfiguratorLibraryUtils.addNode(newNode);
             if (res.IsSuccessful()) {
 
@@ -2341,9 +2332,6 @@ public class Node {
 
             selectedNodeObj.getModuleNameCollection()
                     .put(newModule.getModuleName(), newModule);
-
-            System.err.println("Module collection values ... "
-                    + selectedNodeObj.getModuleCollection().values());
 
             try {
                 OpenConfiguratorProjectUtils.addModuleNode(

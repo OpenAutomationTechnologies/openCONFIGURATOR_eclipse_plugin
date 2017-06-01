@@ -111,9 +111,6 @@ public class NodeAdapterFactory implements IAdapterFactory {
                     if (rmnPropertySource == null) {
                         rmnPropertySource = new RedundantManagingNodePropertySource(
                                 nodeObj);
-                        System.err.println("The RMN property source.."
-                                + nodeObj.getNodeIdString()
-                                + nodeObj.getNodeIDWithName());
                     } else {
                         rmnPropertySource.setNodeData(nodeObj);
                     }

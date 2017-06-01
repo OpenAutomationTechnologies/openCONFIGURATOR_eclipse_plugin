@@ -354,7 +354,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
                 pathSett = setPath;
             }
         }
-        System.err.println("Active path ..." + activepathSetting);
 
         if (pathSett == null) {
             return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
@@ -363,7 +362,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
         List<TPath> pathList = pathSett.getPath();
         TPath pathConfig = null;
         for (TPath path : pathList) {
-            System.err.println("path path ..." + path.getId());
             if (path.getId().equalsIgnoreCase(pathtext)) {
                 pathConfig = path;
             }
