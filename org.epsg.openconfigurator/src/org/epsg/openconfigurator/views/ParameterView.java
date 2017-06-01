@@ -113,16 +113,7 @@ public class ParameterView extends ViewPart implements IPropertyListener {
                 Object[] elements) {
             ArrayList<Object> objList = new ArrayList<>();
 
-            // Display sub-object after filtering of objects.
-            if (parent instanceof ParameterGroup) {
-                ParameterGroup paramGroup = (ParameterGroup) parent;
-                List<ParameterReference> prmGrp = paramGroup
-                        .getParameterRefList();
-                objList.addAll(prmGrp);
-            } else {
-                Collections.addAll(objList,
-                        super.filter(viewer, parent, elements));
-            }
+            Collections.addAll(objList, super.filter(viewer, parent, elements));
 
             return objList.toArray();
         }
@@ -667,6 +658,9 @@ public class ParameterView extends ViewPart implements IPropertyListener {
         filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
                 SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL, filter, true);
+
+        // treeViewer = new TreeViewer(parent,
+        // SWT.SINGLE | SWT.H_SCROLL | SWT.V_SCROLL);
 
         treeViewer = tree.getViewer();
 
