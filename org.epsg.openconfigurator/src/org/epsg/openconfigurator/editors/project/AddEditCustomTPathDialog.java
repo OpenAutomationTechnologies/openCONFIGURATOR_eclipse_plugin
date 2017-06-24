@@ -85,6 +85,8 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
             "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
             "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
 
+    public boolean allOutputConfCheck = false;
+
     /**
      * Path name text box.
      */
@@ -111,6 +113,11 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
      * Path settings parent model.
      */
     private TProjectConfiguration.PathSettings pathSettingsModel;
+
+    /**
+     * Button to Configure same output for all path ID
+     */
+    private Button sameOutputpath;
 
     /**
      * Create the Add/Edit Path settings dialog.
@@ -310,6 +317,26 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
                 }
             });
 
+            sameOutputpath = new Button(container, SWT.CHECK);
+            sameOutputpath.setLayoutData(
+                    new GridData(SWT.RIGHT, SWT.CENTER, false, false, 1, 1));
+            sameOutputpath.setSelection(true);
+
+            Label lblActive = new Label(container, SWT.CENTER);
+            lblActive.setText("Use this path for all path ID");
+            lblActive.setLayoutData(
+                    new GridData(SWT.NONE, SWT.LEFT, false, false, 1, 1));
+
+            /**
+             * Active/In-Active check box selection changed listener.
+             */
+            sameOutputpath.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    dirty = true;
+                }
+            });
+
             return container;
 
         }
@@ -327,6 +354,10 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
     @Override
     protected Point getInitialSize() {
         return new Point(450, 350);
+    }
+
+    public boolean isAllOutputpathConfigured() {
+        return allOutputConfCheck;
     }
 
     /**
@@ -386,6 +417,8 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
                     AddEditCustomTPathDialog.LOCATION_FIELD_MESSAGE_INVALID_PATH);
         }
 
+        allOutputConfCheck = sameOutputpath.getSelection();
+        System.err.println("Conf checked.." + allOutputConfCheck);
         return (nameValid && locationValid);
     }
 

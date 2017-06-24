@@ -535,6 +535,10 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                     currentProject.getProjectConfiguration()
                             .setActivePathSetting(
                                     OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+                    PathSettings customPathSettings = new PathSettings();
+                    customPathSettings.setId(
+                            OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
+
                 }
 
                 IndustrialNetworkProjectEditorPage.this.setDirty(true);
@@ -637,11 +641,14 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                             form.getShell(), pathSettings, path, true);
                     if (addEditPathDialog.open() == Window.OK) {
                         TPath newSetting = addEditPathDialog.getData();
-
+                        System.err.println("Conf checked.." + addEditPathDialog
+                                .isAllOutputpathConfigured());
                         List<TProjectConfiguration.PathSettings> pathList = currentProject
                                 .getProjectConfiguration().getPathSettings();
-
+                        System.err.println("Path List.." + pathList);
                         for (TProjectConfiguration.PathSettings pathSet : pathList) {
+                            System.err
+                                    .println("Path Set ID.." + pathSet.getId());
                             if (pathSet.getId() != null) {
                                 if (pathSet.getId().equalsIgnoreCase(
                                         OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
@@ -649,6 +656,14 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                             .setId(newSetting.getId());
                                     pathSet.getPath().get(itemToEdit)
                                             .setPath(newSetting.getPath());
+                                    if (addEditPathDialog
+                                            .isAllOutputpathConfigured()) {
+                                        for (TPath pathVal : pathSet
+                                                .getPath()) {
+                                            pathVal.setPath(
+                                                    newSetting.getPath());
+                                        }
+                                    }
                                 }
                             }
                         }
@@ -664,62 +679,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 if (pathDropDown.getText().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
                     // Open the Add dialog box for All path
-                    List<PathSettings> pathSettingsList = currentProject
-                            .getProjectConfiguration().getPathSettings();
-                    PathSettings pathSettings = new PathSettings();
-                    pathSettings.setId(
-                            OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
-                    for (PathSettings setPath : pathSettingsList) {
-                        if (setPath != null) {
-                            if (setPath.getId() != null) {
-                                if (setPath.getId().equalsIgnoreCase(
-                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
-                                    pathSettings = setPath;
-                                }
-                            }
-                        }
-                    }
 
-                    AddEditTPathDialog addEditPathDialog = new AddEditTPathDialog(
-                            form.getShell(), pathSettings, null);
-                    if (addEditPathDialog.open() == Window.OK) {
-                        TPath newSetting = addEditPathDialog.getData();
-
-                        // Update the model and the table with the newly added
-                        // value
-                        List<TProjectConfiguration.PathSettings> pathList = currentProject
-                                .getProjectConfiguration().getPathSettings();
-
-                        for (TProjectConfiguration.PathSettings pathSet : pathList) {
-                            if (pathSet.getId() != null) {
-                                if (pathSet.getId().equalsIgnoreCase(
-                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
-                                    if (newSetting.isActive() == true) {
-                                        for (TPath eachPath : pathSet
-                                                .getPath()) {
-                                            eachPath.setActive(false);
-                                        }
-                                    }
-
-                                    pathSet.getPath().add(newSetting);
-                                }
-                            } else {
-                                pathSet.setId(
-                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
-                                if (newSetting.isActive() == true) {
-                                    for (TPath eachPath : pathSet.getPath()) {
-                                        eachPath.setActive(false);
-                                    }
-                                }
-                                pathSet.getPath().add(newSetting);
-                            }
-                        }
-
-                        IndustrialNetworkProjectEditorPage.this.setDirty(true);
-
-                        IndustrialNetworkProjectEditorPage.this
-                                .reloadPathSettingsTable();
-                    }
                 } else if (pathDropDown.getText().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                     // Open the Add dialog box for Custom path
@@ -753,7 +713,9 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                 form.getShell(), pathSettings, null, false);
                         if (addEditPathDialog.open() == Window.OK) {
                             TPath newSetting = addEditPathDialog.getData();
-
+                            System.err.println(
+                                    "Conf checked.." + addEditPathDialog
+                                            .isAllOutputpathConfigured());
                             List<TProjectConfiguration.PathSettings> pathList = currentProject
                                     .getProjectConfiguration()
                                     .getPathSettings();
@@ -778,6 +740,101 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                             OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID);
                                     paths.getPath().add(newSetting);
                                     pathList.add(paths);
+                                }
+                                if (pathSet.getId().equalsIgnoreCase(
+                                        OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
+                                    if (addEditPathDialog
+                                            .isAllOutputpathConfigured()) {
+                                        TPath path = new TPath();
+                                        path.setId(CUSTOM_CONFIG_PATH[0]);
+                                        path.setPath(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                                        TPath binPath = new TPath();
+                                        binPath.setId(CUSTOM_CONFIG_PATH[1]);
+                                        binPath.setPath(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                                        TPath path3 = new TPath();
+                                        path3.setId(CUSTOM_CONFIG_PATH[2]);
+                                        path3.setPath(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                                        TPath path4 = new TPath();
+                                        path4.setId(CUSTOM_CONFIG_PATH[3]);
+                                        path4.setPath(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                                        TPath path5 = new TPath();
+                                        path5.setId(CUSTOM_CONFIG_PATH[4]);
+                                        path5.setPath(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                                        TPath path6 = new TPath();
+                                        path6.setId(CUSTOM_CONFIG_PATH[5]);
+                                        path6.setPath(
+                                                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                                        if (!newSetting.getId()
+                                                .equalsIgnoreCase(
+                                                        CUSTOM_CONFIG_PATH[0])) {
+                                            pathSet.getPath().add(path);
+                                        }
+                                        if (!newSetting.getId()
+                                                .equalsIgnoreCase(
+                                                        CUSTOM_CONFIG_PATH[1])) {
+                                            pathSet.getPath().add(binPath);
+                                        }
+                                        if (!newSetting.getId()
+                                                .equalsIgnoreCase(
+                                                        CUSTOM_CONFIG_PATH[2])) {
+                                            pathSet.getPath().add(path3);
+                                        }
+                                        if (!newSetting.getId()
+                                                .equalsIgnoreCase(
+                                                        CUSTOM_CONFIG_PATH[3])) {
+                                            pathSet.getPath().add(path4);
+                                        }
+                                        if (!newSetting.getId()
+                                                .equalsIgnoreCase(
+                                                        CUSTOM_CONFIG_PATH[4])) {
+                                            pathSet.getPath().add(path5);
+                                        }
+                                        if (!newSetting.getId()
+                                                .equalsIgnoreCase(
+                                                        CUSTOM_CONFIG_PATH[5])) {
+                                            pathSet.getPath().add(path6);
+                                        }
+                                        for (TPath pathVal : pathSet
+                                                .getPath()) {
+
+                                            switch (pathVal.getId()) {
+                                                case "CONFIG_TEXT":
+                                                    pathVal.setPath(newSetting
+                                                            .getPath());
+                                                    break;
+                                                case "CONFIG_BINARY":
+                                                    pathVal.setPath(newSetting
+                                                            .getPath());
+                                                    break;
+                                                case "CONFIG_CHAR_TEXT":
+                                                    pathVal.setPath(newSetting
+                                                            .getPath());
+                                                    break;
+                                                case "XML_PROCESS_IMAGE":
+                                                    pathVal.setPath(newSetting
+                                                            .getPath());
+                                                    break;
+                                                case "C_PROCESS_IMAGE":
+                                                    pathVal.setPath(newSetting
+                                                            .getPath());
+                                                    break;
+                                                case "CSHARP_PROCESS_IMAGE":
+                                                    pathVal.setPath(newSetting
+                                                            .getPath());
+                                                    break;
+                                                default:
+                                                    System.err.println(
+                                                            "Path ID invalid.");
+                                                    break;
+                                            }
+
+                                        }
+                                    }
                                 }
                             }
 
@@ -1849,7 +1906,38 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
                             pathSettingsTable.clearAll();
                             pathSettingsTable.removeAll();
-
+                            pathSettingsTable.setEnabled(false);
+                            pathSettingList.getPath().clear();
+                            TPath path = new TPath();
+                            path.setId(CUSTOM_CONFIG_PATH[0]);
+                            path.setPath(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                            TPath binPath = new TPath();
+                            binPath.setId(CUSTOM_CONFIG_PATH[1]);
+                            binPath.setPath(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                            TPath path3 = new TPath();
+                            path3.setId(CUSTOM_CONFIG_PATH[2]);
+                            path3.setPath(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                            TPath path4 = new TPath();
+                            path4.setId(CUSTOM_CONFIG_PATH[3]);
+                            path4.setPath(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                            TPath path5 = new TPath();
+                            path5.setId(CUSTOM_CONFIG_PATH[4]);
+                            path5.setPath(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                            TPath path6 = new TPath();
+                            path6.setId(CUSTOM_CONFIG_PATH[5]);
+                            path6.setPath(
+                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+                            pathSettingList.getPath().add(path);
+                            pathSettingList.getPath().add(binPath);
+                            pathSettingList.getPath().add(path3);
+                            pathSettingList.getPath().add(path4);
+                            pathSettingList.getPath().add(path5);
+                            pathSettingList.getPath().add(path6);
                             for (TPath setPath : pathSettingList.getPath()) {
                                 TableItem item = new TableItem(
                                         pathSettingsTable, SWT.NONE);
@@ -1870,6 +1958,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                 OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                             pathSettingsTable.clearAll();
                             pathSettingsTable.removeAll();
+                            pathSettingsTable.setEnabled(true);
+                            System.err.println("Here...1");
 
                             for (TPath setPath : pathSettingList.getPath()) {
                                 TableItem item = new TableItem(
@@ -1880,21 +1970,14 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         } else {
                             pathSettingsTable.clearAll();
                             pathSettingsTable.removeAll();
-
-                            TableItem item = new TableItem(pathSettingsTable,
-                                    SWT.NONE);
-                            item.setText(0,
-                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
-                            item.setText(1,
-                                    OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
-                            item.setForeground(Display.getDefault()
-                                    .getSystemColor(SWT.COLOR_DARK_GRAY));
+                            pathSettingsTable.setEnabled(true);
 
                         }
                     }
                 } else {
                     pathSettingsTable.clearAll();
                     pathSettingsTable.removeAll();
+                    pathSettingsTable.setEnabled(true);
 
                     for (TPath setPath : pathSettingList.getPath()) {
                         TableItem item = new TableItem(pathSettingsTable,
@@ -1928,6 +2011,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             editPathSettingsButton.setEnabled(true);
             deletePathSettingsButton.setEnabled(true);
 
+        }
+        if (pathDropDown.getText().equalsIgnoreCase(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
+            addPathSettingsButton.setEnabled(false);
+        } else {
+            addPathSettingsButton.setEnabled(true);
         }
 
     }

@@ -41,7 +41,6 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -496,54 +495,11 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
             List<TPath> pathList = pathSett.getPath();
             TPath pathConfig = null;
             for (TPath path : pathList) {
-                if (path.isActive()) {
-                    pathConfig = path;
-                }
+
+                pathConfig = path;
+
             }
 
-            if (pathConfig == null) {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, "defaultOutputPath");
-                if (defaultPath != null) {
-                    return new Path(defaultPath.getPath(), true);
-                }
-            }
-
-            if (pathConfig != null) {
-                if (pathConfig.getId().equalsIgnoreCase("defaultOutputPath")) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSett, "defaultOutputPath");
-                    if (defaultPath != null) {
-                        return new Path(defaultPath.getPath(), true);
-                    }
-                }
-            }
-
-            String activeOutputPathID = StringUtils.EMPTY;
-            if (pathConfig != null) {
-                activeOutputPathID = pathConfig.getId();
-            }
-            if (activeOutputPathID == null) {
-                if (!pathSett.getPath().isEmpty()) {
-                    TPath defaultPath = OpenConfiguratorProjectUtils
-                            .getTPath(pathSett, "defaultOutputPath");
-                    if (defaultPath != null) {
-                        return new Path(defaultPath.getPath(), true);
-                    }
-                }
-            } else {
-                TPath defaultPath = OpenConfiguratorProjectUtils
-                        .getTPath(pathSett, activeOutputPathID);
-                if (defaultPath != null) {
-                    if (!defaultPath.getId()
-                            .equalsIgnoreCase("defaultOutputPath")) {
-                        return new Path(defaultPath.getPath(), false);
-                    }
-                } else {
-                    System.err.println(
-                            "Unhandled error occurred. activeOutputPath not found");
-                }
-            }
         }
         return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
     }
