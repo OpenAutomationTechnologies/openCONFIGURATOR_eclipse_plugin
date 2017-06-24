@@ -5,7 +5,13 @@
 		<category name="Industrial Automation" id="org.epsg.openconfigurator.view.category"/>
 		<view name="POWERLINK Network" icon="icons/window_16.gif" category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.IndustrialNetworkView" id="org.epsg.openconfigurator.views.IndustrialNetworkView"/>
 		<view allowMultiple="false" category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.ObjectDictionaryView" icon="icons/obd.gif" id="org.epsg.openconfigurator.views.ObjectDictionaryView" name="Object Dictionary"/>
-		<view category="org.epsg.openconfigurator.view.category" class="org.epsg.openconfigurator.views.mapping.MappingView" icon="icons/mapping.gif" id="org.epsg.openconfigurator.views.MappingView" name="Mapping View"/>
+		<view
+        category="org.epsg.openconfigurator.view.category"
+        class="org.epsg.openconfigurator.views.mapping.MappingView"
+        icon="icons/mapping.gif"
+        id="org.epsg.openconfigurator.views.MappingView"
+        name="Mapping View"
+        restorable="true"/>
 	  <view
         allowMultiple="false"
         category="org.epsg.openconfigurator.view.category"

@@ -571,6 +571,11 @@ public class Node {
         }
     }
 
+    public void call() {
+        rootNode.fireNodePropertyChanged(new NodePropertyChangeEvent(this));
+
+    }
+
     public void copyNode(int nodeId, int stationType, String name) {
         copyXdcFile(this, nodeId, stationType, name);
     }

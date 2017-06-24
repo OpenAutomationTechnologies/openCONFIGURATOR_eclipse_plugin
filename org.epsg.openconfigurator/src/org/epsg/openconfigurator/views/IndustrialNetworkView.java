@@ -91,6 +91,8 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPropertyListener;
 import org.eclipse.ui.ISharedImages;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
@@ -541,7 +543,9 @@ public class IndustrialNetworkView extends ViewPart
 
     // Mapping view action message strings.
     public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
+    public static final String SHOW_NODE_OVER_VIEW_ACTION_MESSAGE = "Show Node Overview";
     public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error opening Mapping View";
+    public static final String SHOW_NODE_OVER_VIEW_ERROR_MESSAGE = "Error opening Node Overview";
 
     // Properties actions message strings.
     public static final String PROPERTIES_ACTION_MESSAGE = "Properties";
@@ -925,6 +929,11 @@ public class IndustrialNetworkView extends ViewPart
     private Action showPdoMapping;
 
     /**
+     * Show Node overview action.
+     */
+    private Action showNodeOverview;
+
+    /**
      * Sort Node action.
      */
     private Action sortNode;
@@ -1087,6 +1096,7 @@ public class IndustrialNetworkView extends ViewPart
         getSite().setSelectionProvider(viewer);
         viewer.addSelectionChangedListener(viewerSelectionChangedListener);
         viewer.getControl().addKeyListener(treeViewerKeyListener);
+
     }
 
     @Override
@@ -1135,6 +1145,7 @@ public class IndustrialNetworkView extends ViewPart
                     if (node.hasError()) {
                         manager.add(deleteNode);
                     } else {
+                        manager.add(showNodeOverview);
                         manager.add(showPdoMapping);
                         manager.add(showObjectDictionary);
                         manager.add(new Separator());
@@ -1143,6 +1154,7 @@ public class IndustrialNetworkView extends ViewPart
                 } else if (nodeObjectModel instanceof TNetworkConfiguration) {
                     manager.add(addNewNode);
                     manager.add(new Separator());
+                    manager.add(showNodeOverview);
                     manager.add(showPdoMapping);
                     manager.add(showObjectDictionary);
                     currentProject = rootNode.getOpenConfiguratorProject();
@@ -1206,6 +1218,7 @@ public class IndustrialNetworkView extends ViewPart
                         // Display list of menu only if the nodes are enabled.
                         if (node.isEnabled()) {
                             manager.add(new Separator());
+                            manager.add(showNodeOverview);
                             manager.add(showPdoMapping);
                             manager.add(showObjectDictionary);
                             manager.add(showParameter);
@@ -1526,6 +1539,10 @@ public class IndustrialNetworkView extends ViewPart
         }
         return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
 
+    }
+
+    public TreeViewer getViewer() {
+        return viewer;
     }
 
     private void handleEnableDisable(IStructuredSelection selection) {
@@ -2226,6 +2243,40 @@ public class IndustrialNetworkView extends ViewPart
                 org.epsg.openconfigurator.Activator.getImageDescriptor(
                         IPluginImages.OBD_PARAMETER_REFERENCE_ICON));
 
+        showNodeOverview = new Action(SHOW_NODE_OVER_VIEW_ACTION_MESSAGE) {
+            @Override
+            public void run() {
+
+                try {
+
+                    IWorkbenchPage workBenchPage = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage();
+
+                    // Find desired view :
+                    IViewPart nodeOverView = workBenchPage
+                            .findView(MappingView.ID);
+
+                    // Hide the view :
+                    workBenchPage.hideView(nodeOverView);
+
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getActivePage().showView(MappingView.ID);
+
+                    System.err.println(
+                            "The view site..." + PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getActivePage()
+                                    .showView(MappingView.ID).getViewSite());
+                    viewer.setSelection(viewer.getSelection());
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                    showMessage(SHOW_NODE_OVER_VIEW_ERROR_MESSAGE);
+                }
+            }
+        };
+        showNodeOverview.setToolTipText(SHOW_NODE_OVER_VIEW_ACTION_MESSAGE);
+        showNodeOverview.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.MAPPING_ICON));
+
         showPdoMapping = new Action(SHOW_MAPING_VIEW_ACTION_MESSAGE) {
 
             @Override
@@ -2242,6 +2293,7 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
         };
+
         showPdoMapping.setToolTipText(SHOW_MAPING_VIEW_ACTION_MESSAGE);
         showPdoMapping.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.MAPPING_ICON));
@@ -2262,6 +2314,7 @@ public class IndustrialNetworkView extends ViewPart
                 }
             }
         };
+
         showProperties.setToolTipText(PROPERTIES_ACTION_MESSAGE);
         showProperties.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.PROPERTIES_ICON));
