@@ -2260,57 +2260,6 @@ public class MappingView extends ViewPart {
 
                     // Set null as input to the view, when the node is disabled.
                     displayMappingView(nodeObj);
-                    Object nodeObjModel = nodeObj.getNodeModel();
-
-                    Integer nodeIdVal = Integer
-                            .valueOf(nodeObj.getNodeIdString());
-                    if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        String[] presItems = { "Yes", "No" };
-                        nodeTypeCombo.setItems(presItems);
-                        if (nodeObj
-                                .getNodeModel() instanceof TNetworkConfiguration) {
-                            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
-                                    .getNodeModel();
-                            TMN mn = net.getNodeCollection().getMN();
-                            if (mn.isTransmitsPRes()) {
-
-                                nodeTypeCombo.select(0);
-                            } else {
-                                nodeTypeCombo.select(1);
-                            }
-                        }
-                    } else {
-                        String[] noteTypeItems = { "Normal", "Chained",
-                                "Multiplexed" };
-                        nodeTypeCombo.setItems(noteTypeItems);
-                        if (nodeObj
-                                .getPlkOperationMode() == PlkOperationMode.CHAINED) {
-                            nodeTypeCombo.select(1);
-
-                        } else {
-                            nodeTypeCombo.select(0);
-                        }
-                    }
-
-                    if (nodeObjModel instanceof TCN) {
-                        addListenersToCnControls();
-                        handleGeneralInfoForCn(nodeObj);
-                    } else if (nodeObjModel instanceof TNetworkConfiguration) {
-                        addListenersToMnControls();
-                        handleGeneralInfoForMn(nodeObj);
-                    } else if (nodeObjModel instanceof TRMN) {
-                        addListenersToRmnControls();
-                        handleGeneralInfoForRmn(nodeObj);
-                    } else if (nodeObjModel instanceof TMN) {
-                        addListenersToMnControls();
-                        handleGeneralInfoForMn(nodeObj);
-                    }
-
-                    txt_no_nodename.setText(nodeObj.getName());
-
-                    lst_no_foi.removeAll();
-
-                    listViewer.setInput(nodeObj);
 
                 } else if (selectedObj instanceof Module) {
                     Module module = (Module) selectedObj;
@@ -4526,6 +4475,54 @@ public class MappingView extends ViewPart {
 
         handlePdoTableResize(PdoType.RPDO, showAdvancedview.isChecked());
         rpdoEnabledEntriesCount = getEnabledEntriesCount(PdoType.RPDO);
+        Object nodeObjModel = nodeObj.getNodeModel();
+
+        Integer nodeIdVal = Integer.valueOf(nodeObj.getNodeIdString());
+        if (nodeIdVal == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
+            String[] presItems = { "Yes", "No" };
+            nodeTypeCombo.setItems(presItems);
+            if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
+                TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                        .getNodeModel();
+                TMN mn = net.getNodeCollection().getMN();
+                if (mn.isTransmitsPRes()) {
+
+                    nodeTypeCombo.select(0);
+                } else {
+                    nodeTypeCombo.select(1);
+                }
+            }
+        } else {
+            String[] noteTypeItems = { "Normal", "Chained", "Multiplexed" };
+            nodeTypeCombo.setItems(noteTypeItems);
+            if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
+                nodeTypeCombo.select(1);
+
+            } else {
+                nodeTypeCombo.select(0);
+            }
+        }
+
+        if (nodeObjModel instanceof TCN) {
+            addListenersToCnControls();
+            handleGeneralInfoForCn(nodeObj);
+        } else if (nodeObjModel instanceof TNetworkConfiguration) {
+            addListenersToMnControls();
+            handleGeneralInfoForMn(nodeObj);
+        } else if (nodeObjModel instanceof TRMN) {
+            addListenersToRmnControls();
+            handleGeneralInfoForRmn(nodeObj);
+        } else if (nodeObjModel instanceof TMN) {
+            addListenersToMnControls();
+            handleGeneralInfoForMn(nodeObj);
+        }
+
+        txt_no_nodename.setText(nodeObj.getName());
+
+        lst_no_foi.removeAll();
+
+        listViewer.setInput(nodeObj);
+
     }
 
     @Override

@@ -43,5 +43,10 @@ public interface IPropertySourceSupport {
 
     public static final String BASIC_CATEGORY = "Basic";
     public static final String ADVANCED_CATEGORY = "Advanced";
+    public static final String GENERAL_CATEGORY = "General";
+    public static final String CAPABILITIES_CATEGORY = "Capabilities";
+    public static final String BOOT_BEHAVIOUR_CATEGORY = "Boot behaviour";
+    public static final String INITIAL_VALUE_CATEGORY = "Initial Value";
+    public static final String OBJECT_ATTRIBUTES_CATEGORY = "Object attributes";
 
 }

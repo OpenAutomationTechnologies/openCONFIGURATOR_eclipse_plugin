@@ -40,6 +40,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySheetEntry;
@@ -57,6 +60,7 @@ import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TMN;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 
@@ -140,6 +144,8 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
     public static final String ERROR_LOSS_SOC_TOLERANCE_CANNOT_BE_EMPTY = "Loss of SoC tolerance value cannot be empty.";
     public static final String ERROR_INVALID_VALUE_LOSS_SOC_TOLERANCE = "Invalid Loss of SoC tolerance value.";
     public static final String INVALID_RANGE_LOSS_SOC_TOLERANCE = "[{0}] Actual value {1} with datatype UNSIGNED32 does not fit the datatype limits or format.";
+
+    private static final String INVALID_CYCLE_TIME_VALUE = "Invalid value for Cycle time.";
 
     static {
 
@@ -382,8 +388,11 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         if (!mn.isIsAsyncOnly()) {
                             val = 1;
                         }
-
-                        retObj = Integer.valueOf(val);
+                        if (val == 0) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
@@ -392,7 +401,11 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             val = 1;
                         }
 
-                        retObj = Integer.valueOf(val);
+                        if (val == 0) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
@@ -401,7 +414,11 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                             val = 1;
                         }
 
-                        retObj = Integer.valueOf(val);
+                        if (val == 0) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
@@ -623,6 +640,11 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 return ERROR_CYCLE_TIME_CANNOT_BE_EMPTY;
             }
             try {
+                int cycleTime = Integer.valueOf((String) value);
+                if (cycleTime <= 0) {
+                    return INVALID_CYCLE_TIME_VALUE;
+                }
+
                 // validate the value with openCONFIGURATOR library.
                 PowerlinkObject cycleTimeObj = mnNode.getObjectDictionary()
                         .getObject(INetworkProperties.CYCLE_TIME_OBJECT_ID);
@@ -662,6 +684,10 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 long longValue = Long.decode((String) value);
+                if (longValue < 0) {
+                    return INVALID_RANGE_LOSS_SOC_TOLERANCE;
+                }
+
                 // validate the value
                 Long maxValue = 4294967295L;
                 if ((longValue * 1000) > maxValue) {
@@ -1063,6 +1089,18 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance()
                     .printErrorMessage(e.getMessage(), mnNode.getNetworkId());
+        }
+
+        try {
+            IViewPart viewPart = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage()
+                    .showView(MappingView.ID);
+            if (viewPart instanceof MappingView) {
+                MappingView industrialView = (MappingView) viewPart;
+                industrialView.displayMappingView(mnNode);
+            }
+        } catch (PartInitException e1) {
+            e1.printStackTrace();
         }
 
         try {

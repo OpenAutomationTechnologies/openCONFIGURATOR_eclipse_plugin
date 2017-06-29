@@ -248,7 +248,12 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                     }
                     break;
                 case PARAM_DEFAULT_VALUE_ID:
-                    retObj = paramRef.getDefaultValue();
+                    String defaultValue = paramRef.getDefaultValue();
+                    if (defaultValue.contains("0x")) {
+                        defaultValue = String
+                                .valueOf(Long.decode(defaultValue));
+                    }
+                    retObj = defaultValue;
                     break;
                 case PARAM_ACTUAL_VALUE_ALLOWED_VALUE_ID: {
                     String actualValue = paramRef.getActualValue();
@@ -277,7 +282,12 @@ public class ParameterRefPropertySource extends AbstractParameterPropertySource
                 case PARAM_ACTUAL_VALUE_ID:
                 case PARAM_ACTUAL_VALUE_READ_ONLY_ID:
                     if (paramRef.getActualValue() != null) {
-                        retObj = paramRef.getActualValue();
+                        String actualValue = paramRef.getActualValue();
+                        if (actualValue.contains("0x")) {
+                            actualValue = String
+                                    .valueOf(Long.decode(actualValue));
+                        }
+                        retObj = actualValue;
                     } else {
                         retObj = StringUtils.EMPTY;
                     }

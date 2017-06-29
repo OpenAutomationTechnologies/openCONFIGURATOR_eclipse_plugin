@@ -39,6 +39,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -46,6 +49,7 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
@@ -67,31 +71,35 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
     public ObjectPropertySource(final PowerlinkObject plkObject) {
         setObjectData(plkObject);
 
-        objectIdDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        objectIdDescriptor
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
 
-        nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nameDescriptor
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
         objectTypeDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         objectTypeDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        dataTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        dataTypeDescriptor
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
 
         lowLimitDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         lowLimitDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         highLimitDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         highLimitDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        accessTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        accessTypeDescriptor
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
 
         defaultValueDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
         actualValueReadOnlyDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
         actualValueEditableDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
         actualValueEditableDescriptor.setValidator(new ICellEditorValidator() {
 
             @Override
@@ -101,7 +109,8 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             }
         });
 
-        forceActualValue.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        forceActualValue
+                .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
         forceActualValue.setFilterFlags(EXPERT_FILTER_FLAG);
         forceActualValue.setValidator(new ICellEditorValidator() {
 
@@ -113,20 +122,21 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         });
 
         denotationDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         denotationDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        pdoMappingDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        pdoMappingDescriptor
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         objFlagsDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         objFlagsDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         uniqueIDRefDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         uniqueIDRefDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
 
         objectErrorDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         objectErrorDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
     }
 
@@ -245,24 +255,37 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                     retObj = plkObject.getDataTypeReadable();
                     break;
                 case OBJ_LOW_LIMIT_ID:
-                    retObj = plkObject.getLowLimit();
+                    String lowLimit = plkObject.getLowLimit();
+                    if (lowLimit.contains("0x")) {
+                        lowLimit = String.valueOf(Long.decode(lowLimit));
+                    }
+                    retObj = lowLimit;
                     break;
                 case OBJ_HIGH_LIMIT_ID:
-                    retObj = plkObject.getHighLimit();
+                    String highLimit = plkObject.getHighLimit();
+                    if (highLimit.contains("0x")) {
+                        highLimit = String.valueOf(Long.decode(highLimit));
+                    }
+                    retObj = highLimit;
                     break;
                 case OBJ_ACCESS_TYPE_ID:
                     retObj = plkObject.getAccessType().value();
                     break;
                 case OBJ_DEFAULT_VALUE_ID:
-                    retObj = plkObject.getDefaultValue();
+                    String defaultValue = plkObject.getDefaultValue();
+                    if (defaultValue.contains("0x")) {
+                        defaultValue = String
+                                .valueOf(Long.decode(defaultValue));
+                    }
+                    retObj = defaultValue;
                     break;
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
-                    if (isModuleObject()) {
-                        retObj = plkObject.getActualValue();
-                    } else {
-                        retObj = plkObject.getActualValue();
+                    String actualValue = plkObject.getActualValue();
+                    if (actualValue.contains("0x")) {
+                        actualValue = String.valueOf(Long.decode(actualValue));
                     }
+                    retObj = actualValue;
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:
                     if (isModuleObject()) {
@@ -586,6 +609,18 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         } catch (Exception e) {
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     e.getMessage(), plkObject.getNode().getNetworkId());
+        }
+
+        try {
+            IViewPart viewPart = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage()
+                    .showView(MappingView.ID);
+            if (viewPart instanceof MappingView) {
+                MappingView industrialView = (MappingView) viewPart;
+                industrialView.displayMappingView(plkObject.getNode());
+            }
+        } catch (PartInitException e1) {
+            e1.printStackTrace();
         }
 
         try {

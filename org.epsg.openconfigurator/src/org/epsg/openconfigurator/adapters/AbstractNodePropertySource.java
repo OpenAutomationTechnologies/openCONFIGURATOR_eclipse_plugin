@@ -32,7 +32,6 @@
 package org.epsg.openconfigurator.adapters;
 
 import org.eclipse.jface.viewers.ICellEditorValidator;
-import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.PropertyDescriptor;
 import org.eclipse.ui.views.properties.TextPropertyDescriptor;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
@@ -52,9 +51,9 @@ public abstract class AbstractNodePropertySource {
     public static final String NODE_ERROR_LABEL = "Error";
     private static final String NODE_CONFIG_LABEL = "Configuration File";
     private static final String FIRMWARE_CONFIG_LABEL = "Firmware File";
-    private static final String NODE_IS_ASYNC_ONLY_LABEL = "Is Async Only";
-    private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Is Type1 Router";
-    private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Is Type2 Router";
+    private static final String NODE_IS_ASYNC_ONLY_LABEL = "Async Only";
+    private static final String NODE_IS_TYPE1_ROUTER_LABEL = "Type1 Router";
+    private static final String NODE_IS_TYPE2_ROUTER_LABEL = "Type2 Router";
     private static final String NODE_FORCED_OBJECTS_LABEL = "Forced Objects";
 
     public static final String INTERFACE_UNIQUEID_LABEL = "Unique ID"; //$NON-NLS-1$
@@ -144,17 +143,17 @@ public abstract class AbstractNodePropertySource {
     protected PropertyDescriptor moduleErrorDescriptor = new PropertyDescriptor(
             IAbstractNodeProperties.MODULE_ERROR_OBJECT, NODE_ERROR_LABEL);
 
-    protected ComboBoxPropertyDescriptor isAsyncOnly = new ComboBoxPropertyDescriptor(
+    protected PropertyDescriptor isAsyncOnly = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT,
-            NODE_IS_ASYNC_ONLY_LABEL, YES_NO);
+            NODE_IS_ASYNC_ONLY_LABEL);
 
-    protected ComboBoxPropertyDescriptor isType1Router = new ComboBoxPropertyDescriptor(
+    protected PropertyDescriptor isType1Router = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT,
-            NODE_IS_TYPE1_ROUTER_LABEL, YES_NO);
+            NODE_IS_TYPE1_ROUTER_LABEL);
 
-    protected ComboBoxPropertyDescriptor isType2Router = new ComboBoxPropertyDescriptor(
+    protected PropertyDescriptor isType2Router = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT,
-            NODE_IS_TYPE2_ROUTER_LABEL, YES_NO);
+            NODE_IS_TYPE2_ROUTER_LABEL);
 
     protected PropertyDescriptor forcedObjects = new PropertyDescriptor(
             IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT,

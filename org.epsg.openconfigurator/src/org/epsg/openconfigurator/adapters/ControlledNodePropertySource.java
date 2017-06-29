@@ -40,6 +40,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.ComboBoxPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySheetEntry;
@@ -59,6 +62,7 @@ import org.epsg.openconfigurator.model.PlkOperationMode;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TCN;
 
 /**
@@ -75,10 +79,10 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     // Labels
     private static final String CN_NODE_TYPE_LABEL = "Node Type";
     private static final String CN_FORCED_MULTIPLEXED_CYCLE_LABEL = "Forced Multiplexed Cycle";
-    private static final String CN_IS_MANDATORY_LABEL = "Is Mandatory";
-    private static final String CN_AUTO_START_NODE_LABEL = "Is Autostart Node";
+    private static final String CN_IS_MANDATORY_LABEL = "Mandatory";
+    private static final String CN_AUTO_START_NODE_LABEL = "Autostart Node";
     private static final String CN_RESET_IN_OPERATIONAL_LABEL = "Reset In Operational";
-    private static final String CN_VERIFY_APP_SW_VERSION_LABEL = "Do Verify App S/W Version";
+    private static final String CN_VERIFY_APP_SW_VERSION_LABEL = "Verify App S/W Version";
     private static final String CN_AUTO_APP_SW_UPDATE_ALLOWED_LABEL = "Auto App S/W Update Allowed";
     private static final String CN_VERIFY_DEVICE_TYPE_LABEL = "Verify Device Type";
     private static final String CN_VERIFY_VENDOR_ID_LABEL = "Verify Vendor ID";
@@ -118,7 +122,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final ComboBoxPropertyDescriptor isMandatory = new ComboBoxPropertyDescriptor(
             IControlledNodeProperties.CN_IS_MANDATORY_OBJECT,
             CN_IS_MANDATORY_LABEL, YES_NO);
-    private static final ComboBoxPropertyDescriptor autostartNode = new ComboBoxPropertyDescriptor(
+    private static final PropertyDescriptor autostartNode = new ComboBoxPropertyDescriptor(
             IControlledNodeProperties.CN_AUTO_START_NODE_OBJECT,
             CN_AUTO_START_NODE_LABEL, YES_NO);
     private static final ComboBoxPropertyDescriptor resetInOperational = new ComboBoxPropertyDescriptor(
@@ -151,63 +155,67 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             CN_POLL_RESPONSE_TIMEOUT_LABEL);
 
     static {
-        nodeTypeDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
-        nodeIDDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nodeTypeDescriptor.setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
+        nodeIDDescriptor.setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
 
         forcedMultiplexedCycle
                 .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
         forcedMultiplexedCycle.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        isMandatory.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isMandatory.setCategory(IPropertySourceSupport.CAPABILITIES_CATEGORY);
         isMandatory.setFilterFlags(EXPERT_FILTER_FLAG);
         isMandatory.setDescription(
                 IControlledNodeProperties.CN_IS_MANDATORY_DESCRIPTION);
 
-        autostartNode.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        autostartNode.setCategory(IPropertySourceSupport.CAPABILITIES_CATEGORY);
         autostartNode.setFilterFlags(EXPERT_FILTER_FLAG);
         autostartNode.setDescription(
                 IControlledNodeProperties.CN_AUTO_START_NODE_DESCRIPTION);
 
         resetInOperational
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         resetInOperational.setFilterFlags(EXPERT_FILTER_FLAG);
         resetInOperational.setDescription(
                 IControlledNodeProperties.CN_RESET_IN_OPERATIONAL_DESCRIPTION);
 
         verifyAppSwVersion
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         verifyAppSwVersion.setFilterFlags(EXPERT_FILTER_FLAG);
         verifyAppSwVersion.setDescription(
                 IControlledNodeProperties.CN_VERIFY_APP_SW_VERSION_DESCRIPTION);
 
         autoAppSwUpdateAllowed
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         autoAppSwUpdateAllowed.setFilterFlags(EXPERT_FILTER_FLAG);
-        verifyDeviceType.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        verifyDeviceType
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         verifyDeviceType.setFilterFlags(EXPERT_FILTER_FLAG);
         verifyDeviceType.setDescription(
                 IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_DESCRIPTION);
 
-        verifyVendorId.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        verifyVendorId
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         verifyVendorId.setFilterFlags(EXPERT_FILTER_FLAG);
 
         verifyRevisionNumber
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         verifyRevisionNumber.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        verifyProductCode.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        verifyProductCode
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         verifyProductCode.setFilterFlags(EXPERT_FILTER_FLAG);
 
         verifySerialNumber
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         verifySerialNumber.setFilterFlags(EXPERT_FILTER_FLAG);
 
         presTimeoutDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
     }
 
     // Error messages.
     private static final String ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY = "PRes TimeOut value cannot be empty.";
+    private static final String INVALID_PRES_TIMEOUT_VALUE = "Invalid PRes TimeOut value.";
 
     private Node cnNode;
     private TCN tcn;
@@ -216,10 +224,11 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
         super();
         setNodeData(cnNode);
 
-        nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
-        nodeErrorDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nameDescriptor.setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
+        nodeErrorDescriptor
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
         nodeIdEditableDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
         nodeIdEditableDescriptor.setValidator(new ICellEditorValidator() {
 
             @Override
@@ -229,9 +238,9 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
 
         });
         configurationDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
         firmwareConfigurationDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
         nodeTypeDescriptor.setValidator(new ICellEditorValidator() {
             @Override
             public String isValid(Object value) {
@@ -320,12 +329,12 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
         });
 
-        isAsyncOnly.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isAsyncOnly.setCategory(IPropertySourceSupport.CAPABILITIES_CATEGORY);
         isAsyncOnly.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        isType1Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isType1Router.setCategory(IPropertySourceSupport.CAPABILITIES_CATEGORY);
         isType1Router.setFilterFlags(EXPERT_FILTER_FLAG);
-        isType2Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isType2Router.setCategory(IPropertySourceSupport.CAPABILITIES_CATEGORY);
         isType2Router.setFilterFlags(EXPERT_FILTER_FLAG);
         forcedObjects.setFilterFlags(EXPERT_FILTER_FLAG);
 
@@ -522,17 +531,29 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                     }
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
                         int value = (tcn.isIsAsyncOnly() == true) ? 0 : 1;
-                        retObj = Integer.valueOf(value);
+                        if (value == 0) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
                         int value = (tcn.isIsType1Router() == true) ? 0 : 1;
-                        retObj = Integer.valueOf(value);
+                        if (value == 0) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
                         int value = (tcn.isIsType2Router() == true) ? 0 : 1;
-                        retObj = Integer.valueOf(value);
+                        if (value == 0) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT: {
@@ -659,6 +680,10 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             // validate the value with openCONFIGURATOR library.
             long presTimeoutInNs = Long.decode((String) value).longValue()
                     * 1000;
+            if (presTimeoutInNs <= 0) {
+                return INVALID_PRES_TIMEOUT_VALUE;
+            }
+
             Result validateResult = OpenConfiguratorLibraryUtils
                     .validateSubobjectActualValue(cnNode.getNetworkId(),
                             IPowerlinkConstants.MN_DEFAULT_NODE_ID,
@@ -692,7 +717,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             }
             try {
                 short nodeIDvalue = Short.valueOf(((String) id));
-                if ((nodeIDvalue == 0)
+                if ((nodeIDvalue <= 0)
                         || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
                     return INVALID_CN_NODE_ID;
                 }
@@ -793,6 +818,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         short oldNodeId = cnNode.getCnNodeIdValue();
                         cnNode.getPowerlinkRootNode().setNodeId(oldNodeId,
                                 nodeIDvalue);
+
                         break;
                     case IAbstractNodeProperties.NODE_CONIFG_OBJECT:
                         System.err.println(objectId + " made editable");
@@ -1068,6 +1094,18 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
             OpenConfiguratorMessageConsole.getInstance().printErrorMessage(
                     "Property: " + id + " " + e.getMessage(),
                     cnNode.getNetworkId());
+        }
+
+        try {
+            IViewPart viewPart = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage()
+                    .showView(MappingView.ID);
+            if (viewPart instanceof MappingView) {
+                MappingView industrialView = (MappingView) viewPart;
+                industrialView.displayMappingView(cnNode);
+            }
+        } catch (PartInitException e1) {
+            e1.printStackTrace();
         }
 
         try {

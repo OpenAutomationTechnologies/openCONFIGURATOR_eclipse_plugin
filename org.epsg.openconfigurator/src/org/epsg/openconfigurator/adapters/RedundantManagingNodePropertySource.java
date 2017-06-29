@@ -40,6 +40,9 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jface.viewers.ICellEditorValidator;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.IPropertyDescriptor;
 import org.eclipse.ui.views.properties.IPropertySheetEntry;
 import org.eclipse.ui.views.properties.IPropertySource;
@@ -56,6 +59,7 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.IPowerlinkConstants;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
+import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 
 /**
@@ -349,7 +353,7 @@ public class RedundantManagingNodePropertySource
             }
             try {
                 short nodeIDvalue = Short.valueOf(((String) id));
-                if ((nodeIDvalue == 0)
+                if ((nodeIDvalue <= 0)
                         || (nodeIDvalue == IPowerlinkConstants.MN_DEFAULT_NODE_ID)
                         || (nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID)) {
                     return ERROR_INVALID_RMN_NODE_ID;
@@ -394,6 +398,10 @@ public class RedundantManagingNodePropertySource
 
             try {
                 long longValue = Long.decode((String) value);
+
+                if (longValue <= 0) {
+                    return "Invalid RMN priority.";
+                }
                 // validate the value with openCONFIGURATOR library.
                 PowerlinkSubobject rmnPrioritySubObj = redundantManagingNode
                         .getObjectDictionary().getSubObject(
@@ -671,6 +679,19 @@ public class RedundantManagingNodePropertySource
                     "Property: " + id + " " + e.getMessage(),
                     redundantManagingNode.getProject().getName());
         }
+
+        try {
+            IViewPart viewPart = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage()
+                    .showView(MappingView.ID);
+            if (viewPart instanceof MappingView) {
+                MappingView industrialView = (MappingView) viewPart;
+                industrialView.displayMappingView(redundantManagingNode);
+            }
+        } catch (PartInitException e1) {
+            e1.printStackTrace();
+        }
+
         try {
             redundantManagingNode.getProject().refreshLocal(
                     IResource.DEPTH_INFINITE, new NullProgressMonitor());

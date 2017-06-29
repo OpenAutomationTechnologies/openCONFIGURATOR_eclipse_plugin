@@ -323,7 +323,7 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
             sameOutputpath.setSelection(true);
 
             Label lblActive = new Label(container, SWT.CENTER);
-            lblActive.setText("Use this path for all path ID");
+            lblActive.setText("Configure to all output files");
             lblActive.setLayoutData(
                     new GridData(SWT.NONE, SWT.LEFT, false, false, 1, 1));
 
