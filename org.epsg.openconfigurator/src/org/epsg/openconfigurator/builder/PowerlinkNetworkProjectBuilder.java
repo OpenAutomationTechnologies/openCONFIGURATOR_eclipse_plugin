@@ -115,7 +115,7 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
     private static final String RMN_AVAILABLITY_VALUE = "18432";
 
     private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
-            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "CONFIG_BINARY", "CONFIG_CHAR_ARRAY", "XML_PROCESS_IMAGE",
             "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
 
     /**

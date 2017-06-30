@@ -82,7 +82,7 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
     private final static String LOCATION_FIELD_MESSAGE_INVALID_PATH = "Choose a valid location for the output files";
 
     private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
-            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "CONFIG_BINARY", "CONFIG_CHAR_ARRAY", "XML_PROCESS_IMAGE",
             "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
 
     public boolean allOutputConfCheck = false;

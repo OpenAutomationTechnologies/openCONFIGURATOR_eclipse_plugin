@@ -152,7 +152,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
     private static final int FORM_BODY_NUMBER_OF_COLUMNS = 2;
 
     private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
-            "CONFIG_BINARY", "CONFIG_CHAR_TEXT", "XML_PROCESS_IMAGE",
+            "CONFIG_BINARY", "CONFIG_CHAR_ARRAY", "XML_PROCESS_IMAGE",
             "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
 
     /**
@@ -672,6 +672,11 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                         IndustrialNetworkProjectEditorPage.this
                                 .reloadPathSettingsTable();
+                        if (pathSettingsTable.getItemCount() >= 6) {
+                            addPathSettingsButton.setEnabled(false);
+                        } else {
+                            addPathSettingsButton.setEnabled(true);
+                        }
                     }
                 }
             } else if (e.widget == addPathSettingsButton) {
@@ -811,7 +816,7 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                                     pathVal.setPath(newSetting
                                                             .getPath());
                                                     break;
-                                                case "CONFIG_CHAR_TEXT":
+                                                case "CONFIG_CHAR_ARRAY":
                                                     pathVal.setPath(newSetting
                                                             .getPath());
                                                     break;
@@ -843,6 +848,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
 
                             IndustrialNetworkProjectEditorPage.this
                                     .reloadPathSettingsTable();
+
+                            if (pathSettingsTable.getItemCount() >= 6) {
+                                addPathSettingsButton.setEnabled(false);
+                            } else {
+                                addPathSettingsButton.setEnabled(true);
+                            }
                         } else {
                             if (pathSettings.getPath().isEmpty()) {
                                 pathSettingsList.remove(pathSettings);
@@ -1720,6 +1731,12 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
         reloadAutoGenerationSettingsTable();
         reloadPathSettingsTable();
 
+        if (pathSettingsTable.getItemCount() >= 6) {
+            addPathSettingsButton.setEnabled(false);
+        } else {
+            addPathSettingsButton.setEnabled(true);
+        }
+
         if (currentProject.getProjectConfiguration()
                 .getActiveAutoGenerationSetting().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.AUTO_GENERATION_SETTINGS_ALL_ID)
@@ -1959,7 +1976,6 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                             pathSettingsTable.clearAll();
                             pathSettingsTable.removeAll();
                             pathSettingsTable.setEnabled(true);
-                            System.err.println("Here...1");
 
                             for (TPath setPath : pathSettingList.getPath()) {
                                 TableItem item = new TableItem(
@@ -2012,6 +2028,13 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
             deletePathSettingsButton.setEnabled(true);
 
         }
+
+        if (pathSettingsTable.getItemCount() == 6) {
+            addPathSettingsButton.setEnabled(false);
+        } else {
+            addPathSettingsButton.setEnabled(true);
+        }
+
         if (pathDropDown.getText().equalsIgnoreCase(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
             addPathSettingsButton.setEnabled(false);
