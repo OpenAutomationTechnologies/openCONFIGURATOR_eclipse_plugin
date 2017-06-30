@@ -815,21 +815,21 @@ public class MappingView extends ViewPart {
                 Node node = (Node) element;
                 if (pdoType == PdoType.TPDO) {
                     if (node.getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return node.getName() + " PRes("
-                                + node.getCnNodeIdValue() + ")";
+                        return node.getName() + " PRes ("
+                                + IPowerlinkConstants.MN_DEFAULT_NODE_ID + ")";
                     } else if (node
                             .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes("
+                        return node.getName() + " PRes ("
                                 + node.getCnNodeIdValue() + ")";
                     } else {
                         return node.getNodeIDWithName();
                     }
                 } else if (pdoType == PdoType.RPDO) {
                     if (node.getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
-                        return "MN" + " PReq(" + node.getCnNodeIdValue() + ")";
+                        return "MN" + " PReq (" + node.getCnNodeIdValue() + ")";
                     } else if (node
                             .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                        return node.getName() + " PRes("
+                        return node.getName() + " PRes ("
                                 + node.getCnNodeIdValue() + ")";
                     } else {
                         return node.getNodeIDWithName();
@@ -961,8 +961,8 @@ public class MappingView extends ViewPart {
                             if (pdoType == PdoType.TPDO) {
                                 if (targetNode
                                         .getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
-                                    return targetNode.getName() + " PRes("
-                                            + targetNode.getCnNodeIdValue()
+                                    return targetNode.getName() + " PRes ("
+                                            + IPowerlinkConstants.MN_DEFAULT_NODE_ID
                                             + ")";
                                 } else if (nodeObj == targetNode) {
                                     return "Self("
@@ -971,7 +971,7 @@ public class MappingView extends ViewPart {
                                 } else if (targetNode
                                         .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                                     // TODO Check;
-                                    return targetNode.getName() + " PRes("
+                                    return targetNode.getName() + " PRes ("
                                             + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else {
@@ -980,7 +980,7 @@ public class MappingView extends ViewPart {
                             } else if (pdoType == PdoType.RPDO) {
                                 if (targetNode
                                         .getCnNodeIdValue() == IPowerlinkConstants.INVALID_NODE_ID) {
-                                    return "MN" + " PReq("
+                                    return "MN" + " PReq ("
                                             + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else if (nodeObj == targetNode) {
@@ -989,7 +989,7 @@ public class MappingView extends ViewPart {
                                             + ")";
                                 } else if (targetNode
                                         .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
-                                    return targetNode.getName() + " PRes("
+                                    return targetNode.getName() + " PRes ("
                                             + targetNode.getCnNodeIdValue()
                                             + ")";
                                 } else {
@@ -2620,7 +2620,9 @@ public class MappingView extends ViewPart {
     private KeyAdapter nodeIDModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            System.err.println("The state mask event.." + e.stateMask);
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
 
                 newNodeId = handleSetNodeId(nodeId.getText());
                 if ((!newNodeId.equalsIgnoreCase(StringUtils.EMPTY))) {
