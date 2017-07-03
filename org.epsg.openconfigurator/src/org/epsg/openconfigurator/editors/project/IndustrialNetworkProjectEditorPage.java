@@ -546,6 +546,11 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                         .updateActivePathSetting();
                 IndustrialNetworkProjectEditorPage.this
                         .reloadPathSettingsTable();
+                if (pathSettingsTable.getItemCount() >= 6) {
+                    addPathSettingsButton.setEnabled(false);
+                } else {
+                    addPathSettingsButton.setEnabled(true);
+                }
             } else if (e.widget == editPathSettingsButton) {
                 if (pathDropDown.getText().equalsIgnoreCase(
                         OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID)) {
@@ -750,6 +755,19 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                                         OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                                     if (addEditPathDialog
                                             .isAllOutputpathConfigured()) {
+                                        List<TPath> pathCollection = pathSet
+                                                .getPath();
+                                        if (pathCollection != null) {
+                                            if (pathCollection.size() > 1) {
+
+                                                for (TPath oldPath : pathCollection) {
+
+                                                    pathSet.getPath()
+                                                            .remove(oldPath);
+                                                }
+                                            }
+                                        }
+
                                         TPath path = new TPath();
                                         path.setId(CUSTOM_CONFIG_PATH[0]);
                                         path.setPath(

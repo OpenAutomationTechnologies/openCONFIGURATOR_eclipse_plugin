@@ -125,6 +125,10 @@ public final class OpenConfiguratorProjectUtils {
 
     public static ArrayList<String> defaultBuildConfigurationIdList;
 
+    public static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
+            "CONFIG_BINARY", "CONFIG_CHAR_ARRAY", "XML_PROCESS_IMAGE",
+            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
+
     private static final String UPGRADE_MESSAGE = "Upgrading openCONFIGURATOR project version {0} to version {1}.";
 
     static {
@@ -1048,10 +1052,36 @@ public final class OpenConfiguratorProjectUtils {
                 .setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
         java.util.List<TPath> pathList = pathSettings.getPath();
         TPath path = new TPath();
-        path.setId(OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_ID);
+        path.setId(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[0]);
+        TPath textPath = new TPath();
+        textPath.setId(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[1]);
+        TPath arrayPath = new TPath();
+        arrayPath.setId(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[2]);
+        TPath imagePath = new TPath();
+        imagePath.setId(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[3]);
+        TPath procesImagePath = new TPath();
+        procesImagePath
+                .setId(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[4]);
+        TPath XmlPath = new TPath();
+        XmlPath.setId(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[5]);
         path.setPath(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
         pathList.add(path);
+        textPath.setPath(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+        pathList.add(textPath);
+        arrayPath.setPath(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+        pathList.add(arrayPath);
+        imagePath.setPath(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+        pathList.add(imagePath);
+        procesImagePath.setPath(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+        pathList.add(procesImagePath);
+        XmlPath.setPath(
+                OpenConfiguratorProjectUtils.PATH_SETTINGS_DEFAULT_PATH_VALUE);
+        pathList.add(XmlPath);
         pathSettingList.add(pathSettings);
         tProjectConfiguration.setActivePathSetting(
                 OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
