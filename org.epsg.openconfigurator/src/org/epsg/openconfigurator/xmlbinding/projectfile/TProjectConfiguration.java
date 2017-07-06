@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlType;
  *                 &lt;sequence&gt;
  *                   &lt;element name="Path" type="{http://sourceforge.net/projects/openconf/configuration}tPath" maxOccurs="unbounded"/&gt;
  *                 &lt;/sequence&gt;
- *                 &lt;attribute name="id" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+ *                 &lt;attribute name="id" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *                 &lt;attribute name="activePath" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -38,7 +38,7 @@ import javax.xml.bind.annotation.XmlType;
  *         &lt;element name="AutoGenerationSettings" type="{http://sourceforge.net/projects/openconf/configuration}tAutoGenerationSettings" maxOccurs="unbounded"/&gt;
  *       &lt;/sequence&gt;
  *       &lt;attribute name="activeAutoGenerationSetting" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
- *       &lt;attribute name="activePathSetting" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+ *       &lt;attribute name="activePathSetting" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
  *     &lt;/restriction&gt;
  *   &lt;/complexContent&gt;
  * &lt;/complexType&gt;
@@ -59,7 +59,7 @@ public class TProjectConfiguration {
     protected List<TAutoGenerationSettings> autoGenerationSettings;
     @XmlAttribute(name = "activeAutoGenerationSetting", required = true)
     protected String activeAutoGenerationSetting;
-    @XmlAttribute(name = "activePathSetting", required = true)
+    @XmlAttribute(name = "activePathSetting")
     protected String activePathSetting;
 
     /**
@@ -181,7 +181,7 @@ public class TProjectConfiguration {
      *       &lt;sequence&gt;
      *         &lt;element name="Path" type="{http://sourceforge.net/projects/openconf/configuration}tPath" maxOccurs="unbounded"/&gt;
      *       &lt;/sequence&gt;
-     *       &lt;attribute name="id" use="required" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
+     *       &lt;attribute name="id" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *       &lt;attribute name="activePath" type="{http://ethernet-powerlink.org/POWERLINK}tNonEmptyString" /&gt;
      *     &lt;/restriction&gt;
      *   &lt;/complexContent&gt;
@@ -198,7 +198,7 @@ public class TProjectConfiguration {
 
         @XmlElement(name = "Path", required = true)
         protected List<TPath> path;
-        @XmlAttribute(name = "id", required = true)
+        @XmlAttribute(name = "id")
         protected String id;
         @XmlAttribute(name = "activePath")
         protected String activePath;

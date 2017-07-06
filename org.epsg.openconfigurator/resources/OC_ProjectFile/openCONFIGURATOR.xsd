@@ -27,14 +27,6 @@
 						<xs:selector xpath="."/>
 						<xs:field xpath="@activeAutoGenerationSetting"/>
 					</xs:keyref>
-					<xs:key name="activePathKey">
-						<xs:selector xpath="./oc:PathSettings"/>
-						<xs:field xpath="@id"/>
-					</xs:key>
-					<xs:keyref name="activePathKeyRef" refer="oc:activePathKey">
-						<xs:selector xpath="./oc:PathSettings"/>
-						<xs:field xpath="@activePath"/>
-					</xs:keyref>
 					<xs:unique name="uniquePathSettingsId">
 						<xs:selector xpath="./oc:PathSettings"/>
 						<xs:field xpath="@id"/>
@@ -94,7 +86,7 @@
 					<xs:sequence>
 						<xs:element name="Path" type="oc:tPath" maxOccurs="unbounded"/>
 					</xs:sequence>
-					<xs:attribute name="id" type="ppc:tNonEmptyString" use="required"/>
+					<xs:attribute name="id" type="ppc:tNonEmptyString" use="optional"/>
 					<xs:attribute name="activePath" type="ppc:tNonEmptyString" use="optional"/>
 				</xs:complexType>
 			</xs:element>
@@ -106,7 +98,7 @@
 			</xs:element>
 		</xs:sequence>
 		<xs:attribute name="activeAutoGenerationSetting" type="ppc:tNonEmptyString" use="required"/>
-		<xs:attribute name="activePathSetting" type="ppc:tNonEmptyString" use="required"/>
+		<xs:attribute name="activePathSetting" type="ppc:tNonEmptyString" use="optional"/>
 	</xs:complexType>
 	<xs:complexType name="tAutoGenerationSettings">
 		<xs:annotation>
@@ -204,18 +196,7 @@
 		<xs:annotation>
 			<xs:documentation xml:lang="en">Type to specify paths in the filesystem.</xs:documentation>
 		</xs:annotation>
-		<xs:attribute name="id" use="required">
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="CONFIG_TEXT"/>
-					<xs:enumeration value="CONFIG_BINARY"/>
-					<xs:enumeration value="CONFIG_CHAR_ARRAY"/>
-					<xs:enumeration value="XML_PROCESS_IMAGE"/>
-					<xs:enumeration value="C_PROCESS_IMAGE"/>
-					<xs:enumeration value="CSHARP_PROCESS_IMAGE"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:attribute>
+		<xs:attribute name="id" type="ppc:tNonEmptyString" use="required"/>
 		<xs:attribute name="path" use="required">
 			<xs:annotation>
 				<xs:documentation xml:lang="en">Pathname in UNIX-Style (forward slashes).</xs:documentation>
