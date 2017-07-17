@@ -81,10 +81,6 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
     private final static String LOCATION_FIELD_MESSAGE_MUST_SPEFIFY_PATH = "Must specify a location.";
     private final static String LOCATION_FIELD_MESSAGE_INVALID_PATH = "Choose a valid location for the output files";
 
-    private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
-            "CONFIG_BINARY", "CONFIG_CHAR_ARRAY", "XML_PROCESS_IMAGE",
-            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
-
     public boolean allOutputConfCheck = false;
 
     /**
@@ -208,12 +204,12 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
 
             List<String> idList = new ArrayList<>();
 
-            idList.add(CUSTOM_CONFIG_PATH[0]);
-            idList.add(CUSTOM_CONFIG_PATH[1]);
-            idList.add(CUSTOM_CONFIG_PATH[2]);
-            idList.add(CUSTOM_CONFIG_PATH[3]);
-            idList.add(CUSTOM_CONFIG_PATH[4]);
-            idList.add(CUSTOM_CONFIG_PATH[5]);
+            idList.add(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[0]);
+            idList.add(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[1]);
+            idList.add(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[2]);
+            idList.add(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[3]);
+            idList.add(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[4]);
+            idList.add(OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[5]);
 
             for (TPath path : pathSettingsModel.getPath()) {
                 if (idList.contains(path.getId())) {

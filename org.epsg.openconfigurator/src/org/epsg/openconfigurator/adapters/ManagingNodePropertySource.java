@@ -384,11 +384,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         retObj = asndMaxNumber;
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                        int val = 0;
-                        if (!mn.isIsAsyncOnly()) {
-                            val = 1;
-                        }
-                        if (val == 0) {
+                        if (mn.isIsAsyncOnly()) {
                             retObj = "No";
                         } else {
                             retObj = "Yes";
@@ -396,12 +392,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                        int val = 0;
-                        if (!mn.isIsType1Router()) {
-                            val = 1;
-                        }
-
-                        if (val == 0) {
+                        if (mn.isIsType1Router()) {
                             retObj = "No";
                         } else {
                             retObj = "Yes";
@@ -409,12 +400,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                        int val = 0;
-                        if (!mn.isIsType2Router()) {
-                            val = 1;
-                        }
-
-                        if (val == 0) {
+                        if (mn.isIsType2Router()) {
                             retObj = "No";
                         } else {
                             retObj = "Yes";

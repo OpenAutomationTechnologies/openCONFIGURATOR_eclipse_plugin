@@ -2301,9 +2301,7 @@ public class MappingView extends ViewPart {
                     lst_no_foi.removeAll();
                     listViewer.setInput(module);
 
-                    String[] nodeTypeitems = { "Normal", "Chained",
-                            "Multiplexed" };
-                    nodeTypeCombo.setItems(nodeTypeitems);
+                    nodeTypeCombo.setItems(nodeTypeItems);
                     if (nodeObj
                             .getPlkOperationMode() == PlkOperationMode.CHAINED) {
                         nodeTypeCombo.select(1);
@@ -2341,8 +2339,6 @@ public class MappingView extends ViewPart {
                             }
                         }
                     } else {
-                        String[] nodeTypeItems = { "Normal", "Chained",
-                                "Multiplexed" };
                         nodeTypeCombo.setItems(nodeTypeItems);
                         if (nodeObj
                                 .getPlkOperationMode() == PlkOperationMode.CHAINED) {
@@ -2638,21 +2634,7 @@ public class MappingView extends ViewPart {
                         // TODO Auto-generated catch block
                         e1.printStackTrace();
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
                     // nodeId.setText(nodeObj.getNodeIdString());
                 }
@@ -2712,21 +2694,7 @@ public class MappingView extends ViewPart {
                             }
                             nodeTypeCombo.select(value);
                         }
-                        IViewPart viewPart;
-                        try {
-                            viewPart = PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getActivePage()
-                                    .showView(IndustrialNetworkView.ID);
-                            if (viewPart instanceof IndustrialNetworkView) {
-                                IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                                industrialView.getViewer().refresh();
-                                industrialView.handleRefresh();
-
-                            }
-                        } catch (PartInitException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
+                        refreshNetworkView();
 
                     }
                 }
@@ -2808,21 +2776,7 @@ public class MappingView extends ViewPart {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
                         }
-                        IViewPart viewPart;
-                        try {
-                            viewPart = PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getActivePage()
-                                    .showView(IndustrialNetworkView.ID);
-                            if (viewPart instanceof IndustrialNetworkView) {
-                                IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                                industrialView.getViewer().refresh();
-                                industrialView.handleRefresh();
-
-                            }
-                        } catch (PartInitException e1) {
-                            // TODO Auto-generated catch block
-                            e1.printStackTrace();
-                        }
+                        refreshNetworkView();
                     }
                 }
             }
@@ -2863,21 +2817,7 @@ public class MappingView extends ViewPart {
                                     .printLibraryErrorMessage(res);
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
 
                     long presTimeoutInMs = nodeObj.getPresTimeoutvalue() / 1000;
@@ -2925,21 +2865,7 @@ public class MappingView extends ViewPart {
                                     .printLibraryErrorMessage(res);
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
                     Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
                     long valInUs = val / 1000;
@@ -2977,21 +2903,7 @@ public class MappingView extends ViewPart {
                                     .printLibraryErrorMessage(res);
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
                     asyncMtuText.setText(nodeObj.getAsyncMtu());
                 }
@@ -3031,21 +2943,7 @@ public class MappingView extends ViewPart {
                                     .printLibraryErrorMessage(res);
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
                     asyncTimeOutTxt.setText(nodeObj.getAsyncSlotTimeout());
                 }
@@ -3081,21 +2979,7 @@ public class MappingView extends ViewPart {
                                     .printLibraryErrorMessage(res);
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
                     preScalerText.setText(nodeObj.getPrescaler());
                 }
@@ -3131,21 +3015,7 @@ public class MappingView extends ViewPart {
                                     .printLibraryErrorMessage(res);
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
                     // txt_no_PResTimeOut.setText(nodeObj.getCycleTime());
                 }
@@ -3155,6 +3025,8 @@ public class MappingView extends ViewPart {
     };
 
     private Text nodeId;
+
+    private String[] nodeTypeItems = { "Normal", "Chained", "Multiplexed" };
 
     /**
      * Keyboard bindings.
@@ -3186,21 +3058,7 @@ public class MappingView extends ViewPart {
 
                         }
                     }
-                    IViewPart viewPart;
-                    try {
-                        viewPart = PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getActivePage()
-                                .showView(IndustrialNetworkView.ID);
-                        if (viewPart instanceof IndustrialNetworkView) {
-                            IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
-                            industrialView.getViewer().refresh();
-                            industrialView.handleRefresh();
-
-                        }
-                    } catch (PartInitException e1) {
-                        // TODO Auto-generated catch block
-                        e1.printStackTrace();
-                    }
+                    refreshNetworkView();
                 } else {
 
                     txt_no_nodename.setText(nodeObj.getName());
@@ -4495,8 +4353,8 @@ public class MappingView extends ViewPart {
                 }
             }
         } else {
-            String[] noteTypeItems = { "Normal", "Chained", "Multiplexed" };
-            nodeTypeCombo.setItems(noteTypeItems);
+
+            nodeTypeCombo.setItems(nodeTypeItems);
             if (nodeObj.getPlkOperationMode() == PlkOperationMode.CHAINED) {
                 nodeTypeCombo.select(1);
 
@@ -5675,6 +5533,23 @@ public class MappingView extends ViewPart {
      */
     private void initializeToolBar() {
         // Initialize toolbar for mapping view.
+    }
+
+    public void refreshNetworkView() {
+        IViewPart viewPart;
+        try {
+            viewPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage().showView(IndustrialNetworkView.ID);
+            if (viewPart instanceof IndustrialNetworkView) {
+                IndustrialNetworkView industrialView = (IndustrialNetworkView) viewPart;
+                industrialView.getViewer().refresh();
+                industrialView.handleRefresh();
+
+            }
+        } catch (PartInitException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
     }
 
     @Override

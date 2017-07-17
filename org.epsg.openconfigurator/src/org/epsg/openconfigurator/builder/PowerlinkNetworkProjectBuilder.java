@@ -114,10 +114,6 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
     private static final String RMN_AVAILABLITY_VALUE = "18432";
 
-    private static final String[] CUSTOM_CONFIG_PATH = { "CONFIG_TEXT",
-            "CONFIG_BINARY", "CONFIG_CHAR_ARRAY", "XML_PROCESS_IMAGE",
-            "C_PROCESS_IMAGE", "CSHARP_PROCESS_IMAGE" };
-
     /**
      * Build the concise device configuration outputs in the specified output
      * path.
@@ -777,19 +773,19 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             Path outputpath = pjtEditor.getProjectOutputPath();
 
-            Path configTextPath = pjtEditor
-                    .getConfigTextPath(CUSTOM_CONFIG_PATH[0]);
-            Path configBinaryPath = pjtEditor
-                    .getConfigTextPath(CUSTOM_CONFIG_PATH[1]);
-            Path configcharPath = pjtEditor
-                    .getConfigTextPath(CUSTOM_CONFIG_PATH[2]);
-            Path configXmlPath = pjtEditor
-                    .getConfigTextPath(CUSTOM_CONFIG_PATH[3]);
-            Path configCPath = pjtEditor
-                    .getConfigTextPath(CUSTOM_CONFIG_PATH[4]);
+            Path configTextPath = pjtEditor.getConfigTextPath(
+                    OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[0]);
+            Path configBinaryPath = pjtEditor.getConfigTextPath(
+                    OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[1]);
+            Path configcharPath = pjtEditor.getConfigTextPath(
+                    OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[2]);
+            Path configXmlPath = pjtEditor.getConfigTextPath(
+                    OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[3]);
+            Path configCPath = pjtEditor.getConfigTextPath(
+                    OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[4]);
 
-            Path cSharpPath = pjtEditor
-                    .getConfigTextPath(CUSTOM_CONFIG_PATH[5]);
+            Path cSharpPath = pjtEditor.getConfigTextPath(
+                    OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[5]);
 
             final java.nio.file.Path targetPath = getTargetPath(outputpath);
 

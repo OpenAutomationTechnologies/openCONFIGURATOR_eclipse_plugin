@@ -530,8 +530,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                        int value = (tcn.isIsAsyncOnly() == true) ? 0 : 1;
-                        if (value == 0) {
+                        if (tcn.isIsAsyncOnly() == true) {
                             retObj = "No";
                         } else {
                             retObj = "Yes";
@@ -539,8 +538,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                        int value = (tcn.isIsType1Router() == true) ? 0 : 1;
-                        if (value == 0) {
+                        if (tcn.isIsType1Router() == true) {
                             retObj = "No";
                         } else {
                             retObj = "Yes";
@@ -548,8 +546,7 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                        int value = (tcn.isIsType2Router() == true) ? 0 : 1;
-                        if (value == 0) {
+                        if (tcn.isIsType2Router() == true) {
                             retObj = "No";
                         } else {
                             retObj = "Yes";
