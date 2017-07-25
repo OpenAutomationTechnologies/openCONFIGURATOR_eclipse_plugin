@@ -1054,19 +1054,434 @@ public class MappingView extends ViewPart {
                     break;
                 case 2: // Images for the status column.
                     if (element instanceof PowerlinkSubobject) {
+                        if (nodeObj != null) {
+                            PowerlinkSubobject mapParamObj = (PowerlinkSubobject) element;
 
-                        PowerlinkSubobject mapParamObj = (PowerlinkSubobject) element;
+                            String value = mapParamObj.getActualDefaultValue();
 
-                        String value = mapParamObj.getActualDefaultValue();
+                            if (value.isEmpty()) {
+                                value = emptyObject.getActualValue();
+                            }
 
-                        if (value.isEmpty()) {
-                            value = emptyObject.getActualValue();
-                        }
+                            if (value.length() != 18) {
+                                if ((value.length() == 3)
+                                        || (value.length() == 1)) {
+                                    if (Integer.decode(value) == 0) {
+                                        if (mapParamObj.getId() == 1) {
+                                            try {
+                                                if (!tpdoEnabledMappingEntriesText
+                                                        .getText().isEmpty()) {
+                                                    tpdoEnabledEntriesCount = Integer
+                                                            .parseInt(
+                                                                    tpdoEnabledMappingEntriesText
+                                                                            .getText()
+                                                                            .trim());
+                                                }
 
-                        if (value.length() != 18) {
-                            if ((value.length() == 3)
-                                    || (value.length() == 1)) {
-                                if (Integer.decode(value) == 0) {
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        if (mapParamObj.getId() == 1) {
+                                            try {
+                                                if (!rpdoEnabledMappingEntriesText
+                                                        .getText().isEmpty()) {
+                                                    rpdoEnabledEntriesCount = Integer
+                                                            .parseInt(
+                                                                    rpdoEnabledMappingEntriesText
+                                                                            .getText()
+                                                                            .trim());
+                                                }
+
+                                            } catch (Exception e) {
+                                                e.printStackTrace();
+                                            }
+                                        }
+                                        return null;
+                                    }
+                                }
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                return errorImage;
+                            }
+
+                            String objectId = value.substring(14, 18);
+                            String subObjectId = value.substring(12, 14);
+                            long objectIdValue = 0;
+                            try {
+                                objectIdValue = Long.parseLong(objectId, 16);
+                            } catch (NumberFormatException ex) {
+                                ex.printStackTrace();
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                return errorImage;
+                            }
+
+                            if (objectIdValue == 0) {
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                // Ignore empty Object.
+                                return null;
+                            }
+
+                            PowerlinkObject mappableObject = nodeObj
+                                    .getObjectDictionary()
+                                    .getObject(objectIdValue);
+                            if (nodeObj.isModularheadNode()) {
+                                List<HeadNodeInterface> interfaceList = nodeObj
+                                        .getHeadNodeInterface();
+                                if (interfaceList != null) {
+                                    for (HeadNodeInterface headNodeInterface : interfaceList) {
+                                        Collection<Module> moduleList = headNodeInterface
+                                                .getModuleCollection().values();
+                                        if (moduleList != null) {
+                                            for (Module module : moduleList) {
+                                                List<PowerlinkObject> objectList = module
+                                                        .getObjectDictionary()
+                                                        .getObjectsList();
+                                                for (PowerlinkObject object : objectList) {
+                                                    short subObjectIdValue = 0;
+                                                    subObjectIdValue = Short
+                                                            .parseShort(
+                                                                    subObjectId,
+                                                                    16);
+                                                    for (PowerlinkSubobject subObject : object
+                                                            .getTpdoMappableObjectList()) {
+                                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                                .getModuleObjectsIndex(
+                                                                        subObject
+                                                                                .getModule(),
+                                                                        subObject
+                                                                                .getObject()
+                                                                                .getId());
+                                                        int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                                .getModuleObjectsSubIndex(
+                                                                        subObject
+                                                                                .getModule(),
+                                                                        subObject,
+                                                                        subObject
+                                                                                .getObject()
+                                                                                .getId());
+                                                        if (objectIdValue == objectIndex) {
+                                                            if (subObjectIndex == subObjectIdValue) {
+                                                                switch (pdoType) {
+
+                                                                    case TPDO:
+                                                                        System.err
+                                                                                .println(
+                                                                                        "The IDRaw of object.."
+                                                                                                + mapParamObj
+                                                                                                        .getId());
+                                                                        if (mapParamObj
+                                                                                .getId() == 1) {
+                                                                            try {
+                                                                                if (!tpdoEnabledMappingEntriesText
+                                                                                        .getText()
+                                                                                        .isEmpty()) {
+                                                                                    tpdoEnabledEntriesCount = Integer
+                                                                                            .parseInt(
+                                                                                                    tpdoEnabledMappingEntriesText
+                                                                                                            .getText()
+                                                                                                            .trim());
+                                                                                }
+
+                                                                            } catch (Exception e) {
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        }
+                                                                        count = tpdoEnabledEntriesCount
+                                                                                - 1;
+                                                                        tpdoEnabledEntriesCount = count;
+
+                                                                        if (tpdoEnabledEntriesCount < 0) {
+                                                                            return signedDisableImage;
+                                                                        }
+                                                                        break;
+                                                                    case RPDO:
+                                                                        if (mapParamObj
+                                                                                .getId() == 1) {
+                                                                            try {
+                                                                                if (!rpdoEnabledMappingEntriesText
+                                                                                        .getText()
+                                                                                        .isEmpty()) {
+                                                                                    rpdoEnabledEntriesCount = Integer
+                                                                                            .parseInt(
+                                                                                                    rpdoEnabledMappingEntriesText
+                                                                                                            .getText()
+                                                                                                            .trim());
+                                                                                }
+
+                                                                            } catch (Exception e) {
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        }
+                                                                        count = rpdoEnabledEntriesCount
+                                                                                - 1;
+                                                                        rpdoEnabledEntriesCount = count;
+
+                                                                        if (rpdoEnabledEntriesCount < 0) {
+                                                                            return signedDisableImage;
+                                                                        }
+                                                                        break;
+                                                                    default:
+                                                                        break;
+                                                                }
+                                                                return signedYesImage;
+                                                            }
+                                                        }
+                                                    }
+                                                    for (PowerlinkSubobject subObject : object
+                                                            .getRpdoMappableObjectList()) {
+                                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                                .getModuleObjectsIndex(
+                                                                        subObject
+                                                                                .getModule(),
+                                                                        subObject
+                                                                                .getObject()
+                                                                                .getId());
+                                                        int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                                .getModuleObjectsSubIndex(
+                                                                        subObject
+                                                                                .getModule(),
+                                                                        subObject,
+                                                                        subObject
+                                                                                .getObject()
+                                                                                .getId());
+                                                        if (objectIdValue == objectIndex) {
+                                                            if (subObjectIndex == subObjectIdValue) {
+                                                                switch (pdoType) {
+
+                                                                    case TPDO:
+                                                                        if (mapParamObj
+                                                                                .getId() == 1) {
+                                                                            try {
+                                                                                if (!tpdoEnabledMappingEntriesText
+                                                                                        .getText()
+                                                                                        .isEmpty()) {
+                                                                                    tpdoEnabledEntriesCount = Integer
+                                                                                            .parseInt(
+                                                                                                    tpdoEnabledMappingEntriesText
+                                                                                                            .getText()
+                                                                                                            .trim());
+                                                                                }
+
+                                                                            } catch (Exception e) {
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        }
+                                                                        count = tpdoEnabledEntriesCount
+                                                                                - 1;
+                                                                        tpdoEnabledEntriesCount = count;
+
+                                                                        if (tpdoEnabledEntriesCount < 0) {
+                                                                            return signedDisableImage;
+                                                                        }
+                                                                        break;
+                                                                    case RPDO:
+                                                                        if (mapParamObj
+                                                                                .getId() == 1) {
+                                                                            try {
+                                                                                if (!rpdoEnabledMappingEntriesText
+                                                                                        .getText()
+                                                                                        .isEmpty()) {
+                                                                                    rpdoEnabledEntriesCount = Integer
+                                                                                            .parseInt(
+                                                                                                    rpdoEnabledMappingEntriesText
+                                                                                                            .getText()
+                                                                                                            .trim());
+                                                                                }
+
+                                                                            } catch (Exception e) {
+                                                                                e.printStackTrace();
+                                                                            }
+                                                                        }
+                                                                        count = rpdoEnabledEntriesCount
+                                                                                - 1;
+                                                                        rpdoEnabledEntriesCount = count;
+
+                                                                        if (rpdoEnabledEntriesCount < 0) {
+                                                                            return signedDisableImage;
+                                                                        }
+                                                                        break;
+                                                                    default:
+                                                                        break;
+                                                                }
+                                                                return signedYesImage;
+                                                            }
+                                                        }
+                                                    }
+
+                                                }
+                                            }
+                                        } else {
+                                            System.err.println(
+                                                    "No modules are available under interface.");
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (mappableObject == null) {
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                return errorImage;
+                            }
+
+                            short subObjectIdValue = 0;
+                            try {
+                                subObjectIdValue = Short.parseShort(subObjectId,
+                                        16);
+                            } catch (NumberFormatException ex) {
+                                ex.printStackTrace();
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!tpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            tpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            tpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                if (mapParamObj.getId() == 1) {
+                                    try {
+                                        if (!rpdoEnabledMappingEntriesText
+                                                .getText().isEmpty()) {
+                                            rpdoEnabledEntriesCount = Integer
+                                                    .parseInt(
+                                                            rpdoEnabledMappingEntriesText
+                                                                    .getText()
+                                                                    .trim());
+                                        }
+
+                                    } catch (Exception e) {
+                                        e.printStackTrace();
+                                    }
+                                }
+                                return errorImage;
+                            }
+
+                            // Check if mapped object is mappable to this PDO.
+                            if (mappableObject.getObjectType() == 7) {
+
+                                if (subObjectIdValue != 0) {
                                     if (mapParamObj.getId() == 1) {
                                         try {
                                             if (!tpdoEnabledMappingEntriesText
@@ -1097,594 +1512,190 @@ public class MappingView extends ViewPart {
                                             e.printStackTrace();
                                         }
                                     }
-                                    return null;
+                                    return errorImage;
                                 }
-                            }
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!tpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
 
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!rpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            return errorImage;
-                        }
-
-                        String objectId = value.substring(14, 18);
-                        String subObjectId = value.substring(12, 14);
-                        long objectIdValue = 0;
-                        try {
-                            objectIdValue = Long.parseLong(objectId, 16);
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!tpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!rpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            return errorImage;
-                        }
-
-                        if (objectIdValue == 0) {
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!tpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!rpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            // Ignore empty Object.
-                            return null;
-                        }
-
-                        PowerlinkObject mappableObject = nodeObj
-                                .getObjectDictionary().getObject(objectIdValue);
-                        if (nodeObj.isModularheadNode()) {
-                            List<HeadNodeInterface> interfaceList = nodeObj
-                                    .getHeadNodeInterface();
-                            if (interfaceList != null) {
-                                for (HeadNodeInterface headNodeInterface : interfaceList) {
-                                    Collection<Module> moduleList = headNodeInterface
-                                            .getModuleCollection().values();
-                                    if (moduleList != null) {
-                                        for (Module module : moduleList) {
-                                            List<PowerlinkObject> objectList = module
-                                                    .getObjectDictionary()
-                                                    .getObjectsList();
-                                            for (PowerlinkObject object : objectList) {
-                                                short subObjectIdValue = 0;
-                                                subObjectIdValue = Short
-                                                        .parseShort(subObjectId,
-                                                                16);
-                                                for (PowerlinkSubobject subObject : object
-                                                        .getTpdoMappableObjectList()) {
-                                                    long objectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectsIndex(
-                                                                    subObject
-                                                                            .getModule(),
-                                                                    subObject
-                                                                            .getObject()
-                                                                            .getId());
-                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectsSubIndex(
-                                                                    subObject
-                                                                            .getModule(),
-                                                                    subObject,
-                                                                    subObject
-                                                                            .getObject()
-                                                                            .getId());
-                                                    if (objectIdValue == objectIndex) {
-                                                        if (subObjectIndex == subObjectIdValue) {
-                                                            switch (pdoType) {
-
-                                                                case TPDO:
-                                                                    System.err
-                                                                            .println(
-                                                                                    "The IDRaw of object.."
-                                                                                            + mapParamObj
-                                                                                                    .getId());
-                                                                    if (mapParamObj
-                                                                            .getId() == 1) {
-                                                                        try {
-                                                                            if (!tpdoEnabledMappingEntriesText
-                                                                                    .getText()
-                                                                                    .isEmpty()) {
-                                                                                tpdoEnabledEntriesCount = Integer
-                                                                                        .parseInt(
-                                                                                                tpdoEnabledMappingEntriesText
-                                                                                                        .getText()
-                                                                                                        .trim());
-                                                                            }
-
-                                                                        } catch (Exception e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-                                                                    count = tpdoEnabledEntriesCount
-                                                                            - 1;
-                                                                    tpdoEnabledEntriesCount = count;
-
-                                                                    if (tpdoEnabledEntriesCount < 0) {
-                                                                        return signedDisableImage;
-                                                                    }
-                                                                    break;
-                                                                case RPDO:
-                                                                    if (mapParamObj
-                                                                            .getId() == 1) {
-                                                                        try {
-                                                                            if (!rpdoEnabledMappingEntriesText
-                                                                                    .getText()
-                                                                                    .isEmpty()) {
-                                                                                rpdoEnabledEntriesCount = Integer
-                                                                                        .parseInt(
-                                                                                                rpdoEnabledMappingEntriesText
-                                                                                                        .getText()
-                                                                                                        .trim());
-                                                                            }
-
-                                                                        } catch (Exception e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-                                                                    count = rpdoEnabledEntriesCount
-                                                                            - 1;
-                                                                    rpdoEnabledEntriesCount = count;
-
-                                                                    if (rpdoEnabledEntriesCount < 0) {
-                                                                        return signedDisableImage;
-                                                                    }
-                                                                    break;
-                                                                default:
-                                                                    break;
-                                                            }
-                                                            return signedYesImage;
-                                                        }
+                                switch (pdoType) {
+                                    case RPDO:
+                                        if (!mappableObject.isRpdoMappable()) {
+                                            if (mapParamObj.getId() == 1) {
+                                                try {
+                                                    if (!rpdoEnabledMappingEntriesText
+                                                            .getText()
+                                                            .isEmpty()) {
+                                                        rpdoEnabledEntriesCount = Integer
+                                                                .parseInt(
+                                                                        rpdoEnabledMappingEntriesText
+                                                                                .getText()
+                                                                                .trim());
                                                     }
+
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
                                                 }
-                                                for (PowerlinkSubobject subObject : object
-                                                        .getRpdoMappableObjectList()) {
-                                                    long objectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectsIndex(
-                                                                    subObject
-                                                                            .getModule(),
-                                                                    subObject
-                                                                            .getObject()
-                                                                            .getId());
-                                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                                            .getModuleObjectsSubIndex(
-                                                                    subObject
-                                                                            .getModule(),
-                                                                    subObject,
-                                                                    subObject
-                                                                            .getObject()
-                                                                            .getId());
-                                                    if (objectIdValue == objectIndex) {
-                                                        if (subObjectIndex == subObjectIdValue) {
-                                                            switch (pdoType) {
-
-                                                                case TPDO:
-                                                                    if (mapParamObj
-                                                                            .getId() == 1) {
-                                                                        try {
-                                                                            if (!tpdoEnabledMappingEntriesText
-                                                                                    .getText()
-                                                                                    .isEmpty()) {
-                                                                                tpdoEnabledEntriesCount = Integer
-                                                                                        .parseInt(
-                                                                                                tpdoEnabledMappingEntriesText
-                                                                                                        .getText()
-                                                                                                        .trim());
-                                                                            }
-
-                                                                        } catch (Exception e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-                                                                    count = tpdoEnabledEntriesCount
-                                                                            - 1;
-                                                                    tpdoEnabledEntriesCount = count;
-
-                                                                    if (tpdoEnabledEntriesCount < 0) {
-                                                                        return signedDisableImage;
-                                                                    }
-                                                                    break;
-                                                                case RPDO:
-                                                                    if (mapParamObj
-                                                                            .getId() == 1) {
-                                                                        try {
-                                                                            if (!rpdoEnabledMappingEntriesText
-                                                                                    .getText()
-                                                                                    .isEmpty()) {
-                                                                                rpdoEnabledEntriesCount = Integer
-                                                                                        .parseInt(
-                                                                                                rpdoEnabledMappingEntriesText
-                                                                                                        .getText()
-                                                                                                        .trim());
-                                                                            }
-
-                                                                        } catch (Exception e) {
-                                                                            e.printStackTrace();
-                                                                        }
-                                                                    }
-                                                                    count = rpdoEnabledEntriesCount
-                                                                            - 1;
-                                                                    rpdoEnabledEntriesCount = count;
-
-                                                                    if (rpdoEnabledEntriesCount < 0) {
-                                                                        return signedDisableImage;
-                                                                    }
-                                                                    break;
-                                                                default:
-                                                                    break;
-                                                            }
-                                                            return signedYesImage;
-                                                        }
-                                                    }
-                                                }
-
                                             }
+                                            return warningImage;
                                         }
-                                    } else {
-                                        System.err.println(
-                                                "No modules are available under interface.");
-                                    }
+                                        break;
+                                    case TPDO:
+                                        if (!mappableObject.isTpdoMappable()) {
+                                            if (mapParamObj.getId() == 1) {
+                                                try {
+                                                    if (!tpdoEnabledMappingEntriesText
+                                                            .getText()
+                                                            .isEmpty()) {
+                                                        tpdoEnabledEntriesCount = Integer
+                                                                .parseInt(
+                                                                        tpdoEnabledMappingEntriesText
+                                                                                .getText()
+                                                                                .trim());
+                                                    }
+
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            return warningImage;
+                                        }
+                                        break;
+                                    default:
                                 }
-                            }
-                        }
 
-                        if (mappableObject == null) {
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!tpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
+                            } else {
+                                PowerlinkSubobject mappableSubObject = mappableObject
+                                        .getSubObject(subObjectIdValue);
+                                if (mappableSubObject == null) {
+                                    if (mapParamObj.getId() == 1) {
+                                        try {
+                                            if (!tpdoEnabledMappingEntriesText
+                                                    .getText().isEmpty()) {
+                                                tpdoEnabledEntriesCount = Integer
+                                                        .parseInt(
+                                                                tpdoEnabledMappingEntriesText
+                                                                        .getText()
+                                                                        .trim());
+                                            }
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
                                     }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
+                                    return errorImage;
                                 }
-                            }
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!rpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
 
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            return errorImage;
-                        }
+                                switch (pdoType) {
+                                    case RPDO:
+                                        if (!mappableSubObject
+                                                .isRpdoMappable()) {
+                                            if (mapParamObj.getId() == 1) {
+                                                try {
+                                                    if (!rpdoEnabledMappingEntriesText
+                                                            .getText()
+                                                            .isEmpty()) {
+                                                        rpdoEnabledEntriesCount = Integer
+                                                                .parseInt(
+                                                                        rpdoEnabledMappingEntriesText
+                                                                                .getText()
+                                                                                .trim());
+                                                    }
 
-                        short subObjectIdValue = 0;
-                        try {
-                            subObjectIdValue = Short.parseShort(subObjectId,
-                                    16);
-                        } catch (NumberFormatException ex) {
-                            ex.printStackTrace();
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!tpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        tpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        tpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            return warningImage;
+                                        }
+                                        break;
+                                    case TPDO:
+                                        if (!mappableSubObject
+                                                .isTpdoMappable()) {
+                                            if (mapParamObj.getId() == 1) {
+                                                try {
+                                                    if (!tpdoEnabledMappingEntriesText
+                                                            .getText()
+                                                            .isEmpty()) {
+                                                        tpdoEnabledEntriesCount = Integer
+                                                                .parseInt(
+                                                                        tpdoEnabledMappingEntriesText
+                                                                                .getText()
+                                                                                .trim());
+                                                    }
 
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            if (mapParamObj.getId() == 1) {
-                                try {
-                                    if (!rpdoEnabledMappingEntriesText.getText()
-                                            .isEmpty()) {
-                                        rpdoEnabledEntriesCount = Integer
-                                                .parseInt(
-                                                        rpdoEnabledMappingEntriesText
-                                                                .getText()
-                                                                .trim());
-                                    }
-
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                            return errorImage;
-                        }
-
-                        // Check if mapped object is mappable to this PDO.
-                        if (mappableObject.getObjectType() == 7) {
-
-                            if (subObjectIdValue != 0) {
-                                if (mapParamObj.getId() == 1) {
-                                    try {
-                                        if (!tpdoEnabledMappingEntriesText
-                                                .getText().isEmpty()) {
-                                            tpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            tpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
+                                                } catch (Exception e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                            return warningImage;
                                         }
 
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
+                                        break;
+                                    default:
                                 }
-                                if (mapParamObj.getId() == 1) {
-                                    try {
-                                        if (!rpdoEnabledMappingEntriesText
-                                                .getText().isEmpty()) {
-                                            rpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            rpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
-                                        }
 
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                return errorImage;
                             }
 
                             switch (pdoType) {
-                                case RPDO:
-                                    if (!mappableObject.isRpdoMappable()) {
-                                        if (mapParamObj.getId() == 1) {
-                                            try {
-                                                if (!rpdoEnabledMappingEntriesText
-                                                        .getText().isEmpty()) {
-                                                    rpdoEnabledEntriesCount = Integer
-                                                            .parseInt(
-                                                                    rpdoEnabledMappingEntriesText
-                                                                            .getText()
-                                                                            .trim());
-                                                }
 
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
+                                case TPDO:
+                                    if (mapParamObj.getId() == 1) {
+                                        try {
+                                            if (!tpdoEnabledMappingEntriesText
+                                                    .getText().isEmpty()) {
+                                                tpdoEnabledEntriesCount = Integer
+                                                        .parseInt(
+                                                                tpdoEnabledMappingEntriesText
+                                                                        .getText()
+                                                                        .trim());
                                             }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
-                                        return warningImage;
+                                    }
+                                    count = tpdoEnabledEntriesCount - 1;
+                                    tpdoEnabledEntriesCount = count;
+
+                                    if (tpdoEnabledEntriesCount < 0) {
+                                        return signedDisableImage;
                                     }
                                     break;
-                                case TPDO:
-                                    if (!mappableObject.isTpdoMappable()) {
-                                        if (mapParamObj.getId() == 1) {
-                                            try {
-                                                if (!tpdoEnabledMappingEntriesText
-                                                        .getText().isEmpty()) {
-                                                    tpdoEnabledEntriesCount = Integer
-                                                            .parseInt(
-                                                                    tpdoEnabledMappingEntriesText
-                                                                            .getText()
-                                                                            .trim());
-                                                }
-
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
+                                case RPDO:
+                                    if (mapParamObj.getId() == 1) {
+                                        try {
+                                            if (!rpdoEnabledMappingEntriesText
+                                                    .getText().isEmpty()) {
+                                                rpdoEnabledEntriesCount = Integer
+                                                        .parseInt(
+                                                                rpdoEnabledMappingEntriesText
+                                                                        .getText()
+                                                                        .trim());
                                             }
+
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
                                         }
-                                        return warningImage;
+                                    }
+                                    count = rpdoEnabledEntriesCount - 1;
+                                    rpdoEnabledEntriesCount = count;
+
+                                    if (rpdoEnabledEntriesCount < 0) {
+                                        return signedDisableImage;
                                     }
                                     break;
                                 default:
-                            }
-
-                        } else {
-                            PowerlinkSubobject mappableSubObject = mappableObject
-                                    .getSubObject(subObjectIdValue);
-                            if (mappableSubObject == null) {
-                                if (mapParamObj.getId() == 1) {
-                                    try {
-                                        if (!tpdoEnabledMappingEntriesText
-                                                .getText().isEmpty()) {
-                                            tpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            tpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
-                                        }
-
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                return errorImage;
-                            }
-
-                            switch (pdoType) {
-                                case RPDO:
-                                    if (!mappableSubObject.isRpdoMappable()) {
-                                        if (mapParamObj.getId() == 1) {
-                                            try {
-                                                if (!rpdoEnabledMappingEntriesText
-                                                        .getText().isEmpty()) {
-                                                    rpdoEnabledEntriesCount = Integer
-                                                            .parseInt(
-                                                                    rpdoEnabledMappingEntriesText
-                                                                            .getText()
-                                                                            .trim());
-                                                }
-
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                        return warningImage;
-                                    }
                                     break;
-                                case TPDO:
-                                    if (!mappableSubObject.isTpdoMappable()) {
-                                        if (mapParamObj.getId() == 1) {
-                                            try {
-                                                if (!tpdoEnabledMappingEntriesText
-                                                        .getText().isEmpty()) {
-                                                    tpdoEnabledEntriesCount = Integer
-                                                            .parseInt(
-                                                                    tpdoEnabledMappingEntriesText
-                                                                            .getText()
-                                                                            .trim());
-                                                }
-
-                                            } catch (Exception e) {
-                                                e.printStackTrace();
-                                            }
-                                        }
-                                        return warningImage;
-                                    }
-
-                                    break;
-                                default:
                             }
 
+                            return signedYesImage;
                         }
-
-                        switch (pdoType) {
-
-                            case TPDO:
-                                if (mapParamObj.getId() == 1) {
-                                    try {
-                                        if (!tpdoEnabledMappingEntriesText
-                                                .getText().isEmpty()) {
-                                            tpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            tpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
-                                        }
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                count = tpdoEnabledEntriesCount - 1;
-                                tpdoEnabledEntriesCount = count;
-
-                                if (tpdoEnabledEntriesCount < 0) {
-                                    return signedDisableImage;
-                                }
-                                break;
-                            case RPDO:
-                                if (mapParamObj.getId() == 1) {
-                                    try {
-                                        if (!rpdoEnabledMappingEntriesText
-                                                .getText().isEmpty()) {
-                                            rpdoEnabledEntriesCount = Integer
-                                                    .parseInt(
-                                                            rpdoEnabledMappingEntriesText
-                                                                    .getText()
-                                                                    .trim());
-                                        }
-
-                                    } catch (Exception e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                                count = rpdoEnabledEntriesCount - 1;
-                                rpdoEnabledEntriesCount = count;
-
-                                if (rpdoEnabledEntriesCount < 0) {
-                                    return signedDisableImage;
-                                }
-                                break;
-                            default:
-                                break;
-                        }
-
-                        return signedYesImage;
                     }
                     break;
 
                 default:
                     break;
             }
+
             return null;
+
         }
 
         @Override
@@ -4532,108 +4543,110 @@ public class MappingView extends ViewPart {
 
         String subObjectId = value.substring(12, 14);
 
-        if (nodeObj.isModularheadNode()) {
-            List<HeadNodeInterface> interfaceList = nodeObj
-                    .getHeadNodeInterface();
-            if (interfaceList != null) {
-                for (HeadNodeInterface headNodeInterface : interfaceList) {
-                    Collection<Module> moduleList = headNodeInterface
-                            .getModuleCollection().values();
-                    if (moduleList != null) {
-                        for (Module module : moduleList) {
-                            List<PowerlinkObject> objectList = module
-                                    .getObjectDictionary().getObjectsList();
-                            for (PowerlinkObject object : objectList) {
-                                if (object.isTpdoMappable()
-                                        || object.isRpdoMappable()) {
-                                    long objectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectsIndex(
-                                                    object.getModule(),
-                                                    object.getId());
-                                    return object.getNameWithId(objectIndex);
-                                }
+        if (nodeObj != null) {
+            if (nodeObj.isModularheadNode()) {
+                List<HeadNodeInterface> interfaceList = nodeObj
+                        .getHeadNodeInterface();
+                if (interfaceList != null) {
+                    for (HeadNodeInterface headNodeInterface : interfaceList) {
+                        Collection<Module> moduleList = headNodeInterface
+                                .getModuleCollection().values();
+                        if (moduleList != null) {
+                            for (Module module : moduleList) {
+                                List<PowerlinkObject> objectList = module
+                                        .getObjectDictionary().getObjectsList();
+                                for (PowerlinkObject object : objectList) {
+                                    if (object.isTpdoMappable()
+                                            || object.isRpdoMappable()) {
+                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsIndex(
+                                                        object.getModule(),
+                                                        object.getId());
+                                        return object
+                                                .getNameWithId(objectIndex);
+                                    }
 
-                                short subObjectIdValue = 0;
-                                subObjectIdValue = Short.parseShort(subObjectId,
-                                        16);
-                                for (PowerlinkSubobject subObject : object
-                                        .getTpdoMappableObjectList()) {
-                                    long objectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectsIndex(
-                                                    subObject.getModule(),
-                                                    subObject.getObject()
-                                                            .getId());
-                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectsSubIndex(
-                                                    subObject.getModule(),
-                                                    subObject,
-                                                    subObject.getObject()
-                                                            .getId());
-                                    if (objectIdValue == objectIndex) {
-                                        if (subObjectIndex == subObjectIdValue) {
-                                            return subObject.getNameWithId(
-                                                    objectIndex,
-                                                    subObjectIndex);
+                                    short subObjectIdValue = 0;
+                                    subObjectIdValue = Short
+                                            .parseShort(subObjectId, 16);
+                                    for (PowerlinkSubobject subObject : object
+                                            .getTpdoMappableObjectList()) {
+                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsIndex(
+                                                        subObject.getModule(),
+                                                        subObject.getObject()
+                                                                .getId());
+                                        int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsSubIndex(
+                                                        subObject.getModule(),
+                                                        subObject,
+                                                        subObject.getObject()
+                                                                .getId());
+                                        if (objectIdValue == objectIndex) {
+                                            if (subObjectIndex == subObjectIdValue) {
+                                                return subObject.getNameWithId(
+                                                        objectIndex,
+                                                        subObjectIndex);
+                                            }
                                         }
                                     }
-                                }
-                                for (PowerlinkSubobject subObject : object
-                                        .getRpdoMappableObjectList()) {
-                                    long objectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectsIndex(
-                                                    subObject.getModule(),
-                                                    subObject.getObject()
-                                                            .getId());
-                                    int subObjectIndex = OpenConfiguratorLibraryUtils
-                                            .getModuleObjectsSubIndex(
-                                                    subObject.getModule(),
-                                                    subObject,
-                                                    subObject.getObject()
-                                                            .getId());
-                                    if (objectIdValue == objectIndex) {
-                                        if (subObjectIndex == subObjectIdValue) {
-                                            return subObject.getNameWithId(
-                                                    objectIndex,
-                                                    subObjectIndex);
+                                    for (PowerlinkSubobject subObject : object
+                                            .getRpdoMappableObjectList()) {
+                                        long objectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsIndex(
+                                                        subObject.getModule(),
+                                                        subObject.getObject()
+                                                                .getId());
+                                        int subObjectIndex = OpenConfiguratorLibraryUtils
+                                                .getModuleObjectsSubIndex(
+                                                        subObject.getModule(),
+                                                        subObject,
+                                                        subObject.getObject()
+                                                                .getId());
+                                        if (objectIdValue == objectIndex) {
+                                            if (subObjectIndex == subObjectIdValue) {
+                                                return subObject.getNameWithId(
+                                                        objectIndex,
+                                                        subObjectIndex);
+                                            }
                                         }
                                     }
-                                }
 
+                                }
                             }
+                        } else {
+                            System.err.println(
+                                    "No modules are available under interface.");
                         }
-                    } else {
-                        System.err.println(
-                                "No modules are available under interface.");
                     }
                 }
             }
-        }
 
-        PowerlinkObject mappableObject = nodeObj.getObjectDictionary()
-                .getObject(objectIdValue);
+            PowerlinkObject mappableObject = nodeObj.getObjectDictionary()
+                    .getObject(objectIdValue);
 
-        if (mappableObject != null) {
-            short subObjectIdValue = 0;
-            try {
-                subObjectIdValue = Short.parseShort(subObjectId, 16);
-            } catch (NumberFormatException ex) {
-                ex.printStackTrace();
-                return "Invalid value(" + value + ")";
-            }
+            if (mappableObject != null) {
+                short subObjectIdValue = 0;
+                try {
+                    subObjectIdValue = Short.parseShort(subObjectId, 16);
+                } catch (NumberFormatException ex) {
+                    ex.printStackTrace();
+                    return "Invalid value(" + value + ")";
+                }
 
-            if (mappableObject.getObjectType() == 7) {
-                if (subObjectIdValue == 0) {
-                    return mappableObject.getNameWithId();
+                if (mappableObject.getObjectType() == 7) {
+                    if (subObjectIdValue == 0) {
+                        return mappableObject.getNameWithId();
+                    }
+                }
+
+                PowerlinkSubobject mappableSubObject = mappableObject
+                        .getSubObject(subObjectIdValue);
+                if (mappableSubObject != null) {
+                    return mappableSubObject.getUniqueName();
                 }
             }
-
-            PowerlinkSubobject mappableSubObject = mappableObject
-                    .getSubObject(subObjectIdValue);
-            if (mappableSubObject != null) {
-                return mappableSubObject.getUniqueName();
-            }
         }
-
         return "Not available (0x" + objectId + ")/(0x" + subObjectId + ")";
     }
 

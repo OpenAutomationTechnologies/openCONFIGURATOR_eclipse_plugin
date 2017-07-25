@@ -316,9 +316,6 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
                     String actualValue = plkSubObject.getActualValue();
-                    if (actualValue.contains("0x")) {
-                        actualValue = String.valueOf(Long.decode(actualValue));
-                    }
                     retObj = actualValue;
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:

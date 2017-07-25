@@ -94,4 +94,8 @@ public interface IPluginImages {
     public final static String OBD_PARAMETER_REFERENCE_ICON = "icons/parameter_reference.gif";
     public final static String OBD_PARAMETER_VAR_DECLARATION_ICON = "icons/vardeclaration.gif";
     public final static String OBD_PARAMETER_ACTUAL_VALUE_OVERLAY_ICON = "icons/actual_value.gif";
+
+    // Properties view icons
+    public final static String PROPERTY_CONVERT_TO_DECIMAL = "icons/convert_to_decimal.gif";
+    public final static String PROPERTY_CONVERT_TO_HEXA_DECIMAL = "icons/convert_to_hexadecimal.gif";
 }

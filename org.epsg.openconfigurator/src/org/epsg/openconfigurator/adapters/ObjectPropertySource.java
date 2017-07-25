@@ -68,9 +68,10 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
             IPropertySheetEntry.FILTER_ID_EXPERT };
     private PowerlinkObject plkObject;
 
+
     public ObjectPropertySource(final PowerlinkObject plkObject) {
         setObjectData(plkObject);
-
+        plkObject.getNode().enableActions();
         objectIdDescriptor
                 .setCategory(IPropertySourceSupport.INITIAL_VALUE_CATEGORY);
 
@@ -282,9 +283,6 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                 case OBJ_ACTUAL_VALUE_READ_ONLY_ID:
                 case OBJ_ACTUAL_VALUE_EDITABLE_ID: //$FALL-THROUGH$
                     String actualValue = plkObject.getActualValue();
-                    if (actualValue.contains("0x")) {
-                        actualValue = String.valueOf(Long.decode(actualValue));
-                    }
                     retObj = actualValue;
                     break;
                 case OBJ_FORCE_ACTUAL_VALUE_ID:

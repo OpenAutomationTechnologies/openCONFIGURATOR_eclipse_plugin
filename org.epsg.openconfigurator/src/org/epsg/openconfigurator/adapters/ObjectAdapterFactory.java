@@ -32,6 +32,11 @@
 package org.epsg.openconfigurator.adapters;
 
 import org.eclipse.core.runtime.IAdapterFactory;
+import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.ui.IActionBars;
+import org.eclipse.ui.IPageLayout;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.IPropertySource;
 import org.epsg.openconfigurator.model.Parameter;
 import org.epsg.openconfigurator.model.ParameterGroup;
@@ -73,13 +78,18 @@ public class ObjectAdapterFactory implements IAdapterFactory {
      */
     private ParameterGroupPropertySource parameterGroupPropertySource;
 
+    private final int MINIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE = 4;
+    private final int MAXIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE = 5;
+
     @SuppressWarnings("unchecked")
     @Override
-    public Object getAdapter(Object adaptableObject,
+    public Object getAdapter(final Object adaptableObject,
             @SuppressWarnings("rawtypes") Class adapterType) {
         if (adapterType == IPropertySource.class) {
 
             if (adaptableObject instanceof PowerlinkObject) {
+                PowerlinkObject plkObj = (PowerlinkObject) adaptableObject;
+
                 if (objectPropertySource == null) {
                     objectPropertySource = new ObjectPropertySource(
                             (PowerlinkObject) adaptableObject);
@@ -87,8 +97,70 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                     objectPropertySource
                             .setObjectData((PowerlinkObject) adaptableObject);
                 }
+
+                try {
+                    IActionBars toolMenu = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET).getViewSite()
+                            .getActionBars();
+
+                    toolMenu.updateActionBars();
+
+                    IContributionItem items[] = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET).getViewSite()
+                            .getActionBars().getToolBarManager().getItems();
+                    for (IContributionItem item : items) {
+
+                        if (item.getId() == null) {
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                    .getActivePage()
+                                    .showView(IPageLayout.ID_PROP_SHEET)
+                                    .getViewSite().getActionBars()
+                                    .getToolBarManager().remove(item);
+
+                        }
+                    }
+
+                    plkObj.getNode().createActions(adaptableObject,
+                            objectPropertySource);
+                    plkObj.getNode().enableActions();
+
+                    int length = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET).getViewSite()
+                            .getActionBars().getToolBarManager()
+                            .getItems().length;
+
+                    if (length <= MINIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE) {
+
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getActivePage()
+                                .showView(IPageLayout.ID_PROP_SHEET)
+                                .getViewSite().getActionBars()
+                                .getToolBarManager().add(plkObj.getNode()
+                                        .getConvertDecimalAction());
+                    }
+                    if (length <= MAXIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE) {
+
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getActivePage()
+                                .showView(IPageLayout.ID_PROP_SHEET)
+                                .getViewSite().getActionBars()
+                                .getToolBarManager().add(plkObj.getNode()
+                                        .getConvertHexaDecimalAction());
+
+                    }
+
+                    toolMenu.updateActionBars();
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                }
+
                 return objectPropertySource;
             } else if (adaptableObject instanceof PowerlinkSubobject) {
+                PowerlinkSubobject plksubObj = (PowerlinkSubobject) adaptableObject;
                 if (subObjectPropertySource == null) {
                     subObjectPropertySource = new SubObjectPropertySource(
                             (PowerlinkSubobject) adaptableObject);
@@ -96,8 +168,69 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                     subObjectPropertySource.setSubObjectData(
                             (PowerlinkSubobject) adaptableObject);
                 }
+
+                try {
+                    IActionBars toolMenu = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET).getViewSite()
+                            .getActionBars();
+
+                    toolMenu.updateActionBars();
+
+                    IContributionItem items[] = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET).getViewSite()
+                            .getActionBars().getToolBarManager().getItems();
+                    for (IContributionItem item : items) {
+
+                        if (item.getId() == null) {
+                            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                    .getActivePage()
+                                    .showView(IPageLayout.ID_PROP_SHEET)
+                                    .getViewSite().getActionBars()
+                                    .getToolBarManager().remove(item);
+
+                        }
+                    }
+
+                    plksubObj.getNode().createActions(adaptableObject,
+                            subObjectPropertySource);
+                    plksubObj.getNode().enableActions();
+
+                    int length = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(IPageLayout.ID_PROP_SHEET).getViewSite()
+                            .getActionBars().getToolBarManager()
+                            .getItems().length;
+
+                    if (length <= MINIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE) {
+
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getActivePage()
+                                .showView(IPageLayout.ID_PROP_SHEET)
+                                .getViewSite().getActionBars()
+                                .getToolBarManager().add(plksubObj.getNode()
+                                        .getConvertDecimalAction());
+                    }
+                    if (length <= MAXIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE) {
+
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                                .getActivePage()
+                                .showView(IPageLayout.ID_PROP_SHEET)
+                                .getViewSite().getActionBars()
+                                .getToolBarManager().add(plksubObj.getNode()
+                                        .getConvertHexaDecimalAction());
+
+                    }
+                    toolMenu.updateActionBars();
+
+                } catch (PartInitException e) {
+                    e.printStackTrace();
+                }
                 return subObjectPropertySource;
             } else if (adaptableObject instanceof ParameterReference) {
+                ParameterReference paramRef = (ParameterReference) adaptableObject;
+                paramRef.getNode().disableActions();
                 if (parameterRefPropertySource == null) {
                     parameterRefPropertySource = new ParameterRefPropertySource(
                             (ParameterReference) adaptableObject);
@@ -116,6 +249,8 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                 }
                 return parameterPropertySource;
             } else if (adaptableObject instanceof ParameterGroup) {
+                ParameterGroup paramGrp = (ParameterGroup) adaptableObject;
+                paramGrp.getObjectDictionary().getNode().disableActions();
                 if (parameterGroupPropertySource == null) {
                     parameterGroupPropertySource = new ParameterGroupPropertySource(
                             (ParameterGroup) adaptableObject);

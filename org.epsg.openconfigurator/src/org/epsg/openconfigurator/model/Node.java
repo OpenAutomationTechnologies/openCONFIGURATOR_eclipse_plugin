@@ -49,16 +49,25 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.epsg.openconfigurator.adapters.AbstractObjectPropertySource;
+import org.epsg.openconfigurator.adapters.ObjectPropertySource;
+import org.epsg.openconfigurator.adapters.SubObjectPropertySource;
 import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.event.NodePropertyChangeEvent;
 import org.epsg.openconfigurator.lib.wrapper.ErrorCode;
 import org.epsg.openconfigurator.lib.wrapper.NodeAssignment;
 import org.epsg.openconfigurator.lib.wrapper.OpenConfiguratorCore;
 import org.epsg.openconfigurator.lib.wrapper.Result;
+import org.epsg.openconfigurator.resources.IPluginImages;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.util.PluginErrorDialogUtils;
+import org.epsg.openconfigurator.views.ObjectDictionaryView;
 import org.epsg.openconfigurator.xmlbinding.projectfile.InterfaceList;
 import org.epsg.openconfigurator.xmlbinding.projectfile.OpenCONFIGURATORProject;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TAbstractNode;
@@ -195,6 +204,10 @@ public class Node {
         }
     }
 
+    private Action hexToDecimal;
+
+    private Action decimalToHex;
+
     private ProcessImage processImage;
 
     /**
@@ -277,11 +290,11 @@ public class Node {
      * Instance of Module management.
      */
     private final ModuleManagement moduleManagement;
+
     /**
      * Instance of DeviceModularinterface.
      */
     private final DeviceModularInterface moduleInterface;
-
     /**
      * Instance of head node interface.
      */
@@ -711,6 +724,166 @@ public class Node {
 
     }
 
+    public void createActions(final Object adaptableObject,
+            final Object object) {
+        hexToDecimal = new Action("Hexa-decimal to decimal") {
+            @Override
+            public void run() {
+                if (adaptableObject instanceof PowerlinkObject) {
+                    if (object instanceof ObjectPropertySource) {
+                        ObjectPropertySource objectPropertySource = (ObjectPropertySource) object;
+                        String value = (String) objectPropertySource
+                                .getPropertyValue(
+                                        AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
+                        if (!value.isEmpty()) {
+                            if (value.contains("0x")) {
+                                value = String.valueOf(Long.decode(value));
+                            }
+                            objectPropertySource.setPropertyValue(
+                                    AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
+                                    value);
+                            try {
+                                IViewPart viewpart = PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow()
+                                        .getActivePage()
+                                        .showView(ObjectDictionaryView.ID);
+                                if (viewpart instanceof ObjectDictionaryView) {
+                                    ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                    obd.handleRefresh();
+
+                                }
+                            } catch (PartInitException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } else if (adaptableObject instanceof PowerlinkSubobject) {
+                    if (object instanceof SubObjectPropertySource) {
+                        SubObjectPropertySource subObjectPropertySource = (SubObjectPropertySource) object;
+                        String value = (String) subObjectPropertySource
+                                .getPropertyValue(
+                                        AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
+
+                        if (value.isEmpty()) {
+                            if (value.contains("0x")) {
+                                value = String.valueOf(Long.decode(value));
+                            }
+                            subObjectPropertySource.setPropertyValue(
+                                    AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
+                                    value);
+                            try {
+                                IViewPart viewpart = PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow()
+                                        .getActivePage()
+                                        .showView(ObjectDictionaryView.ID);
+                                if (viewpart instanceof ObjectDictionaryView) {
+                                    ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                    obd.handleRefresh();
+
+                                }
+                            } catch (PartInitException e) {
+                                e.printStackTrace();
+                            }
+                        } else {
+                        }
+                    }
+                }
+            }
+        };
+        hexToDecimal.setToolTipText("Convert to decimal");
+        hexToDecimal.setImageDescriptor(org.epsg.openconfigurator.Activator
+                .getImageDescriptor(IPluginImages.PROPERTY_CONVERT_TO_DECIMAL));
+
+        decimalToHex = new Action("Decimal to hexa-decimal") {
+            @Override
+            public void run() {
+                if (adaptableObject instanceof PowerlinkObject) {
+                    if (object instanceof ObjectPropertySource) {
+                        ObjectPropertySource objectPropertySource = (ObjectPropertySource) object;
+                        String value = (String) objectPropertySource
+                                .getPropertyValue(
+                                        AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
+
+                        if (!value.isEmpty()) {
+
+                            if (!value.contains("0x")) {
+                                int numericVal = Integer.valueOf(value);
+                                value = Integer.toHexString(numericVal);
+                                value = value.toUpperCase();
+                                value = "0x" + value;
+                            }
+                            objectPropertySource.setPropertyValue(
+                                    AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
+                                    value);
+                            try {
+                                IViewPart viewpart = PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow()
+                                        .getActivePage()
+                                        .showView(ObjectDictionaryView.ID);
+                                if (viewpart instanceof ObjectDictionaryView) {
+                                    ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                    obd.handleRefresh();
+                                }
+                            } catch (PartInitException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                } else if (adaptableObject instanceof PowerlinkSubobject) {
+                    if (object instanceof SubObjectPropertySource) {
+                        SubObjectPropertySource subObjectPropertySource = (SubObjectPropertySource) object;
+                        String value = (String) subObjectPropertySource
+                                .getPropertyValue(
+                                        AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
+                        if (!value.isEmpty()) {
+                            if (!value.contains("0x")) {
+                                int numericVal = Integer.valueOf(value);
+                                value = Integer.toHexString(numericVal);
+                                value = value.toUpperCase();
+                                value = "0x" + value;
+                            }
+                            subObjectPropertySource.setPropertyValue(
+                                    AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
+                                    value);
+                            try {
+                                IViewPart viewpart = PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow()
+                                        .getActivePage()
+                                        .showView(ObjectDictionaryView.ID);
+                                if (viewpart instanceof ObjectDictionaryView) {
+                                    ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                    obd.handleRefresh();
+
+                                }
+                            } catch (PartInitException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        decimalToHex.setToolTipText("Convert to hexa-decimal");
+        decimalToHex.setImageDescriptor(
+                org.epsg.openconfigurator.Activator.getImageDescriptor(
+                        IPluginImages.PROPERTY_CONVERT_TO_HEXA_DECIMAL));
+    }
+
+    public void disableActions() {
+        if ((hexToDecimal != null) || (decimalToHex != null)) {
+            hexToDecimal.setEnabled(false);
+            decimalToHex.setEnabled(false);
+        }
+
+    }
+
+    public void enableActions() {
+        if ((hexToDecimal != null) || (decimalToHex != null)) {
+            hexToDecimal.setEnabled(true);
+            decimalToHex.setEnabled(true);
+        }
+    }
+
     /**
      * Add/remove force object model in the project model.
      *
@@ -887,6 +1060,14 @@ public class Node {
      */
     public short getCnNodeIdValue() {
         return nodeId;
+    }
+
+    public Action getConvertDecimalAction() {
+        return hexToDecimal;
+    }
+
+    public Action getConvertHexaDecimalAction() {
+        return decimalToHex;
     }
 
     /**

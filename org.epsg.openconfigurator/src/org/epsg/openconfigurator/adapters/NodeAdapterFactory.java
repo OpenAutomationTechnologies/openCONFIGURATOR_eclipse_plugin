@@ -83,6 +83,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
         if (adapterType == IPropertySource.class) {
             if (adaptableObject instanceof Node) {
                 Node nodeObj = (Node) adaptableObject;
+                nodeObj.disableActions();
                 // Hide property source,when the node is disabled.
                 if (!nodeObj.isEnabled()) {
                     return null;
@@ -118,7 +119,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
                 }
             } else if (adaptableObject instanceof HeadNodeInterface) {
                 HeadNodeInterface headinterfaceObj = (HeadNodeInterface) adaptableObject;
-
+                headinterfaceObj.getNode().disableActions();
                 if (interfacePropertySource == null) {
                     interfacePropertySource = new HeadNodeInterfacePropertySource(
                             headinterfaceObj);
@@ -129,6 +130,7 @@ public class NodeAdapterFactory implements IAdapterFactory {
 
             } else if (adaptableObject instanceof Module) {
                 Module moduleObj = (Module) adaptableObject;
+                moduleObj.getNode().disableActions();
                 if (!moduleObj.isEnabled()) {
                     return null;
                 }
