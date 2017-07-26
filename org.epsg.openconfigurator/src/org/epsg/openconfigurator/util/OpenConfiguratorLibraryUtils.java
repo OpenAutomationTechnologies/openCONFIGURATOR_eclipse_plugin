@@ -1637,6 +1637,7 @@ public class OpenConfiguratorLibraryUtils {
                         .getNodeModel();
                 long lossOfSocTolerance = ntwrkConfg.getLossOfSocTolerance()
                         .longValue();
+                System.err.println("Loss of Soc Value..." + lossOfSocTolerance);
                 // Workaround:
                 // only set the LossOfSocTolerance if not default value
                 if (lossOfSocTolerance != IPowerlinkConstants.LOSS_OF_SOC_TOLERANCE_DEFAULT_VALUE) {

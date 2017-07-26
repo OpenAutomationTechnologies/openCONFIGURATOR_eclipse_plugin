@@ -50,6 +50,7 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PowerlinkSubobject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.views.ObjectDictionaryView;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
@@ -628,6 +629,18 @@ public class SubObjectPropertySource extends AbstractObjectPropertySource
                                 plkSubObject.setActualValue((String) value,
                                         true);
                             }
+                        }
+                        try {
+                            IViewPart viewpart = PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getActivePage()
+                                    .showView(ObjectDictionaryView.ID);
+                            if (viewpart instanceof ObjectDictionaryView) {
+                                ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                obd.handleRefresh();
+
+                            }
+                        } catch (PartInitException e) {
+                            e.printStackTrace();
                         }
 
                         break;

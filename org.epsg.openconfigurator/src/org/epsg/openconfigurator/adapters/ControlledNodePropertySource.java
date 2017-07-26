@@ -134,21 +134,21 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
     private static final ComboBoxPropertyDescriptor autoAppSwUpdateAllowed = new ComboBoxPropertyDescriptor(
             IControlledNodeProperties.CN_AUTO_APP_SW_UPDATE_ALLOWED_OBJECT,
             CN_AUTO_APP_SW_UPDATE_ALLOWED_LABEL, YES_NO);
-    private static final ComboBoxPropertyDescriptor verifyDeviceType = new ComboBoxPropertyDescriptor(
+    private static final PropertyDescriptor verifyDeviceType = new PropertyDescriptor(
             IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_OBJECT,
-            CN_VERIFY_DEVICE_TYPE_LABEL, YES_NO);
-    private static final ComboBoxPropertyDescriptor verifyVendorId = new ComboBoxPropertyDescriptor(
+            CN_VERIFY_DEVICE_TYPE_LABEL);
+    private static final PropertyDescriptor verifyVendorId = new PropertyDescriptor(
             IControlledNodeProperties.CN_VERIFY_VENDOR_ID_OBJECT,
-            CN_VERIFY_VENDOR_ID_LABEL, YES_NO);
-    private static final ComboBoxPropertyDescriptor verifyRevisionNumber = new ComboBoxPropertyDescriptor(
+            CN_VERIFY_VENDOR_ID_LABEL);
+    private static final PropertyDescriptor verifyRevisionNumber = new PropertyDescriptor(
             IControlledNodeProperties.CN_VERIFY_REVISION_NUMBER_OBJECT,
-            CN_VERIFY_REVISION_NUMBER_LABEL, YES_NO);
-    private static final ComboBoxPropertyDescriptor verifyProductCode = new ComboBoxPropertyDescriptor(
+            CN_VERIFY_REVISION_NUMBER_LABEL);
+    private static final PropertyDescriptor verifyProductCode = new PropertyDescriptor(
             IControlledNodeProperties.CN_VERIFY_PRODUCT_CODE_OBJECT,
-            CN_VERIFY_PRODUCT_CODE_LABEL, YES_NO);
-    private static final ComboBoxPropertyDescriptor verifySerialNumber = new ComboBoxPropertyDescriptor(
+            CN_VERIFY_PRODUCT_CODE_LABEL);
+    private static final PropertyDescriptor verifySerialNumber = new PropertyDescriptor(
             IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT,
-            CN_VERIFY_SERIAL_NUMBER_LABEL, YES_NO);
+            CN_VERIFY_SERIAL_NUMBER_LABEL);
 
     private static final TextPropertyDescriptor presTimeoutDescriptor = new TextPropertyDescriptor(
             IControlledNodeProperties.CN_POLL_RESPONSE_TIMEOUT_OBJECT,
@@ -503,30 +503,43 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
                         break;
                     }
                     case IControlledNodeProperties.CN_VERIFY_DEVICE_TYPE_OBJECT: {
-                        int value = (tcn.isVerifyDeviceType() == true) ? 0 : 1;
-                        retObj = Integer.valueOf(value);
+                        if (tcn.isVerifyDeviceType() == true) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IControlledNodeProperties.CN_VERIFY_VENDOR_ID_OBJECT: {
-                        int value = (tcn.isVerifyVendorId() == true) ? 0 : 1;
-                        retObj = Integer.valueOf(value);
+                        if (tcn.isVerifyVendorId() == true) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IControlledNodeProperties.CN_VERIFY_REVISION_NUMBER_OBJECT: {
-                        int value = (tcn.isVerifyRevisionNumber() == true) ? 0
-                                : 1;
-                        retObj = Integer.valueOf(value);
+                        if (tcn.isVerifyRevisionNumber() == true) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IControlledNodeProperties.CN_VERIFY_PRODUCT_CODE_OBJECT: {
-                        int value = (tcn.isVerifyProductCode() == true) ? 0 : 1;
-                        retObj = Integer.valueOf(value);
+                        if (tcn.isVerifyProductCode() == true) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IControlledNodeProperties.CN_VERIFY_SERIAL_NUMBER_OBJECT: {
-                        int value = (tcn.isVerifySerialNumber() == true) ? 0
-                                : 1;
-                        retObj = Integer.valueOf(value);
+                        if (tcn.isVerifySerialNumber() == true) {
+                            retObj = "No";
+                        } else {
+                            retObj = "Yes";
+                        }
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
@@ -671,25 +684,30 @@ public class ControlledNodePropertySource extends AbstractNodePropertySource
      */
     protected String handlePresTimeout(Object value) {
         if (value instanceof String) {
-            if (((String) value).isEmpty()) {
-                return ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY;
-            }
-            // validate the value with openCONFIGURATOR library.
-            long presTimeoutInNs = Long.decode((String) value).longValue()
-                    * 1000;
-            if (presTimeoutInNs <= 0) {
-                return INVALID_PRES_TIMEOUT_VALUE;
-            }
+            try {
+                if (((String) value).isEmpty()) {
+                    return ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY;
+                }
+                // validate the value with openCONFIGURATOR library.
+                long presTimeoutInNs = Long.decode((String) value).longValue()
+                        * 1000;
+                if (presTimeoutInNs <= 0) {
+                    return INVALID_PRES_TIMEOUT_VALUE;
+                }
 
-            Result validateResult = OpenConfiguratorLibraryUtils
-                    .validateSubobjectActualValue(cnNode.getNetworkId(),
-                            IPowerlinkConstants.MN_DEFAULT_NODE_ID,
-                            INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
-                            cnNode.getCnNodeIdValue(),
-                            String.valueOf(presTimeoutInNs), false);
-            if (!validateResult.IsSuccessful()) {
-                return OpenConfiguratorLibraryUtils
-                        .getErrorMessage(validateResult);
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(cnNode.getNetworkId(),
+                                IPowerlinkConstants.MN_DEFAULT_NODE_ID,
+                                INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                                cnNode.getCnNodeIdValue(),
+                                String.valueOf(presTimeoutInNs), false);
+                if (!validateResult.IsSuccessful()) {
+                    return OpenConfiguratorLibraryUtils
+                            .getErrorMessage(validateResult);
+                }
+            } catch (NumberFormatException ex) {
+                ex.printStackTrace();
+                return INVALID_PRES_TIMEOUT_VALUE;
             }
         } else {
             System.err

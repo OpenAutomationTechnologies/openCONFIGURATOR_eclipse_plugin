@@ -168,6 +168,7 @@ public class ObjectDictionaryView extends ViewPart
 
             return objList.toArray();
         }
+
     }
 
     /**
@@ -487,6 +488,7 @@ public class ObjectDictionaryView extends ViewPart
                     treeViewer.setInput(nodeObj);
                 }
 
+                treeViewer.setSelection(null);
             }
         };
         refreshAction.setToolTipText("Refresh");
@@ -611,6 +613,7 @@ public class ObjectDictionaryView extends ViewPart
     public void createPartControl(Composite parent) {
 
         PatternFilter filter = new PowerlinkObjectPatternFilter();
+
         // PatternFilter filter = new PatternFilter();
         filter.setIncludeLeadingWildcard(true);
         FilteredTree tree = new FilteredTree(parent,
@@ -726,6 +729,10 @@ public class ObjectDictionaryView extends ViewPart
         return treeViewer.getControl();
     }
 
+    public TreeViewer getViewer() {
+        return treeViewer;
+    }
+
     public void handleRefresh() {
 
         if (moduleSelection) {
@@ -734,6 +741,7 @@ public class ObjectDictionaryView extends ViewPart
         } else {
             treeViewer.setInput(nodeObj);
         }
+
     }
 
     /**
@@ -755,6 +763,10 @@ public class ObjectDictionaryView extends ViewPart
         } else {
             treeViewer.setInput(nodeObj);
         }
+    }
+
+    public void setEmptySelection() {
+        treeViewer.setSelection(null);
     }
 
     @Override

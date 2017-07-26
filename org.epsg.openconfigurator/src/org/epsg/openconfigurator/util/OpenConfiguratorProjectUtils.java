@@ -106,7 +106,7 @@ import org.jdom2.JDOMException;
  */
 public final class OpenConfiguratorProjectUtils {
 
-    public static final String PATH_SETTINGS_ALL_PATH_ID = "all"; ////$NON-NLS-1$
+    public static final String PATH_SETTINGS_ALL_PATH_ID = "default"; ////$NON-NLS-1$
     public static final String PATH_SETTINGS_DEFAULT_PATH_ID = "defaultOutputPath"; ////$NON-NLS-1$
     public static final String PATH_SETTINGS_CUSTOM_PATH_ID = "custom"; //// $NON-NLS-1$
     public static final String PATH_SETTINGS_DEFAULT_PATH_VALUE = "output"; ////$NON-NLS-1$

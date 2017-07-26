@@ -86,9 +86,8 @@ public class ObjectAdapterFactory implements IAdapterFactory {
     public Object getAdapter(final Object adaptableObject,
             @SuppressWarnings("rawtypes") Class adapterType) {
         if (adapterType == IPropertySource.class) {
-
             if (adaptableObject instanceof PowerlinkObject) {
-                PowerlinkObject plkObj = (PowerlinkObject) adaptableObject;
+                PowerlinkObject plkObject = (PowerlinkObject) adaptableObject;
 
                 if (objectPropertySource == null) {
                     objectPropertySource = new ObjectPropertySource(
@@ -122,9 +121,27 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                         }
                     }
 
-                    plkObj.getNode().createActions(adaptableObject,
+                    plkObject.getNode().createActions(plkObject,
                             objectPropertySource);
-                    plkObj.getNode().enableActions();
+                    plkObject.getNode().enableActions();
+
+                    String value = (String) objectPropertySource
+                            .getPropertyValue(
+                                    AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
+                    if (!value.isEmpty()) {
+                        if (value.contains("0x")) {
+                            plkObject.getNode().getDecToHexAction()
+                                    .setEnabled(false);
+                            toolMenu.updateActionBars();
+                        } else {
+                            plkObject.getNode().getHexToDecAction()
+                                    .setEnabled(false);
+                            toolMenu.updateActionBars();
+                        }
+                    } else {
+                        plkObject.getNode().disableActions();
+                        toolMenu.updateActionBars();
+                    }
 
                     int length = PlatformUI.getWorkbench()
                             .getActiveWorkbenchWindow().getActivePage()
@@ -138,7 +155,7 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                                 .getActivePage()
                                 .showView(IPageLayout.ID_PROP_SHEET)
                                 .getViewSite().getActionBars()
-                                .getToolBarManager().add(plkObj.getNode()
+                                .getToolBarManager().add(plkObject.getNode()
                                         .getConvertDecimalAction());
                     }
                     if (length <= MAXIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE) {
@@ -147,7 +164,7 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                                 .getActivePage()
                                 .showView(IPageLayout.ID_PROP_SHEET)
                                 .getViewSite().getActionBars()
-                                .getToolBarManager().add(plkObj.getNode()
+                                .getToolBarManager().add(plkObject.getNode()
                                         .getConvertHexaDecimalAction());
 
                     }
@@ -196,6 +213,24 @@ public class ObjectAdapterFactory implements IAdapterFactory {
                     plksubObj.getNode().createActions(adaptableObject,
                             subObjectPropertySource);
                     plksubObj.getNode().enableActions();
+
+                    String value = (String) subObjectPropertySource
+                            .getPropertyValue(
+                                    AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
+                    if (!value.isEmpty()) {
+                        if (value.contains("0x")) {
+                            plksubObj.getNode().getDecToHexAction()
+                                    .setEnabled(false);
+                            toolMenu.updateActionBars();
+                        } else {
+                            plksubObj.getNode().getHexToDecAction()
+                                    .setEnabled(false);
+                            toolMenu.updateActionBars();
+                        }
+                    } else {
+                        plksubObj.getNode().disableActions();
+                        toolMenu.updateActionBars();
+                    }
 
                     int length = PlatformUI.getWorkbench()
                             .getActiveWorkbenchWindow().getActivePage()

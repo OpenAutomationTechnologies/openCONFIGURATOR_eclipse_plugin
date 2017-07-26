@@ -49,6 +49,7 @@ import org.epsg.openconfigurator.console.OpenConfiguratorMessageConsole;
 import org.epsg.openconfigurator.lib.wrapper.Result;
 import org.epsg.openconfigurator.model.PowerlinkObject;
 import org.epsg.openconfigurator.util.OpenConfiguratorLibraryUtils;
+import org.epsg.openconfigurator.views.ObjectDictionaryView;
 import org.epsg.openconfigurator.views.mapping.MappingView;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectAccessType;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
@@ -67,7 +68,6 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
     private static final String[] EXPERT_FILTER_FLAG = {
             IPropertySheetEntry.FILTER_ID_EXPERT };
     private PowerlinkObject plkObject;
-
 
     public ObjectPropertySource(final PowerlinkObject plkObject) {
         setObjectData(plkObject);
@@ -139,6 +139,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
         objectErrorDescriptor
                 .setCategory(IPropertySourceSupport.OBJECT_ATTRIBUTES_CATEGORY);
         objectErrorDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
+
     }
 
     private void addObjectPropertyDescriptors(
@@ -512,6 +513,7 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
      */
     public void setObjectData(PowerlinkObject adaptableObject) {
         plkObject = adaptableObject;
+
     }
 
     /**
@@ -552,6 +554,18 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                 // Success - update the OBD
                                 plkObject.setActualValue((String) value, true);
                             }
+                        }
+                        try {
+                            IViewPart viewpart = PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getActivePage()
+                                    .showView(ObjectDictionaryView.ID);
+                            if (viewpart instanceof ObjectDictionaryView) {
+                                ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                obd.handleRefresh();
+
+                            }
+                        } catch (PartInitException e) {
+                            e.printStackTrace();
                         }
                         break;
                     }

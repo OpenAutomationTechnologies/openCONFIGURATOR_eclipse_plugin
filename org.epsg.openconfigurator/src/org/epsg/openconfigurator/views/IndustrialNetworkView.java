@@ -2262,10 +2262,6 @@ public class IndustrialNetworkView extends ViewPart
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                             .getActivePage().showView(MappingView.ID);
 
-                    System.err.println(
-                            "The view site..." + PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getActivePage()
-                                    .showView(MappingView.ID).getViewSite());
                     viewer.setSelection(viewer.getSelection());
                 } catch (PartInitException e) {
                     e.printStackTrace();

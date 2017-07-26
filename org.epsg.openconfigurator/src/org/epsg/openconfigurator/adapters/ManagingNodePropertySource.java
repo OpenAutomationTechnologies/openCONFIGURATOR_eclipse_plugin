@@ -353,10 +353,17 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         retObj = mn.getPathToXDC();
                         break;
                     case INetworkProperties.NET_LOSS_OF_SOC_TOLERANCE_OBJECT: {
-                        long val = networkConfiguration.getLossOfSocTolerance()
-                                .longValue();
-                        long valInUs = val / 1000;
-                        retObj = String.valueOf(valInUs);
+                        if (mnNode
+                                .getNodeModel() instanceof TNetworkConfiguration) {
+                            TNetworkConfiguration ntwrkConfg = (TNetworkConfiguration) mnNode
+                                    .getNodeModel();
+                            long val = ntwrkConfg.getLossOfSocTolerance()
+                                    .longValue();
+
+                            System.err.println("loss of soc.." + val);
+                            long valInUs = val / 1000;
+                            retObj = String.valueOf(valInUs);
+                        }
                         break;
                     }
                     case IManagingNodeProperties.MN_TRANSMIT_PRES_OBJECT: {

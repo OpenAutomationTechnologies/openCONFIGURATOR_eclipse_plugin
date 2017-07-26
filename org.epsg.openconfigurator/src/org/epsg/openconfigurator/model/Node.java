@@ -731,6 +731,7 @@ public class Node {
             public void run() {
                 if (adaptableObject instanceof PowerlinkObject) {
                     if (object instanceof ObjectPropertySource) {
+                        PowerlinkObject plkObj = (PowerlinkObject) adaptableObject;
                         ObjectPropertySource objectPropertySource = (ObjectPropertySource) object;
                         String value = (String) objectPropertySource
                                 .getPropertyValue(
@@ -742,19 +743,14 @@ public class Node {
                             objectPropertySource.setPropertyValue(
                                     AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
                                     value);
-                            try {
-                                IViewPart viewpart = PlatformUI.getWorkbench()
-                                        .getActiveWorkbenchWindow()
-                                        .getActivePage()
-                                        .showView(ObjectDictionaryView.ID);
-                                if (viewpart instanceof ObjectDictionaryView) {
-                                    ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
-                                    obd.handleRefresh();
-
-                                }
-                            } catch (PartInitException e) {
-                                e.printStackTrace();
+                            IViewPart viewpart = PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getActivePage()
+                                    .findView(ObjectDictionaryView.ID);
+                            if (viewpart instanceof ObjectDictionaryView) {
+                                ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                obd.handleRefresh();
                             }
+
                         }
                     }
                 } else if (adaptableObject instanceof PowerlinkSubobject) {
@@ -799,6 +795,7 @@ public class Node {
             public void run() {
                 if (adaptableObject instanceof PowerlinkObject) {
                     if (object instanceof ObjectPropertySource) {
+                        PowerlinkObject plkObj = (PowerlinkObject) adaptableObject;
                         ObjectPropertySource objectPropertySource = (ObjectPropertySource) object;
                         String value = (String) objectPropertySource
                                 .getPropertyValue(
@@ -823,6 +820,7 @@ public class Node {
                                 if (viewpart instanceof ObjectDictionaryView) {
                                     ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
                                     obd.handleRefresh();
+
                                 }
                             } catch (PartInitException e) {
                                 e.printStackTrace();
@@ -1086,6 +1084,10 @@ public class Node {
         return cycleTimeValue;
     }
 
+    public Action getDecToHexAction() {
+        return decimalToHex;
+    }
+
     /**
      * @return Error in configuration file.
      */
@@ -1162,6 +1164,10 @@ public class Node {
      */
     public List<HeadNodeInterface> getHeadNodeInterface() {
         return interfaceOfNodes;
+    }
+
+    public Action getHexToDecAction() {
+        return hexToDecimal;
     }
 
     /**

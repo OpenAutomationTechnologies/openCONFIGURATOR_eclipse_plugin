@@ -1889,6 +1889,10 @@ public class MappingView extends ViewPart {
 
     private static final int MAXIMUM_PRESCALER_VALUE = 1000;
 
+    private static final String INVALID_CYCLE_TIME_VALUE = "Invalid value for Cycle time.";
+
+    private static final String INVALID_PRES_TIMEOUT_VALUE = "Invalid PRes TimeOut value.";
+
     /**
      * Handles LossofSOCTolerance modifications
      *
@@ -1907,6 +1911,15 @@ public class MappingView extends ViewPart {
             }
             try {
                 long longValue = Long.decode((String) value);
+                if (longValue < 0) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            INVALID_RANGE_LOSS_SOC_TOLERANCE,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+
+                }
+
                 // validate the value
                 Long maxValue = 4294967295L;
                 if ((longValue * 1000) > maxValue) {
@@ -1956,7 +1969,7 @@ public class MappingView extends ViewPart {
             try {
                 short nodeIDvalue = Short.valueOf(((String) id));
                 if (nodeObj.getNodeModel() instanceof TCN) {
-                    if ((nodeIDvalue == 0)
+                    if ((nodeIDvalue <= 0)
                             || (nodeIDvalue >= IPowerlinkConstants.MN_DEFAULT_NODE_ID)) {
                         PluginErrorDialogUtils.showMessageWindow(
                                 MessageDialog.ERROR, "Invalid Node ID.",
@@ -1964,7 +1977,7 @@ public class MappingView extends ViewPart {
                         return StringUtils.EMPTY;
                     }
                 } else if (nodeObj.getNodeModel() instanceof TRMN) {
-                    if ((nodeIDvalue == 0)
+                    if ((nodeIDvalue <= 0)
                             || (nodeIDvalue <= IPowerlinkConstants.MN_DEFAULT_NODE_ID)
                             || ((nodeIDvalue > IPowerlinkConstants.RMN_MAX_NODE_ID))) {
                         PluginErrorDialogUtils.showMessageWindow(
@@ -1987,6 +2000,7 @@ public class MappingView extends ViewPart {
                             nodeObj.getNetworkId());
                     return StringUtils.EMPTY;
                 }
+
             } catch (NumberFormatException ex) {
                 ex.printStackTrace();
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
@@ -2178,8 +2192,8 @@ public class MappingView extends ViewPart {
             }
         }
     };
-
     private Tree lst_no_foi;
+
     /**
      * Selection listener to update the objects and sub-objects in the mapping
      * view.
@@ -2255,8 +2269,9 @@ public class MappingView extends ViewPart {
                 }
 
                 sourcePart = part;
-                nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
-                nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
+                nodeTypeCombo.removeSelectionListener(nodeTypeModifyListener);
+                nodeTypeCombo
+                        .removeSelectionListener(transmitPresModifyListener);
                 nodeId.removeKeyListener(nodeIDModifyListener);
                 lossOfSocTolText.removeKeyListener(lossOfSocModifyListener);
                 asyncMtuText.removeKeyListener(asyncMtuModifyListener);
@@ -2383,16 +2398,15 @@ public class MappingView extends ViewPart {
         }
 
     };
+
     /**
      * Source workbench part.
      */
     private IWorkbenchPart sourcePart;
-
     /**
      * Listener instance to listen to the changes in the source part.
      */
     private final PartListener partListener = new PartListener();
-
     /**
      * TPDO page controls
      */
@@ -2401,12 +2415,14 @@ public class MappingView extends ViewPart {
     private ComboViewer sndtoNodecomboviewer;
     private TableViewer tpdoTableViewer;
     private TableViewerColumn tpdoMappingObjectColumn;
-    private TableViewerColumn tpdoActionsColumn;
-    private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
 
+    private TableViewerColumn tpdoActionsColumn;
+
+    private PdoMappingObjectColumnEditingSupport tpdoMappingObjClmnEditingSupport;
     private Composite tpdoPageFooter;
 
     private Button btnTpdoChannelMapAvailableObjects;
+
     private Button btnTpdoChannelClearSelectedRows;
 
     private Text tpdoEnabledMappingEntriesText;
@@ -2414,28 +2430,27 @@ public class MappingView extends ViewPart {
     private Text tpdoChannelSize;
 
     private TableEditor tpdoTableActionsEditor;
-
     private Composite tpdoActionsbuttonGroup;
-
     private Button tpdoActionsUpButton;
     private Button tpdoActionsDownButton;
+
     private TableColumn tpdoTblclmnActualValue;
     private ISelectionChangedListener tpdoChannelSelectionChangeListener;
 
     private ISelectionChangedListener tpdoNodeComboSelectionChangeListener;
+
     private ModifyListener tpdoEnabledMappingEntriesTextModifyListener;
 
     private SelectionListener tpdoMapAvailableObjectsBtnSelectionListener;
 
     private SelectionListener tpdoClearAllMappingBtnSelectionListener;
-
     private SelectionListener tpdoActionsClearBtnSelectionListener;
-
     private SelectionListener tpdoActionsDownBtnSelectionListener;
+
     private SelectionListener tpdoActionsUpBtnSelectionListener;
     private Button tpdoBtnCheckButton;
-
     public boolean tpdoProfileObjectSelection = false;
+
     private int tpdoEnabledEntriesCount;
     private int count = 0;
 
@@ -2444,17 +2459,16 @@ public class MappingView extends ViewPart {
      */
     private TabItem tbtmRpdo;
     private ComboViewer rpdoChannelComboViewer;
-
     private ComboViewer receiveFromNodecomboviewer;
     private TableViewer rpdoTableViewer;
     private TableViewerColumn rpdoMappingObjectColumn;
+
     private TableViewerColumn rpdoActionsColumn;
     private PdoMappingObjectColumnEditingSupport rpdoMappingObjClmnEditingSupport;
-
     private Composite rpdoPageFooter;
+
     private Button btnRpdoChannelMapAvailableObjects;
     private Button btnRpdoChannelClearSelectedRows;
-
     private Text rpdoEnabledMappingEntriesText;
     private Text rpdoChannelSize;
     private TableEditor rpdoTableActionsEditor;
@@ -2462,13 +2476,13 @@ public class MappingView extends ViewPart {
     private Button rpdoActionsUpButton;
     private Button rpdoActionsDownButton;
     private TableColumn rpdoTblclmnActualValue;
+
     private ISelectionChangedListener rpdoChannelSelectionChangeListener;
+
     private ISelectionChangedListener rpdoNodeComboSelectionChangeListener;
 
     private ModifyListener rpdoEnabledMappingEntriesTextModifyListener;
-
     private SelectionListener rpdoMapAvailableObjectsBtnSelectionListener;
-
     private SelectionListener rpdoClearAllMappingBtnSelectionListener;
     private SelectionListener rpdoActionsClearBtnSelectionListener;
     private SelectionListener rpdoActionsDownBtnSelectionListener;
@@ -2481,7 +2495,9 @@ public class MappingView extends ViewPart {
      */
     private Action showAdvancedview;
     private final Image clearImage;
+
     private final Image upArrowImage;
+
     private final Image downArrowImage;
 
     private final Image warningImage;
@@ -2489,9 +2505,7 @@ public class MappingView extends ViewPart {
     private final Image epsgImage;
 
     private final Image errorImage;
-
     private final Image signedYesImage;
-
     private final Image signedDisableImage;
     private final FormToolkit formToolkit = new FormToolkit(
             Display.getDefault());
@@ -2502,15 +2516,17 @@ public class MappingView extends ViewPart {
     private TableViewer tpdoSummaryTableViewer;
     private TableColumn tpdoSummaryClmnMappingVersion;
     private boolean tpdoSummaryOnlyShowChannelsWithData = false;
+
     private TableViewer rpdoSummaryTableViewer;
     private TableColumn rpdoSummaryClmnMappingVersion;
-
     private boolean rpdoSummaryOnlyShowChannelsWithData = false;
     /**
      * Common application model data
      */
     private final Node emptyNode;
+
     private final Node selfReceiptNode;
+
     private final PowerlinkObject emptyObject;
 
     private final ArrayList<Node> targetNodeIdList = new ArrayList<>();
@@ -2627,15 +2643,13 @@ public class MappingView extends ViewPart {
     private KeyAdapter nodeIDModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            System.err.println("The state mask event.." + e.stateMask);
             if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
                     || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
-
+                short oldNodeId = nodeObj.getCnNodeIdValue();
                 newNodeId = handleSetNodeId(nodeId.getText());
                 if ((!newNodeId.equalsIgnoreCase(StringUtils.EMPTY))) {
                     short nodeIDvalue = Short.valueOf((newNodeId));
 
-                    short oldNodeId = nodeObj.getCnNodeIdValue();
                     try {
                         nodeObj.getPowerlinkRootNode().setNodeId(oldNodeId,
                                 nodeIDvalue);
@@ -2647,7 +2661,8 @@ public class MappingView extends ViewPart {
                     }
                     refreshNetworkView();
                 } else {
-                    // nodeId.setText(nodeObj.getNodeIdString());
+                    String nodeIdString = String.valueOf(oldNodeId);
+                    nodeId.setText(nodeIdString);
                 }
 
             }
@@ -2658,139 +2673,133 @@ public class MappingView extends ViewPart {
     /**
      * Keyboard bindings.
      */
-    private KeyAdapter transmitPresModifyListener = new KeyAdapter() {
+    private SelectionAdapter transmitPresModifyListener = new SelectionAdapter() {
         @Override
-        public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                String oldPres = StringUtils.EMPTY;
+        public void widgetSelected(SelectionEvent e) {
+            String oldPres = StringUtils.EMPTY;
 
-                if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
-                    TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
-                            .getNodeModel();
-                    TMN mn = net.getNodeCollection().getMN();
-                    if (mn.isTransmitsPRes()) {
-                        oldPres = "Yes";
-                    } else {
-                        oldPres = "No";
-                    }
-                }
-                int presIndex = nodeTypeCombo.getSelectionIndex();
-                newTransmitPres = handletransmitPres(String.valueOf(presIndex));
-
-                if ((!newTransmitPres.equalsIgnoreCase(StringUtils.EMPTY))) {
-                    if (!newTransmitPres.equalsIgnoreCase(oldPres)) {
-
-                        if (newTransmitPres.equalsIgnoreCase("Yes")) {
-                            newTransmitPres = "0";
-                        } else {
-                            newTransmitPres = "1";
-                        }
-                        Integer value = Integer.valueOf(newTransmitPres);
-
-                        boolean result = (value == 0) ? true : false;
-                        if (nodeObj
-                                .getNodeModel() instanceof TNetworkConfiguration) {
-                            TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
-                                    .getNodeModel();
-                            TMN mn = net.getNodeCollection().getMN();
-                            mn.setTransmitsPRes(result);
-                            try {
-                                OpenConfiguratorProjectUtils
-                                        .updateNodeAttributeValue(nodeObj,
-                                                "transmitsPRes",
-                                                String.valueOf(result));
-                            } catch (JDOMException | IOException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
-                            nodeTypeCombo.select(value);
-                        }
-                        refreshNetworkView();
-
-                    }
+            if (nodeObj.getNodeModel() instanceof TNetworkConfiguration) {
+                TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                        .getNodeModel();
+                TMN mn = net.getNodeCollection().getMN();
+                if (mn.isTransmitsPRes()) {
+                    oldPres = "Yes";
+                } else {
+                    oldPres = "No";
                 }
             }
-        }
+            int presIndex = nodeTypeCombo.getSelectionIndex();
+            newTransmitPres = handletransmitPres(String.valueOf(presIndex));
 
-    };
+            if ((!newTransmitPres.equalsIgnoreCase(StringUtils.EMPTY))) {
+                if (!newTransmitPres.equalsIgnoreCase(oldPres)) {
 
-    /**
-     * Keyboard bindings.
-     */
-    private KeyAdapter nodeTypeModifyListener = new KeyAdapter() {
-        @Override
-        public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
-                String oldNodetype = StringUtils.EMPTY;
-                if (nodeObj.getNodeModel() instanceof TCN) {
-                    TCN tcn = (TCN) nodeObj.getNodeModel();
-                    if (tcn.isIsChained()) {
-                        oldNodetype = "Chained";
+                    if (newTransmitPres.equalsIgnoreCase("Yes")) {
+                        newTransmitPres = "0";
                     } else {
-                        oldNodetype = "Normal";
+                        newTransmitPres = "1";
                     }
-                }
+                    Integer value = Integer.valueOf(newTransmitPres);
 
-                int nodeType = nodeTypeCombo.getSelectionIndex();
-                newNodType = handleNodeTypeChange(nodeType);
-                if ((!newNodType.equalsIgnoreCase(StringUtils.EMPTY))) {
-                    if (!newNodType.equalsIgnoreCase(oldNodetype)) {
-                        if (newNodType.equalsIgnoreCase("Normal")) {
-                            newNodType = "0";
-                        } else {
-                            newNodType = "1";
-                        }
-                        Integer value = Integer.valueOf(newNodType);
-                        PlkOperationMode plkMode = null;
-                        Result res = new Result();
-
-                        int val = value.intValue();
-                        if (val == 0) { // Normal Station.
-                            res = OpenConfiguratorCore.GetInstance()
-                                    .ResetOperationMode(nodeObj.getNetworkId(),
-                                            nodeObj.getCnNodeIdValue());
-                            plkMode = PlkOperationMode.NORMAL;
-                        } else if (val == 1) {
-                            res = OpenConfiguratorCore.GetInstance()
-                                    .SetOperationModeChained(
-                                            nodeObj.getNetworkId(),
-                                            nodeObj.getCnNodeIdValue());
-                            plkMode = PlkOperationMode.CHAINED;
-                        }
-                        if (plkMode != null) {
-                            if (res.IsSuccessful()) {
-                                nodeObj.setPlkOperationMode(plkMode);
-                            } else {
-                                OpenConfiguratorMessageConsole.getInstance()
-                                        .printLibraryErrorMessage(res);
-                            }
-                        } else {
-                            System.err.println(
-                                    "Invalid POWERLINK operation mode");
-                        }
-                        // Node Assignment values will be modified by the
-                        // library. So refresh the project file data.
+                    boolean result = (value == 0) ? true : false;
+                    if (nodeObj
+                            .getNodeModel() instanceof TNetworkConfiguration) {
+                        TNetworkConfiguration net = (TNetworkConfiguration) nodeObj
+                                .getNodeModel();
+                        TMN mn = net.getNodeCollection().getMN();
+                        mn.setTransmitsPRes(result);
                         try {
                             OpenConfiguratorProjectUtils
-                                    .updateNodeAssignmentValues(nodeObj);
-
-                            // RPDO nodeID will be changed by the library. So
-                            // refresh the node XDD data
-                            OpenConfiguratorProjectUtils
-                                    .persistNodeData(nodeObj);
-
-                            // Updates the generator attributes in project file.
-                            OpenConfiguratorProjectUtils
-                                    .updateGeneratorInfo(nodeObj);
-
+                                    .updateNodeAttributeValue(nodeObj,
+                                            "transmitsPRes",
+                                            String.valueOf(result));
                         } catch (JDOMException | IOException e1) {
                             // TODO Auto-generated catch block
                             e1.printStackTrace();
                         }
-                        refreshNetworkView();
+                        nodeTypeCombo.select(value);
                     }
+                    refreshNetworkView();
+
                 }
             }
+        }
+    };
+
+    /**
+     * Keyboard bindings.
+     */
+    private SelectionAdapter nodeTypeModifyListener = new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+
+            String oldNodetype = StringUtils.EMPTY;
+            if (nodeObj.getNodeModel() instanceof TCN) {
+                TCN tcn = (TCN) nodeObj.getNodeModel();
+                if (tcn.isIsChained()) {
+                    oldNodetype = "Chained";
+                } else {
+                    oldNodetype = "Normal";
+                }
+            }
+
+            int nodeType = nodeTypeCombo.getSelectionIndex();
+            newNodType = handleNodeTypeChange(nodeType);
+            if ((!newNodType.equalsIgnoreCase(StringUtils.EMPTY))) {
+                if (!newNodType.equalsIgnoreCase(oldNodetype)) {
+                    if (newNodType.equalsIgnoreCase("Normal")) {
+                        newNodType = "0";
+                    } else {
+                        newNodType = "1";
+                    }
+                    Integer value = Integer.valueOf(newNodType);
+                    PlkOperationMode plkMode = null;
+                    Result res = new Result();
+
+                    int val = value.intValue();
+                    if (val == 0) { // Normal Station.
+                        res = OpenConfiguratorCore.GetInstance()
+                                .ResetOperationMode(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeIdValue());
+                        plkMode = PlkOperationMode.NORMAL;
+                    } else if (val == 1) {
+                        res = OpenConfiguratorCore.GetInstance()
+                                .SetOperationModeChained(nodeObj.getNetworkId(),
+                                        nodeObj.getCnNodeIdValue());
+                        plkMode = PlkOperationMode.CHAINED;
+                    }
+                    if (plkMode != null) {
+                        if (res.IsSuccessful()) {
+                            nodeObj.setPlkOperationMode(plkMode);
+                        } else {
+                            OpenConfiguratorMessageConsole.getInstance()
+                                    .printLibraryErrorMessage(res);
+                        }
+                    } else {
+                        System.err.println("Invalid POWERLINK operation mode");
+                    }
+                    // Node Assignment values will be modified by the
+                    // library. So refresh the project file data.
+                    try {
+                        OpenConfiguratorProjectUtils
+                                .updateNodeAssignmentValues(nodeObj);
+
+                        // RPDO nodeID will be changed by the library. So
+                        // refresh the node XDD data
+                        OpenConfiguratorProjectUtils.persistNodeData(nodeObj);
+
+                        // Updates the generator attributes in project file.
+                        OpenConfiguratorProjectUtils
+                                .updateGeneratorInfo(nodeObj);
+
+                    } catch (JDOMException | IOException e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
+                    }
+                    refreshNetworkView();
+                }
+            }
+
         }
 
     };
@@ -2801,7 +2810,8 @@ public class MappingView extends ViewPart {
     private KeyAdapter presTimeoutModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
                 long presTimeoutInMsVal = nodeObj.getPresTimeoutvalue() / 1000;
 
                 String prestimeout = String.valueOf(presTimeoutInMsVal);
@@ -2847,14 +2857,15 @@ public class MappingView extends ViewPart {
     private KeyAdapter lossOfSocModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
+
                 Long value = Long.valueOf(nodeObj.getLossOfSocTolerance());
                 long valueInUs = value / 1000;
 
                 String lossOfSoc = String.valueOf(valueInUs);
                 newLossOfSoc = handleLossOfSoCTolerance(
                         lossOfSocTolText.getText());
-                System.err.println("Loss of Soc..." + newLossOfSoc);
                 if ((!newLossOfSoc.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newLossOfSoc.equalsIgnoreCase(lossOfSoc)) {
                         long lossOfSocTolerance = Long.decode(newLossOfSoc)
@@ -2877,6 +2888,16 @@ public class MappingView extends ViewPart {
                         }
                     }
                     refreshNetworkView();
+                    try {
+                        nodeObj.getProject().refreshLocal(
+                                IResource.DEPTH_INFINITE,
+                                new NullProgressMonitor());
+                    } catch (CoreException ex) {
+                        System.err.println(
+                                "unable to refresh the resource due to "
+                                        + ex.getCause().getMessage());
+                    }
+
                 } else {
                     Long val = Long.valueOf(nodeObj.getLossOfSocTolerance());
                     long valInUs = val / 1000;
@@ -2893,7 +2914,8 @@ public class MappingView extends ViewPart {
     private KeyAdapter asyncMtuModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
                 String asyncMtu = nodeObj.getAsyncMtu();
                 newAsyncMtu = handleAsyncMtu(asyncMtuText.getText());
                 if ((!newAsyncMtu.equalsIgnoreCase(StringUtils.EMPTY))) {
@@ -2916,7 +2938,10 @@ public class MappingView extends ViewPart {
                     }
                     refreshNetworkView();
                 } else {
-                    asyncMtuText.setText(nodeObj.getAsyncMtu());
+                    if (asyncMtu.contains("0x")) {
+                        asyncMtu = String.valueOf(Long.decode(asyncMtu));
+                    }
+                    asyncMtuText.setText(asyncMtu);
                 }
             }
         }
@@ -2929,13 +2954,14 @@ public class MappingView extends ViewPart {
     private KeyAdapter asyncTimeoutModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
 
                 String asyncTime = nodeObj.getAsyncSlotTimeout();
                 newAsynctimeOut = handleAsyncSlotTimeout(
                         asyncTimeOutTxt.getText());
                 if ((!newAsynctimeOut.equalsIgnoreCase(StringUtils.EMPTY))) {
-                    if (newAsynctimeOut.equalsIgnoreCase(asyncTime)) {
+                    if (!newAsynctimeOut.equalsIgnoreCase(asyncTime)) {
                         Result res = OpenConfiguratorCore.GetInstance()
                                 .SetAsyncSlotTimeout(nodeObj.getNetworkId(),
                                         nodeObj.getCnNodeIdValue(),
@@ -2956,7 +2982,10 @@ public class MappingView extends ViewPart {
                     }
                     refreshNetworkView();
                 } else {
-                    asyncTimeOutTxt.setText(nodeObj.getAsyncSlotTimeout());
+                    if (asyncTime.contains("0x")) {
+                        asyncTime = String.valueOf(Long.decode(asyncTime));
+                    }
+                    asyncTimeOutTxt.setText(asyncTime);
                 }
             }
         }
@@ -2969,7 +2998,8 @@ public class MappingView extends ViewPart {
     private KeyAdapter prescalerModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
                 String preScaler = nodeObj.getPrescaler();
                 newPreScaler = handlePreScalerValue(preScalerText.getText());
                 if ((!newPreScaler.equalsIgnoreCase(StringUtils.EMPTY))) {
@@ -2992,7 +3022,10 @@ public class MappingView extends ViewPart {
                     }
                     refreshNetworkView();
                 } else {
-                    preScalerText.setText(nodeObj.getPrescaler());
+                    if (preScaler.contains("0x")) {
+                        preScaler = String.valueOf(Long.decode(preScaler));
+                    }
+                    preScalerText.setText(preScaler);
                 }
             }
         }
@@ -3005,9 +3038,11 @@ public class MappingView extends ViewPart {
     private KeyAdapter cycleTimeModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
                 String cycleTime = nodeObj.getCycleTime();
-                newCycleTime = handleCycleTime(txt_no_PResTimeOut.getText());
+                newCycleTime = handleCycleTime(txt_no_PResTimeOut.getText(),
+                        cycleTime);
                 if ((!newCycleTime.equalsIgnoreCase(StringUtils.EMPTY))) {
                     if (!newCycleTime.equalsIgnoreCase(cycleTime)) {
                         Long cycleTimeValue = Long.decode(newCycleTime);
@@ -3024,6 +3059,11 @@ public class MappingView extends ViewPart {
                         } else {
                             OpenConfiguratorMessageConsole.getInstance()
                                     .printLibraryErrorMessage(res);
+                            PluginErrorDialogUtils.showMessageWindow(
+                                    MessageDialog.ERROR,
+                                    OpenConfiguratorLibraryUtils
+                                            .getErrorMessage(res),
+                                    nodeObj.getNetworkId());
                         }
                     }
                     refreshNetworkView();
@@ -3045,7 +3085,8 @@ public class MappingView extends ViewPart {
     private KeyAdapter nodeNameModifyListener = new KeyAdapter() {
         @Override
         public void keyReleased(final KeyEvent e) {
-            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)) {
+            if ((e.keyCode == SWT.CR) || (e.keyCode == SWT.KEYPAD_CR)
+                    || ((e.stateMask & SWT.MODIFIER_MASK) != 0)) {
 
                 String nodeName = nodeObj.getName();
                 newNodeName = handleSetNodeName(txt_no_nodename.getText());
@@ -3125,7 +3166,7 @@ public class MappingView extends ViewPart {
     }
 
     private void addListenersToCnControls() {
-        nodeTypeCombo.removeKeyListener(transmitPresModifyListener);
+        nodeTypeCombo.removeSelectionListener(transmitPresModifyListener);
         txt_no_PResTimeOut.removeKeyListener(cycleTimeModifyListener);
         txt_no_PResTimeOut.addKeyListener(presTimeoutModifyListener);
 
@@ -3139,12 +3180,12 @@ public class MappingView extends ViewPart {
         nodeId.setEnabled(true);
         nodeId.addKeyListener(nodeIDModifyListener);
 
-        nodeTypeCombo.addKeyListener(nodeTypeModifyListener);
+        nodeTypeCombo.addSelectionListener(nodeTypeModifyListener);
 
     }
 
     private void addListenersToMnControls() {
-        nodeTypeCombo.removeKeyListener(nodeTypeModifyListener);
+        nodeTypeCombo.removeSelectionListener(nodeTypeModifyListener);
         txt_no_PResTimeOut.removeKeyListener(presTimeoutModifyListener);
         txt_no_PResTimeOut.addKeyListener(cycleTimeModifyListener);
 
@@ -3152,7 +3193,7 @@ public class MappingView extends ViewPart {
         nodeId.removeKeyListener(nodeIDModifyListener);
         nodeId.setEnabled(false);
 
-        nodeTypeCombo.addKeyListener(transmitPresModifyListener);
+        nodeTypeCombo.addSelectionListener(transmitPresModifyListener);
 
         lossOfSocTolText.addKeyListener(lossOfSocModifyListener);
         asyncMtuText.addKeyListener(asyncMtuModifyListener);
@@ -3320,7 +3361,7 @@ public class MappingView extends ViewPart {
             lblNodeType.setForeground(
                     formToolkit.getColors().getColor(IFormColors.TITLE));
 
-            nodeTypeCombo = new Combo(composite_10, SWT.NONE);
+            nodeTypeCombo = new Combo(composite_10, SWT.READ_ONLY);
 
             nodeTypeCombo.setLayoutData(
                     new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
@@ -5001,15 +5042,24 @@ public class MappingView extends ViewPart {
      *         null means valid, and non-null means invalid, with the result
      *         being the error message to display to the end user.
      */
-    protected String handleCycleTime(Object value) {
+    protected String handleCycleTime(Object value, String oldCycleTime) {
         String cycleTime = StringUtils.EMPTY;
         if (value instanceof String) {
             cycleTime = (String) value;
+            int cycleTimeVal = Integer.valueOf(cycleTime);
+
+            if (cycleTimeVal <= 0) {
+                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                        INVALID_CYCLE_TIME_VALUE, nodeObj.getNetworkId());
+                return oldCycleTime;
+            }
+
             if (cycleTime.isEmpty()) {
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
                         nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
+                cycleTime = oldCycleTime;
+                return oldCycleTime;
 
             }
             try {
@@ -5021,9 +5071,11 @@ public class MappingView extends ViewPart {
                             MessageDialog.ERROR,
                             AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND,
                             nodeObj.getNetworkId());
-                    return StringUtils.EMPTY;
+                    cycleTime = oldCycleTime;
+                    return oldCycleTime;
 
                 }
+                System.err.println("Entered state...");
                 Result validateResult = OpenConfiguratorLibraryUtils
                         .validateObjectActualValue(nodeObj.getNetworkId(),
                                 nodeObj.getCnNodeIdValue(),
@@ -5034,14 +5086,18 @@ public class MappingView extends ViewPart {
                             MessageDialog.ERROR, OpenConfiguratorLibraryUtils
                                     .getErrorMessage(validateResult),
                             nodeObj.getNetworkId());
-                    return StringUtils.EMPTY;
+                    cycleTime = oldCycleTime;
+                    return oldCycleTime;
                 }
+                System.err.println("Successfull" + OpenConfiguratorLibraryUtils
+                        .getErrorMessage(validateResult));
 
             } catch (NumberFormatException e) {
                 e.printStackTrace();
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         ERROR_INVALID_VALUE_CYCLE_TIME, nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
+                cycleTime = oldCycleTime;
+                return oldCycleTime;
 
             }
         } else {
@@ -5084,6 +5140,15 @@ public class MappingView extends ViewPart {
         asyncTimeOutTxt.setVisible(false);
         lblPrescaler.setVisible(false);
         preScalerText.setVisible(false);
+
+        productNameLabel.setText("Product Name:");
+        productNameText.setText(nodeObj.getProductName());
+        productIdLabel.setText("Product ID:");
+        productIdText.setText(nodeObj.getProductCodeValue());
+        vendorNamelabel.setText("Vendor Name:");
+        vendorNameText.setText(nodeObj.getVendorName());
+        vendorIdLabel.setText("Vendor ID:");
+        vendorIdtext.setText(nodeObj.getVendorIdValue());
 
     }
 
@@ -5421,34 +5486,49 @@ public class MappingView extends ViewPart {
      */
     protected String handlePresTimeout(Object value) {
         String presTimeOut = StringUtils.EMPTY;
-        if (value instanceof String) {
-            presTimeOut = (String) value;
-            if (presTimeOut.isEmpty()) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY,
-                        nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
+        try {
+            if (value instanceof String) {
+                presTimeOut = (String) value;
+                if (presTimeOut.isEmpty()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            ERROR_PRES_TIMEOUT_CANNOT_BE_EMPTY,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
 
+                }
+                // validate the value with openCONFIGURATOR library.
+                long presTimeoutInNs = Long.decode((String) value).longValue()
+                        * 1000;
+
+                if (presTimeoutInNs <= 0) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, INVALID_PRES_TIMEOUT_VALUE,
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+                Result validateResult = OpenConfiguratorLibraryUtils
+                        .validateSubobjectActualValue(nodeObj.getNetworkId(),
+                                IPowerlinkConstants.MN_DEFAULT_NODE_ID,
+                                INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
+                                nodeObj.getCnNodeIdValue(),
+                                String.valueOf(presTimeoutInNs), false);
+                if (!validateResult.IsSuccessful()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, OpenConfiguratorLibraryUtils
+                                    .getErrorMessage(validateResult),
+                            nodeObj.getNetworkId());
+                    return StringUtils.EMPTY;
+                }
+            } else {
+                System.err.println(
+                        "handlePresTimeout: Invalid value type:" + value);
             }
-            // validate the value with openCONFIGURATOR library.
-            long presTimeoutInNs = Long.decode((String) value).longValue()
-                    * 1000;
-            Result validateResult = OpenConfiguratorLibraryUtils
-                    .validateSubobjectActualValue(nodeObj.getNetworkId(),
-                            IPowerlinkConstants.MN_DEFAULT_NODE_ID,
-                            INetworkProperties.POLL_RESPONSE_TIMEOUT_OBJECT_ID,
-                            nodeObj.getCnNodeIdValue(),
-                            String.valueOf(presTimeoutInNs), false);
-            if (!validateResult.IsSuccessful()) {
-                PluginErrorDialogUtils.showMessageWindow(
-                        MessageDialog.ERROR, OpenConfiguratorLibraryUtils
-                                .getErrorMessage(validateResult),
-                        nodeObj.getNetworkId());
-                return StringUtils.EMPTY;
-            }
-        } else {
-            System.err
-                    .println("handlePresTimeout: Invalid value type:" + value);
+        } catch (NumberFormatException ex) {
+            ex.printStackTrace();
+            PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
+                    "Invalid PRes timeout value.", nodeObj.getNetworkId());
+            return StringUtils.EMPTY;
         }
 
         return presTimeOut;
