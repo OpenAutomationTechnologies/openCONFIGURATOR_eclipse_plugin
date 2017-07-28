@@ -1704,7 +1704,8 @@ public final class IndustrialNetworkProjectEditorPage extends FormPage {
                 path.setId(
                         OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
             } else {
-                if (path.getId().equalsIgnoreCase("all")) {
+                if (!path.getId().equalsIgnoreCase(
+                        OpenConfiguratorProjectUtils.PATH_SETTINGS_CUSTOM_PATH_ID)) {
                     path.setId(
                             OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID);
                 }

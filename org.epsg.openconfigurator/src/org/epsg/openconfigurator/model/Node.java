@@ -743,12 +743,20 @@ public class Node {
                             objectPropertySource.setPropertyValue(
                                     AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
                                     value);
-                            IViewPart viewpart = PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getActivePage()
-                                    .findView(ObjectDictionaryView.ID);
-                            if (viewpart instanceof ObjectDictionaryView) {
-                                ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
-                                obd.handleRefresh();
+                            IViewPart viewpart;
+                            try {
+                                viewpart = PlatformUI.getWorkbench()
+                                        .getActiveWorkbenchWindow()
+                                        .getActivePage()
+                                        .showView(ObjectDictionaryView.ID);
+
+                                if (viewpart instanceof ObjectDictionaryView) {
+                                    ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                                    obd.handleRefresh();
+                                }
+                            } catch (PartInitException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
 
                         }

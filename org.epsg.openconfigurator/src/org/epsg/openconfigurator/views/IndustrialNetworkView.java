@@ -2271,7 +2271,7 @@ public class IndustrialNetworkView extends ViewPart
         };
         showNodeOverview.setToolTipText(SHOW_NODE_OVER_VIEW_ACTION_MESSAGE);
         showNodeOverview.setImageDescriptor(org.epsg.openconfigurator.Activator
-                .getImageDescriptor(IPluginImages.MAPPING_ICON));
+                .getImageDescriptor(IPluginImages.NODE_OVERVIEW_ICON));
 
         showPdoMapping = new Action(SHOW_MAPING_VIEW_ACTION_MESSAGE) {
 

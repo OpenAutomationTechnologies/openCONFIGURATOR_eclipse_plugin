@@ -61,6 +61,7 @@ public interface IPluginImages {
     public final static String EXPORT_NODE_ICON = "icons/export_node.gif";
     public final static String FIRMWARE_OVERLAY_ICON = "icons/firmware_overlay.gif";
     public final static String COPY_NODE_ICON = "icons/copy_node.gif";
+    public final static String NODE_OVERVIEW_ICON = "icons/node_overview.gif";
 
     // Mapping view icons
     public final static String ERROR_ICON = "icons/error.gif";
