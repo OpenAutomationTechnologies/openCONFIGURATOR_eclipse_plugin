@@ -295,11 +295,11 @@ public class Node {
      * Instance of DeviceModularinterface.
      */
     private final DeviceModularInterface moduleInterface;
+
     /**
      * Instance of head node interface.
      */
     private HeadNodeInterface headNodeInterface;
-
     private Map<FirmwareManager, Integer> nodeFirmwareCollection = new HashMap<>();
 
     /**
@@ -1139,6 +1139,11 @@ public class Node {
             }
         }
         return objectText;
+    }
+
+    public TGeneralFeatures getGeneralFeature() {
+
+        return getNetworkManagement().getGeneralFeatures();
     }
 
     /**

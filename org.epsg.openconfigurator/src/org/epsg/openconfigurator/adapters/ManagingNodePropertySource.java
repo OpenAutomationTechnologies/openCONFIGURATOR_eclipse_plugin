@@ -236,6 +236,33 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
 
         forcedObjects.setFilterFlags(EXPERT_FILTER_FLAG);
 
+        isAsyncOnly.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleIsAsyncOnly(value);
+            }
+
+        });
+
+        isType1Router.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleIsType1Router(value);
+            }
+
+        });
+
+        isType2Router.setValidator(new ICellEditorValidator() {
+
+            @Override
+            public String isValid(Object value) {
+                return handleIsType2Router(value);
+            }
+
+        });
+
         cycleTime.setValidator(new ICellEditorValidator() {
 
             @Override
@@ -391,27 +418,28 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                         retObj = asndMaxNumber;
                         break;
                     case IAbstractNodeProperties.NODE_IS_ASYNC_ONLY_OBJECT: {
-                        if (mn.isIsAsyncOnly()) {
-                            retObj = "No";
-                        } else {
-                            retObj = "Yes";
+                        int val = 0;
+                        if (!mn.isIsAsyncOnly()) {
+                            val = 1;
                         }
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE1_ROUTER_OBJECT: {
-                        if (mn.isIsType1Router()) {
-                            retObj = "No";
-                        } else {
-                            retObj = "Yes";
+                        int val = 0;
+                        if (!mn.isIsType1Router()) {
+                            val = 1;
                         }
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_IS_TYPE2_ROUTER_OBJECT: {
-                        if (mn.isIsType2Router()) {
-                            retObj = "No";
-                        } else {
-                            retObj = "Yes";
+                        int val = 0;
+                        if (!mn.isIsType2Router()) {
+                            val = 1;
                         }
+
+                        retObj = Integer.valueOf(val);
                         break;
                     }
                     case IAbstractNodeProperties.NODE_FORCED_OBJECTS_OBJECT:
@@ -661,6 +689,45 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
         } else {
             System.err.println("ERROR invalid value type");
         }
+        return null;
+    }
+
+    private String handleIsAsyncOnly(Object value) {
+        if (value instanceof Integer) {
+            int val = ((Integer) value).intValue();
+            if (val == 0) {
+                if (mnNode.getGeneralFeature().isNMTIsochronous()) {
+                    return ASYNC_NOT_SUPPORTED;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String handleIsType1Router(Object value) {
+        if (value instanceof Integer) {
+            int val = ((Integer) value).intValue();
+            if (val == 0) {
+                if (!mnNode.getGeneralFeature().isRT1RT1Support()) {
+                    return TYPE1ROUTER_NOT_SUPPORTED;
+                }
+            }
+        }
+
+        return null;
+    }
+
+    private String handleIsType2Router(Object value) {
+        if (value instanceof Integer) {
+            int val = ((Integer) value).intValue();
+            if (val == 0) {
+                if (!mnNode.getGeneralFeature().isRT2RT2Support()) {
+                    return TYPE2ROUTER_NOT_SUPPORTED;
+                }
+            }
+        }
+
         return null;
     }
 
