@@ -412,9 +412,9 @@ public final class AddEditCustomTPathDialog extends TitleAreaDialog {
             setErrorMessage(
                     AddEditCustomTPathDialog.LOCATION_FIELD_MESSAGE_INVALID_PATH);
         }
-
-        allOutputConfCheck = sameOutputpath.getSelection();
-        System.err.println("Conf checked.." + allOutputConfCheck);
+        if (sameOutputpath != null) {
+            allOutputConfCheck = sameOutputpath.getSelection();
+        }
         return (nameValid && locationValid);
     }
 

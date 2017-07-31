@@ -86,6 +86,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.TabItem;
 import org.eclipse.ui.IActionBars;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IPageLayout;
@@ -1160,7 +1161,7 @@ public class IndustrialNetworkView extends ViewPart
                     currentProject = rootNode.getOpenConfiguratorProject();
                     System.err.println("currentProject...." + currentProject);
                     if (currentProject != null) {
-                        Path outputpath = getProjectOutputPath(node, false);
+                        Path outputpath = getProjectOutputPath(false);
                         java.nio.file.Path targetPath = null;
 
                         if (outputpath.isLocal()) {
@@ -1339,7 +1340,7 @@ public class IndustrialNetworkView extends ViewPart
                             File xdcFile = new File(
                                     node.getAbsolutePathToXdc());
 
-                            Path outputpath = getProjectOutputPath(node, true);
+                            Path outputpath = getProjectOutputPath(true);
 
                             final java.nio.file.Path targetPath;
 
@@ -1384,7 +1385,7 @@ public class IndustrialNetworkView extends ViewPart
     /**
      * @return Returns the output path settings from the project XML.
      */
-    public Path getProjectOutputPath(Node node, boolean generateXdc) {
+    public Path getProjectOutputPath(boolean generateXdc) {
 
         if (generateXdc) {
             return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
@@ -2154,8 +2155,20 @@ public class IndustrialNetworkView extends ViewPart
             public void run() {
 
                 try {
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getActivePage().showView(MappingView.ID);
+                    IViewPart mappingView = PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getActivePage()
+                            .showView(MappingView.ID);
+
+                    if (mappingView instanceof MappingView) {
+                        MappingView mapView = (MappingView) mappingView;
+                        for (TabItem tab : mapView.getTabFolder().getItems()) {
+                            if (tab.getText()
+                                    .equalsIgnoreCase("PDO Configuration")) {
+                                mapView.getTabFolder().setSelection(tab);
+                            }
+                        }
+
+                    }
 
                     viewer.setSelection(viewer.getSelection());
                 } catch (PartInitException e) {

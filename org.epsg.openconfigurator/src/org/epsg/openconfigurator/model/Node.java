@@ -120,6 +120,10 @@ public class Node {
 
     private static final String ERROR_WHILE_COPYING_XDD = "Error occurred while copying the configuration file.";
 
+    public static final String HEX_TO_DECIMAL_TOOL_TIP_TEXT = "Convert to decimal value";
+
+    public static final String DECIMAL_TO_HEX_TOOL_TIP_TEXT = "Convert to hexadecimal value";
+
     /**
      * Returns the attribute name linked with the node assignment value.
      *
@@ -290,7 +294,6 @@ public class Node {
      * Instance of Module management.
      */
     private final ModuleManagement moduleManagement;
-
     /**
      * Instance of DeviceModularinterface.
      */
@@ -300,6 +303,7 @@ public class Node {
      * Instance of head node interface.
      */
     private HeadNodeInterface headNodeInterface;
+
     private Map<FirmwareManager, Integer> nodeFirmwareCollection = new HashMap<>();
 
     /**
@@ -731,7 +735,6 @@ public class Node {
             public void run() {
                 if (adaptableObject instanceof PowerlinkObject) {
                     if (object instanceof ObjectPropertySource) {
-                        PowerlinkObject plkObj = (PowerlinkObject) adaptableObject;
                         ObjectPropertySource objectPropertySource = (ObjectPropertySource) object;
                         String value = (String) objectPropertySource
                                 .getPropertyValue(
@@ -768,7 +771,7 @@ public class Node {
                                 .getPropertyValue(
                                         AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
 
-                        if (value.isEmpty()) {
+                        if (!value.isEmpty()) {
                             if (value.contains("0x")) {
                                 value = String.valueOf(Long.decode(value));
                             }
@@ -794,7 +797,7 @@ public class Node {
                 }
             }
         };
-        hexToDecimal.setToolTipText("Convert to decimal");
+        hexToDecimal.setToolTipText(HEX_TO_DECIMAL_TOOL_TIP_TEXT);
         hexToDecimal.setImageDescriptor(org.epsg.openconfigurator.Activator
                 .getImageDescriptor(IPluginImages.PROPERTY_CONVERT_TO_DECIMAL));
 
@@ -803,36 +806,35 @@ public class Node {
             public void run() {
                 if (adaptableObject instanceof PowerlinkObject) {
                     if (object instanceof ObjectPropertySource) {
-                        PowerlinkObject plkObj = (PowerlinkObject) adaptableObject;
                         ObjectPropertySource objectPropertySource = (ObjectPropertySource) object;
                         String value = (String) objectPropertySource
                                 .getPropertyValue(
                                         AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
 
                         if (!value.isEmpty()) {
-
                             if (!value.contains("0x")) {
-                                int numericVal = Integer.valueOf(value);
-                                value = Integer.toHexString(numericVal);
+                                Long numericVal = Long.valueOf(value);
+                                value = Long.toHexString(numericVal);
                                 value = value.toUpperCase();
                                 value = "0x" + value;
                             }
                             objectPropertySource.setPropertyValue(
                                     AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID,
                                     value);
+                            IViewPart viewpart;
                             try {
-                                IViewPart viewpart = PlatformUI.getWorkbench()
+                                viewpart = PlatformUI.getWorkbench()
                                         .getActiveWorkbenchWindow()
                                         .getActivePage()
                                         .showView(ObjectDictionaryView.ID);
                                 if (viewpart instanceof ObjectDictionaryView) {
                                     ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
                                     obd.handleRefresh();
-
                                 }
                             } catch (PartInitException e) {
                                 e.printStackTrace();
                             }
+
                         }
                     }
                 } else if (adaptableObject instanceof PowerlinkSubobject) {
@@ -843,8 +845,8 @@ public class Node {
                                         AbstractObjectPropertySource.OBJ_ACTUAL_VALUE_EDITABLE_ID);
                         if (!value.isEmpty()) {
                             if (!value.contains("0x")) {
-                                int numericVal = Integer.valueOf(value);
-                                value = Integer.toHexString(numericVal);
+                                Long numericVal = Long.valueOf(value);
+                                value = Long.toHexString(numericVal);
                                 value = value.toUpperCase();
                                 value = "0x" + value;
                             }
@@ -859,7 +861,6 @@ public class Node {
                                 if (viewpart instanceof ObjectDictionaryView) {
                                     ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
                                     obd.handleRefresh();
-
                                 }
                             } catch (PartInitException e) {
                                 e.printStackTrace();
@@ -869,22 +870,21 @@ public class Node {
                 }
             }
         };
-        decimalToHex.setToolTipText("Convert to hexa-decimal");
+        decimalToHex.setToolTipText(DECIMAL_TO_HEX_TOOL_TIP_TEXT);
         decimalToHex.setImageDescriptor(
                 org.epsg.openconfigurator.Activator.getImageDescriptor(
                         IPluginImages.PROPERTY_CONVERT_TO_HEXA_DECIMAL));
     }
 
     public void disableActions() {
-        if ((hexToDecimal != null) || (decimalToHex != null)) {
+        if ((hexToDecimal != null) && (decimalToHex != null)) {
             hexToDecimal.setEnabled(false);
             decimalToHex.setEnabled(false);
         }
-
     }
 
     public void enableActions() {
-        if ((hexToDecimal != null) || (decimalToHex != null)) {
+        if ((hexToDecimal != null) && (decimalToHex != null)) {
             hexToDecimal.setEnabled(true);
             decimalToHex.setEnabled(true);
         }

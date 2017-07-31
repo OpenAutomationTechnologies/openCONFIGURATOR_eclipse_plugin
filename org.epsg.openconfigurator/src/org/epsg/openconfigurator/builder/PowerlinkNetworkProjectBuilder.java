@@ -608,7 +608,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 continue;
             }
 
-            Path outputpath = pjtEditor.getProjectOutputPath();
+            Path outputpath = IndustrialNetworkProjectEditor
+                    .getProjectOutputPath();
 
             java.nio.file.Path targetPath;
 
@@ -771,7 +772,8 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
 
             long buildStartTime = System.currentTimeMillis();
 
-            Path outputpath = pjtEditor.getProjectOutputPath();
+            Path outputpath = IndustrialNetworkProjectEditor
+                    .getProjectOutputPath();
 
             Path configTextPath = pjtEditor.getConfigTextPath(
                     OpenConfiguratorProjectUtils.CUSTOM_CONFIG_PATH[0]);

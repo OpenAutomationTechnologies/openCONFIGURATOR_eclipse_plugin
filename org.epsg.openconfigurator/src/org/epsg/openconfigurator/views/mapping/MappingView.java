@@ -3122,6 +3122,8 @@ public class MappingView extends ViewPart {
 
     private TreeViewer listViewer;
 
+    private TabFolder tabFolder;
+
     public MappingView() {
         TObject emptyObj = new TObject();
         emptyObj.setName("Empty");
@@ -3284,7 +3286,7 @@ public class MappingView extends ViewPart {
                 new GridData(SWT.FILL, SWT.FILL, true, true, 1, 1));
         composite_2.setLayout(new FillLayout(SWT.HORIZONTAL));
 
-        final TabFolder tabFolder = new TabFolder(composite_2, SWT.NONE);
+        tabFolder = new TabFolder(composite_2, SWT.NONE);
         GridData gd_sctnCnFeatures = new GridData(SWT.FILL, SWT.FILL, true,
                 true, 1, 1);
         gd_sctnCnFeatures.widthHint = 341;
@@ -4890,6 +4892,10 @@ public class MappingView extends ViewPart {
         return null;
     }
 
+    public TabFolder getTabFolder() {
+        return tabFolder;
+    }
+
     /**
      * Handles the Async MTU assignment.
      *
@@ -5045,24 +5051,26 @@ public class MappingView extends ViewPart {
     protected String handleCycleTime(Object value, String oldCycleTime) {
         String cycleTime = StringUtils.EMPTY;
         if (value instanceof String) {
-            cycleTime = (String) value;
-            int cycleTimeVal = Integer.valueOf(cycleTime);
-
-            if (cycleTimeVal <= 0) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        INVALID_CYCLE_TIME_VALUE, nodeObj.getNetworkId());
-                return oldCycleTime;
-            }
-
-            if (cycleTime.isEmpty()) {
-                PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
-                        ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
-                        nodeObj.getNetworkId());
-                cycleTime = oldCycleTime;
-                return oldCycleTime;
-
-            }
             try {
+                cycleTime = (String) value;
+                Integer cycleTimeVal = Integer.valueOf(cycleTime);
+
+                if (cycleTimeVal <= 0) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR, INVALID_CYCLE_TIME_VALUE,
+                            nodeObj.getNetworkId());
+                    return oldCycleTime;
+                }
+
+                if (cycleTime.isEmpty()) {
+                    PluginErrorDialogUtils.showMessageWindow(
+                            MessageDialog.ERROR,
+                            ERROR_CYCLE_TIME_CANNOT_BE_EMPTY,
+                            nodeObj.getNetworkId());
+                    return oldCycleTime;
+
+                }
+
                 // validate the value with openCONFIGURATOR library.
                 PowerlinkObject cycleTimeObj = nodeObj.getObjectDictionary()
                         .getObject(INetworkProperties.CYCLE_TIME_OBJECT_ID);
@@ -5071,7 +5079,6 @@ public class MappingView extends ViewPart {
                             MessageDialog.ERROR,
                             AbstractNodePropertySource.ERROR_OBJECT_NOT_FOUND,
                             nodeObj.getNetworkId());
-                    cycleTime = oldCycleTime;
                     return oldCycleTime;
 
                 }
@@ -5086,7 +5093,6 @@ public class MappingView extends ViewPart {
                             MessageDialog.ERROR, OpenConfiguratorLibraryUtils
                                     .getErrorMessage(validateResult),
                             nodeObj.getNetworkId());
-                    cycleTime = oldCycleTime;
                     return oldCycleTime;
                 }
                 System.err.println("Successfull" + OpenConfiguratorLibraryUtils
@@ -5096,7 +5102,6 @@ public class MappingView extends ViewPart {
                 e.printStackTrace();
                 PluginErrorDialogUtils.showMessageWindow(MessageDialog.ERROR,
                         ERROR_INVALID_VALUE_CYCLE_TIME, nodeObj.getNetworkId());
-                cycleTime = oldCycleTime;
                 return oldCycleTime;
 
             }

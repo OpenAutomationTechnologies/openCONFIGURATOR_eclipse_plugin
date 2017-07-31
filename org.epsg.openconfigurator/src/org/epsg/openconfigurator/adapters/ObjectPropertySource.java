@@ -555,17 +555,12 @@ public class ObjectPropertySource extends AbstractObjectPropertySource
                                 plkObject.setActualValue((String) value, true);
                             }
                         }
-                        try {
-                            IViewPart viewpart = PlatformUI.getWorkbench()
-                                    .getActiveWorkbenchWindow().getActivePage()
-                                    .showView(ObjectDictionaryView.ID);
-                            if (viewpart instanceof ObjectDictionaryView) {
-                                ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
-                                obd.handleRefresh();
-
-                            }
-                        } catch (PartInitException e) {
-                            e.printStackTrace();
+                        IViewPart viewpart = PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getActivePage()
+                                .showView(ObjectDictionaryView.ID);
+                        if (viewpart instanceof ObjectDictionaryView) {
+                            ObjectDictionaryView obd = (ObjectDictionaryView) viewpart;
+                            obd.handleRefresh();
                         }
                         break;
                     }

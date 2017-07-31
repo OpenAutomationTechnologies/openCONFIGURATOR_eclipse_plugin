@@ -101,13 +101,13 @@ public class RedundantManagingNodePropertySource
 
     static {
         waitNotActiveDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         waitNotActiveDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         waitNotActiveDescriptor.setDescription(
                 IRedundantManagingNodeProperties.RMN_WAIT_NOT_ACTIVE_DESCRIPTION);
 
         priorityDescriptor
-                .setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+                .setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         priorityDescriptor.setFilterFlags(EXPERT_FILTER_FLAG);
         priorityDescriptor.setDescription(
                 IRedundantManagingNodeProperties.RMN_PRIORITY_DESCRIPTION);
@@ -136,11 +136,11 @@ public class RedundantManagingNodePropertySource
             }
         });
 
-        nameDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+        nameDescriptor.setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
         nodeErrorDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeIDDescriptor.setCategory(IPropertySourceSupport.BASIC_CATEGORY);
         nodeIdEditableDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
         nodeIdEditableDescriptor.setValidator(new ICellEditorValidator() {
 
             @Override
@@ -151,14 +151,16 @@ public class RedundantManagingNodePropertySource
 
         });
         configurationDescriptor
-                .setCategory(IPropertySourceSupport.BASIC_CATEGORY);
+                .setCategory(IPropertySourceSupport.GENERAL_CATEGORY);
 
-        isAsyncOnly.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isAsyncOnly.setCategory(IPropertySourceSupport.BOOT_BEHAVIOUR_CATEGORY);
         isAsyncOnly.setFilterFlags(EXPERT_FILTER_FLAG);
 
-        isType1Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isType1Router
+                .setCategory(IPropertySourceSupport.NETWORK_BEHAVIOUR_CATEGORY);
         isType1Router.setFilterFlags(EXPERT_FILTER_FLAG);
-        isType2Router.setCategory(IPropertySourceSupport.ADVANCED_CATEGORY);
+        isType2Router
+                .setCategory(IPropertySourceSupport.NETWORK_BEHAVIOUR_CATEGORY);
         isType2Router.setFilterFlags(EXPERT_FILTER_FLAG);
         forcedObjects.setFilterFlags(EXPERT_FILTER_FLAG);
     }

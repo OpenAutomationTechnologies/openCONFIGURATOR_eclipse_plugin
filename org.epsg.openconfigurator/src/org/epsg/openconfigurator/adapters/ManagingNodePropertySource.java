@@ -87,7 +87,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
             CN_LOSS_OF_SOC_TOLERANCE_LABEL };
 
     private static final String[] YES_NO = { "Yes", "No" };
-    private static final String MN_CATEGORY = "Managing Node";
+    private static final String MN_CATEGORY = "Managing node";
     private static final String NETWORK_CATEGORY = "Network";
 
     private static final ComboBoxPropertyDescriptor transmitPres = new ComboBoxPropertyDescriptor(
@@ -661,7 +661,7 @@ public class ManagingNodePropertySource extends AbstractNodePropertySource
                 return ERROR_CYCLE_TIME_CANNOT_BE_EMPTY;
             }
             try {
-                int cycleTime = Integer.valueOf((String) value);
+                Integer cycleTime = Integer.valueOf((String) value);
                 if (cycleTime <= 0) {
                     return INVALID_CYCLE_TIME_VALUE;
                 }

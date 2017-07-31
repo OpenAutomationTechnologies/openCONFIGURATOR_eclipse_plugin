@@ -125,6 +125,13 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
     private static final String INVALID_INPUT_ERROR = "Invalid input: Must be a valid openCONFIGURATOR project file.";
 
     /**
+     * @return Returns the output path settings from the project XML.
+     */
+    public static Path getProjectOutputPath() {
+        return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
+    }
+
+    /**
      * Network identifier for the editor.
      */
     private String networkId;
@@ -471,37 +478,6 @@ public final class IndustrialNetworkProjectEditor extends FormEditor
      */
     public IFile getProjectFile() {
         return projectFile;
-    }
-
-    /**
-     * @return Returns the output path settings from the project XML.
-     */
-    public Path getProjectOutputPath() {
-        List<PathSettings> pathSettList = currentProject
-                .getProjectConfiguration().getPathSettings();
-        String activepathSetting = OpenConfiguratorProjectUtils.PATH_SETTINGS_ALL_PATH_ID;
-        PathSettings pathSett = null;
-        for (PathSettings setPath : pathSettList) {
-            if (setPath.getId() != null) {
-                if (setPath.getId().equalsIgnoreCase(activepathSetting)) {
-                    pathSett = setPath;
-                    break;
-                }
-            } else {
-                pathSett = setPath;
-            }
-        }
-        if (pathSett != null) {
-            List<TPath> pathList = pathSett.getPath();
-            TPath pathConfig = null;
-            for (TPath path : pathList) {
-
-                pathConfig = path;
-
-            }
-
-        }
-        return new Path(IPowerlinkProjectSupport.DEFAULT_OUTPUT_DIR, true);
     }
 
     /**

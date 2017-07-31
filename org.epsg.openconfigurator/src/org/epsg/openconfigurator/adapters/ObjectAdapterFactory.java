@@ -53,6 +53,10 @@ import org.epsg.openconfigurator.model.PowerlinkSubobject;
  */
 public class ObjectAdapterFactory implements IAdapterFactory {
 
+    private static final int MINIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE = 4;
+
+    private static final int MAXIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE = 5;
+
     /**
      * Property source for objects.
      */
@@ -72,14 +76,10 @@ public class ObjectAdapterFactory implements IAdapterFactory {
      * Property source for Parameter.
      */
     private ParameterPropertySource parameterPropertySource;
-
     /**
      * Property source for Parameter group.
      */
     private ParameterGroupPropertySource parameterGroupPropertySource;
-
-    private final int MINIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE = 4;
-    private final int MAXIMUM_ACTION_BAR_SIZE_OF_PROPERTIES_PAGE = 5;
 
     @SuppressWarnings("unchecked")
     @Override

@@ -488,7 +488,7 @@ public class ObjectDictionaryView extends ViewPart
                     treeViewer.setInput(nodeObj);
                 }
 
-                treeViewer.setSelection(null);
+                setEmptySelection();
             }
         };
         refreshAction.setToolTipText("Refresh");
