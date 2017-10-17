@@ -1,13 +1,13 @@
 /*******************************************************************************
  * @file   XddMarshaller.java
  *
- * @author Christoph Ruecker, Bernecker + Rainer Industrie-Elektronik Ges.m.b.H
+ * @author Christoph Ruecker, B&R Industrial Automation GmbH
  *         Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
  * @since 08.04.2013
  *
  * @copyright (c) 2015, Kalycito Infotech Private Limited,
- *                      Bernecker + Rainer Industrie-Elektronik Ges.m.b.H
+ *                      B&R Industrial Automation GmbH
  *                      All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without

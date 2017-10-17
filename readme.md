@@ -40,7 +40,7 @@ Support on openCONFIGURATOR is available via the online discussion forums:
 (c) Kalycito Infotech Private Limited,
     <http://www.kalycito.com>
 
-(c) Bernecker + Rainer Industrie Elektronik Ges.m.b.H.,
+(c) B&R Industrial Automation GmbH,
     B&R Strasse 1,
     A-5142 Eggelsberg,
     <http://www.br-automation.com>

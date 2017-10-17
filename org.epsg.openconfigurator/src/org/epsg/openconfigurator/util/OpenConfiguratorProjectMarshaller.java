@@ -1,7 +1,7 @@
 /*******************************************************************************
  * @file   OpenCONFIGURATORProjectMarshaller.java
  *
- * @author Christoph Ruecker, Bernecker + Rainer Industrie-Elektronik Ges.m.b.H
+ * @author Christoph Ruecker, B&R Industrial Automation GmbH
  *         Ramakrishnan Periyakaruppan, Kalycito Infotech Private Limited.
  *
  * @since 08.04.2013

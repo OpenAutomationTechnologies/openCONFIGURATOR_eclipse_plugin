@@ -4,7 +4,7 @@ Bundle-Name: Ethernet POWERLINK openCONFIGURATOR
 Bundle-SymbolicName: org.epsg.openconfigurator;singleton:=true
 Bundle-Version: 2.2.1.qualifier
 Bundle-Activator: org.epsg.openconfigurator.Activator
-Bundle-Vendor: Kalycito Infotech Pvt Ltd. and Bernecker + Rainer Industrie-Elektronik Ges.m.b.H.
+Bundle-Vendor: Kalycito Infotech Pvt Ltd. and B&R Industrial Automation GmbH
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.ui.console,
