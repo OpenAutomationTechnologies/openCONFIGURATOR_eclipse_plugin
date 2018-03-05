@@ -47,6 +47,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtension;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectExtensionHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TObjectPDOMapping;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup;
+import org.epsg.openconfigurator.xmlbinding.xdd.TParameterGroup.ParameterRef;
 import org.epsg.openconfigurator.xmlbinding.xdd.TParameterList;
 import org.jdom2.JDOMException;
 
@@ -243,7 +244,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             }
         }
         name = object.getName();
-
         denotation = object.getDenotation();
         objFlags = object.getObjFlags();
 
@@ -256,8 +256,103 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             dataTypeReadable = StringUtils.EMPTY;
         }
 
+        highLimit = object.getHighLimit();
+        lowLimit = object.getLowLimit();
+
+        actualValue = object.getActualValue();
+        defaultValue = object.getDefaultValue();
+
+        pdoMapping = object.getPDOmapping();
+        accessType = object.getAccessType();
+
+        uniqueIDRef = object.getUniqueIDRef();
+        rangeSelector = object.getRangeSelector();
+        if (pdoMapping != TObjectPDOMapping.NO) {
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                    || (pdoMapping == TObjectPDOMapping.RPDO))
+                    && ((accessType == TObjectAccessType.RW)
+                            || (accessType == TObjectAccessType.WO))) {
+                isRpdoMappable = true;
+            }
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                    || (pdoMapping == TObjectPDOMapping.TPDO))
+                    && ((accessType == TObjectAccessType.RW)
+                            || (accessType == TObjectAccessType.RO))) {
+                isTpdoMappable = true;
+            }
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                    && (accessType == TObjectAccessType.RW)) {
+                isTpdoMappable = true;
+                isRpdoMappable = true;
+            }
+
+            if (uniqueIDRef instanceof TParameterList.Parameter) {
+                TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef;
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                        && (parameter.getAccess()
+                                .compareTo("readWrite") == 0)) {
+                    isTpdoMappable = true;
+                    isRpdoMappable = true;
+                }
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                        || (pdoMapping == TObjectPDOMapping.RPDO))
+                        && (parameter.getAccess().compareTo("write") == 0)) {
+                    isRpdoMappable = true;
+                }
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                        || (pdoMapping == TObjectPDOMapping.TPDO))
+                        && (parameter.getAccess().compareTo("read") == 0)) {
+                    isTpdoMappable = true;
+                }
+
+            } else if (uniqueIDRef instanceof TParameterGroup) {
+                TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef;
+                List<Object> list = parameterGrp
+                        .getParameterGroupOrParameterRef();
+                for (Object paramRefGrp : list) {
+                    if (paramRefGrp instanceof TParameterGroup.ParameterRef) {
+                        TParameterGroup.ParameterRef ref = (ParameterRef) paramRefGrp;
+                        Object paramRef = ref.getUniqueIDRef();
+
+                        if (paramRef instanceof TParameterList.Parameter) {
+                            TParameterList.Parameter param = (TParameterList.Parameter) paramRef;
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                                    && (param.getAccess()
+                                            .compareTo("readWrite") == 0)) {
+                                isTpdoMappable = true;
+                                isRpdoMappable = true;
+                            }
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                                    || (pdoMapping == TObjectPDOMapping.RPDO))
+                                    && (param.getAccess()
+                                            .compareTo("write") == 0)) {
+                                isRpdoMappable = true;
+                            }
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                                    || (pdoMapping == TObjectPDOMapping.TPDO))
+                                    && (param.getAccess()
+                                            .compareTo("read") == 0)) {
+                                isTpdoMappable = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Calculate the subobjects available in this object.
-        for (TObjectExtension.SubObject subObject : object.getSubObject()) {
+        for (
+
+        TObjectExtension.SubObject subObject : object.getSubObject()) {
             PowerlinkSubobject obj = new PowerlinkSubobject(nodeInstance, this,
                     module, subObject);
             subObjectsList.add(obj);
@@ -269,53 +364,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                 tpdoMappableObjectList.add(obj);
             }
         }
-
-        highLimit = object.getHighLimit();
-        lowLimit = object.getLowLimit();
-
-        actualValue = object.getActualValue();
-        defaultValue = object.getDefaultValue();
-
-        pdoMapping = object.getPDOmapping();
-        accessType = object.getAccessType();
-
-        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.RPDO))) {
-
-            if (object.getUniqueIDRef() != null) {
-                isRpdoMappable = true;
-            } else {
-                if ((accessType == TObjectAccessType.RW)
-                        || (accessType == TObjectAccessType.WO)) {
-                    isRpdoMappable = true;
-                }
-            }
-        }
-        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
-                || (pdoMapping == TObjectPDOMapping.TPDO))) {
-
-            if (object.getUniqueIDRef() != null) {
-                isTpdoMappable = true;
-            } else {
-
-                if ((accessType == TObjectAccessType.RO)
-                        || (accessType == TObjectAccessType.RW)) {
-                    isTpdoMappable = true;
-                }
-            }
-        }
-
-        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
-                && (accessType == TObjectAccessType.RW)) {
-            isRpdoMappable = true;
-            isTpdoMappable = true;
-        }
-
-        uniqueIDRef = object.getUniqueIDRef();
-
-        rangeSelector = object.getRangeSelector();
-
     }
 
     /**
@@ -354,6 +402,97 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             dataTypeReadable = StringUtils.EMPTY;
         }
 
+        highLimit = object.getHighLimit();
+        lowLimit = object.getLowLimit();
+
+        actualValue = object.getActualValue();
+        defaultValue = object.getDefaultValue();
+
+        pdoMapping = object.getPDOmapping();
+        accessType = object.getAccessType();
+        uniqueIDRef = object.getUniqueIDRef();
+        if (pdoMapping != TObjectPDOMapping.NO) {
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                    || (pdoMapping == TObjectPDOMapping.RPDO))
+                    && ((accessType == TObjectAccessType.RW)
+                            || (accessType == TObjectAccessType.WO))) {
+                isRpdoMappable = true;
+            }
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                    || (pdoMapping == TObjectPDOMapping.TPDO))
+                    && ((accessType == TObjectAccessType.RW)
+                            || (accessType == TObjectAccessType.RO))) {
+                isTpdoMappable = true;
+            }
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                    && (accessType == TObjectAccessType.RW)) {
+                isTpdoMappable = true;
+                isRpdoMappable = true;
+            }
+
+            if (uniqueIDRef instanceof TParameterList.Parameter) {
+                TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef;
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                        && (parameter.getAccess()
+                                .compareTo("readWrite") == 0)) {
+                    isTpdoMappable = true;
+                    isRpdoMappable = true;
+                }
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                        || (pdoMapping == TObjectPDOMapping.RPDO))
+                        && (parameter.getAccess().compareTo("write") == 0)) {
+                    isRpdoMappable = true;
+                }
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                        || (pdoMapping == TObjectPDOMapping.TPDO))
+                        && (parameter.getAccess().compareTo("read") == 0)) {
+                    isTpdoMappable = true;
+                }
+
+            } else if (uniqueIDRef instanceof TParameterGroup) {
+                TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef;
+                List<Object> list = parameterGrp
+                        .getParameterGroupOrParameterRef();
+                for (Object paramRefGrp : list) {
+                    if (paramRefGrp instanceof TParameterGroup.ParameterRef) {
+                        TParameterGroup.ParameterRef ref = (ParameterRef) paramRefGrp;
+                        Object paramRef = ref.getUniqueIDRef();
+
+                        if (paramRef instanceof TParameterList.Parameter) {
+                            TParameterList.Parameter param = (TParameterList.Parameter) paramRef;
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                                    && (param.getAccess()
+                                            .compareTo("readWrite") == 0)) {
+                                isTpdoMappable = true;
+                                isRpdoMappable = true;
+                            }
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                                    || (pdoMapping == TObjectPDOMapping.RPDO))
+                                    && (param.getAccess()
+                                            .compareTo("write") == 0)) {
+                                isRpdoMappable = true;
+                            }
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                                    || (pdoMapping == TObjectPDOMapping.TPDO))
+                                    && (param.getAccess()
+                                            .compareTo("read") == 0)) {
+                                isTpdoMappable = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         // Calculate the subobjects available in this object.
         for (TObject.SubObject subObject : object.getSubObject()) {
             PowerlinkSubobject obj = new PowerlinkSubobject(nodeInstance, this,
@@ -367,49 +506,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                 tpdoMappableObjectList.add(obj);
             }
         }
-
-        highLimit = object.getHighLimit();
-        lowLimit = object.getLowLimit();
-
-        actualValue = object.getActualValue();
-        defaultValue = object.getDefaultValue();
-
-        pdoMapping = object.getPDOmapping();
-        accessType = object.getAccessType();
-        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.RPDO))) {
-
-            if (object.getUniqueIDRef() != null) {
-                isRpdoMappable = true;
-            } else {
-                if ((accessType == TObjectAccessType.RW)
-                        || (accessType == TObjectAccessType.WO)) {
-                    isRpdoMappable = true;
-                }
-            }
-        }
-        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
-                || (pdoMapping == TObjectPDOMapping.TPDO))) {
-
-            if (object.getUniqueIDRef() != null) {
-                isTpdoMappable = true;
-            } else {
-
-                if ((accessType == TObjectAccessType.RO)
-                        || (accessType == TObjectAccessType.RW)) {
-                    isTpdoMappable = true;
-                }
-            }
-        }
-
-        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
-                && (accessType == TObjectAccessType.RW)) {
-            isRpdoMappable = true;
-            isTpdoMappable = true;
-        }
-
-        uniqueIDRef = object.getUniqueIDRef();
     }
 
     /**
@@ -447,6 +543,97 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             dataTypeReadable = StringUtils.EMPTY;
         }
 
+        highLimit = object.getHighLimit();
+        lowLimit = object.getLowLimit();
+
+        actualValue = object.getActualValue();
+        defaultValue = object.getDefaultValue();
+
+        pdoMapping = object.getPDOmapping();
+        accessType = object.getAccessType();
+        uniqueIDRef = object.getUniqueIDRef();
+        rangeSelector = object.getRangeSelector();
+        if (pdoMapping != TObjectPDOMapping.NO) {
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                    || (pdoMapping == TObjectPDOMapping.RPDO))
+                    && ((accessType == TObjectAccessType.RW)
+                            || (accessType == TObjectAccessType.WO))) {
+                isRpdoMappable = true;
+            }
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                    || (pdoMapping == TObjectPDOMapping.TPDO))
+                    && ((accessType == TObjectAccessType.RW)
+                            || (accessType == TObjectAccessType.RO))) {
+                isTpdoMappable = true;
+            }
+            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                    || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                    && (accessType == TObjectAccessType.RW)) {
+                isTpdoMappable = true;
+                isRpdoMappable = true;
+            }
+
+            if (uniqueIDRef instanceof TParameterList.Parameter) {
+                TParameterList.Parameter parameter = (TParameterList.Parameter) uniqueIDRef;
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                        && (parameter.getAccess()
+                                .compareTo("readWrite") == 0)) {
+                    isTpdoMappable = true;
+                    isRpdoMappable = true;
+                }
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                        || (pdoMapping == TObjectPDOMapping.RPDO))
+                        && (parameter.getAccess().compareTo("write") == 0)) {
+                    isRpdoMappable = true;
+                }
+                if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                        || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                        || (pdoMapping == TObjectPDOMapping.TPDO))
+                        && (parameter.getAccess().compareTo("read") == 0)) {
+                    isTpdoMappable = true;
+                }
+
+            } else if (uniqueIDRef instanceof TParameterGroup) {
+                TParameterGroup parameterGrp = (TParameterGroup) uniqueIDRef;
+                List<Object> list = parameterGrp
+                        .getParameterGroupOrParameterRef();
+                for (Object paramRefGrp : list) {
+                    if (paramRefGrp instanceof TParameterGroup.ParameterRef) {
+                        TParameterGroup.ParameterRef ref = (ParameterRef) paramRefGrp;
+                        Object paramRef = ref.getUniqueIDRef();
+
+                        if (paramRef instanceof TParameterList.Parameter) {
+                            TParameterList.Parameter param = (TParameterList.Parameter) paramRef;
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL))
+                                    && (param.getAccess()
+                                            .compareTo("readWrite") == 0)) {
+                                isTpdoMappable = true;
+                                isRpdoMappable = true;
+                            }
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                                    || (pdoMapping == TObjectPDOMapping.RPDO))
+                                    && (param.getAccess()
+                                            .compareTo("write") == 0)) {
+                                isRpdoMappable = true;
+                            }
+                            if (((pdoMapping == TObjectPDOMapping.DEFAULT)
+                                    || (pdoMapping == TObjectPDOMapping.OPTIONAL)
+                                    || (pdoMapping == TObjectPDOMapping.TPDO))
+                                    && (param.getAccess()
+                                            .compareTo("read") == 0)) {
+                                isTpdoMappable = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
         // Calculate the subobjects available in this object.
         for (TObjectExtensionHead.SubObject subObject : object.getSubObject()) {
             PowerlinkSubobject obj = new PowerlinkSubobject(nodeInstance, this,
@@ -460,49 +647,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject
                 tpdoMappableObjectList.add(obj);
             }
         }
-
-        highLimit = object.getHighLimit();
-        lowLimit = object.getLowLimit();
-
-        actualValue = object.getActualValue();
-        defaultValue = object.getDefaultValue();
-
-        pdoMapping = object.getPDOmapping();
-        accessType = object.getAccessType();
-        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.RPDO))) {
-
-            if (object.getUniqueIDRef() != null) {
-                isRpdoMappable = true;
-            } else {
-                if ((accessType == TObjectAccessType.RW)
-                        || (accessType == TObjectAccessType.WO)) {
-                    isRpdoMappable = true;
-                }
-            }
-        }
-        if (((pdoMapping == TObjectPDOMapping.DEFAULT)
-                || (pdoMapping == TObjectPDOMapping.OPTIONAL)
-                || (pdoMapping == TObjectPDOMapping.TPDO))) {
-
-            if (object.getUniqueIDRef() != null) {
-                isTpdoMappable = true;
-            } else {
-
-                if ((accessType == TObjectAccessType.RO)
-                        || (accessType == TObjectAccessType.RW)) {
-                    isTpdoMappable = true;
-                }
-            }
-        }
-
-        if ((pdoMapping == TObjectPDOMapping.OPTIONAL)
-                && (accessType == TObjectAccessType.RW)) {
-            isRpdoMappable = true;
-            isTpdoMappable = true;
-        }
-
-        uniqueIDRef = object.getUniqueIDRef();
     }
 
     public long bytesToLong(byte[] bytes) {
@@ -542,7 +686,7 @@ public class PowerlinkObject extends AbstractPowerlinkObject
 
     public synchronized void forceActualValue(Module module, boolean force,
             boolean writeToProjectFile, long newObjectIndex)
-                    throws JDOMException, IOException {
+            throws JDOMException, IOException {
         if (writeToProjectFile) {
             OpenConfiguratorProjectUtils.forceActualValue(module, getNode(),
                     this, null, force, newObjectIndex);
@@ -629,6 +773,14 @@ public class PowerlinkObject extends AbstractPowerlinkObject
             actualValue = StringUtils.EMPTY;
         }
         return actualValue;
+    }
+
+    /**
+     * @return Id of the node from the node model.
+     */
+    @Override
+    public short getCNNodeId() {
+        return nodeInstance.getCnNodeIdValue();
     }
 
     /**
@@ -868,14 +1020,6 @@ public class PowerlinkObject extends AbstractPowerlinkObject
     @Override
     public Node getNode() {
         return nodeInstance;
-    }
-
-    /**
-     * @return Id of the node from the node model.
-     */
-    @Override
-    public short getCNNodeId() {
-        return nodeInstance.getCnNodeIdValue();
     }
 
     /**
