@@ -87,6 +87,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyDevicePowerlinkModularHead;
 import org.epsg.openconfigurator.xmlbinding.xdd.TCNFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TVersion;
 import org.epsg.openconfigurator.xmloperation.XddJdomOperation;
 import org.jdom2.JDOMException;
@@ -393,11 +394,18 @@ public class Node {
                 || (nodeType == NodeType.CONTROLLED_NODE)) {
             xddFirmwareFile = new FirmwareFile(xddModel);
         }
-        List<Interface> interfaceList = moduleManagement
-                .getInterfacelistOfNode();
-        for (Interface interfaces : interfaceList) {
+        List<TInterfaceList.Interface> interfaceList = moduleManagement
+                .getInterfce();
+
+        for (TInterfaceList.Interface interfaces : interfaceList) {
             headNodeInterface = new HeadNodeInterface(this, interfaces);
             interfaceOfNodes.add(headNodeInterface);
+        }
+
+        List<Interface> interfaceForRange = moduleManagement
+                .getInterfacelistOfNode();
+        for (Interface intfc : interfaceForRange) {
+            headNodeInterface.setRangeList(intfc.getRangeList());
         }
 
         moduleInterface = new DeviceModularInterface(this,

@@ -38,10 +38,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.epsg.openconfigurator.util.OpenConfiguratorProjectUtils;
 import org.epsg.openconfigurator.xmlbinding.xdd.ConnectedModuleList;
 import org.epsg.openconfigurator.xmlbinding.xdd.FileList;
-import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
 import org.epsg.openconfigurator.xmlbinding.xdd.RangeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingHead;
@@ -89,12 +89,12 @@ public class HeadNodeInterface {
      * @param node Instance of Modular head node.
      * @param interfaces XDD instance of Interface.
      */
-    public HeadNodeInterface(Node node, Interface interfaces) {
+    public HeadNodeInterface(Node node, TInterfaceList.Interface interfaces) {
         this.node = node;
         if (interfaces != null) {
-            rangeList = interfaces.getRangeList();
-            uniqueIDRef = interfaces.getUniqueIDRef();
-            intfc = (TInterfaceList.Interface) uniqueIDRef;
+
+            uniqueIDRef = interfaces.getUniqueID();
+            intfc = interfaces;
 
             maxModules = intfc.getMaxModules();
             connectedModule = intfc.getConnectedModuleList();
@@ -173,10 +173,11 @@ public class HeadNodeInterface {
      * @return Unique Id of interface from XDD model.
      */
     public String getInterfaceUniqueId() {
-        if (uniqueIDRef instanceof TInterfaceList.Interface) {
-            return intfc.getUniqueID();
+        if (uniqueIDRef instanceof String) {
+            String uniqueId = (String) uniqueIDRef;
+            return uniqueId;
         }
-        return null;
+        return StringUtils.EMPTY;
     }
 
     /**
@@ -184,14 +185,6 @@ public class HeadNodeInterface {
      */
     public List<Object> getLabelDescription() {
         return labelDescription;
-    }
-
-    /**
-     * @return The range list from the XDD model.
-     */
-    public List<org.epsg.openconfigurator.xmlbinding.xdd.Range> getlistofRange() {
-        listOfRange = rangeList.getRange();
-        return listOfRange;
     }
 
     /**

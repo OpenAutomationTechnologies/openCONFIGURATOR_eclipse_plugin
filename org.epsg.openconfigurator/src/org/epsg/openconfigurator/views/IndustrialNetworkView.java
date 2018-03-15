@@ -129,7 +129,6 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration.Pa
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xap.ApplicationProcess;
 import org.epsg.openconfigurator.xmlbinding.xdd.ModuleType;
-import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList.Interface;
 import org.jdom2.JDOMException;
 import org.xml.sax.SAXException;
 
@@ -209,11 +208,11 @@ public class IndustrialNetworkView extends ViewPart
     private class NodeIdSorter extends ViewerComparator {
 
         @Override
-        public int compare(Viewer viewer, Object e1, Object e2) {
-            if ((e1 instanceof Node) && (e2 instanceof Node)) {
+        public int compare(Viewer viewer, Object objFirst, Object objSecond) {
+            if ((objFirst instanceof Node) && (objSecond instanceof Node)) {
 
-                Node nodeFirst = (Node) e1;
-                Node nodeSecond = (Node) e2;
+                Node nodeFirst = (Node) objFirst;
+                Node nodeSecond = (Node) objSecond;
                 if (nodeSecond
                         .getCnNodeIdValue() == IPowerlinkConstants.MN_DEFAULT_NODE_ID) {
                     return 255;
@@ -223,12 +222,20 @@ public class IndustrialNetworkView extends ViewPart
 
             }
 
-            if ((e1 instanceof Module) && (e2 instanceof Module)) {
-                Module moduleFirst = (Module) e1;
-                Module moduleSecond = (Module) e2;
+            if ((objFirst instanceof Module) && (objSecond instanceof Module)) {
+                Module moduleFirst = (Module) objFirst;
+                Module moduleSecond = (Module) objSecond;
                 return moduleFirst.getPosition() - moduleSecond.getPosition();
             }
-            return super.compare(viewer, e1, e2);
+
+            if ((objFirst instanceof HeadNodeInterface)
+                    && (objSecond instanceof HeadNodeInterface)) {
+                HeadNodeInterface interfaceFirst = (HeadNodeInterface) objFirst;
+                HeadNodeInterface interfaceSecond = (HeadNodeInterface) objSecond;
+                return sortInterface(interfaceFirst.getInterfaceUniqueId())
+                        - sortInterface(interfaceSecond.getInterfaceUniqueId());
+            }
+            return super.compare(viewer, objFirst, objSecond);
         }
     }
 
@@ -491,10 +498,9 @@ public class IndustrialNetworkView extends ViewPart
             }
             if (obj instanceof HeadNodeInterface) {
                 HeadNodeInterface interfaceList = (HeadNodeInterface) obj;
-                if (interfaceList.getUniqueIDRef() instanceof Interface) {
-                    Interface intfc = (Interface) interfaceList
-                            .getUniqueIDRef();
-                    return intfc.getUniqueID();
+                if (interfaceList.getUniqueIDRef() instanceof String) {
+                    String intfc = (String) interfaceList.getUniqueIDRef();
+                    return intfc;
                 }
                 return obj.toString();
             }
@@ -519,46 +525,46 @@ public class IndustrialNetworkView extends ViewPart
 
     // Add new node message strings.
     public static final String ADD_NEW_NODE_ACTION_MESSAGE = "Add Node...";
+
     public static final String ADD_NEW_MODULE_ACTION_MESSAGE = "Add Module...";
     public static final String ADD_NEW_NODE_ERROR_MESSAGE = "Internal error occurred. Please try again later";
     public static final String ADD_NEW_NODE_INVALID_SELECTION_MESSAGE = "Invalid selection";
     public static final String ADD_NEW_NODE_TOOL_TIP_TEXT = "Add a node in the network.";
     public static final String ADD_FIRMWARE_TOOL_TIP_TEXT = "Add Firmware...";
-
     // Enable/disable action message string.
     // public static final String ENABLE_DISABLE_ACTION_MESSAGE =
     // "Enable/Disable";
     public static final String ENABLE_ACTION_MESSAGE = "Enable";
+
     public static final String DISABLE_ACTION_MESSAGE = "Disable";
     public static final String GENERATE_NODE_XDC_ACTION_MESSAGE = "Export node XDC";
-
     // Object dictionary action message strings.
     public static final String SHOW_OBJECT_DICTIONARY_ACTION_MESSAGE = "Show Object Dictionary";
+
     public static final String SHOW_PARAMETER_ACTION_MESSAGE = "Show Parameter View";
     public static final String SHOW_OBJECT_DICTIONARY_ERROR_MESSAGE = "Error openning Object Dictionary";
     public static final String SHOW_PARAMETER_ERROR_MESSAGE = "Error opening Parameter";
-
     // Process Image action message strings.
     public static final String SHOW_IO_MAP_ACTION_MESSAGE = "Show I/O Mapping";
-    public static final String SHOW_PROCESS_IMAGE_ERROR_MESSAGE = "Error opening Process Image";
 
+    public static final String SHOW_PROCESS_IMAGE_ERROR_MESSAGE = "Error opening Process Image";
     // Mapping view action message strings.
     public static final String SHOW_MAPING_VIEW_ACTION_MESSAGE = "Show Mapping View";
+
     public static final String SHOW_NODE_OVER_VIEW_ACTION_MESSAGE = "Show Node Overview";
     public static final String SHOW_MAPING_VIEW_ERROR_MESSAGE = "Error opening Mapping View";
     public static final String SHOW_NODE_OVER_VIEW_ERROR_MESSAGE = "Error opening Node Overview";
-
     // Properties actions message strings.
     public static final String PROPERTIES_ACTION_MESSAGE = "Properties";
-    public static final String PROPERTIES_ERROR_MESSAGE = "Error opening properties view";
 
+    public static final String PROPERTIES_ERROR_MESSAGE = "Error opening properties view";
     // Remove node action message string.
     public static final String DELETE_NODE_ACTION_MESSAGE = "Remove";
 
     // Sort node action message string.
     public static final String SORT_NODE_BY_ID_MESSAGE = "Sort by Id";
-    public static final String SORT_NODE_BY_STATION_TYPE_MESSAGE = "Sort by station type";
 
+    public static final String SORT_NODE_BY_STATION_TYPE_MESSAGE = "Sort by station type";
     // Refresh action message string.
     public static final String REFRESH_ACTION_MESSAGE = "Refresh (F5)";
 
@@ -847,6 +853,18 @@ public class IndustrialNetworkView extends ViewPart
 
         System.err.println("Enable..............................." + enable);
         return StringUtils.EMPTY;
+    }
+
+    /**
+     * Remove all the non digit characters from the string
+     *
+     * @param interfaceId
+     * @return Digits in the given string. Returns "0" when no digits present
+     *
+     */
+    private static int sortInterface(String interfaceId) {
+        String intrfcUniqueId = interfaceId.replaceAll("\\D", "");
+        return intrfcUniqueId.isEmpty() ? 0 : Integer.parseInt(intrfcUniqueId);
     }
 
     /**

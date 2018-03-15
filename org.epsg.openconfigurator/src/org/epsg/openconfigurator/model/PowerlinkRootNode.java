@@ -114,6 +114,7 @@ public class PowerlinkRootNode {
     private static final String INVALID_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the node {1}.";
     private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
     private Map<Short, Node> nodeCollection = new HashMap<>();
+    boolean isFileToBeRemoved = false;
     private OpenCONFIGURATORProject currentProject;
 
     @SuppressWarnings("rawtypes")
@@ -647,7 +648,22 @@ public class PowerlinkRootNode {
 
                         InterfaceList.Interface intrfce = interfaceIterator
                                 .next();
-
+                        HeadNodeInterface headNodeInterface = null;
+                        List<HeadNodeInterface> headnodeInterfaceList = processingNode
+                                .getHeadNodeInterface();
+                        /**
+                         * To identify the headnodeinterface of module to be
+                         * displayed in network view
+                         */
+                        for (HeadNodeInterface headInterface : headnodeInterfaceList) {
+                            if (intrfce.getId().equalsIgnoreCase(
+                                    headInterface.getInterfaceUId())) {
+                                headNodeInterface = headInterface;
+                            } else {
+                                System.err.println(
+                                        "Interface ID does not match.");
+                            }
+                        }
                         Iterator<InterfaceList.Interface.Module> moduleListIterator = intrfce
                                 .getModule().iterator();
                         while (moduleListIterator.hasNext()) {
@@ -671,13 +687,9 @@ public class PowerlinkRootNode {
                                     projectFile.getProject().getLocation()
                                             + File.separator
                                             + decodedModuleXdcPath);
-                            System.out.println("CN Module XDD file path:"
-                                    + cnModuleXddFile.getAbsolutePath());
-                            System.out.println("CN Module path to XDC: "
-                                    + module.getPathToXDC());
                             processingModule = new Module(this, projectFile,
                                     module, processingNode, null,
-                                    processingNode.getInterface());
+                                    headNodeInterface);
 
                             try {
 
@@ -686,9 +698,10 @@ public class PowerlinkRootNode {
 
                                 Module newModule = new Module(this, projectFile,
                                         module, processingNode, xdd,
-                                        processingNode.getInterface());
+                                        headNodeInterface);
+
                                 if (String
-                                        .valueOf(processingNode.getInterface()
+                                        .valueOf(headNodeInterface
                                                 .getModuleAddressing())
                                         .equalsIgnoreCase("manual")) {
                                     if (String
@@ -713,24 +726,20 @@ public class PowerlinkRootNode {
                                     newModule.setError(
                                             OpenConfiguratorLibraryUtils
                                                     .getErrorMessage(res));
-                                    processingNode.getInterface()
-                                            .getModuleCollection().put(
-                                                    Integer.valueOf(
-                                                            processingModule
-                                                                    .getPosition()),
-                                                    newModule);
+                                    headNodeInterface.getModuleCollection().put(
+                                            Integer.valueOf(processingModule
+                                                    .getPosition()),
+                                            newModule);
                                 }
-                                processingNode.getInterface()
-                                        .getModuleCollection()
+                                headNodeInterface.getModuleCollection()
                                         .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 newModule);
-                                processingNode.getInterface()
-                                        .getAddressCollection()
+                                headNodeInterface.getAddressCollection()
                                         .put(Integer.valueOf(
                                                 processingModule.getAddress()),
                                                 newModule);
-                                processingNode.getInterface()
+                                headNodeInterface
                                         .getModuleNameCollection().put(
                                                 String.valueOf(processingModule
                                                         .getModuleName()),
@@ -872,15 +881,13 @@ public class PowerlinkRootNode {
                                     processingModule.setError(errorMessage);
                                 }
                             }
-                            if (processingNode.getInterface() != null) {
-                                processingNode.getInterface()
-                                        .getModuleCollection()
+                            if (headNodeInterface != null) {
+                                headNodeInterface.getModuleCollection()
                                         .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 processingModule);
                                 if (processingModule.hasError()) {
-                                    processingNode.getInterface()
-                                            .getModuleNameCollection()
+                                    headNodeInterface.getModuleNameCollection()
                                             .put(String.valueOf(processingModule
                                                     .getModuleName()),
                                                     processingModule);
@@ -1127,6 +1134,20 @@ public class PowerlinkRootNode {
         if (module == null) {
             return retVal;
         }
+        isFileToBeRemoved = false;
+        String pathToXdc = module.getModulePathToXdc();
+        List<HeadNodeInterface> headNodeInterfaceList = module.getNode()
+                .getHeadNodeInterface();
+        Map<Integer, Module> moduleObj = new HashMap<>();
+        for (HeadNodeInterface headNodeInterface : headNodeInterfaceList) {
+            moduleObj = headNodeInterface.getModuleCollection();
+            for (Module mod : moduleObj.values()) {
+                if (pathToXdc.equalsIgnoreCase(mod.getModulePathToXdc())
+                        && !(mod.equals(module))) {
+                    isFileToBeRemoved = true;
+                }
+            }
+        }
 
         IProject currentProject = module.getProject();
         if (currentProject == null) {
@@ -1185,7 +1206,12 @@ public class PowerlinkRootNode {
 
                     // Delete the XDC file from the deviceConfiguration
                     // directory.
-                    Files.delete(Paths.get(module.getAbsolutePathToXdc()));
+                    if (!(isFileToBeRemoved)) {
+                        Files.delete(Paths.get(module.getAbsolutePathToXdc()));
+                    } else {
+                        System.err.println(
+                                "The XDC file to be deleted is linked with other module device of node.");
+                    }
 
                 } catch (JDOMException | IOException ex) {
                     // TODO Auto-generated catch block

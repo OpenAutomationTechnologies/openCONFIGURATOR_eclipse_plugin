@@ -90,6 +90,7 @@ import org.epsg.openconfigurator.xmlbinding.projectfile.TNetworkConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TProjectConfiguration;
 import org.epsg.openconfigurator.xmlbinding.projectfile.TRMN;
 import org.epsg.openconfigurator.xmlbinding.xdd.ISO15745Profile;
+import org.epsg.openconfigurator.xmlbinding.xdd.Interface;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlink;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.ProfileBodyCommunicationNetworkPowerlinkModularHead;
@@ -108,6 +109,7 @@ import org.epsg.openconfigurator.xmlbinding.xdd.TDataTypeList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TDynamicChannel;
 import org.epsg.openconfigurator.xmlbinding.xdd.TEnumValue;
 import org.epsg.openconfigurator.xmlbinding.xdd.TGeneralFeatures;
+import org.epsg.openconfigurator.xmlbinding.xdd.TInterfaceList;
 import org.epsg.openconfigurator.xmlbinding.xdd.TMNFeatures;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingChild;
 import org.epsg.openconfigurator.xmlbinding.xdd.TModuleAddressingHead;
@@ -992,7 +994,7 @@ public class OpenConfiguratorLibraryUtils {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
                     libApiRes = core.CreateModuleParameterObject(
                             node.getNetworkId(), node.getCnNodeIdValue(),
-                            node.getInterface().getInterfaceUId(),
+                            module.getInterfaceOfModule().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -1013,7 +1015,7 @@ public class OpenConfiguratorLibraryUtils {
                             .getUniqueIDRef();
                     libApiRes = core.CreateModuleParameterObject(
                             node.getNetworkId(), node.getCnNodeIdValue(),
-                            node.getInterface().getInterfaceUId(),
+                            module.getInterfaceOfModule().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -1038,7 +1040,7 @@ public class OpenConfiguratorLibraryUtils {
                     Parameter parameter = (Parameter) object.getUniqueIDRef();
                     libApiRes = core.CreateModuleParameterObject(
                             node.getNetworkId(), node.getCnNodeIdValue(),
-                            node.getInterface().getInterfaceUId(),
+                            module.getInterfaceOfModule().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -1058,7 +1060,7 @@ public class OpenConfiguratorLibraryUtils {
                             .getUniqueIDRef();
                     libApiRes = core.CreateModuleParameterObject(
                             node.getNetworkId(), node.getCnNodeIdValue(),
-                            node.getInterface().getInterfaceUId(),
+                            module.getInterfaceOfModule().getInterfaceUId(),
                             module.getChildID(), module.getPosition(),
                             object.getId(), objectType, object.getName(),
                             getObjectDatatype(object.getDataType()),
@@ -2893,7 +2895,7 @@ public class OpenConfiguratorLibraryUtils {
                                 .getUniqueIDRef();
                         libApiRes = core.CreateModuleParameterSubObject(
                                 node.getNetworkId(), node.getCnNodeIdValue(),
-                                node.getInterface().getInterfaceUId(),
+                                module.getInterfaceOfModule().getInterfaceUId(),
                                 module.getChildID(), module.getPosition(),
                                 object.getId(), subObject.getId(),
                                 subObjectType, subObject.getName(),
@@ -2919,7 +2921,7 @@ public class OpenConfiguratorLibraryUtils {
 
                         libApiRes = core.CreateModuleParameterSubObject(
                                 node.getNetworkId(), node.getCnNodeIdValue(),
-                                node.getInterface().getInterfaceUId(),
+                                module.getInterfaceOfModule().getInterfaceUId(),
                                 module.getChildID(), module.getPosition(),
                                 object.getId(), subObject.getId(),
                                 subObjectType, subObject.getName(),
@@ -2959,7 +2961,7 @@ public class OpenConfiguratorLibraryUtils {
                                 .getUniqueIDRef();
                         libApiRes = core.CreateModuleParameterSubObject(
                                 node.getNetworkId(), node.getCnNodeIdValue(),
-                                node.getInterface().getInterfaceUId(),
+                                module.getInterfaceOfModule().getInterfaceUId(),
                                 module.getChildID(), module.getPosition(),
                                 object.getId(), subObject.getId(),
                                 subObjectType, subObject.getName(),
@@ -2983,7 +2985,7 @@ public class OpenConfiguratorLibraryUtils {
                                 .getUniqueIDRef();
                         libApiRes = core.CreateModuleParameterSubObject(
                                 node.getNetworkId(), node.getCnNodeIdValue(),
-                                node.getInterface().getInterfaceUId(),
+                                module.getInterfaceOfModule().getInterfaceUId(),
                                 module.getChildID(), module.getPosition(),
                                 object.getId(), subObject.getId(),
                                 subObjectType, subObject.getName(),
@@ -3279,34 +3281,57 @@ public class OpenConfiguratorLibraryUtils {
             return libApiRes;
         }
 
-        HeadNodeInterface headNodeInterface = node.getInterface();
-        libApiRes = OpenConfiguratorCore.GetInstance().CreateInterface(
-                node.getNetworkId(), node.getCnNodeIdValue(),
-                headNodeInterface.getInterfaceUId(),
-                headNodeInterface.getInterfaceType(),
-                getModuleAddressing(headNodeInterface.getModuleAddressing()),
-                headNodeInterface.getMaxModules().longValue(),
-                headNodeInterface.isInterfaceUnUsedSlots(),
-                headNodeInterface.isMultipleModules());
-
-        if (!libApiRes.IsSuccessful()) {
-            return libApiRes;
-        }
-
-        List<Range> rangeList = headNodeInterface.getlistofRange();
-        for (Range range : rangeList) {
-            libApiRes = OpenConfiguratorCore.GetInstance().CreateRange(
+        List<HeadNodeInterface> headNodeInterfaceList = node
+                .getHeadNodeInterface();
+        for (HeadNodeInterface headNodeInterface : headNodeInterfaceList) {
+            libApiRes = OpenConfiguratorCore.GetInstance().CreateInterface(
                     node.getNetworkId(), node.getCnNodeIdValue(),
-                    headNodeInterface.getInterfaceUId(), range.getName(),
-                    getLong(range.getBaseIndex()), getLong(range.getMaxIndex()),
-                    getLong(range.getMaxSubIndex()),
-                    range.getSortStep().longValue(),
-                    getSortMode(range.getSortMode()),
-                    getSortNumber(range.getSortNumber()),
-                    getPdoMapping(range.getPDOmapping()));
+                    headNodeInterface.getInterfaceUId(),
+                    headNodeInterface.getInterfaceType(),
+                    getModuleAddressing(
+                            headNodeInterface.getModuleAddressing()),
+                    headNodeInterface.getMaxModules().longValue(),
+                    headNodeInterface.isInterfaceUnUsedSlots(),
+                    headNodeInterface.isMultipleModules());
 
             if (!libApiRes.IsSuccessful()) {
                 return libApiRes;
+            }
+
+            List<Interface> interfaceForRange = headNodeInterface.getNode()
+                    .getModuleManagement().getInterfacelistOfNode();
+            for (Interface intfc : interfaceForRange) {
+                if (intfc
+                        .getUniqueIDRef() instanceof TInterfaceList.Interface) {
+                    TInterfaceList.Interface interfaceObj = (TInterfaceList.Interface) intfc
+                            .getUniqueIDRef();
+                    if (interfaceObj.getUniqueID().equalsIgnoreCase(
+                            headNodeInterface.getInterfaceUId())) {
+                        headNodeInterface.setRangeList(intfc.getRangeList());
+                        List<Range> rangeList = headNodeInterface.getRangeList()
+                                .getRange();
+                        for (Range range : rangeList) {
+                            libApiRes = OpenConfiguratorCore.GetInstance()
+                                    .CreateRange(node.getNetworkId(),
+                                            node.getCnNodeIdValue(),
+                                            headNodeInterface.getInterfaceUId(),
+                                            range.getName(),
+                                            getLong(range.getBaseIndex()),
+                                            getLong(range.getMaxIndex()),
+                                            getLong(range.getMaxSubIndex()),
+                                            range.getSortStep().longValue(),
+                                            getSortMode(range.getSortMode()),
+                                            getSortNumber(
+                                                    range.getSortNumber()),
+                                            getPdoMapping(
+                                                    range.getPDOmapping()));
+
+                            if (!libApiRes.IsSuccessful()) {
+                                return libApiRes;
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -3322,31 +3347,37 @@ public class OpenConfiguratorLibraryUtils {
     }
 
     private static Result createModule(Module module) {
-        Node node = module.getNode();
+        if (module != null) {
+            Node node = module.getNode();
+            HeadNodeInterface interfaceOfModule = module.getInterfaceOfModule();
+            String interfaceId = interfaceOfModule.getInterfaceUId();
 
-        Result libApiRes = OpenConfiguratorCore.GetInstance().CreateModule(
-                node.getNetworkId(), node.getCnNodeIdValue(),
-                node.getInterface().getInterfaceUId(), module.getChildID(),
-                module.getPosition(), module.getAddress(),
-                module.getModuleType(), module.getModuleName(),
-                getModuleAddressing(module.getModuleAddressing()),
-                module.getMinPosition(), module.getMaxPosition(),
-                module.getMinAddress(), module.getMaxAddress(),
-                module.getMaxCount());
-        System.err.println("Node id.." + node.getCnNodeIdValue()
-                + " interfaceID.. " + node.getInterface().getInterfaceUId()
-                + " Module Id. . " + module.getChildID());
-        if (!libApiRes.IsSuccessful()) {
-            System.err.println("Create Module..... lib error");
+            Result libApiRes = OpenConfiguratorCore.GetInstance().CreateModule(
+                    node.getNetworkId(), node.getCnNodeIdValue(), interfaceId,
+                    module.getChildID(), module.getPosition(),
+                    module.getAddress(), module.getModuleType(),
+                    module.getModuleName(),
+                    getModuleAddressing(module.getModuleAddressing()),
+                    module.getMinPosition(), module.getMaxPosition(),
+                    module.getMinAddress(), module.getMaxAddress(),
+                    module.getMaxCount());
+            System.err.println("Node id.." + node.getCnNodeIdValue()
+                    + " interfaceID.. " + interfaceId + " Module Id. . "
+                    + module.getChildID());
+
+            if (!libApiRes.IsSuccessful()) {
+                System.err.println("Create Module..... lib error");
+                return libApiRes;
+            }
+
+            libApiRes = importXddModel(module);
+            if (!libApiRes.IsSuccessful()) {
+                return libApiRes;
+            }
+
             return libApiRes;
         }
-
-        libApiRes = importXddModel(module);
-        if (!libApiRes.IsSuccessful()) {
-            return libApiRes;
-        }
-
-        return libApiRes;
+        return null;
     }
 
     private static Result createNode(final Node node) {
@@ -3966,7 +3997,7 @@ public class OpenConfiguratorLibraryUtils {
         Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getCnNodeIdValue(),
-                        node.getInterface().getInterfaceUId(),
+                        module.getInterfaceOfModule().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), 0000, -1,
                         index, subIndex);
         if (!libApiRes.IsSuccessful()) {
@@ -3994,7 +4025,7 @@ public class OpenConfiguratorLibraryUtils {
         Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getCnNodeIdValue(),
-                        node.getInterface().getInterfaceUId(),
+                        module.getInterfaceOfModule().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id,
                         subObject.getId(), index, subIndex);
         if (!libApiRes.IsSuccessful()) {
@@ -4015,7 +4046,7 @@ public class OpenConfiguratorLibraryUtils {
         Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getCnNodeIdValue(),
-                        node.getInterface().getInterfaceUId(),
+                        module.getInterfaceOfModule().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id, -1,
                         index, subIndex);
         if (!libApiRes.IsSuccessful()) {
@@ -4045,7 +4076,7 @@ public class OpenConfiguratorLibraryUtils {
         Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getCnNodeIdValue(),
-                        node.getInterface().getInterfaceUId(),
+                        module.getInterfaceOfModule().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), id,
                         subObject.getId(), index, subIndex);
         System.out.println("Current Index....." + index[0]);
@@ -4078,7 +4109,7 @@ public class OpenConfiguratorLibraryUtils {
         Result libApiRes = OpenConfiguratorCore.GetInstance()
                 .GetModuleObjectCurrentIndex(node.getNetworkId(),
                         node.getCnNodeIdValue(),
-                        node.getInterface().getInterfaceUId(),
+                        module.getInterfaceOfModule().getInterfaceUId(),
                         module.getChildID(), module.getPosition(), 0000,
                         subObject.getId(), index, subIndex);
         System.out.println("Current Index....." + index[0]);

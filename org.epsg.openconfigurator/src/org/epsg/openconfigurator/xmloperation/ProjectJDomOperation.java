@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.xmloperation;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -418,15 +419,40 @@ public class ProjectJDomOperation {
 
     public static void deleteModule(Document document, Module module,
             boolean finalModuleCheck) {
-        System.err.println("finalModuleCheck....." + finalModuleCheck);
-        if (!finalModuleCheck) {
+        Node node = module.getNode();
+        int availableModule = 0;
+        List<HeadNodeInterface> headNodeInterfaceList = node
+                .getHeadNodeInterface();
+        for (HeadNodeInterface headNodeInterface : headNodeInterfaceList) {
+            Collection<Module> moduleCollection = headNodeInterface
+                    .getModuleCollection().values();
+            if (moduleCollection != null) {
+                for (Module mod : moduleCollection) {
+                    availableModule += 1;
+                }
+            }
+        }
+        if (availableModule == 0) {
+            /**
+             * Remove the entire interface list when the there is only one
+             * module
+             */
             JDomUtil.removeElement(document, module.getInterfaceListTagXPath(),
                     OPENCONFIGURATOR_NAMESPACE);
-            // JDomUtil.removeElement(document, module.getXpath(),
-            // OPENCONFIGURATOR_NAMESPACE);
         } else {
-            JDomUtil.removeElement(document, module.getXpath(),
-                    OPENCONFIGURATOR_NAMESPACE);
+            /**
+             * Remove the selected module from the interface list
+             */
+            if (!finalModuleCheck) {
+                JDomUtil.removeElement(document, module.getInterfaceTagXPath(),
+                        OPENCONFIGURATOR_NAMESPACE);
+            } else {
+                /**
+                 * Remove the attributes of interface from the project xml file
+                 */
+                JDomUtil.removeElement(document, module.getXpath(),
+                        OPENCONFIGURATOR_NAMESPACE);
+            }
         }
     }
 
