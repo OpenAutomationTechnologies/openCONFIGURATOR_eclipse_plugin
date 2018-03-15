@@ -113,6 +113,7 @@ public class PowerlinkRootNode {
     private static final String INVALID_NODE_XDC_ERROR = " The XDD/XDC file of node {0} is not available.";
     private static final String INVALID_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the node {1}.";
     private static final String INVALID_MODULE_FIRMWARE_FILE_ERROR = " The firmware file {0} is not available for the module {1}.";
+    public static int VALUE_ZERO = 0;
     private Map<Short, Node> nodeCollection = new HashMap<>();
     private OpenCONFIGURATORProject currentProject;
 
@@ -647,7 +648,19 @@ public class PowerlinkRootNode {
 
                         InterfaceList.Interface intrfce = interfaceIterator
                                 .next();
-
+                        HeadNodeInterface headNodeInterface = null;
+                        List<HeadNodeInterface> headnodeInterfaceList = processingNode
+                                .getHeadNodeInterface();
+                        if (headnodeInterfaceList.size() != VALUE_ZERO) {
+                            for (HeadNodeInterface headInterface : headnodeInterfaceList) {
+                                if (intrfce.getId().equalsIgnoreCase(
+                                        headInterface.getInterfaceUId())) {
+                                    headNodeInterface = headInterface;
+                                } else {
+                                    System.err.println("Module not available.");
+                                }
+                            }
+                        }
                         Iterator<InterfaceList.Interface.Module> moduleListIterator = intrfce
                                 .getModule().iterator();
                         while (moduleListIterator.hasNext()) {
@@ -671,13 +684,9 @@ public class PowerlinkRootNode {
                                     projectFile.getProject().getLocation()
                                             + File.separator
                                             + decodedModuleXdcPath);
-                            System.out.println("CN Module XDD file path:"
-                                    + cnModuleXddFile.getAbsolutePath());
-                            System.out.println("CN Module path to XDC: "
-                                    + module.getPathToXDC());
                             processingModule = new Module(this, projectFile,
                                     module, processingNode, null,
-                                    processingNode.getInterface());
+                                    headNodeInterface);
 
                             try {
 
@@ -686,9 +695,10 @@ public class PowerlinkRootNode {
 
                                 Module newModule = new Module(this, projectFile,
                                         module, processingNode, xdd,
-                                        processingNode.getInterface());
+                                        headNodeInterface);
+
                                 if (String
-                                        .valueOf(processingNode.getInterface()
+                                        .valueOf(headNodeInterface
                                                 .getModuleAddressing())
                                         .equalsIgnoreCase("manual")) {
                                     if (String
@@ -713,24 +723,20 @@ public class PowerlinkRootNode {
                                     newModule.setError(
                                             OpenConfiguratorLibraryUtils
                                                     .getErrorMessage(res));
-                                    processingNode.getInterface()
-                                            .getModuleCollection().put(
-                                                    Integer.valueOf(
-                                                            processingModule
-                                                                    .getPosition()),
-                                                    newModule);
+                                    headNodeInterface.getModuleCollection().put(
+                                            Integer.valueOf(processingModule
+                                                    .getPosition()),
+                                            newModule);
                                 }
-                                processingNode.getInterface()
-                                        .getModuleCollection()
+                                headNodeInterface.getModuleCollection()
                                         .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 newModule);
-                                processingNode.getInterface()
-                                        .getAddressCollection()
+                                headNodeInterface.getAddressCollection()
                                         .put(Integer.valueOf(
                                                 processingModule.getAddress()),
                                                 newModule);
-                                processingNode.getInterface()
+                                headNodeInterface
                                         .getModuleNameCollection().put(
                                                 String.valueOf(processingModule
                                                         .getModuleName()),
@@ -872,15 +878,13 @@ public class PowerlinkRootNode {
                                     processingModule.setError(errorMessage);
                                 }
                             }
-                            if (processingNode.getInterface() != null) {
-                                processingNode.getInterface()
-                                        .getModuleCollection()
+                            if (headNodeInterface != null) {
+                                headNodeInterface.getModuleCollection()
                                         .put(Integer.valueOf(
                                                 processingModule.getPosition()),
                                                 processingModule);
                                 if (processingModule.hasError()) {
-                                    processingNode.getInterface()
-                                            .getModuleNameCollection()
+                                    headNodeInterface.getModuleNameCollection()
                                             .put(String.valueOf(processingModule
                                                     .getModuleName()),
                                                     processingModule);
