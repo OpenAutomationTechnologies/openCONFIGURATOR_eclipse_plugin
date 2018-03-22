@@ -317,7 +317,7 @@ public class NewModuleWizard extends Wizard {
                 if (res.GetErrorType() != ErrorCode.NODE_DOES_NOT_EXIST) {
                     // Show or print error message.
                     System.err
-                            .println("ERROR occured while removin the module. "
+                            .println("ERROR occured while removing the module. "
                                     + OpenConfiguratorLibraryUtils
                                             .getErrorMessage(res));
                 }

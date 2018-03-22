@@ -674,7 +674,7 @@ public class Module {
     }
 
     /**
-     * @return The Xpath of interface list in poroject file.
+     * @return The Xpath of interface list in project file.
      */
     public String getInterfaceListTagXPath() {
         String interfaceListTagXpath = node.getXpath() + "/oc:"
@@ -697,7 +697,7 @@ public class Module {
                 + IControlledNodeProperties.INTERFACE_LIST_TAG;
         String interfaceXpath = interfaceListTagXpath + "/oc:"
                 + IControlledNodeProperties.INTERFACE_TAG + "[@id='"
-                + getInterfaceOfModule().getInterfaceUId() + "']" + "/oc:";
+                + getInterfaceOfModule().getInterfaceUId() + "']";
         return interfaceXpath;
     }
 

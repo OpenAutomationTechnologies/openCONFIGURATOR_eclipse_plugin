@@ -31,6 +31,7 @@
 
 package org.epsg.openconfigurator.xmloperation;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -75,6 +76,9 @@ public class ProjectJDomOperation {
     static final XPathExpression<Element> NETWORKCONFIGURATION_XPATH_EXPR;
 
     static final XPathExpression<Element> GENERATOR_XPATH_EXPR;
+
+    static final int VALUE_ZERO = 0;
+    static final int INCREMENT_AVAILABLE_MODULE_VALUE = 1;
 
     static {
         XPATH_FACTORY_INSTANCE = XPathFactory.instance();
@@ -418,15 +422,42 @@ public class ProjectJDomOperation {
 
     public static void deleteModule(Document document, Module module,
             boolean finalModuleCheck) {
-        System.err.println("finalModuleCheck....." + finalModuleCheck);
-        if (!finalModuleCheck) {
+        Node node = module.getNode();
+        int availableModule = VALUE_ZERO;
+        List<HeadNodeInterface> headNodeInterfaceList = node
+                .getHeadNodeInterface();
+        if (headNodeInterfaceList.size() != VALUE_ZERO) {
+            for (HeadNodeInterface headNodeInterface : headNodeInterfaceList) {
+                Collection<Module> moduleCollection = headNodeInterface
+                        .getModuleCollection().values();
+                if (moduleCollection != null) {
+                    for (Module mod : moduleCollection) {
+                        availableModule += INCREMENT_AVAILABLE_MODULE_VALUE;
+                    }
+                }
+            }
+        }
+        if (availableModule == VALUE_ZERO) {
+            /**
+             * Remove the entire interface list when the there is only one
+             * module
+             */
             JDomUtil.removeElement(document, module.getInterfaceListTagXPath(),
                     OPENCONFIGURATOR_NAMESPACE);
-            // JDomUtil.removeElement(document, module.getXpath(),
-            // OPENCONFIGURATOR_NAMESPACE);
         } else {
-            JDomUtil.removeElement(document, module.getXpath(),
-                    OPENCONFIGURATOR_NAMESPACE);
+            /**
+             * Remove the selected module from the interface list
+             */
+            if (!finalModuleCheck) {
+                JDomUtil.removeElement(document, module.getInterfaceTagXPath(),
+                        OPENCONFIGURATOR_NAMESPACE);
+            } else {
+                /**
+                 * Remove the attributes of interface from the project xml file
+                 */
+                JDomUtil.removeElement(document, module.getXpath(),
+                        OPENCONFIGURATOR_NAMESPACE);
+            }
         }
     }
 
