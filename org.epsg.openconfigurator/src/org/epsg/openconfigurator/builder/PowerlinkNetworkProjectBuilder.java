@@ -428,7 +428,9 @@ public class PowerlinkNetworkProjectBuilder extends IncrementalProjectBuilder {
                 sb.append(System.lineSeparator());
                 lineBreakCount = 0;
             } else {
-                sb.append(" "); //$NON-NLS-1$
+                if (cnt != (txtArray.length - 1)) {
+                    sb.append(" "); //$NON-NLS-1$
+                }
             }
         }
         sb.append("\n");
